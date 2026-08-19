@@ -18,7 +18,7 @@ select_embedding_dimension(
 \item{data}{A \code{\link[=FIMSFrame]{FIMSFrame()}} object.}
 
 \item{series_type}{A single string giving the \code{type} column value to filter
-on, e.g. \code{"landings"} or \code{"index"}.}
+on, e.g. \code{"catch"} or \code{"index"}.}
 
 \item{series_name}{A single string giving the \code{fleet} column value to filter
 on, e.g. \code{"fleet1"} or \code{"survey1"}.}
@@ -62,11 +62,11 @@ run before \code{\link[=create_edm_embedding]{create_edm_embedding()}} and \code
 \dontrun{
 data("data_big")
 ff  <- FIMSFrame(data_big)
-edim <- select_embedding_dimension(ff, series_type = "landings",
+edim <- select_embedding_dimension(ff, series_type = "catch",
                                     series_name = "fleet1")
 print(edim)
 optimal_E <- edim$E[edim$optimal]
-ff <- create_edm_embedding(ff, series_type = "landings",
+ff <- create_edm_embedding(ff, series_type = "catch",
                            series_name = "fleet1",
                            E = optimal_E, tau = 1L)
 }

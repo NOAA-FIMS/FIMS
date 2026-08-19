@@ -163,11 +163,11 @@ test_that("create_edm_embedding() stores uncertainty fields when uncertainty_nam
                   .data[["fleet"]] == "survey1") |>
     dplyr::arrange(.data[["timing"]])
 
-  sd_rows <- base_data |>
-    dplyr::mutate(
-      fleet = "survey1_sd",
-      value = 0.1 * .data[["value"]]
-    )
+  val_col <- if ("observed" %in% names(base_data)) "observed" else "value"
+
+  sd_rows <- base_data
+  sd_rows[["fleet"]] <- "survey1_sd"
+  sd_rows[[val_col]] <- 0.1 * sd_rows[[val_col]]
 
   extended_data <- dplyr::bind_rows(get_data(data_4_model), sd_rows)
   data_4_model2 <- FIMSFrame(extended_data)

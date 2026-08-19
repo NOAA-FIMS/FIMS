@@ -20,7 +20,7 @@ create_multivariate_edm_embedding(
 \item{series_specs}{A named list of series specifications. Each element
 must be a list with two character strings: \code{series_type} and
 \code{series_name}, e.g.
-\code{list(catch = list(series_type = "landings", series_name = "fleet1"), index = list(series_type = "index",    series_name = "survey1"))}.
+\code{list(catch = list(series_type = "catch", series_name = "fleet1"), index = list(series_type = "index",    series_name = "survey1"))}.
 All series must have the same number of observations after filtering.}
 
 \item{E}{Positive integer. Number of time lags per series.}
@@ -72,7 +72,7 @@ ff <- FIMSFrame(data_big)
 ff <- create_multivariate_edm_embedding(
   ff,
   series_specs = list(
-    catch  = list(series_type = "landings", series_name = "fleet1"),
+    catch  = list(series_type = "catch", series_name = "fleet1"),
     index  = list(series_type = "index",    series_name = "survey1")
   ),
   E = 3L, tau = 1L,

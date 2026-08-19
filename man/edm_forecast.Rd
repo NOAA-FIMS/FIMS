@@ -37,7 +37,7 @@ query state for the next step.
 \dontrun{
 data("data_big")
 ff <- FIMSFrame(data_big)
-ff <- create_edm_embedding(ff, series_type = "landings", series_name = "fleet1",
+ff <- create_edm_embedding(ff, series_type = "catch", series_name = "fleet1",
                            E = 3L, tau = 1L)
 fit <- fit_edm(ff, method = "simplex")
 forecasts <- edm_forecast(fit, ff, n_ahead = 5)

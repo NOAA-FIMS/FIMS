@@ -150,7 +150,6 @@ check_distribution_validity <- function(args) {
 #'   data_type = "index"
 #' )
 #' }
-# TODO(EDM): Map EDM prediction fields here if they use data likelihoods.
 initialize_data_distribution <- function(
   module,
   data_type = c("catch", "index", "age_comp", "length_comp"),
@@ -248,8 +247,6 @@ initialize_data_distribution <- function(
 #'   sd = list(value = 0.4, estimation_type = "constant")
 #' )
 #' }
-  # TODO(EDM): Decide whether EDM reuses gaussian/lognormal or needs a wrapper.
-  # TODO(EDM): Expose EDM predictions as module fields before linking here.
 initialize_process_distribution <- function(
   module,
   par,
