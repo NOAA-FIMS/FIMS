@@ -90,6 +90,11 @@ bool CreateTMBModel() {
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
   }
 
+#ifdef FIMS_ENABLE_NATIVE_MAP_TO
+  info0->PrepareParameterMappings();
+  info->PrepareParameterMappings();
+#endif
+
   // base model
   info0->CreateModel();
   info0->CheckModel();
@@ -246,6 +251,13 @@ void clear_internal() {
  * test_clear_with_leak_check().
  */
 void clear_impl(bool get_error_msg) {
+#ifdef FIMS_ENABLE_NATIVE_MAP_TO
+  fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance()
+      ->variable_mapped_pairs.clear();
+  fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance()
+      ->variable_mapped_pairs.clear();
+#endif
+
   // rcpp_interface_base.hpp
   FIMSRcppInterfaceBase::fims_interface_objects.clear();
 
@@ -476,4 +488,21 @@ void log_error(std::string log_entry) {
 
   fims::FIMSLog::fims_log->error_message(log_entry, -1, "R_env", ret.c_str());
 }
+
+#ifdef FIMS_ENABLE_NATIVE_MAP_TO
+/**
+ * @brief Map a target VariableVector to a source VariableVector.
+ *
+ * Both vectors must have the same length. The target is removed from the
+ * independently estimated parameters and receives the source value whenever
+ * the objective function is evaluated.
+ */
+void map_to(const uint32_t& target, const uint32_t& source) {
+  auto mapping = std::make_pair(target, source);
+  fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance()
+      ->variable_mapped_pairs.push_back(mapping);
+  fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance()
+      ->variable_mapped_pairs.push_back(mapping);
+}
+#endif
 #endif  // FIMS_INTERFACE_RCPP_INTERFACE_HPP

@@ -12,6 +12,11 @@
  *
  */
 void register_functions(Rcpp::Module &m) {
+#ifdef FIMS_ENABLE_NATIVE_MAP_TO
+  Rcpp::function(
+      "map_to", &map_to,
+      "Map a target VariableVector to a source VariableVector.");
+#endif
   Rcpp::function(
       "CreateTMBModel", &CreateTMBModel,
       "See "

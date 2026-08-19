@@ -35,6 +35,9 @@ Type objective_function<Type>::operator()() {
     for(size_t i =0; i < information->random_effects_parameters.size(); i++){
         *information->random_effects_parameters[i] = re[i];
     }
+#ifdef FIMS_ENABLE_NATIVE_MAP_TO
+    information->ApplyParameterMappings();
+#endif
     model -> of = this;
 
     Type nll = 0;

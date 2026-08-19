@@ -24,6 +24,13 @@
 # https://github.com/search?q=Rcpp%3A%3AloadModule%28+zzz.R&type=code.
 .onLoad <- function(libname, pkgname) {
   Rcpp::loadModule(module = "fims", what = TRUE)
+  # Native parameter aliasing is registered only in builds compiled with
+  # FIMS_ENABLE_NATIVE_MAP_TO. Export it dynamically when that capability is
+  # present; TMB-only builds do not contain or expose map_to().
+  ns <- asNamespace(pkgname)
+  if (exists("map_to", envir = ns, inherits = FALSE)) {
+    namespaceExport(ns, "map_to")
+  }
 }
 
 .onUnload <- function(libpath) {

@@ -50,6 +50,10 @@ class Information {
   std::vector<std::string>
       random_effects_names; /**< list of all random effects names estimated in
                                the model */
+#ifdef FIMS_ENABLE_NATIVE_MAP_TO
+  /** Pairs of target and source VariableVector IDs. */
+  std::vector<std::pair<uint32_t, uint32_t>> variable_mapped_pairs;
+#endif
 
   // data objects
   std::map<uint32_t, std::shared_ptr<fims_data_object::DataObject<Type>>>
@@ -303,6 +307,98 @@ class Information {
   void RegisterRandomEffectName(std::string re_name) {
     this->random_effects_names.push_back(re_name);
   }
+
+#ifdef FIMS_ENABLE_NATIVE_MAP_TO
+  /**
+   * @brief Validate mappings and remove mapped targets from the TMB parameter
+   * vectors.
+   */
+  void PrepareParameterMappings() {
+    for (size_t mapping_index = 0;
+         mapping_index < this->variable_mapped_pairs.size(); ++mapping_index) {
+      const auto& mapping = this->variable_mapped_pairs[mapping_index];
+      if (mapping.first == mapping.second) {
+        throw std::invalid_argument("A variable cannot be mapped to itself.");
+      }
+      for (size_t other_index = 0;
+           other_index < this->variable_mapped_pairs.size(); ++other_index) {
+        if (mapping_index == other_index) continue;
+        const auto& other = this->variable_mapped_pairs[other_index];
+        if (mapping.first == other.first) {
+          throw std::invalid_argument(
+              "A VariableVector cannot have more than one mapping source.");
+        }
+        if (mapping.second == other.first) {
+          throw std::invalid_argument(
+              "Chained parameter mappings are not currently supported.");
+        }
+      }
+      auto target = this->variable_map.find(mapping.first);
+      auto source = this->variable_map.find(mapping.second);
+      if (target == this->variable_map.end() || source == this->variable_map.end()) {
+        throw std::invalid_argument("A mapped VariableVector ID was not found.");
+      }
+      if (target->second->size() != source->second->size()) {
+        throw std::invalid_argument(
+            "Mapped VariableVectors must have the same length.");
+      }
+
+      for (size_t j = 0; j < target->second->size(); ++j) {
+        Type* target_address = &target->second->at(j);
+        Type* source_address = &source->second->at(j);
+        bool target_is_fixed =
+            std::find(this->fixed_effects_parameters.begin(),
+                      this->fixed_effects_parameters.end(), target_address) !=
+            this->fixed_effects_parameters.end();
+        bool source_is_fixed =
+            std::find(this->fixed_effects_parameters.begin(),
+                      this->fixed_effects_parameters.end(), source_address) !=
+            this->fixed_effects_parameters.end();
+        bool target_is_random =
+            std::find(this->random_effects_parameters.begin(),
+                      this->random_effects_parameters.end(), target_address) !=
+            this->random_effects_parameters.end();
+        bool source_is_random =
+            std::find(this->random_effects_parameters.begin(),
+                      this->random_effects_parameters.end(), source_address) !=
+            this->random_effects_parameters.end();
+        if ((target_is_fixed && source_is_random) ||
+            (target_is_random && source_is_fixed)) {
+          throw std::invalid_argument(
+              "Fixed effects and random effects cannot be mapped together.");
+        }
+        auto fixed = std::find(this->fixed_effects_parameters.begin(),
+                               this->fixed_effects_parameters.end(),
+                               target_address);
+        if (fixed != this->fixed_effects_parameters.end()) {
+          size_t index = std::distance(this->fixed_effects_parameters.begin(), fixed);
+          this->fixed_effects_parameters.erase(fixed);
+          this->parameter_names.erase(this->parameter_names.begin() + index);
+        }
+        auto random = std::find(this->random_effects_parameters.begin(),
+                                this->random_effects_parameters.end(),
+                                target_address);
+        if (random != this->random_effects_parameters.end()) {
+          size_t index = std::distance(this->random_effects_parameters.begin(), random);
+          this->random_effects_parameters.erase(random);
+          this->random_effects_names.erase(this->random_effects_names.begin() + index);
+        }
+      }
+    }
+    ApplyParameterMappings();
+  }
+
+  /** Copy each source vector into its mapped target vector. */
+  void ApplyParameterMappings() {
+    for (const auto& mapping : this->variable_mapped_pairs) {
+      fims::Vector<Type>* target = this->variable_map.at(mapping.first);
+      fims::Vector<Type>* source = this->variable_map.at(mapping.second);
+      for (size_t j = 0; j < target->size(); ++j) {
+        target->at(j) = source->at(j);
+      }
+    }
+  }
+#endif
 
   /**
    * @brief Loop over distributions and set links to distribution x value if
