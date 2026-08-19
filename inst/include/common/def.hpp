@@ -738,6 +738,20 @@ std::string to_string(T v) {
   return ss.str();
 }
 
+template <typename T>
+std::string to_string(const std::vector<T>& values) {
+  std::stringstream ss;
+  ss << "[";
+  for (size_t i = 0; i < values.size(); ++i) {
+    if (i > 0) {
+      ss << ", ";
+    }
+    ss << values[i];
+  }
+  ss << "]";
+  return ss.str();
+}
+
 }  // namespace fims
 
 #endif /* TRAITS_HPP */

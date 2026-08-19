@@ -433,7 +433,7 @@ run_FIMS_projection_scenario <- function(om_input,
         SSB_ratio_prior$log_sd[y]$value <- -5
       }
     }
-    SSB_ratio_prior$set_distribution_links("prior", population$spawning_biomass_ratio$get_id())
+    SSB_ratio_prior$set_distribution_links("prior", observed_id = population$spawning_biomass_ratio$get_id())
   }
   # Set up catch at age model
   caa <- methods::new(CatchAtAge)

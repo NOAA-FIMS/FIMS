@@ -147,7 +147,8 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
         }
 
         bool has_cross_year_cor = false;
-        for (const auto& path : this->paths) {
+        for (size_t path_index = 0; path_index < this->paths.size(); ++path_index) {
+            const auto& path = this->paths[path_index];
             if (path.type == 2) {
                 if (path.from <= 0 || path.to <= 0) {
                     throw std::invalid_argument(
@@ -208,7 +209,8 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
                 }
             }
 
-            for (const auto& path : this->paths) {
+            for (size_t path_index = 0; path_index < this->paths.size(); ++path_index) {
+                const auto& path = this->paths[path_index];
                 if (path.type != 1) {
                     continue;
                 }
@@ -237,7 +239,8 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
                     this->n_variables, this->n_variables);
 
             bool has_local_paths = false;
-            for (const auto& path : this->paths) {
+            for (size_t path_index = 0; path_index < this->paths.size(); ++path_index) {
+                const auto& path = this->paths[path_index];
                 if (path.type != 1) {
                     continue;
                 }
@@ -310,7 +313,8 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
         rho_triplets.reserve(this->paths.size());
         vinv_triplets.reserve(this->n_time * this->n_variables * this->n_variables);
 
-        for (const auto& path : this->paths) {
+        for (size_t path_index = 0; path_index < this->paths.size(); ++path_index) {
+            const auto& path = this->paths[path_index];
             if (path.type != 1) {
                 continue;
             }
@@ -341,7 +345,8 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
                     this->n_variables, this->n_variables);
             bool has_variance_for_block = false;
 
-            for (const auto& path : this->paths) {
+            for (size_t path_index = 0; path_index < this->paths.size(); ++path_index) {
+                const auto& path = this->paths[path_index];
                 if (path.type != 2) {
                     continue;
                 }
@@ -428,7 +433,8 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
         fims::Vector<Eigen::Triplet<Type>> rho_triplets;
         rho_triplets.reserve(this->paths.size());
 
-        for (const auto& path : this->paths) {
+        for (size_t path_index = 0; path_index < this->paths.size(); ++path_index) {
+            const auto& path = this->paths[path_index];
             if (path.type != 1) {
                 continue;
             }
@@ -461,7 +467,8 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
         Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> gamma_kk =
             Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>::Zero(n_k, n_k);
             
-        for (const auto& path : this->paths) {
+        for (size_t path_index = 0; path_index < this->paths.size(); ++path_index) {
+            const auto& path = this->paths[path_index];
             if (path.type != 2) {
                 continue;
             }

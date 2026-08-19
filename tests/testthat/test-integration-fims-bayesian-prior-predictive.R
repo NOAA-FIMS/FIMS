@@ -132,7 +132,7 @@ test_that("posterior equals prior with no data", {
   slope_prior$expected_values[2]$value <- slope_mean
   slope_prior$log_sd$resize(1)
   slope_prior$log_sd[1]$value <- log(slope_sd)
-  slope_prior$set_distribution_links("prior", c(fishing_fleet_selectivity$slope$get_id(), survey_fleet_selectivity$slope$get_id()))
+  slope_prior$set_distribution_links("prior", observed_id = c(fishing_fleet_selectivity$slope$get_id(), survey_fleet_selectivity$slope$get_id()))
 
   inflection_point_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]))
   inflection_point_sd <- 3
@@ -142,7 +142,7 @@ test_that("posterior equals prior with no data", {
   inflection_point_prior$expected_values[2]$value <- inflection_point_mean
   inflection_point_prior$log_sd$resize(1)
   inflection_point_prior$log_sd[1]$value <- log(inflection_point_sd)
-  inflection_point_prior$set_distribution_links("prior", c(fishing_fleet_selectivity$inflection_point$get_id(), survey_fleet_selectivity$inflection_point$get_id()))
+  inflection_point_prior$set_distribution_links("prior", observed_id = c(fishing_fleet_selectivity$inflection_point$get_id(), survey_fleet_selectivity$inflection_point$get_id()))
 
 
   recruitment <- methods::new(BevertonHoltRecruitment)

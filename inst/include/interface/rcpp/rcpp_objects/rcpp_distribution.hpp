@@ -29,7 +29,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The unique ID for the variable map that points to a fims::Vector.
    */
-  std::shared_ptr<DistributionKey> key_m;
+  std::shared_ptr<fims_distributions::DistributionKey> key_m;
   /**
    * @brief The type of density input. The options are prior, re, or data.
    */
@@ -78,7 +78,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The constructor.
    */
   DistributionsInterfaceBase() {
-    this->key_m = std::make_shared<DistributionKey>();
+    this->key_m = std::make_shared<fims_distributions::DistributionKey>();
     this->id_m = DistributionsInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     DistributionsInterfaceBase */
@@ -117,12 +117,16 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @param uncertainty_id Unique ID for the uncertainty object.
    */
   virtual bool set_distribution_links(std::string input_type,
-                                      uint32_t observed_id,
-                                      uint32_t expected_id,
+                                      std::vector<uint32_t> observed_id,
+                                      std::vector<uint32_t> expected_id,
                                       uint32_t uncertainty_id) {
     this->input_type_m.set(input_type);
-    this->key_m->observed_id = observed_id;
-    this->key_m->expected_id = expected_id;
+    this->key_m->observed_id.clear();
+    this->key_m->observed_id.insert(this->key_m->observed_id.end(),
+                                    observed_id.begin(), observed_id.end());
+    this->key_m->expected_id.clear();
+    this->key_m->expected_id.insert(this->key_m->expected_id.end(),
+                                    expected_id.begin(), expected_id.end());
     this->key_m->uncertainty_id = uncertainty_id;
     return true;
   }
@@ -232,6 +236,13 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id_m; }
+
+  virtual bool set_distribution_links(
+      std::string input_type, std::vector<uint32_t> observed_id,
+      std::vector<uint32_t> expected_id, uint32_t uncertainty_id) {
+    return DistributionsInterfaceBase::set_distribution_links(
+        input_type, observed_id, expected_id, uncertainty_id);
+  }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -451,9 +462,14 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->observed_data_id_m = interface_observed_data_id_m;
     std::stringstream ss;
     distribution->input_type = this->input_type_m;
-    distribution->key.resize(this->key_m->size());
-    for (size_t i = 0; i < this->key_m->size(); i++) {
-      distribution->key[i] = this->key_m->at(i);
+    distribution->key.observed_id.resize(this->key_m->observed_id.size());
+    distribution->key.expected_id.resize(this->key_m->expected_id.size());
+    distribution->key.uncertainty_id = this->key_m->uncertainty_id;
+    for (size_t i = 0; i < this->key_m->observed_id.size(); i++) {
+      distribution->key.observed_id[i] = this->key_m->observed_id[i];
+    }
+    for (size_t i = 0; i < this->key_m->expected_id.size(); i++) {
+      distribution->key.expected_id[i] = this->key_m->expected_id[i];
     }
     distribution->id = this->id_m;
     distribution->observed_values.resize(this->observed_values.size());
@@ -581,6 +597,13 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id_m; }
+
+  virtual bool set_distribution_links(
+      std::string input_type, std::vector<uint32_t> observed_id,
+      std::vector<uint32_t> expected_id, uint32_t uncertainty_id) {
+    return DistributionsInterfaceBase::set_distribution_links(
+        input_type, observed_id, expected_id, uncertainty_id);
+  }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -775,9 +798,14 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     std::stringstream ss;
     distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
-    distribution->key.resize(this->key_m->size());
-    for (size_t i = 0; i < this->key_m->size(); i++) {
-      distribution->key[i] = this->key_m->at(i);
+    distribution->key.observed_id.resize(this->key_m->observed_id.size());
+    distribution->key.expected_id.resize(this->key_m->expected_id.size());
+    distribution->key.uncertainty_id = this->key_m->uncertainty_id;
+    for (size_t i = 0; i < this->key_m->observed_id.size(); i++) {
+      distribution->key.observed_id[i] = this->key_m->observed_id[i];
+    }
+    for (size_t i = 0; i < this->key_m->expected_id.size(); i++) {
+      distribution->key.expected_id[i] = this->key_m->expected_id[i];
     }
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
@@ -890,6 +918,13 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id_m; }
+
+  virtual bool set_distribution_links(
+      std::string input_type, std::vector<uint32_t> observed_id,
+      std::vector<uint32_t> expected_id, uint32_t uncertainty_id) {
+    return DistributionsInterfaceBase::set_distribution_links(
+        input_type, observed_id, expected_id, uncertainty_id);
+  }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -1063,9 +1098,14 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     distribution->id = this->id_m;
     distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
-    distribution->key.resize(this->key_m->size());
-    for (size_t i = 0; i < this->key_m->size(); i++) {
-      distribution->key[i] = this->key_m->at(i);
+    distribution->key.observed_id.resize(this->key_m->observed_id.size());
+    distribution->key.expected_id.resize(this->key_m->expected_id.size());
+    distribution->key.uncertainty_id = this->key_m->uncertainty_id;
+    for (size_t i = 0; i < this->key_m->observed_id.size(); i++) {
+      distribution->key.observed_id[i] = this->key_m->observed_id[i];
+    }
+    for (size_t i = 0; i < this->key_m->expected_id.size(); i++) {
+      distribution->key.expected_id[i] = this->key_m->expected_id[i];
     }
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
@@ -1090,6 +1130,71 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     return true;
   }
 
+#endif
+};
+
+/**
+ * @brief The Rcpp interface for the GMRF distribution.
+ */
+class GMRFDistributionsInterface : public DistributionsInterfaceBase {
+ public:
+  static uint32_t id_g;
+  static std::map<uint32_t, std::shared_ptr<GMRFDistributionsInterface>>
+      live_objects;
+
+  SharedInt precision_builder_id_m = -999;
+  RealVector lpdf_vec;
+
+  GMRFDistributionsInterface() : DistributionsInterfaceBase() {
+    GMRFDistributionsInterface::live_objects[this->id_m] =
+        std::make_shared<GMRFDistributionsInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        GMRFDistributionsInterface::live_objects[this->id_m]);
+  }
+
+  GMRFDistributionsInterface(const GMRFDistributionsInterface& other)
+      : DistributionsInterfaceBase(other),
+        precision_builder_id_m(other.precision_builder_id_m),
+        lpdf_vec(other.lpdf_vec) {}
+
+  virtual ~GMRFDistributionsInterface() {}
+
+  virtual uint32_t get_id() { return this->id_m; }
+
+  virtual bool set_distribution_links(std::string input_type,
+                                      std::vector<uint32_t> observed_id,
+                                      std::vector<uint32_t> expected_id,
+                                      uint32_t uncertainty_id) {
+    return DistributionsInterfaceBase::set_distribution_links(
+        input_type, observed_id, expected_id, uncertainty_id);
+  }
+
+  bool set_precision_builder_id(int precision_builder_id) {
+    this->precision_builder_id_m.set(precision_builder_id);
+    return true;
+  }
+
+  virtual double evaluate() { return 0.0; }
+
+#ifdef TMB_MODEL
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims_distributions::GMRF<Type>> distribution =
+        std::make_shared<fims_distributions::GMRF<Type>>();
+    distribution->id = this->id_m;
+    distribution->input_type = this->input_type_m;
+    distribution->key = *this->key_m;
+    info->density_components[distribution->id] = distribution;
+    return true;
+  }
+
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+    return true;
+  }
 #endif
 };
 

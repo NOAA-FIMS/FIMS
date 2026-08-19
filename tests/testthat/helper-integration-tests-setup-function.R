@@ -232,12 +232,12 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   survey_fleet_index_distribution$log_sd$set_estimation_types(c("constant"))
   # Set Data using the IDs from the modules defined above
   survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
-  survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_index_expected$get_id())
+  survey_fleet_index_distribution$set_distribution_links("data", expected_id = survey_fleet$log_index_expected$get_id())
 
   # Age composition distribution
   survey_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
   survey_fleet_agecomp_distribution$set_observed_data(survey_fleet$GetObservedAgeCompDataID())
-  survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$agecomp_proportion$get_id())
+  survey_fleet_agecomp_distribution$set_distribution_links("data", expected_id = survey_fleet$agecomp_proportion$get_id())
 
   # Length composition distribution
   survey_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
@@ -352,7 +352,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   if ("recruitment" %in% names(random_effects)) {
     if (random_effects[["recruitment"]] == "log_devs") {
       recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
-      recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
+      recruitment_distribution$set_distribution_links("random_effects", observed_id = recruitment$log_devs$get_id())
     }
     if (random_effects[["recruitment"]] == "log_r") {
       recruitment_distribution$log_sd[1]$value <- log(1)

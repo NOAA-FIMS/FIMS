@@ -23,6 +23,16 @@
 
 namespace fims_distributions {
 
+/**
+ * @brief Key for linking distributions to observed, expected, and uncertainty
+ * model components.
+ */
+struct DistributionKey {
+  std::vector<uint32_t> observed_id;
+  std::vector<uint32_t> expected_id;
+  uint32_t uncertainty_id = static_cast<uint32_t>(-999);
+};
+
 /** @brief Base class for all module_name functors.
  *
  * @tparam Type The type of the module_name functor.
@@ -134,6 +144,12 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
     }
   }
 
+  inline Type& get_uncertainty(size_t i) {
+    if (this->input_type == "random_effects") {
+      return (*uncertainty)[i];
+    }
+  }
+
   /**
    * @brief Get length of the active observed input vector.
    * @return Size of the observed input under the current `input_type`.
@@ -201,12 +217,6 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    * @brief Boolean; if true, data are simulated from the distribution.
    */
   bool simulate_flag = false;
-
-  struct DistributionKey {
-    uint32_t observed_id;
-    std::vector<uint32_t> expected_id;
-    uint32_t uncertainty_id = static_cast<uint32_t>(-999);
-  };
 
   /**
    * @brief Unique ID for variable map that points to a fims::Vector.
