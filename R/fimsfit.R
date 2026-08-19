@@ -205,6 +205,130 @@ methods::setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
 methods::setGeneric("get_estimates", function(x) standardGeneric("get_estimates"))
+
+.native_observation_estimates <- function(x) {
+  model_input <- get_input(x)[["model"]]
+  native_data <- model_input[["data"]]
+  if (is.null(native_data) || nrow(native_data) == 0L) {
+    return(tibble::tibble())
+  }
+
+  report <- get_report(x)
+  fleet_ids <- model_input[["fleet_ids"]]
+  report_names <- c(
+    catch = "catch_expected", index = "index_expected",
+    age_comp = "agecomp_expected", length_comp = "lengthcomp_expected"
+  )
+
+  purrr::map_dfr(intersect(unique(native_data$type), names(report_names)), function(data_type) {
+    purrr::map_dfr(names(fleet_ids), function(fleet) {
+      rows <- dplyr::filter(
+        native_data,
+        .data$type == .env$data_type,
+        .data$fleet == .env$fleet
+      )
+      if (nrow(rows) == 0L) return(NULL)
+
+      expected <- report[[report_names[[data_type]]]][[match(fleet, names(fleet_ids))]]
+      if (length(expected) != nrow(rows)) return(NULL)
+
+      log_sd <- NA_real_
+      parameter_table <- model_input[["parameter_table"]]
+      if (!is.null(parameter_table)) {
+        sd_rows <- dplyr::filter(
+          parameter_table,
+          .data$module_name == "Data", .data$fleet == .env$fleet,
+          .data$label == "log_sd"
+        )
+        if (nrow(sd_rows) > 0L) log_sd <- sd_rows$value[[1L]]
+      }
+
+      tibble::tibble(
+        module_name = "Data", module_id = NA_integer_,
+        module_type = data_type, label = report_names[[data_type]],
+        type = "derived_quantity", type_id = NA_integer_,
+        parameter_id = NA_integer_, fleet = fleet,
+        year_i = rows$timing,
+        age_i = if ("age" %in% names(rows)) rows$age else NA_integer_,
+        length_i = if ("length" %in% names(rows)) rows$length else NA_real_,
+        input = NA_real_, estimated = NA_real_, expected = as.numeric(expected),
+        observed = rows$observed, estimation_type = NA_character_,
+        uncertainty = NA_real_, distribution = NA_character_,
+        input_type = "data", lpdf = NA_real_, likelihood = NA_real_,
+        log_sd = log_sd, log_like_cv = NA_real_, gradient = NA_real_
+      )
+    })
+  })
+}
+
+.native_derived_estimates <- function(x) {
+  sdreport <- get_sdreport(x)
+  if (length(sdreport) == 0L) return(tibble::tibble())
+  report_summary <- summary(sdreport)
+  labels <- rownames(report_summary)
+  keep <- labels != "re" & !grepl("\\.", labels)
+  if (!any(keep)) return(tibble::tibble())
+
+  tibble::tibble(
+    module_name = "Model", module_id = NA_integer_, module_type = NA_character_,
+    label = labels[keep], type = "derived_quantity", type_id = NA_integer_,
+    parameter_id = NA_integer_, fleet = NA_character_, year_i = NA_integer_,
+    age_i = NA_integer_, length_i = NA_integer_, input = NA_real_,
+    estimated = report_summary[keep, "Estimate"], expected = NA_real_,
+    observed = NA_real_, estimation_type = NA_character_,
+    uncertainty = report_summary[keep, "Std. Error"],
+    distribution = NA_character_, input_type = NA_character_, lpdf = NA_real_,
+    likelihood = NA_real_, log_sd = NA_real_, log_like_cv = NA_real_,
+    gradient = NA_real_
+  )
+}
+
+.native_nonfixed_estimates <- function(x) {
+  model_input <- get_input(x)[["model"]]
+  parameter_table <- model_input[["parameter_table"]]
+  if (is.null(parameter_table)) return(tibble::tibble())
+  rows <- dplyr::filter(
+    parameter_table,
+    !is.na(.data$estimation_type),
+    .data$estimation_type != "fixed_effects"
+  )
+  if (nrow(rows) == 0L) return(tibble::tibble())
+
+  random_summary <- if (length(get_sdreport(x)) > 0L) {
+    summary(get_sdreport(x))[rownames(summary(get_sdreport(x))) == "re", , drop = FALSE]
+  } else NULL
+  random_i <- cumsum(rows$estimation_type == "random_effects")
+  random_found <- rows$estimation_type == "random_effects" &
+    random_i <= if (is.null(random_summary)) 0L else nrow(random_summary)
+  estimate <- rows$value
+  uncertainty <- rep(NA_real_, nrow(rows))
+  estimate[random_found] <- random_summary[random_i[random_found], "Estimate"]
+  uncertainty[random_found] <- random_summary[random_i[random_found], "Std. Error"]
+
+  module_id <- rep(NA_integer_, nrow(rows))
+  fleet_rows <- rows$module_name %in% c("Fleet", "Selectivity") & !is.na(rows$fleet)
+  module_id[fleet_rows] <- unname(model_input$fleet_ids[rows$fleet[fleet_rows]])
+  module_id[rows$module_name == "Recruitment"] <- model_input$recruitment_id
+  module_id[rows$module_name == "Population"] <- model_input$population_id
+  module_id[rows$module_name == "Maturity"] <- model_input$maturity_id
+  module_id[rows$module_name == "Growth"] <- model_input$growth_id
+
+  tibble::tibble(
+    module_name = rows$module_name, module_id = module_id,
+    module_type = rows$module_type, label = rows$label, type = "parameter",
+    type_id = NA_integer_, parameter_id = seq_len(nrow(rows)) - 1L,
+    fleet = rows$fleet,
+    year_i = if ("timing" %in% names(rows)) rows$timing else NA_integer_,
+    age_i = if ("age" %in% names(rows)) rows$age else NA_integer_,
+    length_i = NA_real_, input = rows$value, estimated = estimate,
+    expected = NA_real_, observed = NA_real_,
+    estimation_type = rows$estimation_type, uncertainty = uncertainty,
+    distribution = rows$distribution, input_type = NA_character_,
+    lpdf = NA_real_, likelihood = NA_real_, log_sd = NA_real_,
+    log_like_cv = NA_real_, gradient = NA_real_
+  )
+}
+
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
 methods::setMethod(
@@ -235,8 +359,74 @@ methods::setMethod(
     parameter_names <- get_obj(x)[["par"]] |>
       names()
 
-    # Reshape the TMB output into a standardized data frame.
-    # This serves as the "expected" result to compare against.
+    # Extract the model_output, which contains the JSON-like structure.
+    model_output <- get_model_output(x)
+    if (is.list(get_input(x)[["model"]])) {
+      n_parameters <- length(parameter_names)
+      initial <- as.numeric(obj[["par"]])
+      estimated <- if (length(opt) > 0 && !is.null(opt[["par"]])) {
+        as.numeric(opt[["par"]])
+      } else {
+        initial
+      }
+      gradient <- get_gradient(x)
+      if (length(gradient) != n_parameters) {
+        gradient <- rep(NA_real_, n_parameters)
+      }
+      uncertainty <- rep(NA_real_, n_parameters)
+      if (length(sdreport) > 0) {
+        report_summary <- summary(sdreport)
+        report_names <- rownames(report_summary)
+        matched <- match(parameter_names, report_names)
+        found <- !is.na(matched)
+        uncertainty[found] <- report_summary[matched[found], "Std. Error"]
+      }
+
+      parsed_names <- strsplit(parameter_names, ".", fixed = TRUE)
+      module_name <- vapply(parsed_names, `[[`, character(1), 1L)
+      module_id <- suppressWarnings(as.integer(vapply(
+        parsed_names, `[[`, character(1), 2L
+      )))
+      label <- vapply(parsed_names, `[[`, character(1), 3L)
+      parameter_id <- suppressWarnings(as.integer(vapply(
+        parsed_names, `[[`, character(1), 4L
+      )))
+
+      parameter_output <- tibble::tibble(
+        module_name = module_name,
+        module_id = module_id,
+        module_type = NA_character_,
+        label = label,
+        type = "parameter",
+        type_id = NA_integer_,
+        parameter_id = parameter_id,
+        fleet = NA_character_,
+        year_i = NA_integer_,
+        age_i = NA_integer_,
+        length_i = NA_integer_,
+        input = initial,
+        estimated = estimated,
+        expected = NA_real_,
+        observed = NA_real_,
+        estimation_type = "fixed_effects",
+        uncertainty = uncertainty,
+        distribution = NA_character_,
+        input_type = NA_character_,
+        lpdf = NA_real_,
+        likelihood = NA_real_,
+        log_sd = NA_real_,
+        log_like_cv = NA_real_,
+        gradient = gradient
+      )
+      return(dplyr::bind_rows(
+        parameter_output,
+        .native_nonfixed_estimates(x),
+        .native_derived_estimates(x),
+        .native_observation_estimates(x)
+      ))
+    }
+
+    # Reshape legacy model output into a standardized data frame.
     tmb_output <- reshape_tmb_estimates(
       obj = obj,
       sdreport = sdreport,
@@ -245,9 +435,6 @@ methods::setMethod(
       precomputed_gradient = get_gradient(x)
     ) |>
       add_unique_id()
-
-    # Extract the model_output, which contains the JSON-like structure.
-    model_output <- get_model_output(x)
     # Reshape the output from the JSON structure into a data frame.
     json_output <- reshape_json_estimates(model_output) |>
       add_unique_id()
@@ -450,9 +637,11 @@ FIMSFit <- function(
   max_gradient <- if (length(opt) > 0) max(abs(gradient_vector)) else NA_real_
 
   # Rename parameters instead of "p"
-  parameter_names <- names(get_parameter_names(obj[["par"]]))
+  parameter_names <- native_get_parameter_names()
+  if (length(parameter_names) != length(obj[["par"]])) {
+    parameter_names <- paste0("parameter_", seq_along(obj[["par"]]))
+  }
   names(obj[["par"]]) <- parameter_names
-  random_effects_names <- names(get_random_names(obj[["env"]]$parList()[["re"]]))
 
   # Get the report
   report <- if (length(opt) == 0) {
@@ -467,7 +656,34 @@ FIMSFit <- function(
     dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
   }
 
-  model_output <- input[["model"]]$get_output()
+  model_output <- if (is.null(input[["model_output"]])) {
+    as.character(jsonlite::toJSON(
+      list(
+        name = "FIMS",
+        type = "CatchAtAge",
+        estimation_framework = "TMB",
+        id = 1L,
+        objective_function_value = if (length(opt) > 0L) {
+          opt[["objective"]]
+        } else {
+          obj[["fn"]](obj[["par"]])
+        },
+        growth = list(),
+        recruitment = list(),
+        maturity = list(),
+        selectivity = list(),
+        population_ids = unname(input[["model"]][["population_id"]]),
+        fleet_ids = unname(input[["model"]][["fleet_ids"]]),
+        populations = list(),
+        fleets = list(),
+        density_components = list(),
+        data = list()
+      ),
+      auto_unbox = TRUE
+    ))
+  } else {
+    input[["model_output"]]
+  }
 
 
   fit <- methods::new(
@@ -636,8 +852,6 @@ fit_fims <- function(input,
   cli::cli_inform(c("v" = "Finished optimization"))
 
   check_mle_convergence(input, obj, opt, maxgrad)
-
-  FIMS::set_fixed(opt[["par"]])
 
   time_sdreport <- NA
   if (get_sd) {

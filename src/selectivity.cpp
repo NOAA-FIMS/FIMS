@@ -1,5 +1,5 @@
 /**
  * \file selectivity.cpp
- * \brief Implementation of Rcpp selectivity interfaces for the FIMS framework.
+ * \brief Explicit instantiations for FIMS selectivity models.
  */
 #include "../inst/include/population_dynamics/selectivity/selectivity.hpp"

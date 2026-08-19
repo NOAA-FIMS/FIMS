@@ -81,4 +81,34 @@ namespace
     EXPECT_EQ(selectivity1->inflection_point[0], 20.5);
     EXPECT_EQ(selectivity1->slope[0], 0.13);
   }
+
+  // Native priors already contain direct parameter-vector links. SetupPriors
+  // must preserve those links instead of replacing them with an empty key map.
+  TEST(Information_SetupPriors, PreservesNativeDirectLinks)
+  {
+    std::shared_ptr<fims_info::Information<double> > info =
+      fims_info::Information<double>::GetInstance();
+    info->Clear();
+
+    fims::Vector<double> parameter(2);
+    parameter[0] = 1.0;
+    parameter[1] = 2.0;
+    std::shared_ptr<fims_distributions::NormalLPDF<double> > prior =
+      std::make_shared<fims_distributions::NormalLPDF<double> >();
+    prior->input_type = "prior";
+    prior->priors[0] = &parameter;
+    prior->expected_values.resize(2);
+    prior->expected_mean.resize(1);
+    prior->expected_mean[0] = 0.0;
+    prior->use_mean = "yes";
+    prior->log_sd.resize(1);
+    prior->log_sd[0] = 0.0;
+    info->density_components[prior->id] = prior;
+
+    info->SetupPriors();
+
+    ASSERT_EQ(prior->priors.size(), 1u);
+    EXPECT_EQ(prior->priors[0], &parameter);
+    EXPECT_EQ(prior->get_observed(1), 2.0);
+  }
 }

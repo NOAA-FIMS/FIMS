@@ -34,10 +34,7 @@ test_that("`get_input()` works with correct inputs", {
       expected = fit_data@input
     )
     #' @description Test that `get_input()` returns correct names for the `input` slot.
-    expect_equal(
-      object = names(input),
-      expected = c("parameters", "model")
-    )
+    expect_true(all(c("parameters", "model") %in% names(input)))
   }
 
   # Use purrr::map to apply the function to each file

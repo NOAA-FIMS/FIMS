@@ -199,7 +199,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // Transformation Section
       for (size_t age = 0; age < population->n_ages; age++) {
         for (size_t year = 0; year < population->n_years; year++) {
-          size_t i_age_year = age * population->n_years + year;
+          size_t i_age_year = year * population->n_ages + age;
           population->M[i_age_year] =
               fims_math::exp(population->log_M[i_age_year]);
         }

@@ -1,11 +1,11 @@
 // RTMB configuration to include by TMB.h
 
-// Prevent Rcpp from masking valid uses of Rf_error
-#undef  RCPP_NO_MASK_RF_ERROR
-#define RCPP_NO_MASK_RF_ERROR
-#include <Rcpp.h>
-// Any failed internal assertion sends Rcpp::exception
-#define TMB_ABORT Rcpp::stop("TMB unexpected")
+#ifndef R_NO_REMAP
+#define R_NO_REMAP
+#endif
+#include <Rinternals.h>
+// Any failed internal assertion raises an R error.
+#define TMB_ABORT Rf_error("TMB unexpected")
 // Catch *all* std exceptions (not just bad_alloc)
 #define TMB_CATCH catch(std::exception& excpt)
 // Do not include TMB's thread-safe workarounds

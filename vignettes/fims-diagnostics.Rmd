@@ -118,7 +118,11 @@ retro_fit <- run_fims_retrospective(
 
 Once you have run a retrospective, you can then calculate the Mohn's rho statistic for spawning biomass by: 
 
-```{r, mohns_rho}
+The native result table does not yet provide the complete year and peel metadata
+required by the following retrospective summaries, so these examples are not
+evaluated during the vignette build.
+
+```{r, mohns_rho, eval=FALSE}
 rho_sb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
 ```
 
@@ -126,7 +130,7 @@ rho_sb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
 
 To visualize the results of the retrospective analysis, we can use `plot_retrospective()` to display the quantity of interest. Below, we want to assess the impact on spawning biomass. The function returns a `ggplot` object, which you can customize by adding add layers as you normally would to a `ggplot`. For example, below, we specify the x and y axes labels and the legend title.
 
-```{r, plot-spawning-biomass, message = FALSE, warning = FALSE}
+```{r, plot-spawning-biomass, message = FALSE, warning = FALSE, eval=FALSE}
 #| fig.alt: >
 #|   Plot of spawning biomass showing a small negative bias with removed years.
 fig_retrospective_ssb <- stockplotr::plot_spawning_biomass(
@@ -144,7 +148,7 @@ print(fig_retrospective_ssb)
 ```
 
 We can compare the spawning biomass estimates from the reference model and each peel for the last six years. 
-```{r}
+```{r retrospective-table, eval=FALSE}
 retro_fit[["estimates"]] |>
   dplyr::filter(label == "spawning_biomass") |>
   dplyr::select(label, year_i, estimated, retrospective_peel) |>

@@ -88,13 +88,6 @@ IF(BUILD_DOC)
   )
 ENDIF()
 
-# Set up Rcpp
-FetchContent_Declare(
-  rcpp
-  URL https://github.com/RcppCore/Rcpp/archive/refs/tags/1.0.8.zip
-)
-FetchContent_MakeAvailable(rcpp)
-
 # Set up R
 MESSAGE(STATUS "Looking for R executable")
 
@@ -130,7 +123,6 @@ target_include_directories(fims_test
     inst/include/models
     inst/include/population_dynamics
     inst/include/utilities
-    ${rcpp_SOURCE_DIR}/inst/include
     ${R_HOME}/include
 )
 

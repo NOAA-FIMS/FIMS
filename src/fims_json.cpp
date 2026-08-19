@@ -5,9 +5,6 @@
  */
 
 #include "../inst/include/utilities/fims_json.hpp"
-#ifdef TMB_MODEL
-#include <Rcpp.h>
-#endif
 
 namespace fims {
 
@@ -223,13 +220,8 @@ JsonValue JsonParser::ParseArray() {
 void JsonParser::WriteToFile(const std::string& filename, JsonValue jsonValue) {
   std::ofstream outputFile(filename);
   if (!outputFile) {
-#ifdef TMB_MODEL
-    Rcpp::Rcerr << "Error: Unable to open file " << filename << " for writing."
-                << std::endl;
-#else
     std::cerr << "Error: Unable to open file " << filename << " for writing."
               << std::endl;
-#endif
     return;
   }
 
@@ -293,13 +285,8 @@ void JsonParser::WriteJsonValue(std::ofstream& outputFile,
  * @param jsonValue The JSON value to display.
  */
 void JsonParser::Show(JsonValue jsonValue) {
-#ifdef TMB_MODEL
-  this->PrintJsonValue(Rcpp::Rcout, jsonValue);
-  Rcpp::Rcout << std::endl;
-#else
   this->PrintJsonValue(std::cout, jsonValue);
   std::cout << std::endl;
-#endif
 }
 
 /**

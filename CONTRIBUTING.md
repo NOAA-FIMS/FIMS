@@ -35,18 +35,17 @@ Note that the examples below are for adding a new module to the population dynam
 - [ ] Add the implementation to the module umbrella header in `inst/include/population_dynamics/[category]/[category].hpp`.
 - [ ] Add Doxygen comments while you build the module, not afterward.
 
-**Rcpp interface and TMB integration**
+**Native interface and TMB integration**
 
-- [ ] Add or update the interface class in `inst/include/interface/rcpp/rcpp_objects/rcpp_[category].hpp`.
-- [ ] Use `ParameterVector` in the Rcpp interface and `fims::Vector<Type>` in the C++ functor.
-- [ ] Register the object in both the module-specific `live_objects` map and `FIMSRcppInterfaceBase::fims_interface_objects`.
-- [ ] In `add_to_fims_tmb_internal()`, copy parameter values, register fixed/random effects, and add the `info->variable_map[...]` entry.
-- [ ] Implement or update `finalize()` so optimized values are copied back to the R-facing object.
+- [ ] Add or update the registry in `inst/include/interface/call/[category]_registry.hpp`.
+- [ ] Declare native entry points in `inst/include/interface/call/[category].hpp` and implement them in `src/call_[category].cpp`.
+- [ ] Validate and convert every `SEXP` argument before updating the registered C++ object.
+- [ ] Register each routine and its argument count in `inst/include/interface/TMB/init_tmb.hpp`.
+- [ ] Link the object and register its fixed or random parameters during native model assembly.
 
 **R exposure and initialization**
 
-- [ ] Register the class in `src/fims_modules.hpp`.
-- [ ] Export the class in `R/FIMS-package.R` and run `devtools::document()`.
+- [ ] Add or update the `.Call` wrapper in `R/[category]_call.R` and run `devtools::document()`.
 - [ ] Update `R/create_default_configurations.R` if the new module type should appear in the default configuration workflow.
 - [ ] Update `R/setup_default_parameters.R` so default values and estimation types are generated correctly.
 - [ ] Update `R/initialize_modules.R` and `initialize_fims()` if the module needs explicit initialization or linking behavior.
@@ -54,7 +53,7 @@ Note that the examples below are for adding a new module to the population dynam
 **Testing**
 
 - [ ] Add or update C++ gtests to validate the underlying math and logic.
-- [ ] Add or update testthat tests to validate the Rcpp interface, object wiring, and user-facing behavior.
+- [ ] Add or update testthat tests to validate the native interface, object wiring, and user-facing behavior.
 - [ ] Include checks for parameter setup/resizing, at least one known-value result, edge cases where relevant, and basic object lifecycle behavior such as IDs and repeated instantiation.
 
 **Validation and follow-up**

@@ -245,13 +245,16 @@ parameters_projection <- setup_default_parameters(data = data_4_projections) |>
 
 Reference-point targets are currently achieved by specifying a prior on `spawning_biomass_ratio`, a derived population quantity, in the final year/s of the projection period. Additionally, a prior can be specified on `log_f_multiplier`, which is a simple annual multiplier of fishing mortality, i.e., `F_mort` that allows the total fishing mortality for the population to be adjusted while keeping relative fleet effort constant by fixing `log_Fmort`. This approach allows the annual `log_f_multiplier` to be estimated while ensuring that total fishing mortality is held constant during the projection period and achieves the spawning biomass target.
   
-The wrapper functions used in this vignette are not yet capable of setting up priors so the full projection approach is not included here. This is a high-priority development goal that is in progress. Examples of setting up constraints on `log_f_multiplier` and a prior on `spawning_biomass_ratio` can be found in the test-projections-looped.R test files used to verify this approach.  
+The native initializer does not yet expose the prior and projection links needed
+to fit this example. The setup below is retained as the intended user workflow,
+but model fitting and plotting are not evaluated until those native entry points
+are available.
 
 ### Model fit
 
 Regardless if there are projections or not, the model is fit using the `FIMS::fit_fims()`, which facilitates that the model output will be in the same format that users are used to.
 
-```{r projection-fit}
+```{r projection-fit, eval=FALSE}
 projection_fit <- parameters_projection |>
   initialize_fims(data = data_4_projections) |>
   fit_fims(optimize = TRUE)
@@ -263,7 +266,7 @@ clear()
 
 We use {stockplotr} to plot the model results. In the code below, we pass a single model to `stockplotr::plot_biomass()` but the list can contain multiple models, where the start and end year of each model that is included need not align. Thus, if we had fit the model without projections we could have plotted that here as well for comparison.
 
-```{r fit-plot-projections}
+```{r fit-plot-projections, eval=FALSE}
 #| fig.alt: >
 #|   Plot of spawning biomass for projection model.
 stockplotr::plot_biomass(

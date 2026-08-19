@@ -314,6 +314,12 @@ class Information {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
       if (d->input_type == "prior") {
+        // Native priors are linked directly to their parameter vectors. The
+        // legacy interface instead supplied variable-map keys that must be
+        // resolved here.
+        if (d->key.empty() && !d->priors.empty() && d->priors[0] != NULL) {
+          continue;
+        }
         FIMS_INFO_LOG("Setup prior for distribution " + fims::to_string(d->id));
         variable_map_iterator vmit;
         FIMS_INFO_LOG("Link prior from distribution " + fims::to_string(d->id) +
@@ -342,6 +348,13 @@ class Information {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
       if (d->input_type == "random_effects") {
+        // Native .Call components may be linked directly before final model
+        // assembly. Preserve those links when no variable-map key was
+        // supplied.
+        if (d->key.empty() && d->re != nullptr &&
+            d->re_expected_values != nullptr) {
+          continue;
+        }
         FIMS_INFO_LOG("Setup random effects for distribution " +
                       fims::to_string(d->id));
         variable_map_iterator vmit;
@@ -373,6 +386,11 @@ class Information {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
       if (d->input_type == "data") {
+        // Native .Call likelihoods can carry a direct pointer to the model's
+        // derived quantity. Other components may provide a variable-map key.
+        if (d->key.empty() && d->data_expected_values != nullptr) {
+          continue;
+        }
         FIMS_INFO_LOG("Setup expected value for data distribution " +
                       fims::to_string(d->id));
         variable_map_iterator vmit;
@@ -624,10 +642,7 @@ class Information {
     if (p->growth_id != static_cast<Type>(-999)) {
       uint32_t growth_uint = static_cast<uint32_t>(p->growth_id);
       growth_models_iterator it = this->growth_models.find(
-          growth_uint);  // growth_models is specified in information.hpp
-      // and used in rcpp
-      // at the head of information.hpp; are the
-      // dimensions of ages defined in rcpp or where?
+          growth_uint);
       if (it != this->growth_models.end()) {
         p->growth =
             (*it).second;  // growth defined in population.hpp (the object
@@ -662,8 +677,7 @@ class Information {
     if (p->maturity_id != static_cast<Type>(-999)) {
       uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
       maturity_models_iterator it = this->maturity_models.find(
-          maturity_uint);  // >maturity_models is specified in
-      // information.hpp and used in rcpp
+          maturity_uint);
       if (it != this->maturity_models.end()) {
         p->maturity = (*it).second;  // >maturity defined in population.hpp
         FIMS_INFO_LOG("Maturity model " + fims::to_string(maturity_uint) +

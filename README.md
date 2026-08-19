@@ -7,7 +7,7 @@
 
 # Overview
 
-FIMS is an R package for fitting integrated statistical population-dynamics models to fishery data. The back end is written in C++, and the use of Rcpp allows users to easily interact with the models using R. The package is unique because it includes multiple model types, e.g., surplus production and catch-at-age models. This reduces the burden of learning a new framework when exploring major changes in model structure. Stay tuned for the addition of even more model types.
+FIMS is an R package for fitting integrated statistical population-dynamics models to fishery data. The back end is written in C++ and exposed to users through a registered native R interface. The package is unique because it includes multiple model types, e.g., surplus production and catch-at-age models. This reduces the burden of learning a new framework when exploring major changes in model structure. Stay tuned for the addition of even more model types.
 
 If you are new to FIMS, the best place to start is the <a href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html" target="_blank">"Introducing FIMS"</a> vignette.
 

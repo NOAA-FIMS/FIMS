@@ -159,7 +159,7 @@ struct LogEntry {
   /**
    * @brief The full file path of the file that triggered the log entry.
    * @details Example:
-   * "C:/github/NOAA-FIMS/FIMS/inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp".
+   * "C:/github/NOAA-FIMS/FIMS/inst/include/interface/call/selectivity.hpp".
    */
   std::string file;
   /**

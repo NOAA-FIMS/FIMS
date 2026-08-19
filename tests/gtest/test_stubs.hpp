@@ -2,7 +2,7 @@
 #define FIMS_TEST_STUBS_HPP
 /**
  * \file test_stubs.hpp
- * \brief Stubs for testing Rcpp interfaces in the FIMS framework.
+ * \brief Standalone definitions needed by native FIMS GoogleTests.
  */
 #include "def.hpp"
 #include "fims_json.hpp"

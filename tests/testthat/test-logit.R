@@ -32,7 +32,7 @@ test_that("`logit()` works with correct inputs", {
 
 ## Edge handling ----
 test_that("`logit()` returns correct outputs for edge cases", {
-  #' @description Test that `logit(0, 1L, 0.5)` returns 0 even if an integer is passed to the maximum value, i.e., `b` parameter, because the logit function in the C++ code is typed and the Rcpp interface only exports the double version of the function but users might pass integers.
+  #' @description Test that `logit(0, 1L, 0.5)` returns 0 even if an integer is passed to the maximum value, i.e., `b` parameter, because the C++ function is typed but users might pass integers.
   expect_equal(
     object = logit(0, 1L, 0.5),
     expected = 0
@@ -83,7 +83,7 @@ test_that("`inv_logit()` works with correct inputs", {
 
 ## Edge handling ----
 test_that("`inv_logit()` returns correct outputs for edge cases", {
-  #' @description Test that `inv_logit(0, 1L, 0.0)` returns 0.5 even if an integer is passed to the maximum value, i.e., `b` parameter, because the inv_logit function in the C++ code is typed and the Rcpp interface only exports the double version of the function but users might pass integers.
+  #' @description Test that `inv_logit(0, 1L, 0.0)` returns 0.5 even if an integer is passed to the maximum value, i.e., `b` parameter, because the C++ function is typed but users might pass integers.
   expect_equal(
     object = inv_logit(0, 1L, 0.0),
     expected = 0.5

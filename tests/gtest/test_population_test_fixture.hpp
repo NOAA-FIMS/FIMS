@@ -70,8 +70,8 @@ class CAAInitializeTestFixture : public testing::Test {
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
 
-      // TODO: numbers_at_age are resized in rcpp_population, should this be
-      // removed? Removed number_at_age from rcpp_population instead because
+      // TODO: numbers_at_age are resized during population setup; should this be
+      // removed? It remains here because
       // they are no longer a part of population.
       derived_quantities["numbers_at_age"] = fims::Vector<double>(
           (this->catch_at_age_model->populations[p]->n_years + 1) *
@@ -402,7 +402,7 @@ class CAAEvaluateTestFixture : public testing::Test {
   void InitializeCAA() {
     typedef fims_popdy::CatchAtAge<double>::fleet_iterator fleet_iterator;
 
-    //       // The following are initialized in the rcpp interface: ages,
+    //       // The following are initialized by the R interface: ages,
     //       log_init_naa,
     //       //   numbers_at_age, log_Fmort, log_q
     for (size_t p = 0; p < this->catch_at_age_model->populations.size(); p++) {
@@ -430,7 +430,7 @@ class CAAEvaluateTestFixture : public testing::Test {
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
 
-      // TODO: numbers_at_age are resized in rcpp_population, should this be
+      // TODO: numbers_at_age are resized during population setup; should this be
       // removed?
       derived_quantities["numbers_at_age"] = fims::Vector<double>(
           (this->catch_at_age_model->populations[p]->n_years + 1) *
@@ -697,7 +697,7 @@ class CAAPrepareTestFixture : public testing::Test {
   void InitializeCAA() {
     typedef fims_popdy::CatchAtAge<double>::fleet_iterator fleet_iterator;
 
-    //       // The following are initialized in the rcpp interface: ages,
+    //       // The following are initialized by the R interface: ages,
     //       log_init_naa,
     //       //   numbers_at_age, log_Fmort, log_q
     for (size_t p = 0; p < this->catch_at_age_model->populations.size(); p++) {
@@ -725,7 +725,7 @@ class CAAPrepareTestFixture : public testing::Test {
           this->catch_at_age_model->populations[p]->n_years *
           this->catch_at_age_model->populations[p]->n_ages);
 
-      // TODO: numbers_at_age are resized in rcpp_population, should this be
+      // TODO: numbers_at_age are resized during population setup; should this be
       // removed?
       derived_quantities["numbers_at_age"] = fims::Vector<double>(
           (this->catch_at_age_model->populations[p]->n_years + 1) *

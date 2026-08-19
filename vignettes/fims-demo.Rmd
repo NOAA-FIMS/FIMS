@@ -24,7 +24,7 @@ The NOAA Fisheries Integrated Modeling System (FIMS) is a new modeling framework
 
 ### Loading the package
 
-Calling `library(FIMS)` loads the R package, Rcpp functions, and Rcpp modules into the R environment.
+Calling `library(FIMS)` loads the R package and its registered native interface into the R environment.
 ```{r library, warning=FALSE, message=FALSE}
 library(FIMS)
 library(ggplot2)
@@ -33,13 +33,13 @@ library(stockplotr)
 
 ### Getting help
 
-In addition to using the traditional method of getting help within R for functions, i.e., `?FIMS::fit_fims`, you can use `methods::show()` to access help information for the C++ functions that are exported via {Rcpp}. You will either be provided with a short description of the function or a link to the doxygen documentation for the C++ code that will provide information about the function.
+Use the traditional R help system, for example `?FIMS::fit_fims`, for user-facing functions. C++ implementation details are available in the generated Doxygen documentation.
 
 For example, `CreateTMBModel` is a C++ function that returns a boolean.
 ```r
 methods::show(FIMS::CreateTMBModel)
 internal C++ function <0000014f7bd8ff00>
-    docstring : See the documentation for the Rcpp interface, https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.
+    docstring : See the native-interface documentation in the package source and generated Doxygen reference.
     signature : bool CreateTMBModel()
 ```
 

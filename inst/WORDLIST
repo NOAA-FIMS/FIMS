@@ -172,8 +172,6 @@ rcmdcheckgooglebenchmarkfixture
 rcmdcheckgooglebenchmarknameformat
 rcmdcheckgooglebenchmarksimple
 Rcout
-Rcpp
-rcppchunk
 rdname
 rdrr
 Rdynload

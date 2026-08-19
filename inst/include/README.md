@@ -22,17 +22,22 @@ This directory contains a single header file, `distributions.hpp`, that links to
 
 ### inst/include/interface/
 
-This directory contains the Rcpp interface files for the FIMS C++ code. The interface files are responsible for exposing the C++ functionality to R, allowing users to call C++ functions and access C++ classes directly from R. R, while flexible and expressive, can be slow for computationally intensive tasks and lacks direct support for low-level operations. Directly calling C++ from R is non-trivial due to mismatches in data types, memory handling, and function calling conventions. Rcpp addresses these mismatches by providing an abstraction layer that simplifies the interface process, allowing C++ code to be written in a way that's naturally accessible from R. The interface files typically include function definitions, class declarations, and other necessary components to facilitate communication between R and C++. By using the Rcpp package, we can leverage the performance benefits of C++ while still providing a user-friendly interface for R users.
-
-Typically, Rcpp exposes C++ functions to R using `Rcpp::export` placed before the C++ function code. This enables automatic wrapper generation and type conversion. Unfortunately, we cannot use this functionality within a TMB model, and thus, the code here may be slightly more complicated than a typical Rcpp interface. Classes are made available via `RCPP_MODULE`. `RCPP_MODULE` provides a declarative mechanism to register C++ classes and their members (constructors, methods, fields) so they can be accessed from R via Rcpp modules where class constructors and methods are explicitly bound for R access. For templates, direct export isn't supported, but individual instantiations can be wrapped in type-specific functions.
+This directory contains the native R interface and TMB integration. Files under
+`interface/call` declare registered `.Call` entry points and the registries that
+own C++ model components. Implementations live in `src/call_*.cpp`; R wrappers
+live in `R/*_call.R`. Inputs cross the boundary as `SEXP` values and must be
+validated and converted before they are used by the model.
 
 #### inst/include/interface/interface.hpp
 
-The `interface/interface.hpp` is the only file in the interface directory and it contains the main interface definitions. The file acts as a wrapper that allows R to call C++ functions and access C++ classes seamlessly. Each of the header files within `rcpp_objects` must be listed in `interface/interface.hpp`.
+The `interface/interface.hpp` header contains common definitions used to build
+the model with or without TMB.
 
-#### inst/include/interface/rcpp
+#### inst/include/interface/call
 
-This directory contains the Rcpp module registration layer for FIMS. The files in this directory and its `rcpp_objects` subdirectory define the C++ wrappers, class bindings, helper functions, and registration declarations that expose FIMS C++ objects to R; they live under `inst/include` so the declarations are available both to the package source files in `src/` and to other headers that need to reference the R-facing interface.
+This directory contains native routine declarations, R conversion helpers, and
+object registries. Native routines are registered in `TMB/init_tmb.hpp`; dynamic
+symbol lookup is disabled.
 
 #### inst/include/interface/TMB
 
@@ -40,7 +45,10 @@ This directory contains the TMB integration headers used when FIMS is compiled w
 
 The `TMB.h` file is the main wrapper around TMB's core headers. It supports both TMB library precompilation and normal FIMS source compilation by controlling macros such as `WITH_LIBTMB`, `TMB_PRECOMPILE`, `CSKIP`, `IF_TMB_PRECOMPILE`, and `TMB_EXTERN`; this prevents conflicts between TMB's build mode and the code compiled as part of FIMS. This file was copied from the RTMB package, thanks to guidance from Kasper Kristensen.
 
-The `config.h` file provides the TMB/RTMB configuration used by FIMS. It enables Rcpp-compatible exception handling for TMB failures, turns on `TMB_SAFEBOUNDS`, selects the `TMBAD_FRAMEWORK`, uses a 64-bit index type (`uint64_t`), and configures thread-safe R support when OpenMP is available.
+The `config.h` file provides the TMB/RTMB configuration used by FIMS. It maps
+TMB failures to R errors, turns on `TMB_SAFEBOUNDS`, selects the
+`TMBAD_FRAMEWORK`, uses a 64-bit index type (`uint64_t`), and configures
+thread-safe R support when OpenMP is available.
 
 The `init_tmb.hpp` file handles run-time initialization and registration for the compiled shared object. It provides the `R_init_FIMS` registration callback, supports optional initialization through `FIMS_ONLOAD_INIT_TMB`, and registers TMB C-callables when `TMB_CCALLABLES` is available.
 

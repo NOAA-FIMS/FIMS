@@ -108,8 +108,8 @@ Models with Data. Princeton University Press.
 }
 
 Other diagnostic_functions:
-\code{\link[=run_fims_likelihood]{run_fims_likelihood()}},
-\code{\link[=run_fims_retrospective]{run_fims_retrospective()}}
+\code{\link{run_fims_likelihood}()},
+\code{\link{run_fims_retrospective}()}
 }
 \concept{diagnostic_functions}
 \concept{plotting_functions}
