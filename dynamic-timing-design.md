@@ -3,13 +3,13 @@
 ## Status
 
 - **Document type:** Technical design proposal
-- **Initial scope:** Irregularly timed survey and index observations
+- **Initial scope:** Irregularly timed fishery-fleet and survey observations
 - **Long-term scope:** Continuous processes, discrete biological events, and observations at arbitrary times
 - **Implementation strategy:** Deliver a narrow observation-timing feature first while preserving a path to a sparse event-based engine
 
 ## 1. Summary
 
-FIMS currently stores population numbers at annual boundaries and evaluates catches, indices, and biological quantities from those annual states. Consequently, an index observation is effectively assumed to occur at the start of its model year.
+FIMS currently stores population numbers at annual boundaries and evaluates fishery catches, fishery-dependent indices, survey indices, compositions, and biological quantities from those annual states. Consequently, point observations are effectively assumed to occur at the start of their model year, while catch observations are effectively assumed to cover the entire year.
 
 This design adds exact within-year timing without introducing monthly or seasonal population arrays. The annual population state remains canonical. When an observation occurs within a year, FIMS analytically propagates the annual state to the observation time using the mortality applicable during that year:
 
@@ -17,22 +17,23 @@ This design adds exact within-year timing without introducing monthly or seasona
 N_{a,y}(t) = N_{a,y}(0)\exp(-Z_{a,y}t), \qquad 0 \leq t \leq 1.
 \]
 
-Observation schedules are sparse and attached to observation streams. A schedule identifies the model year and within-year fraction of each observation. This supports:
+Observation schedules are sparse and attached to fishery-fleet and survey data streams. A point schedule identifies the model year and within-year fraction of an observation. An interval schedule additionally identifies its start and end. This supports:
 
-- different starting years for fleets and surveys;
-- different observation dates among surveys;
+- different starting years for fishing fleets and surveys;
+- different observation dates among fishing fleets and surveys;
 - dates that vary by year;
 - missing observation years;
 - multiple observations within a year; and
-- multiple data types collected on the same survey occasion.
+- multiple data types collected on the same sampling occasion; and
+- catch observations covering a full year or a defined within-year interval.
 
-The first implementation changes only observation predictions. Fishing mortality remains an annual continuous process, recruitment and aging remain annual boundary operations, and annual population storage remains unchanged.
+The first implementation changes fishery-fleet and survey observation predictions. Fishing mortality remains an annual continuous process unless a later phase explicitly adds process windows; recruitment and aging remain annual boundary operations, and annual population storage remains unchanged. An observation's time support does not, by itself, change when fishing mortality acts.
 
 ## 2. Goals
 
 The design must:
 
-1. Represent observation time independently of the model's annual storage layout.
+1. Represent fishery-fleet and survey observation time independently of the model's annual storage layout.
 2. Support sparse, irregular schedules and different start dates.
 3. Preserve the current annual population dynamics when timing is not supplied or is zero.
 4. Avoid year-by-season-by-age or year-by-day-by-age state arrays.
@@ -48,7 +49,7 @@ The initial implementation will not provide:
 - seasonal population states;
 - arbitrary calendar libraries in the C++ population engine;
 - within-year changes in mortality rates;
-- instantaneous catches or removals;
+- instantaneous catches or removals as state-changing events;
 - timed or multiple recruitment pulses;
 - alternative aging dates;
 - numerical ODE integration;
@@ -80,19 +81,23 @@ The initial implementation treats annual rates as constant over this interval.
 
 ### 4.4 Observation stream
 
-An observation stream is one time series of a particular data type, such as an abundance index, age composition, or length composition.
+An observation stream is one time series of a particular data type, such as fishery catch, fishery-dependent index, survey index, age composition, or length composition.
 
 ### 4.5 Observation occasion
 
-An observation occasion is a unique sampling time. Multiple streams may refer to the same occasion when, for example, an index and an age composition were collected during the same survey.
+An observation occasion is a unique point sampling time. Multiple streams may refer to the same occasion when, for example, an index and an age composition were collected during the same survey or fishery sampling operation.
 
-### 4.6 Process schedule
+### 4.6 Observation interval
+
+An observation interval is the time support over which an accumulated quantity was measured. Catch is the primary example. An annual catch record usually covers `[0, 1]`; a catch record for part of a year may cover a smaller interval. An interval is not necessarily the period during which the underlying fishing process was active.
+
+### 4.7 Process schedule
 
 A process schedule describes when a state-changing or continuously acting process applies. Fishing mortality schedules are process schedules.
 
-### 4.7 Observation schedule
+### 4.8 Observation schedule
 
-An observation schedule describes when state is inspected to calculate predictions. It does not alter population state.
+An observation schedule describes either when state is inspected or the interval over which an observed quantity is accumulated. It does not alter population state.
 
 Process schedules and observation schedules must remain distinct.
 
@@ -122,13 +127,28 @@ I_{f,a,y,t} = q_{f,y}S_{f,a,y}N_{a,y}\exp(-Z_{a,y}t).
 
 Index weight at age, total index, age composition, and length composition must all be derived from the same timed abundance when they belong to the same observation occasion.
 
-### 5.4 Boundary convention
+### 5.4 Expected catch over an interval
+
+When `F` and `Z` are constant over an observation interval `[t_0,t_1]`, expected catch in numbers is:
+
+\[
+C_{f,a,y,[t_0,t_1]} =
+\frac{F_{f,a,y}}{Z_{a,y}}
+N_{a,y}\exp(-Z_{a,y}t_0)
+\left[1-\exp\{-Z_{a,y}(t_1-t_0)\}\right].
+\]
+
+The existing annual Baranov catch equation is the special case `t_0 = 0` and `t_1 = 1`. This equation permits catch data with different coverage intervals without adding seasonal states.
+
+The interval is the support of the catch observation. It must not silently be interpreted as the interval during which fishing mortality contributes to population dynamics. Supporting a fishery that is active only during part of the year requires piecewise mortality regimes and belongs to a later implementation phase.
+
+### 5.5 Boundary convention
 
 An observation at `fraction = 1.0` sees the state immediately before the next model year's aging and recruitment boundary operations. It must not be implemented by indexing the next annual state because that state may have different age-class and recruitment semantics.
 
 An observation at `fraction = 0.0` must reproduce the existing beginning-of-year result.
 
-### 5.5 Observation purity
+### 5.6 Observation purity
 
 Evaluating an observation must not modify population state. Adding, removing, or reordering observations must not change later annual population states.
 
@@ -149,6 +169,19 @@ Keeping the integer year separate prevents fragile floating-point year lookup an
 
 `ModelTime` is structural input and must not use the automatic-differentiation scalar type.
 
+Point and interval support should be explicit:
+
+```cpp
+enum class ObservationSupport { kPoint, kInterval };
+
+struct ModelInterval {
+  ModelTime start;
+  ModelTime end;
+};
+```
+
+The initial catch implementation should require an interval to remain within one model year. Cross-year intervals can later be split into year-specific segments during schedule compilation.
+
 ### 6.2 Observation occasions
 
 ```cpp
@@ -167,7 +200,9 @@ An occasion may be referenced by one or more observation streams. Sharing an occ
 ```cpp
 struct ObservationScheduleEntry {
   std::size_t observation_index;
-  ObservationOccasionId occasion_id;
+  ObservationSupport support;
+  ObservationOccasionId occasion_id;  // Used for point observations.
+  ModelInterval interval;              // Used for interval observations.
 };
 
 struct ObservationSchedule {
@@ -175,7 +210,7 @@ struct ObservationSchedule {
 };
 ```
 
-`observation_index` identifies the corresponding time element in the observed data object. The schedule therefore does not require leading values for years before a survey starts or placeholder entries for missing years.
+`observation_index` identifies the corresponding time element in the observed data object. The schedule therefore does not require leading values before a fishing fleet or survey starts, or placeholder entries for missing years.
 
 ### 6.4 Initial simplified representation
 
@@ -184,11 +219,12 @@ If introducing occasion identifiers is too large for the first pull request, the
 ```cpp
 struct ObservationSchedule {
   std::vector<std::size_t> model_year;
-  std::vector<double> fraction;
+  std::vector<double> start_fraction;
+  std::vector<double> end_fraction;
 };
 ```
 
-This representation is acceptable only if each entry maps unambiguously to an observed time step. The code should still centralize validation and conversion so it can migrate to shared occasions without changing propagation mathematics.
+For point observations, `start_fraction` equals `end_fraction`. This representation is acceptable only if each entry maps unambiguously to an observed time step. The code should still centralize validation and conversion so it can migrate to typed point occasions and intervals without changing propagation mathematics.
 
 ### 6.5 Fleet role and capabilities
 
@@ -219,12 +255,15 @@ This prevents survey placeholder fishing mortality from contributing to the `Z` 
 The user-facing representation should accept calendar years or dates and identify the observation stream:
 
 ```text
-component  data_type    year  fraction  occasion
-survey1   index        2005      0.42  survey1_2005
-survey1   age_comp     2005      0.42  survey1_2005
-survey1   index        2006      0.45  survey1_2006
-survey1   index        2008      0.39  survey1_2008
-survey2   index        1999      0.71  survey2_1999
+component  data_type  year  start_fraction  end_fraction  occasion
+fleet1    catch      2003            0.00          1.00  fleet1_catch_2003
+fleet1    cpue       2003            0.58          0.58  fleet1_sample_2003
+fleet1    age_comp   2003            0.58          0.58  fleet1_sample_2003
+survey1   index      2005            0.42          0.42  survey1_2005
+survey1   age_comp   2005            0.42          0.42  survey1_2005
+survey1   index      2006            0.45          0.45  survey1_2006
+survey1   index      2008            0.39          0.39  survey1_2008
+survey2   index      1999            0.71          0.71  survey2_1999
 ```
 
 The R layer converts calendar year to `model_year` using:
@@ -233,7 +272,7 @@ The R layer converts calendar year to `model_year` using:
 model\_year = calendar\_year - model\_start\_year.
 \]
 
-The absence of a 2007 row means that no observation occurred in 2007. It is not interpreted as an observation at an unknown time.
+Equal start and end fractions identify a point observation. Unequal values identify an interval. The absence of a row means that no observation occurred in that year. It is not interpreted as an observation at an unknown time.
 
 ### 7.2 Calendar dates
 
@@ -249,7 +288,7 @@ Users should not be allowed to supply both a date and a fraction for the same re
 
 ### 7.3 Defaults
 
-For a transition period, an omitted observation schedule may default to `fraction = 0.0` for each observed year, reproducing current behavior. Because FIMS is pre-1.0, the preferred final API should require timing explicitly for newly constructed observation streams.
+For a transition period, an omitted point-observation schedule may default to `fraction = 0.0`, while an omitted catch interval may default to `[0.0, 1.0]`. These defaults reproduce current behavior. Because FIMS is pre-1.0, the preferred final API should require timing support explicitly for newly constructed fishery-fleet and survey streams.
 
 Defaults and scalar recycling, if offered, should be implemented in R rather than implicitly in C++.
 
@@ -274,7 +313,7 @@ An age-vector overload may be added if it simplifies callers, but the scalar ope
 
 ### 8.2 Prediction path
 
-For each observation occasion:
+For each point observation occasion:
 
 1. Resolve its `model_year` and `fraction`.
 2. Obtain beginning-of-year `numbers_at_age` and annual `mortality_Z`.
@@ -283,6 +322,14 @@ For each observation occasion:
 5. Calculate index numbers or weight.
 6. Calculate any associated age or length composition from the same timed abundance.
 7. Store the prediction at the observation's data index.
+
+For each catch observation interval:
+
+1. Resolve its model year, start fraction, and end fraction.
+2. Obtain beginning-of-year abundance and annual `F` and `Z`.
+3. Evaluate the interval Baranov equation directly.
+4. Calculate catch numbers or weight and associated catch compositions.
+5. Store the prediction at the observation's data index.
 
 ### 8.3 Separation from annual output arrays
 
@@ -308,15 +355,19 @@ Validation must occur during R configuration or C++ model construction, not deep
 
 FIMS must reject:
 
-- `fraction < 0.0` or `fraction > 1.0`;
+- point or interval fractions outside `[0.0, 1.0]`;
 - non-finite fractions;
+- intervals whose end precedes their start;
+- zero-width intervals for accumulated observations;
+- cross-year intervals until schedule splitting is implemented;
 - model years outside the population's modeled range;
 - schedule and observation dimensions that do not agree;
 - unknown component, stream, or occasion identifiers;
 - one occasion identifier assigned conflicting times;
 - ambiguous duplicate schedule entries;
 - calendar dates outside the modeled period; and
-- index or composition observations without a resolvable time when timing is required.
+- catch observations without a resolvable interval;
+- index or composition observations without a resolvable point time when timing is required.
 
 FIMS should allow:
 
@@ -332,23 +383,23 @@ Duplicate entries at one time are valid only when they refer to distinct observa
 
 ## 10. Interaction with data types
 
-### 10.1 Index data
+### 10.1 Fishery and survey index data
 
 Each index observation uses abundance propagated to its scheduled occasion. Catchability and selectivity are evaluated using their existing year-dependent behavior.
 
-### 10.2 Survey age composition
+### 10.2 Age composition
 
-A survey age composition must be calculated from timed selected abundance, not beginning-of-year abundance. If it shares an occasion with an index, both predictions use the same propagated abundance.
+An age composition sampled at a point in time must be calculated from timed selected abundance, whether it comes from a fishing fleet or a survey. If it shares an occasion with an index, both predictions use the same propagated abundance. A catch composition representing accumulated removals instead uses catch numbers over its associated interval.
 
-### 10.3 Survey length composition
+### 10.3 Length composition
 
-Length composition is derived from timed selected abundance at age followed by the existing age-to-length conversion.
+Point-sampled length composition is derived from timed selected abundance at age followed by the existing age-to-length conversion. Catch length composition is derived from interval catch at age followed by the same conversion.
 
 ### 10.4 Fishery catch and catch composition
 
-The first milestone leaves annual catch predictions under the Baranov catch equation unchanged. Annual catch is an integral over the year and must not be treated as an instantaneous observation merely because a landing date is available.
+The first milestone preserves full-year catch as the default but also permits an explicitly supplied within-year catch interval using the interval Baranov equation. Catch must not be treated as an instantaneous observation merely because a landing or reporting date is available.
 
-Timed fishery-independent observations and annual fishery catch processes therefore use separate schedules and mathematics.
+Fishery catch observations, fishery-dependent sampling observations, survey observations, and fishing-mortality process schedules remain separate concepts.
 
 ### 10.5 Fishery-dependent indices
 
@@ -363,7 +414,7 @@ R model and data specification
 Validate dates, schedules, roles, and dimensions
           |
           v
-Convert calendar values to (model_year, fraction)
+Convert calendar values to point or interval model time
           |
           v
 Build annual population state and mortality as today
@@ -371,19 +422,22 @@ Build annual population state and mortality as today
           +-------------------------------+
           |                               |
           v                               v
-Calculate annual catch             For each observation occasion
-with existing equations                    |
-                                          v
-                              N(t) = N(0) exp(-Z t)
-                                          |
-                                          v
-                              Apply q and selectivity
-                                          |
-                                          v
-                             Index and composition predictions
-                                          |
-                                          v
-                                      Likelihood
+For each catch interval       For each point occasion
+          |                               |
+          v                               v
+Interval Baranov catch        N(t) = N(0) exp(-Z t)
+          |                               |
+          v                               v
+Catch and catch-composition   Apply q and selectivity
+predictions                               |
+          |                               v
+          |                  Index and sampled-composition
+          |                  predictions
+          |                               |
+          +---------------+---------------+
+                          |
+                          v
+                      Likelihood
 ```
 
 ## 12. Implementation plan
@@ -402,17 +456,18 @@ with existing equations                    |
 4. Convert calendar year/date input to normalized model time.
 5. Add tests for late starts, gaps, varying dates, and invalid schedules.
 
-### Phase 2: Timed survey predictions
+### Phase 2: Timed fleet and survey predictions
 
 1. Add the analytical survival propagation primitive.
 2. Use timed abundance for expected index numbers and weight.
-3. Use the same timed abundance for survey age compositions.
+3. Use the same timed abundance for fishery- and survey-sampled age compositions.
 4. Propagate the timed prediction through age-to-length conversion.
-5. Preserve existing behavior at fraction zero.
+5. Add interval Baranov predictions for catch and catch compositions.
+6. Preserve existing behavior at point fraction zero and catch interval `[0, 1]`.
 
 ### Phase 3: Observation occasions
 
-1. Allow index and composition streams to share an occasion identifier.
+1. Allow fishery and survey index and composition streams to share an occasion identifier.
 2. Verify conflicting occasion definitions during construction.
 3. Optionally group common occasions in a compiled observation plan.
 4. Benchmark run time and AD tape size before adding further optimization.
@@ -446,24 +501,29 @@ Begin this phase only when a state-changing within-year feature is approved.
 
 - A schedule may begin after model year zero.
 - A schedule may omit internal years.
-- Two surveys may have different dates in the same year.
-- One survey may have multiple observations within a year.
+- Fishing fleets and surveys may have different dates in the same year.
+- One fishing fleet or survey may have multiple observations within a year.
+- Catch streams may begin late, omit years, and use different coverage intervals.
 - Calendar dates convert correctly in leap and non-leap years.
 - Invalid years, fractions, dimensions, and identifiers fail with informative messages.
 
 ### 13.3 Prediction tests
 
-- Fraction zero exactly reproduces current index predictions.
+- Point fraction zero exactly reproduces current index predictions.
+- Catch interval `[0, 1]` exactly reproduces current annual catch predictions.
+- Partial-year catch matches the interval Baranov equation.
 - Fraction one uses full-year survival without applying the next aging transition.
 - Timed index numbers and weight match analytical expectations.
-- Survey age-composition proportions use timed abundance.
+- Fishery and survey sampled age-composition proportions use timed abundance.
+- Catch compositions use removals accumulated over their catch interval.
 - Length compositions are derived from the timed age prediction.
 - Associated streams sharing an occasion use identical timing.
 
 ### 13.4 Invariance tests
 
 - Adding an observation does not change annual population state.
-- Changing an observation date does not change annual catch predictions.
+- Changing a point-observation date does not change population dynamics or catch predictions.
+- Changing catch observation support changes its prediction but not the underlying fishing-mortality process schedule.
 - Reordering observations does not change predictions or likelihood.
 - Duplicate observations at one occasion do not cause extra state transitions.
 - A survey that does not contribute to mortality does not change `Z`.
@@ -472,10 +532,11 @@ Begin this phase only when a state-changing within-year feature is approved.
 
 Construct a model with:
 
-- a fishing fleet active for the full model period;
+- a fishing fleet whose catch and sampled composition data begin in different years;
+- a partial-year catch interval;
 - one survey that begins late and skips a year;
 - a second survey with a different start year and timing;
-- an index and age composition sharing an occasion; and
+- fishery and survey indices with compositions sharing their respective occasions; and
 - a fishery-dependent index whose observation schedule differs from its mortality schedule.
 
 Compare all predictions to independent analytical calculations.
@@ -488,14 +549,15 @@ The initial implementation should:
 - add work proportional to the number of observations, not days or months;
 - avoid creating estimated timing parameters;
 - avoid parameter-dependent caches across objective evaluations; and
-- preserve current performance when all observations occur at fraction zero, within reasonable constant overhead.
+- preserve current performance when point observations occur at fraction zero and catch observations cover `[0, 1]`, within reasonable constant overhead.
 
 Benchmarks should compare:
 
 1. the current annual implementation;
 2. timing enabled with all fractions at zero;
-3. one unique survey time per year; and
-4. several surveys sharing and not sharing occasions.
+3. one unique observation time per fishery fleet and survey per year;
+4. several fishery and survey streams sharing and not sharing occasions; and
+5. full-year and partial-year catch intervals.
 
 Measurements should include objective evaluation time, peak memory, and AD tape size where available.
 
@@ -503,10 +565,10 @@ Measurements should include objective evaluation time, peak memory, and AD tape 
 
 The safest migration path is:
 
-1. Existing models without schedules temporarily receive beginning-of-year schedules.
+1. Existing models without schedules temporarily receive beginning-of-year point schedules and full-year catch intervals.
 2. FIMS emits a deprecation message encouraging explicit observation timing.
 3. R helper functions support concise constant schedules and conversion from dates.
-4. A later pre-1.0 release requires explicit timing for observation streams.
+4. A later pre-1.0 release requires explicit point or interval support for fishery-fleet and survey observation streams.
 
 No compatibility promise should be made for an intermediate fleet-level `index_time[n_years]` representation. The public contract should be sparse observation schedules, even if the first internal implementation temporarily uses dense arrays.
 
@@ -524,9 +586,9 @@ Rejected because it introduces large arrays and computation unrelated to the num
 
 Useful as a prototype but insufficient as the final design. It assumes annual alignment, encourages padding, handles missing years poorly, and cannot cleanly distinguish index, composition, and process schedules.
 
-### 16.4 Full event engine before survey timing
+### 16.4 Full event engine before fleet and survey timing
 
-Deferred because the first required feature is a read-only observation of analytically propagated state. Implementing mutable state events, ordering rules, and dynamics regimes now would substantially increase scope without improving the initial survey result.
+Deferred because point observations and accumulated catch observations can both be evaluated analytically without mutable state events. Implementing event ordering and dynamics regimes now would substantially increase scope without improving the initial fleet and survey result.
 
 ### 16.5 Generic memoization cache
 
@@ -568,20 +630,20 @@ The implementation team should explicitly decide:
 2. Whether timing is attached directly to data objects or stored in a separate observation registry. This proposal recommends a separate schedule linked to data indices.
 3. Whether shared observation occasions are required in the first pull request or introduced immediately afterward.
 4. How current dense derived-quantity reporting maps sparse observations to output.
-5. Whether missing schedules initially default to zero or are rejected. This proposal recommends a temporary zero default followed by explicit timing before version 1.0.
+5. Whether missing schedules initially receive legacy defaults or are rejected. This proposal recommends temporary defaults of zero for points and `[0, 1]` for catches, followed by explicit timing before version 1.0.
 6. Whether fleet capabilities replace or supplement a fleet-role enumeration. This proposal recommends capabilities because fisheries can also produce indices.
 
 ## 19. Acceptance criteria for the first release
 
 The first dynamic-timing release is complete when:
 
-- users can specify a different observation schedule for every survey or index stream;
+- users can specify a different point or interval observation schedule for every fishery-fleet and survey data stream;
 - schedules can have different starts, ends, gaps, and within-year fractions;
-- expected indices and associated survey compositions use analytically propagated abundance;
-- observations at fraction zero reproduce existing results;
-- annual population dynamics and annual catch equations are unchanged;
+- expected fishery and survey indices and their sampled compositions use analytically propagated abundance;
+- full-year and partial-year catch observations use the appropriate Baranov interval equation;
+- point observations at fraction zero and catch intervals `[0, 1]` reproduce existing results;
+- observation timing does not implicitly change annual fishing-mortality process timing or population dynamics;
 - surveys can be configured not to contribute to mortality;
 - invalid schedules fail before optimization;
 - C++ unit tests and R integration tests cover the required timing behavior; and
 - benchmarks show cost scaling with observations rather than a fixed seasonal or daily grid.
-
