@@ -65,6 +65,31 @@ struct PrecisionMatrixBuilderBase {
         return Eigen::Matrix<Type, Eigen::Dynamic, 1>::Zero(n_k);
     }
 };
+
+/**
+ * @brief Builds an identity precision matrix for an unstructured GMRF.
+ *
+ * This is the default precision builder when no structural covariance model
+ * is required. The resulting precision matrix is Q = I.
+ */
+template <typename Type>
+struct UnstructuredPrecisionMatrixBuilder
+    : public PrecisionMatrixBuilderBase<Type> {
+    size_t n = 1;
+
+    UnstructuredPrecisionMatrixBuilder() : PrecisionMatrixBuilderBase<Type>() {}
+    virtual ~UnstructuredPrecisionMatrixBuilder() {}
+
+    virtual size_t rows() const override { return this->n; }
+    virtual size_t cols() const override { return this->n; }
+
+    virtual Eigen::SparseMatrix<Type> BuildPrecisionMatrixSparse() const override {
+        Eigen::SparseMatrix<Type> precision(static_cast<int>(this->n),
+                                             static_cast<int>(this->n));
+        precision.setIdentity();
+        return precision;
+    }
+};
     
 /**
  * @details This class handles the math for "arrow-and-lag" models (the RAM). DSEM is 

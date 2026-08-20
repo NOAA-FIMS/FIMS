@@ -153,5 +153,54 @@ public:
 #endif
 };
 
+/**
+ * @brief Rcpp interface for the default unstructured GMRF precision matrix.
+ */
+class UnstructuredInterface : public FIMSRcppInterfaceBase {
+ public:
+    static uint32_t id_g;
+    static std::map<uint32_t, std::shared_ptr<UnstructuredInterface>>
+        live_objects;
+
+    uint32_t id;
+    size_t n = 1;
+
+    UnstructuredInterface() : id(UnstructuredInterface::id_g++) {}
+
+    UnstructuredInterface(const UnstructuredInterface& other)
+        : FIMSRcppInterfaceBase(other), id(other.id), n(other.n) {}
+
+    virtual ~UnstructuredInterface() {}
+
+    virtual uint32_t get_id() { return this->id; }
+
+    void register_self() {
+        auto self = std::shared_ptr<UnstructuredInterface>(
+            this, [](UnstructuredInterface*) {});
+        UnstructuredInterface::live_objects[this->id] = self;
+        FIMSRcppInterfaceBase::fims_interface_objects.push_back(self);
+    }
+
+#ifdef TMB_MODEL
+    template <typename Type>
+    bool add_to_fims_tmb_internal() {
+        std::shared_ptr<fims_info::Information<Type>> info =
+            fims_info::Information<Type>::GetInstance();
+        std::shared_ptr<fims_distributions::UnstructuredPrecisionMatrixBuilder<Type>>
+            builder = std::make_shared<
+                fims_distributions::UnstructuredPrecisionMatrixBuilder<Type>>();
+        builder->n = this->n;
+        info->precision_builders[this->id] = builder;
+        return true;
+    }
+
+    virtual bool add_to_fims_tmb() {
+        this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+        this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+        return true;
+    }
+#endif
+};
+
 
 #endif 

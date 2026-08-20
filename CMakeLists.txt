@@ -108,7 +108,14 @@ EXECUTE_PROCESS(
 		COMMAND R "--slave" "--no-save" "-e" "cat(R.home())"
 		OUTPUT_VARIABLE R_HOME)
 
+EXECUTE_PROCESS(
+  COMMAND R "--slave" "--no-save" "-e"
+          "cat(system.file('include', package = 'RcppEigen'))"
+  OUTPUT_VARIABLE RCPPEIGEN_INCLUDE
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 MESSAGE(STATUS "R_HOME is ${R_HOME}")
+MESSAGE(STATUS "RcppEigen include directory is ${RCPPEIGEN_INCLUDE}")
 
 EXECUTE_PROCESS(
 		COMMAND R "--slave" "--no-save" "-e" "remotes::install_local(dependencies = FALSE)")
@@ -132,6 +139,7 @@ target_include_directories(fims_test
     inst/include/utilities
     ${rcpp_SOURCE_DIR}/inst/include
     ${R_HOME}/include
+    ${RCPPEIGEN_INCLUDE}
 )
 
 # Add compile definition STD_LIB to the fims_test target.
