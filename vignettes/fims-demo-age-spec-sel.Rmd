@@ -84,78 +84,37 @@ methods::show(data_4_model)
 # Or, look at the structure using str()
 # Increase max.level to see more of the structure
 str(data_4_model, max.level = 1)
-# Use dplyr to subset the data for just the landings
+# Use dplyr to subset the data for just the catch
 get_data(data_4_model) |>
-  dplyr::filter(type == "landings")
+  dplyr::filter(type == "catch")
 ```
 
 The data contains the following fleets:
 
-- A single fishery fleet with age- and length-composition, weight-at-age, and landings data
+- A single fishery fleet with age- and length-composition, weight-at-age, and catch data
 - A single survey with age- and length-composition and index data
 
-You can use the base R function `plot(data_4_model)` to see the data types (e.g., landings, length composition, age composition, etc.) in the `data_4_model` object by fleet.
+You can use the base R function `plot(data_4_model)` to see the data types (e.g., catch, length composition, age composition, etc.) in the `data_4_model` object by fleet.
 
 ```{r FIMSFrame-plot}
 #| warning: false
 #| message: false
 #| fig.alt: >
-#|   Landings are increasing over time and the index is decreasing over time.
+#|   Catches are increasing over time and the index is decreasing over time.
 #| fig.cap: >
 #|   FIMS input values by type (panels) and fleet (colors).
 plot(data_4_model)
-```
-
-## Configurations
-
-### `create_default_configurations()`
-
-The `create_default_configurations()` function is designed to generate a set of default configurations for the various components of a FIMS model. This includes configurations for fleets, growth, maturity, and recruitment modules. By leveraging the structure of the input data, the function can automatically set up initial configurations for each module. By passing the data and configurations to `create_default_parameters()` the function can tailor the defaults based on how many fleets there are and what data types exist. For example, if you have three fleets, then `create_default_configurations()` will set up three logistic selectivity modules.
-
-```{r configurations, max.height='100px', attr.output='.numberLines'}
-# Create default configurations based on the data
-default_configurations <- create_default_configurations(data = data_4_model)
-
-default_configurations
-
-# The output is a nested tibble, with details in the `data` column.
-default_configurations_unnested <- default_configurations |>
-  tidyr::unnest(cols = data)
-
-default_configurations_unnested
-```
-
-### Update configurations
-
-The default_configurations are just a starting point. Functions (e.g., `rows_*()`) from `{dplyr}` can be used to modify the default configurations as needed. For example, logistic selectivity for survey1 can be changed to age-based selectivity.
-```{r updated_configurations, max.height='100px', attr.output='.numberLines'}
-# Update the module_type for survey1's selectivity
-updated_configurations <- default_configurations_unnested |>
-  dplyr::rows_update(
-    y = tibble::tibble(
-      module_name = c("Selectivity"),
-      fleet = c("survey1"),
-      module_type = c("AgeSpecific")
-    ),
-    by = c("module_name", "fleet")
-  )
-
-updated_configurations
-
-# Nest updated_configurations
-updated_configurations_nested <- updated_configurations |>
-  tidyr::nest(.by = c(model_family, module_name, fleet))
 ```
 
 ## Parameters
 
 The parameters that are in the model will depend on which modules are used from the FIMS framework. This combination of modules rather than the use of a control file negates the need for complicated if{} else{} statements in the code.
 
-### `create_default_parameters()`
+### `setup_default_parameters()`
 
 Modules that are available in FIMS are known as reference classes in the C++ code. Each reference class acts as an interface between R and the underlining C++ code that defines FIMS. Several reference classes exist and several more will be created in the future. The beauty of having modules rather than a control file really comes out when more reference classes are created because each reference class can be accessed through R by itself to build up a model rather than needing to modify a control file for future features.
 
-By just passing the configurations and the data to `create_default_parameters()`, the default values for parameters that relate to fleet(s), recruitment, growth, and maturity modules can be created. For example,
+By just passing the data to `setup_default_parameters()`, the default values for parameters that relate to fleet(s), recruitment, growth, and maturity modules can be created. For example,
 
 - "BevertonHolt" for the recruitment module
 - "Dnorm" distribution for recruitment deviations (log_devs)
@@ -163,21 +122,32 @@ By just passing the configurations and the data to `create_default_parameters()`
 - "Logistic" for Maturity module.
 
 ```{r parameters, max.height='100px', attr.output='.numberLines'}
-# Create default parameters based on updated_configurations
-default_parameters <- create_default_parameters(
-  configurations = updated_configurations_nested,
+# Set up default parameters based on data
+default_parameters <- setup_default_parameters(
   data = data_4_model
 )
 
 default_parameters
 
-# Unnest the default_parameters to see the detailed parameters
-default_parameters_unnested <- tidyr::unnest(default_parameters, cols = data)
+# Look at default Logistic parameters
+default_parameters |>
+  dplyr::filter(fleet == "survey1", module_name == "Selectivity") |>
+  dplyr::select(module_type, label, age, value, estimation_type)
 
-default_parameters_unnested
+# Update default to AgeSpecificSelectivity
+new_selectivity <- setup_default_Selectivity(
+    data = data_4_model,
+    fleet = "survey1",
+    module_type = "AgeSpecific"
+  )
+new_selectivity
 
-# Look at default SelectivityatAge parameters
-default_parameters_unnested |>
+updated_parameters <- default_parameters |>
+  dplyr::filter(!(fleet == "survey1" & module_name == "Selectivity")) |>
+  dplyr::bind_rows(new_selectivity)
+
+# Look at updated parameters
+updated_parameters |>
   dplyr::filter(fleet == "survey1", module_name == "Selectivity") |>
   dplyr::select(module_type, label, age, value, estimation_type)
 ```
@@ -189,14 +159,13 @@ Functions (e.g., `rows_*()`) from `{dplyr}` can be used to update the default pa
 In the code below, `rows_update()` is used to adjust the fishing mortality, selectivity, maturity, and population parameters from their default values.
 
 ```{r parameters-update}
-parameters_4_model <- default_parameters |>
-  tidyr::unnest(cols = data) |>
+parameters_4_model <- updated_parameters |>
   # Update log_Fmort initial values for Fleet1
   dplyr::rows_update(
     tibble::tibble(
       fleet = "fleet1",
       label = "log_Fmort",
-      time = seq(get_n_years(data_4_model)),
+      timing = seq(get_n_years(data_4_model)),
       value = log(c(
         0.009459165, 0.027288858, 0.045063639,
         0.061017825, 0.048600752, 0.087420554,
@@ -210,7 +179,7 @@ parameters_4_model <- default_parameters |>
         0.431745298, 0.328030899, 0.499675368
       ))
     ),
-    by = c("fleet", "label", "time")
+    by = c("fleet", "label", "timing")
   ) |>
   # Update log_q for survey1
   dplyr::rows_update(
@@ -222,6 +191,7 @@ parameters_4_model <- default_parameters |>
     by = c("fleet", "label")
   ) |>
   # Update selectivity parameters for survey1
+  # AJ: need to figure out how to change this from default Logistic to AgeSpecific
   # All but first two ages are fixed to true values
   dplyr::rows_update(
     tibble::tibble(
@@ -235,11 +205,11 @@ parameters_4_model <- default_parameters |>
     ),
     by = c("fleet", "label", "age")
   ) |>
-  # Update log_devs in the Recruitment module (time steps 2-30)
+  # Update log_devs in the Recruitment module (timing steps 2-30)
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      time = 2:get_n_years(data_4_model),
+      timing = 2:get_n_years(data_4_model),
       value = c(
         0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
         -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
@@ -249,7 +219,7 @@ parameters_4_model <- default_parameters |>
         -0.19556523, 0.20094360, 0.37248740, -0.07163145
       )
     ),
-    by = c("label", "time")
+    by = c("label", "timing")
   ) |>
   # Update log_sd for log_devs in the Recruitment module
   dplyr::rows_update(
@@ -298,7 +268,7 @@ With data and parameters in place, we can now initialize modules using `initiali
 
 ### `initialize_fims()`
 
-The tibble returned by `create_default_parameters()` is just a data frame containing specifications. Nothing has been created in memory as of yet. To actually initialize the modules, `initialize_fims()` needs to be called. This function takes all of the specifications and matches them with the appropriate data to initialize a module and create the pointers to the memory.
+The tibble returned by `setup_default_parameters()` is just a data frame containing specifications. Nothing has been created in memory as of yet. To actually initialize the modules, `initialize_fims()` needs to be called. This function takes all of the specifications and matches them with the appropriate data to initialize a module and create the pointers to the memory.
 
 ### `fit_fims()`
 
@@ -403,18 +373,18 @@ stockplotr::plot_timeseries(
   stockplotr::theme_noaa()
 ```
 
-```{r fit-plot-landings}
+```{r fit-plot-catch}
 #| fig.alt: >
-#|   Plot of estimated landings.
+#|   Plot of estimated catch.
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
     output |> dplyr::filter(module_id == 1),
-    label_name = "^landings_expected$",
+    label_name = "^catch_expected$",
     geom = "line"
   ),
   x = "year",
   y = "estimate",
-  ylab = "Expected Landings (mt)"
+  ylab = "Expected Catch (mt)"
 ) +
   stockplotr::theme_noaa()
 ```
@@ -472,11 +442,8 @@ The same model can be fit to just the age data, removing the length-composition 
 # Create default parameters, update with modified values, initialize FIMS,
 # and fit the model
 age_only_fit <- parameters_4_model |>
-  # remove rows that have module_type == LengthComp
-  dplyr::rows_delete(
-    y = tibble::tibble(module_type = "LengthComp")
-  ) |>
-  initialize_fims(data = data_4_model) |>
+  initialize_fims(data = get_data(data_4_model) |>
+    dplyr::filter(!type %in% c("length_comp", "age_to_length_conversion"))) |>
   fit_fims(optimize = TRUE)
 
 clear()
@@ -490,11 +457,8 @@ The same model can be fit to just the length data, removing the age-composition 
 # Create default parameters, update with modified values, initialize FIMS,
 # and fit the model
 length_only_fit <- parameters_4_model |>
-  # remove rows that have module_type == AgeComp
-  dplyr::rows_delete(
-    y = tibble::tibble(module_type = "AgeComp")
-  ) |>
-  initialize_fims(data = data_4_model) |>
+  initialize_fims(data = get_data(data_4_model) |>
+    dplyr::filter(!type %in% c("age_comp"))) |>
   fit_fims(optimize = TRUE)
 clear()
 ```
