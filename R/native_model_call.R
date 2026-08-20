@@ -110,6 +110,12 @@ native_add_prior <- function(
     Dlnorm = "lognormal",
     distribution
   )
+  if (!length(mean) || !all(is.finite(mean))) {
+    stop("`mean` must contain finite numeric values.", call. = FALSE)
+  }
+  if (!length(log_sd) || !all(is.finite(log_sd))) {
+    stop("`log_sd` must contain finite numeric values.", call. = FALSE)
+  }
   result <- .Call(
     "fims_call_add_prior",
     as.character(module),
