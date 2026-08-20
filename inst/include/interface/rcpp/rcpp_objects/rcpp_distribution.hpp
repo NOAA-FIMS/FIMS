@@ -131,6 +131,12 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
     return true;
   }
 
+  /**
+   * @brief Converts the R ID vector to the structured distribution key.
+   * @param input_type Distribution pathway, such as data or random_effects.
+   * @param ids IDs supplied by the R interface.
+   * @return True when the key is populated.
+   */
   bool set_distribution_links_from_r(std::string input_type,
                                      Rcpp::IntegerVector ids) {
     std::vector<uint32_t> observed_id;
@@ -1133,11 +1139,15 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  */
 class GMRFDistributionsInterface : public DistributionsInterfaceBase {
  public:
+  /** @brief Global GMRF interface ID counter. */
   static uint32_t id_g;
+  /** @brief Live GMRF interface objects. */
   static std::map<uint32_t, std::shared_ptr<GMRFDistributionsInterface>>
       live_objects;
 
+  /** @brief Precision-builder interface ID. */
   SharedInt precision_builder_id_m = -999;
+  /** @brief Per-observation log-likelihood contributions. */
   RealVector lpdf_vec;
 
   GMRFDistributionsInterface() : DistributionsInterfaceBase() {
@@ -1147,6 +1157,7 @@ class GMRFDistributionsInterface : public DistributionsInterfaceBase {
         GMRFDistributionsInterface::live_objects[this->id_m]);
   }
 
+  /** @brief Copy constructor. */
   GMRFDistributionsInterface(const GMRFDistributionsInterface& other)
       : DistributionsInterfaceBase(other),
         precision_builder_id_m(other.precision_builder_id_m),
@@ -1156,6 +1167,7 @@ class GMRFDistributionsInterface : public DistributionsInterfaceBase {
 
   virtual uint32_t get_id() { return this->id_m; }
 
+  /** @brief Sets the precision-builder interface ID. */
   bool set_precision_builder_id(int precision_builder_id) {
     this->precision_builder_id_m.set(precision_builder_id);
     return true;
@@ -1185,6 +1197,7 @@ class GMRFDistributionsInterface : public DistributionsInterfaceBase {
 #endif
 };
 
+/** @brief Adapts the shared R link method to an Rcpp concrete class. */
 template <typename Distribution>
 bool set_distribution_links_adapter(Distribution* distribution,
                                     std::string input_type,

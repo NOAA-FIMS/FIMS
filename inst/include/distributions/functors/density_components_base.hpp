@@ -28,8 +28,11 @@ namespace fims_distributions {
  * model components.
  */
 struct DistributionKey {
+  /** @brief IDs of observed data or random-effect vectors. */
   std::vector<uint32_t> observed_id;
+  /** @brief IDs of expected-value vectors. */
   std::vector<uint32_t> expected_id;
+  /** @brief ID of the uncertainty or precision-builder object. */
   uint32_t uncertainty_id = static_cast<uint32_t>(-999);
 };
 
@@ -144,6 +147,11 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
     }
   }
 
+  /**
+   * @brief Returns the uncertainty value at a given index.
+   * @param i Index into the uncertainty vector.
+   * @return Reference to the uncertainty value.
+   */
   inline Type& get_uncertainty(size_t i) {
     if (this->input_type == "random_effects") {
       return (*uncertainty)[i];

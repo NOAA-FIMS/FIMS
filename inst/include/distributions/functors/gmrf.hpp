@@ -45,10 +45,10 @@ struct GMRF : public DensityComponentBase<Type> {
 
     /**
      * @brief Evaluates the GMRF log probability density function.
-     * @details The evaluation follows: 
-     * \f[ \log(f(x)) = -\frac{1}{2} (x - (\mu + \text{offset}))^T Q (x - (\mu + \text{offset})) + \frac{1}{2} \log|Q| -N\log(\sqrt(2\pi)) \f]
+    * @details The evaluation centers the observed vector by the expected
+    * values and mean offset, then evaluates the centered vector under Q.
      * where \f$x\f$ is the vector of latent states, \f$\mu\f$ is the mean, 
-     * \text{offset} is the mean vector from the DSEM builder, \f$Q\f$ is the precision matrix, 
+    * offset is the mean vector from the DSEM builder, \f$Q\f$ is the precision matrix,
      * and \f$n\f$ is the dimension of \f$x\f$.
      * @return The calculated log-probability density.
      */ 

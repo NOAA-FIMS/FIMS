@@ -387,6 +387,11 @@ class Vector {
   * 
   * @param value The temporary element whose contents will be moved and appended.
   */
+  /**
+   * @brief Constructs and appends an element in place.
+   * @tparam Args Constructor argument types.
+   * @param args Arguments forwarded to the element constructor.
+   */
   template <class... Args>
   void emplace_back(Args &&...args) {
     this->vec_m.emplace_back(std::forward<Args>(args)...);

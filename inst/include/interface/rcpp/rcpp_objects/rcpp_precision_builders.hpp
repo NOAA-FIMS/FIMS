@@ -158,22 +158,29 @@ public:
  */
 class UnstructuredInterface : public FIMSRcppInterfaceBase {
  public:
+    /** @brief Global unstructured interface ID counter. */
     static uint32_t id_g;
+    /** @brief Live unstructured interface objects. */
     static std::map<uint32_t, std::shared_ptr<UnstructuredInterface>>
         live_objects;
 
+    /** @brief Unique interface ID. */
     uint32_t id;
+    /** @brief Dimension of the identity precision matrix. */
     size_t n = 1;
 
     UnstructuredInterface() : id(UnstructuredInterface::id_g++) {}
 
+    /** @brief Copy constructor. */
     UnstructuredInterface(const UnstructuredInterface& other)
         : FIMSRcppInterfaceBase(other), id(other.id), n(other.n) {}
 
     virtual ~UnstructuredInterface() {}
 
+    /** @brief Returns the unique interface ID. */
     virtual uint32_t get_id() { return this->id; }
 
+    /** @brief Registers this interface with the global object registry. */
     void register_self() {
         auto self = std::shared_ptr<UnstructuredInterface>(
             this, [](UnstructuredInterface*) {});

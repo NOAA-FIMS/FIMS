@@ -55,12 +55,15 @@ struct PrecisionMatrixBuilderBase {
         const Eigen::Matrix<Type, Eigen::Dynamic, 1>& innovations) const {
         return innovations;
     }
+    /** @brief Returns the number of rows in the precision matrix. */
     virtual size_t rows() const = 0;
+    /** @brief Returns the number of columns in the precision matrix. */
     virtual size_t cols() const = 0;
 
     /**
      * @brief n_k is the total number of "slots" (years multiplied by variables)
      */
+    /** @brief Returns the default zero mean offset. */
     virtual Eigen::Matrix<Type, Eigen::Dynamic, 1> GetMeanOffset(size_t n_k) const {
         return Eigen::Matrix<Type, Eigen::Dynamic, 1>::Zero(n_k);
     }
@@ -75,12 +78,15 @@ struct PrecisionMatrixBuilderBase {
 template <typename Type>
 struct UnstructuredPrecisionMatrixBuilder
     : public PrecisionMatrixBuilderBase<Type> {
+    /** @brief Dimension of the identity precision matrix. */
     size_t n = 1;
 
     UnstructuredPrecisionMatrixBuilder() : PrecisionMatrixBuilderBase<Type>() {}
     virtual ~UnstructuredPrecisionMatrixBuilder() {}
 
+    /** @brief Returns the identity matrix row count. */
     virtual size_t rows() const override { return this->n; }
+    /** @brief Returns the identity matrix column count. */
     virtual size_t cols() const override { return this->n; }
 
     virtual Eigen::SparseMatrix<Type> BuildPrecisionMatrixSparse() const override {
@@ -130,10 +136,12 @@ struct DSEMPrecisionMatrixBuilder : public PrecisionMatrixBuilderBase<Type> {
     DSEMPrecisionMatrixBuilder() : PrecisionMatrixBuilderBase<Type>() {}
     virtual ~DSEMPrecisionMatrixBuilder() {}
 
+    /** @brief Returns the DSEM precision matrix row count. */
     virtual size_t rows() const override {
         return this->n_time * this->n_variables;
     }
 
+    /** @brief Returns the DSEM precision matrix column count. */
     virtual size_t cols() const override {
         return this->n_time * this->n_variables;
     }
