@@ -108,17 +108,31 @@ EXECUTE_PROCESS(
 		COMMAND R "--slave" "--no-save" "-e" "cat(R.home())"
 		OUTPUT_VARIABLE R_HOME)
 
+MESSAGE(STATUS "R_HOME is ${R_HOME}")
+
+EXECUTE_PROCESS(
+  COMMAND R "--slave" "--no-save" "-e"
+          "if (!requireNamespace('remotes', quietly = TRUE)) install.packages('remotes', repos = 'https://cloud.r-project.org'); remotes::install_local(dependencies = c('Depends', 'Imports', 'LinkingTo'), upgrade = 'never')"
+  RESULT_VARIABLE R_DEPENDENCY_RESULT)
+
+IF(NOT R_DEPENDENCY_RESULT EQUAL 0)
+  MESSAGE(FATAL_ERROR "Failed to install FIMS R dependencies.")
+ENDIF()
+
 EXECUTE_PROCESS(
   COMMAND R "--slave" "--no-save" "-e"
           "cat(system.file('include', package = 'RcppEigen'))"
   OUTPUT_VARIABLE RCPPEIGEN_INCLUDE
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-MESSAGE(STATUS "R_HOME is ${R_HOME}")
+IF(NOT RCPPEIGEN_INCLUDE OR NOT EXISTS "${RCPPEIGEN_INCLUDE}/Eigen/Core")
+  MESSAGE(FATAL_ERROR
+    "Could not find Eigen headers through the RcppEigen package. "
+    "RcppEigen include path: '${RCPPEIGEN_INCLUDE}'")
+ENDIF()
+
 MESSAGE(STATUS "RcppEigen include directory is ${RCPPEIGEN_INCLUDE}")
 
-EXECUTE_PROCESS(
-		COMMAND R "--slave" "--no-save" "-e" "remotes::install_local(dependencies = FALSE)")
 EXECUTE_PROCESS(
 		COMMAND R "--slave" "--no-save" "-e" "FIMS:::setup_gtest()")
 
