@@ -65,6 +65,12 @@ jobs:
           TESTTHAT_PROGRESS: "plain"
           R_BACKTRACE_ON_ERROR: "full"
         run: |
+          options(
+            error = function() {
+              traceback(2)
+              dump.frames(to.file = TRUE)
+            }
+          )
           pkgdown::build_site(override = list(destination = "docs"))
         shell: Rscript {0}
 
