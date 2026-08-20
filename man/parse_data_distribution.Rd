@@ -39,7 +39,7 @@ call on the right-hand side, such as \code{~ gaussian(mean = x, sd = 0.1)}.
 
 Input handling and validation proceed in stages:
 \itemize{
-\item Character input is converted with \code{\link[base:str2lang]{base::str2lang()}}.
+\item Character input is converted with \code{\link[base:parse]{base::str2lang()}}.
 \item Elements of \code{expression()} input are extracted and parsed as language
 objects.
 \item A language call or formula object is treated as a scalar input.

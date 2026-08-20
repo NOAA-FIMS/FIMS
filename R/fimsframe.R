@@ -63,7 +63,7 @@ methods::setClass(
     n_lengths = "integer",
     start_year = "integer",
     end_year = "integer",
-    # TODO(EDM): Slot holding a named list of delay-embedding results produced
+    # Slot holding a named list of delay-embedding results produced
     # by create_edm_embedding(). Each element is itself a named list with
     # fields: series_name, E, tau, drop_missing, n_rows, n_cols, values
     # (row-major numeric vector), and target_values (numeric vector of x_t per row).
@@ -693,7 +693,7 @@ methods::setMethod(
 #'
 #' @param x A [FIMSFrame()] object.
 #' @param series_type A single string giving the `type` value to filter on,
-#'   e.g. `"index"` or `"landings"`.
+#'   e.g. `"index"` or `"catch"`.
 #' @param series_name A single string giving the `fleet` (fleet / survey) value
 #'   to filter on, e.g. `"survey1"`.
 #' @param E A positive integer — the embedding dimension (number of lagged
@@ -746,25 +746,28 @@ create_edm_embedding <- function(
     cli::cli_abort("{.var tau} must be a positive integer.")
   }
 
+  data_tbl <- get_data(x)
+  val_col <- if ("observed" %in% names(data_tbl)) "observed" else "value"
+
   # Extract the univariate time series from the data slot
   series_data <- dplyr::filter(
-    get_data(x),
+    data_tbl,
     .data[["type"]] == series_type,
     .data[["fleet"]] == series_name
   ) |>
     dplyr::arrange(.data[["timing"]]) |>
-    dplyr::pull(.data[["value"]])
+    dplyr::pull(.data[[val_col]])
 
   # Extract the optional uncertainty series
   uncertainty_data <- numeric(0)
   if (!is.null(uncertainty_name)) {
     uncertainty_data <- dplyr::filter(
-      get_data(x),
+      data_tbl,
       .data[["type"]] == series_type,
       .data[["fleet"]] == uncertainty_name
     ) |>
       dplyr::arrange(.data[["timing"]]) |>
-      dplyr::pull(.data[["value"]])
+      dplyr::pull(.data[[val_col]])
 
     if (length(uncertainty_data) == 0) {
       cli::cli_abort(c(
@@ -1453,7 +1456,7 @@ FIMSFrame <- function(data) {
     n_ages = n_ages,
     lengths = lengths,
     n_lengths = n_lengths,
-    # TODO(EDM): edm_embeddings is populated lazily via create_edm_embedding().
+    # edm_embeddings is populated lazily via create_edm_embedding().
     edm_embeddings = list()
   )
 }

@@ -33,8 +33,6 @@ export(VariableVector)
 export(augment)
 export(calculate_mohns_rho)
 export(clear)
-export(create_default_configurations)
-export(create_default_parameters)
 export(create_edm_embedding)
 export(create_multivariate_edm_embedding)
 export(edm_compare)
@@ -93,9 +91,9 @@ export(logit)
 export(lognormal)
 export(model_age_comp)
 export(model_age_to_length_conversion)
+export(model_catch)
 export(model_edm_matrix)
 export(model_edm_matrix_multivariate)
-export(model_catch)
 export(model_index)
 export(model_length_comp)
 export(model_weight_at_age)
@@ -126,17 +124,13 @@ exportMethods(plot)
 import(methods)
 import(stats)
 importFrom(TMB,MakeADFun)
-importFrom(generics,
-  augment,
-  glance,
-  tidy
-)
+importFrom(generics,augment)
+importFrom(generics,glance)
+importFrom(generics,tidy)
 importFrom(ggplot2,autoplot)
 importFrom(graphics,plot)
-importFrom(rlang,
-  ":=",
-  .data,
-  .env
-)
+importFrom(rlang,":=")
+importFrom(rlang,.data)
+importFrom(rlang,.env)
 importFrom(stockplotr,theme_noaa)
 useDynLib(FIMS, .registration = TRUE)

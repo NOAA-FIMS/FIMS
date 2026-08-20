@@ -58,7 +58,7 @@ and observations.
 ```{r select-E}
 edim <- select_embedding_dimension(
   ff,
-  series_type = "landings",
+  series_type = "catch",
   series_name = "fleet1",
   E_min = 1L,
   E_max = 10L
@@ -89,7 +89,7 @@ delay-embedding matrix inside the `FIMSFrame`. This is required before calling
 ```{r create-embedding}
 ff <- create_edm_embedding(
   ff,
-  series_type = "landings",
+  series_type = "catch",
   series_name = "fleet1",
   E           = optimal_E,
   tau         = 1L
@@ -221,9 +221,9 @@ print(forecasts)
 ```
 
 ```{r plot-forecast, fig.alt="Five-step ahead EDM forecasts from three methods"}
-# Observed landings series
+# Observed catch series
 obs <- dplyr::filter(get_data(ff),
-                     type == "landings", fleet == "fleet1") |>
+                     type == "catch", fleet == "fleet1") |>
   dplyr::arrange(timing) |>
   dplyr::select(time = timing, value)
 
@@ -238,8 +238,8 @@ ggplot() +
   scale_colour_manual(values = c(
     simplex = "steelblue", smap = "darkorange", gp = "forestgreen"
   )) +
-  labs(title = "Landings: observed series and 5-step EDM forecasts",
-       x = "Year", y = "Landings", colour = "Method") +
+  labs(title = "Catch: observed series and 5-step EDM forecasts",
+       x = "Year", y = "Catch", colour = "Method") +
   theme_minimal()
 ```
 
@@ -255,8 +255,8 @@ merged.
 ff_mv <- create_multivariate_edm_embedding(
   ff,
   series_specs = list(
-    catch = list(series_type = "landings", series_name = "fleet1"),
-    index = list(series_type = "index",    series_name = "survey1")
+    catch = list(series_type = "catch", series_name = "fleet1"),
+    index = list(series_type = "index", series_name = "survey1")
   ),
   E             = optimal_E,
   tau           = 1L,

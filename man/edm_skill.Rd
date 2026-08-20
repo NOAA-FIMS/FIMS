@@ -33,7 +33,7 @@ Three metrics are returned:
 \dontrun{
 data("data_big")
 ff  <- FIMSFrame(data_big)
-ff  <- create_edm_embedding(ff, series_type = "landings",
+ff  <- create_edm_embedding(ff, series_type = "catch",
                              series_name = "fleet1", E = 3L, tau = 1L)
 fit <- fit_edm(ff, method = "simplex")
 edm_skill(fit, ff)

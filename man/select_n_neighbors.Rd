@@ -40,7 +40,7 @@ maximises \eqn{\rho}.
 \dontrun{
 data("data_big")
 ff <- FIMSFrame(data_big)
-ff <- create_edm_embedding(ff, series_type = "landings", series_name = "fleet1",
+ff <- create_edm_embedding(ff, series_type = "catch", series_name = "fleet1",
                            E = 3L, tau = 1L)
 skill <- select_n_neighbors(ff)
 print(skill)

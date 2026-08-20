@@ -16,7 +16,7 @@ local_ff <- local({
   ff <- FIMSFrame(data_big)
   create_edm_embedding(
     ff,
-    series_type = "landings",
+    series_type = "catch",
     series_name = "fleet1",
     E = 3L,
     tau = 1L
@@ -69,8 +69,8 @@ test_that("fit_edm() stores correct embedding metadata", {
 test_that("fit_edm() stores correct embedding name", {
   #' @description EDMFit@embedding_name matches the name used by create_edm_embedding().
   fit <- fit_edm(local_ff, method = "simplex",
-                 embedding_name = "landings_fleet1_E3_tau1")
-  expect_equal(get_embedding_name(fit), "landings_fleet1_E3_tau1")
+                 embedding_name = "catch_fleet1_E3_tau1")
+  expect_equal(get_embedding_name(fit), "catch_fleet1_E3_tau1")
 })
 
 test_that("fit_edm() simplex stores n_neighbors in parameters", {
@@ -301,7 +301,7 @@ test_that("select_n_neighbors() errors for unknown embedding_name", {
 
 test_that("select_embedding_dimension() returns a tibble with correct columns", {
   #' @description select_embedding_dimension() returns a tibble with E, rho, rmse, optimal.
-  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+  edim <- select_embedding_dimension(local_ff, series_type = "catch",
                                      series_name = "fleet1")
   expect_s3_class(edim, "tbl_df")
   expect_named(edim, c("E", "rho", "rmse", "optimal"))
@@ -309,7 +309,7 @@ test_that("select_embedding_dimension() returns a tibble with correct columns", 
 
 test_that("select_embedding_dimension() default sweep covers E=1 to 10", {
   #' @description Default E_min=1 and E_max=10 produce 10 rows.
-  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+  edim <- select_embedding_dimension(local_ff, series_type = "catch",
                                      series_name = "fleet1")
   expect_equal(nrow(edim), 10L)
   expect_equal(min(edim$E), 1L)
@@ -318,14 +318,14 @@ test_that("select_embedding_dimension() default sweep covers E=1 to 10", {
 
 test_that("select_embedding_dimension() has exactly one optimal row", {
   #' @description Exactly one row in the result has optimal=TRUE.
-  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+  edim <- select_embedding_dimension(local_ff, series_type = "catch",
                                      series_name = "fleet1")
   expect_equal(sum(edim$optimal), 1L)
 })
 
 test_that("select_embedding_dimension() optimal row maximises rho", {
   #' @description The optimal row has the highest rho value in the sweep.
-  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+  edim <- select_embedding_dimension(local_ff, series_type = "catch",
                                      series_name = "fleet1")
   expect_equal(edim$E[edim$optimal],
                edim$E[which.max(edim$rho)])
@@ -333,7 +333,7 @@ test_that("select_embedding_dimension() optimal row maximises rho", {
 
 test_that("select_embedding_dimension() rho values are in [-1, 1]", {
   #' @description All non-NA rho values from the sweep are valid Pearson correlations.
-  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+  edim <- select_embedding_dimension(local_ff, series_type = "catch",
                                      series_name = "fleet1")
   finite_rho <- edim$rho[!is.na(edim$rho)]
   expect_true(all(finite_rho >= -1 & finite_rho <= 1))
@@ -341,7 +341,7 @@ test_that("select_embedding_dimension() rho values are in [-1, 1]", {
 
 test_that("select_embedding_dimension() rmse values are non-negative", {
   #' @description All non-NA RMSE values from the sweep are non-negative.
-  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+  edim <- select_embedding_dimension(local_ff, series_type = "catch",
                                      series_name = "fleet1")
   finite_rmse <- edim$rmse[!is.na(edim$rmse)]
   expect_true(all(finite_rmse >= 0))
@@ -349,7 +349,7 @@ test_that("select_embedding_dimension() rmse values are non-negative", {
 
 test_that("select_embedding_dimension() respects E_min and E_max", {
   #' @description E_min and E_max bound the sweep range and row count.
-  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+  edim <- select_embedding_dimension(local_ff, series_type = "catch",
                                      series_name = "fleet1",
                                      E_min = 2L, E_max = 6L)
   expect_equal(nrow(edim), 5L)
@@ -359,7 +359,7 @@ test_that("select_embedding_dimension() respects E_min and E_max", {
 
 test_that("select_embedding_dimension() E column is integer", {
   #' @description The E column in the output tibble is integer-typed.
-  edim <- select_embedding_dimension(local_ff, series_type = "landings",
+  edim <- select_embedding_dimension(local_ff, series_type = "catch",
                                      series_name = "fleet1")
   expect_type(edim$E, "integer")
 })
@@ -369,7 +369,7 @@ test_that("select_embedding_dimension() E column is integer", {
 test_that("select_embedding_dimension() errors when data is not a FIMSFrame", {
   #' @description select_embedding_dimension() throws an error if data is not a FIMSFrame.
   expect_error(
-    select_embedding_dimension(list(), "landings", "fleet1"),
+    select_embedding_dimension(list(), "catch", "fleet1"),
     regexp = "FIMSFrame"
   )
 })
@@ -377,7 +377,7 @@ test_that("select_embedding_dimension() errors when data is not a FIMSFrame", {
 test_that("select_embedding_dimension() errors when E_max < E_min", {
   #' @description select_embedding_dimension() throws an error when E_max is less than E_min.
   expect_error(
-    select_embedding_dimension(local_ff, "landings", "fleet1",
+    select_embedding_dimension(local_ff, "catch", "fleet1",
                                E_min = 5L, E_max = 2L),
     regexp = "E_max"
   )
@@ -386,7 +386,7 @@ test_that("select_embedding_dimension() errors when E_max < E_min", {
 test_that("select_embedding_dimension() errors for unknown series", {
   #' @description select_embedding_dimension() throws an error for series not found in data.
   expect_error(
-    select_embedding_dimension(local_ff, "landings", "no_such_fleet"),
+    select_embedding_dimension(local_ff, "catch", "no_such_fleet"),
     regexp = "No data found"
   )
 })

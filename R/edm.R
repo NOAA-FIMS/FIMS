@@ -266,7 +266,7 @@ is.EDMFit <- function(x) methods::is(x, "EDMFit")
 #' @param series_specs A named list of series specifications. Each element
 #'   must be a list with two character strings: `series_type` and
 #'   `series_name`, e.g.
-#'   `list(catch = list(series_type = "landings", series_name = "fleet1"),
+#'   `list(catch = list(series_type = "catch", series_name = "fleet1"),
 #'         index = list(series_type = "index",    series_name = "survey1"))`.
 #'   All series must have the same number of observations after filtering.
 #' @param E Positive integer. Number of time lags per series.
@@ -293,7 +293,7 @@ is.EDMFit <- function(x) methods::is(x, "EDMFit")
 #' ff <- create_multivariate_edm_embedding(
 #'   ff,
 #'   series_specs = list(
-#'     catch  = list(series_type = "landings", series_name = "fleet1"),
+#'     catch  = list(series_type = "catch", series_name = "fleet1"),
 #'     index  = list(series_type = "index",    series_name = "survey1")
 #'   ),
 #'   E = 3L, tau = 1L,
@@ -340,14 +340,17 @@ create_multivariate_edm_embedding <- function(
   k   <- length(series_specs)
 
   # --- Extract and align all series ---------------------------------------
+  data_tbl <- get_data(x)
+  val_col  <- if ("observed" %in% names(data_tbl)) "observed" else "value"
+
   series_list <- lapply(series_specs, function(spec) {
     dplyr::filter(
-      get_data(x),
+      data_tbl,
       .data[["type"]]  == spec$series_type,
       .data[["fleet"]] == spec$series_name
     ) |>
       dplyr::arrange(.data[["timing"]]) |>
-      dplyr::pull(.data[["value"]])
+      dplyr::pull(.data[[val_col]])
   })
 
   lengths <- vapply(series_list, length, integer(1L))
@@ -526,7 +529,7 @@ model_edm_matrix_multivariate <- function(x,
 #'
 #' @param data A [FIMSFrame()] object.
 #' @param series_type A single string giving the `type` column value to filter
-#'   on, e.g. `"landings"` or `"index"`.
+#'   on, e.g. `"catch"` or `"index"`.
 #' @param series_name A single string giving the `fleet` column value to filter
 #'   on, e.g. `"fleet1"` or `"survey1"`.
 #' @param tau Positive integer. Time lag between successive coordinates.
@@ -555,11 +558,11 @@ model_edm_matrix_multivariate <- function(x,
 #' \dontrun{
 #' data("data_big")
 #' ff  <- FIMSFrame(data_big)
-#' edim <- select_embedding_dimension(ff, series_type = "landings",
+#' edim <- select_embedding_dimension(ff, series_type = "catch",
 #'                                     series_name = "fleet1")
 #' print(edim)
 #' optimal_E <- edim$E[edim$optimal]
-#' ff <- create_edm_embedding(ff, series_type = "landings",
+#' ff <- create_edm_embedding(ff, series_type = "catch",
 #'                            series_name = "fleet1",
 #'                            E = optimal_E, tau = 1L)
 #' }
@@ -588,13 +591,16 @@ select_embedding_dimension <- function(data,
   if (E_max < E_min) cli::cli_abort("{.arg E_max} must be >= {.arg E_min}.")
 
   # --- Extract the time series once ---------------------------------------
+  data_tbl <- get_data(data)
+  val_col  <- if ("observed" %in% names(data_tbl)) "observed" else "value"
+
   series_data <- dplyr::filter(
-    get_data(data),
+    data_tbl,
     .data[["type"]]  == series_type,
     .data[["fleet"]] == series_name
   ) |>
     dplyr::arrange(.data[["timing"]]) |>
-    dplyr::pull(.data[["value"]])
+    dplyr::pull(.data[[val_col]])
 
   if (length(series_data) == 0L) {
     cli::cli_abort(c(
@@ -697,7 +703,7 @@ select_embedding_dimension <- function(data,
 #' \dontrun{
 #' data("data_big")
 #' ff <- FIMSFrame(data_big)
-#' ff <- create_edm_embedding(ff, series_type = "landings", series_name = "fleet1",
+#' ff <- create_edm_embedding(ff, series_type = "catch", series_name = "fleet1",
 #'                            E = 3L, tau = 1L)
 #' skill <- select_n_neighbors(ff)
 #' print(skill)
@@ -735,13 +741,16 @@ select_n_neighbors <- function(data,
   tau_used <- emb$tau
 
   # --- Rebuild DelayEmbedding ---------------------------------------------
+  data_tbl <- get_data(data)
+  val_col  <- if ("observed" %in% names(data_tbl)) "observed" else "value"
+
   series_data <- dplyr::filter(
-    get_data(data),
+    data_tbl,
     .data[["type"]]  == emb$series_type,
     .data[["fleet"]] == emb$series_name
   ) |>
     dplyr::arrange(.data[["timing"]]) |>
-    dplyr::pull(.data[["value"]])
+    dplyr::pull(.data[[val_col]])
 
   lib_de <- methods::new(DelayEmbedding)
   if (isTRUE(emb$drop_missing)) {
@@ -843,7 +852,7 @@ select_n_neighbors <- function(data,
 #' \dontrun{
 #' data("data_big")
 #' ff <- FIMSFrame(data_big)
-#' ff <- create_edm_embedding(ff, series_type = "landings", series_name = "fleet1",
+#' ff <- create_edm_embedding(ff, series_type = "catch", series_name = "fleet1",
 #'                            E = 3L, tau = 1L)
 #' # Auto-select optimal n_neighbors via cross-validation
 #' fit <- fit_edm(ff, method = "simplex", auto_select = TRUE)
@@ -914,13 +923,16 @@ fit_edm <- function(data,
 
   # --- Reconstruct Rcpp DelayEmbedding from the stored series -------------
   # Re-extract the original series so the Rcpp object holds live pointers.
+  data_tbl <- get_data(data)
+  val_col  <- if ("observed" %in% names(data_tbl)) "observed" else "value"
+
   series_data <- dplyr::filter(
-    get_data(data),
+    data_tbl,
     .data[["type"]]  == emb$series_type,
     .data[["fleet"]] == emb$series_name
   ) |>
     dplyr::arrange(.data[["timing"]]) |>
-    dplyr::pull(.data[["value"]])
+    dplyr::pull(.data[[val_col]])
 
   lib_de <- methods::new(DelayEmbedding)
   if (isTRUE(emb$drop_missing)) {
@@ -1061,7 +1073,7 @@ fit_edm <- function(data,
 #' \dontrun{
 #' data("data_big")
 #' ff <- FIMSFrame(data_big)
-#' ff <- create_edm_embedding(ff, series_type = "landings", series_name = "fleet1",
+#' ff <- create_edm_embedding(ff, series_type = "catch", series_name = "fleet1",
 #'                            E = 3L, tau = 1L)
 #' fit <- fit_edm(ff, method = "simplex")
 #' forecasts <- edm_forecast(fit, ff, n_ahead = 5)
@@ -1108,7 +1120,7 @@ edm_forecast <- function(fit, data, n_ahead = 1L, ...) {
   ) |>
     dplyr::arrange(.data[["timing"]])
 
-  full_series <- series_tbl$value
+  full_series <- if ("observed" %in% names(series_tbl)) series_tbl$observed else series_tbl$value
   last_time   <- max(series_tbl$timing)
 
   # --- Rebuild library DelayEmbedding -------------------------------------
@@ -1215,7 +1227,7 @@ edm_forecast <- function(fit, data, n_ahead = 1L, ...) {
 #' \dontrun{
 #' data("data_big")
 #' ff  <- FIMSFrame(data_big)
-#' ff  <- create_edm_embedding(ff, series_type = "landings",
+#' ff  <- create_edm_embedding(ff, series_type = "catch",
 #'                              series_name = "fleet1", E = 3L, tau = 1L)
 #' fit <- fit_edm(ff, method = "simplex")
 #' edm_skill(fit, ff)
@@ -1299,7 +1311,7 @@ edm_skill <- function(fit, data) {
 #' \dontrun{
 #' data("data_big")
 #' ff  <- FIMSFrame(data_big)
-#' ff  <- create_edm_embedding(ff, "landings", "fleet1", E = 3L, tau = 1L)
+#' ff  <- create_edm_embedding(ff, "catch", "fleet1", E = 3L, tau = 1L)
 #' fit <- fit_edm(ff, method = "simplex")
 #' autoplot(fit, ff)
 #' }
@@ -1440,7 +1452,7 @@ autoplot.EDMFit <- function(object, data, ...) {
 #' \dontrun{
 #' data("data_big")
 #' ff <- FIMSFrame(data_big)
-#' ff <- create_edm_embedding(ff, series_type = "landings",
+#' ff <- create_edm_embedding(ff, series_type = "catch",
 #'                            series_name = "fleet1", E = 3L, tau = 1L)
 #'
 #' edm_compare(ff)

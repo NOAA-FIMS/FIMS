@@ -32,7 +32,7 @@ annotated in the panel title.
 \dontrun{
 data("data_big")
 ff  <- FIMSFrame(data_big)
-ff  <- create_edm_embedding(ff, "landings", "fleet1", E = 3L, tau = 1L)
+ff  <- create_edm_embedding(ff, "catch", "fleet1", E = 3L, tau = 1L)
 fit <- fit_edm(ff, method = "simplex")
 autoplot(fit, ff)
 }

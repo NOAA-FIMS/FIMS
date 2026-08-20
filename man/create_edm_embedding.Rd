@@ -19,7 +19,7 @@ create_edm_embedding(
 \item{x}{A \code{\link[=FIMSFrame]{FIMSFrame()}} object.}
 
 \item{series_type}{A single string giving the \code{type} value to filter on,
-e.g. \code{"index"} or \code{"landings"}.}
+e.g. \code{"index"} or \code{"catch"}.}
 
 \item{series_name}{A single string giving the \code{fleet} (fleet / survey) value
 to filter on, e.g. \code{"survey1"}.}
