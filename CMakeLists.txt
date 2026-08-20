@@ -39,8 +39,13 @@ execute_process(
   COMMAND git describe --tags --abbrev=0
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   OUTPUT_VARIABLE VERSION
+  ERROR_QUIET
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+
+if(NOT VERSION)
+  set(VERSION "unknown")
+endif()
 
 # Set up doxygen: download doxygen 1.9.3 and add it to the PATH
 option(BUILD_DOC "Build documentation" ON)
@@ -112,7 +117,7 @@ MESSAGE(STATUS "R_HOME is ${R_HOME}")
 
 EXECUTE_PROCESS(
   COMMAND R "--slave" "--no-save" "-e"
-          "if (!requireNamespace('remotes', quietly = TRUE)) install.packages('remotes', repos = 'https://cloud.r-project.org'); remotes::install_local(dependencies = c('Depends', 'Imports', 'LinkingTo'), upgrade = 'never')"
+    "if (!requireNamespace('remotes', quietly = TRUE)) install.packages('remotes', repos = 'https://cloud.r-project.org'); remotes::install_local(path = '${CMAKE_SOURCE_DIR}', dependencies = c('Depends', 'Imports', 'LinkingTo'), upgrade = 'never')"
   RESULT_VARIABLE R_DEPENDENCY_RESULT)
 
 IF(NOT R_DEPENDENCY_RESULT EQUAL 0)

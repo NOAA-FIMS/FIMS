@@ -336,4 +336,32 @@ TEST(DSEMPrecisionBuilder, ThrowsOnSingularCovariance) {
   EXPECT_ANY_THROW(builder.BuildPrecisionMatrixSparse());
 }
 
+TEST(UnstructuredPrecisionBuilder, BuildsIdentityPrecisionMatrix) {
+  fims_distributions::UnstructuredPrecisionMatrixBuilder<double> builder;
+  builder.n = 3;
+
+  EXPECT_EQ(builder.rows(), 3);
+  EXPECT_EQ(builder.cols(), 3);
+
+  Eigen::SparseMatrix<double> precision =
+      builder.BuildPrecisionMatrixSparse();
+
+  EXPECT_EQ(precision.rows(), 3);
+  EXPECT_EQ(precision.cols(), 3);
+  for (int row = 0; row < precision.rows(); ++row) {
+    for (int column = 0; column < precision.cols(); ++column) {
+      EXPECT_DOUBLE_EQ(precision.coeff(row, column),
+                       row == column ? 1.0 : 0.0);
+    }
+  }
+}
+
+TEST(UnstructuredPrecisionBuilder, SupportsDefaultDimension) {
+  fims_distributions::UnstructuredPrecisionMatrixBuilder<double> builder;
+
+  EXPECT_EQ(builder.rows(), 1);
+  EXPECT_EQ(builder.cols(), 1);
+  EXPECT_DOUBLE_EQ(builder.BuildPrecisionMatrixSparse().coeff(0, 0), 1.0);
+}
+
 }  // namespace

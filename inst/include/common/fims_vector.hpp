@@ -375,18 +375,13 @@ class Vector {
   * 
   * @param value The element to be copied and appended.
   */
+  /**
+   * @brief Moves an element to the end of the vector.
+   * @details Transfers a temporary object into the container.
+   * @param value The temporary element whose contents will be moved and appended.
+   */
   inline void push_back(Type &&value) { this->vec_m.push_back(std::move(value)); }
 
-  /**
-  * @brief Moves an element to the end of the vector.
-  * 
-  * @details This function takes a temporary object (rvalue) and transfers 
-  * its internal data directly into the container to avoid an expensive copy. 
-  * Note: The original `value` object is left in a valid but unspecified state 
-  * after this operation.
-  * 
-  * @param value The temporary element whose contents will be moved and appended.
-  */
   /**
    * @brief Constructs and appends an element in place.
    * @tparam Args Constructor argument types.
