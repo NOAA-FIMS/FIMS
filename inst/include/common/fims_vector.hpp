@@ -368,14 +368,6 @@ class Vector {
   inline void push_back(const Type &value) { this->vec_m.push_back(value); }
 
   /**
-  * @brief Adds a copy of an element to the end of the vector.
-  * 
-  * @details This function takes a read-only reference to an object and 
-  * safely copies its data into the internal container. 
-  * 
-  * @param value The element to be copied and appended.
-  */
-  /**
    * @brief Moves an element to the end of the vector.
    * @details Transfers a temporary object into the container.
    * @param value The temporary element whose contents will be moved and appended.
