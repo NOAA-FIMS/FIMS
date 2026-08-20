@@ -53,6 +53,9 @@ struct GMRF : public DensityComponentBase<Type> {
      * @return The calculated log-probability density.
      */ 
     virtual const Type evaluate() {
+#ifndef TMB_MODEL
+        throw std::runtime_error("GMRF::evaluate requires TMB_MODEL.");
+#else
         const size_t n_x = this->get_n_x();
 
         if (this->precision_matrix_ptr == nullptr) {
@@ -106,6 +109,7 @@ struct GMRF : public DensityComponentBase<Type> {
         this->lpdf_vec[0] = this->lpdf;
 
         return this->lpdf;
+#endif
     }
 };
 

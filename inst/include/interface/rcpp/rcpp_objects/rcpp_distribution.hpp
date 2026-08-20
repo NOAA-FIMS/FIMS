@@ -131,6 +131,22 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
     return true;
   }
 
+  bool set_distribution_links_from_r(std::string input_type,
+                                     Rcpp::IntegerVector ids) {
+    std::vector<uint32_t> observed_id;
+    std::vector<uint32_t> expected_id;
+    for (R_xlen_t i = 0; i < ids.size(); ++i) {
+      if (input_type == "data" || i > 0) {
+        expected_id.push_back(static_cast<uint32_t>(ids[i]));
+      } else {
+        observed_id.push_back(static_cast<uint32_t>(ids[i]));
+      }
+    }
+    return this->set_distribution_links(
+        input_type, observed_id, expected_id,
+        static_cast<uint32_t>(-999));
+  }
+
   /**
    * @brief Set the expected mean value for the distribution.
    *
@@ -236,13 +252,6 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id_m; }
-
-  virtual bool set_distribution_links(
-      std::string input_type, std::vector<uint32_t> observed_id,
-      std::vector<uint32_t> expected_id, uint32_t uncertainty_id) {
-    return DistributionsInterfaceBase::set_distribution_links(
-        input_type, observed_id, expected_id, uncertainty_id);
-  }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -598,13 +607,6 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual uint32_t get_id() { return this->id_m; }
 
-  virtual bool set_distribution_links(
-      std::string input_type, std::vector<uint32_t> observed_id,
-      std::vector<uint32_t> expected_id, uint32_t uncertainty_id) {
-    return DistributionsInterfaceBase::set_distribution_links(
-        input_type, observed_id, expected_id, uncertainty_id);
-  }
-
   /**
    * @brief Set the unique ID for the observed data object.
    * @param observed_data_id Unique ID for the observed data object.
@@ -919,13 +921,6 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    */
   virtual uint32_t get_id() { return this->id_m; }
 
-  virtual bool set_distribution_links(
-      std::string input_type, std::vector<uint32_t> observed_id,
-      std::vector<uint32_t> expected_id, uint32_t uncertainty_id) {
-    return DistributionsInterfaceBase::set_distribution_links(
-        input_type, observed_id, expected_id, uncertainty_id);
-  }
-
   /**
    * @brief Set the unique ID for the observed data object.
    * @param observed_data_id Unique ID for the observed data object.
@@ -1161,14 +1156,6 @@ class GMRFDistributionsInterface : public DistributionsInterfaceBase {
 
   virtual uint32_t get_id() { return this->id_m; }
 
-  virtual bool set_distribution_links(std::string input_type,
-                                      std::vector<uint32_t> observed_id,
-                                      std::vector<uint32_t> expected_id,
-                                      uint32_t uncertainty_id) {
-    return DistributionsInterfaceBase::set_distribution_links(
-        input_type, observed_id, expected_id, uncertainty_id);
-  }
-
   bool set_precision_builder_id(int precision_builder_id) {
     this->precision_builder_id_m.set(precision_builder_id);
     return true;
@@ -1197,5 +1184,12 @@ class GMRFDistributionsInterface : public DistributionsInterfaceBase {
   }
 #endif
 };
+
+template <typename Distribution>
+bool set_distribution_links_adapter(Distribution* distribution,
+                                    std::string input_type,
+                                    Rcpp::IntegerVector ids) {
+  return distribution->set_distribution_links_from_r(input_type, ids);
+}
 
 #endif

@@ -34,7 +34,7 @@ void register_distributions(Rcpp::Module& m) {
       .method("set_distribution_mean",
               &DnormDistributionsInterface::set_distribution_mean)
       .method("set_distribution_links",
-              &DnormDistributionsInterface::set_distribution_links)
+              &set_distribution_links_adapter<DnormDistributionsInterface>)
       .field("observed_values", &DnormDistributionsInterface::observed_values)
       .field("expected_values", &DnormDistributionsInterface::expected_values)
       .field("expected_mean", &DnormDistributionsInterface::expected_mean)
@@ -51,7 +51,7 @@ void register_distributions(Rcpp::Module& m) {
       .method("set_observed_data",
               &DlnormDistributionsInterface::set_observed_data)
       .method("set_distribution_links",
-              &DlnormDistributionsInterface::set_distribution_links)
+              &set_distribution_links_adapter<DlnormDistributionsInterface>)
       .field("observed_values", &DlnormDistributionsInterface::observed_values)
       .field("expected_values", &DlnormDistributionsInterface::expected_values)
       .field("log_sd", &DlnormDistributionsInterface::log_sd);
@@ -65,7 +65,7 @@ void register_distributions(Rcpp::Module& m) {
       .method("get_id", &GMRFDistributionsInterface::get_id)
       .method("evaluate", &GMRFDistributionsInterface::evaluate)
       .method("set_distribution_links",
-              &GMRFDistributionsInterface::set_distribution_links)
+              &set_distribution_links_adapter<GMRFDistributionsInterface>)
       .method("set_precision_builder_id",
               &GMRFDistributionsInterface::set_precision_builder_id)
       .field("lpdf_vec", &GMRFDistributionsInterface::lpdf_vec);
@@ -81,7 +81,7 @@ void register_distributions(Rcpp::Module& m) {
       .method("set_observed_data",
               &DmultinomDistributionsInterface::set_observed_data)
       .method("set_distribution_links",
-              &DmultinomDistributionsInterface::set_distribution_links)
+              &set_distribution_links_adapter<DmultinomDistributionsInterface>)
       .method("set_note", &DmultinomDistributionsInterface::set_note)
       .field("observed_values",
              &DmultinomDistributionsInterface::observed_values)

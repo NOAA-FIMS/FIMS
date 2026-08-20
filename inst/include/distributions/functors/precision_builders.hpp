@@ -22,18 +22,12 @@
 #include "../../common/def.hpp"
 #include "../../common/fims_vector.hpp"
 #include "../../common/fims_math.hpp"
+#include <Eigen/Core>
+#include <Eigen/Sparse>
+#include <stdexcept>
 
 #ifdef TMB_MODEL
-#include <Eigen/Sparse>
 #include <Eigen/SparseLU>
-#include <stdexcept>
-#else
-namespace Eigen {
-    template <typename Scalar, int Options = 0, typename StorageIndex = int>
-    class SparseMatrix;
-    template <typename Scalar, int Rows = -1, int Cols = -1, int Options = 0, int MaxRows = -1, int MaxCols = -1>
-    class Matrix;
-} // namespace Eigen
 #endif
 
 namespace fims_distributions {

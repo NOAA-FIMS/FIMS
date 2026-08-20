@@ -320,7 +320,7 @@ initialize_data_distribution <- function(
   # set name of expected values
   expected <- get_expected_name(family, data_type)
   # setup link to expected values
-  new_module$set_distribution_links("data", expected_id = module$field(expected)$get_id())
+  new_module$set_distribution_links("data", module$field(expected)$get_id())
 
   return(new_module)
 }
@@ -409,13 +409,12 @@ initialize_process_distribution <- function(
   if (is.null(expected)) {
     new_module$set_distribution_links(
       "random_effects",
-      observed_id = module$field(par)$get_id()
+      module$field(par)$get_id()
     )
   } else {
     new_module$set_distribution_links(
       "random_effects",
-      observed_id = module$field(par)$get_id(),
-      expected_id = module$field(expected)$get_id()
+      c(module$field(par)$get_id(), module$field(expected)$get_id())
     )
   }
 
