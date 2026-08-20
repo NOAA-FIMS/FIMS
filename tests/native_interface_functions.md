@@ -143,24 +143,26 @@ workflow this call must occur before `fims_call_build_default_likelihood()`.
 ### `fims_call_build_default_likelihood()`
 
 Builds the data objects, distributions, and links used by the comparison model.
-It takes 15 arguments:
+It takes 17 arguments:
 
 1. fishing fleet ID;
 2. survey fleet ID;
 3. landings observations;
-4. landings coefficient of variation;
-5. landings age compositions;
-6. landings length compositions;
-7. survey index observations;
-8. survey coefficient of variation;
-9. survey age compositions;
-10. survey length compositions;
-11. recruitment log standard deviation;
-12. recruitment log-standard-deviation estimation type (`0` constant, `1`
+4. landings distribution family (`dnorm` or `dlnorm`);
+5. landings standard deviation, scalar or observation-specific;
+6. landings age compositions;
+7. landings length compositions;
+8. survey index observations;
+9. survey distribution family (`dnorm` or `dlnorm`);
+10. survey standard deviation, scalar or observation-specific;
+11. survey age compositions;
+12. survey length compositions;
+13. recruitment log standard deviation;
+14. recruitment log-standard-deviation estimation type (`0` constant, `1`
     fixed effect, or `2` random effect);
-13. number of years;
-14. number of ages;
-15. number of lengths.
+15. number of years;
+16. number of ages;
+17. number of lengths.
 
 This is currently a model-specific convenience builder rather than a general
 API for arbitrary likelihood graphs.

@@ -77,7 +77,7 @@ extern "C"
        1},
       {"fims_call_create_model", (DL_FUNC)&fims_call_create_model, 0},
       {"fims_call_build_default_likelihood",
-       (DL_FUNC)&fims_call_build_default_likelihood, 15},
+       (DL_FUNC)&fims_call_build_default_likelihood, 17},
       {"fims_call_add_prior", (DL_FUNC)&fims_call_add_prior, 8},
       {"fims_call_information_model_counts",
        (DL_FUNC)&fims_call_information_model_counts, 0},

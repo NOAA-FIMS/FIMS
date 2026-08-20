@@ -42,28 +42,69 @@
   dplyr::coalesce(rows$estimation_type, default)
 }
 
-.native_cv_from_data <- function(data, fleet, type) {
+.native_distribution_from_data <- function(data, fleet, type) {
   specifications <- get_data(data) |>
     dplyr::filter(
       .data$fleet == .env$fleet,
       .data$type == .env$type
     ) |>
-    dplyr::pull(.data$uncertainty) |>
-    unique()
+    dplyr::pull(.data$uncertainty)
 
-  if (length(specifications) != 1L) {
+  if (length(specifications) == 0L) {
     cli::cli_abort(
-      "The native initializer requires one uncertainty specification for {type} data from fleet `{fleet}`."
+      "The native initializer requires uncertainty specifications for {type} data from fleet `{fleet}`."
     )
   }
   parsed <- parse_data_distribution(specifications)
-  if (!identical(parsed$family[[1L]], "dlnorm")) {
+  families <- unique(stats::na.omit(parsed$family))
+  if (length(families) != 1L || !families %in% c("dnorm", "dlnorm")) {
     cli::cli_abort(
-      "The native initializer currently requires a lognormal distribution for {type} data from fleet `{fleet}`."
+      "The native initializer supports one continuous family (`dnorm` or `dlnorm`) per {type} data set from fleet `{fleet}`."
     )
   }
-  sd_log <- eval(parsed$sdlog[[1L]], envir = parent.frame())
-  sqrt(exp(sd_log^2) - 1)
+  family <- families[[1L]]
+  expected_link <- if (family == "dnorm") {
+    paste0(type, "_expected")
+  } else {
+    paste0("log_", type, "_expected")
+  }
+  links <- unique(stats::na.omit(parsed$link))
+  if (!identical(links, expected_link)) {
+    cli::cli_abort(
+      "The {family} distribution for {type} data must link to `{expected_link}`."
+    )
+  }
+  scale_name <- if (family == "dnorm") "sd" else "sdlog"
+  scale <- vapply(parsed[[scale_name]], function(value) {
+    as.numeric(eval(value, envir = parent.frame()))
+  }, numeric(1L))
+  list(family = family, scale = scale)
+}
+
+.native_validate_composition_distribution <- function(data, fleet, type) {
+  specifications <- get_data(data) |>
+    dplyr::filter(
+      .data$fleet == .env$fleet,
+      .data$type == .env$type
+    ) |>
+    dplyr::pull(.data$uncertainty)
+  if (length(specifications) == 0L) {
+    return(invisible(NULL))
+  }
+  parsed <- parse_data_distribution(specifications)
+  families <- unique(stats::na.omit(parsed$family))
+  expected_link <- if (type == "age_comp") {
+    "agecomp_proportion"
+  } else {
+    "lengthcomp_proportion"
+  }
+  links <- unique(stats::na.omit(parsed$link))
+  if (!identical(families, "dmultinom") || !identical(links, expected_link)) {
+    cli::cli_abort(
+      "Native {type} data require `dmultinom(prob = {expected_link}, size = ...)`."
+    )
+  }
+  invisible(NULL)
 }
 
 #' Initialize a FIMS model through the native interface
@@ -288,17 +329,27 @@ initialize_fims <- function(parameters, data) {
   recruitment_log_sd <- .native_parameter_values(
     parameters, "Recruitment", "log_sd", default = log(1)
   )
+  catch_distribution <- .native_distribution_from_data(
+    data, fishing_fleet, "catch"
+  )
+  index_distribution <- .native_distribution_from_data(
+    data, survey_fleet, "index"
+  )
+  for (fleet in fleets) {
+    .native_validate_composition_distribution(data, fleet, "age_comp")
+    .native_validate_composition_distribution(data, fleet, "length_comp")
+  }
   native_build_default_likelihood(
     fishing_fleet_id = fleet_ids[[fishing_fleet]],
     survey_fleet_id = fleet_ids[[survey_fleet]],
     landings = model_catch(data, fishing_fleet),
-    landings_cv = .native_cv_from_data(
-      data, fishing_fleet, "catch"
-    ),
+    landings_distribution = catch_distribution$family,
+    landings_sd = catch_distribution$scale,
     landings_age_comp = model_age_comp(data, fishing_fleet),
     landings_length_comp = model_length_comp(data, fishing_fleet),
     survey_index = model_index(data, survey_fleet),
-    survey_cv = .native_cv_from_data(data, survey_fleet, "index"),
+    survey_distribution = index_distribution$family,
+    survey_sd = index_distribution$scale,
     survey_age_comp = model_age_comp(data, survey_fleet),
     survey_length_comp = model_length_comp(data, survey_fleet),
     recruitment_log_sd = recruitment_log_sd[[1L]],

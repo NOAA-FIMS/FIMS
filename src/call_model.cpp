@@ -23,6 +23,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace
 {
@@ -1058,46 +1059,64 @@ namespace
     }
 
     template <typename Type>
-    void add_lognormal_component(
+    void add_continuous_data_component(
         std::shared_ptr<fims_info::Information<Type>> info,
         std::shared_ptr<fims_data_object::DataObject<Type>> observed_data,
         fims::Vector<Type> *expected_values,
         size_t n_years,
-        double cv)
+        const std::string &family,
+        const std::vector<double> &sd)
     {
         if (expected_values == nullptr)
         {
-            Rf_error("Lognormal expected-values pointer is null.");
+            Rf_error("Continuous-data expected-values pointer is null.");
         }
         if (expected_values->size() != n_years)
         {
-            Rf_error("Lognormal expected-values size mismatch: expected %zu, got %zu.",
+            Rf_error("Continuous-data expected-values size mismatch: expected %zu, got %zu.",
                      n_years,
                      expected_values->size());
         }
 
-        if (!std::isfinite(cv) || cv <= 0.0)
+        if (sd.size() != 1 && sd.size() != n_years)
         {
-            Rf_error("Lognormal CV must be finite and > 0.");
+            Rf_error("Distribution standard deviation must have length 1 or %zu.", n_years);
+        }
+        for (size_t i = 0; i < sd.size(); ++i)
+        {
+            if (!std::isfinite(sd[i]) || sd[i] <= 0.0)
+                Rf_error("Distribution standard deviations must be finite and > 0.");
         }
 
-        const Type log_sd_value = static_cast<Type>(
-            std::log(std::sqrt(std::log(cv * cv + 1.0))));
-
-        std::shared_ptr<fims_distributions::LogNormalLPDF<Type>> distribution =
-            std::make_shared<fims_distributions::LogNormalLPDF<Type>>();
-        distribution->input_type = "data";
-        distribution->observed_data_id_m =
-            static_cast<int>(observed_data->id);
-        distribution->data_observed_values = observed_data;
-        distribution->data_expected_values = expected_values;
-        distribution->log_sd.resize(n_years);
-        for (size_t year = 0; year < n_years; ++year)
+        if (family == "dlnorm")
         {
-            distribution->log_sd[year] = log_sd_value;
+            std::shared_ptr<fims_distributions::LogNormalLPDF<Type>> distribution =
+                std::make_shared<fims_distributions::LogNormalLPDF<Type>>();
+            distribution->input_type = "data";
+            distribution->observed_data_id_m = static_cast<int>(observed_data->id);
+            distribution->data_observed_values = observed_data;
+            distribution->data_expected_values = expected_values;
+            distribution->log_sd.resize(sd.size());
+            for (size_t i = 0; i < sd.size(); ++i)
+                distribution->log_sd[i] = static_cast<Type>(std::log(sd[i]));
+            info->density_components[distribution->id] = distribution;
+            return;
         }
-
-        info->density_components[distribution->id] = distribution;
+        if (family == "dnorm")
+        {
+            std::shared_ptr<fims_distributions::NormalLPDF<Type>> distribution =
+                std::make_shared<fims_distributions::NormalLPDF<Type>>();
+            distribution->input_type = "data";
+            distribution->observed_data_id_m = static_cast<int>(observed_data->id);
+            distribution->data_observed_values = observed_data;
+            distribution->data_expected_values = expected_values;
+            distribution->log_sd.resize(sd.size());
+            for (size_t i = 0; i < sd.size(); ++i)
+                distribution->log_sd[i] = static_cast<Type>(std::log(sd[i]));
+            info->density_components[distribution->id] = distribution;
+            return;
+        }
+        Rf_error("Unsupported continuous data distribution `%s`.", family.c_str());
     }
 
     template <typename Type>
@@ -1190,11 +1209,13 @@ namespace
         uint32_t fishing_fleet_id,
         uint32_t survey_fleet_id,
         SEXP landings_sexp,
-        double landings_cv,
+        const std::string &landings_distribution,
+        const std::vector<double> &landings_sd,
         SEXP landings_age_comp_sexp,
         SEXP landings_length_comp_sexp,
         SEXP survey_index_sexp,
-        double survey_cv,
+        const std::string &survey_distribution,
+        const std::vector<double> &survey_sd,
         SEXP survey_age_comp_sexp,
         SEXP survey_length_comp_sexp,
         double recruitment_log_sd,
@@ -1264,15 +1285,16 @@ namespace
             fishing_fleet->fleet_observed_catch_data_id_m =
                 static_cast<int>(fishing_landings_data->id);
             fishing_fleet->observed_catch_data = fishing_landings_data;
-            add_lognormal_component<Type>(
+            add_continuous_data_component<Type>(
                 info,
                 fishing_landings_data,
                 require_fleet_derived_quantity<Type>(
                     info,
                     fishing_fleet_id,
-                    "log_catch_expected"),
+                    landings_distribution == "dnorm" ? "catch_expected" : "log_catch_expected"),
                 n_years,
-                landings_cv);
+                landings_distribution,
+                landings_sd);
         }
         else
         {
@@ -1291,15 +1313,16 @@ namespace
             survey_fleet->fleet_observed_index_data_id_m =
                 static_cast<int>(survey_index_data->id);
             survey_fleet->observed_index_data = survey_index_data;
-            add_lognormal_component<Type>(
+            add_continuous_data_component<Type>(
                 info,
                 survey_index_data,
                 require_fleet_derived_quantity<Type>(
                     info,
                     survey_fleet_id,
-                    "log_index_expected"),
+                    survey_distribution == "dnorm" ? "index_expected" : "log_index_expected"),
                 n_years,
-                survey_cv);
+                survey_distribution,
+                survey_sd);
         }
         else
         {
@@ -1451,11 +1474,13 @@ extern "C" SEXP fims_call_build_default_likelihood(
     SEXP fishing_fleet_id_sexp,
     SEXP survey_fleet_id_sexp,
     SEXP landings_sexp,
-    SEXP landings_cv_sexp,
+    SEXP landings_distribution_sexp,
+    SEXP landings_sd_sexp,
     SEXP landings_age_comp_sexp,
     SEXP landings_length_comp_sexp,
     SEXP survey_index_sexp,
-    SEXP survey_cv_sexp,
+    SEXP survey_distribution_sexp,
+    SEXP survey_sd_sexp,
     SEXP survey_age_comp_sexp,
     SEXP survey_length_comp_sexp,
     SEXP recruitment_log_sd_sexp,
@@ -1468,8 +1493,19 @@ extern "C" SEXP fims_call_build_default_likelihood(
         static_cast<uint32_t>(Rf_asInteger(fishing_fleet_id_sexp));
     const uint32_t survey_fleet_id =
         static_cast<uint32_t>(Rf_asInteger(survey_fleet_id_sexp));
-    const double landings_cv = Rf_asReal(landings_cv_sexp);
-    const double survey_cv = Rf_asReal(survey_cv_sexp);
+    const std::string landings_distribution =
+        CHAR(Rf_asChar(landings_distribution_sexp));
+    const std::string survey_distribution =
+        CHAR(Rf_asChar(survey_distribution_sexp));
+    if (TYPEOF(landings_sd_sexp) != REALSXP ||
+        TYPEOF(survey_sd_sexp) != REALSXP)
+        Rf_error("Distribution standard deviations must be numeric vectors.");
+    const std::vector<double> landings_sd(
+        REAL(landings_sd_sexp),
+        REAL(landings_sd_sexp) + XLENGTH(landings_sd_sexp));
+    const std::vector<double> survey_sd(
+        REAL(survey_sd_sexp),
+        REAL(survey_sd_sexp) + XLENGTH(survey_sd_sexp));
     const double recruitment_log_sd = Rf_asReal(recruitment_log_sd_sexp);
     const int recruitment_log_sd_estimation_type =
         Rf_asInteger(recruitment_log_sd_estimation_type_sexp);
@@ -1486,11 +1522,13 @@ extern "C" SEXP fims_call_build_default_likelihood(
         fishing_fleet_id,
         survey_fleet_id,
         landings_sexp,
-        landings_cv,
+        landings_distribution,
+        landings_sd,
         landings_age_comp_sexp,
         landings_length_comp_sexp,
         survey_index_sexp,
-        survey_cv,
+        survey_distribution,
+        survey_sd,
         survey_age_comp_sexp,
         survey_length_comp_sexp,
         recruitment_log_sd,
@@ -1504,11 +1542,13 @@ extern "C" SEXP fims_call_build_default_likelihood(
         fishing_fleet_id,
         survey_fleet_id,
         landings_sexp,
-        landings_cv,
+        landings_distribution,
+        landings_sd,
         landings_age_comp_sexp,
         landings_length_comp_sexp,
         survey_index_sexp,
-        survey_cv,
+        survey_distribution,
+        survey_sd,
         survey_age_comp_sexp,
         survey_length_comp_sexp,
         recruitment_log_sd,

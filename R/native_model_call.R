@@ -22,11 +22,13 @@ native_create_model <- function() {
 #' @param fishing_fleet_id Integer handle for the fishing fleet.
 #' @param survey_fleet_id Integer handle for the survey fleet.
 #' @param landings Numeric landings observations.
-#' @param landings_cv Numeric landings coefficient of variation.
+#' @param landings_distribution,survey_distribution Continuous distribution
+#'   families, either `"dlnorm"` or `"dnorm"`.
+#' @param landings_sd,survey_sd Numeric standard deviations on the scale of the
+#'   selected distribution. Scalars are recycled over observations.
 #' @param landings_age_comp Numeric flattened landings age compositions.
 #' @param landings_length_comp Numeric flattened landings length compositions.
 #' @param survey_index Numeric survey-index observations.
-#' @param survey_cv Numeric survey-index coefficient of variation.
 #' @param survey_age_comp Numeric flattened survey age compositions.
 #' @param survey_length_comp Numeric flattened survey length compositions.
 #' @param recruitment_log_sd Numeric recruitment standard deviation on the
@@ -40,11 +42,13 @@ native_build_default_likelihood <- function(
   fishing_fleet_id,
   survey_fleet_id,
   landings,
-  landings_cv,
+  landings_distribution = "dlnorm",
+  landings_sd,
   landings_age_comp,
   landings_length_comp,
   survey_index,
-  survey_cv,
+  survey_distribution = "dlnorm",
+  survey_sd,
   survey_age_comp,
   survey_length_comp,
   recruitment_log_sd,
@@ -58,11 +62,13 @@ native_build_default_likelihood <- function(
     as.integer(fishing_fleet_id),
     as.integer(survey_fleet_id),
     as.numeric(landings),
-    as.numeric(landings_cv),
+    as.character(landings_distribution),
+    as.numeric(landings_sd),
     as.numeric(landings_age_comp),
     as.numeric(landings_length_comp),
     as.numeric(survey_index),
-    as.numeric(survey_cv),
+    as.character(survey_distribution),
+    as.numeric(survey_sd),
     as.numeric(survey_age_comp),
     as.numeric(survey_length_comp),
     as.numeric(recruitment_log_sd),

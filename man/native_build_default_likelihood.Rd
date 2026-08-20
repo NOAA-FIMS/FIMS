@@ -8,11 +8,13 @@ native_build_default_likelihood(
   fishing_fleet_id,
   survey_fleet_id,
   landings,
-  landings_cv,
+  landings_distribution = "dlnorm",
+  landings_sd,
   landings_age_comp,
   landings_length_comp,
   survey_index,
-  survey_cv,
+  survey_distribution = "dlnorm",
+  survey_sd,
   survey_age_comp,
   survey_length_comp,
   recruitment_log_sd,
@@ -29,15 +31,17 @@ native_build_default_likelihood(
 
 \item{landings}{Numeric landings observations.}
 
-\item{landings_cv}{Numeric landings coefficient of variation.}
+\item{landings_distribution, survey_distribution}{Continuous distribution
+families, either \code{"dlnorm"} or \code{"dnorm"}.}
+
+\item{landings_sd, survey_sd}{Numeric standard deviations on the scale of the
+selected distribution. Scalars are recycled over observations.}
 
 \item{landings_age_comp}{Numeric flattened landings age compositions.}
 
 \item{landings_length_comp}{Numeric flattened landings length compositions.}
 
 \item{survey_index}{Numeric survey-index observations.}
-
-\item{survey_cv}{Numeric survey-index coefficient of variation.}
 
 \item{survey_age_comp}{Numeric flattened survey age compositions.}
 
