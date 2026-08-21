@@ -67,32 +67,32 @@ struct FakeGrowthDerivedObservation
 };
 
 /**
- * @brief Fill a Von Bertalanffy adapter with a consistent single-sex test
+ * @brief Fill a VonB-Schnute adapter with a consistent single-sex test
  * parameter set.
  */
 void ConfigureAdapter(
-    fims_popdy::VonBertalanffyGrowthModelAdapter<double>& adapter,
-    double length_at_ref_age_1,
-    double length_at_ref_age_2,
-    double growth_coefficient_K,
+    fims_popdy::VonBSchnuteGrowthModelAdapter<double>& adapter,
+    double mean_length_young,
+    double mean_length_old,
+    double von_bertalanffy_coefficient_K,
     double reference_age_for_length_1,
     double reference_age_for_length_2,
     double length_weight_a,
     double length_weight_b,
     double length_at_age_sd_at_reference_age_1,
     double length_at_age_sd_at_reference_age_2) {
-  adapter.LengthAtRefAge1Vector().resize(1);
-  adapter.LengthAtRefAge2Vector().resize(1);
-  adapter.GrowthCoefficientKVector().resize(1);
+  adapter.MeanLengthYoungVector().resize(1);
+  adapter.MeanLengthOldVector().resize(1);
+  adapter.VonBertalanffyCoefficientKVector().resize(1);
   adapter.ReferenceAgeForLength1Vector().resize(1);
   adapter.ReferenceAgeForLength2Vector().resize(1);
   adapter.LengthWeightAVector().resize(1);
   adapter.LengthWeightBVector().resize(1);
   adapter.LengthAtAgeSdAtRefAgesVector().resize(2);
 
-  adapter.LengthAtRefAge1Vector()[0] = fims_math::log(length_at_ref_age_1);
-  adapter.LengthAtRefAge2Vector()[0] = fims_math::log(length_at_ref_age_2);
-  adapter.GrowthCoefficientKVector()[0] = fims_math::log(growth_coefficient_K);
+  adapter.MeanLengthYoungVector()[0] = fims_math::log(mean_length_young);
+  adapter.MeanLengthOldVector()[0] = fims_math::log(mean_length_old);
+  adapter.VonBertalanffyCoefficientKVector()[0] = fims_math::log(von_bertalanffy_coefficient_K);
   adapter.ReferenceAgeForLength1Vector()[0] = reference_age_for_length_1;
   adapter.ReferenceAgeForLength2Vector()[0] = reference_age_for_length_2;
   adapter.LengthWeightAVector()[0] = fims_math::log(length_weight_a);
@@ -334,7 +334,7 @@ TEST(RuntimeALK, GrowthDerivedFleetMeanWeightAAMatchesALKWeightedBinCenterWeight
   auto fleet = MakeFleet();
 
   auto growth =
-      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
@@ -408,7 +408,7 @@ TEST(GrowthDerivedALK, IsInactiveWithoutPreparedFleetObservationGeometry) {
   fleet->n_lengths = 4;
 
   auto growth =
-      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
@@ -539,7 +539,7 @@ TEST(GrowthDerivedALK, BuildALKRowReturnsFiniteNonnegativeNormalizedRow) {
   auto fleet = MakeFleet();
 
   auto growth =
-      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
@@ -576,7 +576,7 @@ TEST(GrowthDerivedALK, BuildALKRowFailsForOutOfRangeAge) {
   auto fleet = MakeFleet();
 
   auto growth =
-      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
@@ -603,7 +603,7 @@ TEST(GrowthDerivedALK, BuildALKRowHandlesDifferentFleetBinLayout) {
   auto fleet = MakeFleet({150.0, 250.0, 450.0, 700.0});
 
   auto growth =
-      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);

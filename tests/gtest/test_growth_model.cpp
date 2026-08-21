@@ -9,7 +9,7 @@ TEST(GrowthModel, CanConstructAndPrepare) {
   // years=1, ages=12 (1..12), sexes=1
   fims_popdy::GrowthModel<double> gm(1, 12, 1);
 
-  gm.SetVonBertalanffyParameters(275.0, 725.0, 0.18, 1.0, 12.0);
+  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
   gm.SetAgeOffset(1.0);
@@ -24,45 +24,45 @@ TEST(GrowthModel, CanConstructAndPrepare) {
 
   // Check a couple of values exist and look sane
   const double age = 5.0;
-  const double length_at_ref_age_1 = 275.0;
-  const double length_at_ref_age_2 = 725.0;
-  const double growth_coefficient_K = 0.18;
+  const double mean_length_young = 275.0;
+  const double mean_length_old = 725.0;
+  const double von_bertalanffy_coefficient_K = 0.18;
   const double reference_age_for_length_1 = 1.0;
   const double reference_age_for_length_2 = 12.0;
   const double denom_raw = 1.0 - std::exp(
-      -growth_coefficient_K *
+      -von_bertalanffy_coefficient_K *
       (reference_age_for_length_2 - reference_age_for_length_1));
   const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double expected_length_at_age_1 =
-      length_at_ref_age_1 +
-      (length_at_ref_age_2 - length_at_ref_age_1) *
-          (1.0 - std::exp(-growth_coefficient_K *
+      mean_length_young +
+      (mean_length_old - mean_length_young) *
+          (1.0 - std::exp(-von_bertalanffy_coefficient_K *
                           (1.0 - reference_age_for_length_1))) /
           denom;
   const double expected_length_at_age_5 =
-      length_at_ref_age_1 +
-      (length_at_ref_age_2 - length_at_ref_age_1) *
-          (1.0 - std::exp(-growth_coefficient_K *
+      mean_length_young +
+      (mean_length_old - mean_length_young) *
+          (1.0 - std::exp(-von_bertalanffy_coefficient_K *
                           (age - reference_age_for_length_1))) /
           denom;
   const double expected_length_at_age_8 =
-      length_at_ref_age_1 +
-      (length_at_ref_age_2 - length_at_ref_age_1) *
-          (1.0 - std::exp(-growth_coefficient_K *
+      mean_length_young +
+      (mean_length_old - mean_length_young) *
+          (1.0 - std::exp(-von_bertalanffy_coefficient_K *
                           (8.0 - reference_age_for_length_1))) /
           denom;
   const double expected_length_at_age_12 =
-      length_at_ref_age_1 +
-      (length_at_ref_age_2 - length_at_ref_age_1) *
-          (1.0 - std::exp(-growth_coefficient_K *
+      mean_length_young +
+      (mean_length_old - mean_length_young) *
+          (1.0 - std::exp(-von_bertalanffy_coefficient_K *
                           (12.0 - reference_age_for_length_1))) /
           denom;
   const double observed_length_at_age_1 = p.MeanLAA(0, 0, 0);
   const double observed_length_at_age_12 = p.MeanLAA(0, 11, 0);
 
   EXPECT_NEAR(observed_length_at_age_1, expected_length_at_age_1, 1e-8);
-  EXPECT_GT(expected_length_at_age_5, length_at_ref_age_1);
-  EXPECT_LT(expected_length_at_age_5, length_at_ref_age_2);
+  EXPECT_GT(expected_length_at_age_5, mean_length_young);
+  EXPECT_LT(expected_length_at_age_5, mean_length_old);
   EXPECT_NEAR(observed_length_at_age_12, expected_length_at_age_12, 1e-8);
   EXPECT_NEAR(p.SdLAA(0, 0, 0), 28.0, 1e-7);
   EXPECT_NEAR(p.SdLAA(0, 11, 0), 73.0, 1e-7);
@@ -83,33 +83,33 @@ TEST(GrowthModel, CanConstructAndPrepare) {
 TEST(GrowthModel, UsesDeltaMethodVariabilityAtReferenceAges) {
   fims_popdy::GrowthModel<double> gm(1, 12, 1);
 
-  const double length_at_ref_age_1 = 275.0;
-  const double length_at_ref_age_2 = 725.0;
-  const double growth_coefficient_K = 0.18;
+  const double mean_length_young = 275.0;
+  const double mean_length_old = 725.0;
+  const double von_bertalanffy_coefficient_K = 0.18;
   const double reference_age_for_length_1 = 1.0;
   const double reference_age_for_length_2 = 12.0;
 
-  gm.SetVonBertalanffyParameters(
-      length_at_ref_age_1, length_at_ref_age_2, growth_coefficient_K,
+  gm.SetVonBSchnuteParameters(
+      mean_length_young, mean_length_old, von_bertalanffy_coefficient_K,
       reference_age_for_length_1, reference_age_for_length_2);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetGrowthParameterCovariance(
-      0.01,  // var(log(length_at_ref_age_1))) = 0.1^2
+      0.01,  // var(log(mean_length_young))) = 0.1^2
       0.0,
       0.0,
-      0.01,  // var(log(length_at_ref_age_2))) = 0.1^2
+      0.01,  // var(log(mean_length_old))) = 0.1^2
       0.0,
-      0.01); // var(log(growth_coefficient_K))) = 0.1^2
+      0.01); // var(log(von_bertalanffy_coefficient_K))) = 0.1^2
   gm.SetAgeOffset(1.0);
 
   gm.Prepare();
 
   const auto& p = gm.GetProducts();
 
-  fims_popdy::VonBertalanffyGrowth<double> vb;
-  vb.length_at_ref_age_1 = length_at_ref_age_1;
-  vb.length_at_ref_age_2 = length_at_ref_age_2;
-  vb.growth_coefficient_K = growth_coefficient_K;
+  fims_popdy::VonBSchnuteGrowth<double> vb;
+  vb.mean_length_young = mean_length_young;
+  vb.mean_length_old = mean_length_old;
+  vb.von_bertalanffy_coefficient_K = von_bertalanffy_coefficient_K;
   vb.reference_age_for_length_1 = reference_age_for_length_1;
   vb.reference_age_for_length_2 = reference_age_for_length_2;
 
@@ -159,7 +159,7 @@ TEST(GrowthModel, UsesDeltaMethodVariabilityAtReferenceAges) {
 
 TEST(GrowthModel, ZeroAgesThrows) {
   fims_popdy::GrowthModel<double> gm(1, 0, 1);
-  gm.SetVonBertalanffyParameters(275.0, 725.0, 0.18, 1.0, 12.0);
+  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
@@ -168,7 +168,7 @@ TEST(GrowthModel, ZeroAgesThrows) {
 
 TEST(GrowthModel, RejectsNonIncreasingReferenceLengths) {
   fims_popdy::GrowthModel<double> gm(1, 2, 1);
-  gm.SetVonBertalanffyParameters(275.0, 275.0, 0.18, 1.0, 12.0);
+  gm.SetVonBSchnuteParameters(275.0, 275.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
@@ -177,7 +177,7 @@ TEST(GrowthModel, RejectsNonIncreasingReferenceLengths) {
 
 TEST(GrowthModel, RejectsCoincidentReferenceAges) {
   fims_popdy::GrowthModel<double> gm(1, 3, 1);
-  gm.SetVonBertalanffyParameters(275.0, 725.0, 0.18, 5.0, 5.0);
+  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 5.0, 5.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
@@ -186,7 +186,7 @@ TEST(GrowthModel, RejectsCoincidentReferenceAges) {
 
 TEST(GrowthModel, RejectsNonPositiveLengthWeightA) {
   fims_popdy::GrowthModel<double> gm(1, 2, 1);
-  gm.SetVonBertalanffyParameters(275.0, 725.0, 0.18, 1.0, 12.0);
+  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(0.0, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
@@ -195,7 +195,7 @@ TEST(GrowthModel, RejectsNonPositiveLengthWeightA) {
 
 TEST(GrowthModel, HandlesNegativeSdInputsWithoutThrow) {
   fims_popdy::GrowthModel<double> gm(1, 2, 1);
-  gm.SetVonBertalanffyParameters(275.0, 725.0, 0.18, 1.0, 12.0);
+  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(-1.0, 73.0);
 
@@ -207,7 +207,7 @@ TEST(GrowthModel, HandlesNegativeSdInputsWithoutThrow) {
 TEST(GrowthModel, SingleAgeRejectsCoincidentReferenceAges) {
   fims_popdy::GrowthModel<double> gm(1, 1, 1);
   // Coincident reference ages are invalid even with one modeled age.
-  gm.SetVonBertalanffyParameters(275.0, 725.0, 0.18, 1.0, 1.0);
+  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 1.0, 1.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 

@@ -1043,10 +1043,8 @@ FIMSFrame <- function(data) {
       "{.var data} has 0 rows of data and cannot be used to make a FIMSFrame."
     )
   }
-  # TODO: Change this check when internal estimation of growth is possible
-  if (NROW(dplyr::filter(data, .data$type == "weight_at_age")) == 0) {
-    cli::cli_abort("{.var data} must contain {.var weight_at_age} data.")
-  }
+  # Empirical weight-at-age is required by the EWAA Growth path, but it is not
+  # required at the FIMSFrame level because model-derived Growth can provide WAA.
   if (!all(is.numeric(data[["timing"]]))) {
     cli::cli_abort("{.var timing} must be in numeric format.")
   }

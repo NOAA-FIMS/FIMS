@@ -10,10 +10,16 @@
 # VonB growth convergence ----
 ## Setup ----
 make_vonb_parameters <- function(fims_frame) {
-  FIMS::setup_default_parameters(
-    data = fims_frame,
-    growth_module_type = "VonBertalanffy"
-  )
+  default_parameters <- FIMS::setup_default_parameters(data = fims_frame)
+
+  default_parameters |>
+    dplyr::filter(.data[["module_name"]] != "Growth") |>
+    dplyr::bind_rows(
+      FIMS::setup_default_Growth(
+        data = fims_frame,
+        module_type = "VonB-Schnute"
+      )
+    )
 }
 
 make_vonb_convergence_context <- function() {
@@ -246,13 +252,13 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     dplyr::filter(module_name == "Growth")
   core_growth_estimates <- growth_estimates |>
     dplyr::filter(label %in% c(
-      "length_at_ref_age_1",
-      "length_at_ref_age_2",
-      "growth_coefficient_K"
+      "mean_length_young",
+      "mean_length_old",
+      "von_bertalanffy_coefficient_K"
     )) |>
     dplyr::arrange(match(
       label,
-      c("length_at_ref_age_1", "length_at_ref_age_2", "growth_coefficient_K")
+      c("mean_length_young", "mean_length_old", "von_bertalanffy_coefficient_K")
     )) |>
     dplyr::pull(estimated)
 
@@ -268,10 +274,10 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   #' @description Test that the second reference length stays larger than the first.
   expect_gt(
     growth_estimates |>
-      dplyr::filter(label == "length_at_ref_age_2") |>
+      dplyr::filter(label == "mean_length_old") |>
       dplyr::pull(estimated),
     growth_estimates |>
-      dplyr::filter(label == "length_at_ref_age_1") |>
+      dplyr::filter(label == "mean_length_young") |>
       dplyr::pull(estimated)
   )
 
@@ -280,13 +286,13 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     report[["growth_sd_LAA"]][[1]] > 0
   ))
 
-  #' @description Test that the fitted fleet reports using the growth-derived ALK path.
+  #' @description Test that the fitted fleet reports using the growth-derived age-to-length conversion path.
   expect_equal(
     report[["growth_derived_alk_used"]][[1]][1],
     1
   )
 
-  #' @description Test that the active growth-derived ALK path does not also
+  #' @description Test that the active growth-derived age-to-length conversion path does not also
   #' report a legacy fixed age_to_length_conversion matrix.
   expect_equal(length(report[["age_to_length_conversion"]][[1]]), 0)
 
@@ -341,7 +347,7 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     dim = c(n_lengths, n_ages, n_years)
   )
 
-  #' @description Test that the realized growth-derived ALK rows sum to one for each year and age.
+  #' @description Test that the realized growth-derived age-to-length conversion rows sum to one for each year and age.
   expect_true(all(abs(apply(realized_alk_array, c(2, 3), sum) - 1) < 1e-5))
 
 })
@@ -362,9 +368,9 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
 
   expected_growth <- tibble::tibble(
     label = c(
-      "length_at_ref_age_1",
-      "length_at_ref_age_2",
-      "growth_coefficient_K"
+      "mean_length_young",
+      "mean_length_old",
+      "von_bertalanffy_coefficient_K"
     ),
     expected = c(
       AtoL(1, Linf, K, a0),
@@ -402,43 +408,43 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
   #' @description Test that the fitted VonB output includes the three Model Comparison OM-truth growth parameters.
   expect_setequal(growth_estimates$label, expected_growth$label)
 
-  #' @description Test that fitted length_at_ref_age_1 remains close to the model comparison OM value at age 1.
+  #' @description Test that fitted mean_length_young remains close to the model comparison OM value at age 1.
   expect_equal(
     growth_estimates |>
-      dplyr::filter(label == "length_at_ref_age_1") |>
+      dplyr::filter(label == "mean_length_young") |>
       dplyr::pull(estimated),
     growth_estimates |>
-      dplyr::filter(label == "length_at_ref_age_1") |>
+      dplyr::filter(label == "mean_length_young") |>
       dplyr::pull(expected),
     tolerance = 30
   )
 
-  #' @description Test that fitted length_at_ref_age_2 remains close to the model comparison OM value at age 12.
+  #' @description Test that fitted mean_length_old remains close to the model comparison OM value at age 12.
   expect_equal(
     growth_estimates |>
-      dplyr::filter(label == "length_at_ref_age_2") |>
+      dplyr::filter(label == "mean_length_old") |>
       dplyr::pull(estimated),
     growth_estimates |>
-      dplyr::filter(label == "length_at_ref_age_2") |>
+      dplyr::filter(label == "mean_length_old") |>
       dplyr::pull(expected),
     tolerance = 30
   )
 
-  #' @description Test that fitted growth_coefficient_K remains within 0.01 of the Model Comparison OM growth coefficient.
+  #' @description Test that fitted von_bertalanffy_coefficient_K remains within 0.01 of the Model Comparison OM growth coefficient.
   expect_lte(
     abs(
       growth_estimates |>
-        dplyr::filter(label == "growth_coefficient_K") |>
+        dplyr::filter(label == "von_bertalanffy_coefficient_K") |>
         dplyr::pull(estimated) -
         growth_estimates |>
-        dplyr::filter(label == "growth_coefficient_K") |>
+        dplyr::filter(label == "von_bertalanffy_coefficient_K") |>
         dplyr::pull(expected)
     ),
     0.01
   )
 })
 
-test_that("von bertalanffy report defaults to lightweight derived ALK diagnostics", {
+test_that("von bertalanffy report defaults to lightweight derived age-to-length conversion diagnostics", {
   ctx <- make_vonb_convergence_context()
   on.exit({ rm(ctx); gc() }, add = TRUE)
 
@@ -454,11 +460,11 @@ test_that("von bertalanffy report defaults to lightweight derived ALK diagnostic
   #' @description Test that default reporting keeps fleet growth-derived mean WAA available.
   expect_gt(length(report[["growth_derived_mean_WAA"]][[1]]), 0)
 
-  #' @description Test that default reporting does not materialize the full derived ALK tensor.
+  #' @description Test that default reporting does not materialize the full derived age-to-length conversion tensor.
   expect_equal(length(report[["growth_derived_age_to_length_conversion"]][[1]]), 0)
 })
 
-test_that("von bertalanffy uses fleet length-comp bins when fixed fleet ALK rows are absent", {
+test_that("von bertalanffy uses fleet length-comp bins when fixed fleet age-to-length conversion rows are absent", {
   ctx <- make_vonb_no_fixed_alk_context()
   on.exit({ rm(ctx); gc() }, add = TRUE)
 
@@ -483,13 +489,13 @@ test_that("von bertalanffy uses fleet length-comp bins when fixed fleet ALK rows
     unique() |>
     sort()
 
-  #' @description Test that the growth-derived ALK path is selected when VonB growth is used without fixed fleet ALK rows.
+  #' @description Test that the growth-derived age-to-length conversion path is selected when VonB growth is used without fixed fleet age-to-length conversion rows.
   expect_equal(report[["growth_derived_alk_used"]][[1]][1], 1)
 
-  #' @description Test that no fixed age_to_length_conversion matrix is reported when the fleet relies only on the growth-derived ALK path.
+  #' @description Test that no fixed age_to_length_conversion matrix is reported when the fleet relies only on the growth-derived age-to-length conversion path.
   expect_equal(length(report[["age_to_length_conversion"]][[1]]), 0)
 
-  #' @description Test that fleet initialization falls back to the observed length-comp bins when fixed ALK rows are absent.
+  #' @description Test that fleet initialization falls back to the observed length-comp bins when fixed age-to-length conversion rows are absent.
   expect_equal(fleet_obj$lengths$get_values(), fleet1_lengthcomp_bins)
   expect_equal(fleet_obj$n_lengths$get(), length(fleet1_lengthcomp_bins))
 
@@ -497,7 +503,7 @@ test_that("von bertalanffy uses fleet length-comp bins when fixed fleet ALK rows
   expect_gt(length(report[["growth_derived_mean_WAA"]][[1]]), 0)
 })
 
-test_that("von bertalanffy keeps explicit length_bin geometry when fixed ALK rows are also present", {
+test_that("von bertalanffy keeps explicit length_bin geometry when fixed age-to-length conversion rows are also present", {
   expect_no_warning(ctx <- make_vonb_explicit_length_bin_context())
   on.exit({ rm(ctx); gc() }, add = TRUE)
 
@@ -518,14 +524,14 @@ test_that("von bertalanffy keeps explicit length_bin geometry when fixed ALK row
   #' @description Test that the explicit fleet geometry is reflected in the initialized `n_lengths`.
   expect_equal(fleet_obj$n_lengths$get(), length(ctx$explicit_bins))
 
-  #' @description Test that the growth-derived ALK path is still active when explicit fleet bins are present.
+  #' @description Test that the growth-derived age-to-length conversion path is still active when explicit fleet bins are present.
   expect_equal(report[["growth_derived_alk_used"]][[1]][1], 1)
 
   #' @description Test that the growth-derived path does not fall back to a legacy fixed age-to-length matrix.
   expect_equal(length(report[["age_to_length_conversion"]][[1]]), 0)
 })
 
-test_that("default non-derived growth keeps the historical fixed ALK path", {
+test_that("default non-derived growth keeps the historical fixed age-to-length conversion path", {
   ctx <- make_default_growth_fixed_alk_context()
   on.exit({ rm(ctx); gc() }, add = TRUE)
 
@@ -538,10 +544,10 @@ test_that("default non-derived growth keeps the historical fixed ALK path", {
   #' @description Test that the fixed age_to_length_conversion matrix is present for the historical non-derived growth path.
   expect_gt(length(report[["age_to_length_conversion"]][[1]]), 0)
 
-  #' @description Test that the non-derived growth path reports no growth-derived ALK usage.
+  #' @description Test that the non-derived growth path reports no growth-derived age-to-length conversion usage.
   expect_equal(report[["growth_derived_alk_used"]][[1]][1], 0)
 
-  #' @description Test that no realized growth-derived ALK tensor is produced for the fixed historical path.
+  #' @description Test that no realized growth-derived age-to-length conversion tensor is produced for the fixed historical path.
   expect_equal(length(report[["growth_derived_age_to_length_conversion"]][[1]]), 0)
 })
 
@@ -693,8 +699,8 @@ test_that("von bertalanffy initialization rejects decreasing reference lengths",
   bad_parameters <- ctx$parameters |>
     dplyr::mutate(
       value = dplyr::case_when(
-        module_name == "Growth" & label == "length_at_ref_age_1" ~ 800,
-        module_name == "Growth" & label == "length_at_ref_age_2" ~ 700,
+        module_name == "Growth" & label == "mean_length_young" ~ 800,
+        module_name == "Growth" & label == "mean_length_old" ~ 700,
         TRUE ~ value
       )
     )
@@ -703,6 +709,6 @@ test_that("von bertalanffy initialization rejects decreasing reference lengths",
   expect_error(
     bad_parameters |>
       FIMS::initialize_fims(data = ctx$data),
-    regexp = "length_at_ref_age_2 must be > length_at_ref_age_1"
+    regexp = "mean_length_old must be > mean_length_young"
   )
 })
