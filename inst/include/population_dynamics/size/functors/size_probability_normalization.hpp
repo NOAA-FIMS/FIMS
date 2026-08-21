@@ -1,6 +1,7 @@
 /**
  * @file size_probability_normalization.hpp
- * @brief Defines shared helpers for normalizing probability rows in the size subsystem.
+ * @brief Defines shared helpers for normalizing probability rows in the size
+ * subsystem.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -22,8 +23,7 @@ namespace fims_popdy {
 struct SizeProbabilityNormalization {
   template <typename Type>
   static Type SafeDenominator(
-      const Type& row_sum,
-      const Type& minimum_sum = static_cast<Type>(1e-12)) {
+      const Type& row_sum, const Type& minimum_sum = static_cast<Type>(1e-12)) {
     const Type smoothing = minimum_sum * minimum_sum;
     return fims_math::ad_max(row_sum, minimum_sum, smoothing);
   }

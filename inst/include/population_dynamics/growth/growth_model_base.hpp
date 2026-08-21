@@ -17,8 +17,8 @@ namespace fims_popdy {
 /**
  * @brief Growth module boundary (product-oriented).
  *
- * Downstream code calls Prepare() once (per evaluation/update) and then consumes
- * cached products via GetProducts().
+ * Downstream code calls Prepare() once (per evaluation/update) and then
+ * consumes cached products via GetProducts().
  */
 template <typename Type>
 class GrowthModelBase {

@@ -49,8 +49,7 @@ struct ALKBase : public fims_model_object::FIMSObject<Type> {
    * @param out_row Output age-to-length probability row.
    * @return True if the ALK row was built successfully.
    */
-  virtual bool BuildALKRow(size_t year,
-                           size_t age,
+  virtual bool BuildALKRow(size_t year, size_t age,
                            fims::Vector<Type>& out_row) const = 0;
 };
 

@@ -66,8 +66,7 @@ struct FixedMatrixALK : public ALKBase<Type> {
     // - the fleet has at least one age
     // - the fleet has at least one length bin
     // - the stored fixed matrix has the expected age x length size
-    return fleet_ptr->n_ages > 0 &&
-           fleet_ptr->n_lengths > 0 &&
+    return fleet_ptr->n_ages > 0 && fleet_ptr->n_lengths > 0 &&
            fleet_ptr->age_to_length_conversion.size() ==
                (fleet_ptr->n_ages * fleet_ptr->n_lengths);
   }
@@ -76,9 +75,7 @@ struct FixedMatrixALK : public ALKBase<Type> {
    * @brief Prepare the fixed-matrix ALK for the current model state.
    * @return True if the fixed matrix is active and usable.
    */
-  virtual bool PrepareForCurrentState() override {
-    return this->IsActive();
-  }
+  virtual bool PrepareForCurrentState() override { return this->IsActive(); }
 
   /**
    * @brief Builds the fixed ALK row for a given age.
@@ -87,8 +84,7 @@ struct FixedMatrixALK : public ALKBase<Type> {
    * @param out_row Output age-to-length probability row.
    * @return True if the ALK row was built successfully.
    */
-  virtual bool BuildALKRow(size_t year,
-                           size_t age,
+  virtual bool BuildALKRow(size_t year, size_t age,
                            fims::Vector<Type>& out_row) const override {
     // The current fixed matrix path does not vary by year, but year stays
     // in the interface so all ALK types share the same method signature.
@@ -102,10 +98,8 @@ struct FixedMatrixALK : public ALKBase<Type> {
     // - dimensions are invalid
     // - the requested age is out of range
     // - the fixed matrix does not have the expected size
-    if (fleet_ptr == nullptr ||
-        fleet_ptr->n_ages == 0 ||
-        fleet_ptr->n_lengths == 0 ||
-        age >= fleet_ptr->n_ages ||
+    if (fleet_ptr == nullptr || fleet_ptr->n_ages == 0 ||
+        fleet_ptr->n_lengths == 0 || age >= fleet_ptr->n_ages ||
         fleet_ptr->age_to_length_conversion.size() !=
             (fleet_ptr->n_ages * fleet_ptr->n_lengths)) {
       return false;

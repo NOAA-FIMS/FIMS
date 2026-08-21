@@ -533,10 +533,9 @@ class FleetInterface : public FleetInterfaceBase {
 
     if (this->n_lengths.get() > 0) {
       if (this->lengths.size() != static_cast<size_t>(this->n_lengths.get())) {
-        FIMS_ERROR_LOG(
-            "The size of `lengths` does not match `n_lengths`: " +
-            fims::to_string(this->lengths.size()) + " != " +
-            fims::to_string(this->n_lengths.get()));
+        FIMS_ERROR_LOG("The size of `lengths` does not match `n_lengths`: " +
+                       fims::to_string(this->lengths.size()) +
+                       " != " + fims::to_string(this->n_lengths.get()));
         throw std::invalid_argument(
             "Fleet lengths size mismatch. Fleet lengths is of size " +
             fims::to_string(this->lengths.size()) +
@@ -557,10 +556,9 @@ class FleetInterface : public FleetInterfaceBase {
       const size_t supplied_alk_size = this->age_to_length_conversion.size();
 
       if (supplied_alk_size != 0 && supplied_alk_size != expected_alk_size) {
-        FIMS_ERROR_LOG(
-            "age_to_length_conversion size mismatch, " +
-            fims::to_string(supplied_alk_size) + " != " +
-            fims::to_string(expected_alk_size));
+        FIMS_ERROR_LOG("age_to_length_conversion size mismatch, " +
+                       fims::to_string(supplied_alk_size) +
+                       " != " + fims::to_string(expected_alk_size));
         throw std::invalid_argument(
             "Fleet age_to_length_conversion size mismatch. Expected " +
             fims::to_string(expected_alk_size) + " values but received " +

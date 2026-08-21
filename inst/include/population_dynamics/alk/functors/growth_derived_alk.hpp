@@ -48,8 +48,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
       const std::shared_ptr<Fleet<Type>>& fleet_,
       const std::shared_ptr<GrowthDerivedObservationBase<Type>>&
           growth_observation_,
-      const std::shared_ptr<SizeDistributionProviderBase<Type>>&
-          size_provider_)
+      const std::shared_ptr<SizeDistributionProviderBase<Type>>& size_provider_)
       : ALKBase<Type>(),
         fleet_(fleet_),
         size_provider_(size_provider_),
@@ -63,19 +62,18 @@ struct GrowthDerivedALK : public ALKBase<Type> {
   /**
    * @brief Returns whether this growth-derived ALK is structurally active.
    * @return True if the linked fleet, population size provider, and growth
-   * observation are valid and the fleet has consistent observation-bin geometry.
+   * observation are valid and the fleet has consistent observation-bin
+   * geometry.
    */
   virtual bool IsActive() const override {
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
     std::shared_ptr<SizeDistributionProviderBase<Type>> size_provider_ptr =
         size_provider_.lock();
 
-    return fleet_ptr != nullptr &&
-           size_provider_ptr != nullptr &&
+    return fleet_ptr != nullptr && size_provider_ptr != nullptr &&
            growth_observation_ != nullptr &&
            growth_observation_->SupportsGrowthDerivedALK() &&
-           fleet_ptr->n_ages > 0 &&
-           fleet_ptr->n_lengths > 0 &&
+           fleet_ptr->n_ages > 0 && fleet_ptr->n_lengths > 0 &&
            fleet_ptr->lengths.size() == fleet_ptr->n_lengths &&
            fleet_ptr->length_bin_edges.size() == fleet_ptr->n_lengths + 1 &&
            SizeBinMapping::HasStrictlyIncreasingEdges(
@@ -127,8 +125,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
    * @return True if the ALK row was built successfully using prepared growth
    * products for the current model state.
    */
-  virtual bool BuildALKRow(size_t year,
-                           size_t age,
+  virtual bool BuildALKRow(size_t year, size_t age,
                            fims::Vector<Type>& out_row) const override {
     out_row = BuildMappedFleetALKRow(year, age);
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
@@ -137,7 +134,8 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
  protected:
   /**
-   * @brief Read one prepared age-to-size row from the linked population size provider.
+   * @brief Read one prepared age-to-size row from the linked population size
+   * provider.
    * @param year_index Year index.
    * @param age_index Age index.
    * @return Population-grid probability row for the requested year and age.
@@ -162,18 +160,16 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
     try {
       for (std::size_t size_bin_index = 0;
-           size_bin_index < population_size_grid->n_bins;
-           ++size_bin_index) {
+           size_bin_index < population_size_grid->n_bins; ++size_bin_index) {
         prob_size_row[size_bin_index] =
-            size_provider_ptr->ProbSize(
-                year_index, age_index, size_bin_index);
+            size_provider_ptr->ProbSize(year_index, age_index, size_bin_index);
       }
     } catch (const std::runtime_error&) {
       return fims::Vector<Type>();
     }
 
-    if (!TryFinalizePreparedProbabilityRow(
-            prob_size_row, population_size_grid->n_bins)) {
+    if (!TryFinalizePreparedProbabilityRow(prob_size_row,
+                                           population_size_grid->n_bins)) {
       throw std::runtime_error(
           "GrowthDerivedALK received an invalid prepared population size row");
     }
@@ -190,8 +186,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
    * @return True if the row is usable after sanitization.
    */
   bool TrySanitizeProbabilityRowInPlace(
-      fims::Vector<Type>& row,
-      std::size_t expected_size,
+      fims::Vector<Type>& row, std::size_t expected_size,
       const Type& negative_tolerance = static_cast<Type>(1e-12)) const {
     if (row.size() != expected_size) {
       return false;
@@ -220,8 +215,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
    * @return True if the row is a usable prepared probability row.
    */
   bool TryFinalizePreparedProbabilityRow(
-      fims::Vector<Type>& row,
-      std::size_t expected_size,
+      fims::Vector<Type>& row, std::size_t expected_size,
       const Type& minimum_mass = static_cast<Type>(1e-12)) const {
     if (!TrySanitizeProbabilityRowInPlace(row, expected_size)) {
       return false;
@@ -251,8 +245,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
    * @return True if the mapped fleet row can be used downstream.
    */
   bool TryFinalizeMappedProbabilityRow(
-      fims::Vector<Type>& row,
-      std::size_t expected_size,
+      fims::Vector<Type>& row, std::size_t expected_size,
       const Type& minimum_mass = static_cast<Type>(1e-12),
       const Type& minimum_bin_prob = static_cast<Type>(1e-12)) const {
     if (!TrySanitizeProbabilityRowInPlace(row, expected_size)) {
@@ -302,14 +295,12 @@ struct GrowthDerivedALK : public ALKBase<Type> {
       return fims::Vector<Type>();
     }
 
-    if (fleet_ptr->n_years == 0 ||
-        fleet_ptr->n_lengths == 0 ||
+    if (fleet_ptr->n_years == 0 || fleet_ptr->n_lengths == 0 ||
         fleet_ptr->lengths.size() != fleet_ptr->n_lengths ||
         fleet_ptr->length_bin_edges.size() != fleet_ptr->n_lengths + 1 ||
         !SizeBinMapping::HasStrictlyIncreasingEdges(
             fleet_ptr->length_bin_edges) ||
-        year_index >= fleet_ptr->n_years ||
-        age_index >= fleet_ptr->n_ages) {
+        year_index >= fleet_ptr->n_years || age_index >= fleet_ptr->n_ages) {
       return fims::Vector<Type>();
     }
 
@@ -321,19 +312,16 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
     const fims::Vector<double> mapping_fleet_edges =
         SizeBinMapping::ExpandDestinationEdgesToCoverSourceRange(
-            population_size_grid->edges,
-            fleet_ptr->length_bin_edges);
+            population_size_grid->edges, fleet_ptr->length_bin_edges);
 
     const fims::Vector<fims::Vector<double>> rebin_weights =
-        SizeBinMapping::BuildRebinWeights(
-            population_size_grid->edges,
-            mapping_fleet_edges);
+        SizeBinMapping::BuildRebinWeights(population_size_grid->edges,
+                                          mapping_fleet_edges);
 
     fims::Vector<Type> fleet_row =
         SizeBinMapping::ApplyRebinWeights(rebin_weights, population_prob_size);
 
-    if (!TryFinalizeMappedProbabilityRow(
-            fleet_row, fleet_ptr->n_lengths)) {
+    if (!TryFinalizeMappedProbabilityRow(fleet_row, fleet_ptr->n_lengths)) {
       throw std::runtime_error(
           "GrowthDerivedALK produced an invalid mapped fleet probability row");
     }
@@ -345,7 +333,8 @@ struct GrowthDerivedALK : public ALKBase<Type> {
    * @brief Try to get the linked population size provider.
    * @return Shared pointer to the size provider, or nullptr if unavailable.
    */
-  std::shared_ptr<SizeDistributionProviderBase<Type>> TryGetSizeProvider() const {
+  std::shared_ptr<SizeDistributionProviderBase<Type>> TryGetSizeProvider()
+      const {
     return size_provider_.lock();
   }
 

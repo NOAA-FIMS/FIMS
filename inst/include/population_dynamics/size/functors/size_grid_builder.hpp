@@ -1,6 +1,7 @@
 /**
  * @file size_grid_builder.hpp
- * @brief Defines helpers for constructing population-level biological size grids.
+ * @brief Defines helpers for constructing population-level biological size
+ * grids.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -50,14 +51,14 @@ struct SizeGridBuilder {
   }
 
   /**
-   * @brief Build a regular size grid from lower edge, upper edge, and bin width.
+   * @brief Build a regular size grid from lower edge, upper edge, and bin
+   * width.
    * @param lower_edge Lower edge of the first biological size bin.
    * @param upper_edge Upper edge of the final biological size bin.
    * @param bin_width Width of each biological size bin.
    * @return Internally consistent population size grid.
    */
-  static SizeGrid BuildRegularGrid(double lower_edge,
-                                   double upper_edge,
+  static SizeGrid BuildRegularGrid(double lower_edge, double upper_edge,
                                    double bin_width) {
     if (!(upper_edge > lower_edge)) {
       throw std::runtime_error(
@@ -65,8 +66,7 @@ struct SizeGridBuilder {
     }
 
     if (!(bin_width > 0.0)) {
-      throw std::runtime_error(
-          "SizeGridBuilder requires bin_width > 0");
+      throw std::runtime_error("SizeGridBuilder requires bin_width > 0");
     }
 
     fims::Vector<double> edges;
@@ -101,20 +101,23 @@ struct SizeGridBuilder {
    * centers.
    *
    * @param centers Fleet observation-bin centers.
-   * @return Strictly increasing observation-bin edges inferred from the centers.
+   * @return Strictly increasing observation-bin edges inferred from the
+   * centers.
    */
   static fims::Vector<double> BuildObservationEdgesFromCenters(
       const fims::Vector<double>& centers) {
     if (centers.size() < 2) {
       throw std::runtime_error(
-          "SizeGridBuilder requires at least 2 observation-bin centers to build fleet edges");
+          "SizeGridBuilder requires at least 2 observation-bin centers to "
+          "build fleet edges");
     }
 
     for (std::size_t center_index = 1; center_index < centers.size();
          ++center_index) {
       if (!(centers[center_index] > centers[center_index - 1])) {
         throw std::runtime_error(
-            "SizeGridBuilder requires observation-bin centers to be strictly increasing");
+            "SizeGridBuilder requires observation-bin centers to be strictly "
+            "increasing");
       }
     }
 
@@ -123,8 +126,7 @@ struct SizeGridBuilder {
 
     edges[0] = centers[0] - 0.5 * (centers[1] - centers[0]);
 
-    for (std::size_t center_index = 0;
-         center_index + 1 < centers.size();
+    for (std::size_t center_index = 0; center_index + 1 < centers.size();
          ++center_index) {
       edges[center_index + 1] =
           0.5 * (centers[center_index] + centers[center_index + 1]);
@@ -159,7 +161,8 @@ struct SizeGridBuilder {
       const fims::Vector<fims::Vector<double>>& fleet_edges) {
     if (fleet_edges.size() == 0) {
       throw std::runtime_error(
-          "SizeGridBuilder requires at least 1 fleet edge vector to build the default population size grid");
+          "SizeGridBuilder requires at least 1 fleet edge vector to build the "
+          "default population size grid");
     }
 
     double min_lower_edge = 0.0;
@@ -172,14 +175,16 @@ struct SizeGridBuilder {
 
       if (edges.size() < 2) {
         throw std::runtime_error(
-            "SizeGridBuilder requires each fleet edge vector to contain at least 2 edges");
+            "SizeGridBuilder requires each fleet edge vector to contain at "
+            "least 2 edges");
       }
 
       for (std::size_t edge_index = 1; edge_index < edges.size();
            ++edge_index) {
         if (!(edges[edge_index] > edges[edge_index - 1])) {
           throw std::runtime_error(
-              "SizeGridBuilder requires fleet edge vectors to be strictly increasing");
+              "SizeGridBuilder requires fleet edge vectors to be strictly "
+              "increasing");
         }
       }
 
@@ -210,8 +215,8 @@ struct SizeGridBuilder {
       regular_upper_edge += built_in_bin_width;
     }
 
-    SizeGrid regular_grid =
-        BuildRegularGrid(min_lower_edge, regular_upper_edge, built_in_bin_width);
+    SizeGrid regular_grid = BuildRegularGrid(min_lower_edge, regular_upper_edge,
+                                             built_in_bin_width);
 
     fims::Vector<double> default_edges = regular_grid.edges;
     default_edges.emplace_back(regular_upper_edge + built_in_bin_width);

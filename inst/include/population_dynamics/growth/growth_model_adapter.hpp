@@ -40,8 +40,7 @@ class GrowthDerivedObservationBase : public GrowthBase<Type> {
    * @param n_ages Number of modeled ages.
    * @param n_sexes Number of modeled sexes.
    */
-  virtual void Initialize(std::size_t n_years,
-                          std::size_t n_ages,
+  virtual void Initialize(std::size_t n_years, std::size_t n_ages,
                           std::size_t n_sexes = 1) = 0;
 
   /**
@@ -74,7 +73,8 @@ class GrowthDerivedObservationBase : public GrowthBase<Type> {
  * observation capability for catch-at-age.
  */
 template <typename Type>
-class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> {
+class VonBSchnuteGrowthModelAdapter
+    : public GrowthDerivedObservationBase<Type> {
  public:
   VonBSchnuteGrowthModelAdapter() : GrowthDerivedObservationBase<Type>() {}
 
@@ -108,7 +108,7 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
   }
 
   void UseConstantReferenceMeanLengths(Type constant_mean_length_young,
-                                   Type constant_mean_length_old) {
+                                       Type constant_mean_length_old) {
     length_reference_parameterization_ =
         LengthReferenceParameterization::kBothConstant;
     constant_mean_length_young_ = constant_mean_length_young;
@@ -117,7 +117,8 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
   }
 
   /**
-   * @brief Access the working-scale storage for the first reference-length parameter.
+   * @brief Access the working-scale storage for the first reference-length
+   * parameter.
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& MeanLengthYoungVector() {
@@ -194,7 +195,8 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
   }
 
   /**
-   * @brief Access the log-scale length-at-age SD vector at the two reference ages.
+   * @brief Access the log-scale length-at-age SD vector at the two reference
+   * ages.
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LengthAtAgeSdAtRefAgesVector() {
@@ -285,8 +287,7 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
    * @param n_ages Number of modeled ages.
    * @param n_sexes Number of modeled sexes.
    */
-  void Initialize(std::size_t n_years,
-                  std::size_t n_ages,
+  void Initialize(std::size_t n_years, std::size_t n_ages,
                   std::size_t n_sexes = 1) override {
     EnsureParamsSet();
     if (n_sexes != 1) {
@@ -312,14 +313,12 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
 
   virtual const Type evaluate(int year, const double& a) override {
     if (a < 0.0) {
-      throw std::runtime_error(
-          "Negative age not supported");
+      throw std::runtime_error("Negative age not supported");
     }
     const double a_round = std::round(a);
     const double tol = 1e-8;
     if (std::fabs(a - a_round) > tol) {
-      throw std::runtime_error(
-          "Non-integer age not supported yet");
+      throw std::runtime_error("Non-integer age not supported yet");
     }
     EnsureParamsSet();
     const Type ref_age_1 = CurrentReferenceAgeForLength1();
@@ -342,8 +341,7 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
     const double age_index_round = std::round(age_index_raw);
     if (std::fabs(age_index_raw - age_index_round) <= tol &&
         age_index_round >= 0.0) {
-      const std::size_t age_index =
-          static_cast<std::size_t>(age_index_round);
+      const std::size_t age_index = static_cast<std::size_t>(age_index_round);
       if (age_index < p.n_ages) {
         const std::size_t year_index =
             (year >= 0 && static_cast<std::size_t>(year) < p.n_years)
@@ -364,8 +362,7 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
     growth_products_prepared_ = false;
     if (!model_) {
       if (n_ages_ == 0) {
-        throw std::runtime_error(
-            "Growth model not initialized; n_ages is 0");
+        throw std::runtime_error("Growth model not initialized; n_ages is 0");
       }
       Initialize(n_years_ == 0 ? 1 : n_years_, n_ages_,
                  n_sexes_ == 0 ? 1 : n_sexes_);
@@ -397,8 +394,7 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
    */
   Type EvaluateWeightAtLength(const Type& length) const override {
     EnsureParamsSet();
-    const Type length_safe =
-        fims_math::ad_max(length, static_cast<Type>(1e-8));
+    const Type length_safe = fims_math::ad_max(length, static_cast<Type>(1e-8));
     return CurrentLengthWeightA() *
            fims_math::pow(length_safe, CurrentLengthWeightB());
   }
@@ -470,8 +466,7 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
       model_->SetGrowthParameterCovariance(
           CurrentMeanLengthYoungVariance(),
           CurrentMeanLengthYoungLengthAtRefAge2Covariance(),
-          CurrentMeanLengthYoungKCovariance(),
-          CurrentMeanLengthOldVariance(),
+          CurrentMeanLengthYoungKCovariance(), CurrentMeanLengthOldVariance(),
           CurrentMeanLengthOldKCovariance(),
           CurrentVonBertalanffyCoefficientKVariance());
     } else {
@@ -496,10 +491,9 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
         return constant_mean_length_young_;
 
       case LengthReferenceParameterization::kEstimatedL1BelowConstantL2:
-        return fims_math::inv_logit(
-            static_cast<Type>(0.0),
-            constant_mean_length_old_,
-            mean_length_young_vector_[0]);
+        return fims_math::inv_logit(static_cast<Type>(0.0),
+                                    constant_mean_length_old_,
+                                    mean_length_young_vector_[0]);
 
       case LengthReferenceParameterization::kBothConstant:
         return constant_mean_length_young_;
@@ -511,12 +505,10 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
   Type CurrentMeanLengthOld() const {
     switch (length_reference_parameterization_) {
       case LengthReferenceParameterization::kEstimatedL1EstimatedGap:
-        return CurrentMeanLengthYoungStorage() +
-               CurrentMeanLengthOldStorage();
+        return CurrentMeanLengthYoungStorage() + CurrentMeanLengthOldStorage();
 
       case LengthReferenceParameterization::kConstantL1EstimatedGap:
-        return constant_mean_length_young_ +
-               CurrentMeanLengthOldStorage();
+        return constant_mean_length_young_ + CurrentMeanLengthOldStorage();
 
       case LengthReferenceParameterization::kEstimatedL1BelowConstantL2:
         return constant_mean_length_old_;
@@ -528,17 +520,27 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
     return CurrentMeanLengthOldStorage();
   }
 
-  Type CurrentVonBertalanffyCoefficientK() const { return fims_math::exp(von_bertalanffy_coefficient_K_vector_[0]); }
+  Type CurrentVonBertalanffyCoefficientK() const {
+    return fims_math::exp(von_bertalanffy_coefficient_K_vector_[0]);
+  }
   Type CurrentReferenceAgeForLength1() const {
     return reference_age_for_length_1_vector_[0];
   }
   Type CurrentReferenceAgeForLength2() const {
     return reference_age_for_length_2_vector_[0];
   }
-  Type CurrentLengthWeightA() const { return fims_math::exp(length_weight_a_vector_[0]); }
-  Type CurrentLengthWeightB() const { return fims_math::exp(length_weight_b_vector_[0]); }
-  Type CurrentLengthAtAgeSdAtReferenceAge1() const { return fims_math::exp(length_at_age_sd_at_ref_ages_vector_[0]); }
-  Type CurrentLengthAtAgeSdAtReferenceAge2() const { return fims_math::exp(length_at_age_sd_at_ref_ages_vector_[1]); }
+  Type CurrentLengthWeightA() const {
+    return fims_math::exp(length_weight_a_vector_[0]);
+  }
+  Type CurrentLengthWeightB() const {
+    return fims_math::exp(length_weight_b_vector_[0]);
+  }
+  Type CurrentLengthAtAgeSdAtReferenceAge1() const {
+    return fims_math::exp(length_at_age_sd_at_ref_ages_vector_[0]);
+  }
+  Type CurrentLengthAtAgeSdAtReferenceAge2() const {
+    return fims_math::exp(length_at_age_sd_at_ref_ages_vector_[1]);
+  }
   Type CurrentSdLengthAtRefAge1() const {
     return fims_math::exp(log_sd_length_at_ref_age_1_vector_[0]);
   }
@@ -558,15 +560,13 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
   }
 
   Type CurrentCorrLengthAtRefAge1K() const {
-    return fims_math::inv_logit(
-        static_cast<Type>(-1.0), static_cast<Type>(1.0),
-        logit_corr_length_at_ref_age_1_k_vector_[0]);
+    return fims_math::inv_logit(static_cast<Type>(-1.0), static_cast<Type>(1.0),
+                                logit_corr_length_at_ref_age_1_k_vector_[0]);
   }
 
   Type CurrentCorrLengthAtRefAge2K() const {
-    return fims_math::inv_logit(
-        static_cast<Type>(-1.0), static_cast<Type>(1.0),
-        logit_corr_length_at_ref_age_2_k_vector_[0]);
+    return fims_math::inv_logit(static_cast<Type>(-1.0), static_cast<Type>(1.0),
+                                logit_corr_length_at_ref_age_2_k_vector_[0]);
   }
 
   Type CurrentMeanLengthYoungVariance() const {
@@ -586,19 +586,16 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
 
   Type CurrentMeanLengthYoungLengthAtRefAge2Covariance() const {
     return CurrentCorrLengthAtRefAge1LengthAtRefAge2() *
-           CurrentSdLengthAtRefAge1() *
-           CurrentSdLengthAtRefAge2();
+           CurrentSdLengthAtRefAge1() * CurrentSdLengthAtRefAge2();
   }
 
   Type CurrentMeanLengthYoungKCovariance() const {
-    return CurrentCorrLengthAtRefAge1K() *
-           CurrentSdLengthAtRefAge1() *
+    return CurrentCorrLengthAtRefAge1K() * CurrentSdLengthAtRefAge1() *
            CurrentSdGrowthCoefficientK();
   }
 
   Type CurrentMeanLengthOldKCovariance() const {
-    return CurrentCorrLengthAtRefAge2K() *
-           CurrentSdLengthAtRefAge2() *
+    return CurrentCorrLengthAtRefAge2K() * CurrentSdLengthAtRefAge2() *
            CurrentSdGrowthCoefficientK();
   }
 
@@ -634,8 +631,7 @@ class VonBSchnuteGrowthModelAdapter : public GrowthDerivedObservationBase<Type> 
         reference_age_for_length_2_vector_.size() < 1 ||
         length_weight_a_vector_.size() < 1 ||
         length_weight_b_vector_.size() < 1) {
-      throw std::runtime_error(
-          "VonBSchnuteGrowth parameters not set");
+      throw std::runtime_error("VonBSchnuteGrowth parameters not set");
     }
 
     if (mean_length_young_vector_.size() != 1 ||

@@ -55,12 +55,9 @@ std::shared_ptr<ALKBase<Type>> BuildFleetALK(
               population->growth)) {
     std::shared_ptr<ALKBase<Type>> growth_alk =
         std::make_shared<GrowthDerivedALK<Type>>(
-            fleet,
-            growth_observation,
-            population->size_distribution_provider);
+            fleet, growth_observation, population->size_distribution_provider);
 
-    if (growth_alk->IsActive() &&
-        growth_alk->PrepareForCurrentState()) {
+    if (growth_alk->IsActive() && growth_alk->PrepareForCurrentState()) {
       FIMS_INFO_LOG("Growth-derived ALK successfully set to fleet " +
                     fims::to_string(fleet->id) + " for population " +
                     fims::to_string(population->id));
@@ -72,8 +69,7 @@ std::shared_ptr<ALKBase<Type>> BuildFleetALK(
   std::shared_ptr<ALKBase<Type>> fixed_alk =
       std::make_shared<FixedMatrixALK<Type>>(fleet);
 
-  if (fixed_alk->IsActive() &&
-      fixed_alk->PrepareForCurrentState()) {
+  if (fixed_alk->IsActive() && fixed_alk->PrepareForCurrentState()) {
     FIMS_INFO_LOG("Fixed age-to-length matrix successfully set to fleet " +
                   fims::to_string(fleet->id));
     return fixed_alk;
@@ -103,7 +99,8 @@ void EnsureFleetALK(const std::shared_ptr<Population<Type>>& population,
   }
 
   if (population == nullptr) {
-    throw std::runtime_error("Population pointer was null while resolving ALK.");
+    throw std::runtime_error(
+        "Population pointer was null while resolving ALK.");
   }
 
   if (!fleet->requires_age_length_mapping || fleet->n_lengths == 0) {
@@ -119,13 +116,11 @@ void EnsureFleetALK(const std::shared_ptr<Population<Type>>& population,
       std::shared_ptr<GrowthDerivedALK<Type>> growth_alk =
           std::dynamic_pointer_cast<GrowthDerivedALK<Type>>(fleet->alk);
 
-      if (growth_alk != nullptr &&
-          growth_alk->IsActive() &&
+      if (growth_alk != nullptr && growth_alk->IsActive() &&
           growth_alk->PrepareForCurrentState()) {
         return;
       }
-    } else if (fleet->alk->IsActive() &&
-               fleet->alk->PrepareForCurrentState()) {
+    } else if (fleet->alk->IsActive() && fleet->alk->PrepareForCurrentState()) {
       return;
     }
   }
@@ -138,7 +133,8 @@ void EnsureFleetALK(const std::shared_ptr<Population<Type>>& population,
 
   std::stringstream ss;
   ss << "Fleet " << fleet->GetId()
-     << " has length composition bins but no usable age-to-length conversion path.";
+     << " has length composition bins but no usable age-to-length conversion "
+        "path.";
 
   if (growth_observation != nullptr) {
     ss << " This population uses a growth-derived-capable growth object, so "
@@ -166,7 +162,8 @@ template <typename Type>
 void EnsurePopulationFleetALKs(
     const std::shared_ptr<Population<Type>>& population) {
   if (population == nullptr) {
-    throw std::runtime_error("Population pointer was null while resolving ALKs.");
+    throw std::runtime_error(
+        "Population pointer was null while resolving ALKs.");
   }
 
   for (size_t i = 0; i < population->fleets.size(); ++i) {
