@@ -10,7 +10,7 @@
 # Deterministic test ----
 ## Setup ----
 # Load necessary data for the integration test
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
+if (!integration_fixtures_available()) {
   prepare_test_data()
 }
 

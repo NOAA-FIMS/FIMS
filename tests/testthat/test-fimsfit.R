@@ -10,7 +10,7 @@
 # FIMSFit ----
 ## Setup ----
 # Load the test data from an RDS file containing the fitted model estimates
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
+if (!integration_fixtures_available()) {
   suppressWarnings(
     suppressMessages(
       prepare_test_data()

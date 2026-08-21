@@ -1,6 +1,24 @@
 # This file generates multiple test datasets for use in tests located in
 # tests/testthat.
 
+integration_fixture_files <- c(
+  "deterministic_age_length_comp.RDS",
+  "deterministic_age_length_comp_fixed_effects.RDS",
+  "fit_age_length_comp.RDS",
+  "fit_age_length_comp_fixed_effects.RDS",
+  "fit_agecomp.RDS",
+  "fit_agecomp_na.RDS",
+  "fit_lengthcomp.RDS",
+  "fit_lengthcomp_na.RDS",
+  "fit_age_length_comp_na.RDS",
+  "parameters_model_comparison_project.RDS",
+  "parameters_model_comparison_project_fixed_effects.RDS"
+)
+
+integration_fixtures_available <- function() {
+  all(file.exists(testthat::test_path("fixtures", integration_fixture_files)))
+}
+
 #' Prepare FIMS input data for integration tests
 #'
 #' This function prepares the input data for integration tests by generating
