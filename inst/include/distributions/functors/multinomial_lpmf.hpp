@@ -159,8 +159,13 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
 #endif
           total += observed;
           log_probability -= static_cast<Type>(std::lgamma(observed + 1.0));
-          log_probability +=
-              observed_values_vector[j] * fims_math::log(prob_vector[j]);
+          // Define the multinomial term as zero when the observed count is
+          // zero. Evaluating it directly as 0 * log(0) produces NaN and can
+          // invalidate an otherwise finite likelihood.
+          if (observed != 0.0) {
+            log_probability +=
+                observed_values_vector[j] * fims_math::log(prob_vector[j]);
+          }
         }
         log_probability += static_cast<Type>(std::lgamma(total + 1.0));
         std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
