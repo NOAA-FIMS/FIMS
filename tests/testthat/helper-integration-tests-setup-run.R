@@ -14,9 +14,15 @@ integration_fixture_files <- c(
   "parameters_model_comparison_project.RDS",
   "parameters_model_comparison_project_fixed_effects.RDS"
 )
+integration_fixture_version <- "native-v2"
 
 integration_fixtures_available <- function() {
-  all(file.exists(testthat::test_path("fixtures", integration_fixture_files)))
+  version_file <- testthat::test_path(
+    "fixtures", "integration-fixture-version.txt"
+  )
+  all(file.exists(testthat::test_path("fixtures", integration_fixture_files))) &&
+    file.exists(version_file) &&
+    identical(readLines(version_file, warn = FALSE), integration_fixture_version)
 }
 
 #' Prepare FIMS input data for integration tests
@@ -402,5 +408,10 @@ prepare_test_data <- function() {
     fit_age_length_comp_na,
     file = testthat::test_path("fixtures", "fit_age_length_comp_na.RDS"),
     compress = FALSE
+  )
+
+  writeLines(
+    integration_fixture_version,
+    testthat::test_path("fixtures", "integration-fixture-version.txt")
   )
 }

@@ -117,24 +117,22 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
 
 #if defined(TMB_MODEL) || defined(QUADRA_MODEL)
       for (size_t j = 0; j < dims[1]; j++) {
+        const size_t idx = (i * dims[1]) + j;
         if (this->input_type == "data") {
           // if data, check if there are any NA values and skip lpdf calculation
           // for entire row if there are
-          if (this->get_observed(static_cast<size_t>(i),
-                                 static_cast<size_t>(j)) ==
+          if (this->get_observed(idx) ==
               this->data_observed_values->na_value) {
             containsNA = true;
             break;
           }
           if (!containsNA) {
-            size_t idx = (i * dims[1]) + j;
-            observed_values_vector[j] = this->get_observed(i, j);
+            observed_values_vector[j] = this->get_observed(idx);
             prob_vector[j] = this->get_expected(idx);
           }
         } else {
           // if not data (i.e. prior or process), use observed_values vector
           // instead of data_observed_values
-          size_t idx = (i * dims[1]) + j;
           observed_values_vector[j] = this->get_observed(idx);
           prob_vector[j] = this->get_expected(idx);
         }
@@ -171,7 +169,9 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
 
         this->lpdf += this->lpdf_vec[lpdf_vec_idx];
       } else {
-        this->lpdf_vec[i] = 0;
+        std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
+                  this->lpdf_vec.begin() + lpdf_vec_idx + dims[1],
+                  static_cast<Type>(0));
       }
       lpdf_vec_idx += dims[1];
 /*
