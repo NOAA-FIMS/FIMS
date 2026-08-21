@@ -1,9 +1,11 @@
 # `get_estimates()` works with deterministic run
 
     Code
-      print(dplyr::select(canonicalize_parameter_ids(get_estimates(
-        deterministic_results)), -estimated, -expected, -uncertainty, -gradient,
-      -likelihood, -log_like_cv), n = 320, width = Inf)
+      estimates_snapshot <- dplyr::select(get_estimates(deterministic_results),
+      -estimated, -expected, -uncertainty, -gradient, -likelihood, -log_like_cv)
+      estimates_snapshot_lines <- capture.output(print(estimates_snapshot, n = 320,
+        width = Inf))
+      cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
     Output
       # A tibble: 13,996 x 18
           module_name module_id module_type label            type   type_id
@@ -328,39 +330,39 @@
       318 Fleet               1 <NA>        agecomp_expected <NA>        NA
       319 Fleet               1 <NA>        agecomp_expected <NA>        NA
       320 Fleet               1 <NA>        agecomp_expected <NA>        NA
-          parameter_id fleet year_i age_i length_i  input observed estimation_type 
-                 <int> <chr>  <int> <int>    <int>  <dbl>    <dbl> <chr>           
-        1            1 NA         1    NA       NA -4.66        NA fixed_effects   
-        2            2 NA         2    NA       NA -3.60        NA fixed_effects   
-        3            3 NA         3    NA       NA -3.10        NA fixed_effects   
-        4            4 NA         4    NA       NA -2.80        NA fixed_effects   
-        5            5 NA         5    NA       NA -3.02        NA fixed_effects   
-        6            6 NA         6    NA       NA -2.44        NA fixed_effects   
-        7            7 NA         7    NA       NA -2.43        NA fixed_effects   
-        8            8 NA         8    NA       NA -1.68        NA fixed_effects   
-        9            9 NA         9    NA       NA -2.22        NA fixed_effects   
-       10           10 NA        10    NA       NA -2.02        NA fixed_effects   
-       11           11 NA        11    NA       NA -1.89        NA fixed_effects   
-       12           12 NA        12    NA       NA -1.82        NA fixed_effects   
-       13           13 NA        13    NA       NA -2.15        NA fixed_effects   
-       14           14 NA        14    NA       NA -1.78        NA fixed_effects   
-       15           15 NA        15    NA       NA -1.71        NA fixed_effects   
-       16           16 NA        16    NA       NA -1.82        NA fixed_effects   
-       17           17 NA        17    NA       NA -1.16        NA fixed_effects   
-       18           18 NA        18    NA       NA -1.36        NA fixed_effects   
-       19           19 NA        19    NA       NA -1.37        NA fixed_effects   
-       20           20 NA        20    NA       NA -1.38        NA fixed_effects   
-       21           21 NA        21    NA       NA -1.05        NA fixed_effects   
-       22           22 NA        22    NA       NA -1.37        NA fixed_effects   
-       23           23 NA        23    NA       NA -0.871       NA fixed_effects   
-       24           24 NA        24    NA       NA -1.06        NA fixed_effects   
-       25           25 NA        25    NA       NA -1.07        NA fixed_effects   
-       26           26 NA        26    NA       NA -1.16        NA fixed_effects   
-       27           27 NA        27    NA       NA -1.18        NA fixed_effects   
-       28           28 NA        28    NA       NA -0.840       NA fixed_effects   
-       29           29 NA        29    NA       NA -1.11        NA fixed_effects   
-       30           30 NA        30    NA       NA -0.694       NA fixed_effects   
-       31           31 NA        NA    NA       NA  0           NA constant        
+          parameter_id fleet year_i age_i length_i  input observed estimation_type
+                 <int> <chr>  <int> <int>    <int>  <dbl>    <dbl> <chr>
+        1            4 NA         1    NA       NA -4.66        NA fixed_effects
+        2           24 NA         2    NA       NA -3.60        NA fixed_effects
+        3           25 NA         3    NA       NA -3.10        NA fixed_effects
+        4           26 NA         4    NA       NA -2.80        NA fixed_effects
+        5           27 NA         5    NA       NA -3.02        NA fixed_effects
+        6           28 NA         6    NA       NA -2.44        NA fixed_effects
+        7           29 NA         7    NA       NA -2.43        NA fixed_effects
+        8           30 NA         8    NA       NA -1.68        NA fixed_effects
+        9           31 NA         9    NA       NA -2.22        NA fixed_effects
+       10           32 NA        10    NA       NA -2.02        NA fixed_effects
+       11           33 NA        11    NA       NA -1.89        NA fixed_effects
+       12           34 NA        12    NA       NA -1.82        NA fixed_effects
+       13           35 NA        13    NA       NA -2.15        NA fixed_effects
+       14           36 NA        14    NA       NA -1.78        NA fixed_effects
+       15           37 NA        15    NA       NA -1.71        NA fixed_effects
+       16           38 NA        16    NA       NA -1.82        NA fixed_effects
+       17           39 NA        17    NA       NA -1.16        NA fixed_effects
+       18           40 NA        18    NA       NA -1.36        NA fixed_effects
+       19           41 NA        19    NA       NA -1.37        NA fixed_effects
+       20           42 NA        20    NA       NA -1.38        NA fixed_effects
+       21           43 NA        21    NA       NA -1.05        NA fixed_effects
+       22           44 NA        22    NA       NA -1.37        NA fixed_effects
+       23           45 NA        23    NA       NA -0.871       NA fixed_effects
+       24           46 NA        24    NA       NA -1.06        NA fixed_effects
+       25           47 NA        25    NA       NA -1.07        NA fixed_effects
+       26           48 NA        26    NA       NA -1.16        NA fixed_effects
+       27           49 NA        27    NA       NA -1.18        NA fixed_effects
+       28           50 NA        28    NA       NA -0.840       NA fixed_effects
+       29           51 NA        29    NA       NA -1.11        NA fixed_effects
+       30           52 NA        30    NA       NA -0.694       NA fixed_effects
+       31            3 NA        NA    NA       NA  0           NA constant
        32           NA NA         1     1       NA NA           14 derived_quantity
        33           NA NA         1     2       NA NA           20 derived_quantity
        34           NA NA         1     3       NA NA           23 derived_quantity
@@ -977,9 +979,11 @@
 # `get_estimates()` works with estimation run
 
     Code
-      print(dplyr::select(canonicalize_parameter_ids(get_estimates(readRDS(fit_files[[
-        1]]))), -estimated, -expected, -uncertainty, -gradient, -likelihood,
-      -log_like_cv), n = 320, width = Inf)
+      estimates_snapshot <- dplyr::select(get_estimates(readRDS(fit_files[[1]])),
+      -estimated, -expected, -uncertainty, -gradient, -likelihood, -log_like_cv)
+      estimates_snapshot_lines <- capture.output(print(estimates_snapshot, n = 320,
+        width = Inf))
+      cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
     Output
       # A tibble: 13,996 x 18
           module_name module_id module_type label            type   type_id
@@ -1304,39 +1308,39 @@
       318 Fleet               1 <NA>        agecomp_expected <NA>        NA
       319 Fleet               1 <NA>        agecomp_expected <NA>        NA
       320 Fleet               1 <NA>        agecomp_expected <NA>        NA
-          parameter_id fleet year_i age_i length_i  input observed estimation_type 
-                 <int> <chr>  <int> <int>    <int>  <dbl>    <dbl> <chr>           
-        1            1 NA         1    NA       NA -4.66        NA fixed_effects   
-        2            2 NA         2    NA       NA -3.60        NA fixed_effects   
-        3            3 NA         3    NA       NA -3.10        NA fixed_effects   
-        4            4 NA         4    NA       NA -2.80        NA fixed_effects   
-        5            5 NA         5    NA       NA -3.02        NA fixed_effects   
-        6            6 NA         6    NA       NA -2.44        NA fixed_effects   
-        7            7 NA         7    NA       NA -2.43        NA fixed_effects   
-        8            8 NA         8    NA       NA -1.68        NA fixed_effects   
-        9            9 NA         9    NA       NA -2.22        NA fixed_effects   
-       10           10 NA        10    NA       NA -2.02        NA fixed_effects   
-       11           11 NA        11    NA       NA -1.89        NA fixed_effects   
-       12           12 NA        12    NA       NA -1.82        NA fixed_effects   
-       13           13 NA        13    NA       NA -2.15        NA fixed_effects   
-       14           14 NA        14    NA       NA -1.78        NA fixed_effects   
-       15           15 NA        15    NA       NA -1.71        NA fixed_effects   
-       16           16 NA        16    NA       NA -1.82        NA fixed_effects   
-       17           17 NA        17    NA       NA -1.16        NA fixed_effects   
-       18           18 NA        18    NA       NA -1.36        NA fixed_effects   
-       19           19 NA        19    NA       NA -1.37        NA fixed_effects   
-       20           20 NA        20    NA       NA -1.38        NA fixed_effects   
-       21           21 NA        21    NA       NA -1.05        NA fixed_effects   
-       22           22 NA        22    NA       NA -1.37        NA fixed_effects   
-       23           23 NA        23    NA       NA -0.871       NA fixed_effects   
-       24           24 NA        24    NA       NA -1.06        NA fixed_effects   
-       25           25 NA        25    NA       NA -1.07        NA fixed_effects   
-       26           26 NA        26    NA       NA -1.16        NA fixed_effects   
-       27           27 NA        27    NA       NA -1.18        NA fixed_effects   
-       28           28 NA        28    NA       NA -0.840       NA fixed_effects   
-       29           29 NA        29    NA       NA -1.11        NA fixed_effects   
-       30           30 NA        30    NA       NA -0.694       NA fixed_effects   
-       31           31 NA        NA    NA       NA  0           NA constant        
+          parameter_id fleet year_i age_i length_i  input observed estimation_type
+                 <int> <chr>  <int> <int>    <int>  <dbl>    <dbl> <chr>
+        1            4 NA         1    NA       NA -4.66        NA fixed_effects
+        2           24 NA         2    NA       NA -3.60        NA fixed_effects
+        3           25 NA         3    NA       NA -3.10        NA fixed_effects
+        4           26 NA         4    NA       NA -2.80        NA fixed_effects
+        5           27 NA         5    NA       NA -3.02        NA fixed_effects
+        6           28 NA         6    NA       NA -2.44        NA fixed_effects
+        7           29 NA         7    NA       NA -2.43        NA fixed_effects
+        8           30 NA         8    NA       NA -1.68        NA fixed_effects
+        9           31 NA         9    NA       NA -2.22        NA fixed_effects
+       10           32 NA        10    NA       NA -2.02        NA fixed_effects
+       11           33 NA        11    NA       NA -1.89        NA fixed_effects
+       12           34 NA        12    NA       NA -1.82        NA fixed_effects
+       13           35 NA        13    NA       NA -2.15        NA fixed_effects
+       14           36 NA        14    NA       NA -1.78        NA fixed_effects
+       15           37 NA        15    NA       NA -1.71        NA fixed_effects
+       16           38 NA        16    NA       NA -1.82        NA fixed_effects
+       17           39 NA        17    NA       NA -1.16        NA fixed_effects
+       18           40 NA        18    NA       NA -1.36        NA fixed_effects
+       19           41 NA        19    NA       NA -1.37        NA fixed_effects
+       20           42 NA        20    NA       NA -1.38        NA fixed_effects
+       21           43 NA        21    NA       NA -1.05        NA fixed_effects
+       22           44 NA        22    NA       NA -1.37        NA fixed_effects
+       23           45 NA        23    NA       NA -0.871       NA fixed_effects
+       24           46 NA        24    NA       NA -1.06        NA fixed_effects
+       25           47 NA        25    NA       NA -1.07        NA fixed_effects
+       26           48 NA        26    NA       NA -1.16        NA fixed_effects
+       27           49 NA        27    NA       NA -1.18        NA fixed_effects
+       28           50 NA        28    NA       NA -0.840       NA fixed_effects
+       29           51 NA        29    NA       NA -1.11        NA fixed_effects
+       30           52 NA        30    NA       NA -0.694       NA fixed_effects
+       31            3 NA        NA    NA       NA  0           NA constant
        32           NA NA         1     1       NA NA           14 derived_quantity
        33           NA NA         1     2       NA NA           20 derived_quantity
        34           NA NA         1     3       NA NA           23 derived_quantity
