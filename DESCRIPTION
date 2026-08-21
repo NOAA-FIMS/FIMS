@@ -110,8 +110,6 @@ Suggests:
     usethis,
     withr
 LinkingTo:
-    Rcpp,
-    RcppEigen,
     TMB
 VignetteBuilder:
     knitr
