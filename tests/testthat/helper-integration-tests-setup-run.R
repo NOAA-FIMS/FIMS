@@ -101,7 +101,7 @@ prepare_test_data <- function() {
   # Generate dataset with missing values in age composition for survey1
   # Missing values for length composition for fleet1 year 0012
   length_na_index <- 2
-  data_age_length_comp_raw <- rbind(
+  data_age_length_comp_raw <- dplyr::bind_rows(
     catch_data,
     index_data,
     age_data,
