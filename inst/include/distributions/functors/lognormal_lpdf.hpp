@@ -90,34 +90,43 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
     }
 
     for (size_t i = 0; i < n_x; i++) {
-#ifdef TMB_MODEL
+#if defined(TMB_MODEL) || defined(QUADRA_MODEL)
       if (this->input_type == "data") {
         // if data, check if there are any NA values and skip lpdf calculation
         // https://doi.org/10.1016/j.fishres.2015.12.002 for the use of
         // lognormal constant
         if (this->get_observed(i) != this->data_observed_values->na_value) {
-          this->lpdf_vec[i] =
-              dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true) -
-              log(this->get_observed(i));
+          const Type log_observed = fims_math::log(this->get_observed(i));
+          const Type sd = fims_math::exp(log_sd.get_force_scalar(i));
+          const Type z = (log_observed - this->get_expected(i)) / sd;
+          this->lpdf_vec[i] = -static_cast<Type>(0.5) * z * z -
+                              fims_math::log(sd) - log_observed -
+                              static_cast<Type>(0.91893853320467274178);
         } else {
           this->lpdf_vec[i] = 0;
         }
       } else {
         if (this->input_type == "random_effects") {
           // if random effects, no lognormal constant needs to be applied
-          this->lpdf_vec[i] =
-              dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true);
+          const Type log_observed = fims_math::log(this->get_observed(i));
+          const Type sd = fims_math::exp(log_sd.get_force_scalar(i));
+          const Type z = (log_observed - this->get_expected(i)) / sd;
+          this->lpdf_vec[i] = -static_cast<Type>(0.5) * z * z -
+                              fims_math::log(sd) -
+                              static_cast<Type>(0.91893853320467274178);
         } else {
-          this->lpdf_vec[i] =
-              dnorm(log(this->get_observed(i)), this->get_expected(i),
-                    fims_math::exp(log_sd.get_force_scalar(i)), true) -
-              log(this->get_observed(i));
+          const Type log_observed = fims_math::log(this->get_observed(i));
+          const Type sd = fims_math::exp(log_sd.get_force_scalar(i));
+          const Type z = (log_observed - this->get_expected(i)) / sd;
+          this->lpdf_vec[i] = -static_cast<Type>(0.5) * z * z -
+                              fims_math::log(sd) - log_observed -
+                              static_cast<Type>(0.91893853320467274178);
         }
       }
 
       this->lpdf += this->lpdf_vec[i];
+#endif
+#ifdef TMB_MODEL
       if (this->simulate_flag) {
         FIMS_SIMULATE_F(this->of) {  // preprocessor definition in interface.hpp
                                      // this simulates data that is mean biased

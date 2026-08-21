@@ -2,7 +2,9 @@
 #include <cmath>
 
 #include "../inst/include/interface/interface.hpp"
+#ifdef TMB_MODEL
 #include "../inst/include/interface/TMB/init_tmb.hpp"
+
 #include "../inst/include/common/model.hpp"
 
 /// @cond
@@ -76,4 +78,6 @@ Type objective_function<Type>::operator()()
 
   return nll;
 }
+
+#endif
 /// @endcond

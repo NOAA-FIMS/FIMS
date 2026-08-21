@@ -9,6 +9,8 @@
 #ifndef FIMS_MODELS_FISHERY_MODEL_BASE_HPP
 #define FIMS_MODELS_FISHERY_MODEL_BASE_HPP
 
+#include <set>
+
 #include "../../common/model_object.hpp"
 #include "../../common/fims_math.hpp"
 #include "../../common/fims_vector.hpp"

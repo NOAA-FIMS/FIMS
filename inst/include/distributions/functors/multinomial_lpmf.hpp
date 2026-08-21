@@ -115,7 +115,7 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       // Skips the entire row if any values are NA
       bool containsNA = false;
 
-#ifdef TMB_MODEL
+#if defined(TMB_MODEL) || defined(QUADRA_MODEL)
       for (size_t j = 0; j < dims[1]; j++) {
         if (this->input_type == "data") {
           // if data, check if there are any NA values and skip lpdf calculation
@@ -141,10 +141,33 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       }
 
       if (!containsNA) {
+        double total = 0.0;
+        Type log_probability = static_cast<Type>(0.0);
+        for (size_t j = 0; j < dims[1]; ++j) {
+#ifdef QUADRA_MODEL
+          const double observed = [&]() {
+            if constexpr (std::is_same_v<Type, had::AReal>) {
+              return observed_values_vector[j].val;
+            } else {
+#ifdef TMB_MODEL
+              return asDouble(observed_values_vector[j]);
+#else
+              return static_cast<double>(observed_values_vector[j]);
+#endif
+            }
+          }();
+#else
+          const double observed = asDouble(observed_values_vector[j]);
+#endif
+          total += observed;
+          log_probability -= static_cast<Type>(std::lgamma(observed + 1.0));
+          log_probability +=
+              observed_values_vector[j] * fims_math::log(prob_vector[j]);
+        }
+        log_probability += static_cast<Type>(std::lgamma(total + 1.0));
         std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
                   this->lpdf_vec.begin() + lpdf_vec_idx + dims[1],
-                  dmultinom(observed_values_vector.to_tmb(),
-                            prob_vector.to_tmb(), true));
+                  log_probability);
 
         this->lpdf += this->lpdf_vec[lpdf_vec_idx];
       } else {
