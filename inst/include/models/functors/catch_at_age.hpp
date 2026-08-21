@@ -965,10 +965,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
             for (size_t a = 0; a < fleet->n_ages; a++) {
               size_t i_age_year = y * fleet->n_ages + a;
               size_t i_length_age = a * fleet->n_lengths + l;
-              fdq_["lengthcomp_expected"][i_length_year] +=
-                  fdq_["agecomp_expected"][i_age_year] *
-                  fleet->age_to_length_conversion[i_length_age];
-
               fdq_["catch_numbers_at_length"][i_length_year] +=
                   fdq_["catch_numbers_at_age"][i_age_year] *
                   fleet->age_to_length_conversion[i_length_age];
@@ -976,6 +972,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
               fdq_["index_numbers_at_length"][i_length_year] +=
                   fdq_["index_numbers_at_age"][i_age_year] *
                   fleet->age_to_length_conversion[i_length_age];
+            }
+
+            // Length-composition expectations must not depend on the
+            // presence or sample size of age-composition observations.
+            if (fleet->fleet_observed_catch_data_id_m == -999) {
+              fdq_["lengthcomp_expected"][i_length_year] =
+                  fdq_["index_numbers_at_length"][i_length_year];
+            } else {
+              fdq_["lengthcomp_expected"][i_length_year] =
+                  fdq_["catch_numbers_at_length"][i_length_year];
             }
 
             sum += fdq_["lengthcomp_expected"][i_length_year];

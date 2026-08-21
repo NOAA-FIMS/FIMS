@@ -14,7 +14,7 @@ integration_fixture_files <- c(
   "parameters_model_comparison_project.RDS",
   "parameters_model_comparison_project_fixed_effects.RDS"
 )
-integration_fixture_version <- "native-v3"
+integration_fixture_version <- "native-v4"
 
 integration_fixtures_available <- function() {
   version_file <- testthat::test_path(
