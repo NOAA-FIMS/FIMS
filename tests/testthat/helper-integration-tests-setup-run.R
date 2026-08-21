@@ -87,7 +87,9 @@ prepare_test_data <- function() {
     catch_data,
     index_data,
     age_data,
-    weight_at_age_data
+    weight_at_age_data,
+    length_comp_data,
+    length_age_data
   )
   data_age_length_comp_na <- data_age_length_comp_raw |>
     dplyr::filter(

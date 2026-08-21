@@ -346,13 +346,23 @@ initialize_fims <- function(parameters, data) {
     landings_distribution = catch_distribution$family,
     landings_sd = catch_distribution$scale,
     landings_age_comp = model_age_comp(data, fishing_fleet),
-    landings_length_comp = model_length_comp(data, fishing_fleet),
+    landings_length_comp = if (n_lengths > 0L) {
+      model_length_comp(data, fishing_fleet)
+    } else {
+      NULL
+    },
     survey_index = model_index(data, survey_fleet),
     survey_distribution = index_distribution$family,
     survey_sd = index_distribution$scale,
     survey_age_comp = model_age_comp(data, survey_fleet),
-    survey_length_comp = model_length_comp(data, survey_fleet),
-    recruitment_log_sd = recruitment_log_sd[[1L]],
+    survey_length_comp = if (n_lengths > 0L) {
+      model_length_comp(data, survey_fleet)
+    } else {
+      NULL
+    },
+    # Parameter tables store log_sd, while the native likelihood builder
+    # accepts the standard deviation on its natural scale.
+    recruitment_log_sd = exp(recruitment_log_sd[[1L]]),
     recruitment_log_sd_estimation_type = .native_parameter_types(
       parameters, "Recruitment", "log_sd"
     ),
