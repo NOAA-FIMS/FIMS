@@ -1,16 +1,16 @@
 #include <cmath>
 #include "gtest/gtest.h"
 #include "common/fims_math.hpp"
-#include "population_dynamics/growth/functors/von_bertalanffy.hpp"
+#include "population_dynamics/growth/functors/vonb_schnute.hpp"
 
 namespace
 {
-  fims_popdy::VonBertalanffyGrowth<double> MakeValidVonB() {
-    fims_popdy::VonBertalanffyGrowth<double> vb;
+  fims_popdy::VonBSchnuteGrowth<double> MakeValidVonB() {
+    fims_popdy::VonBSchnuteGrowth<double> vb;
 
-    vb.length_at_ref_age_1 = 275.0;
-    vb.length_at_ref_age_2 = 725.0;
-    vb.growth_coefficient_K = 0.18;
+    vb.mean_length_young = 275.0;
+    vb.mean_length_old = 725.0;
+    vb.von_bertalanffy_coefficient_K = 0.18;
     vb.reference_age_for_length_1 = 1.0;
     vb.reference_age_for_length_2 = 12.0;
     vb.length_weight_a = 2.5e-11;
@@ -19,13 +19,13 @@ namespace
     return vb;
   }
 
-  TEST(VonBertalanffyEvaluate, BasicSanity)
+  TEST(VonBSchnuteEvaluate, BasicSanity)
   {
     auto vb = MakeValidVonB();
 
     // expected values from the formula (guarded denominator)
     const double denom_raw = 1.0 - std::exp(
-        -vb.growth_coefficient_K *
+        -vb.von_bertalanffy_coefficient_K *
         (vb.reference_age_for_length_2 - vb.reference_age_for_length_1));
     const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
 
@@ -34,15 +34,15 @@ namespace
     double L12 = vb.length_at_age(12.0);
 
     const double L1_expected =
-        vb.length_at_ref_age_1 +
-        (vb.length_at_ref_age_2 - vb.length_at_ref_age_1) *
-            (1.0 - std::exp(-vb.growth_coefficient_K *
+        vb.mean_length_young +
+        (vb.mean_length_old - vb.mean_length_young) *
+            (1.0 - std::exp(-vb.von_bertalanffy_coefficient_K *
                             (1.0 - vb.reference_age_for_length_1))) /
             denom;
     const double L12_expected =
-        vb.length_at_ref_age_1 +
-        (vb.length_at_ref_age_2 - vb.length_at_ref_age_1) *
-            (1.0 - std::exp(-vb.growth_coefficient_K *
+        vb.mean_length_young +
+        (vb.mean_length_old - vb.mean_length_young) *
+            (1.0 - std::exp(-vb.von_bertalanffy_coefficient_K *
                             (12.0 - vb.reference_age_for_length_1))) /
             denom;
 
@@ -55,20 +55,20 @@ namespace
     double W5 = vb.evaluate(0, 5.0);
     EXPECT_NEAR(W5, 2.5e-11 * std::pow(L5, 3.0), 1e-10);
 
-    fims_popdy::VonBertalanffyGrowth<double> vb2;
+    fims_popdy::VonBSchnuteGrowth<double> vb2;
     EXPECT_EQ(vb2.GetId(), vb.GetId() + 1);
   }
 
-  TEST(VonBertalanffyEvaluate, UsesLinearRampBelowFirstReferenceAge)
+  TEST(VonBSchnuteEvaluate, UsesLinearRampBelowFirstReferenceAge)
   {
     auto vb = MakeValidVonB();
 
     // This setup reproduces the age-0 back-calculation problem:
     // A1 is above the youngest model age, so age 0 is below the first
     // reference age.
-    vb.length_at_ref_age_1 = 6.0;
-    vb.length_at_ref_age_2 = 67.1;
-    vb.growth_coefficient_K = 0.242;
+    vb.mean_length_young = 6.0;
+    vb.mean_length_old = 67.1;
+    vb.von_bertalanffy_coefficient_K = 0.242;
     vb.reference_age_for_length_1 = 1.0;
     vb.reference_age_for_length_2 = 21.0;
 
@@ -82,7 +82,7 @@ namespace
     EXPECT_NEAR(vb.length_at_age(0.0), 0.0, 1e-12);
     EXPECT_NEAR(vb.length_at_age(0.5), 3.0, 1e-12);
     EXPECT_NEAR(vb.length_at_age(1.0), 6.0, 1e-12);
-    EXPECT_GT(vb.length_at_age(2.0), vb.length_at_ref_age_1);
+    EXPECT_GT(vb.length_at_age(2.0), vb.mean_length_young);
 
     // The key failure mode was NaN weight-at-age at age 0. This should now be
     // finite and non-negative.
@@ -108,7 +108,7 @@ namespace
         0.5, d_log_laa_d_l1, d_log_laa_d_l2, d_log_laa_d_k);
 
     const double ratio_half = 0.5 / vb.reference_age_for_length_1;
-    const double mean_length_half = vb.length_at_ref_age_1 * ratio_half;
+    const double mean_length_half = vb.mean_length_young * ratio_half;
     const double mean_length_half_safe =
         fims_math::ad_max(mean_length_half, 1e-8);
 
@@ -129,24 +129,24 @@ namespace
 
     EXPECT_NEAR(
         d_log_laa_d_log_l1,
-        vb.length_at_ref_age_1 * ratio_half / mean_length_half_safe,
+        vb.mean_length_young * ratio_half / mean_length_half_safe,
         1e-12);
     EXPECT_NEAR(d_log_laa_d_log_l2, 0.0, 1e-12);
     EXPECT_NEAR(d_log_laa_d_log_k, 0.0, 1e-12);
   }
 
-  TEST(VonBertalanffyEvaluate, RejectsNonPositiveGrowthCoefficientK)
+  TEST(VonBSchnuteEvaluate, RejectsNonPositiveGrowthCoefficientK)
   {
     auto vb = MakeValidVonB();
 
     // Make just this one parameter invalid.
-    vb.growth_coefficient_K = 0.0;
+    vb.von_bertalanffy_coefficient_K = 0.0;
 
     // The backend validator should now reject this.
     EXPECT_THROW(vb.length_at_age(1.0), std::runtime_error);
   }
 
-  TEST(VonBertalanffyEvaluate, RejectsReversedReferenceAges)
+  TEST(VonBSchnuteEvaluate, RejectsReversedReferenceAges)
   {
     auto vb = MakeValidVonB();
 
@@ -156,12 +156,12 @@ namespace
     EXPECT_THROW(vb.length_at_age(1.0), std::runtime_error);
   }
 
-  TEST(VonBertalanffyEvaluate, RejectsNonIncreasingReferenceLengths)
+  TEST(VonBSchnuteEvaluate, RejectsNonIncreasingReferenceLengths)
   {
     auto vb = MakeValidVonB();
 
     // Make the second reference length no larger than the first.
-    vb.length_at_ref_age_2 = vb.length_at_ref_age_1;
+    vb.mean_length_old = vb.mean_length_young;
 
     EXPECT_THROW(vb.length_at_age(1.0), std::runtime_error);
   }

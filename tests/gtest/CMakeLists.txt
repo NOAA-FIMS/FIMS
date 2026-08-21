@@ -102,16 +102,16 @@ target_link_libraries(growth_EWAAGrowth_evaluate
 )
 gtest_discover_tests(growth_EWAAGrowth_evaluate)
 
-# test_growth_von_bertalanffy.cpp
-add_executable(growth_von_bertalanffy
-  test_growth_von_bertalanffy.cpp
+# test_growth_vonb_schnute.cpp
+add_executable(growth_vonb_schnute
+  test_growth_vonb_schnute.cpp
 )
-add_as_invoker_manifest(growth_von_bertalanffy)
-target_link_libraries(growth_von_bertalanffy
+add_as_invoker_manifest(growth_vonb_schnute)
+target_link_libraries(growth_vonb_schnute
   gtest_main
   fims_test
 )
-gtest_discover_tests(growth_von_bertalanffy)
+gtest_discover_tests(growth_vonb_schnute)
 
 # test_growth_model.cpp
 add_executable(growth_model

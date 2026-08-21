@@ -64,28 +64,28 @@ std::shared_ptr<FakeGrowthDerivedObservation> MakePreparedGrowth(
 }
 
 void ConfigureAdapter(
-    fims_popdy::VonBertalanffyGrowthModelAdapter<double>& adapter,
-    double length_at_ref_age_1,
-    double length_at_ref_age_2,
-    double growth_coefficient_K,
+    fims_popdy::VonBSchnuteGrowthModelAdapter<double>& adapter,
+    double mean_length_young,
+    double mean_length_old,
+    double von_bertalanffy_coefficient_K,
     double reference_age_for_length_1,
     double reference_age_for_length_2,
     double length_weight_a,
     double length_weight_b,
     double length_at_age_sd_at_reference_age_1,
     double length_at_age_sd_at_reference_age_2) {
-  adapter.LengthAtRefAge1Vector().resize(1);
-  adapter.LengthAtRefAge2Vector().resize(1);
-  adapter.GrowthCoefficientKVector().resize(1);
+  adapter.MeanLengthYoungVector().resize(1);
+  adapter.MeanLengthOldVector().resize(1);
+  adapter.VonBertalanffyCoefficientKVector().resize(1);
   adapter.ReferenceAgeForLength1Vector().resize(1);
   adapter.ReferenceAgeForLength2Vector().resize(1);
   adapter.LengthWeightAVector().resize(1);
   adapter.LengthWeightBVector().resize(1);
   adapter.LengthAtAgeSdAtRefAgesVector().resize(2);
 
-  adapter.LengthAtRefAge1Vector()[0] = fims_math::log(length_at_ref_age_1);
-  adapter.LengthAtRefAge2Vector()[0] = fims_math::log(length_at_ref_age_2);
-  adapter.GrowthCoefficientKVector()[0] = fims_math::log(growth_coefficient_K);
+  adapter.MeanLengthYoungVector()[0] = fims_math::log(mean_length_young);
+  adapter.MeanLengthOldVector()[0] = fims_math::log(mean_length_old);
+  adapter.VonBertalanffyCoefficientKVector()[0] = fims_math::log(von_bertalanffy_coefficient_K);
   adapter.ReferenceAgeForLength1Vector()[0] = reference_age_for_length_1;
   adapter.ReferenceAgeForLength2Vector()[0] = reference_age_for_length_2;
   adapter.LengthWeightAVector()[0] = fims_math::log(length_weight_a);
@@ -207,7 +207,7 @@ TEST(GrowthDerivedSizeProvider,
 TEST(GrowthDerivedSizeProvider,
      PrepareSizeProductsHandlesDifferentGrowthVariability) {
   auto growth =
-      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *growth,
       275.0,
@@ -298,7 +298,7 @@ TEST(GrowthDerivedSizeProvider,
 TEST(GrowthDerivedSizeProvider,
      PrepareSizeProductsShiftMassWithDifferentPreparedGrowthAdapters) {
   auto lower_growth =
-      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *lower_growth,
       225.0,
@@ -315,7 +315,7 @@ TEST(GrowthDerivedSizeProvider,
   ASSERT_NO_THROW(lower_growth->PrepareGrowthProducts());
 
   auto higher_growth =
-      std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *higher_growth,
       325.0,
