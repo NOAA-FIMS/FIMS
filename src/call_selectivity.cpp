@@ -417,6 +417,12 @@ extern "C" SEXP fims_call_create_logistic_selectivity(
                                                  slope_estimation_type_sexp,
                                                  true);
 #endif
+#ifdef QUADRA_MODEL
+    create_logistic_selectivity<QUADRA_FIMS_TYPE>(
+        selectivity_id, inflection_point_sexp, slope_sexp,
+        inflection_point_estimation_type_sexp, slope_estimation_type_sexp,
+        true);
+#endif
 
     return Rf_ScalarInteger(static_cast<int>(selectivity_id));
 }
@@ -490,6 +496,15 @@ extern "C" SEXP fims_call_create_double_logistic_selectivity(
         inflection_point_desc_estimation_type_sexp,
         slope_desc_estimation_type_sexp,
         true);
+#endif
+#ifdef QUADRA_MODEL
+    create_double_logistic_selectivity<QUADRA_FIMS_TYPE>(
+        selectivity_id, inflection_point_asc_sexp, slope_asc_sexp,
+        inflection_point_desc_sexp, slope_desc_sexp,
+        inflection_point_asc_estimation_type_sexp,
+        slope_asc_estimation_type_sexp,
+        inflection_point_desc_estimation_type_sexp,
+        slope_desc_estimation_type_sexp, true);
 #endif
 
     return Rf_ScalarInteger(static_cast<int>(selectivity_id));

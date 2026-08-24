@@ -24,6 +24,11 @@ fit_list <- list(fit_age_length_comp, fit_agecomp)
 on.exit(rm(fit_list), add = TRUE)
 
 ## IO correctness ----
+test_that("`fit_fims()` defaults to the native Quadra backend", {
+  #' @description Test that native Quadra is the first backend choice.
+  expect_identical(formals(fit_fims)$backend[[2]], "quadra")
+})
+
 test_that("`is.FIMSFit()` works with correct inputs", {
   #' @description Test that `is.FIMSFit(fit_age_length_comp)` returns TRUE.
   expect_true(
@@ -92,7 +97,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
   #' @description Test that fit_fims() throws an informative warning when convergence fails.
   expect_warning(
     result <- initialized_model |>
-      fit_fims(optimize = TRUE, control = bad_control),
+      fit_fims(optimize = TRUE, control = bad_control, backend = "TMB"),
     regexp = "Optimization failed convergence checks"
   )
 
@@ -106,7 +111,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
   #' @description Test that fit_fims() throws an informative error when max gradient is high.
   expect_warning(
     result <- initialized_model |>
-      fit_fims(optimize = TRUE, control = bad_control),
+      fit_fims(optimize = TRUE, control = bad_control, backend = "TMB"),
     regexp = "Maximum absolute gradient"
   )
 
@@ -120,7 +125,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
   #' @description Test that fit_fims() throws an informative warning when max gradient is moderately high.
   expect_warning(
     result <- initialized_model |>
-      fit_fims(optimize = TRUE, control = bad_control),
+      fit_fims(optimize = TRUE, control = bad_control, backend = "TMB"),
     regexp = "Optimization resulted in high gradients"
   )
 
@@ -159,7 +164,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
 
   #' @description Test that fit_fims() throws an informative warning when parameter SE values are too large.
   expect_warning(
-    result <- initialized_model |> fit_fims(optimize = TRUE),
+    result <- initialized_model |> fit_fims(optimize = TRUE, backend = "TMB"),
     regexp = "Large condition number detected in Hessian"
   )
 
@@ -197,7 +202,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
 
   #' @description Test that fit_fims() throws an informative warning when parameter SE values are NA.
   expect_warning(
-    result <- initialized_model |> fit_fims(optimize = TRUE),
+    result <- initialized_model |> fit_fims(optimize = TRUE, backend = "TMB"),
     regexp = "NA standard errors"
   )
 
@@ -219,7 +224,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
 
   #' @description Test that fit_fims() throws an informative warning when the Hessian is not positive definite.
   expect_warning(
-    result <- initialized_model |> fit_fims(optimize = TRUE),
+    result <- initialized_model |> fit_fims(optimize = TRUE, backend = "TMB"),
     regexp = "Standard error calculations failed convergence checks"
   )
 
@@ -239,7 +244,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
     ) |>
     initialize_fims(data = data_4_model)
   test_results <- suppressWarnings(suppressMessages(
-    fit_fims(initialized_poor_model, optimize = TRUE)
+    fit_fims(initialized_poor_model, optimize = TRUE, backend = "TMB")
   ))
   expect_true(inherits(test_results, "FIMSFit"))
   expect_equal(get_opt(test_results)[["convergence"]], 1L)

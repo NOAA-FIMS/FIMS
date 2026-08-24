@@ -275,6 +275,12 @@ extern "C" SEXP fims_call_create_beverton_holt_recruitment(
         log_devs_estimation_type_sexp,
         true);
 #endif
+#ifdef QUADRA_MODEL
+    create_beverton_holt_recruitment<QUADRA_FIMS_TYPE>(
+        recruitment_id, logit_steep_sexp, log_rzero_sexp, log_devs_sexp,
+        logit_steep_estimation_type_sexp, log_rzero_estimation_type_sexp,
+        log_devs_estimation_type_sexp, true);
+#endif
 
     return Rf_ScalarInteger(static_cast<int>(recruitment_id));
 }

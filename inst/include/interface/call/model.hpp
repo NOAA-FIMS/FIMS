@@ -38,5 +38,10 @@ extern "C" SEXP fims_call_information_clear();
 extern "C" SEXP fims_call_information_get_fixed();
 extern "C" SEXP fims_call_information_get_random();
 extern "C" SEXP fims_call_information_get_parameter_names();
+extern "C" SEXP fims_call_quadra_fit(
+    SEXP fixed_sexp, SEXP random_sexp, SEXP method_sexp,
+    SEXP max_iterations_sexp, SEXP tolerance_sexp);
+extern "C" SEXP fims_call_quadra_sdreport(
+    SEXP fixed_sexp, SEXP random_sexp);
 
 #endif // FIMS_INTERFACE_CALL_MODEL_HPP

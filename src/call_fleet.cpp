@@ -272,6 +272,16 @@ extern "C" SEXP fims_call_create_fleet(SEXP log_fmort_sexp,
                                   log_q_estimation_type_sexp,
                                   true);
 #endif
+#ifdef QUADRA_MODEL
+    create_fleet<QUADRA_FIMS_TYPE>(fleet_id,
+                                   log_fmort_sexp,
+                                   log_q_sexp,
+                                   selectivity_id_sexp,
+                                   age_to_length_conversion_sexp,
+                                   log_fmort_estimation_type_sexp,
+                                   log_q_estimation_type_sexp,
+                                   true);
+#endif
 
     return Rf_ScalarInteger(static_cast<int>(fleet_id));
 }

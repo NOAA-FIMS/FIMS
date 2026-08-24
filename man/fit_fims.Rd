@@ -12,7 +12,9 @@ fit_fims(
   optimize = TRUE,
   number_of_newton_steps = 0,
   control = list(eval.max = 10000, iter.max = 10000, trace = 0),
-  filename = NULL
+  filename = NULL,
+  backend = c("quadra", "TMB"),
+  gradient_tolerance = 0.001
 )
 }
 \arguments{
@@ -43,6 +45,11 @@ the default is a list of length three with \code{eval.max = 1000},
 object as an RDS object. Defaults to 'fit.RDS', and a value of NULL
 indicates not to save it. If specified, it must end in .RDS. The file is
 written to folder given by \code{input[["path"]]}. Not yet implemented.}
+
+\item{backend}{Optimization backend. Native Quadra joint optimization is
+the default. Use \code{"TMB"} for the legacy TMB optimizer.}
+
+\item{gradient_tolerance}{Positive gradient tolerance used by Quadra.}
 }
 \value{
 An object of class \code{FIMSFit} is returned, where the structure is the same

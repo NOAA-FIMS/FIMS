@@ -167,6 +167,94 @@ native_get_parameter_names <- function() {
   .Call("fims_call_information_get_parameter_names", PACKAGE = "FIMS")
 }
 
+#' Fit the registered native model with Quadra
+#'
+#' @param fixed,random Numeric fixed- and random-effect parameter vectors.
+#' @param method Either `"laplace"` or `"joint"`.
+#' @param max_iterations Positive optimizer iteration limit.
+#' @param gradient_tolerance Positive convergence tolerance.
+#' @return A named list containing estimates and optimizer diagnostics.
+#' @keywords internal
+native_quadra_fit <- function(
+  fixed,
+  random = numeric(),
+  method = c("laplace", "joint"),
+  max_iterations = 100L,
+  gradient_tolerance = 1e-5
+) {
+  method <- match.arg(method)
+  .Call(
+    "fims_call_quadra_fit",
+    as.numeric(fixed),
+    as.numeric(random),
+    method,
+    as.integer(max_iterations),
+    as.numeric(gradient_tolerance),
+    PACKAGE = "FIMS"
+  )
+}
+
+#' Calculate native Quadra standard errors
+#'
+#' @param fixed,random Numeric fixed- and random-effect estimates.
+#' @return A `quadra_sdreport` list containing estimates, covariance matrices,
+#'   gradients, standard errors, and Hessian diagnostics.
+#' @keywords internal
+native_quadra_sdreport <- function(fixed, random = numeric()) {
+  result <- .Call(
+    "fims_call_quadra_sdreport",
+    as.numeric(fixed),
+    as.numeric(random),
+    PACKAGE = "FIMS"
+  )
+  fixed_names <- native_get_parameter_names()
+  if (length(fixed_names) != length(fixed)) {
+    fixed_names <- paste0("parameter_", seq_along(fixed))
+  }
+  names(result$par.fixed) <- fixed_names
+  dimnames(result$cov.fixed) <- list(fixed_names, fixed_names)
+  class(result) <- c("quadra_sdreport", "list")
+  result
+}
+
+#' Summarize a native Quadra standard-error report
+#'
+#' @param object A `quadra_sdreport` object.
+#' @param select Which estimates to return.
+#' @param ... Unused.
+#' @return A numeric matrix with `Estimate` and `Std. Error` columns.
+#' @export
+summary.quadra_sdreport <- function(
+  object,
+  select = c("all", "fixed", "random", "report"),
+  ...
+) {
+  select <- match.arg(select)
+  n_fixed <- length(object$par.fixed)
+  fixed <- cbind(
+    "Estimate" = object$par.fixed,
+    "Std. Error" = utils::head(object$std.error, n_fixed)
+  )
+  random <- cbind(
+    "Estimate" = object$par.random,
+    "Std. Error" = utils::tail(
+      object$std.error,
+      length(object$par.random)
+    )
+  )
+  rownames(random) <- rep("re", nrow(random))
+  empty <- matrix(
+    numeric(), nrow = 0L, ncol = 2L,
+    dimnames = list(NULL, c("Estimate", "Std. Error"))
+  )
+  switch(select,
+    fixed = fixed,
+    random = random,
+    report = empty,
+    all = rbind(fixed, random)
+  )
+}
+
 #' @rdname native_clear
 #' @export
 clear <- native_clear

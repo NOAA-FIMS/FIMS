@@ -1462,6 +1462,9 @@ extern "C" SEXP fims_call_create_model()
 #ifdef TMB_MODEL
     created = create_backend_model_internal<TMBAD_FIMS_TYPE>() && created;
 #endif
+#ifdef QUADRA_MODEL
+    created = create_backend_model_internal<QUADRA_FIMS_TYPE>() && created;
+#endif
 
     std::shared_ptr<fims_model::Model<TMB_FIMS_REAL_TYPE>> model_singleton =
         fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
@@ -1557,6 +1560,15 @@ extern "C" SEXP fims_call_build_default_likelihood(
         n_ages,
         n_lengths);
 #endif
+#ifdef QUADRA_MODEL
+    build_default_likelihood_internal<QUADRA_FIMS_TYPE>(
+        fishing_fleet_id, survey_fleet_id, landings_sexp,
+        landings_distribution, landings_sd, landings_age_comp_sexp,
+        landings_length_comp_sexp, survey_index_sexp, survey_distribution,
+        survey_sd, survey_age_comp_sexp, survey_length_comp_sexp,
+        recruitment_log_sd, recruitment_log_sd_estimation_type, n_years,
+        n_ages, n_lengths);
+#endif
 
     return Rf_ScalarLogical(TRUE);
 }
@@ -1613,6 +1625,9 @@ extern "C" SEXP fims_call_add_prior(
 #ifdef TMB_MODEL
     FIMS_ADD_PRIOR(TMBAD_FIMS_TYPE);
 #endif
+#ifdef QUADRA_MODEL
+    FIMS_ADD_PRIOR(QUADRA_FIMS_TYPE);
+#endif
 #undef FIMS_ADD_PRIOR
 
     UNPROTECT(2);
@@ -1664,6 +1679,14 @@ extern "C" SEXP fims_call_information_clear()
     info_ad->Clear();
     clear_native_registries<TMBAD_FIMS_TYPE>();
     reset_backend_id_counters<TMBAD_FIMS_TYPE>();
+#endif
+#ifdef QUADRA_MODEL
+    std::shared_ptr<fims_info::Information<QUADRA_FIMS_TYPE>> info_quadra =
+        fims_info::Information<QUADRA_FIMS_TYPE>::GetInstance();
+    info_quadra->Clear();
+    clear_native_registries<QUADRA_FIMS_TYPE>();
+    reset_backend_id_counters<QUADRA_FIMS_TYPE>();
+    fims_quadra::reset_tape();
 #endif
 
     return R_NilValue;

@@ -220,6 +220,12 @@ extern "C" SEXP fims_call_create_logistic_maturity(
                                               slope_estimation_type_sexp,
                                               true);
 #endif
+#ifdef QUADRA_MODEL
+    create_logistic_maturity<QUADRA_FIMS_TYPE>(
+        maturity_id, inflection_point_sexp, slope_sexp,
+        inflection_point_estimation_type_sexp, slope_estimation_type_sexp,
+        true);
+#endif
 
     return Rf_ScalarInteger(static_cast<int>(maturity_id));
 }

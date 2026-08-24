@@ -459,6 +459,20 @@ extern "C" SEXP fims_call_create_population(SEXP log_m_sexp,
                                        fleet_ids_sexp,
                                        true);
 #endif
+#ifdef QUADRA_MODEL
+    create_population<QUADRA_FIMS_TYPE>(population_id,
+                                        log_m_sexp,
+                                        log_f_multiplier_sexp,
+                                        log_init_naa_sexp,
+                                        log_m_estimation_type_sexp,
+                                        log_f_multiplier_estimation_type_sexp,
+                                        log_init_naa_estimation_type_sexp,
+                                        maturity_id_sexp,
+                                        growth_id_sexp,
+                                        recruitment_id_sexp,
+                                        fleet_ids_sexp,
+                                        true);
+#endif
 
     return Rf_ScalarInteger(static_cast<int>(population_id));
 }

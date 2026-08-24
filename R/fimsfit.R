@@ -661,7 +661,11 @@ FIMSFit <- function(
       list(
         name = "FIMS",
         type = "CatchAtAge",
-        estimation_framework = "TMB",
+        estimation_framework = if (is.null(input$backend)) {
+          "TMB"
+        } else {
+          input$backend
+        },
         id = 1L,
         objective_function_value = if (length(opt) > 0L) {
           opt[["objective"]]
@@ -725,6 +729,9 @@ FIMSFit <- function(
 #'   object as an RDS object. Defaults to 'fit.RDS', and a value of NULL
 #'   indicates not to save it. If specified, it must end in .RDS. The file is
 #'   written to folder given by `input[["path"]]`. Not yet implemented.
+#' @param backend Optimization backend. Native Quadra joint optimization is
+#'   the default. Use `"TMB"` for the legacy TMB optimizer.
+#' @param gradient_tolerance Positive gradient tolerance used by Quadra.
 #' @return
 #' An object of class `FIMSFit` is returned, where the structure is the same
 #' regardless if `optimize = TRUE` or not. Uncertainty information is only
@@ -746,7 +753,10 @@ fit_fims <- function(input,
                        iter.max = 10000,
                        trace = 0
                      ),
-                     filename = NULL) {
+                     filename = NULL,
+                     backend = c("quadra", "TMB"),
+                     gradient_tolerance = 1e-3) {
+  backend <- match.arg(backend)
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
   # NOTE: When we add implementation for newton step we need to
@@ -766,6 +776,24 @@ fit_fims <- function(input,
     cli::cli_abort("FIMS must have at least one parameter to optimize.")
   }
 
+  if (!(is.numeric(gradient_tolerance) && length(gradient_tolerance) == 1L &&
+      is.finite(gradient_tolerance) && gradient_tolerance > 0)) {
+    cli::cli_abort("{.arg gradient_tolerance} must be one positive number.")
+  }
+
+  if (backend != "TMB" && optimize) {
+    cli::cli_inform(c("v" = "Starting {backend} optimization ..."))
+    quadra_result <- native_quadra_fit(
+      fixed = input$parameters$p,
+      random = input$parameters$re,
+      method = "joint",
+      max_iterations = if (is.null(control$iter.max)) 100L else control$iter.max,
+      gradient_tolerance = gradient_tolerance
+    )
+    input$parameters$p <- quadra_result$par
+    input$parameters$re <- quadra_result$random
+  }
+
   obj <- TMB::MakeADFun(
     data = list(),
     parameters = input$parameters,
@@ -775,12 +803,65 @@ fit_fims <- function(input,
     silent = TRUE
   )
   if (!optimize) {
+    input$backend <- backend
     initial_fit <- FIMSFit(
       input = input,
       obj = obj,
       run_time = c("time_total" = as.difftime(0, units = "secs"))
     )
     return(initial_fit)
+  }
+
+  if (backend != "TMB") {
+    opt <- list(
+      par = quadra_result$par,
+      objective = quadra_result$objective,
+      convergence = if (isTRUE(quadra_result$converged)) 0L else 1L,
+      iterations = quadra_result$iterations,
+      evaluations = NA_integer_,
+      message = quadra_result$message
+    )
+    time_optimization <- as.difftime(
+      quadra_result$elapsed_seconds,
+      units = "secs"
+    )
+    input$backend <- backend
+
+    time_sdreport <- as.difftime(0, units = "secs")
+    if (get_sd) {
+      t2 <- Sys.time()
+      obj$fn(opt$par)
+      sdreport <- native_quadra_sdreport(
+        fixed = quadra_result$par,
+        random = quadra_result$random
+      )
+      time_sdreport <- Sys.time() - t2
+      check_sdreport_convergence(input, obj, opt, sdreport)
+    } else {
+      sdreport <- list()
+      # Initialize TMB's random mode and report state for the legacy FIMSFit
+      # reporting contract; optimization itself remains entirely in Quadra.
+      obj$fn(opt$par)
+    }
+    run_time <- c(
+      time_optimization = time_optimization,
+      time_sdreport = time_sdreport,
+      time_total = time_optimization + time_sdreport
+    )
+    fit <- FIMSFit(
+      input = input,
+      obj = obj,
+      opt = opt,
+      sdreport = sdreport,
+      run_time = run_time
+    )
+    fixed_gradient <- utils::head(
+      as.numeric(quadra_result$gradient),
+      length(opt$par)
+    )
+    fit@gradient <- fixed_gradient
+    fit@max_gradient <- max(abs(fixed_gradient))
+    return(fit)
   }
   if (!is_fims_verbose()) {
     control$trace <- 0

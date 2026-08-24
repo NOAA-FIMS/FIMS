@@ -214,7 +214,9 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport) {
   # Safely extract hessian and check condition number
   hessian_check_result <- tryCatch(
     {
-      if (length(obj[["env"]][["random"]]) > 0) {
+      if (inherits(sdreport, "quadra_sdreport")) {
+        hessian <- sdreport[["hessian"]]
+      } else if (length(obj[["env"]][["random"]]) > 0) {
         hessian <- obj[["env"]]$spHess(random = TRUE)
       } else {
         hessian <- as.matrix(obj$he(opt[["par"]]))

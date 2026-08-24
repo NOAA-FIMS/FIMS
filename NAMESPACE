@@ -3,6 +3,7 @@
 S3method(generics::augment,FIMSFit)
 S3method(generics::glance,FIMSFit)
 S3method(generics::tidy,FIMSFit)
+S3method(summary,quadra_sdreport)
 export(CreateTMBModel)
 export(FIMSFit)
 export(FIMSFrame)

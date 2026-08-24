@@ -182,6 +182,11 @@ extern "C" SEXP fims_call_create_ewaa_growth(SEXP ages_sexp,
                                         n_years_sexp,
                                         weights_estimation_type_sexp);
 #endif
+#ifdef QUADRA_MODEL
+    create_ewaa_growth<QUADRA_FIMS_TYPE>(growth_id, ages_sexp, weights_sexp,
+                                         n_years_sexp,
+                                         weights_estimation_type_sexp);
+#endif
 
     return Rf_ScalarInteger(static_cast<int>(growth_id));
 }
