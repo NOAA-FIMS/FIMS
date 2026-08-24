@@ -1,5 +1,5 @@
 /**
- * @file test_fims_math_ddiric_multinom.cpp
+ * @file test_fims_math_ddirichlet_multinom.cpp
  * @brief Unit test for the Dirichlet-multinomial probability mass function.
  */
 
@@ -139,7 +139,7 @@ std::vector<DirichletMultinomialTestCase> ReadTestCasesFromCsv(
 
 }  // namespace
 
-TEST(FimsMathDdiricMultinomTest, UsesMultipleInputs) {
+TEST(FimsMathDdirichletMultinomTest, UsesMultipleInputs) {
     const std::vector<DirichletMultinomialTestCase> test_cases =
         ReadTestCasesFromCsv("dirichlet_multinomial_test_values.csv");
 
@@ -164,9 +164,9 @@ TEST(FimsMathDdiricMultinomTest, UsesMultipleInputs) {
         const double expected_prob = test_case.expected_prob;
 
         const double result_log =
-            fims_math::ddiric_multinom<double>(x, p, theta, 1);
+            fims_math::ddirichlet_multinom<double>(x, p, theta, 1);
         const double result_prob =
-            fims_math::ddiric_multinom<double>(x, p, theta, 0);
+            fims_math::ddirichlet_multinom<double>(x, p, theta, 0);
 
         SCOPED_TRACE("case_id = " + std::to_string(test_case.case_id));
         EXPECT_NEAR(result_log, expected_log_prob, tolerance);

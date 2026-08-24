@@ -20,11 +20,11 @@ namespace fims_distributions {
 /**
  * @copybrief dirichlet_multinomial_lpmf.hpp
  *
- * @details This implementation computes row-wise Dirichlet-multinomial 
+ * @details This implementation computes row-wise Dirichlet-multinomial
  * log-probability mass contributions from
  * observed counts (`x_vector`) and expected proportions (`prob_vector`).
  * Specifically, when evaluating the Dirichlet-multinomial log-likelihood,
- * observations are passed to `ddiric_multinom(..., give_log = true)`.
+ * observations are passed to `ddirichlet_multinom(..., give_log = true)`.
  *
  * For `data` input, if any element in a row is equal to `na_value`, the entire
  * row is skipped and contributes zero to the objective. Contributions are
@@ -40,8 +40,8 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
    * @brief Dimensions of the number of rows and columns of the multivariate
    * dataset.
    */
-  fims::Vector<size_t> dims; 
-        Type theta;
+  fims::Vector<size_t> dims;
+  Type theta;
 
   /** @brief Constructor.
    */
@@ -146,7 +146,7 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
       if (!containsNA) {
         std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
                   this->lpdf_vec.begin() + lpdf_vec_idx + dims[1],
-                  fims_math::ddiric_multinom(observed_values_vector,
+                  fims_math::ddirichlet_multinom(observed_values_vector,
                             prob_vector, this->theta, true));
 
         this->lpdf += this->lpdf_vec[lpdf_vec_idx];

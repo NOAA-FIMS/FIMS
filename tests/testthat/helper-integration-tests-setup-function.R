@@ -1,4 +1,4 @@
-# file = FIMS/tests/testthat/helper-integration-tests-setup-function.R 
+# file = FIMS/tests/testthat/helper-integration-tests-setup-function.R
 # Helper file for FIMS R tests----
 # This file contains multiple functions that are used to set up and run
 # FIMS models with or without wrapper functions. The functions are sourced by
@@ -22,11 +22,11 @@ FIMS_dmultinom <- function(x, p) {
   return(log_pmf)
 }
 
-# FIMS ddiric_multinom function ----
-#' FIMS ddiric_multinom()
+# FIMS ddirichlet_multinom function ----
+#' FIMS ddirichlet_multinom()
 #'
 #' This function matches the Dirichlet-multinomial log PMF implemented in
-#' `fims_math.hpp` as `ddiric_multinom()`. It is evaluated in log space.
+#' `fims_math.hpp` as `ddirichlet_multinom()`. It is evaluated in log space.
 #'
 #' @param x A vector of length K of counts.
 #' @param p A numeric non-negative vector of length K of probabilities; must sum 1.
@@ -34,7 +34,7 @@ FIMS_dmultinom <- function(x, p) {
 #'
 #' @return The log of the probability mass function for the Dirichlet-multinomial.
 
-FIMS_ddiric_multinom <- function(x, p, theta) {
+FIMS_ddirichlet_multinom <- function(x, p, theta) {
   stopifnot(length(x) == length(p))
   stopifnot(all(is.finite(x)))
   stopifnot(all(x >= 0))

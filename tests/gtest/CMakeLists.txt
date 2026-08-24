@@ -333,13 +333,13 @@ target_link_libraries(def_FIMSLog_clear
 )
 gtest_discover_tests(def_FIMSLog_clear)
 
-# test_fims_math_ddiric_multinom.cpp
-add_executable(FimsMathDdiricMultinomTest
-  test_fims_math_ddiric_multinom.cpp
+# test_fims_math_ddirichlet_multinom.cpp
+add_executable(FimsMathDdirichletMultinomTest
+  test_fims_math_ddirichlet_multinom.cpp
 )
-add_as_invoker_manifest(FimsMathDdiricMultinomTest)
-target_link_libraries(FimsMathDdiricMultinomTest
+add_as_invoker_manifest(FimsMathDdirichletMultinomTest)
+target_link_libraries(FimsMathDdirichletMultinomTest
   gtest_main
   fims_test
 )
-gtest_discover_tests(FimsMathDdiricMultinomTest DISCOVERY_TIMEOUT 10)
+gtest_discover_tests(FimsMathDdirichletMultinomTest DISCOVERY_TIMEOUT 10)
