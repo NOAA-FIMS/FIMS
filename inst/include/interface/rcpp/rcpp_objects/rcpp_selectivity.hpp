@@ -607,19 +607,19 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  */
 class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
  public:
-   /**
+  /**
    * @brief The number of age bins.
    */
   SharedInt n_ages = 1;
-   /**
+  /**
    * @brief Vector of ages.
    */
   RealVector ages;
-   /**
+  /**
    * @brief Minimum observed age
    */
   SharedInt min_age = 1;
-   /**
+  /**
    * @brief Age-specific selectivity parameter values.
    */
   VariableVector logit_sel_at_age;
@@ -662,21 +662,21 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
    * @param x The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    */
-  virtual double evaluate(double x) { 
+  virtual double evaluate(double x) {
     fims_popdy::AgeSpecificSelectivity<double> AgeSpecificSel;
     AgeSpecificSel.n_ages = this->n_ages.get();
     if (this->ages.size() > 0) {
-      AgeSpecificSel.min_age = static_cast<size_t>(
-          *std::min_element(this->ages.storage_m->begin(),
-                            this->ages.storage_m->end()));
+      AgeSpecificSel.min_age = static_cast<size_t>(*std::min_element(
+          this->ages.storage_m->begin(), this->ages.storage_m->end()));
     } else {
       AgeSpecificSel.min_age = static_cast<size_t>(this->min_age.get());
     }
     AgeSpecificSel.logit_sel_at_age.resize(this->logit_sel_at_age.size());
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
-      AgeSpecificSel.logit_sel_at_age[i] = this->logit_sel_at_age[i].initial_value_m;
-    } 
-    return AgeSpecificSel.evaluate(x); 
+      AgeSpecificSel.logit_sel_at_age[i] =
+          this->logit_sel_at_age[i].initial_value_m;
+    }
+    return AgeSpecificSel.evaluate(x);
   }
 
   /**
@@ -739,7 +739,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [null],\n";
-    ss << "  \"dimensions\": [" << this->logit_sel_at_age.size() << "]\n},\n"; 
+    ss << "  \"dimensions\": [" << this->logit_sel_at_age.size() << "]\n},\n";
     ss << "   \"values\":" << this->logit_sel_at_age << "}]\n";
 
     ss << "}";
@@ -760,7 +760,8 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     // set relative info
     selectivity->id = this->id;
     selectivity->n_ages = this->n_ages.get();
-    selectivity->min_age = *std::min_element(this->ages.storage_m->begin(), this->ages.storage_m->end());
+    selectivity->min_age = *std::min_element(this->ages.storage_m->begin(),
+                                             this->ages.storage_m->end());
     selectivity->logit_sel_at_age.resize(this->logit_sel_at_age.size());
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
       selectivity->logit_sel_at_age[i] =

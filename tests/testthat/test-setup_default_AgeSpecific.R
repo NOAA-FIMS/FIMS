@@ -24,8 +24,8 @@ test_that("`setup_default_AgeSpecific()` works with correct inputs", {
     rep(x = "logit_sel_at_age", times = n_ages)
   )
   expect_equal(
-    result[["value"]], 
-    qlogis(1/(1+(exp(-1*(ages-2)))))
+    result[["value"]],
+    qlogis(1 / (1 + (exp(-1 * (ages - 2)))))
   )
 
   clear()

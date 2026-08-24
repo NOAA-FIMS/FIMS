@@ -127,7 +127,6 @@ By just passing the data to `setup_default_parameters()`, the default values for
 default_parameters <- setup_default_parameters(data = data_4_model)
 
 default_parameters
-
 ```
 
 ### Update parameters
@@ -214,7 +213,6 @@ parameters_4_model <- default_parameters |>
     ),
     by = c("label", "age")
   )
-
 ```
 
 ## Fit
