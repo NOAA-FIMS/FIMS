@@ -90,6 +90,7 @@ extern "C"
       {"fims_call_information_get_parameter_names",
        (DL_FUNC)&fims_call_information_get_parameter_names, 0},
       {"fims_call_quadra_fit", (DL_FUNC)&fims_call_quadra_fit, 5},
+      {"fims_call_quadra_evaluate", (DL_FUNC)&fims_call_quadra_evaluate, 2},
       {"fims_call_quadra_sdreport", (DL_FUNC)&fims_call_quadra_sdreport, 2},
       TMB_CALLDEFS,
       {NULL, NULL, 0}};

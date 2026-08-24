@@ -308,6 +308,62 @@ extern "C" SEXP fims_call_quadra_fit(SEXP fixed_sexp, SEXP random_sexp,
   return R_NilValue;
 }
 
+extern "C" SEXP fims_call_quadra_evaluate(SEXP fixed_sexp,
+                                           SEXP random_sexp) {
+  try {
+    if (TYPEOF(fixed_sexp) != REALSXP || TYPEOF(random_sexp) != REALSXP) {
+      Rf_error("Quadra parameters must be numeric vectors.");
+    }
+    std::vector<double> fixed(REAL(fixed_sexp),
+                              REAL(fixed_sexp) + XLENGTH(fixed_sexp));
+    std::vector<double> random(REAL(random_sexp),
+                               REAL(random_sexp) + XLENGTH(random_sexp));
+    auto info = fims_info::Information<QUADRA_FIMS_TYPE>::GetInstance();
+    if (fixed.size() != info->fixed_effects_parameters.size() ||
+        random.size() != info->random_effects_parameters.size()) {
+      Rf_error("Quadra parameter count does not match the FIMS model.");
+    }
+
+    std::vector<QUADRA_FIMS_TYPE*> parameters;
+    parameters.reserve(fixed.size() + random.size());
+    size_t index = 0;
+    for (auto* parameter : info->fixed_effects_parameters) {
+      had::SetValue(*parameter, fixed[index++]);
+      parameters.push_back(parameter);
+    }
+    index = 0;
+    for (auto* parameter : info->random_effects_parameters) {
+      had::SetValue(*parameter, random[index++]);
+      parameters.push_back(parameter);
+    }
+    had::Forward();
+    QUADRA_FIMS_TYPE objective =
+        fims_model::Model<QUADRA_FIMS_TYPE>::GetInstance()->Evaluate();
+    had::ZeroAdjoints(*had::g_ADGraph);
+    had::g_ADGraph->vertices[objective.varId].w = 1.0;
+    had::PropagateAdjoint();
+
+    std::vector<double> gradient;
+    gradient.reserve(parameters.size());
+    for (auto* parameter : parameters) {
+      gradient.push_back(had::GetAdjoint(*parameter));
+    }
+
+    SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
+    SEXP names = PROTECT(Rf_allocVector(STRSXP, 2));
+    fims_quadra::set_list_element(out, names, 0, "objective",
+                                  Rf_ScalarReal(objective.val));
+    fims_quadra::set_list_element(out, names, 1, "gradient",
+                                  fims_quadra::numeric_vector(gradient));
+    Rf_setAttrib(out, R_NamesSymbol, names);
+    UNPROTECT(2);
+    return out;
+  } catch (const std::exception& exception) {
+    Rf_error("Quadra evaluation failed: %s", exception.what());
+  }
+  return R_NilValue;
+}
+
 extern "C" SEXP fims_call_quadra_sdreport(SEXP fixed_sexp,
                                            SEXP random_sexp) {
   try {

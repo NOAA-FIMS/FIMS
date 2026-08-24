@@ -194,6 +194,20 @@ native_quadra_fit <- function(
   )
 }
 
+#' Evaluate the registered native model with Quadra
+#'
+#' @param fixed,random Numeric fixed- and random-effect parameter vectors.
+#' @return A named list containing the joint objective and gradient.
+#' @export
+native_quadra_evaluate <- function(fixed, random = numeric()) {
+  .Call(
+    "fims_call_quadra_evaluate",
+    as.numeric(fixed),
+    as.numeric(random),
+    PACKAGE = "FIMS"
+  )
+}
+
 #' Calculate native Quadra standard errors
 #'
 #' @param fixed,random Numeric fixed- and random-effect estimates.

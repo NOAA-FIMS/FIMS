@@ -20,3 +20,7 @@ test_that("Quadra sdreport summaries match the TMB summary contract", {
   expect_identical(dim(summary(report, "report")), c(0L, 2L))
   expect_equal(nrow(summary(report)), 4L)
 })
+
+test_that("the native Quadra evaluator is exported", {
+  expect_true("native_quadra_evaluate" %in% getNamespaceExports("FIMS"))
+})
