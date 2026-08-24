@@ -498,7 +498,7 @@ setup_default_AgeSpecific <- function(
       module_type = "AgeSpecific",
       label = "logit_sel_at_age",
       age = get_ages(data),
-      value = qlogis(1/(1+(exp(-1*(get_ages(data)-2))))),
+      value = qlogis(1 / (1 + (exp(-1 * (get_ages(data) - 2))))),
       estimation_type = "fixed_effects"
     )
 }
