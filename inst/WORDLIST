@@ -41,6 +41,7 @@ databucket
 dataframe
 dataframes
 DCMAKE
+ddirichlet
 DDirichletMultinomialDistributionsInterface
 deqn
 dlognorm
@@ -128,6 +129,7 @@ mohns
 Moolgavkar
 multicore
 MULTINOMIAL
+multinom
 multisession
 mymap
 Nages
