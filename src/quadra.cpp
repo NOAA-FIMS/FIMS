@@ -41,9 +41,13 @@ namespace {
 // the combined FIMS library is loaded.
 std::unique_ptr<quadra::TapeContext> tape =
     std::make_unique<quadra::TapeContext>();
+std::unique_ptr<quadra::CompactFirstOrderTape> evaluation_tape;
+had::ADGraph* evaluation_graph = nullptr;
 }
 
 void reset_tape() {
+  evaluation_tape.reset();
+  evaluation_graph = nullptr;
   if (tape) {
     tape->reset();
   } else {
@@ -52,6 +56,8 @@ void reset_tape() {
 }
 
 void release_tape() {
+  evaluation_tape.reset();
+  evaluation_graph = nullptr;
   // Quadra scalar mirrors can be constructed while CreateTMBModel() registers
   // shared interface objects in a combined build. Free the large graph, but
   // immediately leave a valid empty graph active for those constructors.
@@ -324,37 +330,51 @@ extern "C" SEXP fims_call_quadra_evaluate(SEXP fixed_sexp,
       Rf_error("Quadra parameter count does not match the FIMS model.");
     }
 
-    std::vector<QUADRA_FIMS_TYPE*> parameters;
-    parameters.reserve(fixed.size() + random.size());
-    size_t index = 0;
-    for (auto* parameter : info->fixed_effects_parameters) {
-      had::SetValue(*parameter, fixed[index++]);
-      parameters.push_back(parameter);
+    std::vector<had::VertexId> parameter_vertices;
+    parameter_vertices.reserve(fixed.size() + random.size());
+    for (const auto* parameter : info->fixed_effects_parameters) {
+      parameter_vertices.push_back(parameter->varId);
     }
-    index = 0;
-    for (auto* parameter : info->random_effects_parameters) {
-      had::SetValue(*parameter, random[index++]);
-      parameters.push_back(parameter);
+    for (const auto* parameter : info->random_effects_parameters) {
+      parameter_vertices.push_back(parameter->varId);
     }
-    had::Forward();
-    QUADRA_FIMS_TYPE objective =
-        fims_model::Model<QUADRA_FIMS_TYPE>::GetInstance()->Evaluate();
-    had::ZeroAdjoints(*had::g_ADGraph);
-    had::g_ADGraph->vertices[objective.varId].w = 1.0;
-    had::PropagateAdjoint();
 
-    std::vector<double> gradient;
-    gradient.reserve(parameters.size());
-    for (auto* parameter : parameters) {
-      gradient.push_back(had::GetAdjoint(*parameter));
+    if (!fims_quadra::evaluation_tape ||
+        fims_quadra::evaluation_graph != had::g_ADGraph) {
+      size_t index = 0;
+      for (auto* parameter : info->fixed_effects_parameters) {
+        had::SetValue(*parameter, fixed[index++]);
+      }
+      index = 0;
+      for (auto* parameter : info->random_effects_parameters) {
+        had::SetValue(*parameter, random[index++]);
+      }
+      had::Forward();
+      QUADRA_FIMS_TYPE recorded_objective =
+          fims_model::Model<QUADRA_FIMS_TYPE>::GetInstance()->Evaluate();
+      auto compact = std::make_unique<quadra::CompactFirstOrderTape>();
+      compact->Build(*had::g_ADGraph, parameter_vertices,
+                     recorded_objective.varId);
+      fims_quadra::evaluation_tape = std::move(compact);
+      fims_quadra::evaluation_graph = had::g_ADGraph;
     }
+
+    std::vector<double> values = fixed;
+    values.insert(values.end(), random.begin(), random.end());
+    Eigen::VectorXd input = Eigen::Map<Eigen::VectorXd>(
+        values.data(), static_cast<Eigen::Index>(values.size()));
+    Eigen::VectorXd gradient;
+    const double objective =
+        fims_quadra::evaluation_tape->Evaluate(input, gradient);
+    std::vector<double> gradient_values(
+        gradient.data(), gradient.data() + gradient.size());
 
     SEXP out = PROTECT(Rf_allocVector(VECSXP, 2));
     SEXP names = PROTECT(Rf_allocVector(STRSXP, 2));
     fims_quadra::set_list_element(out, names, 0, "objective",
-                                  Rf_ScalarReal(objective.val));
+                                  Rf_ScalarReal(objective));
     fims_quadra::set_list_element(out, names, 1, "gradient",
-                                  fims_quadra::numeric_vector(gradient));
+                                  fims_quadra::numeric_vector(gradient_values));
     Rf_setAttrib(out, R_NamesSymbol, names);
     UNPROTECT(2);
     return out;
