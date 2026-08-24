@@ -1135,13 +1135,13 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
   /**
    * @brief Observed data, which should be a vector of length K of integers.
    */
-  ParameterVector observed_values;
+  VariableVector observed_values;
   /**
    * @brief The expected values, which should be a vector of length K where
    * each value specifies the probability of class k. Note that, unlike in R,
    * these probabilities must sum to 1.0.
    */
-  ParameterVector expected_values;
+  VariableVector expected_values;
   /**
    * @brief The dimensions of the number of rows and columns of the
    * multivariate dataset.
