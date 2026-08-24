@@ -40,7 +40,6 @@
 #'   comp_theta = NULL
 #' )
 #' }
-
 validate_comp_nll <- function(observed_prop, sample_size, expected_prop, theta = NULL) {
   observed_counts <- observed_prop * sample_size
 

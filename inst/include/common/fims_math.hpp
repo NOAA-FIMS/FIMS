@@ -392,9 +392,9 @@ T sum(const fims::Vector<T> &v) {
  */
 
 template <typename Type>
-inline const Type ddirichlet_multinom(const fims::Vector<Type>& x,
-                                      const fims::Vector<Type>& p,
-                                      const Type& theta, int give_log = 0) {
+inline const Type ddirichlet_multinom(const fims::Vector<Type> &x,
+                                      const fims::Vector<Type> &p,
+                                      const Type &theta, int give_log = 0) {
   Type n = fims_math::sum(x);
   Type theta_n = theta * n;
 
