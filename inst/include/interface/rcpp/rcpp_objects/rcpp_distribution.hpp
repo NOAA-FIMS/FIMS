@@ -1147,7 +1147,7 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
    * multivariate dataset.
    */
   RealVector dims;
-  Parameter theta;
+  Variable theta;
   /**
    * @brief Vector that records the individual log probability function for each
    * observation.
@@ -1176,11 +1176,12 @@ class DDirichletMultinomialDistributionsInterface : public DistributionsInterfac
    * @param other
    */
   DDirichletMultinomialDistributionsInterface(
-    const DDirichletMultinomialDistributionsInterface &other)
+      const DDirichletMultinomialDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
         observed_values(other.observed_values),
         expected_values(other.expected_values),
         dims(other.dims),
+        theta(other.theta),
         lpdf_vec(other.lpdf_vec),
         notes(other.notes) {}
 
