@@ -370,7 +370,10 @@ tmb_mapped_parameter_names <- function(parameter_names, map = NULL) {
   if (length(parameter_names) != length(map)) {
     cli::cli_abort(c(
       "A TMB parameter map must have one entry per FIMS parameter.",
-      "i" = "Found {length(map)} map entries for {length(parameter_names)} parameters."
+      "i" = paste0(
+        "Found {length(map)} map entries for ",
+        "{length(parameter_names)} parameters."
+      )
     ))
   }
 
@@ -484,9 +487,13 @@ FIMSFit <- function(
     input[["map"]][["p"]]
   )
   if (length(parameter_names) != length(obj[["par"]])) {
-    cli::cli_abort(
-      "TMB produced {length(obj[[\"par\"]])} fixed parameters, but FIMS produced {length(parameter_names)} mapped names."
-    )
+    cli::cli_abort(c(
+      "TMB and FIMS produced different numbers of fixed parameters.",
+      "i" = paste0(
+        "TMB produced {length(obj[[\"par\"]])}; FIMS produced ",
+        "{length(parameter_names)} mapped names."
+      )
+    ))
   }
   names(obj[["par"]]) <- parameter_names
 
