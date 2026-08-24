@@ -3,11 +3,14 @@
 \name{lognormal}
 \alias{lognormal}
 \alias{multinomial}
+\alias{dirichlet_multinomial}
 \title{Distributions not available in the stats package}
 \usage{
 lognormal(link = "log")
 
 multinomial(link = "logit")
+
+dirichlet_multinomial(link = "logit")
 }
 \arguments{
 \item{link}{A string specifying the model link function. For example,
