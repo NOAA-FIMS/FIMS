@@ -142,7 +142,12 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
     std::vector<uint32_t> observed_id;
     std::vector<uint32_t> expected_id;
     for (R_xlen_t i = 0; i < ids.size(); ++i) {
-      if (input_type == "data" || i > 0) {
+      // A prior can be linked to multiple scalar parameter vectors, so every
+      // supplied ID identifies an observed value. For data and random effects,
+      // retain the convention that the remaining IDs identify expected values.
+      if (input_type == "prior") {
+        observed_id.push_back(static_cast<uint32_t>(ids[i]));
+      } else if (input_type == "data" || i > 0) {
         expected_id.push_back(static_cast<uint32_t>(ids[i]));
       } else {
         observed_id.push_back(static_cast<uint32_t>(ids[i]));
