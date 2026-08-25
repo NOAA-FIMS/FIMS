@@ -194,7 +194,8 @@ test_that("posterior equals prior with no data", {
   population$SetRecruitmentID(recruitment$get_id())
   population$SetGrowthID(ewaa_growth$get_id())
   population$SetMaturityID(maturity$get_id())
-
+  population$AddFleet(fishing_fleet$get_id())
+  population$AddFleet(survey_fleet$get_id())
 
   # Set-up TMB
   CreateTMBModel()
