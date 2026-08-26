@@ -34,6 +34,17 @@ label          estimation_type  estimate  uncertainty
 requested_ssb  derived_quantity  ...       ...
 ```
 
+For fitted models created with `get_sd = TRUE`, derived quantities in the
+stored JSON output also include the same backend standard errors:
+
+```json
+{
+  "name": "spawning_biomass",
+  "value": [100.2, 97.4],
+  "uncertainty": [4.1, 4.6]
+}
+```
+
 They can therefore be selected from a fitted `FIMSFit` object in the same way as other derived quantities:
 
 ```r

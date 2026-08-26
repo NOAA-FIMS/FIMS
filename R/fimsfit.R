@@ -257,9 +257,17 @@ methods::setMethod(
       # There are more rows in json_estimates than tmb_estimates
       x = json_output,
       y = tmb_output |>
-        dplyr::select(dplyr::all_of(c("unique_id", "uncertainty", "log_like_cv", "gradient"))),
+        dplyr::select(dplyr::all_of(c("unique_id", "uncertainty", "log_like_cv", "gradient"))) |>
+        dplyr::rename(tmb_uncertainty = "uncertainty"),
       by = c("unique_id")
     ) |>
+      dplyr::mutate(
+        uncertainty = dplyr::coalesce(
+          .data$uncertainty,
+          .data$tmb_uncertainty
+        )
+      ) |>
+      dplyr::select(-dplyr::all_of("tmb_uncertainty")) |>
       dplyr::select(-dplyr::all_of("unique_id")) |>
       dplyr::relocate(dplyr::all_of("uncertainty"), .after = dplyr::all_of("estimation_type"))
   }
@@ -468,6 +476,10 @@ FIMSFit <- function(
   }
 
   model_output <- input[["model"]]$get_output()
+  model_output <- add_derived_quantity_uncertainty_to_json(
+    model_output = model_output,
+    sdreport = sdreport
+  )
 
 
   fit <- methods::new(

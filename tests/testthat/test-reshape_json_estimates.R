@@ -158,6 +158,41 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
 }
 
 ## IO correctness ----
+test_that("derived quantity uncertainty is added to JSON", {
+  #' @description Test that backend standard errors are added to matching JSON derived quantities.
+  model_output <- jsonlite::toJSON(list(
+    populations = list(list(
+      derived_quantities = list(
+        list(name = "biomass", value = list(10, 20)),
+        list(name = "numbers_at_age", value = list(1, 2, 3))
+      )
+    )),
+    fleets = list()
+  ), auto_unbox = TRUE)
+  sdreport <- structure(list(dummy = TRUE),
+    fims_backend_report = structure(
+      matrix(c(10, 0.5, 20, 0.75),
+        ncol = 2,
+        byrow = TRUE,
+        dimnames = list(
+          c("biomass", "biomass"),
+          c("Estimate", "Std. Error")
+        )
+      )
+    )
+  )
+
+  output <- FIMS:::add_derived_quantity_uncertainty_to_json(
+    model_output,
+    sdreport
+  ) |>
+    jsonlite::fromJSON(simplifyVector = FALSE)
+
+  biomass <- output$populations[[1]]$derived_quantities[[1]]
+  expect_equal(unlist(biomass$uncertainty), c(0.5, 0.75))
+  expect_null(output$populations[[1]]$derived_quantities[[2]]$uncertainty)
+})
+
 test_that("`reshape_json_estimates()` output matches TMB for a deterministic run", {
   # Define the path to the deterministic model run fixture.
   deterministic_path <- testthat::test_path(
