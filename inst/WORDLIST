@@ -115,6 +115,8 @@ MAINPAGE
 Makevars
 Mangel
 mape
+mathbf
+mathcal
 mathrel
 mathrm
 maxgrad
@@ -150,6 +152,7 @@ opensci
 oppy
 ordinnames
 Ovec
+overdispersion
 overparameterized
 parameterizations
 Pdev
