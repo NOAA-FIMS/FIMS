@@ -13,19 +13,47 @@
 #include "common/information.hpp"
 
 /**
+ * @brief The kinds of observed data FIMS can build.
+ *
+ * @details The create_data_interface_() function takes one of these names from
+ * R and builds the matching class: "age_comp" builds an AgeCompDataInterface,
+ * "index" builds an IndexDataInterface, and so on. DataInterfaceBase is never
+ * built on its own; it only holds what all four kinds have in common.
+ *
+ * These are an enum rather than plain strings so that every place in the C++
+ * code that acts on a data kind has to name one of these values, which makes
+ * it harder to add a kind and forget to handle it somewhere.
+ */
+enum class DataType : uint8_t {
+  age_comp = 0,
+  length_comp = 1,
+  index = 2,
+  catch_data = 3
+};
+
+/**
+ * @brief Convert a data type name supplied from R to a DataType enum.
+ */
+inline DataType DataTypeFromString(const std::string &type) {
+  if (type == "age_comp") return DataType::age_comp;
+  if (type == "length_comp") return DataType::length_comp;
+  if (type == "index") return DataType::index;
+  if (type == "catch") return DataType::catch_data;
+  throw std::invalid_argument(
+      "Invalid data type: '" + type +
+      "'. Valid options are: age_comp, length_comp, index, catch.");
+}
+
+/**
  * @brief Rcpp interface that serves as the parent class for Rcpp data
  * interfaces. This type should be inherited and not called from R directly.
  */
 class DataInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   /**
-   * @brief The vector of data that is being passed from R.
-   */
-  Rcpp::NumericVector observed_data;
-  /**
    * @brief The vector of uncertainty that is being passed from R.
    */
-  Rcpp::NumericVector uncertainty;
+  fims::Vector<double> uncertainty;
   /**
    * @brief The static id of the DataInterfaceBase object.
    */
@@ -35,32 +63,17 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
    *
    */
   uint32_t id;
-  /**
-   * @brief The map associating the IDs of DataInterfaceBase to the objects.
-   * This is a live object, which is an object that has been created and lives
-   * in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<DataInterfaceBase>> live_objects;
 
   /**
    * @brief The constructor.
    */
-  DataInterfaceBase() {
-    this->id = DataInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    DataInterfaceBase */
-    // DataInterfaceBase::live_objects[this->id] = this;
-  }
+  DataInterfaceBase() { this->id = DataInterfaceBase::id_g++; }
 
   /**
-   * @brief Construct a new Data Interface Base object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  DataInterfaceBase(const DataInterfaceBase &other)
-      : observed_data(other.observed_data),
-        uncertainty(other.uncertainty),
-        id(other.id) {}
+  DataInterfaceBase(const DataInterfaceBase &) = delete;
+  DataInterfaceBase &operator=(const DataInterfaceBase &) = delete;
 
   /**
    * @brief The destructor.
@@ -97,12 +110,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
   /**
    * @brief The vector of age-composition data that is being passed from R.
    */
-  RealVector age_comp_data;
-  /**
-   * @brief The vector of age-composition uncertainty that is being passed from
-   * R.
-   */
-  RealVector uncertainty;
+  fims::Vector<double> age_comp_data;
 
   /**
    * @brief The constructor.
@@ -112,23 +120,13 @@ class AgeCompDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->age_comp_data.resize(amax * ymax);
     this->uncertainty.resize(amax * ymax);
-    DataInterfaceBase::live_objects[this->id] =
-        std::make_shared<AgeCompDataInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
-   * @brief Construct a new Age Comp Data Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  AgeCompDataInterface(const AgeCompDataInterface &other)
-      : DataInterfaceBase(other),
-        amax(other.amax),
-        ymax(other.ymax),
-        age_comp_data(other.age_comp_data),
-        uncertainty(other.uncertainty) {}
+  AgeCompDataInterface(const AgeCompDataInterface &) = delete;
+  AgeCompDataInterface &operator=(const AgeCompDataInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -140,6 +138,15 @@ class AgeCompDataInterface : public DataInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_vector
+   */
+  virtual fims::Vector<double> *get_vector(const std::string &name) {
+    if (name == "values") return &this->age_comp_data;
+    if (name == "uncertainty") return &this->uncertainty;
+    return nullptr;
+  }
 
   /**
    * @brief Converts the data to json representation for the output.
@@ -230,12 +237,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
   /**
    * @brief The vector of length-composition data that is being passed from R.
    */
-  RealVector length_comp_data;
-  /**
-   * @brief The vector of length-composition uncertainty that is being passed
-   * from R.
-   */
-  RealVector uncertainty;
+  fims::Vector<double> length_comp_data;
 
   /**
    * @brief The constructor.
@@ -245,23 +247,12 @@ class LengthCompDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->length_comp_data.resize(lmax * ymax);
     this->uncertainty.resize(lmax * ymax);
-    DataInterfaceBase::live_objects[this->id] =
-        std::make_shared<LengthCompDataInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
-   * @brief Construct a new Length Comp Data Interface object
-   *
-   * @param other
-   */
-  LengthCompDataInterface(const LengthCompDataInterface &other)
-      : DataInterfaceBase(other),
-        lmax(other.lmax),
-        ymax(other.ymax),
-        length_comp_data(other.length_comp_data),
-        uncertainty(other.uncertainty) {}
+   * @brief Interface objects are not copyable.   */
+  LengthCompDataInterface(const LengthCompDataInterface &) = delete;
+  LengthCompDataInterface &operator=(const LengthCompDataInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -273,6 +264,15 @@ class LengthCompDataInterface : public DataInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_vector
+   */
+  virtual fims::Vector<double> *get_vector(const std::string &name) {
+    if (name == "values") return &this->length_comp_data;
+    if (name == "uncertainty") return &this->uncertainty;
+    return nullptr;
+  }
 
   /**
    * @brief Converts the data to json representation for the output.
@@ -352,12 +352,7 @@ class IndexDataInterface : public DataInterfaceBase {
   /**
    * @brief The vector of index data that is being passed from R.
    */
-  RealVector index_data;
-  /**
-   * @brief The vector of index uncertainty that is being passed from
-   * R.
-   */
-  RealVector uncertainty;
+  fims::Vector<double> index_data;
 
   /**
    * @brief The constructor.
@@ -366,22 +361,13 @@ class IndexDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->index_data.resize(ymax);
     this->uncertainty.resize(ymax);
-    DataInterfaceBase::live_objects[this->id] =
-        std::make_shared<IndexDataInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
-   * @brief Construct a new Index Data Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  IndexDataInterface(const IndexDataInterface &other)
-      : DataInterfaceBase(other),
-        ymax(other.ymax),
-        index_data(other.index_data),
-        uncertainty(other.uncertainty) {}
+  IndexDataInterface(const IndexDataInterface &) = delete;
+  IndexDataInterface &operator=(const IndexDataInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -393,6 +379,15 @@ class IndexDataInterface : public DataInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_vector
+   */
+  virtual fims::Vector<double> *get_vector(const std::string &name) {
+    if (name == "values") return &this->index_data;
+    if (name == "uncertainty") return &this->uncertainty;
+    return nullptr;
+  }
 
   /**
    * @brief Converts the data to json representation for the output.
@@ -473,12 +468,7 @@ class CatchDataInterface : public DataInterfaceBase {
   /**
    * @brief The vector of catch data that is being passed from R.
    */
-  RealVector catch_data;
-  /**
-   * @brief The vector of catch uncertainty that is being passed from
-   * R.
-   */
-  RealVector uncertainty;
+  fims::Vector<double> catch_data;
 
   /**
    * @brief The constructor.
@@ -487,22 +477,13 @@ class CatchDataInterface : public DataInterfaceBase {
     this->ymax = ymax;
     this->catch_data.resize(ymax);
     this->uncertainty.resize(ymax);
-    DataInterfaceBase::live_objects[this->id] =
-        std::make_shared<CatchDataInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        DataInterfaceBase::live_objects[this->id]);
   }
 
   /**
-   * @brief Construct a new Catch Data Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  CatchDataInterface(const CatchDataInterface &other)
-      : DataInterfaceBase(other),
-        ymax(other.ymax),
-        catch_data(other.catch_data),
-        uncertainty(other.uncertainty) {}
+  CatchDataInterface(const CatchDataInterface &) = delete;
+  CatchDataInterface &operator=(const CatchDataInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -514,6 +495,15 @@ class CatchDataInterface : public DataInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_vector
+   */
+  virtual fims::Vector<double> *get_vector(const std::string &name) {
+    if (name == "values") return &this->catch_data;
+    if (name == "uncertainty") return &this->uncertainty;
+    return nullptr;
+  }
 
   /**
    * @brief Converts the data to json representation for the output.

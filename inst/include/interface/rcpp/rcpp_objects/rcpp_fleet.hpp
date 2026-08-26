@@ -26,39 +26,23 @@ class FleetInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The local id of the FleetInterfaceBase object.
    */
   uint32_t id;
-  /**
-   * @brief The map associating the IDs of FleetInterfaceBase to the objects.
-   * This is a live object, which is an object that has been created and lives
-   * in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>> live_objects;
 
   /**
    * @brief The constructor.
    */
-  FleetInterfaceBase() {
-    this->id = FleetInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    FleetInterfaceBase */
-    // FleetInterfaceBase::live_objects[this->id] = this;
-  }
+  FleetInterfaceBase() { this->id = FleetInterfaceBase::id_g++; }
 
   /**
-   * @brief Construct a new Fleet Interface Base object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  FleetInterfaceBase(const FleetInterfaceBase &other) : id(other.id) {}
+  FleetInterfaceBase(const FleetInterfaceBase &) = delete;
+  FleetInterfaceBase &operator=(const FleetInterfaceBase &) = delete;
 
   /**
    * @brief The destructor.
    */
   virtual ~FleetInterfaceBase() {}
 
-  /**
-   * @brief Get the ID for the child fleet interface objects to inherit.
-   */
-  virtual uint32_t get_id() = 0;
 };
 
 /**
@@ -214,58 +198,13 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief The constructor.
    */
-  FleetInterface() : FleetInterfaceBase() {
-    std::shared_ptr<FleetInterface> fleet =
-        std::make_shared<FleetInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(fleet);
-    /* Create instance of map: key is id and value is pointer to
-     FleetInterfaceBase */
-    FleetInterfaceBase::live_objects[this->id] = fleet;
-  }
+  FleetInterface() : FleetInterfaceBase() {}
 
   /**
-   * @brief Construct a new Fleet Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  FleetInterface(const FleetInterface &other)
-      : FleetInterfaceBase(other),
-        interface_observed_agecomp_data_id_m(
-            other.interface_observed_agecomp_data_id_m),
-        interface_observed_lengthcomp_data_id_m(
-            other.interface_observed_lengthcomp_data_id_m),
-        interface_observed_index_data_id_m(
-            other.interface_observed_index_data_id_m),
-        interface_observed_catch_data_id_m(
-            other.interface_observed_catch_data_id_m),
-        interface_selectivity_id_m(other.interface_selectivity_id_m),
-        name(other.name),
-        n_ages(other.n_ages),
-        n_lengths(other.n_lengths),
-        n_years(other.n_years),
-        observed_catch_units(other.observed_catch_units),
-        observed_index_units(other.observed_index_units),
-        log_q(other.log_q),
-        log_Fmort(other.log_Fmort),
-        age_to_length_conversion(other.age_to_length_conversion),
-        catch_numbers_at_age(other.catch_numbers_at_age),
-        catch_weight_at_age(other.catch_weight_at_age),
-        catch_numbers_at_length(other.catch_numbers_at_length),
-        catch_weight(other.catch_weight),
-        catch_numbers(other.catch_numbers),
-        catch_expected(other.catch_expected),
-        log_catch_expected(other.log_catch_expected),
-        agecomp_proportion(other.agecomp_proportion),
-        lengthcomp_proportion(other.lengthcomp_proportion),
-        index_numbers_at_age(other.index_numbers_at_age),
-        index_weight_at_age(other.index_weight_at_age),
-        index_numbers_at_length(other.index_numbers_at_length),
-        index_weight(other.index_weight),
-        index_numbers(other.index_numbers),
-        index_expected(other.index_expected),
-        log_index_expected(other.log_index_expected),
-        agecomp_expected(other.agecomp_expected),
-        lengthcomp_expected(other.lengthcomp_expected) {}
+  FleetInterface(const FleetInterface &) = delete;
+  FleetInterface &operator=(const FleetInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -277,6 +216,17 @@ class FleetInterface : public FleetInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   */
+  virtual VariableVector *get_parameter(const std::string &name) {
+    if (name == "log_q") return &this->log_q;
+    if (name == "log_Fmort") return &this->log_Fmort;
+    if (name == "age_to_length_conversion")
+      return &this->age_to_length_conversion;
+    return nullptr;
+  }
 
   /**
    * @brief Sets the name of the fleet.

@@ -6,51 +6,148 @@
 #include <Rcpp.h>
 // static id of the RecruitmentInterfaceBase object
 uint32_t RecruitmentInterfaceBase::id_g = 1;
-// local id of the RecruitmentInterfaceBase object map relating the ID of the
-// RecruitmentInterfaceBase to the RecruitmentInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<RecruitmentInterfaceBase>>
-    RecruitmentInterfaceBase::live_objects;
+
+// ── Short name for the pointer type ─────────────────────────────────────────
+// SharedRecruitment is a short name for the pointer type used throughout this
+// file. It covers both the stock--recruit relationship and the recruitment
+// process modules: evaluate_mean() and evaluate_process() are
+// declared on RecruitmentInterfaceBase, so the functions below call them
+// without knowing which form it is. Parameters differ between forms, so those
+// are asked for by name.
+using SharedRecruitment = std::shared_ptr<RecruitmentInterfaceBase>;
+
+// ── Building a module ──────────────────────────────────────────────────────
+/**
+ * @brief Create a recruitment module of the requested type.
+ *
+ * @details Allocates the recruitment interface object to heap memory, hands ownership 
+ * to a shared_ptr, and wraps that shared_ptr in the XPtr. The 'true' argument 
+ * binds the XPtr to R's garbage collector: when the R variable is garbage 
+ * collected, 'delete shared_ptr*' runs and the reference count is decremented.
+ *
+ * @param type One of "beverton_holt", "log_devs_process", or "log_r_process".
+ *   The latter two are recruitment process modules, which carry no parameters
+ *   of their own and are linked to a stock--recruit module by ID.
+ */
+Rcpp::XPtr<SharedRecruitment> create_recruitment_(std::string type) {
+  SharedRecruitment recruitment_interface;
+  switch (RecruitmentTypeFromString(type)) {
+    case RecruitmentType::beverton_holt:
+      recruitment_interface =
+          std::make_shared<BevertonHoltRecruitmentInterface>();
+      break;
+    case RecruitmentType::log_devs_process:
+      recruitment_interface = std::make_shared<LogDevsRecruitmentInterface>();
+      break;
+    case RecruitmentType::log_r_process:
+      recruitment_interface = std::make_shared<LogRRecruitmentInterface>();
+      break;
+  }
+  return Rcpp::XPtr<SharedRecruitment>(
+      new SharedRecruitment(recruitment_interface), true);
+}
+
+// ── Scalar setters ───────────────────────────────────────────────────────────
+// process_id is declared on the base, so this works for any recruitment form.
+/**
+ * @brief Link a recruitment parameterization to the recruitment process module.
+ *
+ * @param xp The recruitment module.
+ * @param process_id The process module's ID, as returned by
+ *   get_module_id_() on a process module.
+ */
+void set_recruitment_process_id_(Rcpp::XPtr<SharedRecruitment> xp,
+                                 int process_id) {
+  (*xp)->process_id = process_id;
+}
+
+// n_years sizes log_expected_recruitment, which only the stock--recruit module
+// has.
+/**
+ * @brief Set the number of years this recruitment module spans.
+ *
+ * @details Sizes the expected-recruitment vector, which only a stock--recruit
+ *   module has, so calling this on a process module is an error.
+ *
+ * @param xp The recruitment module.
+ * @param n_years Number of years.
+ */
+void set_recruitment_n_years_(Rcpp::XPtr<SharedRecruitment> xp, int n_years) {
+  std::shared_ptr<BevertonHoltRecruitmentInterface> beverton_holt =
+      std::dynamic_pointer_cast<BevertonHoltRecruitmentInterface>(*xp);
+  if (!beverton_holt) {
+    Rcpp::stop(
+        "`n_years` applies only to a stock--recruit module, not to a "
+        "recruitment process module.");
+  }
+  beverton_holt->n_years = n_years;
+}
+
+// ── Getters ──────────────────────────────────────────────────────────────────
+
+/**
+ * @brief Evaluate expected recruitment.
+ *
+ * @param xp The recruitment module.
+ * @param spawners Spawning biomass.
+ * @param phi_0 Unfished spawning biomass per recruit.
+ * @return Expected recruitment. Process modules have no stock--recruit
+ *   relationship and return 0.
+ */
+double evaluate_recruitment_mean_(Rcpp::XPtr<SharedRecruitment> xp,
+                                  double spawners, double phi_0) {
+  return (*xp)->evaluate_mean(spawners, phi_0);
+}
+
+/**
+ * @brief Evaluate the recruitment process based on the parameterization.
+ *
+ * @param xp The recruitment process parameterization.
+ * @param pos The time step to evaluate at.
+ * @return The process value. Stock--recruit modules have no process and return
+ *   0.
+ */
+double evaluate_recruitment_process_(Rcpp::XPtr<SharedRecruitment> xp,
+                                     size_t pos) {
+  return (*xp)->evaluate_process(pos);
+}
+
+// ── Base-class conversion for CreateTMBModel() ───────────────────────────────
+/**
+ * @brief Return a second pointer to the same object, typed to the common
+ *   interface base class.
+ *
+ * @details This does not create a new object. CreateTMBModel() holds a mixed
+ *   list of modules and calls add_to_fims_tmb() on each, which it can only do
+ *   through a pointer typed to the class they all share.
+ *
+ * @param xp The recruitment module.
+ * @return A base-class pointer to the same module.
+ */
+Rcpp::XPtr<SharedBase> recruitment_to_fims_xptr_(
+    Rcpp::XPtr<SharedRecruitment> xp) {
+  // Every interface class inherits from FIMSRcppInterfaceBase, so this
+  // conversion needs no cast: same object, more general pointer type.
+  SharedBase base = *xp;
+  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
 
 /**
  * Function to register recruitment classes with the Rcpp module system.
  *
  */
+/**
+ * @brief Register the recruitment functions with the Rcpp module system.
+ *
+ * @param m The Rcpp module to register into.
+ */
 void register_recruitment(Rcpp::Module& m) {
-  Rcpp::class_<BevertonHoltRecruitmentInterface>(
-      "BevertonHoltRecruitment",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classBevertonHoltRecruitmentInterface.html.")
-      .constructor()
-      .field("logit_steep", &BevertonHoltRecruitmentInterface::logit_steep)
-      .field("log_rzero", &BevertonHoltRecruitmentInterface::log_rzero)
-      .field("log_devs", &BevertonHoltRecruitmentInterface::log_devs)
-      .field("log_r", &BevertonHoltRecruitmentInterface::log_r)
-      .field("log_expected_recruitment",
-             &BevertonHoltRecruitmentInterface::log_expected_recruitment)
-      .field("n_years", &BevertonHoltRecruitmentInterface::n_years)
-      .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
-      .method("SetRecruitmentProcessID",
-              &BevertonHoltRecruitmentInterface::SetRecruitmentProcessID)
-      .method("evaluate_mean",
-              &BevertonHoltRecruitmentInterface::evaluate_mean);
-
-  Rcpp::class_<LogDevsRecruitmentInterface>(
-      "LogDevsRecruitmentProcess",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classLogDevsRecruitmentInterface.html.")
-      .constructor()
-      .method("get_id", &LogDevsRecruitmentInterface::get_id)
-      .method("evaluate_process",
-              &LogDevsRecruitmentInterface::evaluate_process);
-
-  Rcpp::class_<LogRRecruitmentInterface>(
-      "LogRRecruitmentProcess",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classLogRRecruitmentInterface.html.")
-      .constructor()
-      .method("get_id", &LogRRecruitmentInterface::get_id)
-      .method("evaluate_process", &LogRRecruitmentInterface::evaluate_process);
+  // Rcpp::class_<> registrations removed — users no longer call methods::new().
+  Rcpp::function("create_recruitment_", &create_recruitment_);
+  Rcpp::function("set_recruitment_process_id_", &set_recruitment_process_id_);
+  Rcpp::function("set_recruitment_n_years_", &set_recruitment_n_years_);
+  Rcpp::function("evaluate_recruitment_mean_", &evaluate_recruitment_mean_);
+  Rcpp::function("evaluate_recruitment_process_",
+                 &evaluate_recruitment_process_);
+  Rcpp::function("recruitment_to_fims_xptr_", &recruitment_to_fims_xptr_);
 }

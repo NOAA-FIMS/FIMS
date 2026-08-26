@@ -13,6 +13,35 @@
 #include "rcpp_interface_base.hpp"
 
 /**
+ * @brief The selectivity forms FIMS can build.
+ *
+ * @details The create_selectivity_() function takes one of these names from R
+ * and builds the matching class: "logistic" builds a
+ * LogisticSelectivityInterface, "double_logistic" builds a
+ * DoubleLogisticSelectivityInterface. SelectivityInterfaceBase is never built
+ * on its own; it only holds what all selectivity forms have in common.
+ *
+ * These are an enum rather than plain strings so that every place in the C++
+ * code that acts on a selectivity form has to name one of these values, which
+ * makes it harder to add a form and forget to handle it somewhere.
+ */
+enum class SelectivityType : uint8_t {
+  logistic = 0,
+  double_logistic = 1
+};
+
+/**
+ * @brief Convert a type name supplied from R to a SelectivityType.
+ */
+inline SelectivityType SelectivityTypeFromString(const std::string &name) {
+  if (name == "logistic") return SelectivityType::logistic;
+  if (name == "double_logistic") return SelectivityType::double_logistic;
+  throw std::invalid_argument(
+      "Invalid type: '" + name +
+      "'. Valid options are: logistic, double_logistic.");
+}
+
+/**
  * @brief Rcpp interface that serves as the parent class for Rcpp selectivity
  * interfaces. This type should be inherited and not called from R directly.
  */
@@ -26,42 +55,24 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The local id of the SelectivityInterfaceBase object.
    */
   uint32_t id;
-  /**
-   * @brief The map associating the IDs of SelectivityInterfaceBase to the
-   * objects. This is a live object, which is an object that has been created
-   * and lives in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
-      live_objects;
 
   /**
    * @brief The constructor.
    */
-  SelectivityInterfaceBase() {
-    this->id = SelectivityInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    SelectivityInterfaceBase */
-    // SelectivityInterfaceBase::live_objects[this->id] = this;
-  }
+  SelectivityInterfaceBase() { this->id = SelectivityInterfaceBase::id_g++; }
 
   /**
-   * @brief Construct a new Selectivity Interface Base object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  SelectivityInterfaceBase(const SelectivityInterfaceBase &other)
-      : id(other.id) {}
+  SelectivityInterfaceBase(const SelectivityInterfaceBase &) = delete;
+  SelectivityInterfaceBase &operator=(const SelectivityInterfaceBase &) = delete;
 
   /**
    * @brief The destructor.
    */
   virtual ~SelectivityInterfaceBase() {}
 
-  /**
-   * @brief Get the ID for the child selectivity interface objects to inherit.
-   */
-  virtual uint32_t get_id() = 0;
-
+    
   /**
    * @brief A method for each child selectivity interface object to inherit so
    * each selectivity option can have an evaluate() function.
@@ -88,22 +99,13 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LogisticSelectivityInterface() : SelectivityInterfaceBase() {
-    SelectivityInterfaceBase::live_objects[this->id] =
-        std::make_shared<LogisticSelectivityInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        SelectivityInterfaceBase::live_objects[this->id]);
-  }
+  LogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
   /**
-   * @brief Construct a new Logistic Selectivity Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  LogisticSelectivityInterface(const LogisticSelectivityInterface &other)
-      : SelectivityInterfaceBase(other),
-        inflection_point(other.inflection_point),
-        slope(other.slope) {}
+  LogisticSelectivityInterface(const LogisticSelectivityInterface &) = delete;
+  LogisticSelectivityInterface &operator=(const LogisticSelectivityInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -115,6 +117,15 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   */
+  virtual VariableVector *get_parameter(const std::string &name) {
+    if (name == "inflection_point") return &this->inflection_point;
+    if (name == "slope") return &this->slope;
+    return nullptr;
+  }
 
   /**
    * @brief Evaluate selectivity using the logistic function.
@@ -280,30 +291,29 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   VariableVector
       slope_desc; /**< the width of the curve at the inflection_point */
 
-  DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {
-    SelectivityInterfaceBase::live_objects[this->id] =
-        std::make_shared<DoubleLogisticSelectivityInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        SelectivityInterfaceBase::live_objects[this->id]);
-  }
+  DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
   /**
-   * @brief Construct a new Double Logistic Selectivity Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  DoubleLogisticSelectivityInterface(
-      const DoubleLogisticSelectivityInterface &other)
-      : SelectivityInterfaceBase(other),
-        inflection_point_asc(other.inflection_point_asc),
-        slope_asc(other.slope_asc),
-        inflection_point_desc(other.inflection_point_desc),
-        slope_desc(other.slope_desc) {}
+  DoubleLogisticSelectivityInterface(const DoubleLogisticSelectivityInterface &) = delete;
+  DoubleLogisticSelectivityInterface &operator=(const DoubleLogisticSelectivityInterface &) = delete;
 
   virtual ~DoubleLogisticSelectivityInterface() {}
 
   /** @brief returns the id for the double logistic selectivity interface */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   */
+  virtual VariableVector *get_parameter(const std::string &name) {
+    if (name == "inflection_point_asc") return &this->inflection_point_asc;
+    if (name == "slope_asc") return &this->slope_asc;
+    if (name == "inflection_point_desc") return &this->inflection_point_desc;
+    if (name == "slope_desc") return &this->slope_desc;
+    return nullptr;
+  }
 
   /** @brief evaluate the double logistic selectivity function
    *   @param x  The independent variable in the logistic function (e.g., age or

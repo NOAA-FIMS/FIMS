@@ -26,45 +26,11 @@
 #include <limits>
 
 
-/**
- * @brief Convert an estimation status string to enum.
- */
-inline fims_enum::EstimationStatus EstimationStatusFromString(const std::string& status) {
-  if (status == "assumed_known") {
-    return fims_enum::EstimationStatus::kAssumedKnown;
-  }
-  if (status == "fixed_effects") {
-    return fims_enum::EstimationStatus::kFixedEffects;
-  }
-  if (status == "random_effects") {
-    return fims_enum::EstimationStatus::kRandomEffects;
-  }
-  if (status == "derived_quantity") {
-    return fims_enum::EstimationStatus::kDerivedQuantity;
-  }
-
-  throw std::invalid_argument(
-      "Invalid estimation_status: " + status +
-      ". Valid options are: assumed_known, fixed_effects, random_effects, or "
-      "derived_quantity.");
-}
-
-/**
- * @brief Convert an estimation status enum to string.
- */
-inline std::string EstimationStatusToString(fims_enum::EstimationStatus status) {
-  switch (status) {
-    case fims_enum::EstimationStatus::kAssumedKnown:
-      return "assumed_known";
-    case fims_enum::EstimationStatus::kFixedEffects:
-      return "fixed_effects";
-    case fims_enum::EstimationStatus::kRandomEffects:
-      return "random_effects";
-    case fims_enum::EstimationStatus::kDerivedQuantity:
-      return "derived_quantity";
-  }
-  return "assumed_known";
-}
+// EstimationStatusFromString() and EstimationStatusToString() now live in
+// common/enumerations.hpp, next to the enum they convert. Pulled into this
+// scope so the call sites below stay unqualified.
+using fims_enum::EstimationStatusFromString;
+using fims_enum::EstimationStatusToString;
 
 /**
  * @brief An Rcpp interface that defines the Variable class.
@@ -532,233 +498,51 @@ inline std::ostream& operator<<(std::ostream& out, VariableVector& v) {
   return out;
 }
 
-/**
- * @brief An Rcpp interface class that defines the RealVector class.
- *
- * @details An Rcpp interface class that defines the interface between R and
- * C++ for a real vector type. Underlying values are held in a shared pointer
- * and are carried over to any copies of this vector.
- */
-class RealVector {
- public:
-  /**
-   * @brief The static ID of the RealVector object.
-   */
-  static uint32_t id_g;
-  /**
-   * @brief real storage.
-   */
-  std::shared_ptr<std::vector<double>> storage_m;
-  /**
-   * @brief The local ID of the RealVector object.
-   */
-  uint32_t id_m;
-
-  /**
-   * @brief The constructor.
-   */
-  RealVector() {
-    this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double>>();
-    this->storage_m->resize(1);
-  }
-
-  /**
-   * @brief The constructor.
-   */
-  RealVector(const RealVector& other)
-      : storage_m(other.storage_m), id_m(other.id_m) {}
-
-  /**
-   * @brief The constructor.
-   */
-  RealVector(size_t size) {
-    this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double>>();
-    this->storage_m->resize(size);
-  }
-
-  /**
-   * @brief The constructor for initializing a real vector.
-   * @param x A numeric vector.
-   * @param size The number of elements to copy over.
-   */
-  RealVector(Rcpp::NumericVector x, size_t size) {
-    this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double>>();
-    const size_t input_size = static_cast<size_t>(x.size());
-    if (input_size != size) {
-      throw std::invalid_argument(
-          "RealVector::RealVector(Rcpp::NumericVector, size_t): `x` length (" +
-          std::to_string(input_size) +
-          ") must equal the requested "
-          "size (" +
-          std::to_string(size) +
-          "). Received length: " + std::to_string(input_size) + ".");
-    }
-    this->storage_m->assign(x.begin(), x.end());
-  }
-
-  /**
-   * @brief The constructor for initializing a real vector.
-   * @param v A vector of doubles.
-   */
-  RealVector(const fims::Vector<double>& v) {
-    this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double>>();
-    this->storage_m->resize(v.size());
-    for (size_t i = 0; i < v.size(); i++) {
-      storage_m->at(i) = v[i];
-    }
-  }
-
-  /**
-   * @brief Destroy the real Vector object.
-   *
-   */
-  virtual ~RealVector() {}
-
-  /**
-   * @brief
-   *
-   * @param v
-   * @return RealVector&
-   */
-  RealVector& operator=(const Rcpp::NumericVector& v) {
-    this->storage_m->assign(v.begin(), v.end());
-    return *this;
-  }
-
-  /**
-   * @brief Gets the ID of the RealVector object.
-   */
-  virtual uint32_t get_id() { return this->id_m; }
-
-  /**
-   * @brief
-   *
-   * @param orig
-   */
-  void set_values(const Rcpp::NumericVector& orig) {
-    this->storage_m->resize(orig.size());
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      this->storage_m->at(i) = orig[i];
-    }
-  }
-
-  /**
-   * @brief
-   *
-   * @return Rcpp::NumericVector
-   */
-  Rcpp::NumericVector get_values() {
-    Rcpp::NumericVector ret(this->storage_m->size());
-    for (size_t i = 0; i < this->size(); i++) {
-      ret[i] = this->storage_m->at(i);
-    }
-
-    return ret;
-  }
-
-  /**
-   * @brief The accessor where the first index starts is zero.
-   * @param pos The position of the RealVector that you want returned.
-   */
-  inline double& operator[](size_t pos) { return this->storage_m->at(pos); }
-
-  /**
-   * @brief The accessor where the first index starts at one. This function is
-   * for calling accessing from R.
-   * @param pos The position of the VariableVector that you want returned.
-   */
-  SEXP at(R_xlen_t pos) {
-    if (static_cast<size_t>(pos) == 0 ||
-        static_cast<size_t>(pos) > this->storage_m->size()) {
-      throw std::invalid_argument("RealVector: Index out of range");
-      FIMS_ERROR_LOG(fims::to_string(pos) + "!<" +
-                     fims::to_string(this->size()));
-      return NULL;
-    }
-    return Rcpp::wrap(this->storage_m->at(pos - 1));
-  }
-
-  /**
-   * @brief An internal accessor for calling a position of a RealVector
-   * from R.
-   * @param pos An integer specifying the position of the RealVector
-   * you want returned. The first position is one and the last position is
-   * the same as the size of the RealVector.
-   */
-  double& get(size_t pos) {
-    if (pos >= this->storage_m->size()) {
-      throw std::invalid_argument("RealVector: Index out of range");
-    }
-    return (this->storage_m->at(pos));
-  }
-
-  /**
-   * @brief An internal setter for setting a position of a RealVector
-   * from R.
-   * @param pos An integer specifying the position of the RealVector
-   * you want to set. The first position is one and the last position is the
-   * same as the size of the RealVector.
-   * @param p A numeric value specifying the value to set position `pos` to
-   * in the RealVector.
-   */
-  void set(size_t pos, const double& p) { this->storage_m->at(pos) = p; }
-
-  /**
-   * @brief Returns the size of a RealVector.
-   */
-  size_t size() { return this->storage_m->size(); }
-
-  /**
-   * @brief Resizes a RealVector to the desired length.
-   * @param size An integer specifying the desired length for the
-   * RealVector to be resized to.
-   */
-  void resize(size_t size) { this->storage_m->resize(size); }
-
-  /**
-   * @brief Sets the value of all elements in the RealVector to the
-   * provided value.
-   *
-   * @param value A double specifying the value to set all elements to
-   * within the RealVector.
-   */
-  void fill(double value) {
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      storage_m->at(i) = value;
-    }
-  }
-
-  /**
-   * @brief The printing methods for a RealVector.
-   *
-   */
-  void show() {
-    Rcpp::Rcout << this->storage_m->data() << "\n";
-
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      Rcpp::Rcout << storage_m->at(i) << "  ";
-    }
-  }
-
-  /**
-   * @brief Create a deep copy with a new RealVector ID.
-   */
-  RealVector deep_copy() const {
-    RealVector copy;
-    copy.storage_m = std::make_shared<std::vector<double>>(*this->storage_m);
-    return copy;
-  }
-};
-#ifdef FIMS_HEADER_ONLY
-uint32_t RealVector::id_g = 0;
-#endif
-
 RCPP_EXPOSED_CLASS(VariableVector)
-RCPP_EXPOSED_CLASS(RealVector)
+
+/**
+ * @brief Fill a VariableVector from R, setting values and estimation statuses.
+ *
+ * @details Shared by the standalone XPtr setter functions in the src/*.cpp
+ * files. The vector is resized to match `values`. An `estimation_status` of
+ * length 1 is recycled across every element; otherwise it must be the same
+ * length as `values`.
+ *
+ * @param target The VariableVector to fill.
+ * @param values The initial values.
+ * @param estimation_status One status name, or one per element.
+ */
+inline void set_variable_vector(VariableVector &target,
+                                Rcpp::NumericVector values,
+                                Rcpp::CharacterVector estimation_status) {
+  if (estimation_status.size() != 1 &&
+      estimation_status.size() != values.size()) {
+    Rcpp::stop(
+        "set_variable_vector(): `estimation_status` must be length 1 or the "
+        "same length as `values`.");
+  }
+  target.resize(values.size());
+  for (int i = 0; i < values.size(); i++) {
+    Variable &v = target.storage_m->at(i);
+    v.initial_value_m = values[i];
+    v.estimation_status_m = EstimationStatusFromString(Rcpp::as<std::string>(
+        estimation_status[estimation_status.size() == 1 ? 0 : i]));
+  }
+}
+
+/**
+ * @brief Fill a numeric vector from R, resizing to match.
+ *
+ * @param target The vector to fill.
+ * @param values The values to copy in.
+ */
+inline void set_real_vector(fims::Vector<double> &target,
+                            Rcpp::NumericVector values) {
+  target.resize(values.size());
+  for (int i = 0; i < values.size(); i++) {
+    target[i] = values[i];
+  }
+}
 
 /**
  *@brief Base class for all interface objects.
@@ -774,6 +558,59 @@ class FIMSRcppInterfaceBase {
    */
   static std::vector<std::shared_ptr<FIMSRcppInterfaceBase>>
       fims_interface_objects;
+
+  /**
+   * @brief This module's unique ID.
+   *
+   * @details Every module carries one, and IDs are how modules refer to each
+   * other: a fleet records its selectivity's ID, a population records its
+   * growth module's, and fims_info::Information is keyed by them. Declared on
+   * the root so one exported getter serves every module.
+   *
+   * @return The ID.
+   */
+  virtual uint32_t get_id() = 0;
+
+  /**
+   * @brief Look up one of this module's parameter vectors by name.
+   *
+   * @details Declared on the root so that one exported setter and one id
+   * getter serve every module, reached through an XPtr typed to this class.
+   * Modules that carry no named parameters -- the data modules and the
+   * fishery models -- inherit this default and report that the name is
+   * unknown.
+   *
+   * Section 2.1 of Parameter_Registry.Rmd replaces these hand-written
+   * overrides with a declare_parameter() call per field in each constructor.
+   * The signature here is what that design calls find_parameter(), so the
+   * exported functions do not change when that lands.
+   *
+   * @param name The parameter name as used in R.
+   * @return A pointer to the vector, or nullptr if this module has no
+   * parameter by that name.
+   */
+  virtual VariableVector *get_parameter(const std::string &name) {
+    return nullptr;
+  }
+
+  /**
+   * @brief Look up one of this module's fixed numeric vectors by name.
+   *
+   * @details The counterpart to get_parameter(), for vectors that hold plain
+   * numbers rather than estimable parameters: observations, uncertainties,
+   * ages, empirical weights. These carry no estimation status and no
+   * variable_map id, so one setter writes them with values alone.
+   *
+   * A module author picks between the two by what the field is, not by which
+   * family it belongs to: estimable goes in get_parameter(), fixed goes here.
+   *
+   * @param name The vector name as used in R.
+   * @return A pointer to the vector, or nullptr if this module has no vector
+   * by that name.
+   */
+  virtual fims::Vector<double> *get_vector(const std::string &name) {
+    return nullptr;
+  }
 
   /**
    * @brief A virtual method to inherit to add objects to the TMB model.
@@ -837,5 +674,16 @@ class FIMSRcppInterfaceBase {
     return ss.str();
   }
 };
+
+/**
+ * @brief A shared pointer that can hold any FIMS interface object.
+ *
+ * @details Every interface class -- data, fleet, population, and the rest --
+ * inherits from FIMSRcppInterfaceBase, so a SharedBase can point at any of
+ * them. CreateTMBModel() uses this to hold a mixed list of modules and call
+ * add_to_fims_tmb() on each one without needing to know what each module is:
+ * C++ runs the right version based on what the object actually is.
+ */
+using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
 
 #endif

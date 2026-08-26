@@ -47,21 +47,4 @@ void register_vectors(Rcpp::Module& m) {
       .method("fill", &VariableVector::fill)
       .method("deep_copy", &VariableVector::deep_copy)
       .method("get_id", &VariableVector::get_id);
-
-  Rcpp::class_<RealVector>(
-      "RealVector",
-      "See https://noaa-fims.github.io/FIMS/doxygen/classRealVector.html.")
-      .constructor()
-      .constructor<size_t>()
-      .constructor<Rcpp::NumericVector, size_t>()
-      .method("get", &RealVector::get)
-      .method("set", &RealVector::set)
-      .method("set_values", &RealVector::set_values)
-      .method("get_values", &RealVector::get_values)
-      .method("show", &RealVector::show)
-      .method("at", &RealVector::at)
-      .method("size", &RealVector::size)
-      .method("resize", &RealVector::resize)
-      .method("deep_copy", &RealVector::deep_copy)
-      .method("get_id", &RealVector::get_id);
 }

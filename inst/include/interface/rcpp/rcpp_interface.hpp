@@ -85,6 +85,11 @@ bool CreateTMBModel() {
       fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
   info->Clear();
 
+  // NOTE (Step 3 -> Step 4): fims_interface_objects is no longer populated.
+  // The interface constructors used to push a heap copy of themselves into
+  // this global vector; that copy is what Step 3 removed. Until Step 4 gives
+  // CreateTMBModel() a list of base XPtrs from the R-side registry, this loop
+  // has nothing to iterate and no modules reach fims_info::Information.
   for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
        i++) {
     FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
@@ -246,88 +251,33 @@ void clear_internal() {
  * test_clear_with_leak_check().
  */
 void clear_impl(bool get_error_msg) {
-  // rcpp_interface_base.hpp
-  FIMSRcppInterfaceBase::fims_interface_objects.clear();
+  // Under the Rcpp::XPtr design there are no live_objects maps or
+  // fims_interface_objects vector to reset: the interface objects are owned by
+  // the shared_ptrs the XPtrs wrap, so they are released when R garbage
+  // collects the R-side variables holding them. All that remains here is
+  // resetting the id_g counters and the TMB Information singletons.
 
   // Variable and VariableVector
   Variable::id_g = 1;
   VariableVector::id_g = 1;
   // rcpp_data.hpp
   DataInterfaceBase::id_g = 1;
-  DataInterfaceBase::live_objects.clear();
-
-  AgeCompDataInterface::id_g = 1;
-  AgeCompDataInterface::live_objects.clear();
-
-  LengthCompDataInterface::id_g = 1;
-  LengthCompDataInterface::live_objects.clear();
-
-  CatchDataInterface::id_g = 1;
-  CatchDataInterface::live_objects.clear();
-
-  IndexDataInterface::id_g = 1;
-  IndexDataInterface::live_objects.clear();
-
   // rcpp_fleets.hpp
   FleetInterfaceBase::id_g = 1;
-  FleetInterfaceBase::live_objects.clear();
-
-  FleetInterface::id_g = 1;
-  FleetInterface::live_objects.clear();
-
   // rcpp_growth.hpp
   GrowthInterfaceBase::id_g = 1;
-  GrowthInterfaceBase::live_objects.clear();
-
-  EWAAGrowthInterface::id_g = 1;
-  EWAAGrowthInterface::live_objects.clear();
-
   // rcpp_maturity.hpp
   MaturityInterfaceBase::id_g = 1;
-  MaturityInterfaceBase::live_objects.clear();
-
-  LogisticMaturityInterface::id_g = 1;
-  LogisticMaturityInterface::live_objects.clear();
-
   // rcpp_population.hpp
   PopulationInterfaceBase::id_g = 1;
-  PopulationInterfaceBase::live_objects.clear();
-
-  PopulationInterface::id_g = 1;
-  PopulationInterface::live_objects.clear();
-
   // rcpp_recruitment.hpp
   RecruitmentInterfaceBase::id_g = 1;
-  RecruitmentInterfaceBase::live_objects.clear();
-
-  BevertonHoltRecruitmentInterface::id_g = 1;
-  BevertonHoltRecruitmentInterface::live_objects.clear();
-
   // rcpp_selectivity.hpp
   SelectivityInterfaceBase::id_g = 1;
-  SelectivityInterfaceBase::live_objects.clear();
-
-  LogisticSelectivityInterface::id_g = 1;
-  LogisticSelectivityInterface::live_objects.clear();
-
-  DoubleLogisticSelectivityInterface::id_g = 1;
-  DoubleLogisticSelectivityInterface::live_objects.clear();
-
   // rcpp_distribution.hpp
   DistributionsInterfaceBase::id_g = 1;
-  DistributionsInterfaceBase::live_objects.clear();
-
-  DnormDistributionsInterface::id_g = 1;
-  DnormDistributionsInterface::live_objects.clear();
-
-  DlnormDistributionsInterface::id_g = 1;
-  DlnormDistributionsInterface::live_objects.clear();
-
-  DmultinomDistributionsInterface::id_g = 1;
-  DmultinomDistributionsInterface::live_objects.clear();
-
+  // rcpp_models.hpp
   FisheryModelInterfaceBase::id_g = 1;
-  FisheryModelInterfaceBase::live_objects.clear();
 
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMBAD_FIMS_TYPE>();
