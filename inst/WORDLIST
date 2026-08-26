@@ -1,6 +1,7 @@
 abhinav
 acomp
 adcomp
+adgrad
 ADMB
 ADREPORT
 agecomp
@@ -46,8 +47,10 @@ dlognorm
 dmultinorm
 Doering
 dontrun
+doforward
 dplyr
 DTMB
+dynlib
 emph
 endcond
 envir
@@ -129,6 +132,7 @@ nrecruits
 nsaw
 nsurveys
 onclick
+oldwd
 opensci
 oppy
 ordinnames
@@ -150,6 +154,7 @@ pwalk
 QNXNTO
 qobj
 rapidjson
+rangeweight
 Rbuildignore
 Rcerr
 rchunk
@@ -225,6 +230,7 @@ Wmacro
 WORDLIST
 Wunused
 xlab
+xbiomass
 yearf
 yearm
 yintercept
