@@ -1,0 +1,238 @@
+/**
+ * @file derived_quantity_report.hpp
+ * @brief Backend-neutral request and result types for derived quantity reports.
+ * @copyright This file is part of the NOAA, National Marine Fisheries Service
+ * Fisheries Integrated Modeling System project. See LICENSE in the source
+ * folder for reuse information.
+ */
+#ifndef FIMS_DERIVED_QUANTITY_REPORT_HPP
+#define FIMS_DERIVED_QUANTITY_REPORT_HPP
+
+#include <cstdint>
+#include <map>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+#include "fims_vector.hpp"
+
+namespace fims_report {
+
+/**
+ * @brief Match a derived quantity name against a glob pattern.
+ *
+ * @details An asterisk matches zero or more characters. All other characters
+ * are matched literally.
+ *
+ * @param pattern Glob pattern supplied as the quantity name.
+ * @param value Available derived quantity name.
+ * @return bool Whether the value matches the pattern.
+ */
+inline bool MatchDerivedQuantityName(const std::string& pattern,
+                                     const std::string& value) {
+  size_t pattern_i = 0;
+  size_t value_i = 0;
+  size_t star_i = std::string::npos;
+  size_t retry_value_i = 0;
+
+  while (value_i < value.size()) {
+    if (pattern_i < pattern.size() && pattern[pattern_i] == value[value_i]) {
+      ++pattern_i;
+      ++value_i;
+    } else if (pattern_i < pattern.size() && pattern[pattern_i] == '*') {
+      star_i = pattern_i++;
+      retry_value_i = value_i;
+    } else if (star_i != std::string::npos) {
+      pattern_i = star_i + 1;
+      value_i = ++retry_value_i;
+    } else {
+      return false;
+    }
+  }
+  while (pattern_i < pattern.size() && pattern[pattern_i] == '*') {
+    ++pattern_i;
+  }
+  return pattern_i == pattern.size();
+}
+
+/** @brief Return whether a quantity name contains a glob wildcard. */
+inline bool IsDerivedQuantityPattern(const std::string& quantity_name) {
+  return quantity_name.find('*') != std::string::npos;
+}
+
+/** @brief Names of population derived quantities available to report. */
+inline std::vector<std::string> AvailablePopulationDerivedQuantityNames() {
+  return {"biomass",
+          "expected_recruitment",
+          "mortality_F",
+          "mortality_M",
+          "mortality_Z",
+          "numbers_at_age",
+          "proportion_mature_at_age",
+          "spawning_biomass",
+          "sum_selectivity",
+          "total_landings_numbers",
+          "total_landings_weight",
+          "unfished_biomass",
+          "unfished_numbers_at_age",
+          "unfished_spawning_biomass"};
+}
+
+/** @brief Names of fleet derived quantities available to report. */
+inline std::vector<std::string> AvailableFleetDerivedQuantityNames() {
+  return {"agecomp_expected",
+          "agecomp_proportion",
+          "catch_index",
+          "index_expected",
+          "index_numbers",
+          "index_numbers_at_age",
+          "index_numbers_at_length",
+          "index_weight",
+          "index_weight_at_age",
+          "landings_expected",
+          "landings_numbers",
+          "landings_numbers_at_age",
+          "landings_numbers_at_length",
+          "landings_weight",
+          "landings_weight_at_age",
+          "lengthcomp_expected",
+          "lengthcomp_proportion",
+          "log_index_expected",
+          "log_landings_expected"};
+}
+
+/**
+ * @brief Identifies the model component that owns a derived quantity.
+ */
+enum class DerivedQuantityComponentType { model, population, fleet, unknown };
+
+/**
+ * @brief Convert a derived quantity component type to a stable label.
+ *
+ * @param component_type Component type.
+ * @return std::string Stable component label.
+ */
+inline std::string ToString(DerivedQuantityComponentType component_type) {
+  switch (component_type) {
+    case DerivedQuantityComponentType::model:
+      return "model";
+    case DerivedQuantityComponentType::population:
+      return "population";
+    case DerivedQuantityComponentType::fleet:
+      return "fleet";
+    case DerivedQuantityComponentType::unknown:
+    default:
+      return "unknown";
+  }
+}
+
+/**
+ * @brief A request to report a derived quantity and optionally calculate its
+ * SE.
+ */
+struct DerivedQuantityReportRequest {
+  uint32_t model_id = 0;
+  uint32_t component_id = 0;
+  DerivedQuantityComponentType component_type =
+      DerivedQuantityComponentType::unknown;
+  std::string quantity_name;
+  bool report_se = false;
+
+  /**
+   * @brief Build a stable key identifying this request.
+   *
+   * @return std::string Registry key.
+   */
+  std::string BuildRequestKey() const {
+    std::ostringstream ss;
+    ss << "model." << model_id << "." << ToString(component_type);
+    if (component_type != DerivedQuantityComponentType::model) {
+      ss << "." << component_id;
+    }
+    ss << "." << quantity_name;
+    return ss.str();
+  }
+};
+
+/**
+ * @brief A backend-neutral estimate and uncertainty result.
+ */
+struct DerivedQuantityEstimate {
+  DerivedQuantityReportRequest request;
+  fims::Vector<double> estimate;
+  fims::Vector<double> se;
+  fims::Vector<int> dims;
+  fims::Vector<std::string> dim_names;
+};
+
+/**
+ * @brief Stores derived quantity reporting requests for a model.
+ */
+class DerivedQuantityReportRegistry {
+ public:
+  typedef std::vector<DerivedQuantityReportRequest> request_vector;
+
+ private:
+  request_vector requests_m;
+  std::map<std::string, size_t> request_index_m;
+
+ public:
+  /**
+   * @brief Register a derived quantity reporting request.
+   *
+   * @param request Request to add.
+   * @return const DerivedQuantityReportRequest& Stored request.
+   */
+  const DerivedQuantityReportRequest& Add(
+      DerivedQuantityReportRequest request) {
+    if (request.quantity_name.empty()) {
+      throw std::invalid_argument(
+          "DerivedQuantityReportRegistry::Add: quantity_name cannot be empty");
+    }
+    const std::string request_key = request.BuildRequestKey();
+    if (request_index_m.find(request_key) != request_index_m.end()) {
+      std::ostringstream ss;
+      ss << "DerivedQuantityReportRegistry::Add: request '" << request_key
+         << "' already exists";
+      throw std::invalid_argument(ss.str());
+    }
+
+    request_index_m[request_key] = requests_m.size();
+    requests_m.push_back(request);
+    return requests_m.back();
+  }
+
+  /**
+   * @brief Remove all registered requests.
+   */
+  void Clear() {
+    requests_m.clear();
+    request_index_m.clear();
+  }
+
+  /**
+   * @brief Get registered requests.
+   *
+   * @return const request_vector& Registered requests.
+   */
+  const request_vector& GetRequests() const { return requests_m; }
+
+  /**
+   * @brief Get number of registered requests.
+   *
+   * @return size_t Number of requests.
+   */
+  size_t size() const { return requests_m.size(); }
+
+  /**
+   * @brief Check whether there are no registered requests.
+   *
+   * @return bool True if empty.
+   */
+  bool empty() const { return requests_m.empty(); }
+};
+
+}  // namespace fims_report
+
+#endif

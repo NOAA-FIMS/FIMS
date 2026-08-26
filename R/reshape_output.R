@@ -1,5 +1,82 @@
 # This file contains many functions to reshape output from get_output()
 
+#' Add derived quantity uncertainty to finalized model JSON
+#'
+#' @param model_output A JSON string returned by a model's `get_output()`.
+#' @param sdreport A TMB `sdreport` object carrying the FIMS backend report.
+#' @return The JSON string with uncertainty vectors added to derived quantities.
+#' @noRd
+add_derived_quantity_uncertainty_to_json <- function(model_output, sdreport) {
+  if (length(sdreport) == 0) {
+    return(model_output)
+  }
+
+  report_summary <- attr(sdreport, "fims_backend_report")
+  if (is.null(report_summary)) {
+    report_summary <- tryCatch(
+      summary(sdreport, "report"),
+      error = function(e) NULL
+    )
+  }
+  if (is.null(report_summary) || nrow(report_summary) == 0) {
+    return(model_output)
+  }
+
+  report_names <- rownames(report_summary)
+  report_se <- unname(report_summary[, "Std. Error"])
+  consumed <- stats::setNames(
+    integer(length(unique(report_names))),
+    unique(report_names)
+  )
+  json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE)
+
+  add_component_uncertainty <- function(component) {
+    quantities <- component[["derived_quantities"]]
+    if (is.null(quantities)) {
+      return(component)
+    }
+    for (quantity_i in seq_along(quantities)) {
+      quantity_name <- quantities[[quantity_i]][["name"]]
+      matching_rows <- which(report_names == quantity_name)
+      if (length(matching_rows) == 0) {
+        next
+      }
+      n_values <- length(unlist(quantities[[quantity_i]][["value"]]))
+      first <- consumed[[quantity_name]] + 1L
+      last <- first + n_values - 1L
+      if (last > length(matching_rows)) {
+        next
+      }
+      quantities[[quantity_i]][["uncertainty"]] <- as.list(
+        report_se[matching_rows[seq.int(first, last)]]
+      )
+      consumed[[quantity_name]] <<- last
+    }
+    component[["derived_quantities"]] <- quantities
+    component
+  }
+
+  for (component_group in c("populations", "fleets")) {
+    if (!is.null(json_list[[component_group]])) {
+      json_list[[component_group]] <- lapply(
+        json_list[[component_group]],
+        add_component_uncertainty
+      )
+    }
+  }
+
+  as.character(
+    jsonlite::toJSON(
+      json_list,
+      auto_unbox = TRUE,
+      pretty = TRUE,
+      digits = NA,
+      null = "null",
+      na = "null"
+    )
+  )
+}
+
 #' Reshape JSON estimates
 #'
 #' @description
@@ -229,6 +306,23 @@ reshape_tmb_estimates <- function(obj,
 
   if (length(sdreport) > 0) {
     std <- summary(sdreport)
+    backend_report_std <- attr(sdreport, "fims_backend_report")
+    if (is.null(backend_report_std)) {
+      backend_report_std <- calculate_tmb_adreport_uncertainty(
+        obj = obj,
+        sdreport = sdreport
+      )
+    }
+    if (!is.null(backend_report_std)) {
+      report_nrow <- nrow(backend_report_std)
+      if (report_nrow > 0) {
+        report_rows <- seq.int(
+          from = nrow(std) - report_nrow + 1L,
+          to = nrow(std)
+        )
+        std[report_rows, c("Estimate", "Std. Error")] <- backend_report_std
+      }
+    }
     # Number of rows for derived quantities: based on the difference
     # between the total number of rows in std and the length of parameter_names.
     derived_quantity_nrow <- nrow(std) - length(parameter_names)
@@ -331,6 +425,11 @@ dimension_folded_to_tibble <- function(section) {
     temp |>
       dplyr::bind_cols(
         estimated_value = unlist(section[["value"]]),
+        uncertainty = if (!is.null(section[["uncertainty"]])) {
+          unlist(section[["uncertainty"]])
+        } else {
+          NA_real_
+        },
         estimation_type = "derived_quantity"
       )
   }

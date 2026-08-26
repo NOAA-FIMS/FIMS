@@ -10,6 +10,7 @@
 #define FIMS_MODELS_FISHERY_MODEL_BASE_HPP
 
 #include "../../common/model_object.hpp"
+#include "../../common/derived_quantity_report.hpp"
 #include "../../common/fims_math.hpp"
 #include "../../common/fims_vector.hpp"
 #include "../../population_dynamics/population/population.hpp"
@@ -151,6 +152,20 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    */
   std::shared_ptr<DimensionInfoMap> population_dimension_info;
 
+  /**
+   * @brief Shared registry for derived quantity report and SE requests.
+   */
+  std::shared_ptr<fims_report::DerivedQuantityReportRegistry>
+      derived_quantity_report_registry;
+
+  /**
+   * @brief Stable storage for runtime-generated TMB report names.
+   *
+   * @details TMB's report vector retains the supplied character pointer, so
+   * wildcard-expanded names must outlive the reporting call.
+   */
+  std::set<std::string> derived_quantity_report_names;
+
 #ifdef TMB_MODEL
   ::objective_function<Type> *of;
 #endif
@@ -163,6 +178,8 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
     population_derived_quantities = std::make_shared<DerivedQuantitiesMap>();
     fleet_dimension_info = std::make_shared<DimensionInfoMap>();
     population_dimension_info = std::make_shared<DimensionInfoMap>();
+    derived_quantity_report_registry =
+        std::make_shared<fims_report::DerivedQuantityReportRegistry>();
   }
 
   /**
@@ -177,7 +194,10 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
         fleet_derived_quantities(other.fleet_derived_quantities),
         population_derived_quantities(other.population_derived_quantities),
         fleet_dimension_info(other.fleet_dimension_info),
-        population_dimension_info(other.population_dimension_info) {}
+        population_dimension_info(other.population_dimension_info),
+        derived_quantity_report_registry(
+            other.derived_quantity_report_registry),
+        derived_quantity_report_names(other.derived_quantity_report_names) {}
 
   /**
    * @brief Destroy the Fishery Model Base object.
@@ -338,6 +358,182 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
       uint32_t population_id) {
     return (*population_dimension_info)[population_id];
   }
+
+  /**
+   * @brief Register a derived quantity to report and optionally calculate SEs.
+   *
+   * @param component_type The component that owns the derived quantity.
+   * @param component_id The component id.
+   * @param quantity_name The derived quantity name.
+   * @param report_se Whether uncertainty should be calculated.
+   * @return const fims_report::DerivedQuantityReportRequest& Stored request.
+   */
+  const fims_report::DerivedQuantityReportRequest &ReportDerivedQuantity(
+      fims_report::DerivedQuantityComponentType component_type,
+      uint32_t component_id, const std::string &quantity_name,
+      bool report_se = true) {
+    if (!derived_quantity_report_registry) {
+      derived_quantity_report_registry =
+          std::make_shared<fims_report::DerivedQuantityReportRegistry>();
+    }
+
+    fims_report::DerivedQuantityReportRequest request;
+    request.model_id = this->GetId();
+    request.component_type = component_type;
+    request.component_id = component_id;
+    request.quantity_name = quantity_name;
+    request.report_se = report_se;
+    return derived_quantity_report_registry->Add(request);
+  }
+
+  /**
+   * @brief Register a population derived quantity report request.
+   *
+   * @param population_id The population id.
+   * @param quantity_name The derived quantity name.
+   * @param report_se Whether uncertainty should be calculated.
+   * @return const fims_report::DerivedQuantityReportRequest& Stored request.
+   */
+  const fims_report::DerivedQuantityReportRequest &
+  ReportPopulationDerivedQuantity(uint32_t population_id,
+                                  const std::string &quantity_name,
+                                  bool report_se = true) {
+    return ReportDerivedQuantity(
+        fims_report::DerivedQuantityComponentType::population, population_id,
+        quantity_name, report_se);
+  }
+
+  /**
+   * @brief Register a fleet derived quantity report request.
+   *
+   * @param fleet_id The fleet id.
+   * @param quantity_name The derived quantity name.
+   * @param report_se Whether uncertainty should be calculated.
+   * @return const fims_report::DerivedQuantityReportRequest& Stored request.
+   */
+  const fims_report::DerivedQuantityReportRequest &ReportFleetDerivedQuantity(
+      uint32_t fleet_id, const std::string &quantity_name,
+      bool report_se = true) {
+    return ReportDerivedQuantity(
+        fims_report::DerivedQuantityComponentType::fleet, fleet_id,
+        quantity_name, report_se);
+  }
+
+  /**
+   * @brief Get the derived quantity report request registry.
+   *
+   * @return fims_report::DerivedQuantityReportRegistry& Registry.
+   */
+  fims_report::DerivedQuantityReportRegistry &
+  GetDerivedQuantityReportRegistry() {
+    if (!derived_quantity_report_registry) {
+      derived_quantity_report_registry =
+          std::make_shared<fims_report::DerivedQuantityReportRegistry>();
+    }
+    return *derived_quantity_report_registry;
+  }
+
+  /**
+   * @brief Get derived quantity report requests.
+   *
+   * @return const std::vector<fims_report::DerivedQuantityReportRequest>&
+   * Registered requests.
+   */
+  const std::vector<fims_report::DerivedQuantityReportRequest> &
+  GetDerivedQuantityReportRequests() {
+    return GetDerivedQuantityReportRegistry().GetRequests();
+  }
+
+  /**
+   * @brief Clear all derived quantity report requests.
+   */
+  void ClearDerivedQuantityReportRequests() {
+    GetDerivedQuantityReportRegistry().Clear();
+  }
+
+#ifdef TMB_MODEL
+  /**
+   * @brief Report registered derived quantities to TMB's report vector.
+   *
+   * @details TMB uses the report vector to calculate ADREPORT standard errors
+   * with sdreport. This method keeps the request/lookup logic in the model
+   * base class so individual fishery models only need to call it after derived
+   * quantities have been calculated.
+   */
+  void ReportRequestedDerivedQuantitiesTMB() {
+    if (!derived_quantity_report_registry ||
+        derived_quantity_report_registry->empty()) {
+      return;
+    }
+
+    const std::vector<fims_report::DerivedQuantityReportRequest> &requests =
+        derived_quantity_report_registry->GetRequests();
+    for (size_t i = 0; i < requests.size(); i++) {
+      const fims_report::DerivedQuantityReportRequest &request = requests[i];
+      std::map<std::string, fims::Vector<Type> > *component_quantities = NULL;
+      if (request.component_type ==
+          fims_report::DerivedQuantityComponentType::population) {
+        typename DerivedQuantitiesMap::iterator component_it =
+            population_derived_quantities->find(request.component_id);
+        if (component_it == population_derived_quantities->end()) {
+          std::ostringstream ss;
+          ss << "ReportRequestedDerivedQuantitiesTMB: population_id "
+             << request.component_id << " not found";
+          throw std::out_of_range(ss.str());
+        }
+        component_quantities = &(component_it->second);
+      } else if (request.component_type ==
+                 fims_report::DerivedQuantityComponentType::fleet) {
+        typename DerivedQuantitiesMap::iterator component_it =
+            fleet_derived_quantities->find(request.component_id);
+        if (component_it == fleet_derived_quantities->end()) {
+          std::ostringstream ss;
+          ss << "ReportRequestedDerivedQuantitiesTMB: fleet_id "
+             << request.component_id << " not found";
+          throw std::out_of_range(ss.str());
+        }
+        component_quantities = &(component_it->second);
+      } else {
+        std::ostringstream ss;
+        ss << "ReportRequestedDerivedQuantitiesTMB: unsupported component type "
+           << fims_report::ToString(request.component_type);
+        throw std::invalid_argument(ss.str());
+      }
+
+      bool found = false;
+      typename std::map<std::string, fims::Vector<Type> >::iterator quantity_it;
+      for (quantity_it = component_quantities->begin();
+           quantity_it != component_quantities->end(); ++quantity_it) {
+        if (!fims_report::MatchDerivedQuantityName(request.quantity_name,
+                                                   quantity_it->first)) {
+          continue;
+        }
+        found = true;
+        std::string output_name = request.quantity_name;
+        if (fims_report::IsDerivedQuantityPattern(request.quantity_name)) {
+          output_name = quantity_it->first;
+        }
+
+        const std::string &stable_output_name =
+            *(derived_quantity_report_names.insert(output_name).first);
+        vector<Type> report_values = quantity_it->second.to_tmb();
+        FIMS_REPORT_F_(stable_output_name.c_str(), report_values, this->of);
+        if (request.report_se) {
+          this->of->reportvector.push(report_values,
+                                      stable_output_name.c_str());
+        }
+      }
+      if (!found) {
+        std::ostringstream ss;
+        ss << "ReportRequestedDerivedQuantitiesTMB: "
+           << fims_report::ToString(request.component_type)
+           << " derived quantity pattern '" << request.quantity_name
+           << "' matched no quantities";
+        throw std::out_of_range(ss.str());
+      }
+    }
+  }
+#endif
 
   /**
    * @brief Initialize a model.
