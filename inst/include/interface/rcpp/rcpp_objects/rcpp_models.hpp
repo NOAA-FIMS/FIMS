@@ -87,7 +87,8 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    */
   FisheryModelInterfaceBase(const FisheryModelInterfaceBase &other)
       : population_ids(other.population_ids),
-        derived_quantity_report_registry(other.derived_quantity_report_registry),
+        derived_quantity_report_registry(
+            other.derived_quantity_report_registry),
         id(other.id) {}
 
   /**
@@ -230,8 +231,8 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
                                        bool report_se) {
     for (R_xlen_t i = 0; i < quantity_names.size(); ++i) {
       this->ReportDerivedQuantity(
-          fims_report::DerivedQuantityComponentType::population,
-          population_id, Rcpp::as<std::string>(quantity_names[i]), report_se);
+          fims_report::DerivedQuantityComponentType::population, population_id,
+          Rcpp::as<std::string>(quantity_names[i]), report_se);
     }
   }
 
@@ -262,8 +263,7 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    */
   void ReportDerivedQuantity(
       fims_report::DerivedQuantityComponentType component_type,
-      uint32_t component_id, const std::string &quantity_name,
-      bool report_se) {
+      uint32_t component_id, const std::string &quantity_name, bool report_se) {
     if (!this->derived_quantity_report_registry) {
       this->derived_quantity_report_registry =
           std::make_shared<fims_report::DerivedQuantityReportRegistry>();
@@ -1130,8 +1130,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         const fims_report::DerivedQuantityReportRequest &request = requests[i];
         model->ReportDerivedQuantity(request.component_type,
                                      request.component_id,
-                                     request.quantity_name,
-                                     request.report_se);
+                                     request.quantity_name, request.report_se);
       }
     }
 

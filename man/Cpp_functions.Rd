@@ -2,6 +2,9 @@
 % Please edit documentation in R/Rcpp_exports.R
 \name{Cpp_functions}
 \alias{Cpp_functions}
+\alias{calculate_adreport_payload_se}
+\alias{calculate_derived_quantity_se}
+\alias{calculate_derived_quantity_laplace_se}
 \alias{clear}
 \alias{get_fixed}
 \alias{get_log}
@@ -27,6 +30,9 @@ C++ docs.
 }
 \details{
 \itemize{
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html}{calculate_adreport_payload_se}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html}{calculate_derived_quantity_se}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__functions_8cpp.html}{calculate_derived_quantity_laplace_se}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{clear}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_fixed}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_log}

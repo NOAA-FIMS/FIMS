@@ -470,7 +470,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
         derived_quantity_report_registry->GetRequests();
     for (size_t i = 0; i < requests.size(); i++) {
       const fims_report::DerivedQuantityReportRequest &request = requests[i];
-      std::map<std::string, fims::Vector<Type> > *component_quantities = NULL;
+      std::map<std::string, fims::Vector<Type>> *component_quantities = NULL;
       if (request.component_type ==
           fims_report::DerivedQuantityComponentType::population) {
         typename DerivedQuantitiesMap::iterator component_it =
@@ -501,7 +501,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
       }
 
       bool found = false;
-      typename std::map<std::string, fims::Vector<Type> >::iterator quantity_it;
+      typename std::map<std::string, fims::Vector<Type>>::iterator quantity_it;
       for (quantity_it = component_quantities->begin();
            quantity_it != component_quantities->end(); ++quantity_it) {
         if (!fims_report::MatchDerivedQuantityName(request.quantity_name,
