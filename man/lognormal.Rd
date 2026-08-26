@@ -15,8 +15,9 @@ dirichlet_multinomial(link = "logit")
 \arguments{
 \item{link}{A string specifying the model link function. For example,
 \code{"identity"} or \code{"log"} are appropriate names for the \code{\link[stats:gaussian]{stats::gaussian()}}
-distribution. \code{"log"} and \code{"logit"} are the defaults for the lognormal and
-the multinomial, respectively.}
+distribution. \code{"log"} is the default for the lognormal distribution;
+\code{"logit"} is the default for the multinomial and Dirichlet-multinomial
+distributions.}
 }
 \value{
 An object of class \code{family} (which has a concise print method). This
@@ -35,6 +36,8 @@ similar manner.
 a_family <- multinomial()
 a_family[["family"]]
 a_family[["link"]]
+dirichlet_family <- dirichlet_multinomial()
+dirichlet_family[["family"]]
 }
 \seealso{
 \itemize{

@@ -1130,6 +1130,13 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 #endif
 };
 
+/**
+ * @brief Rcpp interface for the Dirichlet-multinomial distribution.
+ *
+ * Use `methods::new(DDirichletMultinomDistribution)` in R to construct this
+ * interface. The distribution models multivariate count data using expected
+ * category probabilities and a positive linear overdispersion parameter.
+ */
 class DDirichletMultinomialDistributionsInterface
     : public DistributionsInterfaceBase {
  public:
@@ -1148,6 +1155,9 @@ class DDirichletMultinomialDistributionsInterface
    * multivariate dataset.
    */
   RealVector dims;
+  /**
+   * @brief Linear overdispersion parameter. Must be greater than zero.
+   */
   Variable theta;
   /**
    * @brief Vector that records the individual log probability function for each
@@ -1156,8 +1166,7 @@ class DDirichletMultinomialDistributionsInterface
   RealVector lpdf_vec; /**< The vector */
 
   /**
-   * @brief TODO: document this.
-   *
+   * @brief User-supplied note associated with the distribution.
    */
   SharedString notes;
 
@@ -1224,16 +1233,14 @@ class DDirichletMultinomialDistributionsInterface
   }
 
   /**
-   * @brief Set the note object
-   *
-   * @param note
+   * @brief Sets a user-supplied note for the distribution.
+   * @param note Text to associate with the distribution.
    */
   void set_note(std::string note) { this->notes.set(note); }
 
   /**
-   * @brief
-   *
-   * @return double
+   * @brief Evaluates the Dirichlet-multinomial log probability mass function.
+   * @return The total log probability mass for the configured observations.
    */
   virtual double evaluate() {
     fims_distributions::Dirichlet_multinomialLPMF<double> dirichlet_multinomial;
@@ -1255,6 +1262,9 @@ class DDirichletMultinomialDistributionsInterface
     return dirichlet_multinomial.evaluate();
   }
 
+  /**
+   * @brief Copies fitted values from the finalized model into the R interface.
+   */
   void finalize() {
     if (this->finalized) {
       // log warning that finalize has been called more than once.
@@ -1320,11 +1330,9 @@ class DDirichletMultinomialDistributionsInterface
   }
 
   /**
-   * @brief Converts the data to json representation for the output.
-   * @return A string is returned specifying that the module relates to the
-   * distribution interface with a log_normal distribution. It also returns the
-   * ID and the natural log of the probability density function values
-   * themselves. This string is formatted for a json file.
+   * @brief Converts the Dirichlet-multinomial results to JSON.
+   * @return A JSON string containing module metadata, log probability mass
+   * contributions, expected values, and observed values.
    */
   virtual std::string to_json() {
     std::stringstream ss;
@@ -1364,7 +1372,7 @@ class DDirichletMultinomialDistributionsInterface
 
       ss << "],\n";
     }
-    // no log_sd_values for Dirichletmultinomial
+    // No log_sd values are used for the Dirichlet-multinomial distribution.
     ss << "  \"observed_values\":[";
     if (this->observed_values.size() == 0) {
       ss << "]\n";
@@ -1382,6 +1390,11 @@ class DDirichletMultinomialDistributionsInterface
 
 #ifdef TMB_MODEL
 
+  /**
+   * @brief Adds this distribution to a typed FIMS model.
+   * @tparam Type Numeric scalar type used by the model.
+   * @return `true` after the distribution is registered.
+   */
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     FIMS_INFO_LOG("Adding Dirichlet-multinomial to FIMS.");
@@ -1417,6 +1430,10 @@ class DDirichletMultinomialDistributionsInterface
     return true;
   }
 
+  /**
+   * @brief Adds this distribution to the supported FIMS model types.
+   * @return `true` after both model representations are registered.
+   */
   virtual bool add_to_fims_tmb() {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();

@@ -75,10 +75,9 @@ void register_distributions(Rcpp::Module& m) {
       "DDirichletMultinomDistribution",
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classDDirichletMultinomDistributionsInterface.html.")
+      "classDDirichletMultinomialDistributionsInterface.html.")
       .constructor()
-      .method("get_id",
-              &DDirichletMultinomialDistributionsInterface::get_id)
+      .method("get_id", &DDirichletMultinomialDistributionsInterface::get_id)
       .method("evaluate",
               &DDirichletMultinomialDistributionsInterface::evaluate)
       .method("set_observed_data",

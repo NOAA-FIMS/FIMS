@@ -42,6 +42,7 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
    * dataset.
    */
   fims::Vector<size_t> dims;
+  /** @brief Linear overdispersion parameter. Must be greater than zero. */
   Type theta;
 
   /** @brief Constructor.
@@ -54,13 +55,17 @@ struct Dirichlet_multinomialLPMF : public DensityComponentBase<Type> {
 
   /**
    * @brief Evaluates the Dirichlet-multinomial log probability mass function.
-   * @details The following equation is the Dirichlet-multinomial probability
-   * mass function, and thus, the log of it is evaluated: \f[ f(\underline{y}) =
-   * \frac{n!}{y_{1}!... y_{k}!}p^{y_{1}}_{1}...p^{y_{k}}_{k}, \f] where \f$k\f$
-   * is the number of categories, \f$n\f$ is the sample size, \f$\mu_{i}\f$ is
-   * the mean of \f$y_{i}\f$ and is equal to \f$np_{i}\f$, and
-   * \f$\sigma^{2}_{i}\f$ is the variance of \f$y_{i}\f$ and is equal to
-   * \f$np_{i}(1-p_{i})\f$.
+   * @details Let \f$n = \sum_i y_i\f$ and
+   * \f$\alpha_i = \theta n p_i\f$. This method evaluates the logarithm of
+   * the following Dirichlet-multinomial probability mass function:
+   * \f[
+   * f(\mathbf{y}\mid\mathbf{p},\theta) =
+   * \frac{n!}{\prod_i y_i!}
+   * \frac{\Gamma(\theta n)}{\Gamma(n + \theta n)}
+   * \prod_i \frac{\Gamma(y_i + \theta n p_i)}
+   * {\Gamma(\theta n p_i)}.
+   * \f]
+   * @return The total log probability mass across all non-missing rows.
    */
   virtual const Type evaluate() {
     // set dims using data_observed_values if no user input

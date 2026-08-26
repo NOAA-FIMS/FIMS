@@ -8,12 +8,13 @@
 #' [NOAA-FIMS C++ Documentation](https://noaa-fims.github.io/FIMS/doxygen/)
 #'
 #' @name Cpp_classes
-#' @aliases AgeComp BevertonHoltRecruitment CatchAtAge DlnormDistribution DmultinomDistribution DnormDistribution DoubleLogisticSelectivity EWAAGrowth Fleet Index Catch LengthComp LogDevsRecruitmentProcess LogRRecruitmentProcess LogisticMaturity LogisticSelectivity Variable VariableVector Population RealVector SharedInt SharedReal SharedString
+#' @aliases AgeComp BevertonHoltRecruitment CatchAtAge DDirichletMultinomDistribution DlnormDistribution DmultinomDistribution DnormDistribution DoubleLogisticSelectivity EWAAGrowth Fleet Index Catch LengthComp LogDevsRecruitmentProcess LogRRecruitmentProcess LogisticMaturity LogisticSelectivity Variable VariableVector Population RealVector SharedInt SharedReal SharedString
 #'
 #' @details
 #' - [AgeComp](https://noaa-fims.github.io/FIMS/doxygen/classAgeCompDataInterface.html)
 #' - [BevertonHoltRecruitment](https://noaa-fims.github.io/FIMS/doxygen/classBevertonHoltRecruitmentInterface.html)
 #' - [CatchAtAge](https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html)
+#' - [DDirichletMultinomDistribution](https://noaa-fims.github.io/FIMS/doxygen/classDDirichletMultinomialDistributionsInterface.html)
 #' - [DlnormDistribution](https://noaa-fims.github.io/FIMS/doxygen/classDlnormDistributionsInterface.html)
 #' - [DmultinomDistribution](https://noaa-fims.github.io/FIMS/doxygen/classDmultinomDistributionsInterface.html)
 #' - [DnormDistribution](https://noaa-fims.github.io/FIMS/doxygen/classDnormDistributionsInterface.html)
