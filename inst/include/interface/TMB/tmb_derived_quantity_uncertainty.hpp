@@ -126,24 +126,22 @@ class LaplaceADReportUncertaintyAdapter {
         const double d_i_j =
             report.random_jacobian[(i * report.n_random_effects) + j];
         for (size_t k = 0; k < report.n_random_effects; k++) {
-          variance += d_i_j *
-                      report.random_effect_covariance
-                          [(j * report.n_random_effects) + k] *
-                      report.random_jacobian
-                          [(i * report.n_random_effects) + k];
+          variance +=
+              d_i_j *
+              report
+                  .random_effect_covariance[(j * report.n_random_effects) + k] *
+              report.random_jacobian[(i * report.n_random_effects) + k];
         }
       }
 
       for (size_t j = 0; j < report.n_fixed_effects; j++) {
         const double d_i_j =
-            report.adjusted_fixed_jacobian
-                [(i * report.n_fixed_effects) + j];
+            report.adjusted_fixed_jacobian[(i * report.n_fixed_effects) + j];
         for (size_t k = 0; k < report.n_fixed_effects; k++) {
-          variance += d_i_j *
-                      report.fixed_effect_covariance
-                          [(j * report.n_fixed_effects) + k] *
-                      report.adjusted_fixed_jacobian
-                          [(i * report.n_fixed_effects) + k];
+          variance +=
+              d_i_j *
+              report.fixed_effect_covariance[(j * report.n_fixed_effects) + k] *
+              report.adjusted_fixed_jacobian[(i * report.n_fixed_effects) + k];
         }
       }
 

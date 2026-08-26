@@ -60,12 +60,10 @@ class DeltaMethodUncertaintyCalculator {
     for (size_t i = 0; i < input.estimate.size(); i++) {
       double variance = 0.0;
       for (size_t j = 0; j < input.n_parameters; j++) {
-        const double d_i_j =
-            input.jacobian[(i * input.n_parameters) + j];
+        const double d_i_j = input.jacobian[(i * input.n_parameters) + j];
         for (size_t k = 0; k < input.n_parameters; k++) {
-          variance +=
-              d_i_j * input.covariance[(j * input.n_parameters) + k] *
-              input.jacobian[(i * input.n_parameters) + k];
+          variance += d_i_j * input.covariance[(j * input.n_parameters) + k] *
+                      input.jacobian[(i * input.n_parameters) + k];
         }
       }
 
