@@ -12,6 +12,12 @@
 #include "rcpp_interface_base.hpp"
 #include "../../../distributions/distributions.hpp"
 
+// DistributionType and its converters live in common/enumerations.hpp rather
+// than here. Pulled into this scope so the code in
+// src/rcpp_distribution.cpp can name it unqualified, like the other families.
+using fims_enum::DistributionType;
+using fims_enum::DistributionTypeFromString;
+
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp distribution
  * interfaces. This type should be inherited and not called from R directly.
@@ -59,13 +65,6 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    */
   std::string use_mean_m = "no";
   /**
-   * @brief The map associating the ID of the DistributionsInterfaceBase to the
-     DistributionsInterfaceBase objects. This is a live object, which is an
-     object that has been created and lives in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
-      live_objects;
-  /**
    * @brief The ID of the observed data object, which is set to -999.
    */
   int interface_observed_data_id_m = -999;
@@ -80,33 +79,20 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   DistributionsInterfaceBase() {
     this->key_m = std::make_shared<std::vector<uint32_t>>();
     this->id_m = DistributionsInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    DistributionsInterfaceBase */
-    // DistributionsInterfaceBase::live_objects[this->id_m] = this;
   }
 
   /**
-   * @brief Construct a new Distributions Interface Base object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  DistributionsInterfaceBase(const DistributionsInterfaceBase &other)
-      : id_m(other.id_m),
-        key_m(other.key_m),
-        input_type_m(other.input_type_m),
-        use_mean_m(other.use_mean_m),
-        interface_observed_data_id_m(other.interface_observed_data_id_m) {}
+  DistributionsInterfaceBase(const DistributionsInterfaceBase &) = delete;
+  DistributionsInterfaceBase &operator=(const DistributionsInterfaceBase &) = delete;
 
   /**
    * @brief The destructor.
    */
   virtual ~DistributionsInterfaceBase() {}
 
-  /**
-   * @brief Get the ID for the child distribution interface objects to inherit.
-   */
-  virtual uint32_t get_id() = 0;
-
+    
   /**
    * @brief Sets pointers for data observations, random effects, or priors.
    *
@@ -189,30 +175,18 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Vector that records the individual log probability function for each
    * observation.
    */
-  RealVector lpdf_vec; /**< The vector*/
+  fims::Vector<double> lpdf_vec; /**< The vector*/
 
   /**
    * @brief The constructor.
    */
-  DnormDistributionsInterface() : DistributionsInterfaceBase() {
-    DistributionsInterfaceBase::live_objects[this->id_m] =
-        std::make_shared<DnormDistributionsInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        DistributionsInterfaceBase::live_objects[this->id_m]);
-  }
+  DnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
   /**
-   * @brief Construct a new Dnorm Distributions Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  DnormDistributionsInterface(const DnormDistributionsInterface &other)
-      : DistributionsInterfaceBase(other),
-        observed_values(other.observed_values),
-        expected_values(other.expected_values),
-        expected_mean(other.expected_mean),
-        log_sd(other.log_sd),
-        lpdf_vec(other.lpdf_vec) {}
+  DnormDistributionsInterface(const DnormDistributionsInterface &) = delete;
+  DnormDistributionsInterface &operator=(const DnormDistributionsInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -224,6 +198,17 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id_m; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   */
+  virtual VariableVector *get_parameter(const std::string &name) {
+    if (name == "observed_values") return &this->observed_values;
+    if (name == "expected_values") return &this->expected_values;
+    if (name == "expected_mean") return &this->expected_mean;
+    if (name == "log_sd") return &this->log_sd;
+    return nullptr;
+  }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -346,7 +331,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
                                              dnorm->expected_mean[i]);
       }
 
-      this->lpdf_vec = RealVector(n_x);
+      this->lpdf_vec.resize(n_x);
       if (this->expected_values.size() == 1) {
         this->expected_values.resize(n_x);
       }
@@ -534,29 +519,18 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Vector that records the individual log probability function for each
    * observation.
    */
-  RealVector lpdf_vec; /**< The vector */
+  fims::Vector<double> lpdf_vec; /**< The vector */
 
   /**
    * @brief The constructor.
    */
-  DlnormDistributionsInterface() : DistributionsInterfaceBase() {
-    DistributionsInterfaceBase::live_objects[this->id_m] =
-        std::make_shared<DlnormDistributionsInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        DistributionsInterfaceBase::live_objects[this->id_m]);
-  }
+  DlnormDistributionsInterface() : DistributionsInterfaceBase() {}
 
   /**
-   * @brief Construct a new Dlnorm Distributions Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  DlnormDistributionsInterface(const DlnormDistributionsInterface &other)
-      : DistributionsInterfaceBase(other),
-        observed_values(other.observed_values),
-        expected_values(other.expected_values),
-        log_sd(other.log_sd),
-        lpdf_vec(other.lpdf_vec) {}
+  DlnormDistributionsInterface(const DlnormDistributionsInterface &) = delete;
+  DlnormDistributionsInterface &operator=(const DlnormDistributionsInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -568,6 +542,16 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id_m; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   */
+  virtual VariableVector *get_parameter(const std::string &name) {
+    if (name == "observed_values") return &this->observed_values;
+    if (name == "expected_values") return &this->expected_values;
+    if (name == "log_sd") return &this->log_sd;
+    return nullptr;
+  }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -675,7 +659,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
                                              dlnorm->log_sd.get_force_scalar(i));
       }
 
-      this->lpdf_vec = RealVector(n_x);
+      this->lpdf_vec.resize(n_x);
       if (this->expected_values.size() == 1) {
         this->expected_values.resize(n_x);
       }
@@ -841,12 +825,12 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @brief The dimensions of the number of rows and columns of the
    * multivariate dataset.
    */
-  RealVector dims;
+  fims::Vector<double> dims;
   /**
    * @brief Vector that records the individual log probability function for each
    * observation.
    */
-  RealVector lpdf_vec; /**< The vector */
+  fims::Vector<double> lpdf_vec; /**< The vector */
 
   /**
    * @brief TODO: document this.
@@ -857,25 +841,13 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   /**
    * @brief The constructor.
    */
-  DmultinomDistributionsInterface() : DistributionsInterfaceBase() {
-    DistributionsInterfaceBase::live_objects[this->id_m] =
-        std::make_shared<DmultinomDistributionsInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        DistributionsInterfaceBase::live_objects[this->id_m]);
-  }
+  DmultinomDistributionsInterface() : DistributionsInterfaceBase() {}
 
   /**
-   * @brief Construct a new Dmultinom Distributions Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  DmultinomDistributionsInterface(const DmultinomDistributionsInterface &other)
-      : DistributionsInterfaceBase(other),
-        observed_values(other.observed_values),
-        expected_values(other.expected_values),
-        dims(other.dims),
-        lpdf_vec(other.lpdf_vec),
-        notes(other.notes) {}
+  DmultinomDistributionsInterface(const DmultinomDistributionsInterface &) = delete;
+  DmultinomDistributionsInterface &operator=(const DmultinomDistributionsInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -886,6 +858,23 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id_m; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   */
+  virtual VariableVector *get_parameter(const std::string &name) {
+    if (name == "observed_values") return &this->observed_values;
+    if (name == "expected_values") return &this->expected_values;
+    return nullptr;
+  }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_vector
+   */
+  virtual fims::Vector<double> *get_vector(const std::string &name) {
+    if (name == "dims") return &this->dims;
+    return nullptr;
+  }
 
   /**
    * @brief Set the unique ID for the observed data object.
@@ -973,7 +962,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       this->lpdf_value = dmultinom->lpdf;
 
       size_t n_x = dmultinom->lpdf_vec.size();
-      this->lpdf_vec = Rcpp::NumericVector(n_x);
+      this->lpdf_vec.resize(n_x);
       if (this->expected_values.size() != n_x) {
         this->expected_values.resize(n_x);
       }

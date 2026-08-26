@@ -14,6 +14,38 @@
 #include "rcpp_interface_base.hpp"
 
 /**
+ * @brief The recruitment forms FIMS can build.
+ *
+ * @details The create_recruitment_() function takes one of these names from R
+ * and builds the matching class: "beverton_holt" builds a
+ * BevertonHoltRecruitmentInterface, "log_devs_process" builds a
+ * LogDevsRecruitmentInterface, and so on. RecruitmentInterfaceBase is never
+ * built on its own; it only holds what all recruitment forms have in common.
+ *
+ * These are an enum rather than plain strings so that every place in the C++
+ * code that acts on a recruitment form has to name one of these values, which
+ * makes it harder to add a form and forget to handle it somewhere.
+ */
+enum class RecruitmentType : uint8_t {
+  beverton_holt = 0,
+  log_devs_process = 1,
+  log_r_process = 2
+};
+
+/**
+ * @brief Convert a type name supplied from R to a RecruitmentType.
+ */
+inline RecruitmentType RecruitmentTypeFromString(const std::string &name) {
+  if (name == "beverton_holt") return RecruitmentType::beverton_holt;
+  if (name == "log_devs_process") return RecruitmentType::log_devs_process;
+  if (name == "log_r_process") return RecruitmentType::log_r_process;
+  throw std::invalid_argument(
+      "Invalid type: '" + name +
+      "'. Valid options are: beverton_holt, log_devs_process, "
+      "log_r_process.");
+}
+
+/**
  * @brief Rcpp interface that serves as the parent class for Rcpp recruitment
  * interfaces. This type should be inherited and not called from R directly.
  */
@@ -31,42 +63,24 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The process id of the RecruitmentInterfaceBase object.
    */
   int process_id = -999;
-  /**
-   * @brief The map associating the IDs of RecruitmentInterfaceBase to the
-   * objects. This is a live object, which is an object that has been created
-   * and lives in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<RecruitmentInterfaceBase>>
-      live_objects;
 
   /**
    * @brief The constructor.
    */
-  RecruitmentInterfaceBase() {
-    this->id = RecruitmentInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    RecruitmentInterfaceBase */
-    // RecruitmentInterfaceBase::live_objects[this->id] = this;
-  }
+  RecruitmentInterfaceBase() { this->id = RecruitmentInterfaceBase::id_g++; }
 
   /**
-   * @brief Construct a new Recruitment Interface Base object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  RecruitmentInterfaceBase(const RecruitmentInterfaceBase &other)
-      : id(other.id), process_id(other.process_id) {}
+  RecruitmentInterfaceBase(const RecruitmentInterfaceBase &) = delete;
+  RecruitmentInterfaceBase &operator=(const RecruitmentInterfaceBase &) = delete;
 
   /**
    * @brief The destructor.
    */
   virtual ~RecruitmentInterfaceBase() {}
 
-  /**
-   * @brief Get the ID for the child recruitment interface objects to inherit.
-   */
-  virtual uint32_t get_id() = 0;
-
+    
   /** @copydoc fims_popdy::RecruitmentBase::evaluate_mean */
   virtual double evaluate_mean(double spawners, double phi_0) = 0;
 
@@ -110,46 +124,17 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief Expectation of the recruitment process.
    */
   VariableVector log_expected_recruitment;
-  /**
-   * @brief The estimate of the logit transformation of steepness.
-   */
-  double estimated_logit_steep;
-  /**
-   * @brief The estimate of the natural log of recruitment at unfished biomass.
-   */
-  double estimated_log_rzero;
-  /**
-   * @brief The estimates of the natural log of recruitment deviations.
-   */
-  RealVector estimated_log_devs;
 
   /**
    * @brief The constructor.
    */
-  BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {
-    RecruitmentInterfaceBase::live_objects[this->id] =
-        std::make_shared<BevertonHoltRecruitmentInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        RecruitmentInterfaceBase::live_objects[this->id]);
-  }
+  BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {}
 
   /**
-   * @brief Construct a new Beverton--Holt Recruitment Interface object.
-   *
-   * @param other The passed object to copy.
+   * @brief Interface objects are not copyable.
    */
-  BevertonHoltRecruitmentInterface(
-      const BevertonHoltRecruitmentInterface &other)
-      : RecruitmentInterfaceBase(other),
-        n_years(other.n_years),
-        logit_steep(other.logit_steep),
-        log_rzero(other.log_rzero),
-        log_devs(other.log_devs),
-        log_r(other.log_r),
-        log_expected_recruitment(other.log_expected_recruitment),
-        estimated_logit_steep(other.estimated_logit_steep),
-        estimated_log_rzero(other.estimated_log_rzero),
-        estimated_log_devs(other.estimated_log_devs) {}
+  BevertonHoltRecruitmentInterface(const BevertonHoltRecruitmentInterface &) = delete;
+  BevertonHoltRecruitmentInterface &operator=(const BevertonHoltRecruitmentInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -161,6 +146,17 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   */
+  virtual VariableVector *get_parameter(const std::string &name) {
+    if (name == "logit_steep") return &this->logit_steep;
+    if (name == "log_rzero") return &this->log_rzero;
+    if (name == "log_devs") return &this->log_devs;
+    if (name == "log_r") return &this->log_r;
+    return nullptr;
+  }
 
   /**
    * @brief Set the unique ID for the recruitment process object.
@@ -393,10 +389,13 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LogDevsRecruitmentInterface() : RecruitmentInterfaceBase() {
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<LogDevsRecruitmentInterface>(*this));
-  }
+  LogDevsRecruitmentInterface() : RecruitmentInterfaceBase() {}
+
+  /**
+   * @brief Interface objects are not copyable.
+   */
+  LogDevsRecruitmentInterface(const LogDevsRecruitmentInterface &) = delete;
+  LogDevsRecruitmentInterface &operator=(const LogDevsRecruitmentInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -466,10 +465,13 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LogRRecruitmentInterface() : RecruitmentInterfaceBase() {
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<LogRRecruitmentInterface>(*this));
-  }
+  LogRRecruitmentInterface() : RecruitmentInterfaceBase() {}
+
+  /**
+   * @brief Interface objects are not copyable.
+   */
+  LogRRecruitmentInterface(const LogRRecruitmentInterface &) = delete;
+  LogRRecruitmentInterface &operator=(const LogRRecruitmentInterface &) = delete;
 
   /**
    * @brief The destructor.

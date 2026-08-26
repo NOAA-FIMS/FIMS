@@ -39,6 +39,11 @@ void register_recruitment(Rcpp::Module &m);
  */
 void register_fleet(Rcpp::Module &m);
 /**
+ * \brief Register the shared parameter accessors, which work on any module.
+ * \param m The Rcpp module to register functions in.
+ */
+void register_parameters(Rcpp::Module &m);
+/**
  * \brief Register the variable module.
  * \param m The Rcpp module to register functions in.
  */
@@ -71,6 +76,7 @@ void register_maturity(Rcpp::Module &m);
 RcppExport RCPP_MODULE(fims) {
   Rcpp::Module m("fims");
   register_functions(m);
+  register_parameters(m);
   register_variable(m);
   register_vectors(m);
   register_recruitment(m);

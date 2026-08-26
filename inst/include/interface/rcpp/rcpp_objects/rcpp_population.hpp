@@ -10,6 +10,7 @@
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 
 #include "rcpp_interface_base.hpp"
+#include "rcpp_fleet.hpp"
 #include "../../../population_dynamics/population/population.hpp"
 
 /**
@@ -26,13 +27,6 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The local id of the PopulationInterfaceBase object.
    */
   uint32_t id;
-  /**
-   * @brief The map associating the IDs of PopulationInterfaceBase to the
-   * objects. This is a live object, which is an object that has been created
-   * and lives in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<PopulationInterfaceBase>>
-      live_objects;
 
   /**
    * @brief Initialize the catch at age model.
@@ -47,30 +41,19 @@ class PopulationInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The constructor.
    */
-  PopulationInterfaceBase() {
-    this->id = PopulationInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    PopulationInterfaceBase */
-    // PopulationInterfaceBase::live_objects[this->id] = this;
-  }
+  PopulationInterfaceBase() { this->id = PopulationInterfaceBase::id_g++; }
 
   /**
-   * @brief Construct a new Population Interface Base object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  PopulationInterfaceBase(const PopulationInterfaceBase &other)
-      : id(other.id) {}
+  PopulationInterfaceBase(const PopulationInterfaceBase &) = delete;
+  PopulationInterfaceBase &operator=(const PopulationInterfaceBase &) = delete;
 
   /**
    * @brief The destructor.
    */
   virtual ~PopulationInterfaceBase() {}
 
-  /**
-   * @brief Get the ID for the child population interface objects to inherit.
-   */
-  virtual uint32_t get_id() = 0;
 };
 
 /**
@@ -91,6 +74,19 @@ class PopulationInterface : public PopulationInterfaceBase {
    * list of fleets that operate on this population.
    */
   std::shared_ptr<std::set<uint32_t>> fleet_ids;
+  /**
+   * @brief The fleet modules that operate on this population.
+   *
+   * @details Population holds direct shared_ptrs to the fleets. 
+   * CatchAtAgeInterface walks these to reach every fleet in the
+   * model, both to size its derived-quantity maps and to serialize it.
+   *
+   * fleet_ids and fleets_m are always written together by SetFleets(), so the
+   * association and the reachability link cannot drift apart. A fleet that
+   * operates on several populations appears in each population's list and is
+   * de-duplicated by ID in CatchAtAgeInterface::GetFleets().
+   */
+  std::vector<std::shared_ptr<FleetInterface>> fleets_m;
   /**
    * Iterator for fleet ids.
    */
@@ -148,7 +144,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
    */
-  RealVector ages;
+  fims::Vector<double> ages;
   /**
    * @brief The name for the population.
    */
@@ -237,6 +233,12 @@ class PopulationInterface : public PopulationInterfaceBase {
   }
 
   /**
+   * @brief Interface objects are not copyable.
+   */
+  PopulationInterface(const PopulationInterface &) = delete;
+  PopulationInterface &operator=(const PopulationInterface &) = delete;
+
+  /**
    * @brief The destructor.
    */
   virtual ~PopulationInterface() {}
@@ -246,6 +248,26 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_vector
+   */
+  virtual fims::Vector<double> *get_vector(const std::string &name) {
+    if (name == "ages") return &this->ages;
+    return nullptr;
+  }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   */
+  virtual VariableVector *get_parameter(const std::string &name) {
+    if (name == "log_M") return &this->log_M;
+    if (name == "log_init_naa") return &this->log_init_naa;
+    if (name == "log_f_multiplier") return &this->log_f_multiplier;
+    if (name == "proportion_female") return &this->proportion_female;
+    if (name == "spawning_biomass_ratio") return &this->spawning_biomass_ratio;
+    return nullptr;
+  }
 
   /**
    * @brief Sets the name of the population.
@@ -282,10 +304,40 @@ class PopulationInterface : public PopulationInterfaceBase {
   }
 
   /**
-   * @brief Add a fleet id to the list of fleets
-   * operating on this population.
+   * @brief Set the fleets that operate on this population, replacing whatever
+   * was there before.
+   *
+   * @details Records each fleet's unique ID and a direct link to the interface
+   * object, rebuilding both together so they cannot disagree. Replacing rather
+   * than appending is what lets a population copied from another one be given
+   * a different set of fleets.
+   *
+   * A fleet may operate on more than one population, so the same fleet
+   * appearing in two populations' lists is expected. The same fleet appearing
+   * twice in one list is not, and the repeat is ignored.
+   *
+   * @param fleets The fleet interface objects, in the order they should be
+   * recorded.
    */
-  void AddFleet(uint32_t fleet_id) { this->fleet_ids->insert(fleet_id); }
+  void SetFleets(const std::vector<std::shared_ptr<FleetInterface>> &fleets) {
+    this->fleet_ids->clear();
+    this->fleets_m.clear();
+    for (size_t i = 0; i < fleets.size(); i++) {
+      if (!fleets[i]) {
+        FIMS_ERROR_LOG("Cannot add a null fleet to Population " +
+                       fims::to_string(this->id) + ".");
+        continue;
+      }
+      if (!this->fleet_ids->insert(fleets[i]->get_id()).second) {
+        FIMS_WARNING_LOG("Fleet " + fims::to_string(fleets[i]->get_id()) +
+                         " appears more than once in the fleets given to "
+                         "Population " + fims::to_string(this->id) +
+                         "; ignoring the repeat.");
+        continue;
+      }
+      this->fleets_m.push_back(fleets[i]);
+    }
+  }
 
   /**
    * @brief Extracts derived quantities back to the Rcpp interface object from

@@ -9,7 +9,7 @@ FIMSFrame(data)
 \arguments{
 \item{data}{A \code{data.frame} that contains the necessary columns to construct
 a \code{FIMSFrame-class} object. Currently, those columns are
-\verb{r glue::glue_collapse(colnames(data_big), sep = ", ", last = ", and ")}.
+type, fleet, age, length, timing, observed, unit, and uncertainty.
 See the \code{data_big} object in FIMS, e.g., \code{data(data_big, package = "FIMS")}.}
 }
 \value{

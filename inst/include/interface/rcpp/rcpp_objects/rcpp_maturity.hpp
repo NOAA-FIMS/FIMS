@@ -13,6 +13,32 @@
 #include "rcpp_interface_base.hpp"
 
 /**
+ * @brief The maturity forms FIMS can build.
+ *
+ * @details The create_maturity_() function takes one of these names from R and
+ * builds the matching class: "logistic" builds a LogisticMaturityInterface.
+ * MaturityInterfaceBase is never built on its own; it only holds what all
+ * maturity forms have in common.
+ *
+ * These are an enum rather than plain strings so that every place in the C++
+ * code that acts on a maturity form has to name one of these values, which
+ * makes it harder to add a form and forget to handle it somewhere.
+ */
+enum class MaturityType : uint8_t {
+  logistic = 0
+};
+
+/**
+ * @brief Convert a type name supplied from R to a MaturityType.
+ */
+inline MaturityType MaturityTypeFromString(const std::string &name) {
+  if (name == "logistic") return MaturityType::logistic;
+  throw std::invalid_argument(
+      "Invalid type: '" + name +
+      "'. Valid options are: logistic.");
+}
+
+/**
  * @brief Rcpp interface that serves as the parent class for Rcpp maturity
  * interfaces. This type should be inherited and not called from R directly.
  */
@@ -26,41 +52,24 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The local id of the MaturityInterfaceBase object.
    */
   uint32_t id;
-  /**
-   * @brief The map associating the IDs of MaturityInterfaceBase to the objects.
-   * This is a live object, which is an object that has been created and lives
-   * in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
-      live_objects;
 
   /**
    * @brief The constructor.
    */
-  MaturityInterfaceBase() {
-    this->id = MaturityInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    MaturityInterfaceBase */
-    // MaturityInterfaceBase::live_objects[this->id] = this;
-  }
+  MaturityInterfaceBase() { this->id = MaturityInterfaceBase::id_g++; }
 
   /**
-   * @brief Construct a new Maturity Interface Base object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  MaturityInterfaceBase(const MaturityInterfaceBase& other) : id(other.id) {}
+  MaturityInterfaceBase(const MaturityInterfaceBase &) = delete;
+  MaturityInterfaceBase &operator=(const MaturityInterfaceBase &) = delete;
 
   /**
    * @brief The destructor.
    */
   virtual ~MaturityInterfaceBase() {}
 
-  /**
-   * @brief Get the ID for the child maturity interface objects to inherit.
-   */
-  virtual uint32_t get_id() = 0;
-
+    
   /**
    * @brief A method for each child maturity interface object to inherit so
    * each maturity option can have an evaluate() function.
@@ -86,22 +95,13 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LogisticMaturityInterface() : MaturityInterfaceBase() {
-    MaturityInterfaceBase::live_objects[this->id] =
-        std::make_shared<LogisticMaturityInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        MaturityInterfaceBase::live_objects[this->id]);
-  }
+  LogisticMaturityInterface() : MaturityInterfaceBase() {}
 
   /**
-   * @brief Construct a new Logistic Maturity Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  LogisticMaturityInterface(const LogisticMaturityInterface& other)
-      : MaturityInterfaceBase(other),
-        inflection_point(other.inflection_point),
-        slope(other.slope) {}
+  LogisticMaturityInterface(const LogisticMaturityInterface &) = delete;
+  LogisticMaturityInterface &operator=(const LogisticMaturityInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -113,6 +113,15 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   */
+  virtual VariableVector *get_parameter(const std::string &name) {
+    if (name == "inflection_point") return &this->inflection_point;
+    if (name == "slope") return &this->slope;
+    return nullptr;
+  }
 
   /**
    * @brief Evaluate maturity using the logistic function.

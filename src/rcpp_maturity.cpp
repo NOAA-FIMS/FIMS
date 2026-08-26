@@ -5,26 +5,82 @@
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
 // static id of the MaturityInterfaceBase object
 uint32_t MaturityInterfaceBase::id_g = 1;
-// local id of the MaturityInterfaceBase object map relating the ID of the
-// MaturityInterfaceBase to the MaturityInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
-    MaturityInterfaceBase::live_objects;
 
 #include <Rcpp.h>
+
+// SharedMaturity is the pointer type used throughout this file and allows
+// functions to work on the correct child class based on the input string.
+using SharedMaturity = std::shared_ptr<MaturityInterfaceBase>;
+
+// ── Building a module ──────────────────────────────────────────────────────
+/**
+ * @brief Create a maturity module of the requested type.
+ *
+ * @details Allocates the maturity interface object to heap memory, hands ownership 
+ * to a shared_ptr, and wraps that shared_ptr in the XPtr. The 'true' argument 
+ * binds the XPtr to R's garbage collector: when the R variable is garbage 
+ * collected, 'delete shared_ptr*' runs and the reference count is decremented.
+ *
+ * @param type Currently only "logistic".
+ *
+ * @return A pointer to the new maturity module.
+ */
+Rcpp::XPtr<SharedMaturity> create_maturity_(std::string type) {
+  SharedMaturity maturity_interface;
+  switch (MaturityTypeFromString(type)) {
+    case MaturityType::logistic:
+      maturity_interface = std::make_shared<LogisticMaturityInterface>();
+      break;
+  }
+  return Rcpp::XPtr<SharedMaturity>(new SharedMaturity(maturity_interface),
+                                    true);
+}
+
+/**
+ * @brief Evaluate maturity at one point.
+ *
+ * @details Evaluates the interface object directly, so it can be called before
+ *   CreateTMBModel() to check a maturity curve.
+ *
+ * @param xp The maturity module.
+ * @param x The independent variable, usually age or length.
+ * @return Proportion mature at that point.
+ */
+double evaluate_maturity_(Rcpp::XPtr<SharedMaturity> xp, double x) {
+  return (*xp)->evaluate(x);
+}
+
+// ── Base-class conversion for CreateTMBModel() ───────────────────────────────
+/**
+ * @brief Return a second pointer to the same object, typed to the common
+ *   interface base class.
+ *
+ * @details This does not create a new object. CreateTMBModel() holds a mixed
+ *   list of modules and calls add_to_fims_tmb() on each, which it can only do
+ *   through a pointer typed to the class they all share.
+ *
+ * @param xp The maturity module.
+ * @return A base-class pointer to the same module.
+ */
+Rcpp::XPtr<SharedBase> maturity_to_fims_xptr_(Rcpp::XPtr<SharedMaturity> xp) {
+  // Every interface class inherits from FIMSRcppInterfaceBase, so this
+  // conversion needs no cast: same object, more general pointer type.
+  SharedBase base = *xp;
+  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
 
 /**
  * Function to register maturity classes with the Rcpp module system.
  *
  */
+/**
+ * @brief Register the maturity functions with the Rcpp module system.
+ *
+ * @param m The Rcpp module to register into.
+ */
 void register_maturity(Rcpp::Module& m) {
-  Rcpp::class_<LogisticMaturityInterface>(
-      "LogisticMaturity",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classLogisticMaturityInterface.html.")
-      .constructor()
-      .field("inflection_point", &LogisticMaturityInterface::inflection_point)
-      .field("slope", &LogisticMaturityInterface::slope)
-      .method("get_id", &LogisticMaturityInterface::get_id)
-      .method("evaluate", &LogisticMaturityInterface::evaluate);
+  // Rcpp::class_<> registrations removed — users no longer call methods::new().
+  Rcpp::function("create_maturity_", &create_maturity_);
+  Rcpp::function("evaluate_maturity_", &evaluate_maturity_);
+  Rcpp::function("maturity_to_fims_xptr_", &maturity_to_fims_xptr_);
 }
