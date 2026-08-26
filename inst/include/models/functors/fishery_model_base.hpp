@@ -158,6 +158,14 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
   std::shared_ptr<fims_report::DerivedQuantityReportRegistry>
       derived_quantity_report_registry;
 
+  /**
+   * @brief Stable storage for runtime-generated TMB report names.
+   *
+   * @details TMB's report vector retains the supplied character pointer, so
+   * wildcard-expanded names must outlive the reporting call.
+   */
+  std::set<std::string> derived_quantity_report_names;
+
 #ifdef TMB_MODEL
   ::objective_function<Type> *of;
 #endif
@@ -188,7 +196,8 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
         fleet_dimension_info(other.fleet_dimension_info),
         population_dimension_info(other.population_dimension_info),
         derived_quantity_report_registry(
-            other.derived_quantity_report_registry) {}
+            other.derived_quantity_report_registry),
+        derived_quantity_report_names(other.derived_quantity_report_names) {}
 
   /**
    * @brief Destroy the Fishery Model Base object.
@@ -357,15 +366,12 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @param component_id The component id.
    * @param quantity_name The derived quantity name.
    * @param report_se Whether uncertainty should be calculated.
-   * @param report_value Whether point estimates should be reported.
-   * @param report_name Optional user-facing report name.
    * @return const fims_report::DerivedQuantityReportRequest& Stored request.
    */
   const fims_report::DerivedQuantityReportRequest &ReportDerivedQuantity(
       fims_report::DerivedQuantityComponentType component_type,
       uint32_t component_id, const std::string &quantity_name,
-      bool report_se = true, bool report_value = true,
-      const std::string &report_name = "") {
+      bool report_se = true) {
     if (!derived_quantity_report_registry) {
       derived_quantity_report_registry =
           std::make_shared<fims_report::DerivedQuantityReportRegistry>();
@@ -376,9 +382,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
     request.component_type = component_type;
     request.component_id = component_id;
     request.quantity_name = quantity_name;
-    request.report_name = report_name;
     request.report_se = report_se;
-    request.report_value = report_value;
     return derived_quantity_report_registry->Add(request);
   }
 
@@ -388,19 +392,15 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @param population_id The population id.
    * @param quantity_name The derived quantity name.
    * @param report_se Whether uncertainty should be calculated.
-   * @param report_value Whether point estimates should be reported.
-   * @param report_name Optional user-facing report name.
    * @return const fims_report::DerivedQuantityReportRequest& Stored request.
    */
   const fims_report::DerivedQuantityReportRequest &
   ReportPopulationDerivedQuantity(uint32_t population_id,
                                   const std::string &quantity_name,
-                                  bool report_se = true,
-                                  bool report_value = true,
-                                  const std::string &report_name = "") {
+                                  bool report_se = true) {
     return ReportDerivedQuantity(
         fims_report::DerivedQuantityComponentType::population, population_id,
-        quantity_name, report_se, report_value, report_name);
+        quantity_name, report_se);
   }
 
   /**
@@ -409,17 +409,14 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    * @param fleet_id The fleet id.
    * @param quantity_name The derived quantity name.
    * @param report_se Whether uncertainty should be calculated.
-   * @param report_value Whether point estimates should be reported.
-   * @param report_name Optional user-facing report name.
    * @return const fims_report::DerivedQuantityReportRequest& Stored request.
    */
   const fims_report::DerivedQuantityReportRequest &ReportFleetDerivedQuantity(
       uint32_t fleet_id, const std::string &quantity_name,
-      bool report_se = true, bool report_value = true,
-      const std::string &report_name = "") {
+      bool report_se = true) {
     return ReportDerivedQuantity(
         fims_report::DerivedQuantityComponentType::fleet, fleet_id,
-        quantity_name, report_se, report_value, report_name);
+        quantity_name, report_se);
   }
 
   /**
@@ -473,10 +470,6 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
         derived_quantity_report_registry->GetRequests();
     for (size_t i = 0; i < requests.size(); i++) {
       const fims_report::DerivedQuantityReportRequest &request = requests[i];
-      if (!request.report_value && !request.report_se) {
-        continue;
-      }
-
       std::map<std::string, fims::Vector<Type> > *component_quantities = NULL;
       if (request.component_type ==
           fims_report::DerivedQuantityComponentType::population) {
@@ -516,24 +509,18 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
           continue;
         }
         found = true;
-        std::string output_name = request.report_name;
+        std::string output_name = request.quantity_name;
         if (fims_report::IsDerivedQuantityPattern(request.quantity_name)) {
-          fims_report::DerivedQuantityReportRequest matched_request = request;
-          matched_request.quantity_name = quantity_it->first;
-          if (request.report_name == request.BuildDefaultReportName()) {
-            matched_request.report_name = "";
-            output_name = matched_request.BuildDefaultReportName();
-          } else {
-            output_name += "." + quantity_it->first;
-          }
+          output_name = quantity_it->first;
         }
 
+        const std::string &stable_output_name =
+            *(derived_quantity_report_names.insert(output_name).first);
         vector<Type> report_values = quantity_it->second.to_tmb();
-        if (request.report_value) {
-          FIMS_REPORT_F_(output_name.c_str(), report_values, this->of);
-        }
+        FIMS_REPORT_F_(stable_output_name.c_str(), report_values, this->of);
         if (request.report_se) {
-          this->of->reportvector.push(report_values, output_name.c_str());
+          this->of->reportvector.push(report_values,
+                                      stable_output_name.c_str());
         }
       }
       if (!found) {

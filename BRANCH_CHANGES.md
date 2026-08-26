@@ -1,6 +1,6 @@
 # Derived quantity uncertainty reporting
 
-This branch adds end-to-end uncertainty reporting for derived model quantities. A caller can request a named population or fleet quantity from a `CatchAtAge` model, optionally give it a user-facing output name, and receive its estimate and standard error alongside the fitted parameters.
+This branch adds end-to-end uncertainty reporting for derived model quantities. A caller can request one or more population or fleet quantities from a `CatchAtAge` model and receive their estimates and standard errors alongside the fitted parameters.
 
 The branch is based on commit `4e805bf0` and contains two feature commits:
 
@@ -18,9 +18,7 @@ caa$AddPopulation(population$get_id())
 caa$ReportPopulationDerivedQuantity(
   population$get_id(),       # component ID
   "spawning_biomass",        # quantity stored by the model
-  TRUE,                       # calculate/report its standard error
-  TRUE,                       # report its point estimate
-  "requested_ssb"            # name used in output
+  TRUE                        # calculate/report its standard error
 )
 
 CreateTMBModel()
@@ -31,7 +29,7 @@ The requested values flow through TMB `ADREPORT`, and the usual reshaped FIMS es
 
 ```text
 label          estimation_type  estimate  uncertainty
-requested_ssb  derived_quantity  ...       ...
+spawning_biomass  derived_quantity  ...       ...
 ```
 
 For fitted models created with `get_sd = TRUE`, derived quantities in the
@@ -50,7 +48,7 @@ They can therefore be selected from a fitted `FIMSFit` object in the same way as
 ```r
 ssb <- tidy(fit, parameters = "derived_quantity") |>
   dplyr::filter(
-    term == "requested_ssb"
+    term == "spawning_biomass"
   ) |>
   dplyr::select(term, estimate, std.error)
 ```
@@ -63,10 +61,25 @@ Fleet quantities use the corresponding method:
 caa$ReportFleetDerivedQuantity(
   survey_fleet$get_id(),
   "index_expected",
-  TRUE,
-  TRUE,
-  "survey_index_expected"
+  TRUE
 )
+```
+
+Pass a character vector to request several exact names at once:
+
+```r
+caa$ReportPopulationDerivedQuantity(
+  population$get_id(),
+  c("biomass", "spawning_biomass", "unfished_biomass"),
+  TRUE
+)
+```
+
+The available names can be inspected before registering requests:
+
+```r
+caa$GetPopulationDerivedQuantityNames()
+caa$GetFleetDerivedQuantityNames()
 ```
 
 Use `*` in a quantity name to request every matching derived quantity. For
@@ -77,25 +90,32 @@ example, this reports `biomass`, `spawning_biomass`, `unfished_biomass`, and
 caa$ReportPopulationDerivedQuantity(
   population$get_id(),
   "*biomass",
-  TRUE,
-  TRUE,
-  "biomass"
+  TRUE
 )
 ```
 
-Wildcard results receive distinct names by appending the matched quantity to
-the requested report name, such as `biomass.spawning_biomass`. If no explicit
-report name is supplied, each match receives its ordinary generated name. A
-pattern that matches no available quantities produces an error. Wildcards can
-appear anywhere, so `unfished_*` and `*landings*` are also valid.
+Multiple wildcard patterns can be supplied together. This example requests
+all quantities ending in `biomass` or `at_age`:
+
+```r
+caa$ReportPopulationDerivedQuantity(
+  population$get_id(),
+  c("*biomass", "*at_age"),
+  TRUE
+)
+```
+
+Each wildcard match retains its existing derived quantity name. A pattern that
+matches no available quantities produces an error. Wildcards can appear
+anywhere, so `unfished_*` and `*landings*` are also valid. Patterns are expanded
+independently; overlapping patterns can therefore request the same quantity
+more than once.
 
 The full method arguments are:
 
 ```text
-ReportPopulationDerivedQuantity(component_id, quantity_name,
-                                report_se, report_value, report_name)
-ReportFleetDerivedQuantity(component_id, quantity_name,
-                           report_se, report_value, report_name)
+ReportPopulationDerivedQuantity(component_id, quantity_names, report_se)
+ReportFleetDerivedQuantity(component_id, quantity_names, report_se)
 ```
 
 Requests can be inspected or cleared while configuring a model:
@@ -105,7 +125,9 @@ caa$GetDerivedQuantityReportRequestCount()
 caa$ClearDerivedQuantityReportRequests()
 ```
 
-Report names must be unique within a model. An omitted/empty name is generated as `model.<model_id>.<component_type>.<component_id>.<quantity_name>`. An unknown component ID or quantity name fails when the model attempts to report it.
+Derived quantities always use their existing names and point estimates are
+always reported. Duplicate requests are rejected. An unknown component ID or
+quantity name fails when the model attempts to report it.
 
 ## What happens during fitting
 
@@ -164,8 +186,8 @@ Internal R helpers build this payload directly from `TMB::MakeADFun()` and `TMB:
 
 The implementation separates reporting policy from uncertainty backends:
 
-- `DerivedQuantityReportRequest` describes the model/component IDs, quantity name, output name, and whether values and SEs are requested.
-- `DerivedQuantityReportRegistry` owns requests, supplies stable default names, rejects empty quantity names and duplicate report names, and supports clearing/counting.
+- `DerivedQuantityReportRequest` describes the model/component IDs, quantity name, and whether its SE is requested; point estimates are always reported.
+- `DerivedQuantityReportRegistry` owns requests, rejects empty or duplicate requests, and supports clearing/counting.
 - `DerivedQuantityEstimate` is a backend-neutral result containing estimates, SEs, and dimension metadata.
 - `DeltaMethodUncertaintyCalculator` provides the backend-neutral fixed-effect calculation and validates all input dimensions.
 - TMB adapters translate fixed-effect and Laplace ADREPORT inputs into the common result type.

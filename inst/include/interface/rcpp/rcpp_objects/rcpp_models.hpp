@@ -222,35 +222,34 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief Register a population derived quantity report request.
    *
    * @param population_id Population id.
-   * @param quantity_name Derived quantity name.
+   * @param quantity_names Derived quantity names or wildcard patterns.
    * @param report_se Whether standard errors should be calculated.
-   * @param report_value Whether point estimates should be reported.
-   * @param report_name Optional output report name.
    */
   void ReportPopulationDerivedQuantity(uint32_t population_id,
-                                       std::string quantity_name,
-                                       bool report_se, bool report_value,
-                                       std::string report_name) {
-    this->ReportDerivedQuantity(
-        fims_report::DerivedQuantityComponentType::population, population_id,
-        quantity_name, report_se, report_value, report_name);
+                                       Rcpp::CharacterVector quantity_names,
+                                       bool report_se) {
+    for (R_xlen_t i = 0; i < quantity_names.size(); ++i) {
+      this->ReportDerivedQuantity(
+          fims_report::DerivedQuantityComponentType::population,
+          population_id, Rcpp::as<std::string>(quantity_names[i]), report_se);
+    }
   }
 
   /**
    * @brief Register a fleet derived quantity report request.
    *
    * @param fleet_id Fleet id.
-   * @param quantity_name Derived quantity name.
+   * @param quantity_names Derived quantity names or wildcard patterns.
    * @param report_se Whether standard errors should be calculated.
-   * @param report_value Whether point estimates should be reported.
-   * @param report_name Optional output report name.
    */
-  void ReportFleetDerivedQuantity(uint32_t fleet_id, std::string quantity_name,
-                                  bool report_se, bool report_value,
-                                  std::string report_name) {
-    this->ReportDerivedQuantity(
-        fims_report::DerivedQuantityComponentType::fleet, fleet_id,
-        quantity_name, report_se, report_value, report_name);
+  void ReportFleetDerivedQuantity(uint32_t fleet_id,
+                                  Rcpp::CharacterVector quantity_names,
+                                  bool report_se) {
+    for (R_xlen_t i = 0; i < quantity_names.size(); ++i) {
+      this->ReportDerivedQuantity(
+          fims_report::DerivedQuantityComponentType::fleet, fleet_id,
+          Rcpp::as<std::string>(quantity_names[i]), report_se);
+    }
   }
 
   /**
@@ -258,15 +257,13 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param component_type Component type.
    * @param component_id Component id.
-   * @param quantity_name Derived quantity name.
+   * @param quantity_names Derived quantity names or wildcard patterns.
    * @param report_se Whether standard errors should be calculated.
-   * @param report_value Whether point estimates should be reported.
-   * @param report_name Optional output report name.
    */
   void ReportDerivedQuantity(
       fims_report::DerivedQuantityComponentType component_type,
-      uint32_t component_id, const std::string &quantity_name, bool report_se,
-      bool report_value, const std::string &report_name) {
+      uint32_t component_id, const std::string &quantity_name,
+      bool report_se) {
     if (!this->derived_quantity_report_registry) {
       this->derived_quantity_report_registry =
           std::make_shared<fims_report::DerivedQuantityReportRegistry>();
@@ -277,9 +274,7 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
     request.component_type = component_type;
     request.component_id = component_id;
     request.quantity_name = quantity_name;
-    request.report_name = report_name;
     request.report_se = report_se;
-    request.report_value = report_value;
     this->derived_quantity_report_registry->Add(request);
   }
 
@@ -304,6 +299,14 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
       return 0;
     }
     return static_cast<int>(this->derived_quantity_report_registry->size());
+  }
+
+  Rcpp::CharacterVector GetPopulationDerivedQuantityNames() {
+    return Rcpp::wrap(fims_report::AvailablePopulationDerivedQuantityNames());
+  }
+
+  Rcpp::CharacterVector GetFleetDerivedQuantityNames() {
+    return Rcpp::wrap(fims_report::AvailableFleetDerivedQuantityNames());
   }
 };
 
@@ -352,17 +355,14 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @brief Register a population derived quantity report request.
    *
    * @param population_id Population id.
-   * @param quantity_name Derived quantity name.
+   * @param quantity_names Derived quantity names or wildcard patterns.
    * @param report_se Whether standard errors should be calculated.
-   * @param report_value Whether point estimates should be reported.
-   * @param report_name Optional output report name.
    */
   void ReportPopulationDerivedQuantity(uint32_t population_id,
-                                       std::string quantity_name,
-                                       bool report_se, bool report_value,
-                                       std::string report_name) {
+                                       Rcpp::CharacterVector quantity_names,
+                                       bool report_se) {
     FisheryModelInterfaceBase::ReportPopulationDerivedQuantity(
-        population_id, quantity_name, report_se, report_value, report_name);
+        population_id, quantity_names, report_se);
   }
 
   /**
@@ -371,14 +371,12 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param fleet_id Fleet id.
    * @param quantity_name Derived quantity name.
    * @param report_se Whether standard errors should be calculated.
-   * @param report_value Whether point estimates should be reported.
-   * @param report_name Optional output report name.
    */
-  void ReportFleetDerivedQuantity(uint32_t fleet_id, std::string quantity_name,
-                                  bool report_se, bool report_value,
-                                  std::string report_name) {
+  void ReportFleetDerivedQuantity(uint32_t fleet_id,
+                                  Rcpp::CharacterVector quantity_names,
+                                  bool report_se) {
     FisheryModelInterfaceBase::ReportFleetDerivedQuantity(
-        fleet_id, quantity_name, report_se, report_value, report_name);
+        fleet_id, quantity_names, report_se);
   }
 
   /**
@@ -395,6 +393,14 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    */
   int GetDerivedQuantityReportRequestCount() {
     return FisheryModelInterfaceBase::GetDerivedQuantityReportRequestCount();
+  }
+
+  Rcpp::CharacterVector GetPopulationDerivedQuantityNames() {
+    return FisheryModelInterfaceBase::GetPopulationDerivedQuantityNames();
+  }
+
+  Rcpp::CharacterVector GetFleetDerivedQuantityNames() {
+    return FisheryModelInterfaceBase::GetFleetDerivedQuantityNames();
   }
 
   /**
@@ -1122,10 +1128,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           this->derived_quantity_report_registry->GetRequests();
       for (size_t i = 0; i < requests.size(); i++) {
         const fims_report::DerivedQuantityReportRequest &request = requests[i];
-        model->ReportDerivedQuantity(
-            request.component_type, request.component_id,
-            request.quantity_name, request.report_se, request.report_value,
-            request.report_name);
+        model->ReportDerivedQuantity(request.component_type,
+                                     request.component_id,
+                                     request.quantity_name,
+                                     request.report_se);
       }
     }
 

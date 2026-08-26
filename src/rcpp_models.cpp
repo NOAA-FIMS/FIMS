@@ -32,6 +32,10 @@ void register_fishery_models(Rcpp::Module& m) {
               &CatchAtAgeInterface::ClearDerivedQuantityReportRequests)
       .method("GetDerivedQuantityReportRequestCount",
               &CatchAtAgeInterface::GetDerivedQuantityReportRequestCount)
+      .method("GetPopulationDerivedQuantityNames",
+              &CatchAtAgeInterface::GetPopulationDerivedQuantityNames)
+      .method("GetFleetDerivedQuantityNames",
+              &CatchAtAgeInterface::GetFleetDerivedQuantityNames)
       .method("get_output", &CatchAtAgeInterface::to_json)
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)

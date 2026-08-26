@@ -18,7 +18,6 @@ TEST(FixedEffectADReportUncertaintyAdapter,
      HandlesCorrectInput_CalculatesStandardErrors) {
   fims_tmb::FixedEffectADReport report;
   report.request.quantity_name = "derived";
-  report.request.report_name = "derived";
   report.estimate = fims::Vector<double>{-3.0, -1.0};
   report.jacobian = fims::Vector<double>{1.0, 2.0, 2.0, 1.0};
   report.fixed_effect_covariance = fims::Vector<double>{4.0, 0.0, 0.0, 9.0};
@@ -27,7 +26,6 @@ TEST(FixedEffectADReportUncertaintyAdapter,
   fims_tmb::FixedEffectADReportUncertaintyAdapter adapter;
   fims_report::DerivedQuantityEstimate estimate = adapter.Calculate(report);
 
-  EXPECT_EQ(estimate.request.report_name, "derived");
   EXPECT_EQ(estimate.estimate[0], -3.0);
   EXPECT_EQ(estimate.estimate[1], -1.0);
   EXPECT_EQ(estimate.se[0], std::sqrt(40.0));
@@ -39,7 +37,6 @@ TEST(FixedEffectADReportUncertaintyAdapter,
      HandlesCorrectInput_CalculatesMultipleReports) {
   fims_tmb::FixedEffectADReport report1;
   report1.request.quantity_name = "derived_one";
-  report1.request.report_name = "derived_one";
   report1.estimate = fims::Vector<double>{4.0};
   report1.jacobian = fims::Vector<double>{2.0};
   report1.fixed_effect_covariance = fims::Vector<double>{9.0};
@@ -47,7 +44,6 @@ TEST(FixedEffectADReportUncertaintyAdapter,
 
   fims_tmb::FixedEffectADReport report2;
   report2.request.quantity_name = "derived_two";
-  report2.request.report_name = "derived_two";
   report2.estimate = fims::Vector<double>{5.0};
   report2.jacobian = fims::Vector<double>{3.0};
   report2.fixed_effect_covariance = fims::Vector<double>{4.0};
@@ -70,7 +66,6 @@ TEST(FixedEffectADReportUncertaintyAdapter,
 TEST(FixedEffectADReportUncertaintyAdapter, ThrowsWhenPayloadIsInvalid) {
   fims_tmb::FixedEffectADReport report;
   report.request.quantity_name = "derived";
-  report.request.report_name = "derived";
   report.estimate = fims::Vector<double>{1.0};
   report.jacobian = fims::Vector<double>{1.0};
   report.fixed_effect_covariance = fims::Vector<double>{1.0};
@@ -87,7 +82,6 @@ TEST(LaplaceADReportUncertaintyAdapter,
      HandlesCorrectInput_CalculatesStandardErrors) {
   fims_tmb::LaplaceADReport report;
   report.request.quantity_name = "derived";
-  report.request.report_name = "derived";
   report.estimate = fims::Vector<double>{10.0, 20.0};
   report.adjusted_fixed_jacobian =
       fims::Vector<double>{1.0, 2.0, 0.5, 1.0};
@@ -102,7 +96,6 @@ TEST(LaplaceADReportUncertaintyAdapter,
   fims_tmb::LaplaceADReportUncertaintyAdapter adapter;
   fims_report::DerivedQuantityEstimate estimate = adapter.Calculate(report);
 
-  EXPECT_EQ(estimate.request.report_name, "derived");
   EXPECT_EQ(estimate.estimate[0], 10.0);
   EXPECT_EQ(estimate.estimate[1], 20.0);
   EXPECT_DOUBLE_EQ(estimate.se[0], std::sqrt(58.0));
@@ -113,7 +106,6 @@ TEST(LaplaceADReportUncertaintyAdapter,
 TEST(LaplaceADReportUncertaintyAdapter, ThrowsWhenPayloadIsInvalid) {
   fims_tmb::LaplaceADReport report;
   report.request.quantity_name = "derived";
-  report.request.report_name = "derived";
   report.estimate = fims::Vector<double>{1.0};
   report.adjusted_fixed_jacobian = fims::Vector<double>{1.0};
   report.fixed_effect_covariance = fims::Vector<double>{1.0};

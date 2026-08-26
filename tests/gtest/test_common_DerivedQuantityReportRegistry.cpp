@@ -27,8 +27,7 @@ TEST(DerivedQuantityNamePattern, MatchesGlobWildcards) {
 
 // DerivedQuantityReportRegistry
 // IO correctness
-TEST(DerivedQuantityReportRegistry,
-     HandlesCorrectInput_BuildsDefaultReportName) {
+TEST(DerivedQuantityReportRegistry, HandlesCorrectInput_AddsRequest) {
   fims_report::DerivedQuantityReportRegistry registry;
   fims_report::DerivedQuantityReportRequest request;
   request.model_id = 1;
@@ -41,27 +40,21 @@ TEST(DerivedQuantityReportRegistry,
   const auto& stored = registry.Add(request);
 
   EXPECT_EQ(registry.size(), static_cast<size_t>(1));
-  EXPECT_EQ(stored.report_name, "model.1.population.12.spawning_biomass");
   EXPECT_TRUE(stored.report_se);
-  EXPECT_TRUE(stored.report_value);
 }
 
 // IO correctness
-TEST(DerivedQuantityReportRegistry,
-     HandlesCorrectInput_PreservesExplicitReportName) {
+TEST(DerivedQuantityReportRegistry, HandlesCorrectInput_AddsFleetRequest) {
   fims_report::DerivedQuantityReportRegistry registry;
   fims_report::DerivedQuantityReportRequest request;
   request.model_id = 1;
   request.component_type = fims_report::DerivedQuantityComponentType::fleet;
   request.component_id = 3;
   request.quantity_name = "index";
-  request.report_name = "survey_index";
-  request.report_value = false;
 
   const auto& stored = registry.Add(request);
 
-  EXPECT_EQ(stored.report_name, "survey_index");
-  EXPECT_FALSE(stored.report_value);
+  EXPECT_EQ(stored.quantity_name, "index");
 }
 
 // Edge handling
@@ -81,14 +74,13 @@ TEST(DerivedQuantityReportRegistry, HandlesEdge_ClearRemovesRequests) {
 }
 
 // Error handling
-TEST(DerivedQuantityReportRegistry, ThrowsWhenReportNameIsDuplicated) {
+TEST(DerivedQuantityReportRegistry, ThrowsWhenRequestIsDuplicated) {
   fims_report::DerivedQuantityReportRegistry registry;
   fims_report::DerivedQuantityReportRequest request;
   request.model_id = 1;
   request.component_type = fims_report::DerivedQuantityComponentType::fleet;
   request.component_id = 3;
   request.quantity_name = "landings";
-  request.report_name = "fleet_landings";
 
   registry.Add(request);
 
@@ -112,12 +104,11 @@ TEST(DerivedQuantityReportRegistry, ThrowsWhenQuantityNameIsEmpty) {
 TEST(FisheryModelBase, HandlesCorrectInput_ReportsPopulationDerivedQuantity) {
   fims_popdy::CatchAtAge<double> model;
 
-  const auto& stored = model.ReportPopulationDerivedQuantity(
-      2, "spawning_biomass", true, true, "ssb");
+  const auto& stored =
+      model.ReportPopulationDerivedQuantity(2, "spawning_biomass", true);
   const auto& requests = model.GetDerivedQuantityReportRequests();
 
   EXPECT_EQ(requests.size(), static_cast<size_t>(1));
-  EXPECT_EQ(stored.report_name, "ssb");
   EXPECT_EQ(stored.component_type,
             fims_report::DerivedQuantityComponentType::population);
   EXPECT_EQ(stored.component_id, static_cast<uint32_t>(2));

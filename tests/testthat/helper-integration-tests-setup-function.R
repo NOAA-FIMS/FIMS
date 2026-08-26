@@ -420,17 +420,13 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
         caa$ReportPopulationDerivedQuantity(
           component_id,
           request[["quantity_name"]],
-          request[["report_se"]],
-          request[["report_value"]],
-          request[["report_name"]]
+          request[["report_se"]]
         )
       } else if (identical(component_type, "fleet")) {
         caa$ReportFleetDerivedQuantity(
           request[["component_id"]],
           request[["quantity_name"]],
-          request[["report_se"]],
-          request[["report_value"]],
-          request[["report_name"]]
+          request[["report_se"]]
         )
       } else {
         stop("Unsupported derived quantity component_type: ", component_type)

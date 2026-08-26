@@ -22,16 +22,14 @@ test_that("CatchAtAge derived quantity report requests reach TMB reports", {
       list(
         component_type = "population",
         quantity_name = "spawning_biomass",
-        report_se = TRUE,
-        report_value = TRUE,
-        report_name = "requested_spawning_biomass"
+        report_se = TRUE
       )
     )
   )
 
-  expect_true("requested_spawning_biomass" %in% names(result[["report"]]))
+  expect_true("spawning_biomass" %in% names(result[["report"]]))
   expect_length(
-    result[["report"]][["requested_spawning_biomass"]],
+    result[["report"]][["spawning_biomass"]],
     om_input_list[[1]][["nyr"]] + 1
   )
 })
@@ -49,17 +47,14 @@ test_that("CatchAtAge expands wildcard derived quantity report requests", {
       list(
         component_type = "population",
         quantity_name = "*biomass",
-        report_se = TRUE,
-        report_value = TRUE,
-        report_name = "biomass"
+        report_se = TRUE
       )
     )
   )
 
-  expected <- paste0(
-    "biomass.",
-    c("biomass", "spawning_biomass", "unfished_biomass",
-      "unfished_spawning_biomass")
+  expected <- c(
+    "biomass", "spawning_biomass", "unfished_biomass",
+    "unfished_spawning_biomass"
   )
   expect_true(all(expected %in% names(result[["report"]])))
 })
@@ -79,9 +74,7 @@ test_that("CatchAtAge derived quantity report requests get backend uncertainty",
         list(
           component_type = "population",
           quantity_name = "spawning_biomass",
-          report_se = TRUE,
-          report_value = TRUE,
-          report_name = "requested_spawning_biomass"
+          report_se = TRUE
         )
       )
     )
@@ -111,7 +104,8 @@ test_that("CatchAtAge derived quantity report requests get backend uncertainty",
     precomputed_gradient = gradient
   )
   requested_estimates <- estimates |>
-    dplyr::filter(.data$label == "requested_spawning_biomass")
+    dplyr::filter(.data$label == "spawning_biomass") |>
+    utils::tail(om_input_list[[1]][["nyr"]] + 1)
   requested_backend <- utils::tail(
     backend_report_std,
     om_input_list[[1]][["nyr"]] + 1
@@ -139,9 +133,7 @@ test_that("CatchAtAge random-effect derived quantity reports get backend uncerta
       list(
         component_type = "population",
         quantity_name = "spawning_biomass",
-        report_se = TRUE,
-        report_value = TRUE,
-        report_name = "requested_spawning_biomass_random"
+        report_se = TRUE
       )
     )
   )
@@ -170,7 +162,7 @@ test_that("CatchAtAge random-effect derived quantity reports get backend uncerta
 
   expect_equal(
     rownames(requested_backend),
-    rep("requested_spawning_biomass_random", om_input_list[[1]][["nyr"]] + 1)
+    rep("spawning_biomass", om_input_list[[1]][["nyr"]] + 1)
   )
   expect_true(all(is.finite(requested_backend[, "Std. Error"])))
   expect_equal(

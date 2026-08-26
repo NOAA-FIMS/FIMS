@@ -65,13 +65,15 @@ add_derived_quantity_uncertainty_to_json <- function(model_output, sdreport) {
     }
   }
 
-  jsonlite::toJSON(
-    json_list,
-    auto_unbox = TRUE,
-    pretty = TRUE,
-    digits = NA,
-    null = "null",
-    na = "null"
+  as.character(
+    jsonlite::toJSON(
+      json_list,
+      auto_unbox = TRUE,
+      pretty = TRUE,
+      digits = NA,
+      null = "null",
+      na = "null"
+    )
   )
 }
 

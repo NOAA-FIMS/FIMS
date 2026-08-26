@@ -61,16 +61,57 @@ inline bool IsDerivedQuantityPattern(const std::string& quantity_name) {
   return quantity_name.find('*') != std::string::npos;
 }
 
+/** @brief Names of population derived quantities available to report. */
+inline std::vector<std::string> AvailablePopulationDerivedQuantityNames() {
+  return {"biomass",
+          "expected_recruitment",
+          "mortality_F",
+          "mortality_M",
+          "mortality_Z",
+          "numbers_at_age",
+          "proportion_mature_at_age",
+          "spawning_biomass",
+          "sum_selectivity",
+          "total_landings_numbers",
+          "total_landings_weight",
+          "unfished_biomass",
+          "unfished_numbers_at_age",
+          "unfished_spawning_biomass"};
+}
+
+/** @brief Names of fleet derived quantities available to report. */
+inline std::vector<std::string> AvailableFleetDerivedQuantityNames() {
+  return {"agecomp_expected",
+          "agecomp_proportion",
+          "catch_index",
+          "index_expected",
+          "index_numbers",
+          "index_numbers_at_age",
+          "index_numbers_at_length",
+          "index_weight",
+          "index_weight_at_age",
+          "landings_expected",
+          "landings_numbers",
+          "landings_numbers_at_age",
+          "landings_numbers_at_length",
+          "landings_weight",
+          "landings_weight_at_age",
+          "lengthcomp_expected",
+          "lengthcomp_proportion",
+          "log_index_expected",
+          "log_landings_expected"};
+}
+
 /**
  * @brief Identifies the model component that owns a derived quantity.
  */
 enum class DerivedQuantityComponentType { model, population, fleet, unknown };
 
 /**
- * @brief Convert a derived quantity component type to a stable report label.
+ * @brief Convert a derived quantity component type to a stable label.
  *
  * @param component_type Component type.
- * @return std::string Stable label used in default report names.
+ * @return std::string Stable component label.
  */
 inline std::string ToString(DerivedQuantityComponentType component_type) {
   switch (component_type) {
@@ -96,16 +137,14 @@ struct DerivedQuantityReportRequest {
   DerivedQuantityComponentType component_type =
       DerivedQuantityComponentType::unknown;
   std::string quantity_name;
-  std::string report_name;
-  bool report_value = true;
   bool report_se = false;
 
   /**
-   * @brief Build a stable default report name.
+   * @brief Build a stable key identifying this request.
    *
-   * @return std::string Default report name.
+   * @return std::string Registry key.
    */
-  std::string BuildDefaultReportName() const {
+  std::string BuildRequestKey() const {
     std::ostringstream ss;
     ss << "model." << model_id << "." << ToString(component_type);
     if (component_type != DerivedQuantityComponentType::model) {
@@ -136,7 +175,7 @@ class DerivedQuantityReportRegistry {
 
  private:
   request_vector requests_m;
-  std::map<std::string, size_t> report_name_index_m;
+  std::map<std::string, size_t> request_index_m;
 
  public:
   /**
@@ -151,18 +190,15 @@ class DerivedQuantityReportRegistry {
       throw std::invalid_argument(
           "DerivedQuantityReportRegistry::Add: quantity_name cannot be empty");
     }
-    if (request.report_name.empty()) {
-      request.report_name = request.BuildDefaultReportName();
-    }
-    if (report_name_index_m.find(request.report_name) !=
-        report_name_index_m.end()) {
+    const std::string request_key = request.BuildRequestKey();
+    if (request_index_m.find(request_key) != request_index_m.end()) {
       std::ostringstream ss;
-      ss << "DerivedQuantityReportRegistry::Add: report_name '"
-         << request.report_name << "' already exists";
+      ss << "DerivedQuantityReportRegistry::Add: request '" << request_key
+         << "' already exists";
       throw std::invalid_argument(ss.str());
     }
 
-    report_name_index_m[request.report_name] = requests_m.size();
+    request_index_m[request_key] = requests_m.size();
     requests_m.push_back(request);
     return requests_m.back();
   }
@@ -172,7 +208,7 @@ class DerivedQuantityReportRegistry {
    */
   void Clear() {
     requests_m.clear();
-    report_name_index_m.clear();
+    request_index_m.clear();
   }
 
   /**

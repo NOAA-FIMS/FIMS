@@ -185,8 +185,9 @@ test_that("derived quantity uncertainty is added to JSON", {
   output <- FIMS:::add_derived_quantity_uncertainty_to_json(
     model_output,
     sdreport
-  ) |>
-    jsonlite::fromJSON(simplifyVector = FALSE)
+  )
+  expect_identical(class(output), "character")
+  output <- jsonlite::fromJSON(output, simplifyVector = FALSE)
 
   biomass <- output$populations[[1]]$derived_quantities[[1]]
   expect_equal(unlist(biomass$uncertainty), c(0.5, 0.75))

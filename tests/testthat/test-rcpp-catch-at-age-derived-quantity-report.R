@@ -7,21 +7,17 @@ test_that("CatchAtAge derived quantity report requests can be managed", {
   expect_no_error(
     caa$ReportPopulationDerivedQuantity(
       1,
-      "spawning_biomass",
-      TRUE,
-      TRUE,
-      "ssb"
+      c("spawning_biomass", "biomass"),
+      TRUE
     )
   )
-  expect_equal(caa$GetDerivedQuantityReportRequestCount(), 1)
+  expect_equal(caa$GetDerivedQuantityReportRequestCount(), 2)
 
   expect_error(
     caa$ReportPopulationDerivedQuantity(
       1,
       "spawning_biomass",
-      TRUE,
-      TRUE,
-      "ssb"
+      TRUE
     ),
     "already exists"
   )
@@ -38,10 +34,16 @@ test_that("CatchAtAge can request fleet derived quantity reports", {
     caa$ReportFleetDerivedQuantity(
       2,
       "index_expected",
-      TRUE,
-      FALSE,
-      "survey_index_expected"
+      TRUE
     )
   )
   expect_equal(caa$GetDerivedQuantityReportRequestCount(), 1)
+})
+
+test_that("CatchAtAge lists available derived quantity names", {
+  clear()
+  caa <- methods::new(CatchAtAge)
+
+  expect_contains(caa$GetPopulationDerivedQuantityNames(), "spawning_biomass")
+  expect_contains(caa$GetFleetDerivedQuantityNames(), "index_expected")
 })
