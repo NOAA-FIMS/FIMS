@@ -477,7 +477,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
         continue;
       }
 
-      fims::Vector<Type> *derived_quantity = NULL;
+      std::map<std::string, fims::Vector<Type> > *component_quantities = NULL;
       if (request.component_type ==
           fims_report::DerivedQuantityComponentType::population) {
         typename DerivedQuantitiesMap::iterator component_it =
@@ -488,15 +488,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
              << request.component_id << " not found";
           throw std::out_of_range(ss.str());
         }
-        typename std::map<std::string, fims::Vector<Type>>::iterator
-            quantity_it = component_it->second.find(request.quantity_name);
-        if (quantity_it == component_it->second.end()) {
-          std::ostringstream ss;
-          ss << "ReportRequestedDerivedQuantitiesTMB: population derived "
-             << "quantity '" << request.quantity_name << "' not found";
-          throw std::out_of_range(ss.str());
-        }
-        derived_quantity = &(quantity_it->second);
+        component_quantities = &(component_it->second);
       } else if (request.component_type ==
                  fims_report::DerivedQuantityComponentType::fleet) {
         typename DerivedQuantitiesMap::iterator component_it =
@@ -507,15 +499,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
              << request.component_id << " not found";
           throw std::out_of_range(ss.str());
         }
-        typename std::map<std::string, fims::Vector<Type>>::iterator
-            quantity_it = component_it->second.find(request.quantity_name);
-        if (quantity_it == component_it->second.end()) {
-          std::ostringstream ss;
-          ss << "ReportRequestedDerivedQuantitiesTMB: fleet derived quantity '"
-             << request.quantity_name << "' not found";
-          throw std::out_of_range(ss.str());
-        }
-        derived_quantity = &(quantity_it->second);
+        component_quantities = &(component_it->second);
       } else {
         std::ostringstream ss;
         ss << "ReportRequestedDerivedQuantitiesTMB: unsupported component type "
@@ -523,12 +507,42 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
         throw std::invalid_argument(ss.str());
       }
 
-      vector<Type> report_values = derived_quantity->to_tmb();
-      if (request.report_value) {
-        FIMS_REPORT_F_(request.report_name.c_str(), report_values, this->of);
+      bool found = false;
+      typename std::map<std::string, fims::Vector<Type> >::iterator quantity_it;
+      for (quantity_it = component_quantities->begin();
+           quantity_it != component_quantities->end(); ++quantity_it) {
+        if (!fims_report::MatchDerivedQuantityName(request.quantity_name,
+                                                   quantity_it->first)) {
+          continue;
+        }
+        found = true;
+        std::string output_name = request.report_name;
+        if (fims_report::IsDerivedQuantityPattern(request.quantity_name)) {
+          fims_report::DerivedQuantityReportRequest matched_request = request;
+          matched_request.quantity_name = quantity_it->first;
+          if (request.report_name == request.BuildDefaultReportName()) {
+            matched_request.report_name = "";
+            output_name = matched_request.BuildDefaultReportName();
+          } else {
+            output_name += "." + quantity_it->first;
+          }
+        }
+
+        vector<Type> report_values = quantity_it->second.to_tmb();
+        if (request.report_value) {
+          FIMS_REPORT_F_(output_name.c_str(), report_values, this->of);
+        }
+        if (request.report_se) {
+          this->of->reportvector.push(report_values, output_name.c_str());
+        }
       }
-      if (request.report_se) {
-        this->of->reportvector.push(report_values, request.report_name.c_str());
+      if (!found) {
+        std::ostringstream ss;
+        ss << "ReportRequestedDerivedQuantitiesTMB: "
+           << fims_report::ToString(request.component_type)
+           << " derived quantity pattern '" << request.quantity_name
+           << "' matched no quantities";
+        throw std::out_of_range(ss.str());
       }
     }
   }

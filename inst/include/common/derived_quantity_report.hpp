@@ -20,6 +20,48 @@
 namespace fims_report {
 
 /**
+ * @brief Match a derived quantity name against a glob pattern.
+ *
+ * @details An asterisk matches zero or more characters. All other characters
+ * are matched literally.
+ *
+ * @param pattern Glob pattern supplied as the quantity name.
+ * @param value Available derived quantity name.
+ * @return bool Whether the value matches the pattern.
+ */
+inline bool MatchDerivedQuantityName(const std::string& pattern,
+                                     const std::string& value) {
+  size_t pattern_i = 0;
+  size_t value_i = 0;
+  size_t star_i = std::string::npos;
+  size_t retry_value_i = 0;
+
+  while (value_i < value.size()) {
+    if (pattern_i < pattern.size() && pattern[pattern_i] == value[value_i]) {
+      ++pattern_i;
+      ++value_i;
+    } else if (pattern_i < pattern.size() && pattern[pattern_i] == '*') {
+      star_i = pattern_i++;
+      retry_value_i = value_i;
+    } else if (star_i != std::string::npos) {
+      pattern_i = star_i + 1;
+      value_i = ++retry_value_i;
+    } else {
+      return false;
+    }
+  }
+  while (pattern_i < pattern.size() && pattern[pattern_i] == '*') {
+    ++pattern_i;
+  }
+  return pattern_i == pattern.size();
+}
+
+/** @brief Return whether a quantity name contains a glob wildcard. */
+inline bool IsDerivedQuantityPattern(const std::string& quantity_name) {
+  return quantity_name.find('*') != std::string::npos;
+}
+
+/**
  * @brief Identifies the model component that owns a derived quantity.
  */
 enum class DerivedQuantityComponentType { model, population, fleet, unknown };

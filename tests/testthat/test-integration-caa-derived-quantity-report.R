@@ -36,6 +36,34 @@ test_that("CatchAtAge derived quantity report requests reach TMB reports", {
   )
 })
 
+test_that("CatchAtAge expands wildcard derived quantity report requests", {
+  #' @description Test that a wildcard quantity name reports every matching derived quantity.
+  result <- setup_and_run_FIMS_without_wrappers(
+    iter_id = 1,
+    om_input_list = om_input_list,
+    om_output_list = om_output_list,
+    em_input_list = em_input_list,
+    estimation_mode = FALSE,
+    random_effects = NULL,
+    derived_quantity_report_requests = list(
+      list(
+        component_type = "population",
+        quantity_name = "*biomass",
+        report_se = TRUE,
+        report_value = TRUE,
+        report_name = "biomass"
+      )
+    )
+  )
+
+  expected <- paste0(
+    "biomass.",
+    c("biomass", "spawning_biomass", "unfished_biomass",
+      "unfished_spawning_biomass")
+  )
+  expect_true(all(expected %in% names(result[["report"]])))
+})
+
 test_that("CatchAtAge derived quantity report requests get backend uncertainty", {
   #' @description Test that requested derived quantity uncertainty is calculated through the FIMS backend.
   result <- suppressWarnings(

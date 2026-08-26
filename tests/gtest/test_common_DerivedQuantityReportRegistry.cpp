@@ -13,6 +13,18 @@
 
 namespace {
 
+TEST(DerivedQuantityNamePattern, MatchesGlobWildcards) {
+  EXPECT_TRUE(fims_report::MatchDerivedQuantityName("*biomass", "biomass"));
+  EXPECT_TRUE(fims_report::MatchDerivedQuantityName("*biomass",
+                                                    "spawning_biomass"));
+  EXPECT_TRUE(fims_report::MatchDerivedQuantityName(
+      "unfished_*", "unfished_spawning_biomass"));
+  EXPECT_TRUE(fims_report::MatchDerivedQuantityName("*", "mortality_F"));
+  EXPECT_FALSE(fims_report::MatchDerivedQuantityName("*biomass",
+                                                     "numbers_at_age"));
+  EXPECT_FALSE(fims_report::MatchDerivedQuantityName("biomass", "xbiomass"));
+}
+
 // DerivedQuantityReportRegistry
 // IO correctness
 TEST(DerivedQuantityReportRegistry,
