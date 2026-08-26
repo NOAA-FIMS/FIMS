@@ -59,6 +59,80 @@ test_that("CatchAtAge expands wildcard derived quantity report requests", {
   expect_true(all(expected %in% names(result[["report"]])))
 })
 
+test_that("CatchAtAge expands multiple wildcard patterns", {
+  #' @description Test that multiple wildcard patterns report all quantities matched by either pattern.
+  result <- setup_and_run_FIMS_without_wrappers(
+    iter_id = 1,
+    om_input_list = om_input_list,
+    om_output_list = om_output_list,
+    em_input_list = em_input_list,
+    estimation_mode = FALSE,
+    random_effects = NULL,
+    derived_quantity_report_requests = list(
+      list(
+        component_type = "population",
+        quantity_name = c("*biomass", "*at_age"),
+        report_se = TRUE
+      )
+    )
+  )
+
+  expected <- c(
+    "biomass", "spawning_biomass", "unfished_biomass",
+    "unfished_spawning_biomass", "numbers_at_age",
+    "proportion_mature_at_age", "unfished_numbers_at_age"
+  )
+  expect_true(all(expected %in% names(result[["report"]])))
+})
+
+test_that("CatchAtAge reports overlapping wildcard matches", {
+  #' @description Test that overlapping wildcard patterns preserve the matched derived quantity name.
+  result <- setup_and_run_FIMS_without_wrappers(
+    iter_id = 1,
+    om_input_list = om_input_list,
+    om_output_list = om_output_list,
+    em_input_list = em_input_list,
+    estimation_mode = FALSE,
+    random_effects = NULL,
+    derived_quantity_report_requests = list(
+      list(
+        component_type = "population",
+        quantity_name = c("*biomass", "spawning_*"),
+        report_se = TRUE
+      )
+    )
+  )
+
+  expect_true("spawning_biomass" %in% names(result[["report"]]))
+  expect_length(
+    result[["report"]][["spawning_biomass"]],
+    om_input_list[[1]][["nyr"]] + 1
+  )
+})
+
+test_that("CatchAtAge rejects wildcard patterns with no matches", {
+  #' @description Test that a wildcard pattern matching no derived quantities produces an informative error.
+  withr::defer(FIMS::clear())
+  expect_error(
+    setup_and_run_FIMS_without_wrappers(
+      iter_id = 1,
+      om_input_list = om_input_list,
+      om_output_list = om_output_list,
+      em_input_list = em_input_list,
+      estimation_mode = FALSE,
+      random_effects = NULL,
+      derived_quantity_report_requests = list(
+        list(
+          component_type = "population",
+          quantity_name = "does_not_exist*",
+          report_se = TRUE
+        )
+      )
+    ),
+    "matched no quantities"
+  )
+})
+
 test_that("CatchAtAge derived quantity report requests get backend uncertainty", {
   #' @description Test that requested derived quantity uncertainty is calculated through the FIMS backend.
   result <- suppressWarnings(
@@ -118,6 +192,21 @@ test_that("CatchAtAge derived quantity report requests get backend uncertainty",
     unname(requested_backend[, "Std. Error"]),
     tolerance = 1e-8
   )
+
+  json_output <- jsonlite::fromJSON(
+    result[["model_output"]],
+    simplifyVector = FALSE
+  )
+  spawning_biomass <- purrr::detect(
+    json_output$populations[[1]]$derived_quantities,
+    \(x) identical(x$name, "spawning_biomass")
+  )
+  expect_false(is.null(spawning_biomass))
+  expect_equal(
+    length(spawning_biomass$uncertainty),
+    om_input_list[[1]][["nyr"]] + 1
+  )
+  expect_true(all(is.finite(unlist(spawning_biomass$uncertainty))))
 })
 
 test_that("CatchAtAge random-effect derived quantity reports get backend uncertainty", {

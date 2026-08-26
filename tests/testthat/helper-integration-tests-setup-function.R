@@ -448,6 +448,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # Optimization with nlminb
   opt <- NULL
+  model_output <- NULL
   if (estimation_mode == TRUE) {
     opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
       control = list(eval.max = 10000, iter.max = 10000, trace = 0)
@@ -467,6 +468,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
       FIMS:::calculate_tmb_adreport_payload_uncertainty(adreport_payload)
     attr(sdr, "fims_adreport_payload") <- adreport_payload
     attr(sdr, "fims_backend_report") <- derived_quantity_backend_report
+    model_output <- FIMS:::add_derived_quantity_uncertainty_to_json(
+      fims_finalized,
+      sdr
+    )
   } else {
     sdr <- list()
     sdr_report <- list()
@@ -494,6 +499,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     sdr_fixed = sdr_fixed,
     sdr_random = sdr_random,
     sdr = sdr,
+    model_output = model_output,
     derived_quantity_backend_report = derived_quantity_backend_report
   ))
 }
