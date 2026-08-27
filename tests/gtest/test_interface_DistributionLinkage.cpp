@@ -15,7 +15,6 @@ protected:
     void SetUp() override {
         // Clear singletons to ensure a clean state for each test
         fims_info::Information<double>::GetInstance()->Clear();
-        fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance()->Clear();
         
         // Clear the static lists of live objects in the interfaces
         RecruitmentInterfaceBase::live_objects.clear();
@@ -32,7 +31,6 @@ protected:
     void TearDown() override {
         // Cleanup is handled by SetUp of the next test, but good practice to have it.
         fims_info::Information<double>::GetInstance()->Clear();
-        fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance()->Clear();
         RecruitmentInterfaceBase::live_objects.clear();
         DistributionsInterfaceBase::live_objects.clear();
         FIMSRcppInterfaceBase::fims_interface_objects.clear();
@@ -60,6 +58,7 @@ TEST_F(DistributionLinkageTest, RandomEffectsLinkageIsCorrect) {
     EXPECT_EQ(dnorm_interface->key_m->observed_id[0], log_devs_id);
     EXPECT_EQ(dnorm_interface->input_type_m.get(), "random_effects");
 
+    #define TMB_MODEL
     // 4. Push the Rcpp interface objects to the TMB backend.
     recruitment_interface->add_to_fims_tmb();
     dnorm_interface->add_to_fims_tmb();
