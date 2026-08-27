@@ -150,6 +150,11 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   RealVector ages;
   /**
+   * @brief Calendar years that are modeled in the population. The length of
+   * this vector should equal \"n_years\".
+   */
+  RealVector years;
+  /**
    * @brief The name for the population.
    */
   SharedString name = fims::to_string("NA");
@@ -262,6 +267,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_init_naa(other.log_init_naa),
         proportion_female(other.proportion_female),
         ages(other.ages),
+        years(other.years),
         name(other.name),
         total_catch_weight(other.total_catch_weight),
         total_catch_numbers(other.total_catch_numbers),
@@ -422,6 +428,23 @@ class PopulationInterface : public PopulationInterfaceBase {
             fims::to_string(this->id) + " is not equal to n_ages.");
       }
     }
+    if (this->years.size() == 0 && this->n_years.get() > 0) {
+      FIMS_WARNING_LOG(
+          "The years vector for population " + fims::to_string(this->id) +
+          " was not supplied. Filling with sequential indices from 1 to " +
+          fims::to_string(this->n_years.get()) + ".");
+      this->years.resize(this->n_years.get());
+      for (size_t i = 0; i < this->years.size(); i++) {
+        this->years[i] = static_cast<double>(i + 1);
+      }
+    }
+    if (static_cast<size_t>(this->n_years.get()) == this->years.size()) {
+      population->years.resize(this->n_years.get());
+    } else {
+      throw std::invalid_argument(
+          "The size of the years vector for population " +
+          fims::to_string(this->id) + " is not equal to n_years.");
+    }
 
     fleet_ids_iterator it;
     for (it = this->fleet_ids->begin(); it != this->fleet_ids->end(); it++) {
@@ -568,6 +591,9 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
+    }
+    for (size_t i = 0; i < years.size(); i++) {
+      population->years[i] = this->years[i];
     }
 
     // add to Information

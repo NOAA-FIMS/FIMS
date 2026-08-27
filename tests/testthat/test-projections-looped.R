@@ -335,6 +335,7 @@ run_FIMS_projection_scenario <- function(om_input,
 
   population$n_fleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
   population$n_years$set(om_input[["nyr"]] + n_projection_years)
+  population$years[] <- seq_len(om_input[["nyr"]] + n_projection_years)
   population$SetRecruitmentID(recruitment$get_id())
   population$SetGrowthID(ewaa_growth$get_id())
   population$SetMaturityID(maturity$get_id())

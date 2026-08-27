@@ -22,6 +22,15 @@ test_that("`initialize_fims()` works with correct inputs", {
   expect_named(result, c("parameters", "model"))
   #' @description Test that `initialize_fims()` returns a list with two elements.
   expect_equal(length(result), 2)
+  model_output <- jsonlite::fromJSON(
+    result[["model"]]$get_output(),
+    simplifyVector = FALSE
+  )
+  #' @description Test that population JSON stores calendar years in annual-index order.
+  expect_equal(
+    unlist(model_output[["populations"]][[1]][["years"]]),
+    as.numeric(get_years(data))
+  )
   #' @description Test that `initialize_fims()` returns a list when it is provided parameters that are nested.
   expect_type(
     initialize_fims(
@@ -325,6 +334,8 @@ test_that("`initialize_population()` works with correct inputs", {
     linked_ids = linked_ids
   )
   expect_type(result, "S4")
+  #' @description Test that `initialize_population()` assigns one calendar year to every annual index.
+  expect_equal(result$years[], get_years(data))
   #' @description Test that `initialize_population()` creates a module with expected methods in the class definition method table.
   expect_true(all(
     c(

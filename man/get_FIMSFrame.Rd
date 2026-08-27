@@ -14,6 +14,9 @@
 \alias{get_n_years}
 \alias{get_n_years,FIMSFrame-method}
 \alias{get_n_years,data.frame-method}
+\alias{get_years}
+\alias{get_years,FIMSFrame-method}
+\alias{get_years,data.frame-method}
 \alias{get_start_year}
 \alias{get_start_year,FIMSFrame-method}
 \alias{get_start_year,data.frame-method}
@@ -57,6 +60,12 @@ get_n_years(x)
 \S4method{get_n_years}{FIMSFrame}(x)
 
 \S4method{get_n_years}{data.frame}(x)
+
+get_years(x)
+
+\S4method{get_years}{FIMSFrame}(x)
+
+\S4method{get_years}{data.frame}(x)
 
 get_start_year(x)
 
@@ -111,6 +120,9 @@ model, where fleets is inclusive of both fishing fleets and survey vessels.
 
 \code{\link[=get_n_years]{get_n_years()}} returns an integer specifying the number of years in the
 model.
+
+\code{\link[=get_years]{get_years()}} returns the calendar years represented by annual model
+indices.
 
 \code{\link[=get_start_year]{get_start_year()}} returns an integer specifying the start year of the
 model.

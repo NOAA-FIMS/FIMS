@@ -27,6 +27,7 @@ test_that("rcpp population interface works with correct inputs", {
   population$ages[] <- seq(1, n_ages)
   population$n_fleets$set(2)
   population$n_years$set(n_years)
+  population$years[] <- 2001:2010
 
 
   #' @description Test that the population id is 1.
@@ -34,6 +35,9 @@ test_that("rcpp population interface works with correct inputs", {
     object = population$get_id(),
     expected = 1
   )
+
+  #' @description Test that population years retain calendar-year values.
+  expect_equal(population$years[], 2001:2010)
 
   for (i in 1:(n_years * n_ages)) {
     #' @description Test that the log_M values are all -1.
@@ -90,7 +94,23 @@ test_that("rcpp population interface works with correct inputs", {
 })
 
 ## Edge handling ----
-# No Edge handling for now.
+test_that("rcpp population interface allows omitted years", {
+  population <- methods::new(Population)
+  population$n_years$set(3)
+  population$n_ages$set(1)
+  population$ages[] <- 1
+  population$log_M[] <- rep(log(0.2), 3)
+  population$log_init_naa[] <- 0
+
+  CreateTMBModel()
+
+  #' @description Test that omitted population years default to sequential annual indices.
+  expect_equal(population$years[], 1:3)
+  #' @description Test that defaulting omitted population years is recorded as a warning.
+  expect_match(get_log_warnings(), "years vector.*was not supplied")
+
+  clear()
+})
 
 ## Error handling ----
 # No built in errors or warnings to test for now.

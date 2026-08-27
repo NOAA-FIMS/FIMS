@@ -157,6 +157,28 @@ methods::setMethod(
 )
 
 #' @return
+#' [get_years()] returns the calendar years represented by annual model
+#' indices.
+#' @export
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setGeneric("get_years", function(x) standardGeneric("get_years"))
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_years",
+  "FIMSFrame",
+  function(x) seq.int(x@start_year, x@end_year)
+)
+#' @rdname get_FIMSFrame
+#' @keywords FIMSFrame
+methods::setMethod(
+  "get_years",
+  "data.frame",
+  function(x) get_years(FIMSFrame(x))
+)
+
+#' @return
 #' [get_start_year()] returns an integer specifying the start year of the
 #' model.
 #' @export

@@ -348,6 +348,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"module_name\": \"Population\",\n";
       ss << " \"population\": \"" << population_interface->name << "\",\n";
       ss << " \"module_id\": " << population_interface->id << ",\n";
+      ss << " \"years\": " << pop->years << ",\n";
       ss << " \"recruitment_id\": " << population_interface->recruitment_id
          << ",\n";
       ss << " \"growth_id\": " << population_interface->growth_id << ",\n";

@@ -162,7 +162,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
   )
 
   real_vector_fields <- c(
-    "ages", "weights"
+    "ages", "years", "weights"
   )
 
   for (field in module_fields) {
@@ -180,14 +180,11 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
           "n_years" = get_n_years(data)
         )
       )
-    } else if (field %in% c("ages", "weights")) {
+    } else if (field %in% real_vector_fields) {
       get_value_function <- switch(field,
         "ages" = get_ages,
+        "years" = get_years,
         "weights" = model_weight_at_age
-      )
-      module_length <- switch(field,
-        "ages" = get_n_ages(data),
-        "weights" = get_n_ages(data) * (get_n_years(data) + 1)
       )
       module[[field]][] <- get_value_function(data)
     } else {

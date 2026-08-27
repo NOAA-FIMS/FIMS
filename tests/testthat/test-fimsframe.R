@@ -49,6 +49,15 @@ test_that("`fims_frame()` works with the correct inputs", {
   #' @description Test that `get_n_years()` retrieves the number of years as an integer.
   expect_type(get_n_years(fims_frame), "integer")
 
+  #' @description Test that `get_years()` retrieves every modeled calendar year.
+  expect_equal(
+    get_years(fims_frame),
+    get_start_year(fims_frame):get_end_year(fims_frame)
+  )
+
+  #' @description Test that the modeled-years vector has one entry per annual index.
+  expect_length(get_years(fims_frame), get_n_years(fims_frame))
+
   #' @description Test that `get_start_year()` retrieves the start year as a single value.
   expect_length(get_n_years(fims_frame), 1)
 
