@@ -23,11 +23,8 @@
 #include "../../common/fims_vector.hpp"
 #include "../../common/fims_math.hpp"
 #include <stdexcept>
-
-#ifdef TMB_MODEL
 #include <Eigen/Core>
 #include <Eigen/Sparse>
-#endif
 
 namespace fims_distributions {
 
