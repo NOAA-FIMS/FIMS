@@ -23,10 +23,10 @@ namespace fims_popdy {
  * transformed to the interval [0, 1]:
  *
  * \f[
- * s_a = \frac{1}{1 + \exp(-logit_sel_at_age)}
+ * s_a = \frac{1}{1 + \exp(-logit\_sel\_at\_age)}
  * \f]
  *
- * where \f$\logit_sel_at_age\f$ is the logit-scale parameter for age \f$a\f$
+ * where \f$logit\_sel\_at\_age\f$ is the logit-scale parameter for age \f$a\f$
  * and \f$s_a\f$ is the resulting selectivity.
  *
  * The parameter at age \f$a\f$ is selected using the zero-based index
@@ -41,7 +41,7 @@ namespace fims_popdy {
  * fishing mortality. Users should ensure that at least one age-specific
  * selectivity parameter is "constant", i.e., not estimated, and is equal to or
  * near 1, or otherwise impose suitable constraints. This can be achieved by
- * setting at least one age-specific parameter (logit_sel_at_age), which are on
+ * setting at least one age-specific parameter (`logit_sel_at_age`), which are on
  * the logit scale, to a value greater than 10 with estimation_type ==
  * "constant".
  */
