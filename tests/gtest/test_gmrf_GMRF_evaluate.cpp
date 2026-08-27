@@ -7,16 +7,15 @@
 #include "distributions/functors/gmrf.hpp"
 #include "distributions/functors/precision_builders.hpp"
 #include "common/fims_vector.hpp"
-#include <Eigen/Sparse>
 #include <cmath>  // For std::log, std::sqrt, M_PI
 
 // Define TMB_MODEL for tests that require TMB/Eigen functionality
 #ifndef TMB_MODEL
+#include <Eigen/Sparse>
+#include "TMB.hpp" // To get density::GMRF
 #define TMB_MODEL
 #endif
-#include "TMB.hpp"  // To get density::GMRF
 
-namespace {
 
 template <typename Type>
 struct FixedPrecisionBuilder : public fims_distributions::PrecisionMatrixBuilderBase<Type> {
