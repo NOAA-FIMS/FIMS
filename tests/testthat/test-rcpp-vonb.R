@@ -13,10 +13,10 @@ make_vonb_test_context <- function() {
   data("data_big", package = "FIMS")
   fims_frame <- FIMS::FIMSFrame(data_big)
 
-  ages <- get_ages(fims_frame)
+  ages <- FIMS::get_ages(fims_frame)
   if (length(ages) == 0 || all(is.na(ages))) {
     reference_age_for_length_1 <- 0
-    reference_age_for_length_2 <- get_n_ages(fims_frame) - 1
+    reference_age_for_length_2 <- FIMS::get_n_ages(fims_frame) - 1
   } else {
     reference_age_for_length_1 <- min(ages, na.rm = TRUE)
     reference_age_for_length_2 <- max(ages, na.rm = TRUE)
@@ -28,7 +28,7 @@ make_vonb_test_context <- function() {
     reference_age_for_length_2 = reference_age_for_length_2,
     mean_length_young = 275,
     mean_length_old = 725,
-    von_bertalanffy_coefficient_K = 0.18,
+    growth_coefficient = 0.18,
     length_weight_a = 2.5e-11,
     length_weight_b = 3,
     length_at_age_sd_at_ref_ages = c(28, 73)
@@ -42,13 +42,13 @@ new_vonb <- function(
     ctx,
     mean_length_young_in = ctx$mean_length_young,
     mean_length_old_in = ctx$mean_length_old,
-    von_bertalanffy_coefficient_K_in = ctx$von_bertalanffy_coefficient_K,
+    growth_coefficient_in = ctx$growth_coefficient,
     reference_age_for_length_1_in = ctx$reference_age_for_length_1,
     reference_age_for_length_2_in = ctx$reference_age_for_length_2,
     length_weight_a_in = ctx$length_weight_a,
     length_weight_b_in = ctx$length_weight_b,
     length_at_age_sd_at_ref_ages_in = ctx$length_at_age_sd_at_ref_ages) {
-  vb <- methods::new(VonBSchnuteGrowth)
+  vb <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
 
   vb$mean_length_young$resize(1)
   vb$mean_length_young[1]$value <- mean_length_young_in
@@ -56,8 +56,8 @@ new_vonb <- function(
   vb$mean_length_old$resize(1)
   vb$mean_length_old[1]$value <- mean_length_old_in
 
-  vb$von_bertalanffy_coefficient_K$resize(1)
-  vb$von_bertalanffy_coefficient_K[1]$value <- von_bertalanffy_coefficient_K_in
+  vb$growth_coefficient$resize(1)
+  vb$growth_coefficient[1]$value <- growth_coefficient_in
 
   vb$reference_age_for_length_1$resize(1)
   vb$reference_age_for_length_1[1]$value <- reference_age_for_length_1_in
@@ -75,7 +75,7 @@ new_vonb <- function(
   vb$length_at_age_sd_at_ref_ages[1]$value <- length_at_age_sd_at_ref_ages_in[1]
   vb$length_at_age_sd_at_ref_ages[2]$value <- length_at_age_sd_at_ref_ages_in[2]
 
-  vb$n_ages$set(get_n_ages(ctx$fims_frame))
+  vb$n_ages$set(FIMS::get_n_ages(ctx$fims_frame))
 
   vb
 }
@@ -84,18 +84,18 @@ new_vonb_with_delta_block <- function(
     ctx,
     mean_length_young_in = ctx$mean_length_young,
     mean_length_old_in = ctx$mean_length_old,
-    von_bertalanffy_coefficient_K_in = ctx$von_bertalanffy_coefficient_K,
+    growth_coefficient_in = ctx$growth_coefficient,
     reference_age_for_length_1_in = ctx$reference_age_for_length_1,
     reference_age_for_length_2_in = ctx$reference_age_for_length_2,
     length_weight_a_in = ctx$length_weight_a,
     length_weight_b_in = ctx$length_weight_b,
     log_sd_length_at_ref_age_1_in = log(0.1),
     log_sd_length_at_ref_age_2_in = log(0.1),
-    log_sd_growth_coefficient_K_in = log(0.1),
+    log_sd_growth_coefficient_in = log(0.1),
     logit_corr_length_at_ref_age_1_length_at_ref_age_2_in = 0,
-    logit_corr_length_at_ref_age_1_k_in = 0,
-    logit_corr_length_at_ref_age_2_k_in = 0) {
-  vb <- methods::new(VonBSchnuteGrowth)
+    logit_corr_length_at_ref_age_1_growth_coefficient_in = 0,
+    logit_corr_length_at_ref_age_2_growth_coefficient_in = 0) {
+  vb <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
 
   vb$mean_length_young$resize(1)
   vb$mean_length_young[1]$value <- mean_length_young_in
@@ -103,8 +103,8 @@ new_vonb_with_delta_block <- function(
   vb$mean_length_old$resize(1)
   vb$mean_length_old[1]$value <- mean_length_old_in
 
-  vb$von_bertalanffy_coefficient_K$resize(1)
-  vb$von_bertalanffy_coefficient_K[1]$value <- von_bertalanffy_coefficient_K_in
+  vb$growth_coefficient$resize(1)
+  vb$growth_coefficient[1]$value <- growth_coefficient_in
 
   vb$reference_age_for_length_1$resize(1)
   vb$reference_age_for_length_1[1]$value <- reference_age_for_length_1_in
@@ -124,22 +124,22 @@ new_vonb_with_delta_block <- function(
   vb$log_sd_length_at_ref_age_2$resize(1)
   vb$log_sd_length_at_ref_age_2[1]$value <- log_sd_length_at_ref_age_2_in
 
-  vb$log_sd_growth_coefficient_K$resize(1)
-  vb$log_sd_growth_coefficient_K[1]$value <- log_sd_growth_coefficient_K_in
+  vb$log_sd_growth_coefficient$resize(1)
+  vb$log_sd_growth_coefficient[1]$value <- log_sd_growth_coefficient_in
 
   vb$logit_corr_length_at_ref_age_1_length_at_ref_age_2$resize(1)
   vb$logit_corr_length_at_ref_age_1_length_at_ref_age_2[1]$value <-
     logit_corr_length_at_ref_age_1_length_at_ref_age_2_in
 
-  vb$logit_corr_length_at_ref_age_1_k$resize(1)
-  vb$logit_corr_length_at_ref_age_1_k[1]$value <-
-    logit_corr_length_at_ref_age_1_k_in
+  vb$logit_corr_length_at_ref_age_1_growth_coefficient$resize(1)
+  vb$logit_corr_length_at_ref_age_1_growth_coefficient[1]$value <-
+    logit_corr_length_at_ref_age_1_growth_coefficient_in
 
-  vb$logit_corr_length_at_ref_age_2_k$resize(1)
-  vb$logit_corr_length_at_ref_age_2_k[1]$value <-
-    logit_corr_length_at_ref_age_2_k_in
+  vb$logit_corr_length_at_ref_age_2_growth_coefficient$resize(1)
+  vb$logit_corr_length_at_ref_age_2_growth_coefficient[1]$value <-
+    logit_corr_length_at_ref_age_2_growth_coefficient_in
 
-  vb$n_ages$set(get_n_ages(ctx$fims_frame))
+  vb$n_ages$set(FIMS::get_n_ages(ctx$fims_frame))
 
   vb
 }
@@ -151,17 +151,17 @@ test_that("rcpp von bertalanffy growth evaluate() works with correct input", {
   on.exit({ rm(vb, ctx); gc() }, add = TRUE)
 
   age <- ctx$reference_age_for_length_2
-  denom_raw <- 1 - exp(-ctx$von_bertalanffy_coefficient_K *
+  denom_raw <- 1 - exp(-ctx$growth_coefficient *
     (ctx$reference_age_for_length_2 - ctx$reference_age_for_length_1))
   denom <- ad_max(ad_fabs(denom_raw), 1e-8)
 
   expected_length_at_age <- ctx$mean_length_young +
     (ctx$mean_length_old - ctx$mean_length_young) *
-      (1 - exp(-ctx$von_bertalanffy_coefficient_K * (age - ctx$reference_age_for_length_1))) / denom
+      (1 - exp(-ctx$growth_coefficient * (age - ctx$reference_age_for_length_1))) / denom
 
   expected_weight_at_age <- ctx$length_weight_a * expected_length_at_age^ctx$length_weight_b
 
-  #' @description Test that VonBSchnuteGrowth evaluate() returns expected
+  #' @description Test that VonBertalanffySchnuteGrowth evaluate() returns expected
   #' weight-at-age under guarded denominator math.
   expect_equal(
     object = vb$evaluate(age),
@@ -176,17 +176,17 @@ test_that("rcpp von bertalanffy growth evaluate() works with delta-method variab
   on.exit({ rm(vb, ctx); gc() }, add = TRUE)
 
   age <- ctx$reference_age_for_length_2
-  denom_raw <- 1 - exp(-ctx$von_bertalanffy_coefficient_K *
+  denom_raw <- 1 - exp(-ctx$growth_coefficient *
     (ctx$reference_age_for_length_2 - ctx$reference_age_for_length_1))
   denom <- ad_max(ad_fabs(denom_raw), 1e-8)
 
   expected_length_at_age <- ctx$mean_length_young +
     (ctx$mean_length_old - ctx$mean_length_young) *
-      (1 - exp(-ctx$von_bertalanffy_coefficient_K * (age - ctx$reference_age_for_length_1))) / denom
+      (1 - exp(-ctx$growth_coefficient * (age - ctx$reference_age_for_length_1))) / denom
 
   expected_weight_at_age <- ctx$length_weight_a * expected_length_at_age^ctx$length_weight_b
 
-  #' @description Test that VonBSchnuteGrowth evaluate() returns expected
+  #' @description Test that VonBertalanffySchnuteGrowth evaluate() returns expected
   #' weight-at-age when only the delta-method variability block is supplied.
   expect_equal(
     object = vb$evaluate(age),
@@ -197,7 +197,7 @@ test_that("rcpp von bertalanffy growth evaluate() works with delta-method variab
 
 test_that("rcpp von bertalanffy growth rejects partial delta-method variability inputs", {
   ctx <- make_vonb_test_context()
-  vb <- methods::new(VonBSchnuteGrowth)
+  vb <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
 
   vb$mean_length_young$resize(1)
   vb$mean_length_young[1]$value <- ctx$mean_length_young
@@ -205,8 +205,8 @@ test_that("rcpp von bertalanffy growth rejects partial delta-method variability 
   vb$mean_length_old$resize(1)
   vb$mean_length_old[1]$value <- ctx$mean_length_old
 
-  vb$von_bertalanffy_coefficient_K$resize(1)
-  vb$von_bertalanffy_coefficient_K[1]$value <- ctx$von_bertalanffy_coefficient_K
+  vb$growth_coefficient$resize(1)
+  vb$growth_coefficient[1]$value <- ctx$growth_coefficient
 
   vb$reference_age_for_length_1$resize(1)
   vb$reference_age_for_length_1[1]$value <- ctx$reference_age_for_length_1
@@ -223,10 +223,10 @@ test_that("rcpp von bertalanffy growth rejects partial delta-method variability 
   vb$log_sd_length_at_ref_age_1$resize(1)
   vb$log_sd_length_at_ref_age_1[1]$value <- log(0.1)
 
-  vb$n_ages$set(get_n_ages(ctx$fims_frame))
+  vb$n_ages$set(FIMS::get_n_ages(ctx$fims_frame))
   on.exit({ rm(vb, ctx); gc() }, add = TRUE)
 
-  #' @description Test that VonBSchnuteGrowth evaluate() rejects incomplete
+  #' @description Test that VonBertalanffySchnuteGrowth evaluate() rejects incomplete
   #' delta-method variability inputs.
   expect_error(
     vb$evaluate(ctx$reference_age_for_length_1),
@@ -244,7 +244,7 @@ test_that("rcpp von bertalanffy growth rejects both variability paths at once", 
 
   on.exit({ rm(vb, ctx); gc() }, add = TRUE)
 
-  #' @description Test that VonBSchnuteGrowth rejects parameter sets that
+  #' @description Test that VonBertalanffySchnuteGrowth rejects parameter sets that
   #' supply both interpolation inputs and the full delta-method variability
   #' block.
   expect_error(
@@ -259,7 +259,7 @@ test_that("rcpp von bertalanffy growth rejects fractional ages", {
   vb <- new_vonb(ctx)
   on.exit({ rm(vb, ctx); gc() }, add = TRUE)
 
-  #' @description Test that VonBSchnuteGrowth evaluate() rejects
+  #' @description Test that VonBertalanffySchnuteGrowth evaluate() rejects
   #' non-integer ages.
   expect_error(
     vb$evaluate(ctx$reference_age_for_length_1 + 0.5),
@@ -272,7 +272,7 @@ test_that("rcpp von bertalanffy growth handles below-range ages", {
   vb <- new_vonb(ctx)
   on.exit({ rm(vb, ctx); gc() }, add = TRUE)
 
-  #' @description Test that VonBSchnuteGrowth evaluate() errors for
+  #' @description Test that VonBertalanffySchnuteGrowth evaluate() errors for
   #' negative ages below the supported model age domain.
   expect_error(
     vb$evaluate(-1),
@@ -295,7 +295,7 @@ test_that("rcpp von bertalanffy growth allows above-reference ages", {
   on.exit({ rm(vb, ctx_shift, ctx); gc() }, add = TRUE)
 
   age_above_ref <- ctx_shift$reference_age_for_length_2 + 1
-  expect_true(age_above_ref <= max(get_ages(ctx_shift$fims_frame), na.rm = TRUE))
+  expect_true(age_above_ref <= max(FIMS::get_ages(ctx_shift$fims_frame), na.rm = TRUE))
 
   expect_true(is.finite(vb$evaluate(age_above_ref)))
 })
@@ -310,7 +310,7 @@ test_that("rcpp von bertalanffy growth rejects reversed reference ages", {
   )
   on.exit({ rm(vb_bad, ctx); gc() }, add = TRUE)
 
-  #' @description Test that VonBSchnuteGrowth evaluate() rejects reversed
+  #' @description Test that VonBertalanffySchnuteGrowth evaluate() rejects reversed
   #' reference ages when more than one age is modeled.
   expect_error(
     vb_bad$evaluate(ctx$reference_age_for_length_1),
@@ -320,11 +320,11 @@ test_that("rcpp von bertalanffy growth rejects reversed reference ages", {
 
 test_that("rcpp von bertalanffy growth errors when parameters are missing", {
   ctx <- make_vonb_test_context()
-  vb_missing <- methods::new(VonBSchnuteGrowth)
-  vb_missing$n_ages$set(get_n_ages(ctx$fims_frame))
+  vb_missing <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
+  vb_missing$n_ages$set(FIMS::get_n_ages(ctx$fims_frame))
   on.exit({ rm(vb_missing, ctx); gc() }, add = TRUE)
 
-  #' @description Test that VonBSchnuteGrowth evaluate() errors when
+  #' @description Test that VonBertalanffySchnuteGrowth evaluate() errors when
   #' required parameters are missing.
   expect_error(
     vb_missing$evaluate(ctx$reference_age_for_length_1),

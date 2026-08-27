@@ -360,16 +360,16 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 };
 
 /**
- * @brief Rcpp-facing VonB-Schnute growth module.
+ * @brief Rcpp-facing VonBertalanffySchnute growth module.
  * Inherits "derived observation" capability so this growth can support
- * growth-derived outputs used by downstream ALK/WAA paths.
+ * growth-derived outputs used by downstream age-to-length conversion/WAA paths.
  */
-class VonBSchnuteGrowthInterface
+class VonBertalanffySchnuteGrowthInterface
     : public GrowthDerivedObservationInterfaceBase {
  public:
   VariableVector mean_length_young; /**< expected length at reference age 1 */
   VariableVector mean_length_old; /**< expected length at reference age 2 */
-  VariableVector von_bertalanffy_coefficient_K; /**< growth coefficient */
+  VariableVector growth_coefficient; /**< growth coefficient */
   VariableVector reference_age_for_length_1; /**< first reference age */
   VariableVector reference_age_for_length_2; /**< second reference age */
   VariableVector length_weight_a; /**< coefficient in W = a * L^b */
@@ -377,43 +377,43 @@ class VonBSchnuteGrowthInterface
   VariableVector length_at_age_sd_at_ref_ages; /**< natural-scale SD values at the two reference ages for the legacy interpolation path */
   VariableVector log_sd_length_at_ref_age_1; /**< working-scale VonB variability parameter for sd(log(mean_length_young)) */
   VariableVector log_sd_length_at_ref_age_2; /**< working-scale VonB variability parameter for sd(log(mean_length_old)) */
-  VariableVector log_sd_growth_coefficient_K; /**< working-scale VonB variability parameter for sd(log(von_bertalanffy_coefficient_K)) */
+  VariableVector log_sd_growth_coefficient; /**< working-scale VonB variability parameter for sd(log(growth_coefficient)) */
   VariableVector logit_corr_length_at_ref_age_1_length_at_ref_age_2; /**< working-scale VonB variability parameter for corr(log(mean_length_young), log(mean_length_old)) */
-  VariableVector logit_corr_length_at_ref_age_1_k; /**< working-scale VonB variability parameter for corr(log(mean_length_young), log(von_bertalanffy_coefficient_K)) */
-  VariableVector logit_corr_length_at_ref_age_2_k; /**< working-scale VonB variability parameter for corr(log(mean_length_old), log(von_bertalanffy_coefficient_K)) */
+  VariableVector logit_corr_length_at_ref_age_1_growth_coefficient; /**< working-scale VonB variability parameter for corr(log(mean_length_young), log(growth_coefficient)) */
+  VariableVector logit_corr_length_at_ref_age_2_growth_coefficient; /**< working-scale VonB variability parameter for corr(log(mean_length_old), log(growth_coefficient)) */
   SharedInt n_ages = 0; /**< modeled number of ages for validation */
 
   /**
-   * @brief Construct a new VonB-Schnute growth interface.
+   * @brief Construct a new VonBertalanffySchnute growth interface.
    */
-  VonBSchnuteGrowthInterface() : GrowthDerivedObservationInterfaceBase() {
+  VonBertalanffySchnuteGrowthInterface() : GrowthDerivedObservationInterfaceBase() {
     // Variability inputs are optional and mutually exclusive by path, so
     // leave them absent until a caller explicitly supplies one path.
     this->length_at_age_sd_at_ref_ages.resize(0);
     this->log_sd_length_at_ref_age_1.resize(0);
     this->log_sd_length_at_ref_age_2.resize(0);
-    this->log_sd_growth_coefficient_K.resize(0);
+    this->log_sd_growth_coefficient.resize(0);
     this->logit_corr_length_at_ref_age_1_length_at_ref_age_2.resize(0);
-    this->logit_corr_length_at_ref_age_1_k.resize(0);
-    this->logit_corr_length_at_ref_age_2_k.resize(0);
+    this->logit_corr_length_at_ref_age_1_growth_coefficient.resize(0);
+    this->logit_corr_length_at_ref_age_2_growth_coefficient.resize(0);
 
     // Register this interface instance in global registries so it can be
     // discovered and linked by ID during model initialization.
     GrowthInterfaceBase::live_objects[this->id] =
-        std::make_shared<VonBSchnuteGrowthInterface>(*this);
+        std::make_shared<VonBertalanffySchnuteGrowthInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<VonBSchnuteGrowthInterface>(*this));
+        std::make_shared<VonBertalanffySchnuteGrowthInterface>(*this));
   }
 
   /**
    * @brief Copy constructor.
    * @param other Source interface object.
    */
-  VonBSchnuteGrowthInterface(const VonBSchnuteGrowthInterface& other)
+  VonBertalanffySchnuteGrowthInterface(const VonBertalanffySchnuteGrowthInterface& other)
       : GrowthDerivedObservationInterfaceBase(other),
         mean_length_young(other.mean_length_young),
         mean_length_old(other.mean_length_old),
-        von_bertalanffy_coefficient_K(other.von_bertalanffy_coefficient_K),
+        growth_coefficient(other.growth_coefficient),
         reference_age_for_length_1(other.reference_age_for_length_1),
         reference_age_for_length_2(other.reference_age_for_length_2),
         length_weight_a(other.length_weight_a),
@@ -421,16 +421,16 @@ class VonBSchnuteGrowthInterface
         length_at_age_sd_at_ref_ages(other.length_at_age_sd_at_ref_ages),
         log_sd_length_at_ref_age_1(other.log_sd_length_at_ref_age_1),
         log_sd_length_at_ref_age_2(other.log_sd_length_at_ref_age_2),
-        log_sd_growth_coefficient_K(other.log_sd_growth_coefficient_K),
+        log_sd_growth_coefficient(other.log_sd_growth_coefficient),
         logit_corr_length_at_ref_age_1_length_at_ref_age_2(
             other.logit_corr_length_at_ref_age_1_length_at_ref_age_2),
-        logit_corr_length_at_ref_age_1_k(
-            other.logit_corr_length_at_ref_age_1_k),
-        logit_corr_length_at_ref_age_2_k(
-            other.logit_corr_length_at_ref_age_2_k),
+        logit_corr_length_at_ref_age_1_growth_coefficient(
+            other.logit_corr_length_at_ref_age_1_growth_coefficient),
+        logit_corr_length_at_ref_age_2_growth_coefficient(
+            other.logit_corr_length_at_ref_age_2_growth_coefficient),
         n_ages(other.n_ages) {}
 
-  virtual ~VonBSchnuteGrowthInterface() {}
+  virtual ~VonBertalanffySchnuteGrowthInterface() {}
 
   // Return stable module ID used for linking this growth object to populations.
   virtual uint32_t get_id() { return this->id; }
@@ -441,7 +441,7 @@ class VonBSchnuteGrowthInterface
    */
   virtual void finalize() {
     if (this->finalized) {
-      FIMS_WARNING_LOG("VonB-Schnute Growth " + fims::to_string(this->id) +
+      FIMS_WARNING_LOG("VonBertalanffySchnute Growth " + fims::to_string(this->id) +
                        " has been finalized already.");
     }
 
@@ -453,9 +453,9 @@ class VonBSchnuteGrowthInterface
       return;
     }
 
-    std::shared_ptr<fims_popdy::VonBSchnuteGrowthModelAdapter<double>> vb =
+    std::shared_ptr<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>> vb =
         std::dynamic_pointer_cast<
-            fims_popdy::VonBSchnuteGrowthModelAdapter<double>>(
+            fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>(
             growth_observation);
     if (!vb) {
       FIMS_WARNING_LOG("Growth model type mismatch for id " +
@@ -485,7 +485,7 @@ class VonBSchnuteGrowthInterface
         this->mean_length_old,
         FinalMeanLengthOldFromWorkingScale(vb->MeanLengthYoungVector(),
                                              vb->MeanLengthOldVector()));
-    set_final(this->von_bertalanffy_coefficient_K, vb->VonBertalanffyCoefficientKVector(), true);
+    set_final(this->growth_coefficient, vb->GrowthCoefficientVector(), true);
     set_final(this->reference_age_for_length_1,
               vb->ReferenceAgeForLength1Vector(), false);
     set_final(this->reference_age_for_length_2,
@@ -498,13 +498,13 @@ class VonBSchnuteGrowthInterface
               vb->LogSdLengthAtRefAge1Vector(), false);
     set_final(this->log_sd_length_at_ref_age_2,
               vb->LogSdLengthAtRefAge2Vector(), false);
-    set_final(this->log_sd_growth_coefficient_K,
-              vb->LogSdGrowthCoefficientKVector(), false);
+    set_final(this->log_sd_growth_coefficient,
+              vb->LogSdGrowthCoefficientVector(), false);
     set_final(this->logit_corr_length_at_ref_age_1_length_at_ref_age_2,
               vb->LogitCorrLengthAtRefAge1LengthAtRefAge2Vector(), false);
-    set_final(this->logit_corr_length_at_ref_age_1_k,
+    set_final(this->logit_corr_length_at_ref_age_1_growth_coefficient,
               vb->LogitCorrLengthAtRefAge1KVector(), false);
-    set_final(this->logit_corr_length_at_ref_age_2_k,
+    set_final(this->logit_corr_length_at_ref_age_2_growth_coefficient,
               vb->LogitCorrLengthAtRefAge2KVector(), false);
   }
 
@@ -522,11 +522,11 @@ class VonBSchnuteGrowthInterface
     }
     ValidateVonBInputs(false);
 
-    fims_popdy::VonBSchnuteGrowth<double> vb;
+    fims_popdy::VonBertalanffySchnuteGrowth<double> vb;
 
     vb.mean_length_young = this->mean_length_young[0].initial_value_m;
     vb.mean_length_old = this->mean_length_old[0].initial_value_m;
-    vb.von_bertalanffy_coefficient_K  = this->von_bertalanffy_coefficient_K[0].initial_value_m;
+    vb.growth_coefficient  = this->growth_coefficient[0].initial_value_m;
     vb.reference_age_for_length_1 = this->reference_age_for_length_1[0].initial_value_m;
     vb.reference_age_for_length_2 = this->reference_age_for_length_2[0].initial_value_m;
 
@@ -660,7 +660,7 @@ class VonBSchnuteGrowthInterface
 
   template <typename Type>
   void ConfigureLengthReferenceParameterization(
-      const std::shared_ptr<fims_popdy::VonBSchnuteGrowthModelAdapter<Type>>&
+      const std::shared_ptr<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<Type>>&
           vb) {
     switch (GetLengthReferenceParameterization()) {
       case LengthReferenceParameterization::kEstimatedL1EstimatedGap:
@@ -688,33 +688,33 @@ class VonBSchnuteGrowthInterface
   void ValidateVonBInputs(bool require_variability) {
     if (this->mean_length_young.size() < 1 ||
         this->mean_length_old.size() < 1 ||
-        this->von_bertalanffy_coefficient_K.size() < 1 ||
+        this->growth_coefficient.size() < 1 ||
         this->reference_age_for_length_1.size() < 1 ||
         this->reference_age_for_length_2.size() < 1 ||
         this->length_weight_a.size() < 1 ||
         this->length_weight_b.size() < 1) {
-      Rcpp::stop("VonBSchnuteGrowth parameters not set");
+      Rcpp::stop("VonBertalanffySchnuteGrowth parameters not set");
     }
 
     const bool has_sd = this->length_at_age_sd_at_ref_ages.size() > 0;
     const bool has_any_structured_delta =
         this->log_sd_length_at_ref_age_1.size() > 0 ||
         this->log_sd_length_at_ref_age_2.size() > 0 ||
-        this->log_sd_growth_coefficient_K.size() > 0 ||
+        this->log_sd_growth_coefficient.size() > 0 ||
         this->logit_corr_length_at_ref_age_1_length_at_ref_age_2.size() > 0 ||
-        this->logit_corr_length_at_ref_age_1_k.size() > 0 ||
-        this->logit_corr_length_at_ref_age_2_k.size() > 0;
+        this->logit_corr_length_at_ref_age_1_growth_coefficient.size() > 0 ||
+        this->logit_corr_length_at_ref_age_2_growth_coefficient.size() > 0;
     const bool has_structured_delta =
         this->log_sd_length_at_ref_age_1.size() > 0 &&
         this->log_sd_length_at_ref_age_2.size() > 0 &&
-        this->log_sd_growth_coefficient_K.size() > 0 &&
+        this->log_sd_growth_coefficient.size() > 0 &&
         this->logit_corr_length_at_ref_age_1_length_at_ref_age_2.size() > 0 &&
-        this->logit_corr_length_at_ref_age_1_k.size() > 0 &&
-        this->logit_corr_length_at_ref_age_2_k.size() > 0;
+        this->logit_corr_length_at_ref_age_1_growth_coefficient.size() > 0 &&
+        this->logit_corr_length_at_ref_age_2_growth_coefficient.size() > 0;
 
     if (require_variability && !has_sd && !has_any_structured_delta) {
       Rcpp::stop(
-          "VonBSchnuteGrowth requires either "
+          "VonBertalanffySchnuteGrowth requires either "
           "length_at_age_sd_at_ref_ages or the structured delta-method "
           "growth variability inputs");
     }
@@ -740,12 +740,12 @@ class VonBSchnuteGrowthInterface
     if (has_structured_delta &&
         (this->log_sd_length_at_ref_age_1.size() != 1 ||
          this->log_sd_length_at_ref_age_2.size() != 1 ||
-         this->log_sd_growth_coefficient_K.size() != 1 ||
+         this->log_sd_growth_coefficient.size() != 1 ||
          this->logit_corr_length_at_ref_age_1_length_at_ref_age_2.size() != 1 ||
-         this->logit_corr_length_at_ref_age_1_k.size() != 1 ||
-         this->logit_corr_length_at_ref_age_2_k.size() != 1)) {
+         this->logit_corr_length_at_ref_age_1_growth_coefficient.size() != 1 ||
+         this->logit_corr_length_at_ref_age_2_growth_coefficient.size() != 1)) {
       Rcpp::stop(
-          "VonBSchnuteGrowth currently supports a single structured "
+          "VonBertalanffySchnuteGrowth currently supports a single structured "
           "delta-method variability parameter set; expected size 1 for "
           "each structured uncertainty input");
     }
@@ -754,7 +754,7 @@ class VonBSchnuteGrowthInterface
     const double a2 = this->reference_age_for_length_2[0].initial_value_m;
     if (a2 <= a1) {
       Rcpp::stop(
-          "VonBSchnuteGrowth reference_age_for_length_2 must be > "
+          "VonBertalanffySchnuteGrowth reference_age_for_length_2 must be > "
           "reference_age_for_length_1");
     }
 
@@ -769,14 +769,14 @@ class VonBSchnuteGrowthInterface
 
     check_positive(this->mean_length_young, "mean_length_young");
     check_positive(this->mean_length_old, "mean_length_old");
-    check_positive(this->von_bertalanffy_coefficient_K, "von_bertalanffy_coefficient_K");
+    check_positive(this->growth_coefficient, "growth_coefficient");
     check_positive(this->length_weight_a, "length_weight_a");
     check_positive(this->length_weight_b, "length_weight_b");
 
     if (this->mean_length_old[0].initial_value_m <=
         this->mean_length_young[0].initial_value_m) {
       Rcpp::stop(
-          "VonBSchnuteGrowth mean_length_old must be > "
+          "VonBertalanffySchnuteGrowth mean_length_old must be > "
           "mean_length_young");
     }
 
@@ -793,7 +793,7 @@ virtual std::string to_json() {
 
   ss << "{\n";
   ss << " \"module_name\":\"Growth\",\n";
-  ss << " \"module_type\": \"VonB-Schnute\",\n";
+  ss << " \"module_type\": \"VonBertalanffySchnute\",\n";
   ss << " \"module_id\": " << this->id << ",\n";
 
   ss << " \"parameters\": [\n";
@@ -810,16 +810,16 @@ virtual std::string to_json() {
   ss << "   \"values\":" << this->mean_length_young << "\n";
   ss << "},\n";
 
-  // von_bertalanffy_coefficient_K
+  // growth_coefficient
   ss << "{\n";
-  ss << "   \"name\": \"von_bertalanffy_coefficient_K\",\n";
-  ss << "   \"id\":" << this->von_bertalanffy_coefficient_K.id_m << ",\n";
+  ss << "   \"name\": \"growth_coefficient\",\n";
+  ss << "   \"id\":" << this->growth_coefficient.id_m << ",\n";
   ss << "   \"type\": \"vector\",\n";
   ss << "   \"dimensionality\": {\n";
   ss << "    \"header\": [null],\n";
-  ss << "    \"dimensions\": [" << this->von_bertalanffy_coefficient_K.size() << "]\n";
+  ss << "    \"dimensions\": [" << this->growth_coefficient.size() << "]\n";
   ss << "   },\n";
-  ss << "   \"values\":" << this->von_bertalanffy_coefficient_K << "\n";
+  ss << "   \"values\":" << this->growth_coefficient << "\n";
   ss << "},\n";
 
   // mean_length_old
@@ -910,15 +910,15 @@ virtual std::string to_json() {
                             this->log_sd_length_at_ref_age_1);
   append_optional_parameter("log_sd_length_at_ref_age_2",
                             this->log_sd_length_at_ref_age_2);
-  append_optional_parameter("log_sd_growth_coefficient_K",
-                            this->log_sd_growth_coefficient_K);
+  append_optional_parameter("log_sd_growth_coefficient",
+                            this->log_sd_growth_coefficient);
   append_optional_parameter(
       "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
       this->logit_corr_length_at_ref_age_1_length_at_ref_age_2);
-  append_optional_parameter("logit_corr_length_at_ref_age_1_k",
-                            this->logit_corr_length_at_ref_age_1_k);
-  append_optional_parameter("logit_corr_length_at_ref_age_2_k",
-                            this->logit_corr_length_at_ref_age_2_k);
+  append_optional_parameter("logit_corr_length_at_ref_age_1_growth_coefficient",
+                            this->logit_corr_length_at_ref_age_1_growth_coefficient);
+  append_optional_parameter("logit_corr_length_at_ref_age_2_growth_coefficient",
+                            this->logit_corr_length_at_ref_age_2_growth_coefficient);
 
   ss << "\n]\n";
   ss << "}";
@@ -933,14 +933,14 @@ bool add_to_fims_tmb_internal() {
 
   std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
       growth_observation =
-          std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<Type>>();
-  std::shared_ptr<fims_popdy::VonBSchnuteGrowthModelAdapter<Type>> vb =
+          std::make_shared<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<Type>>();
+  std::shared_ptr<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<Type>> vb =
       std::dynamic_pointer_cast<
-          fims_popdy::VonBSchnuteGrowthModelAdapter<Type>>(
+          fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<Type>>(
           growth_observation);
   if (!vb) {
     Rcpp::stop(
-        "Failed to create VonB-Schnute growth-derived observation model");
+        "Failed to create VonBertalanffySchnute growth-derived observation model");
   }
 
   vb->id = this->id;
@@ -1029,8 +1029,8 @@ bool add_to_fims_tmb_internal() {
                                 vb->MeanLengthOldVector(),
                                 "mean_length_old",
                                 WorkingScaleInitialLengthAtRefAge2());
-  load_and_register(this->von_bertalanffy_coefficient_K, vb->VonBertalanffyCoefficientKVector(),
-                    "von_bertalanffy_coefficient_K", true);
+  load_and_register(this->growth_coefficient, vb->GrowthCoefficientVector(),
+                    "growth_coefficient", true);
   load_and_register(this->reference_age_for_length_1,
                     vb->ReferenceAgeForLength1Vector(),
                     "reference_age_for_length_1", false);
@@ -1050,19 +1050,19 @@ bool add_to_fims_tmb_internal() {
   load_optional_and_register(this->log_sd_length_at_ref_age_2,
                              vb->LogSdLengthAtRefAge2Vector(),
                              "log_sd_length_at_ref_age_2", false);
-  load_optional_and_register(this->log_sd_growth_coefficient_K,
-                             vb->LogSdGrowthCoefficientKVector(),
-                             "log_sd_growth_coefficient_K", false);
+  load_optional_and_register(this->log_sd_growth_coefficient,
+                             vb->LogSdGrowthCoefficientVector(),
+                             "log_sd_growth_coefficient", false);
   load_optional_and_register(
       this->logit_corr_length_at_ref_age_1_length_at_ref_age_2,
       vb->LogitCorrLengthAtRefAge1LengthAtRefAge2Vector(),
       "logit_corr_length_at_ref_age_1_length_at_ref_age_2", false);
-  load_optional_and_register(this->logit_corr_length_at_ref_age_1_k,
+  load_optional_and_register(this->logit_corr_length_at_ref_age_1_growth_coefficient,
                              vb->LogitCorrLengthAtRefAge1KVector(),
-                             "logit_corr_length_at_ref_age_1_k", false);
-  load_optional_and_register(this->logit_corr_length_at_ref_age_2_k,
+                             "logit_corr_length_at_ref_age_1_growth_coefficient", false);
+  load_optional_and_register(this->logit_corr_length_at_ref_age_2_growth_coefficient,
                              vb->LogitCorrLengthAtRefAge2KVector(),
-                             "logit_corr_length_at_ref_age_2_k", false);
+                             "logit_corr_length_at_ref_age_2_growth_coefficient", false);
 
   this->RegisterGrowthObservationInInfo<Type>(growth_observation);
   return true;
