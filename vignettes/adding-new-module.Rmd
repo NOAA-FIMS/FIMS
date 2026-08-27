@@ -33,7 +33,7 @@ Before starting, ensure you have:
 - Familiarity with C++ and template programming
 - Understanding of the R/C++ interface via Rcpp
 - Basic knowledge of TMB (Template Model Builder)
-- Development environment set up as described in [CONTRIBUTING.md](../CONTRIBUTING.md)
+- Development environment set up as described in [CONTRIBUTING.md](https://github.com/NOAA-FIMS/FIMS/blob/main/CONTRIBUTING.md)
 
 # FIMS Code Structure
 
@@ -217,9 +217,9 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
 
 **See also**
 
-- [inst/include/population_dynamics/selectivity/functors/logistic.hpp](../inst/include/population_dynamics/selectivity/functors/logistic.hpp)
-- [inst/include/population_dynamics/maturity/functors/logistic.hpp](../inst/include/population_dynamics/maturity/functors/logistic.hpp)
-- [inst/include/population_dynamics/recruitment/functors/sr_beverton_holt.hpp](../inst/include/population_dynamics/recruitment/functors/sr_beverton_holt.hpp)
+- [inst/include/population_dynamics/selectivity/functors/logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/selectivity/functors/logistic.hpp)
+- [inst/include/population_dynamics/maturity/functors/logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/functors/logistic.hpp)
+- [inst/include/population_dynamics/recruitment/functors/sr_beverton_holt.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/recruitment/functors/sr_beverton_holt.hpp)
 
 ### 1.3 Create or update the umbrella header
 
@@ -274,8 +274,8 @@ selectivity$evaluate(10.0)
 
 **See also**
 
-- [inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp](../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp)
-- [tests/testthat/test-rcpp-selectivity.R](../tests/testthat/test-rcpp-selectivity.R)
+- [inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp)
+- [tests/testthat/test-rcpp-selectivity.R](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/test-rcpp-selectivity.R)
 
 ### 2.2 Create or update the interface class
 
@@ -416,8 +416,8 @@ A good `finalize()` implementation usually does the following:
 
 **See also**
 
-- [inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp](../inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp)
-- [inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp](../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp)
+- [inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_selectivity.hpp)
+- [inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp)
 
 ## Step 3: Register the module with the R API
 
@@ -466,7 +466,7 @@ The R wrapper functions use `setup_default_parameters()` before `initialize_fims
 
 **Relevant files**
 
-- [R/setup_default_parameters.R](../R/setup_default_parameters.R)
+- [R/setup_default_parameters.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/setup_default_parameters.R)
 
 If you add a new module type that users should be able to request by default, update:
 
@@ -485,7 +485,7 @@ For a new selectivity or data-module option, you will often update an existing h
 
 ### 4.2 Update `initialize_modules.R`
 
-**Relevant file**: [R/initialize_modules.R](../R/initialize_modules.R)
+**Relevant file**: [R/initialize_modules.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/initialize_modules.R)
 
 `initialize_module()` currently builds the Rcpp class name by combining `module_type` and `module_name`:
 
@@ -546,7 +546,7 @@ A good new-module test set usually covers:
 
 ### 5.1 C++ Google tests
 
-Use the gtest layer to test the computation object directly. New tests can be initialized and formatted for you by running the R function `FIMS::use_gtest_template()`. For the standard contributor workflow for building and running the gtest suite, see [Standard contributor checks](../CONTRIBUTING.md#standard-contributor-checks).
+Use the gtest layer to test the computation object directly. New tests can be initialized and formatted for you by running the R function `FIMS::use_gtest_template()`. For the standard contributor workflow for building and running the gtest suite, see [Standard contributor checks](https://github.com/NOAA-FIMS/FIMS/blob/main/CONTRIBUTING.md#standard-contributor-checks).
 
 Typical targets include:
 
@@ -556,7 +556,7 @@ Typical targets include:
 
 ### 5.2 R testthat tests
 
-Use testthat to exercise the Rcpp-facing class and the R initialization helpers. New tests can be initialized and formatted for you by running the R function `FIMS::use_testthat_template()`. For the standard contributor workflow for running testthat, formatting, documentation, and package checks, see [Standard contributor checks](../CONTRIBUTING.md#standard-contributor-checks).
+Use testthat to exercise the Rcpp-facing class and the R initialization helpers. New tests can be initialized and formatted for you by running the R function `FIMS::use_testthat_template()`. For the standard contributor workflow for running testthat, formatting, documentation, and package checks, see [Standard contributor checks](https://github.com/NOAA-FIMS/FIMS/blob/main/CONTRIBUTING.md#standard-contributor-checks).
 
 Current selectivity tests illustrate the main patterns:
 
@@ -569,13 +569,13 @@ Current `initialize_*()` tests also check that the returned object is an S4 obje
 
 **See also**
 
-- [tests/testthat/test-rcpp-selectivity.R](../tests/testthat/test-rcpp-selectivity.R)
-- [tests/testthat/test-initialize_modules.R](../tests/testthat/test-initialize_modules.R)
-- [tests/gtest/](../tests/gtest/)
+- [tests/testthat/test-rcpp-selectivity.R](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/test-rcpp-selectivity.R)
+- [tests/testthat/test-initialize_modules.R](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/test-initialize_modules.R)
+- [tests/gtest/](https://github.com/NOAA-FIMS/FIMS/tree/main/tests/gtest)
 
 ## Step 6: Finalize the documentation and build checks
 
-By the time the implementation is working, most of the documentation should already exist. Use this step to make sure the module-specific documentation is complete and then follow [Standard contributor checks](../CONTRIBUTING.md#standard-contributor-checks) for the routine contributor tasks such as building Doxygen, running tests, formatting code, spell-checking, and package checks.
+By the time the implementation is working, most of the documentation should already exist. Use this step to make sure the module-specific documentation is complete and then follow [Standard contributor checks](https://github.com/NOAA-FIMS/FIMS/blob/main/CONTRIBUTING.md#standard-contributor-checks) for the routine contributor tasks such as building Doxygen, running tests, formatting code, spell-checking, and package checks.
 
 ### 6.1 Module-specific documentation
 
@@ -606,7 +606,7 @@ When adding a new module or a new module type, you will usually touch several la
 
 ## Validation checklist
 
-For the routine contributor validation steps, use [Standard contributor checks](../CONTRIBUTING.md#standard-contributor-checks). In addition, make sure you update this guide and `CONTRIBUTING.md` whenever your new module changes the documented workflow.
+For the routine contributor validation steps, use [Standard contributor checks](https://github.com/NOAA-FIMS/FIMS/blob/main/CONTRIBUTING.md#standard-contributor-checks). In addition, make sure you update this guide and `CONTRIBUTING.md` whenever your new module changes the documented workflow.
 
 # Common patterns and best practices
 
@@ -705,16 +705,16 @@ If you encounter issues:
 
 Study these existing modules as templates:
 
-- **Selectivity**: [inst/include/population_dynamics/selectivity/](../inst/include/population_dynamics/selectivity/)
-- **Maturity**: [inst/include/population_dynamics/maturity/](../inst/include/population_dynamics/maturity/)
-- **Recruitment**: [inst/include/population_dynamics/recruitment/](../inst/include/population_dynamics/recruitment/)
+- **Selectivity**: [inst/include/population_dynamics/selectivity/](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/selectivity)
+- **Maturity**: [inst/include/population_dynamics/maturity/](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/maturity)
+- **Recruitment**: [inst/include/population_dynamics/recruitment/](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/population_dynamics/recruitment)
 - **R parameter workflow**:
-  - [R/setup_default_parameters.R](../R/setup_default_parameters.R)
-  - [R/initialize_modules.R](../R/initialize_modules.R)
+  - [R/setup_default_parameters.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/setup_default_parameters.R)
+  - [R/initialize_modules.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/initialize_modules.R)
 
 ## Documentation resources
 
-- [Contributing Guidelines](../CONTRIBUTING.md)
+- [Contributing Guidelines](https://github.com/NOAA-FIMS/FIMS/blob/main/CONTRIBUTING.md)
 - [Intro to C++](training-intro-cpp.html)
 - [Intro to Rcpp](training-intro-rcpp.html)
 - [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
