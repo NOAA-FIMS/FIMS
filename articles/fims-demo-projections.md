@@ -304,17 +304,17 @@ projection_fit <- parameters_projection |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00222 to 0.00019 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00128 to 0.00037 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 7.09877 seconds
+    ## ℹ Total run time was 14.22653 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00019
+    ## ℹ Maximum gradient= 0.00037
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 1624.68892
     ## • Total NLL= 1560.83065
-    ## ℹ Terminal SB= 993.45014
+    ## ℹ Terminal SB= 993.44976
 
 ``` r
 
