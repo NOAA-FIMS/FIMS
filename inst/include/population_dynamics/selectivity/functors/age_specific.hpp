@@ -22,13 +22,15 @@ namespace fims_popdy {
  * Age-specific selectivity allows users to estimate age-specific selectivity
  * values, with great inherent flexibility. The number of parameters (either
  * estimated or fixed) is equal to the number of ages. Users are recommended to
- * fix selectivity for at least one age to a value equal or close to 1.
+ * fix selectivity for at least one age to a value equal or close to 1. This can be achieved by
+ * setting at least one age-specific parameter (logit_sel_at_age) on the logit scale
+ * to a value greater than 10 with estimation_type == "constant".
  */
 template <typename Type>
 struct AgeSpecificSelectivity : public SelectivityBase<Type> {
-  fims::Vector<Type> logit_sel_at_age;
-  size_t n_ages;
-  size_t min_age;
+  fims::Vector<Type> logit_sel_at_age; /** age-specific selectivity parameters on the logit scale */  
+  size_t n_ages; /** number of modeled ages, based on user-provided input data */
+  size_t min_age; /** minimum modeled age, based on user-provided input data */
 
   AgeSpecificSelectivity() : SelectivityBase<Type>() {}
 

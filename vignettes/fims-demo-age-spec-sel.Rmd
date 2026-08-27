@@ -254,7 +254,7 @@ parameters_4_model <- updated_parameters |>
     by = c("label", "age")
   )
 
-# Look at updated SelectivityatAge parameters
+# Look at updated AgeSpecific selecitivity parameters
 parameters_4_model |>
   dplyr::filter(fleet == "survey1", module_name == "Selectivity") |>
   dplyr::select(module_type, label, age, value, estimation_type)
