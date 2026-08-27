@@ -28,9 +28,9 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct AgeSpecificSelectivity : public SelectivityBase<Type> {
-  fims::Vector<Type> logit_sel_at_age; /** age-specific selectivity parameters on the logit scale */  
-  size_t n_ages; /** number of modeled ages, based on user-provided input data */
-  size_t min_age; /** minimum modeled age, based on user-provided input data */
+  fims::Vector<Type> logit_sel_at_age; /**< age-specific selectivity parameters on the logit scale */  
+  size_t n_ages; /**< number of modeled ages, based on user-provided input data */
+  size_t min_age; /**< minimum modeled age, based on user-provided input data */
 
   AgeSpecificSelectivity() : SelectivityBase<Type>() {}
 

@@ -254,7 +254,7 @@ parameters_4_model <- updated_parameters |>
     by = c("label", "age")
   )
 
-# Look at updated AgeSpecific selecitivity parameters
+# Look at updated AgeSpecific selectivity parameters
 parameters_4_model |>
   dplyr::filter(fleet == "survey1", module_name == "Selectivity") |>
   dplyr::select(module_type, label, age, value, estimation_type)
@@ -290,7 +290,7 @@ fit <- parameters_4_model |>
 fit@sdreport$pdHess
 fit@obj$gr()
 fit@obj$par
-sel_ests <- get_estimates(fit) |> dplyr::filter(module_name == "Selectivity")
+sel_estimates <- get_estimates(fit) |> dplyr::filter(module_name == "Selectivity")
 ```
 
 ### Logging system

@@ -90,7 +90,7 @@ namespace
 
   // Edge handling
   // Test the use of get_force_scalar_wrap across multiple ages and timesteps.
-  TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeAgesandTimeSteps) {
+  TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeAgesAndTimeSteps) {
     // Setup 
     // Load or prepare any necessary data for testing
     fims_popdy::AgeSpecificSelectivity<double> fishery_selectivity;
