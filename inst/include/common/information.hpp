@@ -23,7 +23,7 @@
 #include "../population_dynamics/population/population.hpp"
 #include "../population_dynamics/recruitment/recruitment.hpp"
 #include "../population_dynamics/selectivity/selectivity.hpp"
-#include "../population_dynamics/alk/functors/alk_runtime.hpp"
+#include "../population_dynamics/age_to_length_conversion/functors/age_to_length_conversion_runtime.hpp"
 #include "../population_dynamics/size/functors/size_grid_builder.hpp"
 #include "../population_dynamics/size/growth_derived_size_provider.hpp"
 #include "def.hpp"
@@ -536,26 +536,26 @@ class Information {
   }
 
   /**
-   * @brief Set the ALK module referenced by the fleet and population modules.
+   * @brief Set the age-to-length conversion module referenced by the fleet and population modules.
    *
    * @param &valid_model reference to true/false boolean indicating whether
    * model is valid.
    * @param p shared pointer to population module
    * @param f shared pointer to fleet module
    */
-  void SetFleetALKModel(bool &valid_model,
+  void SetFleetAgeToLengthConversionModel(bool &valid_model,
                         std::shared_ptr<fims_popdy::Population<Type>> p,
                         std::shared_ptr<fims_popdy::Fleet<Type>> f) {
     if (p == nullptr || f == nullptr) {
       valid_model = false;
-      FIMS_ERROR_LOG("Unable to set fleet ALK because the population or fleet "
+      FIMS_ERROR_LOG("Unable to set fleet age-to-length conversion because the population or fleet "
                      "pointer was null.");
       return;
     }
 
-    f->alk = fims_popdy::BuildFleetALK<Type>(p, f);
+    f->age_to_length_conversion_model = fims_popdy::BuildAgeToLengthConversionFleet<Type>(p, f);
 
-    if (f->alk != nullptr && f->alk->IsActive()) {
+    if (f->age_to_length_conversion_model != nullptr && f->age_to_length_conversion_model->IsActive()) {
       return;
     }
 
@@ -566,7 +566,7 @@ class Information {
                      "age-to-length conversion path. Provide fixed "
                      "age-to-length conversion of size " +
                      fims::to_string(f->n_ages * f->n_lengths) +
-                     " or use a supported growth-derived ALK path.");
+                     " or use a supported growth-derived age-to-length conversion path.");
     }
   }
 
@@ -1087,7 +1087,7 @@ class Information {
 
       SetGrowth(valid_model, p);
       for (size_t i = 0; i < p->fleets.size(); ++i) {
-        SetFleetALKModel(valid_model, p, p->fleets[i]);
+        SetFleetAgeToLengthConversionModel(valid_model, p, p->fleets[i]);
       }
 
       SetMaturity(valid_model, p);

@@ -297,7 +297,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 #endif
   }
 
-  void ReportGrowthDerivedALKTensor(bool report) {
+  void ReportAgeToLengthConversionDerivedTensor(bool report) {
 #ifdef TMB_MODEL
     std::shared_ptr<fims_info::Information<double>> info =
         fims_info::Information<double>::GetInstance();
@@ -307,7 +307,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::shared_ptr<fims_popdy::CatchAtAge<double>> model_ptr =
           std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>(
               (*model_it).second);
-      model_ptr->report_growth_derived_alk_tensor = report;
+      model_ptr->report_age_to_length_conversion_derived_tensor = report;
     }
 #endif
   }

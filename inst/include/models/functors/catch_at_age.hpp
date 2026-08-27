@@ -15,7 +15,7 @@
 #include <stdexcept>
 
 #include "fishery_model_base.hpp"
-#include "../../population_dynamics/alk/functors/alk_runtime.hpp"
+#include "../../population_dynamics/age_to_length_conversion/functors/age_to_length_conversion_runtime.hpp"
 
 
 /* Dictionary block for shared parameter snippet documentations.
@@ -123,17 +123,17 @@ class CatchAtAge : public FisheryModelBase<Type> {
   std::map<std::string, fims::Vector<fims::Vector<Type>>> report_vectors;
   /**
    * @brief Controls whether reporting materializes the full derived
-   * age-to-length tensor for fleets using the growth-derived ALK path.
+   * age-to-length tensor for fleets using the growth-derived age-to-length conversion path.
    *
    * Default is false to avoid large report-side allocations.
    */
-  bool report_growth_derived_alk_tensor = false;
+  bool report_age_to_length_conversion_derived_tensor = false;
   /**
    * @brief Optional per-evaluation cache of growth-derived fleet mean WAA.
    *
    * Storage is flattened as [year, age] for each fleet and only populated
-   * when the fleet is eligible for the supported growth-derived ALK path.
-   * This avoids repeated row-by-row ALK reconstruction in objective-side
+   * when the fleet is eligible for the supported growth-derived age-to-length conversion path.
+   * This avoids repeated row-by-row age-to-length conversion reconstruction in objective-side
    * weight calculations while avoiding full [year, age, length] allocation.
    */
   std::map<uint32_t, fims::Vector<Type>> fleet_growth_derived_mean_waa_cache;
@@ -160,8 +160,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       : FisheryModelBase<Type>(other),
         name_m(other.name_m),
         ages(other.ages),
-        report_growth_derived_alk_tensor(
-            other.report_growth_derived_alk_tensor) {
+        report_age_to_length_conversion_derived_tensor(
+            other.report_age_to_length_conversion_derived_tensor) {
     this->model_type_m = "caa";
   }
 
@@ -993,59 +993,59 @@ class CatchAtAge : public FisheryModelBase<Type> {
   // --- Growth-derived WAA helpers ---
   //
   // These helpers compute and cache fleet-level and population-level
-  // weight-at-age values that use growth-derived ALK rows when available.
+  // weight-at-age values that use growth-derived age-to-length conversion rows when available.
 
   /**
-   * @brief Compute expected fleet-specific weight-at-age from a normalized ALK
+   * @brief Compute expected fleet-specific weight-at-age from a normalized age-to-length conversion
    * row and fleet observation-bin centers.
    *
-   * This is the bin-based downstream WAA step used with the growth-derived ALK
+   * This is the bin-based downstream WAA step used with the growth-derived age-to-length conversion
    * path. Instead of using only growth->evaluate(age), it computes expected
    * weight as the weighted average of weight-at-length over the same fleet
-   * observation bins used in the mapped ALK row.
+   * observation bins used in the mapped age-to-length conversion row.
    *
    * @param growth_observation Shared pointer to the linked growth-derived
    * observation capability.
    * @param fleet Shared pointer to the fleet object.
-   * @param alk_row Normalized age-to-length probabilities for one year and age.
+   * @param age_to_length_conversion_row Normalized age-to-length probabilities for one year and age.
    * @return Expected weight-at-age on the natural scale.
    */
-  Type MeanWeightFromALKRow(
+  Type MeanWeightFromAgeToLengthConversionRow(
       const std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>&
           growth_observation,
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
-      const fims::Vector<Type>& alk_row) {
+      const fims::Vector<Type>& age_to_length_conversion_row) {
     Type mean_weight = static_cast<Type>(0.0);
     for (size_t l = 0; l < fleet->n_lengths; ++l) {
       mean_weight +=
-          alk_row[l] * growth_observation->EvaluateWeightAtLength(fleet->lengths[l]);
+          age_to_length_conversion_row[l] * growth_observation->EvaluateWeightAtLength(fleet->lengths[l]);
     }
     return mean_weight;
   }
 
   /**
-   * @brief Build one fleet-specific growth-derived ALK row or fail clearly.
+   * @brief Build one fleet-specific growth-derived age-to-length conversion row or fail clearly.
    *
-   * @param growth_alk Shared pointer to the growth-derived ALK.
+   * @param age_to_length_conversion_derived Shared pointer to the growth-derived age-to-length conversion.
    * @param fleet Shared pointer to the fleet object.
    * @param year Year index.
    * @param age Age index.
-   * @param alk_row Output normalized age-to-length probabilities.
+   * @param age_to_length_conversion_row Output normalized age-to-length probabilities.
    */
-  void BuildGrowthDerivedALKRowOrThrow(
-      const std::shared_ptr<fims_popdy::GrowthDerivedALK<Type>>& growth_alk,
+  void BuildAgeToLengthConversionDerivedRowOrThrow(
+      const std::shared_ptr<fims_popdy::AgeToLengthConversionDerived<Type>>& age_to_length_conversion_derived,
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
       size_t year,
       size_t age,
-      fims::Vector<Type>& alk_row) {
-    if (growth_alk == nullptr || !growth_alk->IsActive()) {
+      fims::Vector<Type>& age_to_length_conversion_row) {
+    if (age_to_length_conversion_derived == nullptr || !age_to_length_conversion_derived->IsActive()) {
       throw std::runtime_error(
-          "Growth-derived ALK was unavailable while building fleet age-to-length probabilities.");
+          "Growth-derived age-to-length conversion was unavailable while building fleet age-to-length probabilities.");
     }
 
-    if (!growth_alk->BuildALKRow(year, age, alk_row)) {
+    if (!age_to_length_conversion_derived->BuildAgeToLengthConversionRow(year, age, age_to_length_conversion_row)) {
       std::stringstream ss;
-      ss << "Failed to build growth-derived ALK row for fleet id "
+      ss << "Failed to build growth-derived age-to-length conversion row for fleet id "
          << fleet->GetId() << ", year " << year
          << ", age " << age << ".";
       FIMS_ERROR_LOG(ss.str());
@@ -1055,29 +1055,29 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Compute fleet-specific mean weight-at-age from one growth-derived
-   * ALK row.
+   * age-to-length conversion row.
    *
-   * This helper builds the fleet-specific ALK row for the requested year and
+   * This helper builds the fleet-specific age-to-length conversion row for the requested year and
    * age, then converts that mapped age-to-length row into expected weight using
    * weight-at-length evaluated at the fleet observation-bin centers.
    *
-   * @param growth_alk Shared pointer to the growth-derived ALK.
+   * @param age_to_length_conversion_derived Shared pointer to the growth-derived age-to-length conversion.
    * @param fleet Shared pointer to the fleet object.
    * @param year Year index.
    * @param age Age index.
    * @return Expected fleet-specific mean weight-at-age.
    */
-  Type MeanWeightFromGrowthDerivedALK(
-      const std::shared_ptr<fims_popdy::GrowthDerivedALK<Type>>& growth_alk,
+  Type MeanWeightFromAgeToLengthConversionDerived(
+      const std::shared_ptr<fims_popdy::AgeToLengthConversionDerived<Type>>& age_to_length_conversion_derived,
       const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
       size_t year,
       size_t age) {
-    fims::Vector<Type> alk_row;
-    BuildGrowthDerivedALKRowOrThrow(growth_alk, fleet, year, age, alk_row);
+    fims::Vector<Type> age_to_length_conversion_row;
+    BuildAgeToLengthConversionDerivedRowOrThrow(age_to_length_conversion_derived, fleet, year, age, age_to_length_conversion_row);
 
-    return MeanWeightFromALKRow(growth_alk->growth_observation_,
+    return MeanWeightFromAgeToLengthConversionRow(age_to_length_conversion_derived->growth_observation_,
                                 fleet,
-                                alk_row);
+                                age_to_length_conversion_row);
   }
 
   /**
@@ -1125,7 +1125,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @brief Build growth-derived fleet mean WAA cache for the current
    * evaluation.
    *
-   * Only [year, age] mean WAA is cached. The full derived ALK tensor is not
+   * Only [year, age] mean WAA is cached. The full derived age-to-length conversion tensor is not
    * materialized in objective-side evaluation.
    */
   void RefreshFleetGrowthDerivedMeanWAACache() {
@@ -1134,11 +1134,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
     fleet_iterator fit;
     for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
       std::shared_ptr<fims_popdy::Fleet<Type>>& fleet = (*fit).second;
-      std::shared_ptr<fims_popdy::GrowthDerivedALK<Type>> growth_alk =
-          std::dynamic_pointer_cast<fims_popdy::GrowthDerivedALK<Type>>(
-              fleet->alk);
+      std::shared_ptr<fims_popdy::AgeToLengthConversionDerived<Type>> age_to_length_conversion_derived_model =
+          std::dynamic_pointer_cast<fims_popdy::AgeToLengthConversionDerived<Type>>(
+              fleet->age_to_length_conversion_model);
 
-      if (growth_alk == nullptr || !growth_alk->IsActive()) {
+      if (age_to_length_conversion_derived_model == nullptr || !age_to_length_conversion_derived_model->IsActive()) {
         continue;
       }
 
@@ -1149,7 +1149,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         for (size_t a = 0; a < fleet->n_ages; ++a) {
           const size_t i_age_year = y * fleet->n_ages + a;
           growth_derived_mean_WAA[i_age_year] =
-              MeanWeightFromGrowthDerivedALK(growth_alk, fleet, y, a);
+              MeanWeightFromAgeToLengthConversionDerived(age_to_length_conversion_derived_model, fleet, y, a);
         }
       }
 
@@ -1159,16 +1159,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Ensure all fleets linked to this model have a usable ALK.
+   * @brief Ensure all fleets linked to this model have a usable age-to-length conversion.
    *
-   * Reuses each fleet's current ALK when it matches the current population
+   * Reuses each fleet's current age-to-length conversion when it matches the current population
    * growth path and can prepare for the current model state. Otherwise
-   * rebuilds the fleet ALK from the current population and fleet state before
+   * rebuilds the fleet age-to-length conversion from the current population and fleet state before
    * evaluation or reporting uses it.
    */
-  void EnsureAllFleetALKs() {
+  void EnsureAllFleetAgeToLengthConversion() {
     for (size_t p = 0; p < this->populations.size(); ++p) {
-      fims_popdy::EnsurePopulationFleetALKs<Type>(this->populations[p]);
+      fims_popdy::EnsurePopulationFleetAgeToLengthConversion<Type>(this->populations[p]);
     }
   }
 
@@ -1203,11 +1203,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Compute fleet-specific expected weight-at-age from the
-   * growth-derived ALK path.
+   * growth-derived age-to-length conversion path.
    *
    * This helper uses the fleet-specific growth-derived path only. It first
    * prefers the per-evaluation fleet WAA cache and then falls back to the
-   * shared ALK-row calculation helper. If neither growth-derived path is
+   * shared age-to-length conversion-row calculation helper. If neither growth-derived path is
    * available, the function fails rather than silently switching to a
    * different weight-at-age meaning.
    *
@@ -1231,12 +1231,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
       return cached_mean_weight;
     }
 
-    std::shared_ptr<fims_popdy::GrowthDerivedALK<Type>> growth_alk =
-        std::dynamic_pointer_cast<fims_popdy::GrowthDerivedALK<Type>>(
-            fleet->alk);
+    std::shared_ptr<fims_popdy::AgeToLengthConversionDerived<Type>> age_to_length_conversion_derived_model =
+        std::dynamic_pointer_cast<fims_popdy::AgeToLengthConversionDerived<Type>>(
+            fleet->age_to_length_conversion_model);
 
-    if (growth_alk != nullptr && growth_alk->IsActive()) {
-      return MeanWeightFromGrowthDerivedALK(growth_alk, fleet, year, age);
+    if (age_to_length_conversion_derived_model != nullptr && age_to_length_conversion_derived_model->IsActive()) {
+      return MeanWeightFromAgeToLengthConversionDerived(age_to_length_conversion_derived_model, fleet, year, age);
     }
 
     std::stringstream ss;
@@ -1356,7 +1356,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         continue;
       }
 
-      if (fleet->alk == nullptr || !fleet->alk->IsActive()) {
+      if (fleet->age_to_length_conversion_model == nullptr || !fleet->age_to_length_conversion_model->IsActive()) {
         std::stringstream ss;
         ss << "Fleet id " << fleet->GetId()
            << "no usable age-to-length conversion path";
@@ -1376,10 +1376,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
         // robust_sum = static_cast<Type>(1.0);
         for (size_t a = 0; a < fleet->n_ages; a++) {
           size_t i_age_year = y * fleet->n_ages + a;
-          fims::Vector<Type> alk_row;
-          if (!fleet->alk->BuildALKRow(y, a, alk_row)) {
+          fims::Vector<Type> age_to_length_conversion_row;
+          if (!fleet->age_to_length_conversion_model->BuildAgeToLengthConversionRow(y, a, age_to_length_conversion_row)) {
             std::stringstream ss;
-            ss << "Failed to build ALK row for fleet id "
+            ss << "Failed to build age-to-length conversion row for fleet id "
                << fleet->GetId() << ", year " << y
                << ", age " << a << ".";
             FIMS_ERROR_LOG(ss.str());
@@ -1388,7 +1388,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
           for (size_t l = 0; l < fleet->n_lengths; l++) {
             size_t i_length_year = y * fleet->n_lengths + l;
-            const Type age_to_length_prob = alk_row[l];
+            const Type age_to_length_prob = age_to_length_conversion_row[l];
             fdq_["lengthcomp_expected"][i_length_year] +=
                 fdq_["agecomp_expected"][i_age_year] * age_to_length_prob;
 
@@ -1479,7 +1479,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
      */
     Prepare();
     PreparePopulationGrowthProducts();
-    EnsureAllFleetALKs();
+    EnsureAllFleetAgeToLengthConversion();
     RefreshFleetGrowthDerivedMeanWAACache();
     /*
      start at year=0, age=0;
@@ -1622,7 +1622,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     int n_pops = this->populations.size();
 #ifdef TMB_MODEL
     if (this->do_reporting == true) {
-      EnsureAllFleetALKs();
+      EnsureAllFleetAgeToLengthConversion();
       report_vectors.clear();
       // std::shared_ptr<UncertaintyReportInfoMap>
       // population_uncertainty_report_info_map =
@@ -1656,8 +1656,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       vector<vector<Type>> agecomp_expected_f(n_fleets);
       vector<vector<Type>> agecomp_proportion_f(n_fleets);
       vector<vector<Type>> age_to_length_conversion_f(n_fleets);
-      vector<vector<Type>> growth_derived_age_to_length_conversion_f(n_fleets);
-      vector<vector<Type>> growth_derived_alk_used_f(n_fleets);
+      vector<vector<Type>> age_to_length_conversion_derived_f(n_fleets);
+      vector<vector<Type>> age_to_length_conversion_derived_used_f(n_fleets);
       vector<vector<Type>> growth_derived_mean_WAA_f(n_fleets);
       vector<vector<Type>> index_expected_f(n_fleets);
       vector<vector<Type>> index_numbers_f(n_fleets);
@@ -1750,48 +1750,48 @@ class CatchAtAge : public FisheryModelBase<Type> {
             derived_quantities["agecomp_expected"].to_tmb();
         agecomp_proportion_f(fleet_idx) =
             derived_quantities["agecomp_proportion"].to_tmb();
-        fims::Vector<Type> growth_derived_age_to_length_conversion;
-        fims::Vector<Type> growth_derived_alk_used;
+        fims::Vector<Type> age_to_length_conversion_derived;
+        fims::Vector<Type> age_to_length_conversion_derived_used;
         fims::Vector<Type> growth_derived_mean_WAA;
-        bool using_growth_derived_alk = false;
+        bool using_age_to_length_conversion_derived = false;
         if (isDouble<Type>::value) {
-          growth_derived_alk_used.resize(1);
-          growth_derived_alk_used[0] = static_cast<Type>(0.0);
+          age_to_length_conversion_derived_used.resize(1);
+          age_to_length_conversion_derived_used[0] = static_cast<Type>(0.0);
 
-          std::shared_ptr<fims_popdy::GrowthDerivedALK<Type>> growth_alk =
-              std::dynamic_pointer_cast<fims_popdy::GrowthDerivedALK<Type>>(
-                  fleet->alk);
+          std::shared_ptr<fims_popdy::AgeToLengthConversionDerived<Type>> age_to_length_conversion_derived_model =
+              std::dynamic_pointer_cast<fims_popdy::AgeToLengthConversionDerived<Type>>(
+                  fleet->age_to_length_conversion_model);
 
-          if (growth_alk != nullptr && growth_alk->IsActive()) {
-            using_growth_derived_alk = true;
-            growth_derived_alk_used[0] = static_cast<Type>(1.0);
+          if (age_to_length_conversion_derived_model != nullptr && age_to_length_conversion_derived_model->IsActive()) {
+            using_age_to_length_conversion_derived = true;
+            age_to_length_conversion_derived_used[0] = static_cast<Type>(1.0);
             growth_derived_mean_WAA.resize(fleet->n_years * fleet->n_ages);
 
             for (size_t y = 0; y < fleet->n_years; ++y) {
               for (size_t a = 0; a < fleet->n_ages; ++a) {
                 const size_t i_age_year = y * fleet->n_ages + a;
 
-                if (this->report_growth_derived_alk_tensor) {
-                  if (growth_derived_age_to_length_conversion.size() == 0) {
-                    growth_derived_age_to_length_conversion.resize(
+                if (this->report_age_to_length_conversion_derived_tensor) {
+                  if (age_to_length_conversion_derived.size() == 0) {
+                    age_to_length_conversion_derived.resize(
                         fleet->n_years * fleet->n_ages * fleet->n_lengths);
                   }
 
-                  fims::Vector<Type> alk_row;
-                  BuildGrowthDerivedALKRowOrThrow(
-                      growth_alk, fleet, y, a, alk_row);
+                  fims::Vector<Type> age_to_length_conversion_row;
+                  BuildAgeToLengthConversionDerivedRowOrThrow(
+                      age_to_length_conversion_derived_model, fleet, y, a, age_to_length_conversion_row);
 
                   growth_derived_mean_WAA[i_age_year] =
-                      MeanWeightFromALKRow(growth_alk->growth_observation_,
+                      MeanWeightFromAgeToLengthConversionRow(age_to_length_conversion_derived_model->growth_observation_,
                                            fleet,
-                                           alk_row);
+                                           age_to_length_conversion_row);
 
                   for (size_t l = 0; l < fleet->n_lengths; ++l) {
                     const size_t i_length_age_year =
                         y * (fleet->n_ages * fleet->n_lengths) +
                         a * fleet->n_lengths + l;
-                    growth_derived_age_to_length_conversion[i_length_age_year] =
-                        alk_row[l];
+                    age_to_length_conversion_derived[i_length_age_year] =
+                        age_to_length_conversion_row[l];
                   }
                 } else {
                   growth_derived_mean_WAA[i_age_year] =
@@ -1802,11 +1802,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
           }
         }
 
-        growth_derived_age_to_length_conversion_f(fleet_idx) =
-            growth_derived_age_to_length_conversion.to_tmb();
-        growth_derived_alk_used_f(fleet_idx) = growth_derived_alk_used.to_tmb();
+        age_to_length_conversion_derived_f(fleet_idx) =
+            age_to_length_conversion_derived.to_tmb();
+        age_to_length_conversion_derived_used_f(fleet_idx) = age_to_length_conversion_derived_used.to_tmb();
         growth_derived_mean_WAA_f(fleet_idx) = growth_derived_mean_WAA.to_tmb();
-        if (!using_growth_derived_alk) {
+        if (!using_age_to_length_conversion_derived) {
           age_to_length_conversion_f(fleet_idx) =
               fleet->age_to_length_conversion.to_tmb();
         }
@@ -1942,9 +1942,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
       FIMS_REPORT_F_("agecomp_proportion", agecomp_proportion_f, this->of);
       FIMS_REPORT_F_("age_to_length_conversion", age_to_length_conversion_f,
                      this->of);
-      FIMS_REPORT_F_("growth_derived_age_to_length_conversion",
-                     growth_derived_age_to_length_conversion_f, this->of);
-      FIMS_REPORT_F_("growth_derived_alk_used", growth_derived_alk_used_f,
+      FIMS_REPORT_F_("age_to_length_conversion_derived",
+                     age_to_length_conversion_derived_f, this->of);
+      FIMS_REPORT_F_("age_to_length_conversion_derived_used", age_to_length_conversion_derived_used_f,
                      this->of);
       FIMS_REPORT_F_("growth_derived_mean_WAA", growth_derived_mean_WAA_f,
                      this->of);

@@ -14,7 +14,7 @@
 #include "../../common/model_object.hpp"
 #include "../../distributions/distributions.hpp"
 #include "../selectivity/selectivity.hpp"
-#include "../alk/functors/alk_base.hpp"
+#include "../age_to_length_conversion/functors/age_to_length_conversion_base.hpp"
 
 namespace fims_popdy {
 
@@ -38,10 +38,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   std::shared_ptr<SelectivityBase<Type>>
       selectivity; /*!< selectivity component*/
 
-  // age-length key
-  std::shared_ptr<ALKBase<Type>> alk; /*!< fleet-specific age-length key */
+  // age-to-length conversion model
+  std::shared_ptr<AgeToLengthConversionBase<Type>>
+      age_to_length_conversion_model; /*!< fleet-specific age-to-length conversion model */
   bool requires_age_length_mapping =
-      false; /*!< whether an active modeled path requires ALK-based mapping */
+      false; /*!< whether an active modeled path requires age-to-length conversion-based mapping */
 
   // catch data
   int fleet_observed_catch_data_id_m = -999; /*!< id of catch data */

@@ -234,16 +234,16 @@ target_link_libraries(population_Population_InitializePrepare
 )
 gtest_discover_tests(population_Population_InitializePrepare)
 
-# test_population_dynamics_alk.cpp
-add_executable(population_dynamics_alk
-  test_population_dynamics_alk.cpp
+# test_population_dynamics_age_to_length_conversion.cpp
+add_executable(population_dynamics_age_to_length_conversion
+  test_population_dynamics_age_to_length_conversion.cpp
 )
-add_as_invoker_manifest(population_dynamics_alk)
-target_link_libraries(population_dynamics_alk
+add_as_invoker_manifest(population_dynamics_age_to_length_conversion)
+target_link_libraries(population_dynamics_age_to_length_conversion
   gtest_main
   fims_test
 )
-gtest_discover_tests(population_dynamics_alk)
+gtest_discover_tests(population_dynamics_age_to_length_conversion)
 
 # test_population_dynamics_size.cpp
 add_executable(population_dynamics_size

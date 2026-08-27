@@ -28,6 +28,6 @@ void register_fishery_models(Rcpp::Module& m) {
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)
       .method("IsReporting", &CatchAtAgeInterface::IsReporting)
-      .method("ReportGrowthDerivedALKTensor",
-              &CatchAtAgeInterface::ReportGrowthDerivedALKTensor);
+      .method("ReportAgeToLengthConversionDerivedTensor",
+              &CatchAtAgeInterface::ReportAgeToLengthConversionDerivedTensor);
 }

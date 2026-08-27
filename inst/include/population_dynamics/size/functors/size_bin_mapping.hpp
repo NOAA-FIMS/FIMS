@@ -23,7 +23,7 @@ namespace fims_popdy {
  * bins.
  *
  * This helper operates only on bin geometry. It does not depend on growth,
- * ALK, selectivity, or catch-at-age logic.
+ * age-to-length conversion, selectivity, or catch-at-age logic.
  */
 struct SizeBinMapping {
   /**

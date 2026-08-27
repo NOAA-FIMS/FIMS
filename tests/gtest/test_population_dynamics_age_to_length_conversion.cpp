@@ -8,9 +8,9 @@
 
 #include "common/fims_math.hpp"
 #include "common/fims_vector.hpp"
-#include "population_dynamics/alk/functors/fixed_matrix_alk.hpp"
-#include "population_dynamics/alk/functors/growth_derived_alk.hpp"
-#include "population_dynamics/alk/functors/alk_runtime.hpp"
+#include "population_dynamics/age_to_length_conversion/functors/age_to_length_conversion_fixed.hpp"
+#include "population_dynamics/age_to_length_conversion/functors/age_to_length_conversion_derived.hpp"
+#include "population_dynamics/age_to_length_conversion/functors/age_to_length_conversion_runtime.hpp"
 #include "population_dynamics/fleet/fleet.hpp"
 #include "population_dynamics/growth/growth_model_adapter.hpp"
 #include "population_dynamics/growth/growth_products.hpp"
@@ -22,12 +22,12 @@ namespace {
 
 /**
  * @brief Minimal growth-derived observation used to control cached products in
- * ALK unit tests.
+ * age-to-length conversion unit tests.
  */
 struct FakeGrowthDerivedObservation
     : public fims_popdy::GrowthDerivedObservationBase<double> {
   fims_popdy::GrowthProducts<double> products;
-  bool supports_growth_derived_alk = true;
+  bool supports_age_to_length_conversion_derived = true;
   std::size_t prepare_calls = 0;
   bool products_prepared = false;
 
@@ -40,8 +40,8 @@ struct FakeGrowthDerivedObservation
     products_prepared = false;
   }
 
-  bool SupportsGrowthDerivedALK() const override {
-    return supports_growth_derived_alk;
+  bool SupportsAgeToLengthConversionDerived() const override {
+    return supports_age_to_length_conversion_derived;
   }
 
   void PrepareGrowthProducts() override {
@@ -67,14 +67,14 @@ struct FakeGrowthDerivedObservation
 };
 
 /**
- * @brief Fill a VonB-Schnute adapter with a consistent single-sex test
+ * @brief Fill a VonBertalanffySchnute adapter with a consistent single-sex test
  * parameter set.
  */
 void ConfigureAdapter(
-    fims_popdy::VonBSchnuteGrowthModelAdapter<double>& adapter,
+    fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>& adapter,
     double mean_length_young,
     double mean_length_old,
-    double von_bertalanffy_coefficient_K,
+    double growth_coefficient,
     double reference_age_for_length_1,
     double reference_age_for_length_2,
     double length_weight_a,
@@ -83,7 +83,7 @@ void ConfigureAdapter(
     double length_at_age_sd_at_reference_age_2) {
   adapter.MeanLengthYoungVector().resize(1);
   adapter.MeanLengthOldVector().resize(1);
-  adapter.VonBertalanffyCoefficientKVector().resize(1);
+  adapter.GrowthCoefficientVector().resize(1);
   adapter.ReferenceAgeForLength1Vector().resize(1);
   adapter.ReferenceAgeForLength2Vector().resize(1);
   adapter.LengthWeightAVector().resize(1);
@@ -92,7 +92,7 @@ void ConfigureAdapter(
 
   adapter.MeanLengthYoungVector()[0] = fims_math::log(mean_length_young);
   adapter.MeanLengthOldVector()[0] = fims_math::log(mean_length_old);
-  adapter.VonBertalanffyCoefficientKVector()[0] = fims_math::log(von_bertalanffy_coefficient_K);
+  adapter.GrowthCoefficientVector()[0] = fims_math::log(growth_coefficient);
   adapter.ReferenceAgeForLength1Vector()[0] = reference_age_for_length_1;
   adapter.ReferenceAgeForLength2Vector()[0] = reference_age_for_length_2;
   adapter.LengthWeightAVector()[0] = fims_math::log(length_weight_a);
@@ -144,7 +144,7 @@ fims_popdy::SizeGrid MakePopulationSizeGridForFleet(
 }
 
 /**
- * @brief Build a configured growth-derived size provider for ALK tests.
+ * @brief Build a configured growth-derived size provider for age-to-length conversion tests.
  */
 std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
 MakeConfiguredSizeProvider(
@@ -197,23 +197,23 @@ void FillFixedMatrix(const std::shared_ptr<fims_popdy::Fleet<double>>& fleet) {
   fleet->age_to_length_conversion[11] = 0.25;
 }
 
-TEST(FixedMatrixALK, IsActiveWithValidMatrix) {
+TEST(AgeToLengthConversionFixed, IsActiveWithValidMatrix) {
   auto fleet = MakeFleet();
   FillFixedMatrix(fleet);
 
-  fims_popdy::FixedMatrixALK<double> alk(fleet);
+  fims_popdy::AgeToLengthConversionFixed<double> age_to_length_conversion(fleet);
 
-  EXPECT_TRUE(alk.IsActive());
+  EXPECT_TRUE(age_to_length_conversion.IsActive());
 }
 
-TEST(FixedMatrixALK, BuildALKRowCopiesExpectedAgeRow) {
+TEST(AgeToLengthConversionFixed, BuildAgeToLengthConversionRowCopiesExpectedAgeRow) {
   auto fleet = MakeFleet();
   FillFixedMatrix(fleet);
 
-  fims_popdy::FixedMatrixALK<double> alk(fleet);
+  fims_popdy::AgeToLengthConversionFixed<double> age_to_length_conversion(fleet);
   fims::Vector<double> row;
 
-  EXPECT_TRUE(alk.BuildALKRow(0, 1, row));
+  EXPECT_TRUE(age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row));
   ASSERT_EQ(row.size(), 4u);
   EXPECT_DOUBLE_EQ(row[0], 0.4);
   EXPECT_DOUBLE_EQ(row[1], 0.3);
@@ -221,16 +221,16 @@ TEST(FixedMatrixALK, BuildALKRowCopiesExpectedAgeRow) {
   EXPECT_DOUBLE_EQ(row[3], 0.1);
 }
 
-TEST(FixedMatrixALK, IsInactiveWithWrongMatrixSize) {
+TEST(AgeToLengthConversionFixed, IsInactiveWithWrongMatrixSize) {
   auto fleet = MakeFleet();
   fleet->age_to_length_conversion.resize(3);
 
-  fims_popdy::FixedMatrixALK<double> alk(fleet);
+  fims_popdy::AgeToLengthConversionFixed<double> age_to_length_conversion(fleet);
 
-  EXPECT_FALSE(alk.IsActive());
+  EXPECT_FALSE(age_to_length_conversion.IsActive());
 }
 
-TEST(RuntimeALK, BuildFleetALKReturnsNullWhenGrowthDerivedPrepareFails) {
+TEST(AgeToLengthConversionRuntime, BuildAgeToLengthConversionFleetReturnsNullWhenGrowthDerivedPrepareFails) {
   auto population = std::make_shared<fims_popdy::Population<double>>();
   auto fleet = MakeFleet();
   FillFixedMatrix(fleet);
@@ -241,13 +241,13 @@ TEST(RuntimeALK, BuildFleetALKReturnsNullWhenGrowthDerivedPrepareFails) {
   population->growth = growth;
   ConfigurePopulationSizeSupport(population, fleet, growth);
 
-  std::shared_ptr<fims_popdy::ALKBase<double>> alk =
-      fims_popdy::BuildFleetALK<double>(population, fleet);
+  std::shared_ptr<fims_popdy::AgeToLengthConversionBase<double>> age_to_length_conversion =
+      fims_popdy::BuildAgeToLengthConversionFleet<double>(population, fleet);
 
-  EXPECT_EQ(alk, nullptr);
+  EXPECT_EQ(age_to_length_conversion, nullptr);
 }
 
-TEST(RuntimeALK, BuildFleetALKUsesGrowthDerivedWhenPrepareSucceeds) {
+TEST(AgeToLengthConversionRuntime, BuildAgeToLengthConversionFleetUsesGrowthDerivedWhenPrepareSucceeds) {
   auto population = std::make_shared<fims_popdy::Population<double>>();
   auto fleet = MakeFleet();
 
@@ -257,20 +257,20 @@ TEST(RuntimeALK, BuildFleetALKUsesGrowthDerivedWhenPrepareSucceeds) {
   population->growth = growth;
   ConfigurePopulationSizeSupport(population, fleet, growth);
 
-  std::shared_ptr<fims_popdy::ALKBase<double>> alk =
-      fims_popdy::BuildFleetALK<double>(population, fleet);
+  std::shared_ptr<fims_popdy::AgeToLengthConversionBase<double>> age_to_length_conversion =
+      fims_popdy::BuildAgeToLengthConversionFleet<double>(population, fleet);
 
-  ASSERT_NE(alk, nullptr);
+  ASSERT_NE(age_to_length_conversion, nullptr);
   EXPECT_NE(
-      std::dynamic_pointer_cast<fims_popdy::GrowthDerivedALK<double>>(alk),
+      std::dynamic_pointer_cast<fims_popdy::AgeToLengthConversionDerived<double>>(age_to_length_conversion),
       nullptr);
   EXPECT_EQ(
-      std::dynamic_pointer_cast<fims_popdy::FixedMatrixALK<double>>(alk),
+      std::dynamic_pointer_cast<fims_popdy::AgeToLengthConversionFixed<double>>(age_to_length_conversion),
       nullptr);
   EXPECT_EQ(growth->prepare_calls, 1);
 }
 
-TEST(RuntimeALK, EnsureFleetALKThrowsWhenExistingGrowthDerivedPrepareFails) {
+TEST(AgeToLengthConversionRuntime, EnsureAgeToLengthConversionFleetThrowsWhenExistingGrowthDerivedPrepareFails) {
   auto population = std::make_shared<fims_popdy::Population<double>>();
   auto fleet = MakeFleet();
   FillFixedMatrix(fleet);
@@ -281,23 +281,23 @@ TEST(RuntimeALK, EnsureFleetALKThrowsWhenExistingGrowthDerivedPrepareFails) {
   population->growth = growth;
   ConfigurePopulationSizeSupport(population, fleet, growth);
 
-  fleet->alk =
-      std::make_shared<fims_popdy::GrowthDerivedALK<double>>(
+  fleet->age_to_length_conversion_model =
+      std::make_shared<fims_popdy::AgeToLengthConversionDerived<double>>(
           fleet,
           growth,
           population->size_distribution_provider);
 
-  ASSERT_NE(fleet->alk, nullptr);
+  ASSERT_NE(fleet->age_to_length_conversion_model, nullptr);
   EXPECT_NE(
-      std::dynamic_pointer_cast<fims_popdy::GrowthDerivedALK<double>>(fleet->alk),
+      std::dynamic_pointer_cast<fims_popdy::AgeToLengthConversionDerived<double>>(fleet->age_to_length_conversion_model),
       nullptr);
 
   EXPECT_THROW(
-      fims_popdy::EnsureFleetALK<double>(population, fleet),
+      fims_popdy::EnsureAgeToLengthConversionFleet<double>(population, fleet),
       std::runtime_error);
 }
 
-TEST(RuntimeALK, EnsureFleetALKDoesNotReuseFixedALKForGrowthDerivedPopulation) {
+TEST(AgeToLengthConversionRuntime, EnsureAgeToLengthConversionFleetDoesNotReuseFixedAgeToLengthConversionForGrowthDerivedPopulation) {
   auto population = std::make_shared<fims_popdy::Population<double>>();
   auto fleet = MakeFleet();
   FillFixedMatrix(fleet);
@@ -308,19 +308,19 @@ TEST(RuntimeALK, EnsureFleetALKDoesNotReuseFixedALKForGrowthDerivedPopulation) {
   population->growth = growth;
   ConfigurePopulationSizeSupport(population, fleet, growth);
 
-  fleet->alk = std::make_shared<fims_popdy::FixedMatrixALK<double>>(fleet);
+  fleet->age_to_length_conversion_model = std::make_shared<fims_popdy::AgeToLengthConversionFixed<double>>(fleet);
 
-  ASSERT_NE(fleet->alk, nullptr);
+  ASSERT_NE(fleet->age_to_length_conversion_model, nullptr);
   EXPECT_NE(
-      std::dynamic_pointer_cast<fims_popdy::FixedMatrixALK<double>>(fleet->alk),
+      std::dynamic_pointer_cast<fims_popdy::AgeToLengthConversionFixed<double>>(fleet->age_to_length_conversion_model),
       nullptr);
 
   EXPECT_THROW(
-      fims_popdy::EnsureFleetALK<double>(population, fleet),
+      fims_popdy::EnsureAgeToLengthConversionFleet<double>(population, fleet),
       std::runtime_error);
 }
 
-TEST(RuntimeALK, GrowthDerivedFleetMeanWeightAAThrowsWithoutFleetGrowthDerivedPath) {
+TEST(AgeToLengthConversionRuntime, GrowthDerivedFleetMeanWeightAAThrowsWithoutFleetGrowthDerivedPath) {
   fims_popdy::CatchAtAge<double> model;
   auto fleet = MakeFleet();
 
@@ -329,12 +329,12 @@ TEST(RuntimeALK, GrowthDerivedFleetMeanWeightAAThrowsWithoutFleetGrowthDerivedPa
       std::runtime_error);
 }
 
-TEST(RuntimeALK, GrowthDerivedFleetMeanWeightAAMatchesALKWeightedBinCenterWeights) {
+TEST(AgeToLengthConversionRuntime, GrowthDerivedFleetMeanWeightAAMatchesAgeToLengthConversionWeightedBinCenterWeights) {
   fims_popdy::CatchAtAge<double> model;
   auto fleet = MakeFleet();
 
   auto growth =
-      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
@@ -350,18 +350,18 @@ TEST(RuntimeALK, GrowthDerivedFleetMeanWeightAAMatchesALKWeightedBinCenterWeight
               fleet->n_years,
               fleet->n_ages);
 
-  auto growth_alk =
-      std::make_shared<fims_popdy::GrowthDerivedALK<double>>(
+  auto age_to_length_conversion_derived =
+      std::make_shared<fims_popdy::AgeToLengthConversionDerived<double>>(
           fleet,
           growth,
           size_provider);
-  ASSERT_TRUE(growth_alk->IsActive());
-  ASSERT_TRUE(growth_alk->PrepareForCurrentState());
+  ASSERT_TRUE(age_to_length_conversion_derived->IsActive());
+  ASSERT_TRUE(age_to_length_conversion_derived->PrepareForCurrentState());
 
-  fleet->alk = growth_alk;
+  fleet->age_to_length_conversion_model = age_to_length_conversion_derived;
 
   fims::Vector<double> row;
-  ASSERT_TRUE(growth_alk->BuildALKRow(0, 1, row));
+  ASSERT_TRUE(age_to_length_conversion_derived->BuildAgeToLengthConversionRow(0, 1, row));
   ASSERT_EQ(row.size(), fleet->n_lengths);
 
   double expected_mean_weight = 0.0;
@@ -376,7 +376,7 @@ TEST(RuntimeALK, GrowthDerivedFleetMeanWeightAAMatchesALKWeightedBinCenterWeight
   EXPECT_NEAR(observed_mean_weight, expected_mean_weight, 1e-8);
 }
 
-TEST(RuntimeALK, PopulationMeanWeightAAPreparesGrowthProductsWhenNeeded) {
+TEST(AgeToLengthConversionRuntime, PopulationMeanWeightAAPreparesGrowthProductsWhenNeeded) {
   fims_popdy::CatchAtAge<double> model;
   auto population = std::make_shared<fims_popdy::Population<double>>();
 
@@ -401,14 +401,14 @@ TEST(RuntimeALK, PopulationMeanWeightAAPreparesGrowthProductsWhenNeeded) {
   EXPECT_DOUBLE_EQ(mean_weight, 2.5);
 }
 
-TEST(GrowthDerivedALK, IsInactiveWithoutPreparedFleetObservationGeometry) {
+TEST(AgeToLengthConversionDerived, IsInactiveWithoutPreparedFleetObservationGeometry) {
   auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
   fleet->n_years = 1;
   fleet->n_ages = 3;
   fleet->n_lengths = 4;
 
   auto growth =
-      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
@@ -416,12 +416,12 @@ TEST(GrowthDerivedALK, IsInactiveWithoutPreparedFleetObservationGeometry) {
 
   std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
       size_provider;
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, size_provider);
+  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(fleet, growth, size_provider);
 
-  EXPECT_FALSE(alk.IsActive());
+  EXPECT_FALSE(age_to_length_conversion.IsActive());
 }
 
-TEST(GrowthDerivedALK, PrepareForCurrentStateFailsForMultiSexProducts) {
+TEST(AgeToLengthConversionDerived, PrepareForCurrentStateFailsForMultiSexProducts) {
   auto fleet = MakeFleet();
   auto growth = std::make_shared<FakeGrowthDerivedObservation>();
 
@@ -436,13 +436,13 @@ TEST(GrowthDerivedALK, PrepareForCurrentStateFailsForMultiSexProducts) {
               fleet->n_years,
               fleet->n_ages);
 
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, size_provider);
+  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(fleet, growth, size_provider);
 
-  EXPECT_TRUE(alk.IsActive());
-  EXPECT_FALSE(alk.PrepareForCurrentState());
+  EXPECT_TRUE(age_to_length_conversion.IsActive());
+  EXPECT_FALSE(age_to_length_conversion.PrepareForCurrentState());
 }
 
-TEST(GrowthDerivedALK, IsActiveDoesNotPrepareGrowthProducts) {
+TEST(AgeToLengthConversionDerived, IsActiveDoesNotPrepareGrowthProducts) {
   auto fleet = MakeFleet();
   auto growth = std::make_shared<FakeGrowthDerivedObservation>();
 
@@ -457,13 +457,13 @@ TEST(GrowthDerivedALK, IsActiveDoesNotPrepareGrowthProducts) {
               fleet->n_years,
               fleet->n_ages);
 
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, size_provider);
+  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(fleet, growth, size_provider);
 
-  EXPECT_TRUE(alk.IsActive());
+  EXPECT_TRUE(age_to_length_conversion.IsActive());
   EXPECT_EQ(growth->prepare_calls, 0);
 }
 
-TEST(GrowthDerivedALK, BuildALKRowFailsBeforePrepareForCurrentState) {
+TEST(AgeToLengthConversionDerived, BuildAgeToLengthConversionRowFailsBeforePrepareForCurrentState) {
   auto fleet = MakeFleet();
   auto growth = std::make_shared<FakeGrowthDerivedObservation>();
 
@@ -478,15 +478,15 @@ TEST(GrowthDerivedALK, BuildALKRowFailsBeforePrepareForCurrentState) {
               fleet->n_years,
               fleet->n_ages);
 
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, size_provider);
+  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(fleet, growth, size_provider);
   fims::Vector<double> row;
 
-  ASSERT_TRUE(alk.IsActive());
-  EXPECT_FALSE(alk.BuildALKRow(0, 1, row));
+  ASSERT_TRUE(age_to_length_conversion.IsActive());
+  EXPECT_FALSE(age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row));
   EXPECT_EQ(growth->prepare_calls, 0);
 }
 
-TEST(GrowthDerivedALK, PrepareForCurrentStateEnablesRowBuilding) {
+TEST(AgeToLengthConversionDerived, PrepareForCurrentStateEnablesRowBuilding) {
   auto fleet = MakeFleet();
   auto growth = std::make_shared<FakeGrowthDerivedObservation>();
 
@@ -501,17 +501,17 @@ TEST(GrowthDerivedALK, PrepareForCurrentStateEnablesRowBuilding) {
               fleet->n_years,
               fleet->n_ages);
 
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, size_provider);
+  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(fleet, growth, size_provider);
   fims::Vector<double> row;
 
-  ASSERT_TRUE(alk.IsActive());
-  ASSERT_TRUE(alk.PrepareForCurrentState());
+  ASSERT_TRUE(age_to_length_conversion.IsActive());
+  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
   EXPECT_EQ(growth->prepare_calls, 1);
-  ASSERT_TRUE(alk.BuildALKRow(0, 1, row));
+  ASSERT_TRUE(age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row));
   ASSERT_EQ(row.size(), fleet->n_lengths);
 }
 
-TEST(GrowthDerivedALK, PrepareForCurrentStateReusesAlreadyPreparedProducts) {
+TEST(AgeToLengthConversionDerived, PrepareForCurrentStateReusesAlreadyPreparedProducts) {
   auto fleet = MakeFleet();
   auto growth = std::make_shared<FakeGrowthDerivedObservation>();
 
@@ -528,18 +528,18 @@ TEST(GrowthDerivedALK, PrepareForCurrentStateReusesAlreadyPreparedProducts) {
   growth->PrepareGrowthProducts();
   ASSERT_EQ(growth->prepare_calls, 1u);
 
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, size_provider);
+  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(fleet, growth, size_provider);
 
-  ASSERT_TRUE(alk.IsActive());
-  ASSERT_TRUE(alk.PrepareForCurrentState());
+  ASSERT_TRUE(age_to_length_conversion.IsActive());
+  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
   EXPECT_EQ(growth->prepare_calls, 1u);
 }
 
-TEST(GrowthDerivedALK, BuildALKRowReturnsFiniteNonnegativeNormalizedRow) {
+TEST(AgeToLengthConversionDerived, BuildAgeToLengthConversionRowReturnsFiniteNonnegativeNormalizedRow) {
   auto fleet = MakeFleet();
 
   auto growth =
-      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
@@ -554,12 +554,12 @@ TEST(GrowthDerivedALK, BuildALKRowReturnsFiniteNonnegativeNormalizedRow) {
               fleet->n_years,
               fleet->n_ages);
 
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, size_provider);
+  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(fleet, growth, size_provider);
   fims::Vector<double> row;
 
-  ASSERT_TRUE(alk.IsActive());
-  ASSERT_TRUE(alk.PrepareForCurrentState());
-  ASSERT_TRUE(alk.BuildALKRow(0, 1, row));
+  ASSERT_TRUE(age_to_length_conversion.IsActive());
+  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
+  ASSERT_TRUE(age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row));
   ASSERT_EQ(row.size(), fleet->n_lengths);
 
   double row_sum = 0.0;
@@ -572,11 +572,11 @@ TEST(GrowthDerivedALK, BuildALKRowReturnsFiniteNonnegativeNormalizedRow) {
   EXPECT_NEAR(row_sum, 1.0, 1e-5);
 }
 
-TEST(GrowthDerivedALK, BuildALKRowFailsForOutOfRangeAge) {
+TEST(AgeToLengthConversionDerived, BuildAgeToLengthConversionRowFailsForOutOfRangeAge) {
   auto fleet = MakeFleet();
 
   auto growth =
-      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
@@ -591,19 +591,19 @@ TEST(GrowthDerivedALK, BuildALKRowFailsForOutOfRangeAge) {
               fleet->n_years,
               fleet->n_ages);
 
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, size_provider);
+  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(fleet, growth, size_provider);
   fims::Vector<double> row;
 
-  ASSERT_TRUE(alk.IsActive());
-  ASSERT_TRUE(alk.PrepareForCurrentState());
-  EXPECT_FALSE(alk.BuildALKRow(0, fleet->n_ages, row));
+  ASSERT_TRUE(age_to_length_conversion.IsActive());
+  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
+  EXPECT_FALSE(age_to_length_conversion.BuildAgeToLengthConversionRow(0, fleet->n_ages, row));
 }
 
-TEST(GrowthDerivedALK, BuildALKRowHandlesDifferentFleetBinLayout) {
+TEST(AgeToLengthConversionDerived, BuildAgeToLengthConversionRowHandlesDifferentFleetBinLayout) {
   auto fleet = MakeFleet({150.0, 250.0, 450.0, 700.0});
 
   auto growth =
-      std::make_shared<fims_popdy::VonBSchnuteGrowthModelAdapter<double>>();
+      std::make_shared<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(
       *growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0, 73.0);
   growth->SetAgeOffset(1.0);
@@ -619,12 +619,12 @@ TEST(GrowthDerivedALK, BuildALKRowHandlesDifferentFleetBinLayout) {
               fleet->n_years,
               fleet->n_ages);
 
-  fims_popdy::GrowthDerivedALK<double> alk(fleet, growth, size_provider);
+  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(fleet, growth, size_provider);
   fims::Vector<double> row;
 
-  ASSERT_TRUE(alk.IsActive());
-  ASSERT_TRUE(alk.PrepareForCurrentState());
-  ASSERT_TRUE(alk.BuildALKRow(0, 1, row));
+  ASSERT_TRUE(age_to_length_conversion.IsActive());
+  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
+  ASSERT_TRUE(age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row));
   ASSERT_EQ(row.size(), fleet->n_lengths);
 
   double row_sum = 0.0;
