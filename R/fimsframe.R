@@ -739,13 +739,22 @@ methods::setValidity(
     # TODO: Add checks for other slots
     # Add validity check for types
     present_types <- unique(object@data[["type"]])
+    allowed_types <- c(
+      "age_comp",
+      "age_to_length_conversion",
+      "index",
+      "catch",
+      "length_bin",
+      "length_comp",
+      "weight_at_age"
+    )
 
     # Issues warning if there are any unrecognized types
-    unknown_types <- sort(setdiff(present_types, fims_input_types))
+    unknown_types <- sort(setdiff(present_types, allowed_types))
     if (length(unknown_types) > 0) {
       cli::cli_warn(c(
         "!" = "Data contains unexpected type{?s}: {.var {unknown_types}}.",
-        "i" = "Allowed types are: {.var {fims_input_types}}.",
+        "i" = "Allowed types are: {.var {allowed_types}}.",
         "i" = "Model will run but check that data types are correct."
       ))
     }
