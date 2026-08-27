@@ -16,36 +16,75 @@
 namespace fims_popdy {
 
 /**
- *  @brief AgeSpecificSelectivity class that returns the inverse logit function
- * value from fims_math.
+ *  @brief Age-specific selectivity calculated using one parameter per age bin.
  *
- * Age-specific selectivity allows users to estimate age-specific selectivity
- * values, with great inherent flexibility. The number of parameters (either
- * estimated or fixed) is equal to the number of ages. Users are recommended to
- * fix selectivity for at least one age to a value equal or close to 1. This can be achieved by
- * setting at least one age-specific parameter (logit_sel_at_age) on the logit scale
- * to a value greater than 10 with estimation_type == "constant".
+ * AgeSpecificSelectivity estimates a separate selectivity value for each age
+ * bin. The values stored in `logit_sel_at_age` are on the logit scale and are
+ * transformed to the interval [0, 1]:
+ *
+ * \f[
+ * s_a = \frac{1}{1 + \exp(-logit_sel_at_age)}
+ * \f]
+ *
+ * where \f$\logit_sel_at_age\f$ is the logit-scale parameter for age \f$a\f$
+ * and \f$s_a\f$ is the resulting selectivity.
+ *
+ * The parameter at age \f$a\f$ is selected using the zero-based index
+ * \f$a - min\_age\f$. Therefore, `logit_sel_at_age[0]` corresponds to
+ * `min_age`, `logit_sel_at_age[1]` corresponds to `min_age + 1`, and so on.
+ * The parameter vector should normally contain one element for each age class,
+ * with `n_ages` matching the number of modeled ages.
+ *
+ * Age-specific selectivity is highly flexible because it does not impose a
+ * smooth parametric curve across ages. This flexibility can create
+ * identifiability problems, especially when estimating both selectivity and
+ * fishing mortality. Users should ensure that at least one age-specific
+ * selectivity parameter is "constant", i.e., not estimated, and is equal to or
+ * near 1, or otherwise impose suitable constraints. This can be achieved by
+ * setting at least one age-specific parameter (logit_sel_at_age), which are on
+ * the logit scale, to a value greater than 10 with estimation_type ==
+ * "constant".
  */
 template <typename Type>
 struct AgeSpecificSelectivity : public SelectivityBase<Type> {
-  fims::Vector<Type> logit_sel_at_age; /**< age-specific selectivity parameters on the logit scale */  
-  size_t n_ages; /**< number of modeled ages, based on user-provided input data */
-  size_t min_age; /**< minimum modeled age, based on user-provided input data */
+  /**
+   * @brief Stores the age-specific selectivity parameters on the logit scale.
+   *
+   * Each element corresponds to one modeled age, beginning with `min_age`.
+   */
+  fims::Vector<Type> logit_sel_at_age;
+
+  /**
+   * @brief Stores the number of modeled age bins.
+   */
+  size_t n_ages;
+
+  /**
+   * @brief Minimum modeled age, used to map input age to `logit_sel_at_age`.
+   */
+  size_t min_age;
 
   AgeSpecificSelectivity() : SelectivityBase<Type>() {}
 
   virtual ~AgeSpecificSelectivity() {}
 
   /**
-   * @brief Method of the age-specific selectivity class that implements the
-   * inverse logit function from FIMS math to properly transform parameter
-   * values.
+   * @brief Calculates selectivity for an age using its age-specific parameter.
    *
-   * a + (b - a) / (static_cast<Type>(1.0) + fims_math::exp(-logit_x))
+   * The input age is converted to a zero-based parameter index by subtracting
+   * `min_age`. This zero-based index, based on `x`, is then used to select the
+   * appropriate element of `logit_sel_at_age`, which is a logit-scale
+   * parameter, and it is transformed to a selectivity value between zero and
+   * one using `fims_math::inv_logit` with lower and upper bounds of zero and
+   * one. Consequently, `logit_sel_at_age[0]` corresponds to `min_age`, and
+   * each subsequent element corresponds to the next modeled age.
    *
-   *
-   * @param x  The independent variable in the age-specific selectivity function
-   * (e.g., age).
+   * @see fims_math::inv_logit
+   * @param x The age at which selectivity is evaluated. The value is expected
+   * to be an integer-valued age greater than or equal to `min_age`.
+   * @return The selectivity for age `x`.
+   * @throws std::invalid_argument if the calculated age index is outside
+   * `logit_sel_at_age`.
    */
   virtual const Type evaluate(const Type &x) {
     Type a = static_cast<Type>(0.0);
