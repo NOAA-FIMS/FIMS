@@ -503,8 +503,10 @@ setup_default_AgeSpecific <- function(
       label = "logit_sel_at_age",
       age = get_ages(data),
       value = qlogis(1 / (1 + (exp(-1 * (get_ages(data) - 2))))),
-      estimation_type = c(rep("fixed_effects", length(get_ages(data)) - 1),
-                          "constant")
+      estimation_type = c(
+        rep("fixed_effects", length(get_ages(data)) - 1),
+        "constant"
+      )
     )
 }
 
