@@ -1,22 +1,22 @@
 /**
- * @file growth_derived_alk.hpp
- * @brief Declares the GrowthDerivedALK class, which implements ALKBase
+ * @file age_to_length_conversion_derived.hpp
+ * @brief Declares the AgeToLengthConversionDerived class, which implements AgeToLengthConversionBase
  * by mapping prepared population age-to-size distributions onto fleet
  * observation bins.
- * @details Defines guards for the growth-derived ALK functor.
+ * @details Defines guards for the growth-derived age-to-length conversion functor.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
  */
-#ifndef POPULATION_DYNAMICS_GROWTH_DERIVED_ALK_HPP
-#define POPULATION_DYNAMICS_GROWTH_DERIVED_ALK_HPP
+#ifndef POPULATION_DYNAMICS_AGE_TO_LENGTH_CONVERSION_DERIVED_HPP
+#define POPULATION_DYNAMICS_AGE_TO_LENGTH_CONVERSION_DERIVED_HPP
 
 #include <algorithm>
 #include <cstddef>
 #include <memory>
 
 #include "../../../common/fims_math.hpp"
-#include "alk_base.hpp"
+#include "age_to_length_conversion_base.hpp"
 #include "../../fleet/fleet.hpp"
 #include "../../growth/growth_model_adapter.hpp"
 #include "../../size/size_distribution_provider_base.hpp"
@@ -26,11 +26,11 @@
 namespace fims_popdy {
 
 /**
- * @brief Growth-derived ALK implementation that reads prepared population
+ * @brief Growth-derived age-to-length conversion implementation that reads prepared population
  * age-to-size probabilities and maps them into fleet observation bins.
  */
 template <typename Type>
-struct GrowthDerivedALK : public ALKBase<Type> {
+struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
   std::weak_ptr<Fleet<Type>> fleet_; /**< non-owning link to the fleet */
   std::weak_ptr<SizeDistributionProviderBase<Type>>
       size_provider_; /**< non-owning link to the population size provider */
@@ -39,18 +39,18 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
   /**
    * @brief Constructor.
-   * @param fleet_ Shared pointer to the fleet using this ALK.
+   * @param fleet_ Shared pointer to the fleet using this age-to-length conversion.
    * @param growth_observation_ Shared pointer to the growth-derived
    * observation capability.
    * @param size_provider_ Shared pointer to the population size provider.
    */
-  GrowthDerivedALK(
+  AgeToLengthConversionDerived(
       const std::shared_ptr<Fleet<Type>>& fleet_,
       const std::shared_ptr<GrowthDerivedObservationBase<Type>>&
           growth_observation_,
       const std::shared_ptr<SizeDistributionProviderBase<Type>>&
           size_provider_)
-      : ALKBase<Type>(),
+      : AgeToLengthConversionBase<Type>(),
         fleet_(fleet_),
         size_provider_(size_provider_),
         growth_observation_(growth_observation_) {}
@@ -58,10 +58,10 @@ struct GrowthDerivedALK : public ALKBase<Type> {
   /**
    * @brief Destructor.
    */
-  virtual ~GrowthDerivedALK() {}
+  virtual ~AgeToLengthConversionDerived() {}
 
   /**
-   * @brief Returns whether this growth-derived ALK is structurally active.
+   * @brief Returns whether this growth-derived age-to-length conversion is structurally active.
    * @return True if the linked fleet, population size provider, and growth
    * observation are valid and the fleet has consistent observation-bin geometry.
    */
@@ -73,7 +73,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
     return fleet_ptr != nullptr &&
            size_provider_ptr != nullptr &&
            growth_observation_ != nullptr &&
-           growth_observation_->SupportsGrowthDerivedALK() &&
+           growth_observation_->SupportsAgeToLengthConversionDerived() &&
            fleet_ptr->n_ages > 0 &&
            fleet_ptr->n_lengths > 0 &&
            fleet_ptr->lengths.size() == fleet_ptr->n_lengths &&
@@ -88,10 +88,10 @@ struct GrowthDerivedALK : public ALKBase<Type> {
    *
    * This helper reuses already prepared growth products when available and only
    * triggers preparation when products have not yet been prepared. It then
-   * prepares the linked population size provider so the ALK can read
+   * prepares the linked population size provider so the age-to-length conversion can read
    * population age-to-size rows for mapping into fleet observation bins.
    *
-   * @return True if the required growth products are available for this ALK
+   * @return True if the required growth products are available for this age-to-length conversion
    * path and the linked population size provider can be prepared.
    */
   virtual bool PrepareForCurrentState() override {
@@ -120,17 +120,17 @@ struct GrowthDerivedALK : public ALKBase<Type> {
   }
 
   /**
-   * @brief Builds the normalized ALK row for a given year and age.
+   * @brief Builds the normalized age-to-length conversion row for a given year and age.
    * @param year Year index.
    * @param age Age index.
    * @param out_row Output age-to-length probability row.
-   * @return True if the ALK row was built successfully using prepared growth
+   * @return True if the age-to-length conversion row was built successfully using prepared growth
    * products for the current model state.
    */
-  virtual bool BuildALKRow(size_t year,
+  virtual bool BuildAgeToLengthConversionRow(size_t year,
                            size_t age,
                            fims::Vector<Type>& out_row) const override {
-    out_row = BuildMappedFleetALKRow(year, age);
+    out_row = BuildMappedFleetAgeToLengthConversionRow(year, age);
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
     return fleet_ptr != nullptr && out_row.size() == fleet_ptr->n_lengths;
   }
@@ -175,7 +175,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
     if (!TryFinalizePreparedProbabilityRow(
             prob_size_row, population_size_grid->n_bins)) {
       throw std::runtime_error(
-          "GrowthDerivedALK received an invalid prepared population size row");
+          "AgeToLengthConversionDerived received an invalid prepared population size row");
     }
 
     return prob_size_row;
@@ -279,13 +279,13 @@ struct GrowthDerivedALK : public ALKBase<Type> {
   }
 
   /**
-   * @brief Build one fleet ALK row by mapping a population age-to-size row
+   * @brief Build one fleet age-to-length conversion row by mapping a population age-to-size row
    * onto fleet observation bins.
    * @param year_index Year index.
    * @param age_index Age index.
    * @return Normalized fleet observation-bin probability row.
    */
-  fims::Vector<Type> BuildMappedFleetALKRow(std::size_t year_index,
+  fims::Vector<Type> BuildMappedFleetAgeToLengthConversionRow(std::size_t year_index,
                                             std::size_t age_index) const {
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
     std::shared_ptr<SizeDistributionProviderBase<Type>> size_provider_ptr =
@@ -335,7 +335,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
     if (!TryFinalizeMappedProbabilityRow(
             fleet_row, fleet_ptr->n_lengths)) {
       throw std::runtime_error(
-          "GrowthDerivedALK produced an invalid mapped fleet probability row");
+          "AgeToLengthConversionDerived produced an invalid mapped fleet probability row");
     }
 
     return fleet_row;
@@ -355,7 +355,7 @@ struct GrowthDerivedALK : public ALKBase<Type> {
    */
   const GrowthProducts<Type>* TryGetGrowthProducts() const {
     if (growth_observation_ == nullptr ||
-        !growth_observation_->SupportsGrowthDerivedALK()) {
+        !growth_observation_->SupportsAgeToLengthConversionDerived()) {
       return nullptr;
     }
 
@@ -365,4 +365,4 @@ struct GrowthDerivedALK : public ALKBase<Type> {
 
 }  // namespace fims_popdy
 
-#endif /* POPULATION_DYNAMICS_GROWTH_DERIVED_ALK_HPP */
+#endif /* POPULATION_DYNAMICS_AGE_TO_LENGTH_CONVERSION_DERIVED_HPP */
