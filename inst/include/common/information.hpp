@@ -536,37 +536,43 @@ class Information {
   }
 
   /**
-   * @brief Set the age-to-length conversion module referenced by the fleet and population modules.
+   * @brief Set the age-to-length conversion module referenced by the fleet and
+   * population modules.
    *
    * @param &valid_model reference to true/false boolean indicating whether
    * model is valid.
    * @param p shared pointer to population module
    * @param f shared pointer to fleet module
    */
-  void SetFleetAgeToLengthConversionModel(bool &valid_model,
-                        std::shared_ptr<fims_popdy::Population<Type>> p,
-                        std::shared_ptr<fims_popdy::Fleet<Type>> f) {
+  void SetFleetAgeToLengthConversionModel(
+      bool& valid_model, std::shared_ptr<fims_popdy::Population<Type>> p,
+      std::shared_ptr<fims_popdy::Fleet<Type>> f) {
     if (p == nullptr || f == nullptr) {
       valid_model = false;
-      FIMS_ERROR_LOG("Unable to set fleet age-to-length conversion because the population or fleet "
-                     "pointer was null.");
+      FIMS_ERROR_LOG(
+          "Unable to set fleet age-to-length conversion because the population "
+          "or fleet "
+          "pointer was null.");
       return;
     }
 
-    f->age_to_length_conversion_model = fims_popdy::BuildAgeToLengthConversionFleet<Type>(p, f);
+    f->age_to_length_conversion_model =
+        fims_popdy::BuildAgeToLengthConversionFleet<Type>(p, f);
 
-    if (f->age_to_length_conversion_model != nullptr && f->age_to_length_conversion_model->IsActive()) {
+    if (f->age_to_length_conversion_model != nullptr &&
+        f->age_to_length_conversion_model->IsActive()) {
       return;
     }
 
     if (f->n_lengths > 0) {
       valid_model = false;
-      FIMS_ERROR_LOG("Fleet " + fims::to_string(f->id) +
-                     " has fleet length observation bins but no usable "
-                     "age-to-length conversion path. Provide fixed "
-                     "age-to-length conversion of size " +
-                     fims::to_string(f->n_ages * f->n_lengths) +
-                     " or use a supported growth-derived age-to-length conversion path.");
+      FIMS_ERROR_LOG(
+          "Fleet " + fims::to_string(f->id) +
+          " has fleet length observation bins but no usable "
+          "age-to-length conversion path. Provide fixed "
+          "age-to-length conversion of size " +
+          fims::to_string(f->n_ages * f->n_lengths) +
+          " or use a supported growth-derived age-to-length conversion path.");
     }
   }
 
@@ -712,8 +718,7 @@ class Information {
     }
 
     for (std::size_t population_bin_index = 0;
-         population_bin_index < size_grid.n_bins;
-         ++population_bin_index) {
+         population_bin_index < size_grid.n_bins; ++population_bin_index) {
       const double population_left = size_grid.edges[population_bin_index];
       const double population_right = size_grid.edges[population_bin_index + 1];
       const double population_bin_width = population_right - population_left;
@@ -766,13 +771,12 @@ class Information {
    * @param p Shared pointer to population module.
    */
   void EnsurePopulationSizeGrid(
-      bool &valid_model,
-      std::shared_ptr<fims_popdy::Population<Type>> p) {
+      bool& valid_model, std::shared_ptr<fims_popdy::Population<Type>> p) {
     fims::Vector<fims::Vector<double>> fleet_edges;
 
     try {
       fleet_edges = PrepareFleetObservationBinEdges(p);
-    } catch (const std::exception &e) {
+    } catch (const std::exception& e) {
       valid_model = false;
       FIMS_ERROR_LOG(
           "Failed to prepare fleet observation-bin geometry for population " +
@@ -783,20 +787,20 @@ class Information {
     if (p->size_grid.IsConsistent() && p->size_grid.n_bins > 0) {
       try {
         EnforcePopulationGridNotCoarserThanFleetBins(p->size_grid, fleet_edges);
-      } catch (const std::exception &e) {
+      } catch (const std::exception& e) {
         valid_model = false;
         FIMS_ERROR_LOG(
             "Population " + fims::to_string(p->id) +
             " has a biological size grid that is incompatible with active "
-            "fleet observation bins: " + e.what());
+            "fleet observation bins: " +
+            e.what());
       }
       return;
     }
 
-    const bool size_grid_missing =
-        p->size_grid.n_bins == 0 &&
-        p->size_grid.edges.size() == 0 &&
-        p->size_grid.centers.size() == 0;
+    const bool size_grid_missing = p->size_grid.n_bins == 0 &&
+                                   p->size_grid.edges.size() == 0 &&
+                                   p->size_grid.centers.size() == 0;
 
     if (size_grid_missing) {
       try {
@@ -806,9 +810,8 @@ class Information {
               "to build the default biological size grid");
         }
 
-        p->size_grid =
-            fims_popdy::SizeGridBuilder::BuildDefaultFromFleetEdges(
-                fleet_edges);
+        p->size_grid = fims_popdy::SizeGridBuilder::BuildDefaultFromFleetEdges(
+            fleet_edges);
         EnforcePopulationGridNotCoarserThanFleetBins(p->size_grid, fleet_edges);
 
         const std::size_t regular_bin_count =
@@ -823,10 +826,11 @@ class Information {
               "biological size-grid override if needed.");
         }
 
-      } catch (const std::exception &e) {
+      } catch (const std::exception& e) {
         valid_model = false;
         FIMS_ERROR_LOG(
-            "Failed to initialize default population size grid for population " +
+            "Failed to initialize default population size grid for "
+            "population " +
             fims::to_string(p->id) + ": " + e.what());
       }
       return;
@@ -898,8 +902,7 @@ class Information {
           }
 
           const bool population_has_size_grid_input =
-              p->size_grid.n_bins > 0 ||
-              p->size_grid.edges.size() > 0 ||
+              p->size_grid.n_bins > 0 || p->size_grid.edges.size() > 0 ||
               p->size_grid.centers.size() > 0;
 
           bool any_length_based_fleet = false;

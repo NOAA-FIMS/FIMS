@@ -28,13 +28,16 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct SizeProducts {
-  std::size_t n_years = 0;      /*!< number of modeled years represented */
-  std::size_t n_ages = 0;       /*!< number of modeled ages represented */
-  std::size_t n_size_bins = 0;  /*!< number of biological size bins represented */
+  std::size_t n_years = 0; /*!< number of modeled years represented */
+  std::size_t n_ages = 0;  /*!< number of modeled ages represented */
+  std::size_t n_size_bins =
+      0; /*!< number of biological size bins represented */
 
-  fims::Vector<Type> mean_LAA;   /*!< mean length-at-age on the natural scale */
-  fims::Vector<Type> sd_LAA;     /*!< spread of length-at-age on the natural scale */
-  fims::Vector<Type> prob_size;  /*!< age-to-size probabilities on the biological size grid */
+  fims::Vector<Type> mean_LAA; /*!< mean length-at-age on the natural scale */
+  fims::Vector<Type>
+      sd_LAA; /*!< spread of length-at-age on the natural scale */
+  fims::Vector<Type>
+      prob_size; /*!< age-to-size probabilities on the biological size grid */
 
   /**
    * @brief Default constructor.
@@ -79,8 +82,7 @@ struct SizeProducts {
    * This is used by providers that read MeanLAA and SdLAA from upstream growth
    * products and only own ProbSize locally.
    */
-  void ResizeProbSizeOnly(std::size_t years,
-                          std::size_t ages,
+  void ResizeProbSizeOnly(std::size_t years, std::size_t ages,
                           std::size_t size_bins) {
     n_years = years;
     n_ages = ages;
@@ -118,14 +120,12 @@ struct SizeProducts {
   inline std::size_t AgeYearSizeIndex(std::size_t year_index,
                                       std::size_t age_index,
                                       std::size_t size_bin_index) const {
-    if (year_index >= n_years ||
-        age_index >= n_ages ||
+    if (year_index >= n_years || age_index >= n_ages ||
         size_bin_index >= n_size_bins) {
       throw std::out_of_range("SizeProducts year-age-size index out of range");
     }
 
-    return year_index * (n_ages * n_size_bins) +
-           age_index * n_size_bins +
+    return year_index * (n_ages * n_size_bins) + age_index * n_size_bins +
            size_bin_index;
   }
 
@@ -156,7 +156,8 @@ struct SizeProducts {
    * @param size_bin_index Size-bin index.
    * @return Reference to age-to-size probability.
    */
-  inline Type& ProbSize(std::size_t year_index, std::size_t age_index, std::size_t size_bin_index) {
+  inline Type& ProbSize(std::size_t year_index, std::size_t age_index,
+                        std::size_t size_bin_index) {
     return prob_size[AgeYearSizeIndex(year_index, age_index, size_bin_index)];
   }
 
@@ -166,7 +167,8 @@ struct SizeProducts {
    * @param age_index Age index.
    * @return Const reference to mean length-at-age.
    */
-  inline const Type& MeanLAA(std::size_t year_index, std::size_t age_index) const {
+  inline const Type& MeanLAA(std::size_t year_index,
+                             std::size_t age_index) const {
     return mean_LAA[AgeYearIndex(year_index, age_index)];
   }
 
@@ -176,7 +178,8 @@ struct SizeProducts {
    * @param age_index Age index.
    * @return Const reference to spread of length-at-age.
    */
-  inline const Type& SdLAA(std::size_t year_index, std::size_t age_index) const {
+  inline const Type& SdLAA(std::size_t year_index,
+                           std::size_t age_index) const {
     return sd_LAA[AgeYearIndex(year_index, age_index)];
   }
 
@@ -187,8 +190,7 @@ struct SizeProducts {
    * @param size_bin_index Size-bin index.
    * @return Const reference to age-to-size probability.
    */
-  inline const Type& ProbSize(std::size_t year_index,
-                              std::size_t age_index,
+  inline const Type& ProbSize(std::size_t year_index, std::size_t age_index,
                               std::size_t size_bin_index) const {
     return prob_size[AgeYearSizeIndex(year_index, age_index, size_bin_index)];
   }

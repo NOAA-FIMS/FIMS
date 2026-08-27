@@ -24,9 +24,9 @@ namespace fims_popdy {
  * observe it.
  */
 struct SizeGrid {
-  std::size_t n_bins = 0;        /*!< number of biological size bins */
-  fims::Vector<double> edges;    /*!< size-bin edges on the natural scale */
-  fims::Vector<double> centers;  /*!< size-bin centers on the natural scale */
+  std::size_t n_bins = 0;       /*!< number of biological size bins */
+  fims::Vector<double> edges;   /*!< size-bin edges on the natural scale */
+  fims::Vector<double> centers; /*!< size-bin centers on the natural scale */
 
   /**
    * @brief Return whether the bin edges are strictly increasing.
@@ -73,7 +73,8 @@ struct SizeGrid {
   }
 
   /**
-   * @brief Return whether the grid dimensions and geometry are internally consistent.
+   * @brief Return whether the grid dimensions and geometry are internally
+   * consistent.
    * @return True when the bin counts match and the grid geometry is valid.
    */
   bool IsConsistent() const {

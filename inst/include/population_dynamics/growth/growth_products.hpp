@@ -25,11 +25,11 @@ namespace fims_popdy {
 template <typename Type>
 struct GrowthProducts {
   std::size_t n_years = 0; /**< number of years represented */
-  std::size_t n_ages = 0; /**< number of ages represented */
+  std::size_t n_ages = 0;  /**< number of ages represented */
   std::size_t n_sexes = 0; /**< number of sexes represented */
 
   std::vector<Type> mean_LAA; /**< mean length-at-age values */
-  std::vector<Type> sd_LAA; /**< standard deviation of length-at-age values */
+  std::vector<Type> sd_LAA;   /**< standard deviation of length-at-age values */
   std::vector<Type> mean_WAA; /**< mean weight-at-age values */
 
   /**
@@ -120,7 +120,8 @@ struct GrowthProducts {
    * @param s Sex index.
    * @return Const reference to the requested value.
    */
-  inline const Type& MeanLAA(std::size_t y, std::size_t a, std::size_t s) const {
+  inline const Type& MeanLAA(std::size_t y, std::size_t a,
+                             std::size_t s) const {
     return mean_LAA[Index(y, a, s)];
   }
 
@@ -142,7 +143,8 @@ struct GrowthProducts {
    * @param s Sex index.
    * @return Const reference to the requested value.
    */
-  inline const Type& MeanWAA(std::size_t y, std::size_t a, std::size_t s) const {
+  inline const Type& MeanWAA(std::size_t y, std::size_t a,
+                             std::size_t s) const {
     return mean_WAA[Index(y, a, s)];
   }
 

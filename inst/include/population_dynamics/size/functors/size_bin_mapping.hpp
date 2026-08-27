@@ -34,19 +34,17 @@ struct SizeBinMapping {
    * @param right_b Right edge of interval B.
    * @return Non-negative overlap width.
    */
-  static double OverlapWidth(double left_a,
-                             double right_a,
-                             double left_b,
+  static double OverlapWidth(double left_a, double right_a, double left_b,
                              double right_b) {
     return (std::max)(
-        0.0,
-        (std::min)(right_a, right_b) - (std::max)(left_a, left_b));
+        0.0, (std::min)(right_a, right_b) - (std::max)(left_a, left_b));
   }
 
   /**
    * @brief Check that a bin-edge vector is usable for geometric mapping.
    * @param edges Bin edges to validate.
-   * @return True when there are at least 2 edges and they are strictly increasing.
+   * @return True when there are at least 2 edges and they are strictly
+   * increasing.
    */
   static bool HasStrictlyIncreasingEdges(const fims::Vector<double>& edges) {
     if (edges.size() < 2) {
@@ -63,7 +61,8 @@ struct SizeBinMapping {
   }
 
   /**
-   * @brief Build overlap-based rebinning weights from source bins to destination bins.
+   * @brief Build overlap-based rebinning weights from source bins to
+   * destination bins.
    * @param source_edges Population biological size-grid edges.
    * @param destination_edges Fleet observation-bin edges.
    * @return Matrix of weights stored as [destination_bin][source_bin].
@@ -104,8 +103,8 @@ struct SizeBinMapping {
         const double destination_left = destination_edges[i];
         const double destination_right = destination_edges[i + 1];
         const double source_width = source_right - source_left;
-        const double overlap = OverlapWidth(source_left, source_right,
-                                            destination_left, destination_right);
+        const double overlap = OverlapWidth(
+            source_left, source_right, destination_left, destination_right);
 
         weights[i][j] = source_width > 0.0 ? overlap / source_width : 0.0;
       }
@@ -168,8 +167,7 @@ struct SizeBinMapping {
 
     if (expanded_edges[last_destination_edge] <
         source_edges[last_source_edge]) {
-      expanded_edges[last_destination_edge] =
-          source_edges[last_source_edge];
+      expanded_edges[last_destination_edge] = source_edges[last_source_edge];
     }
 
     return expanded_edges;
@@ -205,7 +203,6 @@ struct SizeBinMapping {
 
     return destination_mass;
   }
-
 };
 
 }  // namespace fims_popdy

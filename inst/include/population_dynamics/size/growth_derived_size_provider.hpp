@@ -52,7 +52,8 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
   void PrepareSizeProducts() override {
     if (!population_size_grid_) {
       throw std::runtime_error(
-          "GrowthDerivedSizeProvider requires a population biological size grid");
+          "GrowthDerivedSizeProvider requires a population biological size "
+          "grid");
     }
 
     if (!population_size_grid_->IsConsistent()) {
@@ -87,8 +88,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
           "products with n_sexes == 1");
     }
 
-    size_products_.ResizeProbSizeOnly(n_years_,
-                                      n_ages_,
+    size_products_.ResizeProbSizeOnly(n_years_, n_ages_,
                                       population_size_grid_->n_bins);
 
     const Type plus_group_warning_threshold = static_cast<Type>(0.01);
@@ -103,10 +103,9 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
         const Type negative_tolerance = static_cast<Type>(1e-10);
 
         for (std::size_t size_bin_index = 0;
-             size_bin_index < population_size_grid_->n_bins;
-             ++size_bin_index) {
-          Type bin_prob = PopulationSizeBinProb(
-              growth_products, year_index, age_index, size_bin_index);
+             size_bin_index < population_size_grid_->n_bins; ++size_bin_index) {
+          Type bin_prob = PopulationSizeBinProb(growth_products, year_index,
+                                                age_index, size_bin_index);
 
           if (!(bin_prob >= -negative_tolerance)) {
             throw std::runtime_error(
@@ -132,17 +131,13 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
             SizeProbabilityNormalization::SafeDenominator(row_sum);
 
         for (std::size_t size_bin_index = 0;
-             size_bin_index < population_size_grid_->n_bins;
-             ++size_bin_index) {
+             size_bin_index < population_size_grid_->n_bins; ++size_bin_index) {
           size_products_.ProbSize(year_index, age_index, size_bin_index) =
               prob_row[size_bin_index] / safe_row_sum;
         }
 
-        const Type plus_group_prob =
-            size_products_.ProbSize(
-                year_index,
-                age_index,
-                population_size_grid_->n_bins - 1);
+        const Type plus_group_prob = size_products_.ProbSize(
+            year_index, age_index, population_size_grid_->n_bins - 1);
 
         if (!plus_group_warning_needed &&
             plus_group_prob > plus_group_warning_threshold) {
@@ -158,8 +153,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
           "Growth-derived size preparation placed more than 0.01 "
           "probability in the terminal biological plus-group bin for at "
           "least one year-age row. First occurrence was year index " +
-          fims::to_string(warning_year_index) +
-          ", age index " +
+          fims::to_string(warning_year_index) + ", age index " +
           fims::to_string(warning_age_index) +
           ". The population biological size grid may need to be widened.");
       plus_group_warning_emitted_ = true;
@@ -182,8 +176,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     return PreparedGrowthProducts().SdLAA(year_index, age_index, 0);
   }
 
-  const Type& ProbSize(std::size_t year_index,
-                       std::size_t age_index,
+  const Type& ProbSize(std::size_t year_index, std::size_t age_index,
                        std::size_t size_bin_index) const override {
     if (!size_products_prepared_) {
       throw std::runtime_error(
@@ -193,8 +186,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     return size_products_.ProbSize(year_index, age_index, size_bin_index);
   }
 
-  void SetGrowth(
-      std::shared_ptr<GrowthDerivedObservationBase<Type>> growth) {
+  void SetGrowth(std::shared_ptr<GrowthDerivedObservationBase<Type>> growth) {
     growth_observation_ = growth;
     size_products_prepared_ = false;
     plus_group_warning_emitted_ = false;
@@ -202,8 +194,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
 
  private:
   Type PopulationSizeBinProb(const GrowthProducts<Type>& growth_products,
-                             std::size_t year_index,
-                             std::size_t age_index,
+                             std::size_t year_index, std::size_t age_index,
                              std::size_t size_bin_index) const {
     if (!population_size_grid_ || population_size_grid_->n_bins == 0) {
       throw std::runtime_error(
@@ -212,9 +203,9 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     }
 
     const Type mean_laa = growth_products.MeanLAA(year_index, age_index, 0);
-    const Type sd_laa = fims_math::ad_max(
-        growth_products.SdLAA(year_index, age_index, 0),
-        static_cast<Type>(1e-8));
+    const Type sd_laa =
+        fims_math::ad_max(growth_products.SdLAA(year_index, age_index, 0),
+                          static_cast<Type>(1e-8));
 
     if (population_size_grid_->n_bins == 1) {
       return static_cast<Type>(1.0);

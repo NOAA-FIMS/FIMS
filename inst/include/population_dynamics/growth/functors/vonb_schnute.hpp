@@ -16,7 +16,8 @@
 namespace fims_popdy {
 
 /**
- * @brief VonBertalanffySchnute growth functor for length-at-age and weight-at-age.
+ * @brief VonBertalanffySchnute growth functor for length-at-age and
+ * weight-at-age.
  *
  * Parameterization using length at two reference ages:
  * L(a) = mean_length_young +
@@ -31,8 +32,8 @@ namespace fims_popdy {
 template <typename Type>
 struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
   Type mean_length_young = Type(0.0); /**< expected length at reference age 1 */
-  Type mean_length_old = Type(0.0); /**< expected length at reference age 2 */
-  Type growth_coefficient = Type(0.0); /**< growth coefficient */
+  Type mean_length_old = Type(0.0);   /**< expected length at reference age 2 */
+  Type growth_coefficient = Type(0.0);         /**< growth coefficient */
   Type reference_age_for_length_1 = Type(0.0); /**< first reference age */
   Type reference_age_for_length_2 = Type(0.0); /**< second reference age */
 
@@ -108,19 +109,18 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
       // This no-seasons ramp goes from length 0 at age 0 to L1 at A1;
       // seasonal growth may need a different transition in the future.
       const Type age_nonnegative = age <= Type(0.0) ? Type(0.0) : age;
-      return mean_length_young * age_nonnegative /
-             reference_age_for_length_1;
+      return mean_length_young * age_nonnegative / reference_age_for_length_1;
     }
 
-    const Type denom = Type(1.0) -
-        fims_math::exp(-growth_coefficient * (reference_age_for_length_2 -
-                                                reference_age_for_length_1));
+    const Type denom = Type(1.0) - fims_math::exp(-growth_coefficient *
+                                                  (reference_age_for_length_2 -
+                                                   reference_age_for_length_1));
     // AD-safe floor to avoid divide-by-zero/NaN when denominator is tiny.
-    const Type denom_safe = fims_math::ad_max(
-        fims_math::ad_fabs(denom), static_cast<Type>(1e-8));
-    const Type numer = Type(1.0) -
-        fims_math::exp(-growth_coefficient *
-                       (age - reference_age_for_length_1));
+    const Type denom_safe =
+        fims_math::ad_max(fims_math::ad_fabs(denom), static_cast<Type>(1e-8));
+    const Type numer =
+        Type(1.0) - fims_math::exp(-growth_coefficient *
+                                   (age - reference_age_for_length_1));
     return mean_length_young +
            (mean_length_old - mean_length_young) * numer / denom_safe;
   }
@@ -132,8 +132,7 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
    */
   Type log_length_at_age(const Type& age) const {
     const Type length = length_at_age(age);
-    const Type length_safe = fims_math::ad_max(
-        length, static_cast<Type>(1e-8));
+    const Type length_safe = fims_math::ad_max(length, static_cast<Type>(1e-8));
     return fims_math::log(length_safe);
   }
 
@@ -148,8 +147,7 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
    * @param d_log_laa_d_k Output derivative with respect to
    * growth_coefficient.
    */
-  void log_length_at_age_gradient(const Type& age,
-                                  Type& d_log_laa_d_l1,
+  void log_length_at_age_gradient(const Type& age, Type& d_log_laa_d_l1,
                                   Type& d_log_laa_d_l2,
                                   Type& d_log_laa_d_k) const {
     ValidateLengthParameters();
@@ -159,8 +157,8 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
       const Type age_nonnegative = age <= Type(0.0) ? Type(0.0) : age;
       const Type ratio = age_nonnegative / reference_age_for_length_1;
       const Type mean_length = mean_length_young * ratio;
-      const Type mean_length_safe = fims_math::ad_max(
-          mean_length, static_cast<Type>(1e-8));
+      const Type mean_length_safe =
+          fims_math::ad_max(mean_length, static_cast<Type>(1e-8));
 
       d_log_laa_d_l1 = ratio / mean_length_safe;
       d_log_laa_d_l2 = Type(0.0);
@@ -172,30 +170,27 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
     const Type age_delta_2 =
         reference_age_for_length_2 - reference_age_for_length_1;
 
-    const Type exp_num =
-        fims_math::exp(-growth_coefficient * age_delta_1);
-    const Type exp_den =
-        fims_math::exp(-growth_coefficient * age_delta_2);
+    const Type exp_num = fims_math::exp(-growth_coefficient * age_delta_1);
+    const Type exp_den = fims_math::exp(-growth_coefficient * age_delta_2);
 
     const Type numer = Type(1.0) - exp_num;
     const Type denom = Type(1.0) - exp_den;
-    const Type denom_safe = fims_math::ad_max(
-        fims_math::ad_fabs(denom), static_cast<Type>(1e-8));
+    const Type denom_safe =
+        fims_math::ad_max(fims_math::ad_fabs(denom), static_cast<Type>(1e-8));
 
     const Type ratio = numer / denom_safe;
     const Type delta_length = mean_length_old - mean_length_young;
     const Type mean_length = mean_length_young + delta_length * ratio;
-    const Type mean_length_safe = fims_math::ad_max(
-        mean_length, static_cast<Type>(1e-8));
+    const Type mean_length_safe =
+        fims_math::ad_max(mean_length, static_cast<Type>(1e-8));
 
     const Type d_length_d_l1 = Type(1.0) - ratio;
     const Type d_length_d_l2 = ratio;
 
     const Type d_numer_d_k = age_delta_1 * exp_num;
     const Type d_denom_d_k = age_delta_2 * exp_den;
-    const Type d_ratio_d_k =
-        (d_numer_d_k * denom_safe - numer * d_denom_d_k) /
-        (denom_safe * denom_safe);
+    const Type d_ratio_d_k = (d_numer_d_k * denom_safe - numer * d_denom_d_k) /
+                             (denom_safe * denom_safe);
     const Type d_length_d_k = delta_length * d_ratio_d_k;
 
     d_log_laa_d_l1 = d_length_d_l1 / mean_length_safe;
@@ -224,8 +219,8 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
     Type d_log_laa_d_l2 = Type(0.0);
     Type d_log_laa_d_k = Type(0.0);
 
-    log_length_at_age_gradient(
-        age, d_log_laa_d_l1, d_log_laa_d_l2, d_log_laa_d_k);
+    log_length_at_age_gradient(age, d_log_laa_d_l1, d_log_laa_d_l2,
+                               d_log_laa_d_k);
 
     d_log_laa_d_log_l1 = d_log_laa_d_l1 * mean_length_young;
     d_log_laa_d_log_l2 = d_log_laa_d_l2 * mean_length_old;

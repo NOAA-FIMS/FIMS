@@ -17,5 +17,4 @@
 #include "functors/vonb_schnute.hpp"
 #include "growth_model_adapter.hpp"
 
-
 #endif /* FIMS_POPULATION_DYNAMICS_GROWTH_HPP */
