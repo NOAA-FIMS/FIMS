@@ -39,8 +39,13 @@ execute_process(
   COMMAND git describe --tags --abbrev=0
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   OUTPUT_VARIABLE VERSION
+  ERROR_QUIET
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+
+if(NOT VERSION)
+  set(VERSION "unknown")
+endif()
 
 # Set up doxygen: download doxygen 1.9.3 and add it to the PATH
 option(BUILD_DOC "Build documentation" ON)
@@ -111,7 +116,19 @@ EXECUTE_PROCESS(
 MESSAGE(STATUS "R_HOME is ${R_HOME}")
 
 EXECUTE_PROCESS(
-		COMMAND R "--slave" "--no-save" "-e" "remotes::install_local(dependencies = FALSE)")
+  COMMAND R "--slave" "--no-save" "-e"
+          "cat(system.file('include', package = 'RcppEigen'))"
+  OUTPUT_VARIABLE RCPPEIGEN_INCLUDE
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+IF(NOT RCPPEIGEN_INCLUDE OR NOT EXISTS "${RCPPEIGEN_INCLUDE}/Eigen/Core")
+  MESSAGE(FATAL_ERROR
+    "Could not find Eigen headers through the RcppEigen package. "
+    "RcppEigen include path: '${RCPPEIGEN_INCLUDE}'")
+ENDIF()
+
+MESSAGE(STATUS "RcppEigen include directory is ${RCPPEIGEN_INCLUDE}")
+
 EXECUTE_PROCESS(
 		COMMAND R "--slave" "--no-save" "-e" "FIMS:::setup_gtest()")
 
@@ -132,6 +149,7 @@ target_include_directories(fims_test
     inst/include/utilities
     ${rcpp_SOURCE_DIR}/inst/include
     ${R_HOME}/include
+    ${RCPPEIGEN_INCLUDE}
 )
 
 # Add compile definition STD_LIB to the fims_test target.

@@ -52,14 +52,14 @@ namespace
     info->density_components[1] = normal_inflection_point;
     info->density_components[2] = lognormal_slope;
     // Set up inflection point key. Keys 1 and 3 will reference variable map 1 and 3
-    normal_inflection_point->key.resize(2);
-    normal_inflection_point->key[0] = 1;
-    normal_inflection_point->key[1] = 3;
+    normal_inflection_point->key.observed_id.resize(2);
+    normal_inflection_point->key.observed_id[0] = 1;
+    normal_inflection_point->key.observed_id[1] = 3;
     normal_inflection_point->input_type = "prior";
     // Set up slope key. Keys 2 and 4 will reference variable map 2 and 4
-    lognormal_slope->key.resize(2);
-    lognormal_slope->key[0] = 2;
-    lognormal_slope->key[1] = 4;
+    lognormal_slope->key.observed_id.resize(2);
+    lognormal_slope->key.observed_id[0] = 2;
+    lognormal_slope->key.observed_id[1] = 4;
     lognormal_slope->input_type = "prior";
 
     // Call function that links key ID to variable map pointers given variable map ID

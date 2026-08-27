@@ -247,6 +247,9 @@ initialize_data_distribution <- function(
 #'   sd = list(value = 0.4, estimation_type = "constant")
 #' )
 #' }
+#' @rdname initialize_data_distribution
+#' @keywords distribution
+#' @export
 initialize_process_distribution <- function(
   module,
   par,
@@ -333,10 +336,7 @@ initialize_process_distribution <- function(
   } else {
     new_module$set_distribution_links(
       "random_effects",
-      c(
-        module$field(par)$get_id(),
-        module$field(expected)$get_id()
-      )
+      c(module$field(par)$get_id(), module$field(expected)$get_id())
     )
   }
 

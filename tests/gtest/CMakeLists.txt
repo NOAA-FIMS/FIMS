@@ -124,6 +124,18 @@ target_link_libraries(information_Information_SetupRandomEffects
 )
 gtest_discover_tests(information_Information_SetupRandomEffects)
 
+# test_Interface_DistributionLinkage.cpp
+add_executable(Interface_DistributionLinkage
+  test_interface_DistributionLinkage.cpp
+)
+add_as_invoker_manifest(Interface_DistributionLinkage)
+target_link_libraries(Interface_DistributionLinkage
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(Interface_DistributionLinkage)
+
+
 # test_srBevertonHolt_SRBevertonHolt_evaluateMean.cpp
 add_executable(srBevertonHolt_SRBevertonHolt_evaluateMean
   test_srBevertonHolt_SRBevertonHolt_evaluateMean.cpp

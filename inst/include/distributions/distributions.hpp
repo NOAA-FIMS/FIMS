@@ -15,5 +15,7 @@
 #include "functors/lognormal_lpdf.hpp"
 #include "functors/multinomial_lpmf.hpp"
 #include "functors/normal_lpdf.hpp"
+#include "functors/precision_builders.hpp"
+#include "functors/gmrf.hpp"
 
 #endif /* FIMS_DISTRIBUTIONS_HPP */

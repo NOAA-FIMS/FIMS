@@ -29,7 +29,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The unique ID for the variable map that points to a fims::Vector.
    */
-  std::shared_ptr<std::vector<uint32_t>> key_m;
+  std::shared_ptr<fims_distributions::DistributionKey> key_m;
   /**
    * @brief The type of density input. The options are prior, re, or data.
    */
@@ -78,7 +78,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The constructor.
    */
   DistributionsInterfaceBase() {
-    this->key_m = std::make_shared<std::vector<uint32_t>>();
+    this->key_m = std::make_shared<fims_distributions::DistributionKey>();
     this->id_m = DistributionsInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     DistributionsInterfaceBase */
@@ -112,12 +112,50 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param input_type String that sets whether the distribution type is for
    * priors, random effects, or data.
-   * @param ids Vector of unique ids for each linked parameter(s), derived
-   * value(s), or observed data vector.
+   * @param observed_id Unique ID for the observed data object.
+   * @param expected_id Unique ID for the expected value object.
+   * @param uncertainty_id Unique ID for the uncertainty object.
    */
   virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    return false;
+                                      std::vector<uint32_t> observed_id,
+                                      std::vector<uint32_t> expected_id,
+                                      uint32_t uncertainty_id) {
+    this->input_type_m.set(input_type);
+    this->key_m->observed_id.clear();
+    this->key_m->observed_id.insert(this->key_m->observed_id.end(),
+                                    observed_id.begin(), observed_id.end());
+    this->key_m->expected_id.clear();
+    this->key_m->expected_id.insert(this->key_m->expected_id.end(),
+                                    expected_id.begin(), expected_id.end());
+    this->key_m->uncertainty_id = uncertainty_id;
+    return true;
+  }
+
+  /**
+   * @brief Converts the R ID vector to the structured distribution key.
+   * @param input_type Distribution pathway, such as data or random_effects.
+   * @param ids IDs supplied by the R interface.
+   * @return True when the key is populated.
+   */
+  bool set_distribution_links_from_r(std::string input_type,
+                                     Rcpp::IntegerVector ids) {
+    std::vector<uint32_t> observed_id;
+    std::vector<uint32_t> expected_id;
+    for (R_xlen_t i = 0; i < ids.size(); ++i) {
+      // A prior can be linked to multiple scalar parameter vectors, so every
+      // supplied ID identifies an observed value. For data and random effects,
+      // retain the convention that the remaining IDs identify expected values.
+      if (input_type == "prior") {
+        observed_id.push_back(static_cast<uint32_t>(ids[i]));
+      } else if (input_type == "data" || i > 0) {
+        expected_id.push_back(static_cast<uint32_t>(ids[i]));
+      } else {
+        observed_id.push_back(static_cast<uint32_t>(ids[i]));
+      }
+    }
+    return this->set_distribution_links(
+        input_type, observed_id, expected_id,
+        static_cast<uint32_t>(-999));
   }
 
   /**
@@ -189,7 +227,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Vector that records the individual log probability function for each
    * observation.
    */
-  RealVector lpdf_vec; /**< The vector*/
+  /** @brief The vector */
+  RealVector lpdf_vec;
 
   /**
    * @brief The constructor.
@@ -244,18 +283,6 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     return true;
   }
 
-  /**
-   * @copydoc DistributionsInterfaceBase::set_distribution_links
-   */
-  virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
-    this->key_m->resize(ids.size());
-    for (R_xlen_t i = 0; i < ids.size(); i++) {
-      this->key_m->at(i) = ids[i];
-    }
-    return true;
-  }
 
   /**
    * @brief Evaluate normal probability density function (pdf). The natural log
@@ -455,9 +482,14 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->observed_data_id_m = interface_observed_data_id_m;
     std::stringstream ss;
     distribution->input_type = this->input_type_m;
-    distribution->key.resize(this->key_m->size());
-    for (size_t i = 0; i < this->key_m->size(); i++) {
-      distribution->key[i] = this->key_m->at(i);
+    distribution->key.observed_id.resize(this->key_m->observed_id.size());
+    distribution->key.expected_id.resize(this->key_m->expected_id.size());
+    distribution->key.uncertainty_id = this->key_m->uncertainty_id;
+    for (size_t i = 0; i < this->key_m->observed_id.size(); i++) {
+      distribution->key.observed_id[i] = this->key_m->observed_id[i];
+    }
+    for (size_t i = 0; i < this->key_m->expected_id.size(); i++) {
+      distribution->key.expected_id[i] = this->key_m->expected_id[i];
     }
     distribution->id = this->id_m;
     distribution->observed_values.resize(this->observed_values.size());
@@ -550,7 +582,8 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Vector that records the individual log probability function for each
    * observation.
    */
-  RealVector lpdf_vec; /**< The vector */
+  /** @brief The vector */
+  RealVector lpdf_vec;
 
   /**
    * @brief The constructor.
@@ -594,23 +627,6 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     return true;
   }
 
-  /**
-   * @brief Sets pointers for data observations, random effects, or priors.
-   *
-   * @param input_type String that sets whether the distribution type is for
-   * priors, random effects, or data.
-   * @param ids Vector of unique ids for each linked parameter(s), derived
-   * value(s), or observed data vector.
-   */
-  virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
-    this->key_m->resize(ids.size());
-    for (R_xlen_t i = 0; i < ids.size(); i++) {
-      this->key_m->at(i) = ids[i];
-    }
-    return true;
-  }
 
   /**
    * @brief Evaluate lognormal probability density function (pdf). The natural
@@ -795,9 +811,14 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     std::stringstream ss;
     distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
-    distribution->key.resize(this->key_m->size());
-    for (size_t i = 0; i < this->key_m->size(); i++) {
-      distribution->key[i] = this->key_m->at(i);
+    distribution->key.observed_id.resize(this->key_m->observed_id.size());
+    distribution->key.expected_id.resize(this->key_m->expected_id.size());
+    distribution->key.uncertainty_id = this->key_m->uncertainty_id;
+    for (size_t i = 0; i < this->key_m->observed_id.size(); i++) {
+      distribution->key.observed_id[i] = this->key_m->observed_id[i];
+    }
+    for (size_t i = 0; i < this->key_m->expected_id.size(); i++) {
+      distribution->key.expected_id[i] = this->key_m->expected_id[i];
     }
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
@@ -869,7 +890,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @brief Vector that records the individual log probability function for each
    * observation.
    */
-  RealVector lpdf_vec; /**< The vector */
+  /** @brief The vector */
+  RealVector lpdf_vec;
 
   /**
    * @brief TODO: document this.
@@ -919,23 +941,6 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     return true;
   }
 
-  /**
-   * @brief Sets pointers for data observations, random effects, or priors.
-   *
-   * @param input_type String that sets whether the distribution type is for
-   * priors, random effects, or data.
-   * @param ids Vector of unique ids for each linked parameter(s), derived
-   * value(s), or observed data vector.
-   */
-  virtual bool set_distribution_links(std::string input_type,
-                                      Rcpp::IntegerVector ids) {
-    this->input_type_m.set(input_type);
-    this->key_m->resize(ids.size());
-    for (R_xlen_t i = 0; i < ids.size(); i++) {
-      this->key_m->at(i) = ids[i];
-    }
-    return true;
-  }
 
   /**
    * @brief Set the note object
@@ -1099,9 +1104,14 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     distribution->id = this->id_m;
     distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
-    distribution->key.resize(this->key_m->size());
-    for (size_t i = 0; i < this->key_m->size(); i++) {
-      distribution->key[i] = this->key_m->at(i);
+    distribution->key.observed_id.resize(this->key_m->observed_id.size());
+    distribution->key.expected_id.resize(this->key_m->expected_id.size());
+    distribution->key.uncertainty_id = this->key_m->uncertainty_id;
+    for (size_t i = 0; i < this->key_m->observed_id.size(); i++) {
+      distribution->key.observed_id[i] = this->key_m->observed_id[i];
+    }
+    for (size_t i = 0; i < this->key_m->expected_id.size(); i++) {
+      distribution->key.expected_id[i] = this->key_m->expected_id[i];
     }
     distribution->observed_values.resize(this->observed_values.size());
     for (size_t i = 0; i < this->observed_values.size(); i++) {
@@ -1128,5 +1138,76 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
 #endif
 };
+
+/**
+ * @brief The Rcpp interface for the GMRF distribution.
+ */
+class GMRFDistributionsInterface : public DistributionsInterfaceBase {
+ public:
+  /** @brief Global GMRF interface ID counter. */
+  static uint32_t id_g;
+  /** @brief Live GMRF interface objects. */
+  static std::map<uint32_t, std::shared_ptr<GMRFDistributionsInterface>>
+      live_objects;
+
+  /** @brief Precision-builder interface ID. */
+  SharedInt precision_builder_id_m = -999;
+  /** @brief Per-observation log-likelihood contributions. */
+  RealVector lpdf_vec;
+
+  GMRFDistributionsInterface() : DistributionsInterfaceBase() {
+    GMRFDistributionsInterface::live_objects[this->id_m] =
+        std::make_shared<GMRFDistributionsInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        GMRFDistributionsInterface::live_objects[this->id_m]);
+  }
+
+  /** @brief Copy constructor. */
+  GMRFDistributionsInterface(const GMRFDistributionsInterface& other)
+      : DistributionsInterfaceBase(other),
+        precision_builder_id_m(other.precision_builder_id_m),
+        lpdf_vec(other.lpdf_vec) {}
+
+  virtual ~GMRFDistributionsInterface() {}
+
+  virtual uint32_t get_id() { return this->id_m; }
+
+  /** @brief Sets the precision-builder interface ID. */
+  bool set_precision_builder_id(int precision_builder_id) {
+    this->precision_builder_id_m.set(precision_builder_id);
+    return true;
+  }
+
+  virtual double evaluate() { return 0.0; }
+
+#ifdef TMB_MODEL
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+    std::shared_ptr<fims_distributions::GMRF<Type>> distribution =
+        std::make_shared<fims_distributions::GMRF<Type>>();
+    distribution->id = this->id_m;
+    distribution->input_type = this->input_type_m;
+    distribution->key = *this->key_m;
+    info->density_components[distribution->id] = distribution;
+    return true;
+  }
+
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+    return true;
+  }
+#endif
+};
+
+/** @brief Adapts the shared R link method to an Rcpp concrete class. */
+template <typename Distribution>
+bool set_distribution_links_adapter(Distribution* distribution,
+                                    std::string input_type,
+                                    Rcpp::IntegerVector ids) {
+  return distribution->set_distribution_links_from_r(input_type, ids);
+}
 
 #endif

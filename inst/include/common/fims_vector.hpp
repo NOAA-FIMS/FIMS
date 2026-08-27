@@ -142,7 +142,9 @@ class Vector {
    */
   inline Type &operator[](size_t pos) {
     if (pos >= this->size()) {
-      throw std::invalid_argument("fims::Vector out of bounds");
+      throw std::invalid_argument(
+          "fims::Vector out of bounds: index " + std::to_string(pos) +
+          ", size " + std::to_string(this->size()));
     }
     return this->vec_m[pos];
   }
@@ -153,7 +155,9 @@ class Vector {
    */
   inline const Type &operator[](size_t n) const {
     if (n >= this->size()) {
-      throw std::invalid_argument("fims::Vector out of bounds");
+      throw std::invalid_argument(
+          "fims::Vector out of bounds: index " + std::to_string(n) +
+          ", size " + std::to_string(this->size()));
     }
     return this->vec_m[n];
   }
@@ -228,10 +232,21 @@ class Vector {
   inline iterator begin() { return this->vec_m.begin(); }
 
   /**
+   * @brief Returns a constant iterator to the first element of the vector.
+   */
+  inline const_iterator begin() const { return this->vec_m.begin(); }
+
+  /**
    * @brief Returns an iterator to the element following the last element of the
    * vector.
    */
   inline iterator end() { return this->vec_m.end(); }
+
+  /**
+   * @brief Returns a constant iterator to the element following the last
+   * element of the vector.
+   */
+  inline const_iterator end() const { return this->vec_m.end(); }
 
   /**
    * @brief Returns a reverse iterator to the first element of the reversed
@@ -354,10 +369,19 @@ class Vector {
   /**
    * @brief Adds an element to the end.
    */
-  inline void push_back(const Type &&value) { this->vec_m.push_back(value); }
+  inline void push_back(const Type &value) { this->vec_m.push_back(value); }
 
   /**
-   * @brief Constructs an element in-place at the end.
+   * @brief Moves an element to the end of the vector.
+   * @details Transfers a temporary object into the container.
+   * @param value The temporary element whose contents will be moved and appended.
+   */
+  inline void push_back(Type &&value) { this->vec_m.push_back(std::move(value)); }
+
+  /**
+   * @brief Constructs and appends an element in place.
+   * @tparam Args Constructor argument types.
+   * @param args Arguments forwarded to the element constructor.
    */
   template <class... Args>
   void emplace_back(Args &&...args) {

@@ -17,6 +17,8 @@
 #include <vector>
 
 #include "../distributions/distributions.hpp"
+#include "../distributions/functors/gmrf.hpp"
+#include "../distributions/functors/precision_builders.hpp"
 #include "../models/functors/fishery_model_base.hpp"
 #include "../population_dynamics/fleet/fleet.hpp"
 #include "../population_dynamics/growth/growth.hpp"
@@ -130,6 +132,16 @@ class Information {
       density_components_iterator;
   /**< iterator for distribution objects>*/
 
+  std::map<
+      uint32_t,
+      std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>>>
+      precision_builders; /**< map of sparse precision-matrix builders keyed by interface id */
+  typedef typename std::map<
+      uint32_t,
+      std::shared_ptr<fims_distributions::PrecisionMatrixBuilderBase<Type>>>::iterator
+      precision_builders_iterator;
+  /**< iterator for precision-builder objects>*/
+
   std::unordered_map<uint32_t,
                      std::shared_ptr<fims_popdy::FisheryModelBase<Type>>>
       models_map; /**<hash map of fishery models, e.g., CAA, GMACS, Spatial,
@@ -212,8 +224,12 @@ class Information {
       if (d->re_expected_values) {
         d->re_expected_values->clear();
       }
+      if (d->uncertainty) {
+        d->uncertainty->clear();
+      }
     }
     this->density_components.clear();
+    this->precision_builders.clear();
   }
 
   /**
@@ -228,7 +244,7 @@ class Information {
   std::string State() {
     std::stringstream ss;
     ss << "Information object State:\n";
-    ss << "data_objects: " << this->data_objects.clear();
+    ss << "data_objects: " << this->data_objects.size() << std::endl;
     ss << "populations: " << this->populations.size() << std::endl;
     ss << "fixed_effects_parameters: " << this->fixed_effects_parameters.size()
        << std::endl;
@@ -317,13 +333,13 @@ class Information {
         FIMS_INFO_LOG("Setup prior for distribution " + fims::to_string(d->id));
         variable_map_iterator vmit;
         FIMS_INFO_LOG("Link prior from distribution " + fims::to_string(d->id) +
-                      " to parameter " + fims::to_string(d->key[0]));
-        d->priors.resize(d->key.size());
-        for (size_t i = 0; i < d->key.size(); i++) {
+                      " to parameter " +
+                      fims::to_string(d->key.observed_id[0]));
+        d->priors.resize(d->key.observed_id.size());
+        for (size_t i = 0; i < d->key.observed_id.size(); i++) {
           FIMS_INFO_LOG("Link prior from distribution " +
-                        fims::to_string(d->id) + " to parameter " +
-                        fims::to_string(d->key[0]));
-          vmit = this->variable_map.find(d->key[i]);
+                        fims::to_string(d->key.observed_id[i]));
+          vmit = this->variable_map.find(d->key.observed_id[i]);
           d->priors[i] = (*vmit).second;
         }
         FIMS_INFO_LOG("Prior size for distribution " + fims::to_string(d->id) +
@@ -338,26 +354,51 @@ class Information {
    */
   void SetupRandomEffects() {
     for (density_components_iterator it = this->density_components.begin();
-         it != this->density_components.end(); ++it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*it).second;
+        it != this->density_components.end(); ++it) {
+      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d = (*it).second;
+
       if (d->input_type == "random_effects") {
-        FIMS_INFO_LOG("Setup random effects for distribution " +
-                      fims::to_string(d->id));
+        FIMS_INFO_LOG("Setup random effects for distribution " + fims::to_string(d->id));
         variable_map_iterator vmit;
-        FIMS_INFO_LOG("Link random effects from distribution " +
-                      fims::to_string(d->id) + " to derived value " +
-                      fims::to_string(d->key[0]));
-        vmit = this->variable_map.find(d->key[0]);
-        d->re = (*vmit).second;
-        if (d->key.size() == 2) {
-          vmit = this->variable_map.find(d->key[1]);
-          d->re_expected_values = (*vmit).second;
+
+        // 1. Link the observed random effect vector
+        FIMS_INFO_LOG("Link random effects from distribution " + fims::to_string(d->id) +
+                      " to derived value " +
+                      fims::to_string(d->key.observed_id[0]));
+        vmit = this->variable_map.find(d->key.observed_id[0]);
+        if (vmit != this->variable_map.end()) {
+          d->re = (*vmit).second;
         } else {
+          FIMS_ERROR_LOG("Observed ID not found in variable map for distribution " + fims::to_string(d->id));
+        }
+
+        // 2. Link or initialize the expected values
+        if (!d->key.expected_id.empty()) {
+          vmit = this->variable_map.find(d->key.expected_id[0]);
+          if (vmit != this->variable_map.end()) {
+            d->re_expected_values = (*vmit).second;
+          } else {
+            FIMS_ERROR_LOG("Expected ID not found in variable map for distribution " + fims::to_string(d->id));
+          }
+        } else {
+          // Fallback if no expected ID is provided (maintains the previous GMRF resizing behavior)
+          if (d->re) {
+            d->expected_values.resize(d->re->size());
+          }
           d->re_expected_values = &d->expected_values;
         }
-        FIMS_INFO_LOG("Random effect size for distribution " +
-                      fims::to_string(d->id) +
+
+        // 3. Link the uncertainty (this now generically handles the GMRF precision builder pointer)
+        if (d->key.uncertainty_id != static_cast<uint32_t>(-999)) {
+          vmit = this->variable_map.find(d->key.uncertainty_id);
+          if (vmit != this->variable_map.end()) {
+            d->uncertainty = (*vmit).second;
+          } else {
+            FIMS_ERROR_LOG("Uncertainty ID not found in variable map for distribution " + fims::to_string(d->id));
+          }
+        }
+
+        FIMS_INFO_LOG("Random effect size for distribution " + fims::to_string(d->id) +
                       " is: " + fims::to_string(d->observed_values.size()));
       }
     }
@@ -378,8 +419,8 @@ class Information {
         variable_map_iterator vmit;
         FIMS_INFO_LOG("Link expected value from distribution " +
                       fims::to_string(d->id) + " to derived value " +
-                      fims::to_string(d->key[0]));
-        vmit = this->variable_map.find(d->key[0]);
+                      fims::to_string(d->key.expected_id[0]));
+        vmit = this->variable_map.find(d->key.expected_id[0]);
         d->data_expected_values = (*vmit).second;
         FIMS_INFO_LOG(
             "Expected value size for distribution " + fims::to_string(d->id) +

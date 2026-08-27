@@ -19,6 +19,7 @@
 #include "rcpp_objects/rcpp_models.hpp"
 #include "rcpp_objects/rcpp_natural_mortality.hpp"
 #include "rcpp_objects/rcpp_population.hpp"
+#include "rcpp_objects/rcpp_precision_builders.hpp"
 #include "rcpp_objects/rcpp_recruitment.hpp"
 #include "rcpp_objects/rcpp_selectivity.hpp"
 
@@ -325,6 +326,12 @@ void clear_impl(bool get_error_msg) {
 
   DmultinomDistributionsInterface::id_g = 1;
   DmultinomDistributionsInterface::live_objects.clear();
+
+  GMRFDistributionsInterface::id_g = 1;
+  GMRFDistributionsInterface::live_objects.clear();
+
+  DSEMInterface::id_g = 1;
+  DSEMInterface::live_objects.clear();
 
   FisheryModelInterfaceBase::id_g = 1;
   FisheryModelInterfaceBase::live_objects.clear();

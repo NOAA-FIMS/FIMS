@@ -23,6 +23,19 @@
 
 namespace fims_distributions {
 
+/**
+ * @brief Key for linking distributions to observed, expected, and uncertainty
+ * model components.
+ */
+struct DistributionKey {
+  /** @brief IDs of observed data or random-effect vectors. */
+  std::vector<uint32_t> observed_id;
+  /** @brief IDs of expected-value vectors. */
+  std::vector<uint32_t> expected_id;
+  /** @brief ID of the uncertainty or precision-builder object. */
+  uint32_t uncertainty_id = static_cast<uint32_t>(-999);
+};
+
 /** @brief Base class for all module_name functors.
  *
  * @tparam Type The type of the module_name functor.
@@ -48,6 +61,9 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
 
   /** @brief Expected value vector for random-effects pathways. */
   fims::Vector<Type>* re_expected_values = NULL;
+
+  /** @brief Uncertainty vector for random-effects pathways. */
+  fims::Vector<Type>* uncertainty = NULL;
 
   /** @brief Expected value vector for data pathways. */
   fims::Vector<Type>* data_expected_values = NULL;
@@ -132,6 +148,17 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   }
 
   /**
+   * @brief Returns the uncertainty value at a given index.
+   * @param i Index into the uncertainty vector.
+   * @return Reference to the uncertainty value.
+   */
+  inline Type& get_uncertainty(size_t i) {
+    if (this->input_type == "random_effects") {
+      return (*uncertainty)[i];
+    }
+  }
+
+  /**
    * @brief Get length of the active observed input vector.
    * @return Size of the observed input under the current `input_type`.
    */
@@ -202,7 +229,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Unique ID for variable map that points to a fims::Vector.
    */
-  std::vector<uint32_t> key;
+  DistributionKey key;
 
 #ifdef TMB_MODEL
   /**
