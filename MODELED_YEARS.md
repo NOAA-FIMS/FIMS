@@ -106,14 +106,13 @@ The finalized year vector is serialized as population-level metadata:
 
 Annual parameters and derived quantities continue to use dimensionality names
 such as `n_years`, `n_years-1`, and `n_years+1`. Consumers can use the
-population `years` metadata to translate their `year_i` dimension indices into
-calendar years while retaining the existing JSON dimensionality contract.
+population `years` metadata to translate internal year-dimension indices into
+the `timing` values returned by `get_estimates()`.
 
 For example, given `years = c(2001, 2002, 2003)`:
 
-| Dimension | `year_i` values | Calendar-year interpretation |
+| Dimension | Internal indices | `timing` values |
 |---|---:|---:|
 | `n_years` | 1, 2, 3 | 2001, 2002, 2003 |
 | `n_years-1` | 2, 3 | 2002, 2003 |
 | `n_years+1` | 1, 2, 3, 4 | 2001, 2002, 2003, 2004 |
-

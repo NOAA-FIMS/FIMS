@@ -39,6 +39,15 @@ reshape_json_estimates <- function(model_output) {
     \(x) tidyr::unnest_wider(tibble::tibble(json = x), dplyr::all_of("json"))
   )
 
+  modeled_years <- if ("years" %in% names(read_list[["populations"]])) {
+    unlist(
+      read_list[["populations"]][["years"]][[1]],
+      use.names = FALSE
+    )
+  } else {
+    numeric()
+  }
+
 
   # Process the density components
   # TODO: Still need links to the parameter id because we are just joining by
@@ -145,7 +154,10 @@ reshape_json_estimates <- function(model_output) {
       values_to = "parameters"
     ) |>
     # TODO: Think about these ids when we have more than one population
-    dplyr::select(-dplyr::all_of("delete_me"), -dplyr::ends_with("_id"), -dplyr::all_of("population")) |>
+    dplyr::select(
+      -dplyr::any_of(c("delete_me", "population", "years")),
+      -dplyr::ends_with("_id")
+    ) |>
     dplyr::mutate(
       parameters = purrr::map(
         .data$parameters,
@@ -162,11 +174,15 @@ reshape_json_estimates <- function(model_output) {
     module_information,
     population_information
   ) |>
+    dplyr::mutate(
+      timing = year_index_to_timing(.data$year_i, modeled_years)
+    ) |>
     dplyr::select(
       dplyr::all_of(c("module_name", "module_id", "module_type")),
       "label" = dplyr::all_of("name"),
       dplyr::all_of(c("type", "type_id")), "parameter_id" = dplyr::all_of("id"),
-      dplyr::all_of("fleet"), dplyr::ends_with("_i"),
+      dplyr::all_of("fleet"), dplyr::all_of("timing"),
+      dplyr::ends_with("_i"),
       "input" = dplyr::all_of("value"),
       estimated = "estimated_value",
       "expected" = expected_values,
@@ -175,7 +191,22 @@ reshape_json_estimates <- function(model_output) {
       lpdf = "lpdf_value", dplyr::all_of("likelihood"),
       "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
-    )
+    ) |>
+    dplyr::select(-dplyr::all_of("year_i"))
+}
+
+#' Convert annual indices to model timing values
+#'
+#' @param year_index Numeric annual indices from JSON dimensionality metadata.
+#' @param modeled_years Numeric calendar years stored on the population.
+#' @return A numeric vector of model timing values.
+#' @noRd
+year_index_to_timing <- function(year_index, modeled_years) {
+  if (length(modeled_years) == 0) {
+    return(as.numeric(year_index))
+  }
+  timing_lookup <- c(modeled_years, max(modeled_years) + 1)
+  unname(timing_lookup[year_index])
 }
 
 #' Reshape TMB estimates
@@ -345,10 +376,9 @@ dimension_folded_to_tibble <- function(section) {
 #' folded into a single vector in the json output.
 #'
 #' @details
-#' The dimension index is returned not the actual year of the model. For
-#' example, if the model starts in year 1900, then year_i of 1, which is what
-#' is returned from this function will need to map to 1900 and that will need
-#' to be done externally.
+#' This internal helper returns a year index. [reshape_json_estimates()] maps
+#' that index to the population's modeled-year vector and exposes the result as
+#' `timing`.
 #' This function will accommodate dimensions of year-1 and year+1 where the
 #' indexing of the former will start at 2 instead of 1.
 #' @param data A list containing the header and dimensions information from a

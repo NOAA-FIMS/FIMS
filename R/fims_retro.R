@@ -45,7 +45,7 @@
 #' * `estimates` - A data frame containing model estimates from all retrospective
 #'   runs, with the following key columns:
 #'   * `label` - Type of estimate (e.g., "spawning_biomass")
-#'   * `year_i` - Year index for the estimate
+#'   * `timing` - Calendar year for the estimate
 #'   * `age_i` - Age index (if applicable)
 #'   * `estimated` - Point estimate value
 #'   * `uncertainty` - Standard error of the estimate

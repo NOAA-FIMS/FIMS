@@ -17,7 +17,7 @@
 #' | `fleet`       | Fleet identifier (integer)                                |
 #' | `module_id`   | Unique module identifier                                  |
 #' | `distribution`| Likelihood distribution used for this data stream         |
-#' | `year_i`      | Year index (present when available in the estimates)      |
+#' | `timing`      | Calendar year (present when available in the estimates)   |
 #' | `age_i`       | Age index  (present when available in the estimates)      |
 #'
 #' @param x A `FIMSFit` object returned from [fit_fims()].
@@ -82,7 +82,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   }
 
   # Determine which optional index columns are present in the output
-  # (year_i, age_i, length_i, season_i, etc.). These are carried through so
+  # (age_i, length_i, season_i, etc.). These and timing are carried through so
   # users can group metrics by, e.g., year.
   index_cols <- names(fit_rows)[grepl("_i$", names(fit_rows))]
 
@@ -90,7 +90,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   meta_cols <- intersect(
     c(
       "label", "module_id", "module_type", "fleet", "distribution",
-      "estimation_type", index_cols
+      "estimation_type", "timing", index_cols
     ),
     names(fit_rows)
   )

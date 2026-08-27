@@ -18,7 +18,7 @@ if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
-  "parameter_id", "fleet", "year_i", "age_i", "length_i",
+  "parameter_id", "fleet", "timing", "age_i", "length_i",
   "input", "estimated", "expected", "observed",
   "estimation_type", "uncertainty",
   "distribution", "input_type",
@@ -34,10 +34,25 @@ test_that("`get_estimates()` works with deterministic run", {
     object = deterministic_colnames,
     expected = expected_colnames
   )
+  modeled_years <- jsonlite::fromJSON(
+    get_model_output(deterministic_results),
+    simplifyVector = FALSE
+  )[["populations"]][[1]][["years"]] |>
+    unlist(use.names = FALSE)
+  if (length(modeled_years) > 0) {
+    #' @description Test that estimate timing values use modeled calendar years rather than annual indices.
+    expect_true(all(
+      stats::na.omit(get_estimates(deterministic_results)[["timing"]]) %in%
+        c(modeled_years, max(modeled_years) + 1)
+    ))
+  }
 
   #' @description Test that the result values from the model fit have not changed from the accepted version.
   expect_snapshot(
     get_estimates(deterministic_results) |>
+      # Normalize calendar years so snapshots remain independent of the model's
+      # chosen start year.
+      dplyr::mutate(timing = dplyr::dense_rank(.data$timing)) |>
       # Remove the estimate, uncertainty, and gradient columns, as they
       # may change between runs
       dplyr::select(
@@ -78,6 +93,9 @@ test_that("`get_estimates()` works with estimation run", {
     # Read the first RDS file, get estimates, and print a snapshot
     readRDS(fit_files[[1]]) |>
       get_estimates() |>
+      # Normalize calendar years so snapshots remain independent of the model's
+      # chosen start year.
+      dplyr::mutate(timing = dplyr::dense_rank(.data$timing)) |>
       # Remove the estimated, uncertainty, and gradient columns, as they
       # may change between runs
       dplyr::select(

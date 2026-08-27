@@ -61,7 +61,7 @@ A list with two named elements:
 with the following key columns:
 \itemize{
 \item \code{label} - Type of estimate (e.g., "spawning_biomass", "recruitment")
-\item \code{year_i} - Year index for the estimate
+\item \code{timing} - Calendar year for the estimate
 \item \code{age_i} - Age index (if applicable)
 \item \code{estimated} - Point estimate value
 \item \code{uncertainty} - Standard error of the estimate

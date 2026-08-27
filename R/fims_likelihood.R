@@ -59,7 +59,7 @@
 #' * `estimates` - Data frame containing model estimates for each profiled value,
 #'   with the following key columns:
 #'   * `label` - Type of estimate (e.g., "spawning_biomass", "recruitment")
-#'   * `year_i` - Year index for the estimate
+#'   * `timing` - Calendar year for the estimate
 #'   * `age_i` - Age index (if applicable)
 #'   * `estimated` - Point estimate value
 #'   * `uncertainty` - Standard error of the estimate

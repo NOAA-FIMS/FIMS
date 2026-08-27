@@ -28,7 +28,7 @@ spawning_biomass_for_prop_female <- function(prop_female) {
 
   spawning_biomass <- get_estimates(fit) |>
     dplyr::filter(label == "spawning_biomass") |>
-    dplyr::arrange(year_i) |>
+    dplyr::arrange(timing) |>
     dplyr::pull(estimated)
 
   clear()

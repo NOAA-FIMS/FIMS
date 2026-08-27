@@ -327,7 +327,7 @@
       318 Fleet               1 <NA>        agecomp_expected <NA>        NA
       319 Fleet               1 <NA>        agecomp_expected <NA>        NA
       320 Fleet               1 <NA>        agecomp_expected <NA>        NA
-          parameter_id fleet year_i age_i length_i  input observed estimation_type 
+          parameter_id fleet timing age_i length_i  input observed estimation_type 
                  <int> <chr>  <int> <int>    <int>  <dbl>    <dbl> <chr>           
         1            4 NA         1    NA       NA -4.66        NA fixed_effects   
         2          299 NA         2    NA       NA -3.60        NA fixed_effects   
@@ -1303,7 +1303,7 @@
       318 Fleet               1 <NA>        agecomp_expected <NA>        NA
       319 Fleet               1 <NA>        agecomp_expected <NA>        NA
       320 Fleet               1 <NA>        agecomp_expected <NA>        NA
-          parameter_id fleet year_i age_i length_i  input observed estimation_type 
+          parameter_id fleet timing age_i length_i  input observed estimation_type 
                  <int> <chr>  <int> <int>    <int>  <dbl>    <dbl> <chr>           
         1            4 NA         1    NA       NA -4.66        NA fixed_effects   
         2          299 NA         2    NA       NA -3.60        NA fixed_effects   
@@ -1948,4 +1948,3 @@
       319 multinomial  data       -826.     NA
       320 multinomial  data       -826.     NA
       # i 13,676 more rows
-
