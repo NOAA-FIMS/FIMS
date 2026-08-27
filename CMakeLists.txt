@@ -117,15 +117,6 @@ MESSAGE(STATUS "R_HOME is ${R_HOME}")
 
 EXECUTE_PROCESS(
   COMMAND R "--slave" "--no-save" "-e"
-    "if (!requireNamespace('remotes', quietly = TRUE)) install.packages('remotes', repos = 'https://cloud.r-project.org'); remotes::install_local(path = '${CMAKE_SOURCE_DIR}', dependencies = c('Depends', 'Imports', 'LinkingTo'), upgrade = 'never')"
-  RESULT_VARIABLE R_DEPENDENCY_RESULT)
-
-IF(NOT R_DEPENDENCY_RESULT EQUAL 0)
-  MESSAGE(FATAL_ERROR "Failed to install FIMS R dependencies.")
-ENDIF()
-
-EXECUTE_PROCESS(
-  COMMAND R "--slave" "--no-save" "-e"
           "cat(system.file('include', package = 'RcppEigen'))"
   OUTPUT_VARIABLE RCPPEIGEN_INCLUDE
   OUTPUT_STRIP_TRAILING_WHITESPACE)
