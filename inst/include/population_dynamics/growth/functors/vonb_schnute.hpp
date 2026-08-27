@@ -1,6 +1,6 @@
 /**
  * @file vonb_schnute.hpp
- * @brief Defines the VonBSchnuteGrowth class, which inherits from the
+ * @brief Defines the VonBertalanffySchnuteGrowth class, which inherits from the
  * GrowthBase class.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
@@ -16,64 +16,64 @@
 namespace fims_popdy {
 
 /**
- * @brief VonB-Schnute growth functor for length-at-age and weight-at-age.
+ * @brief VonBertalanffySchnute growth functor for length-at-age and weight-at-age.
  *
  * Parameterization using length at two reference ages:
  * L(a) = mean_length_young +
  *        (mean_length_old - mean_length_young) *
- *        (1 - exp(-von_bertalanffy_coefficient_K * (a - reference_age_for_length_1))) /
- *        (1 - exp(-von_bertalanffy_coefficient_K *
+ *        (1 - exp(-growth_coefficient * (a - reference_age_for_length_1))) /
+ *        (1 - exp(-growth_coefficient *
  *                 (reference_age_for_length_2 - reference_age_for_length_1)))
  * @note Users can anchor at t0 by setting reference_age_for_length_1 = 0
  * and mean_length_young = L(0). This is valid as long as
  * reference_age_for_length_2 > reference_age_for_length_1.
  */
 template <typename Type>
-struct VonBSchnuteGrowth : public GrowthBase<Type> {
+struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
   Type mean_length_young = Type(0.0); /**< expected length at reference age 1 */
   Type mean_length_old = Type(0.0); /**< expected length at reference age 2 */
-  Type von_bertalanffy_coefficient_K = Type(0.0); /**< growth coefficient */
+  Type growth_coefficient = Type(0.0); /**< growth coefficient */
   Type reference_age_for_length_1 = Type(0.0); /**< first reference age */
   Type reference_age_for_length_2 = Type(0.0); /**< second reference age */
 
   Type length_weight_a = Type(0.0); /**< coefficient in W = a * L^b */
   Type length_weight_b = Type(3.0); /**< exponent in W = a * L^b */
 
-  VonBSchnuteGrowth() : GrowthBase<Type>() {}
-  virtual ~VonBSchnuteGrowth() {}
+  VonBertalanffySchnuteGrowth() : GrowthBase<Type>() {}
+  virtual ~VonBertalanffySchnuteGrowth() {}
 
   /**
-   * @brief Validate the VonB-Schnute parameters used by length-at-age
+   * @brief Validate the VonBertalanffySchnute parameters used by length-at-age
    * calculations.
    *
    * Throws when the stored growth parameter values are incompatible with the
-   * raw VonB-Schnute length-at-age calculation.
+   * raw VonBertalanffySchnute length-at-age calculation.
    */
   void ValidateLengthParameters() const {
-    if (von_bertalanffy_coefficient_K <= Type(0.0)) {
+    if (growth_coefficient <= Type(0.0)) {
       throw std::runtime_error(
-          "VonBSchnuteGrowth von_bertalanffy_coefficient_K must be > 0");
+          "VonBertalanffySchnuteGrowth growth_coefficient must be > 0");
     }
 
     if (mean_length_young <= Type(0.0)) {
       throw std::runtime_error(
-          "VonBSchnuteGrowth mean_length_young must be > 0");
+          "VonBertalanffySchnuteGrowth mean_length_young must be > 0");
     }
 
     if (mean_length_old <= Type(0.0)) {
       throw std::runtime_error(
-          "VonBSchnuteGrowth mean_length_old must be > 0");
+          "VonBertalanffySchnuteGrowth mean_length_old must be > 0");
     }
 
     if (reference_age_for_length_2 <= reference_age_for_length_1) {
       throw std::runtime_error(
-          "VonBSchnuteGrowth reference_age_for_length_2 must be > "
+          "VonBertalanffySchnuteGrowth reference_age_for_length_2 must be > "
           "reference_age_for_length_1");
     }
 
     if (mean_length_old <= mean_length_young) {
       throw std::runtime_error(
-          "VonBSchnuteGrowth mean_length_old must be > "
+          "VonBertalanffySchnuteGrowth mean_length_old must be > "
           "mean_length_young");
     }
   }
@@ -85,12 +85,12 @@ struct VonBSchnuteGrowth : public GrowthBase<Type> {
   void ValidateWeightParameters() const {
     if (length_weight_a <= Type(0.0)) {
       throw std::runtime_error(
-          "VonBSchnuteGrowth length_weight_a must be > 0");
+          "VonBertalanffySchnuteGrowth length_weight_a must be > 0");
     }
 
     if (length_weight_b <= Type(0.0)) {
       throw std::runtime_error(
-          "VonBSchnuteGrowth length_weight_b must be > 0");
+          "VonBertalanffySchnuteGrowth length_weight_b must be > 0");
     }
   }
 
@@ -113,13 +113,13 @@ struct VonBSchnuteGrowth : public GrowthBase<Type> {
     }
 
     const Type denom = Type(1.0) -
-        fims_math::exp(-von_bertalanffy_coefficient_K * (reference_age_for_length_2 -
+        fims_math::exp(-growth_coefficient * (reference_age_for_length_2 -
                                                 reference_age_for_length_1));
     // AD-safe floor to avoid divide-by-zero/NaN when denominator is tiny.
     const Type denom_safe = fims_math::ad_max(
         fims_math::ad_fabs(denom), static_cast<Type>(1e-8));
     const Type numer = Type(1.0) -
-        fims_math::exp(-von_bertalanffy_coefficient_K *
+        fims_math::exp(-growth_coefficient *
                        (age - reference_age_for_length_1));
     return mean_length_young +
            (mean_length_old - mean_length_young) * numer / denom_safe;
@@ -139,14 +139,14 @@ struct VonBSchnuteGrowth : public GrowthBase<Type> {
 
   /**
    * @brief Evaluate the gradient of log mean length at age with respect to
-   * the current natural-scale FIMS VonB-Schnute parameterization.
+   * the current natural-scale FIMS VonBertalanffySchnute parameterization.
    * @param age Age on the natural scale.
    * @param d_log_laa_d_l1 Output derivative with respect to
    * mean_length_young.
    * @param d_log_laa_d_l2 Output derivative with respect to
    * mean_length_old.
    * @param d_log_laa_d_k Output derivative with respect to
-   * von_bertalanffy_coefficient_K.
+   * growth_coefficient.
    */
   void log_length_at_age_gradient(const Type& age,
                                   Type& d_log_laa_d_l1,
@@ -173,9 +173,9 @@ struct VonBSchnuteGrowth : public GrowthBase<Type> {
         reference_age_for_length_2 - reference_age_for_length_1;
 
     const Type exp_num =
-        fims_math::exp(-von_bertalanffy_coefficient_K * age_delta_1);
+        fims_math::exp(-growth_coefficient * age_delta_1);
     const Type exp_den =
-        fims_math::exp(-von_bertalanffy_coefficient_K * age_delta_2);
+        fims_math::exp(-growth_coefficient * age_delta_2);
 
     const Type numer = Type(1.0) - exp_num;
     const Type denom = Type(1.0) - exp_den;
@@ -205,16 +205,16 @@ struct VonBSchnuteGrowth : public GrowthBase<Type> {
 
   /**
    * @brief Evaluate the gradient of log mean length at age with respect to
-   * the log-scale FIMS VonB-Schnute parameterization
+   * the log-scale FIMS VonBertalanffySchnute parameterization
    * [log(mean_length_young), log(mean_length_old),
-   *  log(von_bertalanffy_coefficient_K)].
+   *  log(growth_coefficient)].
    * @param age Age on the natural scale.
    * @param d_log_laa_d_log_l1 Output derivative with respect to
    * log(mean_length_young).
    * @param d_log_laa_d_log_l2 Output derivative with respect to
    * log(mean_length_old).
    * @param d_log_laa_d_log_k Output derivative with respect to
-   * log(von_bertalanffy_coefficient_K).
+   * log(growth_coefficient).
    */
   void log_length_at_age_logscale_gradient(const Type& age,
                                            Type& d_log_laa_d_log_l1,
@@ -229,7 +229,7 @@ struct VonBSchnuteGrowth : public GrowthBase<Type> {
 
     d_log_laa_d_log_l1 = d_log_laa_d_l1 * mean_length_young;
     d_log_laa_d_log_l2 = d_log_laa_d_l2 * mean_length_old;
-    d_log_laa_d_log_k = d_log_laa_d_k * von_bertalanffy_coefficient_K;
+    d_log_laa_d_log_k = d_log_laa_d_k * growth_coefficient;
   }
 
   /**

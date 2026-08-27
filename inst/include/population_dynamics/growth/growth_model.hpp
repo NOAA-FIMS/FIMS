@@ -2,7 +2,7 @@
  * @file growth_model.hpp
  * @brief Concrete growth model implementation (Phase 1).
  *
- * Wraps a growth functor (e.g. VonB-Schnute) and produces growth products
+ * Wraps a growth functor (e.g. VonBertalanffySchnute) and produces growth products
  * in (year, age, sex) space.
  */
 #ifndef POPULATION_DYNAMICS_GROWTH_MODEL_HPP
@@ -19,7 +19,7 @@
 namespace fims_popdy {
 
 /**
- * @brief Concrete growth model using VonB-Schnute growth (Phase 1).
+ * @brief Concrete growth model using VonBertalanffySchnute growth (Phase 1).
  *
  * Assumptions:
  * - single sex (n_sexes = 1)
@@ -44,15 +44,15 @@ class GrowthModel : public GrowthModelBase<Type> {
         n_sexes_(n_sexes),
         products_(n_years, n_ages, n_sexes) {}
 
-  /// Set fixed VonB-Schnute parameters (explicit reference ages).
-  void SetVonBSchnuteParameters(Type mean_length_young,
+  /// Set fixed VonBertalanffySchnute parameters (explicit reference ages).
+  void SetVonBertalanffySchnuteParameters(Type mean_length_young,
                                    Type mean_length_old,
-                                   Type von_bertalanffy_coefficient_K,
+                                   Type growth_coefficient,
                                    Type reference_age_for_length_1,
                                    Type reference_age_for_length_2) {
     vb_.mean_length_young = mean_length_young;
     vb_.mean_length_old = mean_length_old;
-    vb_.von_bertalanffy_coefficient_K = von_bertalanffy_coefficient_K;
+    vb_.growth_coefficient = growth_coefficient;
     vb_.reference_age_for_length_1 = reference_age_for_length_1;
     vb_.reference_age_for_length_2 = reference_age_for_length_2;
     needs_update_ = true;
@@ -80,24 +80,24 @@ class GrowthModel : public GrowthModelBase<Type> {
   /// variability path.
   ///
   /// The supplied covariance must match the current log-scale FIMS
-  /// VonB-Schnute estimation parameterization in this exact order:
+  /// VonBertalanffySchnute estimation parameterization in this exact order:
   /// 1. log(mean_length_young)
   /// 2. log(mean_length_old)
-  /// 3. log(von_bertalanffy_coefficient_K)
+  /// 3. log(growth_coefficient)
   void SetGrowthParameterCovariance(
       Type length_at_ref_age_1_variance,
       Type length_at_ref_age_1_length_at_ref_age_2_covariance,
       Type length_at_ref_age_1_k_covariance,
       Type length_at_ref_age_2_variance,
       Type length_at_ref_age_2_k_covariance,
-      Type growth_coefficient_k_variance) {
+      Type growth_coefficient_variance) {
     ValidateGrowthParameterCovariance(
         length_at_ref_age_1_variance,
         length_at_ref_age_1_length_at_ref_age_2_covariance,
         length_at_ref_age_1_k_covariance,
         length_at_ref_age_2_variance,
         length_at_ref_age_2_k_covariance,
-        growth_coefficient_k_variance);
+        growth_coefficient_variance);
 
     length_at_ref_age_1_variance_ = length_at_ref_age_1_variance;
     length_at_ref_age_1_length_at_ref_age_2_covariance_ =
@@ -105,7 +105,7 @@ class GrowthModel : public GrowthModelBase<Type> {
     length_at_ref_age_1_k_covariance_ = length_at_ref_age_1_k_covariance;
     length_at_ref_age_2_variance_ = length_at_ref_age_2_variance;
     length_at_ref_age_2_k_covariance_ = length_at_ref_age_2_k_covariance;
-    growth_coefficient_k_variance_ = growth_coefficient_k_variance;
+    growth_coefficient_variance_ = growth_coefficient_variance;
     use_delta_method_variability_ = true;
     needs_update_ = true;
   }
@@ -119,7 +119,7 @@ class GrowthModel : public GrowthModelBase<Type> {
     length_at_ref_age_1_k_covariance_ = static_cast<Type>(0.0);
     length_at_ref_age_2_variance_ = static_cast<Type>(0.0);
     length_at_ref_age_2_k_covariance_ = static_cast<Type>(0.0);
-    growth_coefficient_k_variance_ = static_cast<Type>(0.0);
+    growth_coefficient_variance_ = static_cast<Type>(0.0);
     use_delta_method_variability_ = false;
     needs_update_ = true;
   }
@@ -130,11 +130,11 @@ class GrowthModel : public GrowthModelBase<Type> {
 
     if (n_ages_ == 0) {
       throw std::runtime_error(
-          "VonBSchnuteGrowth requires n_ages > 0");
+          "VonBertalanffySchnuteGrowth requires n_ages > 0");
     }
     if (vb_.reference_age_for_length_2 <= vb_.reference_age_for_length_1) {
       throw std::runtime_error(
-          "VonBSchnuteGrowth reference_age_for_length_2 must be > "
+          "VonBertalanffySchnuteGrowth reference_age_for_length_2 must be > "
           "reference_age_for_length_1");
     }
 
@@ -189,10 +189,10 @@ class GrowthModel : public GrowthModelBase<Type> {
       Type length_at_ref_age_1_k_covariance,
       Type length_at_ref_age_2_variance,
       Type length_at_ref_age_2_k_covariance,
-      Type growth_coefficient_k_variance) const {
+      Type growth_coefficient_variance) const {
     if (length_at_ref_age_1_variance < Type(0.0) ||
         length_at_ref_age_2_variance < Type(0.0) ||
-        growth_coefficient_k_variance < Type(0.0)) {
+        growth_coefficient_variance < Type(0.0)) {
       throw std::runtime_error(
           "Growth parameter variances must be >= 0");
     }
@@ -207,28 +207,28 @@ class GrowthModel : public GrowthModelBase<Type> {
 
     if (length_at_ref_age_1_k_covariance *
             length_at_ref_age_1_k_covariance >
-        length_at_ref_age_1_variance * growth_coefficient_k_variance) {
+        length_at_ref_age_1_variance * growth_coefficient_variance) {
       throw std::runtime_error(
           "Growth covariance between mean_length_young and "
-          "von_bertalanffy_coefficient_K is inconsistent with the supplied variances");
+          "growth_coefficient is inconsistent with the supplied variances");
     }
 
     if (length_at_ref_age_2_k_covariance *
             length_at_ref_age_2_k_covariance >
-        length_at_ref_age_2_variance * growth_coefficient_k_variance) {
+        length_at_ref_age_2_variance * growth_coefficient_variance) {
       throw std::runtime_error(
           "Growth covariance between mean_length_old and "
-          "von_bertalanffy_coefficient_K is inconsistent with the supplied variances");
+          "growth_coefficient is inconsistent with the supplied variances");
     }
 
     const Type determinant =
         length_at_ref_age_1_variance *
-            (length_at_ref_age_2_variance * growth_coefficient_k_variance -
+            (length_at_ref_age_2_variance * growth_coefficient_variance -
              length_at_ref_age_2_k_covariance *
                  length_at_ref_age_2_k_covariance) -
         length_at_ref_age_1_length_at_ref_age_2_covariance *
             (length_at_ref_age_1_length_at_ref_age_2_covariance *
-                 growth_coefficient_k_variance -
+                 growth_coefficient_variance -
              length_at_ref_age_1_k_covariance *
                  length_at_ref_age_2_k_covariance) +
         length_at_ref_age_1_k_covariance *
@@ -287,7 +287,7 @@ class GrowthModel : public GrowthModelBase<Type> {
            Type(2.0) * d_log_laa_d_log_l2 * d_log_laa_d_log_k *
                length_at_ref_age_2_k_covariance_ +
            d_log_laa_d_log_k * d_log_laa_d_log_k *
-               growth_coefficient_k_variance_;
+               growth_coefficient_variance_;
   }
 
   std::size_t n_years_;
@@ -297,7 +297,7 @@ class GrowthModel : public GrowthModelBase<Type> {
   GrowthProducts<Type> products_;
 
   // Phase 1 functor
-  VonBSchnuteGrowth<Type> vb_;
+  VonBertalanffySchnuteGrowth<Type> vb_;
 
   // Caching state
   bool needs_update_ = true;
@@ -310,7 +310,7 @@ class GrowthModel : public GrowthModelBase<Type> {
   Type length_at_ref_age_1_k_covariance_ = static_cast<Type>(0.0);
   Type length_at_ref_age_2_variance_ = static_cast<Type>(0.0);
   Type length_at_ref_age_2_k_covariance_ = static_cast<Type>(0.0);
-  Type growth_coefficient_k_variance_ = static_cast<Type>(0.0);
+  Type growth_coefficient_variance_ = static_cast<Type>(0.0);
   Type age_offset_ = static_cast<Type>(0.0);
 
  public:

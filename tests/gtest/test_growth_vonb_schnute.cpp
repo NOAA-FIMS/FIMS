@@ -5,12 +5,12 @@
 
 namespace
 {
-  fims_popdy::VonBSchnuteGrowth<double> MakeValidVonB() {
-    fims_popdy::VonBSchnuteGrowth<double> vb;
+  fims_popdy::VonBertalanffySchnuteGrowth<double> MakeValidVonB() {
+    fims_popdy::VonBertalanffySchnuteGrowth<double> vb;
 
     vb.mean_length_young = 275.0;
     vb.mean_length_old = 725.0;
-    vb.von_bertalanffy_coefficient_K = 0.18;
+    vb.growth_coefficient = 0.18;
     vb.reference_age_for_length_1 = 1.0;
     vb.reference_age_for_length_2 = 12.0;
     vb.length_weight_a = 2.5e-11;
@@ -19,13 +19,13 @@ namespace
     return vb;
   }
 
-  TEST(VonBSchnuteEvaluate, BasicSanity)
+  TEST(VonBertalanffySchnuteEvaluate, BasicSanity)
   {
     auto vb = MakeValidVonB();
 
     // expected values from the formula (guarded denominator)
     const double denom_raw = 1.0 - std::exp(
-        -vb.von_bertalanffy_coefficient_K *
+        -vb.growth_coefficient *
         (vb.reference_age_for_length_2 - vb.reference_age_for_length_1));
     const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
 
@@ -36,13 +36,13 @@ namespace
     const double L1_expected =
         vb.mean_length_young +
         (vb.mean_length_old - vb.mean_length_young) *
-            (1.0 - std::exp(-vb.von_bertalanffy_coefficient_K *
+            (1.0 - std::exp(-vb.growth_coefficient *
                             (1.0 - vb.reference_age_for_length_1))) /
             denom;
     const double L12_expected =
         vb.mean_length_young +
         (vb.mean_length_old - vb.mean_length_young) *
-            (1.0 - std::exp(-vb.von_bertalanffy_coefficient_K *
+            (1.0 - std::exp(-vb.growth_coefficient *
                             (12.0 - vb.reference_age_for_length_1))) /
             denom;
 
@@ -55,11 +55,11 @@ namespace
     double W5 = vb.evaluate(0, 5.0);
     EXPECT_NEAR(W5, 2.5e-11 * std::pow(L5, 3.0), 1e-10);
 
-    fims_popdy::VonBSchnuteGrowth<double> vb2;
+    fims_popdy::VonBertalanffySchnuteGrowth<double> vb2;
     EXPECT_EQ(vb2.GetId(), vb.GetId() + 1);
   }
 
-  TEST(VonBSchnuteEvaluate, UsesLinearRampBelowFirstReferenceAge)
+  TEST(VonBertalanffySchnuteEvaluate, UsesLinearRampBelowFirstReferenceAge)
   {
     auto vb = MakeValidVonB();
 
@@ -68,7 +68,7 @@ namespace
     // reference age.
     vb.mean_length_young = 6.0;
     vb.mean_length_old = 67.1;
-    vb.von_bertalanffy_coefficient_K = 0.242;
+    vb.growth_coefficient = 0.242;
     vb.reference_age_for_length_1 = 1.0;
     vb.reference_age_for_length_2 = 21.0;
 
@@ -135,18 +135,18 @@ namespace
     EXPECT_NEAR(d_log_laa_d_log_k, 0.0, 1e-12);
   }
 
-  TEST(VonBSchnuteEvaluate, RejectsNonPositiveGrowthCoefficientK)
+  TEST(VonBertalanffySchnuteEvaluate, RejectsNonPositiveGrowthCoefficient)
   {
     auto vb = MakeValidVonB();
 
     // Make just this one parameter invalid.
-    vb.von_bertalanffy_coefficient_K = 0.0;
+    vb.growth_coefficient = 0.0;
 
     // The backend validator should now reject this.
     EXPECT_THROW(vb.length_at_age(1.0), std::runtime_error);
   }
 
-  TEST(VonBSchnuteEvaluate, RejectsReversedReferenceAges)
+  TEST(VonBertalanffySchnuteEvaluate, RejectsReversedReferenceAges)
   {
     auto vb = MakeValidVonB();
 
@@ -156,7 +156,7 @@ namespace
     EXPECT_THROW(vb.length_at_age(1.0), std::runtime_error);
   }
 
-  TEST(VonBSchnuteEvaluate, RejectsNonIncreasingReferenceLengths)
+  TEST(VonBertalanffySchnuteEvaluate, RejectsNonIncreasingReferenceLengths)
   {
     auto vb = MakeValidVonB();
 

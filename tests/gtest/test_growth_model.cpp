@@ -9,7 +9,7 @@ TEST(GrowthModel, CanConstructAndPrepare) {
   // years=1, ages=12 (1..12), sexes=1
   fims_popdy::GrowthModel<double> gm(1, 12, 1);
 
-  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
+  gm.SetVonBertalanffySchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
   gm.SetAgeOffset(1.0);
@@ -26,35 +26,35 @@ TEST(GrowthModel, CanConstructAndPrepare) {
   const double age = 5.0;
   const double mean_length_young = 275.0;
   const double mean_length_old = 725.0;
-  const double von_bertalanffy_coefficient_K = 0.18;
+  const double growth_coefficient = 0.18;
   const double reference_age_for_length_1 = 1.0;
   const double reference_age_for_length_2 = 12.0;
   const double denom_raw = 1.0 - std::exp(
-      -von_bertalanffy_coefficient_K *
+      -growth_coefficient *
       (reference_age_for_length_2 - reference_age_for_length_1));
   const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double expected_length_at_age_1 =
       mean_length_young +
       (mean_length_old - mean_length_young) *
-          (1.0 - std::exp(-von_bertalanffy_coefficient_K *
+          (1.0 - std::exp(-growth_coefficient *
                           (1.0 - reference_age_for_length_1))) /
           denom;
   const double expected_length_at_age_5 =
       mean_length_young +
       (mean_length_old - mean_length_young) *
-          (1.0 - std::exp(-von_bertalanffy_coefficient_K *
+          (1.0 - std::exp(-growth_coefficient *
                           (age - reference_age_for_length_1))) /
           denom;
   const double expected_length_at_age_8 =
       mean_length_young +
       (mean_length_old - mean_length_young) *
-          (1.0 - std::exp(-von_bertalanffy_coefficient_K *
+          (1.0 - std::exp(-growth_coefficient *
                           (8.0 - reference_age_for_length_1))) /
           denom;
   const double expected_length_at_age_12 =
       mean_length_young +
       (mean_length_old - mean_length_young) *
-          (1.0 - std::exp(-von_bertalanffy_coefficient_K *
+          (1.0 - std::exp(-growth_coefficient *
                           (12.0 - reference_age_for_length_1))) /
           denom;
   const double observed_length_at_age_1 = p.MeanLAA(0, 0, 0);
@@ -85,12 +85,12 @@ TEST(GrowthModel, UsesDeltaMethodVariabilityAtReferenceAges) {
 
   const double mean_length_young = 275.0;
   const double mean_length_old = 725.0;
-  const double von_bertalanffy_coefficient_K = 0.18;
+  const double growth_coefficient = 0.18;
   const double reference_age_for_length_1 = 1.0;
   const double reference_age_for_length_2 = 12.0;
 
-  gm.SetVonBSchnuteParameters(
-      mean_length_young, mean_length_old, von_bertalanffy_coefficient_K,
+  gm.SetVonBertalanffySchnuteParameters(
+      mean_length_young, mean_length_old, growth_coefficient,
       reference_age_for_length_1, reference_age_for_length_2);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetGrowthParameterCovariance(
@@ -99,17 +99,17 @@ TEST(GrowthModel, UsesDeltaMethodVariabilityAtReferenceAges) {
       0.0,
       0.01,  // var(log(mean_length_old))) = 0.1^2
       0.0,
-      0.01); // var(log(von_bertalanffy_coefficient_K))) = 0.1^2
+      0.01); // var(log(growth_coefficient))) = 0.1^2
   gm.SetAgeOffset(1.0);
 
   gm.Prepare();
 
   const auto& p = gm.GetProducts();
 
-  fims_popdy::VonBSchnuteGrowth<double> vb;
+  fims_popdy::VonBertalanffySchnuteGrowth<double> vb;
   vb.mean_length_young = mean_length_young;
   vb.mean_length_old = mean_length_old;
-  vb.von_bertalanffy_coefficient_K = von_bertalanffy_coefficient_K;
+  vb.growth_coefficient = growth_coefficient;
   vb.reference_age_for_length_1 = reference_age_for_length_1;
   vb.reference_age_for_length_2 = reference_age_for_length_2;
 
@@ -159,7 +159,7 @@ TEST(GrowthModel, UsesDeltaMethodVariabilityAtReferenceAges) {
 
 TEST(GrowthModel, ZeroAgesThrows) {
   fims_popdy::GrowthModel<double> gm(1, 0, 1);
-  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
+  gm.SetVonBertalanffySchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
@@ -168,7 +168,7 @@ TEST(GrowthModel, ZeroAgesThrows) {
 
 TEST(GrowthModel, RejectsNonIncreasingReferenceLengths) {
   fims_popdy::GrowthModel<double> gm(1, 2, 1);
-  gm.SetVonBSchnuteParameters(275.0, 275.0, 0.18, 1.0, 12.0);
+  gm.SetVonBertalanffySchnuteParameters(275.0, 275.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
@@ -177,7 +177,7 @@ TEST(GrowthModel, RejectsNonIncreasingReferenceLengths) {
 
 TEST(GrowthModel, RejectsCoincidentReferenceAges) {
   fims_popdy::GrowthModel<double> gm(1, 3, 1);
-  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 5.0, 5.0);
+  gm.SetVonBertalanffySchnuteParameters(275.0, 725.0, 0.18, 5.0, 5.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
@@ -186,7 +186,7 @@ TEST(GrowthModel, RejectsCoincidentReferenceAges) {
 
 TEST(GrowthModel, RejectsNonPositiveLengthWeightA) {
   fims_popdy::GrowthModel<double> gm(1, 2, 1);
-  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
+  gm.SetVonBertalanffySchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(0.0, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
@@ -195,7 +195,7 @@ TEST(GrowthModel, RejectsNonPositiveLengthWeightA) {
 
 TEST(GrowthModel, HandlesNegativeSdInputsWithoutThrow) {
   fims_popdy::GrowthModel<double> gm(1, 2, 1);
-  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
+  gm.SetVonBertalanffySchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(-1.0, 73.0);
 
@@ -207,7 +207,7 @@ TEST(GrowthModel, HandlesNegativeSdInputsWithoutThrow) {
 TEST(GrowthModel, SingleAgeRejectsCoincidentReferenceAges) {
   fims_popdy::GrowthModel<double> gm(1, 1, 1);
   // Coincident reference ages are invalid even with one modeled age.
-  gm.SetVonBSchnuteParameters(275.0, 725.0, 0.18, 1.0, 1.0);
+  gm.SetVonBertalanffySchnuteParameters(275.0, 725.0, 0.18, 1.0, 1.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 

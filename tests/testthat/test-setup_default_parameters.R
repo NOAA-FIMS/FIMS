@@ -60,7 +60,7 @@ test_that("`setup_default_parameters()` defaults to EWAA when empirical weight-a
   clear()
 })
 
-test_that("`setup_default_parameters()` defaults to VonB-Schnute when weight-at-age is absent and length compositions are present", {
+test_that("`setup_default_parameters()` defaults to VonBertalanffySchnute when weight-at-age is absent and length compositions are present", {
   data_without_weight_at_age <- FIMS::FIMSFrame(
     dplyr::filter(data_big, type != "weight_at_age")
   )
@@ -72,8 +72,8 @@ test_that("`setup_default_parameters()` defaults to VonB-Schnute when weight-at-
     dplyr::pull(.data[["module_type"]]) |>
     unique()
 
-  #' @description Test that length-composition data trigger VonB-Schnute when empirical weight-at-age data are absent.
-  expect_equal(growth_type, "VonB-Schnute")
+  #' @description Test that length-composition data trigger VonBertalanffySchnute when empirical weight-at-age data are absent.
+  expect_equal(growth_type, "VonBertalanffySchnute")
 
   clear()
 })
