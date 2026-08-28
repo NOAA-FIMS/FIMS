@@ -388,9 +388,8 @@ clear()
 One could also change the default selectivity configuration for the survey, update default parameterization, and evaluate the ability to estimate a small number of age-specific parameter values.
 
 ```{r age-specific-selectivity}
-# Update default "survey1" selectivity from "Logistic" to "AgeSpecificSelectivity"
-# This calls the dependent function setup_default_AgeSpecificSelectivity()
-# This function is also used by setup_default_Selectivity() and setup_default_parameters()
+# Update "survey1" selectivity from "Logistic" to "AgeSpecificSelectivity"
+# This function is also used by setup_default_parameters()
 age_specific_selectivity_default <- setup_default_Selectivity(
   data = data_4_model,
   fleet = "survey1",
@@ -408,8 +407,9 @@ parameters_age_specific_selectivity |>
   dplyr::select(module_type, fleet, label, age, value, estimation_type)
 
 # Update the age-specific selectivity parameterization to facilitate estimation
-# Values for first two ages are set to generic initial values and estimated using "fixed_effects"
-# All other values are fixed to true approximate values used in generating demo data
+# Values for first two ages are set to generic initial values and estimated
+# using "fixed_effects"
+# Other values are fixed to true approximate values used in generating demo data
 parameters_age_specific_selectivity <- parameters_age_specific_selectivity |>
   dplyr::rows_update(
     tibble::tibble(
@@ -431,7 +431,8 @@ parameters_age_specific_selectivity <- parameters_age_specific_selectivity |>
 age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
-get_estimates(age_specific_selectivity_fit) |> dplyr::filter(module_name == "Selectivity", module_type == "AgeSpecific")
+get_estimates(age_specific_selectivity_fit) |> 
+  dplyr::filter(module_name == "Selectivity", module_type == "AgeSpecific")
 
 clear()
 ```
