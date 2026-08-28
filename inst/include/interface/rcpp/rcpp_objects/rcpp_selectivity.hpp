@@ -738,8 +738,8 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     ss << "   \"id\":" << this->logit_sel_at_age.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [null],\n";
-    ss << "  \"dimensions\": [" << this->logit_sel_at_age.size() << "]\n},\n";
+    ss << "  \"header\": [\"n_ages\"],\n";
+    ss << "  \"dimensions\": [" << this->n_ages.get() << "]\n},\n";
     ss << "   \"values\":" << this->logit_sel_at_age << "}]\n";
 
     ss << "}";
