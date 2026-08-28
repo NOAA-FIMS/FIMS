@@ -431,7 +431,7 @@ parameters_age_specific_selectivity <- parameters_age_specific_selectivity |>
 age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
   initialize_fims(data = data_4_model) |>
   fit_fims(optimize = TRUE)
-get_estimates(age_specific_selectivity_fit) |> 
+get_estimates(age_specific_selectivity_fit) |>
   dplyr::filter(module_name == "Selectivity", module_type == "AgeSpecific")
 
 clear()
