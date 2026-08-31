@@ -5,6 +5,11 @@
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp"
 // static id of the MaturityInterfaceBase object
 uint32_t MaturityInterfaceBase::id_g = 1;
+namespace {
+// Adds this counter to the list clear() rewinds.
+IdCounterRegistration maturity_id_g_registration(
+    &MaturityInterfaceBase::id_g);
+}  // namespace
 
 #include <Rcpp.h>
 
@@ -69,6 +74,26 @@ Rcpp::XPtr<SharedBase> maturity_to_fims_xptr_(Rcpp::XPtr<SharedMaturity> xp) {
   return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
 }
 
+// ── Invalidation for clear() ─────────────────────────────────────────────────
+/**
+ * @brief Invalidate a pointer to a maturity module, releasing this
+ * pointer's share of the module.
+ *
+ * @details Called by the R `clear()` wrapper for every module in the registry.
+ * The external pointer is set to NULL in place, so the R variable still holding
+ * it reports "external pointer is not valid" on the next use instead of quietly
+ * operating on a module that is no longer part of any model. Once both this
+ * pointer and the module's base pointer are released, nothing owns the module
+ * and its memory is returned immediately rather than at the next garbage
+ * collection.
+ *
+ * Releasing an already-released pointer does nothing, so this is safe to call
+ * twice.
+ *
+ * @param xp The module to invalidate.
+ */
+void release_maturity_(Rcpp::XPtr<SharedMaturity> xp) { xp.release(); }
+
 /**
  * Function to register maturity classes with the Rcpp module system.
  *
@@ -79,8 +104,8 @@ Rcpp::XPtr<SharedBase> maturity_to_fims_xptr_(Rcpp::XPtr<SharedMaturity> xp) {
  * @param m The Rcpp module to register into.
  */
 void register_maturity(Rcpp::Module& m) {
-  // Rcpp::class_<> registrations removed — users no longer call methods::new().
   Rcpp::function("create_maturity_", &create_maturity_);
   Rcpp::function("evaluate_maturity_", &evaluate_maturity_);
   Rcpp::function("maturity_to_fims_xptr_", &maturity_to_fims_xptr_);
+  Rcpp::function("release_maturity_", &release_maturity_);
 }

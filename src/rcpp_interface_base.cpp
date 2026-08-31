@@ -14,9 +14,13 @@ uint32_t Variable::id_g = 0;
 
 uint32_t VariableVector::id_g = 0;
 
+namespace {
+// Adds these counters to the list clear() rewinds.
+IdCounterRegistration variable_id_g_registration(&Variable::id_g);
+IdCounterRegistration variable_vector_id_g_registration(
+    &VariableVector::id_g);
+}  // namespace
 
-std::vector<std::shared_ptr<FIMSRcppInterfaceBase>>
-    FIMSRcppInterfaceBase::fims_interface_objects;
 // ── Parameters, by name, for any module ──────────────────────────────────────
 // These take an XPtr typed to FIMSRcppInterfaceBase, so one of each serves
 // every module family. The R wrapper already holds that pointer: it is the same
@@ -106,6 +110,25 @@ uint32_t get_parameter_id_(Rcpp::XPtr<SharedBase> xp, std::string name) {
   return require_parameter(xp, name).id_m;
 }
 
+// ── Invalidation for clear() ─────────────────────────────────────────────────
+/**
+ * @brief Invalidate a module's base pointer, releasing its share of the
+ * module.
+ *
+ * @details The companion to the per-family `release_*_()` functions. Every
+ * module is reachable through two pointers, one typed to its family and one
+ * typed to this base class, and each owns a share of the module. The R
+ * `clear()` wrapper releases both, which invalidates the module for any later
+ * use and returns its memory immediately.
+ *
+ * A separate function per family is needed for the other pointer because
+ * releasing deletes through the pointer's own type, and the family types are
+ * unrelated to this one.
+ *
+ * @param xp The module to invalidate.
+ */
+void release_base_(Rcpp::XPtr<SharedBase> xp) { xp.release(); }
+
 /**
  * Function to register the shared parameter accessors with the Rcpp module
  * system.
@@ -115,4 +138,5 @@ void register_parameters(Rcpp::Module &m) {
   Rcpp::function("set_vector_", &set_vector_);
   Rcpp::function("get_module_id_", &get_module_id_);
   Rcpp::function("get_parameter_id_", &get_parameter_id_);
+  Rcpp::function("release_base_", &release_base_);
 }

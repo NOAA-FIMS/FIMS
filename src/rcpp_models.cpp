@@ -6,6 +6,11 @@
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp"
 // static id of the FisheryModelInterfaceBase object
 uint32_t FisheryModelInterfaceBase::id_g = 1;
+namespace {
+// Adds this counter to the list clear() rewinds.
+IdCounterRegistration model_id_g_registration(
+    &FisheryModelInterfaceBase::id_g);
+}  // namespace
 
 #include <Rcpp.h>
 
@@ -130,6 +135,26 @@ Rcpp::XPtr<SharedBase> model_to_fims_xptr_(Rcpp::XPtr<SharedFisheryModel> xp) {
   return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
 }
 
+// ── Invalidation for clear() ─────────────────────────────────────────────────
+/**
+ * @brief Invalidate a pointer to a fishery model module, releasing this
+ * pointer's share of the module.
+ *
+ * @details Called by the R `clear()` wrapper for every module in the registry.
+ * The external pointer is set to NULL in place, so the R variable still holding
+ * it reports "external pointer is not valid" on the next use instead of quietly
+ * operating on a module that is no longer part of any model. Once both this
+ * pointer and the module's base pointer are released, nothing owns the module
+ * and its memory is returned immediately rather than at the next garbage
+ * collection.
+ *
+ * Releasing an already-released pointer does nothing, so this is safe to call
+ * twice.
+ *
+ * @param xp The module to invalidate.
+ */
+void release_models_(Rcpp::XPtr<SharedFisheryModel> xp) { xp.release(); }
+
 /**
  * Function to register fishery model classes with the Rcpp module system.
  *
@@ -140,11 +165,11 @@ Rcpp::XPtr<SharedBase> model_to_fims_xptr_(Rcpp::XPtr<SharedFisheryModel> xp) {
  * @param m The Rcpp module to register into.
  */
 void register_fishery_models(Rcpp::Module& m) {
-  // Rcpp::class_<> registrations removed — users no longer call methods::new().
   Rcpp::function("create_fishery_model_", &create_fishery_model_);
   Rcpp::function("set_model_populations_", &set_model_populations_);
   Rcpp::function("get_model_output_", &get_model_output_);
   Rcpp::function("do_model_reporting_", &do_model_reporting_);
   Rcpp::function("is_model_reporting_", &is_model_reporting_);
   Rcpp::function("model_to_fims_xptr_", &model_to_fims_xptr_);
+  Rcpp::function("release_models_", &release_models_);
 }
