@@ -107,6 +107,23 @@
   invisible(NULL)
 }
 
+.native_model_composition <- function(data, fleet, type) {
+  has_composition <- get_data(data) |>
+    dplyr::filter(
+      .data[["fleet"]] == .env[["fleet"]],
+      .data[["type"]] == .env[["type"]]
+    ) |>
+    nrow() |>
+    as.logical()
+  if (!has_composition) {
+    return(numeric())
+  }
+  if (identical(type, "age_comp")) {
+    return(model_age_comp(data, fleet))
+  }
+  model_length_comp(data, fleet)
+}
+
 #' Initialize a FIMS model through the native interface
 #'
 #' Builds the currently supported catch-at-age model without constructing any
@@ -128,6 +145,14 @@ initialize_fims <- function(parameters, data) {
 
   if ("data" %in% names(parameters)) {
     parameters <- tidyr::unnest(parameters, cols = "data")
+  }
+
+  # Parameter tables created before the native-interface transition used
+  # `time` for model timing. Preserve that public input contract while using
+  # the current domain name internally; timing is a model coordinate, not an
+  # elapsed runtime measurement.
+  if ("time" %in% names(parameters) && !"timing" %in% names(parameters)) {
+    parameters <- dplyr::rename(parameters, timing = "time")
   }
 
   valid_estimation_types <- c("constant", "fixed_effects", "random_effects")
@@ -266,7 +291,8 @@ initialize_fims <- function(parameters, data) {
       parameters, "Recruitment", "log_rzero"
     ),
     log_devs = .native_parameter_values(
-      parameters, "Recruitment", "log_devs", default = numeric()
+      parameters, "Recruitment", "log_devs",
+      default = numeric()
     ),
     logit_steep_estimation_type = .native_parameter_types(
       parameters, "Recruitment", "logit_steep"
@@ -327,7 +353,8 @@ initialize_fims <- function(parameters, data) {
   native_create_model()
 
   recruitment_log_sd <- .native_parameter_values(
-    parameters, "Recruitment", "log_sd", default = log(1)
+    parameters, "Recruitment", "log_sd",
+    default = log(1)
   )
   catch_distribution <- .native_distribution_from_data(
     data, fishing_fleet, "catch"
@@ -345,13 +372,19 @@ initialize_fims <- function(parameters, data) {
     landings = model_catch(data, fishing_fleet),
     landings_distribution = catch_distribution$family,
     landings_sd = catch_distribution$scale,
-    landings_age_comp = model_age_comp(data, fishing_fleet),
-    landings_length_comp = model_length_comp(data, fishing_fleet),
+    landings_age_comp = .native_model_composition(
+      data, fishing_fleet, "age_comp"
+    ),
+    landings_length_comp = .native_model_composition(
+      data, fishing_fleet, "length_comp"
+    ),
     survey_index = model_index(data, survey_fleet),
     survey_distribution = index_distribution$family,
     survey_sd = index_distribution$scale,
-    survey_age_comp = model_age_comp(data, survey_fleet),
-    survey_length_comp = model_length_comp(data, survey_fleet),
+    survey_age_comp = .native_model_composition(data, survey_fleet, "age_comp"),
+    survey_length_comp = .native_model_composition(
+      data, survey_fleet, "length_comp"
+    ),
     recruitment_log_sd = recruitment_log_sd[[1L]],
     recruitment_log_sd_estimation_type = .native_parameter_types(
       parameters, "Recruitment", "log_sd"

@@ -10,78 +10,89 @@
 # population_prepare ----
 ## IO correctness ----
 test_that("`population_create()` returns a backend handle", {
-    #' @description Test that `population_create()` returns an integer handle.
-    expect_type(
-        object = population_create(
-            log_m = c(log(0.2), log(0.3)),
-            log_f_multiplier = log(1.0),
-            log_init_naa = c(log(1000), log(500), log(250))
-        ),
-        type = "integer"
-    )
+  #' @description Test that `population_create()` returns an integer handle.
+  expect_type(
+    object = population_create(
+      log_m = c(log(0.2), log(0.3)),
+      log_f_multiplier = log(1.0),
+      log_init_naa = c(log(1000), log(500), log(250))
+    ),
+    type = "integer"
+  )
 })
 
 test_that("`population_prepare()` exponentiates M and f_multiplier", {
-    #' @description Test that `population_prepare()` returns transformed `M` and `f_multiplier` values.
-    result <- population_prepare(
-        log_m = c(log(0.2), log(0.3)),
-        log_f_multiplier = log(1.5),
-        log_init_naa = c(log(1000), log(500), log(250))
-    )
-    expect_equal(result[["M"]], c(0.2, 0.3))
-    expect_equal(result[["f_multiplier"]], c(1.5, 1.5))
+  #' @description Test that `population_prepare()` returns transformed `M` and `f_multiplier` values.
+  result <- population_prepare(
+    log_m = c(log(0.2), log(0.3)),
+    log_f_multiplier = log(1.5),
+    log_init_naa = c(log(1000), log(500), log(250))
+  )
+  expect_equal(result[["M"]], c(0.2, 0.3))
+  expect_equal(result[["f_multiplier"]], c(1.5, 1.5))
 })
 
 ## Error handling ----
 test_that("`population_prepare()` rejects mismatched yearly input lengths", {
-    #' @description Test that `population_prepare()` errors when `log_f_multiplier` does not have length 1 or match `log_m`.
-    expect_error(
-        object = population_prepare(
-            log_m = c(log(0.2), log(0.3), log(0.4)),
-            log_f_multiplier = c(log(1.2), log(1.1)),
-            log_init_naa = c(log(1000), log(500), log(250))
-        ),
-        regexp = "must have length 1 or match the length of the paired input"
-    )
+  #' @description Test that `population_prepare()` errors when `log_f_multiplier` does not have length 1 or match `log_m`.
+  expect_error(
+    object = population_prepare(
+      log_m = c(log(0.2), log(0.3), log(0.4)),
+      log_f_multiplier = c(log(1.2), log(1.1)),
+      log_init_naa = c(log(1000), log(500), log(250))
+    ),
+    regexp = "must have length 1 or match the length of the paired input"
+  )
 })
 
 test_that("`population_create()` links a fleet by handle", {
-    #' @description Test that `population_create()` accepts existing fleet handles for population linkage.
-    fleet_id <- fleet_create(log_fmort = c(log(0.2), log(0.3)), log_q = log(0.5))
-    expect_type(
-        object = population_create(
-            log_m = c(log(0.2), log(0.3)),
-            log_f_multiplier = log(1.0),
-            log_init_naa = c(log(1000), log(500), log(250)),
-            fleet_ids = fleet_id
-        ),
-        type = "integer"
-    )
+  #' @description Test that `population_create()` accepts existing fleet handles for population linkage.
+  fleet_id <- fleet_create(log_fmort = c(log(0.2), log(0.3)), log_q = log(0.5))
+  expect_type(
+    object = population_create(
+      log_m = c(log(0.2), log(0.3)),
+      log_f_multiplier = log(1.0),
+      log_init_naa = c(log(1000), log(500), log(250)),
+      fleet_ids = fleet_id
+    ),
+    type = "integer"
+  )
 })
 
 test_that("`population_create()` registers fixed and random effects", {
-    #' @description Test that population create calls register fixed and random effects when estimation types are provided.
-    clear()
+  #' @description Test that population create calls register fixed and random effects when estimation types are provided.
+  clear()
 
-    before <- native_information_parameter_counts()
+  before <- native_information_parameter_counts()
 
+  population_create(
+    log_m = c(log(0.2), log(0.3)),
+    log_f_multiplier = c(log(1.0), log(1.1)),
+    log_init_naa = c(log(1000), log(500), log(250)),
+    log_m_estimation_type = c("fixed_effects", "constant"),
+    log_f_multiplier_estimation_type = c("random_effects", "constant"),
+    log_init_naa_estimation_type = c("constant", "fixed_effects", "random_effects")
+  )
+
+  after <- native_information_parameter_counts()
+
+  expect_equal(
+    object = after[["fixed_effects_parameters"]] - before[["fixed_effects_parameters"]],
+    expected = 2L
+  )
+  expect_equal(
+    object = after[["random_effects_parameters"]] - before[["random_effects_parameters"]],
+    expected = 2L
+  )
+})
+
+test_that("`population_create()` rejects fractional linked handles", {
+  #' @description Test that fractional population dependency handles are rejected instead of silently truncated.
+  expect_error(
     population_create(
-        log_m = c(log(0.2), log(0.3)),
-        log_f_multiplier = c(log(1.0), log(1.1)),
-        log_init_naa = c(log(1000), log(500), log(250)),
-        log_m_estimation_type = c("fixed_effects", "constant"),
-        log_f_multiplier_estimation_type = c("random_effects", "constant"),
-        log_init_naa_estimation_type = c("constant", "fixed_effects", "random_effects")
-    )
-
-    after <- native_information_parameter_counts()
-
-    expect_equal(
-        object = after[["fixed_effects_parameters"]] - before[["fixed_effects_parameters"]],
-        expected = 2L
-    )
-    expect_equal(
-        object = after[["random_effects_parameters"]] - before[["random_effects_parameters"]],
-        expected = 2L
-    )
+      log_m = 0, log_f_multiplier = 0, log_init_naa = 0,
+      fleet_ids = 1.5
+    ),
+    "fleet_ids.*whole numbers"
+  )
 })

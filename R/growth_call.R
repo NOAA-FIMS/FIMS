@@ -13,14 +13,18 @@ growth_ewaa_create <- function(ages,
                                weights,
                                n_years,
                                weights_estimation_type = "constant") {
-    .Call(
-        "fims_call_create_ewaa_growth",
-        as.numeric(ages),
-        as.numeric(weights),
-        as.integer(n_years),
-        as.integer(.map_estimation_type_code(weights_estimation_type)),
-        PACKAGE = "FIMS"
-    )
+  n_years <- .native_integer_vector(
+    n_years, "n_years",
+    minimum = 1L, scalar = TRUE
+  )
+  .Call(
+    "fims_call_create_ewaa_growth",
+    as.numeric(ages),
+    as.numeric(weights),
+    n_years,
+    as.integer(.map_estimation_type_code(weights_estimation_type)),
+    PACKAGE = "FIMS"
+  )
 }
 
 #' Evaluate EWAA growth through the native `.Call` interface
@@ -33,16 +37,17 @@ growth_ewaa_create <- function(ages,
 #' @return A numeric vector of evaluated weights-at-age.
 #' @export
 growth_ewaa <- function(year, age, ages, weights, n_years) {
-    growth_id <- growth_ewaa_create(
-        ages = ages, weights = weights,
-        n_years = n_years
-    )
+  growth_id <- growth_ewaa_create(
+    ages = ages, weights = weights,
+    n_years = n_years
+  )
 
-    .Call(
-        "fims_call_ewaa_growth_evaluate",
-        as.integer(year),
-        as.numeric(age),
-        growth_id,
-        PACKAGE = "FIMS"
-    )
+  year <- .native_integer_vector(year, "year")
+  .Call(
+    "fims_call_ewaa_growth_evaluate",
+    year,
+    as.numeric(age),
+    growth_id,
+    PACKAGE = "FIMS"
+  )
 }

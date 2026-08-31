@@ -10,53 +10,61 @@
 # fleet_prepare ----
 ## IO correctness ----
 test_that("`fleet_create()` returns a backend handle", {
-    #' @description Test that `fleet_create()` returns an integer handle.
-    expect_type(
-        object = fleet_create(log_fmort = c(log(0.2), log(0.3)), log_q = log(0.5)),
-        type = "integer"
-    )
+  #' @description Test that `fleet_create()` returns an integer handle.
+  expect_type(
+    object = fleet_create(log_fmort = c(log(0.2), log(0.3)), log_q = log(0.5)),
+    type = "integer"
+  )
 })
 
 test_that("`fleet_prepare()` exponentiates log_Fmort and log_q", {
-    #' @description Test that `fleet_prepare()` returns transformed `Fmort` and `q` values.
-    result <- fleet_prepare(log_fmort = c(log(0.2), log(0.3)), log_q = log(0.5))
-    expect_equal(result[["Fmort"]], c(0.2, 0.3))
-    expect_equal(result[["q"]], c(0.5, 0.5))
+  #' @description Test that `fleet_prepare()` returns transformed `Fmort` and `q` values.
+  result <- fleet_prepare(log_fmort = c(log(0.2), log(0.3)), log_q = log(0.5))
+  expect_equal(result[["Fmort"]], c(0.2, 0.3))
+  expect_equal(result[["q"]], c(0.5, 0.5))
 })
 
 ## Error handling ----
 test_that("`fleet_prepare()` rejects mismatched input lengths", {
-    #' @description Test that `fleet_prepare()` errors when `log_q` does not have length 1 or match `log_fmort`.
-    expect_error(
-        object = fleet_prepare(
-            log_fmort = c(log(0.2), log(0.3), log(0.4)),
-            log_q = c(log(0.5), log(0.6))
-        ),
-        regexp = "must have length 1 or match the length of the paired input"
-    )
+  #' @description Test that `fleet_prepare()` errors when `log_q` does not have length 1 or match `log_fmort`.
+  expect_error(
+    object = fleet_prepare(
+      log_fmort = c(log(0.2), log(0.3), log(0.4)),
+      log_q = c(log(0.5), log(0.6))
+    ),
+    regexp = "must have length 1 or match the length of the paired input"
+  )
 })
 
 test_that("`fleet_create()` registers fixed and random effects", {
-    #' @description Test that fleet create calls register fixed and random effects when estimation types are provided.
-    clear()
+  #' @description Test that fleet create calls register fixed and random effects when estimation types are provided.
+  clear()
 
-    before <- native_information_parameter_counts()
+  before <- native_information_parameter_counts()
 
-    fleet_create(
-        log_fmort = c(log(0.2), log(0.3)),
-        log_q = c(log(0.4), log(0.5)),
-        log_fmort_estimation_type = c("fixed_effects", "constant"),
-        log_q_estimation_type = c("random_effects", "constant")
-    )
+  fleet_create(
+    log_fmort = c(log(0.2), log(0.3)),
+    log_q = c(log(0.4), log(0.5)),
+    log_fmort_estimation_type = c("fixed_effects", "constant"),
+    log_q_estimation_type = c("random_effects", "constant")
+  )
 
-    after <- native_information_parameter_counts()
+  after <- native_information_parameter_counts()
 
-    expect_equal(
-        object = after[["fixed_effects_parameters"]] - before[["fixed_effects_parameters"]],
-        expected = 1L
-    )
-    expect_equal(
-        object = after[["random_effects_parameters"]] - before[["random_effects_parameters"]],
-        expected = 1L
-    )
+  expect_equal(
+    object = after[["fixed_effects_parameters"]] - before[["fixed_effects_parameters"]],
+    expected = 1L
+  )
+  expect_equal(
+    object = after[["random_effects_parameters"]] - before[["random_effects_parameters"]],
+    expected = 1L
+  )
+})
+
+test_that("`fleet_create()` rejects fractional linked handles", {
+  #' @description Test that a fractional selectivity handle is rejected instead of silently truncated.
+  expect_error(
+    fleet_create(log_fmort = 0, log_q = 0, selectivity_id = 1.5),
+    "selectivity_id.*whole number"
+  )
 })

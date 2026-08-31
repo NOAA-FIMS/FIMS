@@ -10,61 +10,76 @@
 # growth_ewaa ----
 ## IO correctness ----
 test_that("`growth_ewaa_create()` returns a backend handle", {
-    #' @description Test that `growth_ewaa_create()` returns an integer handle.
-    expect_type(
-        object = growth_ewaa_create(
-            ages = c(1, 2, 3), weights = c(0.2, 0.4, 0.6),
-            n_years = 2
-        ),
-        type = "integer"
-    )
+  #' @description Test that `growth_ewaa_create()` returns an integer handle.
+  expect_type(
+    object = growth_ewaa_create(
+      ages = c(1, 2, 3), weights = c(0.2, 0.4, 0.6),
+      n_years = 2
+    ),
+    type = "integer"
+  )
 })
 
 test_that("`growth_ewaa()` evaluates EWAA values for a shared age vector", {
-    #' @description Test that `growth_ewaa()` returns expected weights for age lookups when one age vector is reused for each year.
-    expect_equal(
-        object = growth_ewaa(
-            year = c(0L, 1L, 2L), age = c(1, 2, 3),
-            ages = c(1, 2, 3), weights = c(0.2, 0.4, 0.6),
-            n_years = 2
-        ),
-        expected = c(0.2, 0.4, 0.6)
-    )
+  #' @description Test that `growth_ewaa()` returns expected weights for age lookups when one age vector is reused for each year.
+  expect_equal(
+    object = growth_ewaa(
+      year = c(0L, 1L, 2L), age = c(1, 2, 3),
+      ages = c(1, 2, 3), weights = c(0.2, 0.4, 0.6),
+      n_years = 2
+    ),
+    expected = c(0.2, 0.4, 0.6)
+  )
 })
 
 ## Error handling ----
 test_that("`growth_ewaa_create()` rejects invalid weight dimensions", {
-    #' @description Test that `growth_ewaa_create()` errors when `weights` length is not equal to `ages` or `ages * (n_years + 1)`.
-    expect_error(
-        object = growth_ewaa_create(
-            ages = c(1, 2, 3), weights = c(0.2, 0.4),
-            n_years = 2
-        ),
-        regexp = "weights"
-    )
+  #' @description Test that `growth_ewaa_create()` errors when `weights` length is not equal to `ages` or `ages * (n_years + 1)`.
+  expect_error(
+    object = growth_ewaa_create(
+      ages = c(1, 2, 3), weights = c(0.2, 0.4),
+      n_years = 2
+    ),
+    regexp = "weights"
+  )
 })
 
 test_that("`growth_ewaa()` rejects unknown year-age combinations", {
-    #' @description Test that `growth_ewaa()` errors when a year-age key is not present in the EWAA map.
-    expect_error(
-        object = growth_ewaa(
-            year = 0L, age = 4,
-            ages = c(1, 2, 3), weights = c(0.2, 0.4, 0.6),
-            n_years = 2
-        ),
-        regexp = "not found"
-    )
+  #' @description Test that `growth_ewaa()` errors when a year-age key is not present in the EWAA map.
+  expect_error(
+    object = growth_ewaa(
+      year = 0L, age = 4,
+      ages = c(1, 2, 3), weights = c(0.2, 0.4, 0.6),
+      n_years = 2
+    ),
+    regexp = "not found"
+  )
 })
 
 test_that("`growth_ewaa_create()` rejects estimable EWAA weights", {
-    #' @description Test that EWAA growth currently accepts only constant estimation type for weights.
-    expect_error(
-        object = growth_ewaa_create(
-            ages = c(1, 2, 3),
-            weights = c(0.2, 0.4, 0.6),
-            n_years = 2,
-            weights_estimation_type = "fixed_effects"
-        ),
-        regexp = "constant estimation type"
-    )
+  #' @description Test that EWAA growth currently accepts only constant estimation type for weights.
+  expect_error(
+    object = growth_ewaa_create(
+      ages = c(1, 2, 3),
+      weights = c(0.2, 0.4, 0.6),
+      n_years = 2,
+      weights_estimation_type = "fixed_effects"
+    ),
+    regexp = "constant estimation type"
+  )
+})
+
+test_that("growth integer inputs are not silently truncated", {
+  #' @description Test that fractional year and model-dimension values fail before reaching the native registry.
+  expect_error(
+    growth_ewaa_create(ages = 1:3, weights = c(1, 2, 3), n_years = 1.5),
+    "n_years.*whole number"
+  )
+  expect_error(
+    growth_ewaa(
+      year = 0.5, age = 1, ages = 1:3,
+      weights = c(1, 2, 3), n_years = 1
+    ),
+    "year.*whole numbers"
+  )
 })

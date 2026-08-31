@@ -6,7 +6,7 @@
 CMakeLists.txt
 tests/gtest
 tests/test_plan
-build
+^build$
 ^codecov\.yml$
 ^cspell\.json$
 .vscode
@@ -24,3 +24,9 @@ fims.log
 ^assets$
 setup_fims.sh
 ^native_.*\.patch$
+^tests/loop.*\.R$
+^tests/tmb_call.*\.R$
+^tests/testthat/fixtures/fit_.*\.RDS$
+^tests/testthat/fixtures/deterministic_.*\.RDS$
+^tests/testthat/fixtures/parameters_.*\.RDS$
+^tests/testthat/fixtures/data_.*\.RDS$

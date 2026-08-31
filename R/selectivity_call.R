@@ -16,14 +16,14 @@ selectivity_logistic_create <- function(inflection_point,
                                         slope,
                                         inflection_point_estimation_type = "constant",
                                         slope_estimation_type = "constant") {
-    .Call(
-        "fims_call_create_logistic_selectivity",
-        as.numeric(inflection_point),
-        as.numeric(slope),
-        as.integer(.map_estimation_type_code(inflection_point_estimation_type)),
-        as.integer(.map_estimation_type_code(slope_estimation_type)),
-        PACKAGE = "FIMS"
-    )
+  .Call(
+    "fims_call_create_logistic_selectivity",
+    as.numeric(inflection_point),
+    as.numeric(slope),
+    as.integer(.map_estimation_type_code(inflection_point_estimation_type)),
+    as.integer(.map_estimation_type_code(slope_estimation_type)),
+    PACKAGE = "FIMS"
+  )
 }
 
 #' Evaluate logistic selectivity through the native `.Call` interface
@@ -35,22 +35,22 @@ selectivity_logistic_create <- function(inflection_point,
 #' @return A numeric vector of logistic selectivity values.
 #' @export
 selectivity_logistic <- function(x, inflection_point, slope) {
-    valid_lengths <- c(1L, length(x))
-    if (!(length(inflection_point) %in% valid_lengths) ||
-        !(length(slope) %in% valid_lengths)) {
-        stop(
-            "Selectivity parameters must have length 1 or match the length of `x`.",
-            call. = FALSE
-        )
-    }
-    selectivity_id <- selectivity_logistic_create(inflection_point, slope)
-
-    .Call(
-        "fims_call_logistic_selectivity",
-        as.numeric(x),
-        selectivity_id,
-        PACKAGE = "FIMS"
+  valid_lengths <- c(1L, length(x))
+  if (!(length(inflection_point) %in% valid_lengths) ||
+    !(length(slope) %in% valid_lengths)) {
+    stop(
+      "Selectivity parameters must have length 1 or match the length of `x`.",
+      call. = FALSE
     )
+  }
+  selectivity_id <- selectivity_logistic_create(inflection_point, slope)
+
+  .Call(
+    "fims_call_logistic_selectivity",
+    as.numeric(x),
+    selectivity_id,
+    PACKAGE = "FIMS"
+  )
 }
 
 #' Create a double logistic selectivity backend object through the native `.Call` interface
@@ -82,18 +82,18 @@ selectivity_double_logistic_create <- function(inflection_point_asc,
                                                slope_asc_estimation_type = "constant",
                                                inflection_point_desc_estimation_type = "constant",
                                                slope_desc_estimation_type = "constant") {
-    .Call(
-        "fims_call_create_double_logistic_selectivity",
-        as.numeric(inflection_point_asc),
-        as.numeric(slope_asc),
-        as.numeric(inflection_point_desc),
-        as.numeric(slope_desc),
-        as.integer(.map_estimation_type_code(inflection_point_asc_estimation_type)),
-        as.integer(.map_estimation_type_code(slope_asc_estimation_type)),
-        as.integer(.map_estimation_type_code(inflection_point_desc_estimation_type)),
-        as.integer(.map_estimation_type_code(slope_desc_estimation_type)),
-        PACKAGE = "FIMS"
-    )
+  .Call(
+    "fims_call_create_double_logistic_selectivity",
+    as.numeric(inflection_point_asc),
+    as.numeric(slope_asc),
+    as.numeric(inflection_point_desc),
+    as.numeric(slope_desc),
+    as.integer(.map_estimation_type_code(inflection_point_asc_estimation_type)),
+    as.integer(.map_estimation_type_code(slope_asc_estimation_type)),
+    as.integer(.map_estimation_type_code(inflection_point_desc_estimation_type)),
+    as.integer(.map_estimation_type_code(slope_desc_estimation_type)),
+    PACKAGE = "FIMS"
+  )
 }
 
 #' Evaluate double logistic selectivity through the native `.Call` interface
@@ -112,55 +112,55 @@ selectivity_double_logistic <- function(x,
                                         slope_asc,
                                         inflection_point_desc,
                                         slope_desc) {
-    parameter_lengths <- lengths(list(
-        inflection_point_asc,
-        slope_asc,
-        inflection_point_desc,
-        slope_desc
-    ))
-    if (any(!(parameter_lengths %in% c(1L, length(x))))) {
-        stop(
-            "Selectivity parameters must have length 1 or match the length of `x`.",
-            call. = FALSE
-        )
-    }
-    selectivity_id <- selectivity_double_logistic_create(
-        inflection_point_asc,
-        slope_asc,
-        inflection_point_desc,
-        slope_desc
+  parameter_lengths <- lengths(list(
+    inflection_point_asc,
+    slope_asc,
+    inflection_point_desc,
+    slope_desc
+  ))
+  if (any(!(parameter_lengths %in% c(1L, length(x))))) {
+    stop(
+      "Selectivity parameters must have length 1 or match the length of `x`.",
+      call. = FALSE
     )
+  }
+  selectivity_id <- selectivity_double_logistic_create(
+    inflection_point_asc,
+    slope_asc,
+    inflection_point_desc,
+    slope_desc
+  )
 
-    .Call(
-        "fims_call_double_logistic_selectivity",
-        as.numeric(x),
-        selectivity_id,
-        PACKAGE = "FIMS"
-    )
+  .Call(
+    "fims_call_double_logistic_selectivity",
+    as.numeric(x),
+    selectivity_id,
+    PACKAGE = "FIMS"
+  )
 }
 
 .map_estimation_type_code <- function(x) {
-    if (is.character(x)) {
-        lookup <- c(
-            constant = 0L,
-            fixed_effects = 1L,
-            random_effects = 2L
-        )
-        if (!all(x %in% names(lookup))) {
-            stop("Estimation type values must be one of: constant, fixed_effects, random_effects.")
-        }
-        return(unname(lookup[x]))
+  if (is.character(x)) {
+    lookup <- c(
+      constant = 0L,
+      fixed_effects = 1L,
+      random_effects = 2L
+    )
+    if (!all(x %in% names(lookup))) {
+      stop("Estimation type values must be one of: constant, fixed_effects, random_effects.")
     }
+    return(unname(lookup[x]))
+  }
 
-    if (is.numeric(x) || is.integer(x)) {
-        x_int <- as.integer(x)
-        if (!all(x_int %in% c(0L, 1L, 2L))) {
-            stop("Numeric estimation type codes must be one of: 0 (constant), 1 (fixed_effects), 2 (random_effects).")
-        }
-        return(x_int)
+  if (is.numeric(x) || is.integer(x)) {
+    if (any(!is.finite(x)) || any(x %% 1 != 0) ||
+      !all(x %in% c(0L, 1L, 2L))) {
+      stop("Numeric estimation type codes must be one of: 0 (constant), 1 (fixed_effects), 2 (random_effects).")
     }
+    return(as.integer(x))
+  }
 
-    stop("Estimation type must be character or integer-like.")
+  stop("Estimation type must be character or integer-like.")
 }
 
 #' Get Information parameter and random-effect registration counts
@@ -171,7 +171,7 @@ selectivity_double_logistic <- function(x,
 #' @return Named integer vector with registration counts.
 #' @export
 native_information_parameter_counts <- function() {
-    .Call("fims_call_information_parameter_counts", PACKAGE = "FIMS")
+  .Call("fims_call_information_parameter_counts", PACKAGE = "FIMS")
 }
 
 #' Get Information model assembly counts
@@ -182,5 +182,5 @@ native_information_parameter_counts <- function() {
 #' @return Named integer vector with model assembly counts.
 #' @export
 native_information_model_counts <- function() {
-    .Call("fims_call_information_model_counts", PACKAGE = "FIMS")
+  .Call("fims_call_information_model_counts", PACKAGE = "FIMS")
 }

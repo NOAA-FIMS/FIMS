@@ -26,20 +26,33 @@ population_create <- function(log_m,
                               growth_id = NA_integer_,
                               recruitment_id = NA_integer_,
                               fleet_ids = integer()) {
-    .Call(
-        "fims_call_create_population",
-        as.numeric(log_m),
-        as.numeric(log_f_multiplier),
-        as.numeric(log_init_naa),
-        as.integer(.map_estimation_type_code(log_m_estimation_type)),
-        as.integer(.map_estimation_type_code(log_f_multiplier_estimation_type)),
-        as.integer(.map_estimation_type_code(log_init_naa_estimation_type)),
-        as.integer(maturity_id),
-        as.integer(growth_id),
-        as.integer(recruitment_id),
-        as.integer(fleet_ids),
-        PACKAGE = "FIMS"
-    )
+  maturity_id <- .native_integer_vector(
+    maturity_id, "maturity_id",
+    allow_na = TRUE, scalar = TRUE
+  )
+  growth_id <- .native_integer_vector(
+    growth_id, "growth_id",
+    allow_na = TRUE, scalar = TRUE
+  )
+  recruitment_id <- .native_integer_vector(
+    recruitment_id, "recruitment_id",
+    allow_na = TRUE, scalar = TRUE
+  )
+  fleet_ids <- .native_integer_vector(fleet_ids, "fleet_ids")
+  .Call(
+    "fims_call_create_population",
+    as.numeric(log_m),
+    as.numeric(log_f_multiplier),
+    as.numeric(log_init_naa),
+    as.integer(.map_estimation_type_code(log_m_estimation_type)),
+    as.integer(.map_estimation_type_code(log_f_multiplier_estimation_type)),
+    as.integer(.map_estimation_type_code(log_init_naa_estimation_type)),
+    maturity_id,
+    growth_id,
+    recruitment_id,
+    fleet_ids,
+    PACKAGE = "FIMS"
+  )
 }
 
 #' Prepare population transformed values through the native `.Call` interface
@@ -60,16 +73,16 @@ population_prepare <- function(log_m,
                                growth_id = NA_integer_,
                                recruitment_id = NA_integer_,
                                fleet_ids = integer()) {
-    if (length(log_m) > 1L && length(log_f_multiplier) > 1L &&
-        length(log_m) != length(log_f_multiplier)) {
-        stop(
-            "`log_f_multiplier` must have length 1 or match the length of the paired input.",
-            call. = FALSE
-        )
-    }
-    n <- max(length(log_m), length(log_f_multiplier))
-    list(
-        M = exp(log_m),
-        f_multiplier = rep(exp(log_f_multiplier), length.out = n)
+  if (length(log_m) > 1L && length(log_f_multiplier) > 1L &&
+    length(log_m) != length(log_f_multiplier)) {
+    stop(
+      "`log_f_multiplier` must have length 1 or match the length of the paired input.",
+      call. = FALSE
     )
+  }
+  n <- max(length(log_m), length(log_f_multiplier))
+  list(
+    M = exp(log_m),
+    f_multiplier = rep(exp(log_f_multiplier), length.out = n)
+  )
 }

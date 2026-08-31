@@ -10,99 +10,111 @@
 # selectivity_logistic ----
 ## IO correctness ----
 test_that("`selectivity_logistic_create()` returns a backend handle", {
-    #' @description Test that `selectivity_logistic_create()` returns an integer handle.
-    expect_type(
-        object = selectivity_logistic_create(10, 0.2),
-        type = "integer"
-    )
+  #' @description Test that `selectivity_logistic_create()` returns an integer handle.
+  expect_type(
+    object = selectivity_logistic_create(10, 0.2),
+    type = "integer"
+  )
 })
 
 test_that("`selectivity_double_logistic_create()` returns a backend handle", {
-    #' @description Test that `selectivity_double_logistic_create()` returns an integer handle.
-    expect_type(
-        object = selectivity_double_logistic_create(10.5, 0.2, 15, 0.05),
-        type = "integer"
-    )
+  #' @description Test that `selectivity_double_logistic_create()` returns an integer handle.
+  expect_type(
+    object = selectivity_double_logistic_create(10.5, 0.2, 15, 0.05),
+    type = "integer"
+  )
 })
 
 test_that("`selectivity_double_logistic()` matches the double logistic formula", {
-    #' @description Test that `selectivity_double_logistic()` evaluates the same values as the underlying double logistic formula.
-    expect_equal(
-        object = selectivity_double_logistic(34.5, 10.5, 0.2, 15, 0.05),
-        expected = 1 / (1 + exp(-(34.5 - 10.5) * 0.2)) *
-            (1 - 1 / (1 + exp(-(34.5 - 15) * 0.05)))
-    )
+  #' @description Test that `selectivity_double_logistic()` evaluates the same values as the underlying double logistic formula.
+  expect_equal(
+    object = selectivity_double_logistic(34.5, 10.5, 0.2, 15, 0.05),
+    expected = 1 / (1 + exp(-(34.5 - 10.5) * 0.2)) *
+      (1 - 1 / (1 + exp(-(34.5 - 15) * 0.05)))
+  )
 })
 
 ## IO correctness ----
 test_that("`selectivity_logistic()` matches the logistic selectivity formula", {
-    #' @description Test that `selectivity_logistic()` evaluates the same values as the underlying logistic formula.
-    expect_equal(
-        object = selectivity_logistic(10, 10, 0.2),
-        expected = 0.5
+  #' @description Test that `selectivity_logistic()` evaluates the same values as the underlying logistic formula.
+  expect_equal(
+    object = selectivity_logistic(10, 10, 0.2),
+    expected = 0.5
+  )
+  #' @description Test that `selectivity_logistic()` works on a vector of values.
+  expect_equal(
+    object = selectivity_logistic(c(9, 10, 11), 10, 0.2),
+    expected = c(
+      1 / (1 + exp(-0.2 * (9 - 10))),
+      0.5,
+      1 / (1 + exp(-0.2 * (11 - 10)))
     )
-    #' @description Test that `selectivity_logistic()` works on a vector of values.
-    expect_equal(
-        object = selectivity_logistic(c(9, 10, 11), 10, 0.2),
-        expected = c(
-            1 / (1 + exp(-0.2 * (9 - 10))),
-            0.5,
-            1 / (1 + exp(-0.2 * (11 - 10)))
-        )
-    )
+  )
 })
 
 ## Edge handling ----
 test_that("`selectivity_logistic()` recycles scalar parameters across x", {
-    #' @description Test that a scalar `inflection_point` is recycled across a vector `x`.
-    expect_equal(
-        object = selectivity_logistic(c(9, 10, 11), 10, c(0.2, 0.2, 0.2)),
-        expected = c(
-            1 / (1 + exp(-0.2 * (9 - 10))),
-            0.5,
-            1 / (1 + exp(-0.2 * (11 - 10)))
-        )
+  #' @description Test that a scalar `inflection_point` is recycled across a vector `x`.
+  expect_equal(
+    object = selectivity_logistic(c(9, 10, 11), 10, c(0.2, 0.2, 0.2)),
+    expected = c(
+      1 / (1 + exp(-0.2 * (9 - 10))),
+      0.5,
+      1 / (1 + exp(-0.2 * (11 - 10)))
     )
+  )
 })
 
 ## Error handling ----
 test_that("`selectivity_logistic()` rejects mismatched vector lengths", {
-    #' @description Test that `selectivity_logistic()` errors when `slope` does not have length 1 or the same length as `x`.
-    expect_error(
-        object = selectivity_logistic(c(9, 10, 11), 10, c(0.2, 0.3)),
-        regexp = "must have length 1 or match the length of `x`"
-    )
+  #' @description Test that `selectivity_logistic()` errors when `slope` does not have length 1 or the same length as `x`.
+  expect_error(
+    object = selectivity_logistic(c(9, 10, 11), 10, c(0.2, 0.3)),
+    regexp = "must have length 1 or match the length of `x`"
+  )
 })
 
 test_that("`selectivity_logistic_create()` registers fixed and random effects", {
-    #' @description Test that selectivity create calls register fixed and random effects in Information when estimation types are provided.
-    clear()
+  #' @description Test that selectivity create calls register fixed and random effects in Information when estimation types are provided.
+  clear()
 
-    before <- native_information_parameter_counts()
+  before <- native_information_parameter_counts()
 
+  selectivity_logistic_create(
+    inflection_point = 10,
+    slope = 0.2,
+    inflection_point_estimation_type = "fixed_effects",
+    slope_estimation_type = "random_effects"
+  )
+
+  after <- native_information_parameter_counts()
+
+  expect_equal(
+    object = after[["fixed_effects_parameters"]] - before[["fixed_effects_parameters"]],
+    expected = 1L
+  )
+  expect_equal(
+    object = after[["random_effects_parameters"]] - before[["random_effects_parameters"]],
+    expected = 1L
+  )
+  expect_equal(
+    object = after[["parameter_names"]] - before[["parameter_names"]],
+    expected = 1L
+  )
+  expect_equal(
+    object = after[["random_effects_names"]] - before[["random_effects_names"]],
+    expected = 1L
+  )
+})
+
+test_that("estimation codes are not silently truncated", {
+  #' @description Test that fractional numeric estimation codes fail rather than selecting a different estimation type.
+  expect_error(
     selectivity_logistic_create(
-        inflection_point = 10,
-        slope = 0.2,
-        inflection_point_estimation_type = "fixed_effects",
-        slope_estimation_type = "random_effects"
-    )
-
-    after <- native_information_parameter_counts()
-
-    expect_equal(
-        object = after[["fixed_effects_parameters"]] - before[["fixed_effects_parameters"]],
-        expected = 1L
-    )
-    expect_equal(
-        object = after[["random_effects_parameters"]] - before[["random_effects_parameters"]],
-        expected = 1L
-    )
-    expect_equal(
-        object = after[["parameter_names"]] - before[["parameter_names"]],
-        expected = 1L
-    )
-    expect_equal(
-        object = after[["random_effects_names"]] - before[["random_effects_names"]],
-        expected = 1L
-    )
+      inflection_point = 10,
+      slope = 0.2,
+      inflection_point_estimation_type = 1.5
+    ),
+    "Numeric estimation type codes"
+  )
 })

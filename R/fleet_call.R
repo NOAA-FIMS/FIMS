@@ -18,16 +18,20 @@ fleet_create <- function(log_fmort,
                          age_to_length_conversion = numeric(),
                          log_fmort_estimation_type = "constant",
                          log_q_estimation_type = "constant") {
-    .Call(
-        "fims_call_create_fleet",
-        as.numeric(log_fmort),
-        as.numeric(log_q),
-        as.integer(selectivity_id),
-        as.numeric(age_to_length_conversion),
-        as.integer(.map_estimation_type_code(log_fmort_estimation_type)),
-        as.integer(.map_estimation_type_code(log_q_estimation_type)),
-        PACKAGE = "FIMS"
-    )
+  selectivity_id <- .native_integer_vector(
+    selectivity_id, "selectivity_id",
+    allow_na = TRUE, scalar = TRUE
+  )
+  .Call(
+    "fims_call_create_fleet",
+    as.numeric(log_fmort),
+    as.numeric(log_q),
+    selectivity_id,
+    as.numeric(age_to_length_conversion),
+    as.integer(.map_estimation_type_code(log_fmort_estimation_type)),
+    as.integer(.map_estimation_type_code(log_q_estimation_type)),
+    PACKAGE = "FIMS"
+  )
 }
 
 #' Prepare fleet transformed values through the native `.Call` interface
@@ -43,23 +47,23 @@ fleet_prepare <- function(log_fmort,
                           log_q,
                           selectivity_id = NA_integer_,
                           age_to_length_conversion = numeric()) {
-    fleet_id <- fleet_create(
-        log_fmort = log_fmort,
-        log_q = log_q,
-        selectivity_id = selectivity_id,
-        age_to_length_conversion = age_to_length_conversion
-    )
+  fleet_id <- fleet_create(
+    log_fmort = log_fmort,
+    log_q = log_q,
+    selectivity_id = selectivity_id,
+    age_to_length_conversion = age_to_length_conversion
+  )
 
-    result <- .Call(
-        "fims_call_fleet_prepare",
-        fleet_id,
-        PACKAGE = "FIMS"
-    )
+  result <- .Call(
+    "fims_call_fleet_prepare",
+    fleet_id,
+    PACKAGE = "FIMS"
+  )
 
-    # The backend stores scalar catchability once. Expand it to the number of
-    # modeled years at the R boundary rather than reading beyond native storage.
-    if (length(log_q) == 1L && length(log_fmort) > 1L) {
-        result[["q"]] <- rep(exp(log_q), length(log_fmort))
-    }
-    result
+  # The backend stores scalar catchability once. Expand it to the number of
+  # modeled years at the R boundary rather than reading beyond native storage.
+  if (length(log_q) == 1L && length(log_fmort) > 1L) {
+    result[["q"]] <- rep(exp(log_q), length(log_fmort))
+  }
+  result
 }

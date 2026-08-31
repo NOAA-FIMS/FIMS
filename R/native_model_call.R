@@ -17,6 +17,10 @@ native_create_model <- function() {
   .Call("fims_call_create_model", PACKAGE = "FIMS")
 }
 
+.native_scalar_integer <- function(value, argument, minimum = 0L) {
+  .native_integer_vector(value, argument, minimum = minimum, scalar = TRUE)
+}
+
 #' Build the native default likelihood graph
 #'
 #' @param fishing_fleet_id Integer handle for the fishing fleet.
@@ -39,28 +43,34 @@ native_create_model <- function() {
 #' @return `TRUE` when likelihood construction succeeds.
 #' @export
 native_build_default_likelihood <- function(
-  fishing_fleet_id,
-  survey_fleet_id,
-  landings,
-  landings_distribution = "dlnorm",
-  landings_sd,
-  landings_age_comp,
-  landings_length_comp,
-  survey_index,
-  survey_distribution = "dlnorm",
-  survey_sd,
-  survey_age_comp,
-  survey_length_comp,
-  recruitment_log_sd,
-  recruitment_log_sd_estimation_type = "constant",
-  n_years,
-  n_ages,
-  n_lengths
-) {
+    fishing_fleet_id,
+    survey_fleet_id,
+    landings,
+    landings_distribution = "dlnorm",
+    landings_sd,
+    landings_age_comp,
+    landings_length_comp,
+    survey_index,
+    survey_distribution = "dlnorm",
+    survey_sd,
+    survey_age_comp,
+    survey_length_comp,
+    recruitment_log_sd,
+    recruitment_log_sd_estimation_type = "constant",
+    n_years,
+    n_ages,
+    n_lengths) {
+  fishing_fleet_id <- .native_scalar_integer(
+    fishing_fleet_id, "fishing_fleet_id"
+  )
+  survey_fleet_id <- .native_scalar_integer(survey_fleet_id, "survey_fleet_id")
+  n_years <- .native_scalar_integer(n_years, "n_years", minimum = 1L)
+  n_ages <- .native_scalar_integer(n_ages, "n_ages", minimum = 1L)
+  n_lengths <- .native_scalar_integer(n_lengths, "n_lengths")
   .Call(
     "fims_call_build_default_likelihood",
-    as.integer(fishing_fleet_id),
-    as.integer(survey_fleet_id),
+    fishing_fleet_id,
+    survey_fleet_id,
     as.numeric(landings),
     as.character(landings_distribution),
     as.numeric(landings_sd),
@@ -73,9 +83,9 @@ native_build_default_likelihood <- function(
     as.numeric(survey_length_comp),
     as.numeric(recruitment_log_sd),
     as.integer(.map_estimation_type_code(recruitment_log_sd_estimation_type)),
-    as.integer(n_years),
-    as.integer(n_ages),
-    as.integer(n_lengths),
+    n_years,
+    n_ages,
+    n_lengths,
     PACKAGE = "FIMS"
   )
 }
@@ -101,15 +111,15 @@ native_build_default_likelihood <- function(
 #' @return `TRUE` invisibly when the prior is registered.
 #' @export
 native_add_prior <- function(
-  module,
-  object_id,
-  parameter,
-  distribution = c("normal", "lognormal", "Dnorm", "Dlnorm"),
-  mean = 0,
-  log_sd = 0,
-  mean_estimation_type = "constant",
-  log_sd_estimation_type = "constant"
-) {
+    module,
+    object_id,
+    parameter,
+    distribution = c("normal", "lognormal", "Dnorm", "Dlnorm"),
+    mean = 0,
+    log_sd = 0,
+    mean_estimation_type = "constant",
+    log_sd_estimation_type = "constant") {
+  object_id <- .native_scalar_integer(object_id, "object_id")
   distribution <- match.arg(distribution)
   distribution <- switch(distribution,
     Dnorm = "normal",
@@ -125,7 +135,7 @@ native_add_prior <- function(
   result <- .Call(
     "fims_call_add_prior",
     as.character(module),
-    as.integer(object_id),
+    object_id,
     as.character(parameter),
     distribution,
     as.numeric(mean),
@@ -167,6 +177,17 @@ native_get_parameter_names <- function() {
   .Call("fims_call_information_get_parameter_names", PACKAGE = "FIMS")
 }
 
+#' Read registered native FIMS random-effect names
+#'
+#' Names preserve the module, object, parameter, and element identity used by
+#' the native model. Their order matches [native_get_random()].
+#'
+#' @return A character vector in native random-effect registration order.
+#' @export
+native_get_random_effect_names <- function() {
+  .Call("fims_call_information_get_random_effect_names", PACKAGE = "FIMS")
+}
+
 #' @rdname native_clear
 #' @export
 clear <- native_clear
@@ -202,10 +223,14 @@ get_parameter_names <- function(pars = NULL) {
 #' @rdname native_get_parameter_names
 #' @export
 get_random_names <- function(pars = NULL) {
+  random_effect_names <- native_get_random_effect_names()
   if (is.null(pars)) {
-    return(character())
+    return(random_effect_names)
   }
 
-  names(pars) <- paste0("random_effect_", seq_along(pars))
+  if (length(random_effect_names) != length(pars)) {
+    return(pars)
+  }
+  names(pars) <- random_effect_names
   pars
 }

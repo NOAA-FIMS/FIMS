@@ -80,11 +80,38 @@ test_that("native priors contribute their density to the objective", {
   )
 
   expected_prior_nll <- sum(-stats::dnorm(
-    maturity_value, mean = 0, sd = 1, log = TRUE
+    maturity_value,
+    mean = 0, sd = 1, log = TRUE
   ))
   expect_equal(
     as.numeric(prior_obj$fn(prior_obj$par) - baseline_value),
     as.numeric(expected_prior_nll),
     tolerance = 1e-8
   )
+})
+test_that("`initialize_fims()` accepts legacy parameter timing columns", {
+  data <- FIMSFrame(data_big)
+  parameters <- setup_default_parameters(data) |>
+    dplyr::rename(time = "timing")
+
+  initialized <- initialize_fims(parameters, data)
+  on.exit(native_clear(), add = TRUE)
+
+  expect_true(length(initialized[["parameters"]][["p"]]) > 0L)
+  expect_equal(
+    length(native_get_parameter_names()),
+    length(initialized[["parameters"]][["p"]])
+  )
+})
+
+test_that("`initialize_fims()` supports models with one composition type", {
+  for (excluded_type in c("age_comp", "length_comp")) {
+    composition_data <- data_big |>
+      dplyr::filter(.data[["type"]] != .env[["excluded_type"]]) |>
+      FIMSFrame()
+    parameters <- setup_default_parameters(composition_data)
+
+    expect_no_error(initialize_fims(parameters, composition_data))
+    native_clear()
+  }
 })
