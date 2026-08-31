@@ -5,6 +5,11 @@
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_growth.hpp"
 // static id of the GrowthInterfaceBase object
 uint32_t GrowthInterfaceBase::id_g = 1;
+namespace {
+// Adds this counter to the list clear() rewinds.
+IdCounterRegistration growth_id_g_registration(
+    &GrowthInterfaceBase::id_g);
+}  // namespace
 
 #include <Rcpp.h>
 
@@ -85,6 +90,26 @@ Rcpp::XPtr<SharedBase> growth_to_fims_xptr_(Rcpp::XPtr<SharedGrowth> xp) {
   return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
 }
 
+// ── Invalidation for clear() ─────────────────────────────────────────────────
+/**
+ * @brief Invalidate a pointer to a growth module, releasing this pointer's
+ * share of the module.
+ *
+ * @details Called by the R `clear()` wrapper for every module in the registry.
+ * The external pointer is set to NULL in place, so the R variable still holding
+ * it reports "external pointer is not valid" on the next use instead of quietly
+ * operating on a module that is no longer part of any model. Once both this
+ * pointer and the module's base pointer are released, nothing owns the module
+ * and its memory is returned immediately rather than at the next garbage
+ * collection.
+ *
+ * Releasing an already-released pointer does nothing, so this is safe to call
+ * twice.
+ *
+ * @param xp The module to invalidate.
+ */
+void release_growth_(Rcpp::XPtr<SharedGrowth> xp) { xp.release(); }
+
 /**
  * Function to register growth classes with the Rcpp module system.
  *
@@ -95,9 +120,9 @@ Rcpp::XPtr<SharedBase> growth_to_fims_xptr_(Rcpp::XPtr<SharedGrowth> xp) {
  * @param m The Rcpp module to register into.
  */
 void register_growth(Rcpp::Module& m) {
-  // Rcpp::class_<> registrations removed — users no longer call methods::new().
   Rcpp::function("create_growth_", &create_growth_);
   Rcpp::function("set_growth_n_years_", &set_growth_n_years_);
   Rcpp::function("evaluate_growth_", &evaluate_growth_);
   Rcpp::function("growth_to_fims_xptr_", &growth_to_fims_xptr_);
+  Rcpp::function("release_growth_", &release_growth_);
 }

@@ -6,6 +6,11 @@
 
 // static id of the PopulationInterfaceBase object
 uint32_t PopulationInterfaceBase::id_g = 1;
+namespace {
+// Adds this counter to the list clear() rewinds.
+IdCounterRegistration population_id_g_registration(
+    &PopulationInterfaceBase::id_g);
+}  // namespace
 
 #include <Rcpp.h>
 
@@ -83,6 +88,30 @@ void set_population_process_ids_(Rcpp::XPtr<SharedPopulation> xp,
   (*xp)->recruitment_err_id = recruitment_err_id;
 }
 
+/**
+ * @brief Read the IDs of the modules a population is linked to.
+ *
+ * @details The counterpart to set_population_process_ids_(), returning all
+ * four IDs at once under the same names that setter takes. An unset link
+ * reads back as -999, the value the population is constructed with, so a
+ * caller can tell "not linked" from "linked to module 0".
+ *
+ * This is what lets a link be changed without the caller having to remember
+ * what it was: the population is asked, rather than told.
+ *
+ * @param xp The population module.
+ * @return A named integer vector with elements "maturity", "growth",
+ *   "recruitment", and "recruitment_err".
+ */
+Rcpp::IntegerVector get_population_process_ids_(
+    Rcpp::XPtr<SharedPopulation> xp) {
+  return Rcpp::IntegerVector::create(
+      Rcpp::Named("maturity") = (*xp)->maturity_id,
+      Rcpp::Named("growth") = (*xp)->growth_id,
+      Rcpp::Named("recruitment") = (*xp)->recruitment_id,
+      Rcpp::Named("recruitment_err") = (*xp)->recruitment_err_id);
+}
+
 // Fleets are the exception: the model walks the populations to reach every
 // fleet it needs to size derived quantities for, so the population holds
 // direct links as well as the IDs. SetFleets() rebuilds both together, and
@@ -140,6 +169,26 @@ Rcpp::XPtr<SharedBase> population_to_fims_xptr_(
 }
 
 // ── Module registration ──────────────────────────────────────────────────────
+// ── Invalidation for clear() ─────────────────────────────────────────────────
+/**
+ * @brief Invalidate a pointer to a population module, releasing this
+ * pointer's share of the module.
+ *
+ * @details Called by the R `clear()` wrapper for every module in the registry.
+ * The external pointer is set to NULL in place, so the R variable still holding
+ * it reports "external pointer is not valid" on the next use instead of quietly
+ * operating on a module that is no longer part of any model. Once both this
+ * pointer and the module's base pointer are released, nothing owns the module
+ * and its memory is returned immediately rather than at the next garbage
+ * collection.
+ *
+ * Releasing an already-released pointer does nothing, so this is safe to call
+ * twice.
+ *
+ * @param xp The module to invalidate.
+ */
+void release_population_(Rcpp::XPtr<SharedPopulation> xp) { xp.release(); }
+
 /**
  * @brief Register the population functions with the Rcpp module system.
  *
@@ -150,7 +199,10 @@ void register_population(Rcpp::Module& m) {
   Rcpp::function("set_population_constants_",   &set_population_constants_);
   Rcpp::function("set_population_name_",             &set_population_name_);
   Rcpp::function("set_population_process_ids_", &set_population_process_ids_);
+  Rcpp::function("get_population_process_ids_",
+                 &get_population_process_ids_);
   Rcpp::function("set_population_fleets_",           &set_population_fleets_);
   Rcpp::function("get_population_name_",             &get_population_name_);
   Rcpp::function("population_to_fims_xptr_",         &population_to_fims_xptr_);
+  Rcpp::function("release_population_", &release_population_);
 }

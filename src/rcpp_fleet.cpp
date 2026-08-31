@@ -7,6 +7,11 @@
 #include <Rcpp.h>
 // static id of the FleetInterfaceBase object
 uint32_t FleetInterfaceBase::id_g = 1;
+namespace {
+// Adds this counter to the list clear() rewinds.
+IdCounterRegistration fleet_id_g_registration(
+    &FleetInterfaceBase::id_g);
+}  // namespace
 
 // ── Short name for the pointer type ────────────────────────────────────────
 using SharedFleet = std::shared_ptr<FleetInterface>;
@@ -170,6 +175,26 @@ Rcpp::XPtr<SharedBase> fleet_to_fims_xptr_(Rcpp::XPtr<SharedFleet> xp) {
   return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
 }
 
+// ── Invalidation for clear() ─────────────────────────────────────────────────
+/**
+ * @brief Invalidate a pointer to a fleet module, releasing this pointer's
+ * share of the module.
+ *
+ * @details Called by the R `clear()` wrapper for every module in the registry.
+ * The external pointer is set to NULL in place, so the R variable still holding
+ * it reports "external pointer is not valid" on the next use instead of quietly
+ * operating on a module that is no longer part of any model. Once both this
+ * pointer and the module's base pointer are released, nothing owns the module
+ * and its memory is returned immediately rather than at the next garbage
+ * collection.
+ *
+ * Releasing an already-released pointer does nothing, so this is safe to call
+ * twice.
+ *
+ * @param xp The module to invalidate.
+ */
+void release_fleet_(Rcpp::XPtr<SharedFleet> xp) { xp.release(); }
+
 /**
  * Function to register fleet classes with the Rcpp module system.
  *
@@ -180,7 +205,6 @@ Rcpp::XPtr<SharedBase> fleet_to_fims_xptr_(Rcpp::XPtr<SharedFleet> xp) {
  * @param m The Rcpp module to register into.
  */
 void register_fleet(Rcpp::Module& m) {
-  // Rcpp::class_<FleetInterface> removed — users no longer call methods::new().
   Rcpp::function("create_fleet_", &create_fleet_);
   Rcpp::function("set_fleet_constants_", &set_fleet_constants_);
   Rcpp::function("set_fleet_name_", &set_fleet_name_);
@@ -193,4 +217,5 @@ void register_fleet(Rcpp::Module& m) {
   Rcpp::function("get_fleet_observed_data_ids_",
                  &get_fleet_observed_data_ids_);
   Rcpp::function("fleet_to_fims_xptr_", &fleet_to_fims_xptr_);
+  Rcpp::function("release_fleet_", &release_fleet_);
 }
