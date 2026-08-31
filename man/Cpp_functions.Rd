@@ -2,7 +2,6 @@
 % Please edit documentation in R/Rcpp_exports.R
 \name{Cpp_functions}
 \alias{Cpp_functions}
-\alias{clear}
 \alias{get_fixed}
 \alias{get_log}
 \alias{get_log_errors}
@@ -18,7 +17,6 @@
 \alias{set_fixed}
 \alias{set_log_throw_on_error}
 \alias{set_random}
-\alias{CreateTMBModel}
 \title{C++ Functions Exported via Rcpp}
 \description{
 The following functions are exported from C++ via Rcpp. Their documentation
@@ -27,7 +25,6 @@ C++ docs.
 }
 \details{
 \itemize{
-\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{clear}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_fixed}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_log}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{get_log_errors}
@@ -43,7 +40,6 @@ C++ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{set_fixed}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{set_log_throw_on_error}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{set_random}
-\item \href{https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html}{CreateTMBModel}
 }
 }
 \section{C++ Documentation}{

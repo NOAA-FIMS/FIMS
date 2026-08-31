@@ -5,6 +5,11 @@
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp"
 // static id of the DataInterfaceBase object
 uint32_t DataInterfaceBase::id_g = 1;
+namespace {
+// Adds this counter to the list clear() rewinds.
+IdCounterRegistration data_id_g_registration(
+    &DataInterfaceBase::id_g);
+}  // namespace
 
 #include <Rcpp.h>
 
@@ -81,6 +86,26 @@ Rcpp::XPtr<SharedBase> data_to_fims_xptr_(Rcpp::XPtr<SharedData> xp) {
   return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
 }
 
+// ── Invalidation for clear() ─────────────────────────────────────────────────
+/**
+ * @brief Invalidate a pointer to a data module, releasing this pointer's
+ * share of the module.
+ *
+ * @details Called by the R `clear()` wrapper for every module in the registry.
+ * The external pointer is set to NULL in place, so the R variable still holding
+ * it reports "external pointer is not valid" on the next use instead of quietly
+ * operating on a module that is no longer part of any model. Once both this
+ * pointer and the module's base pointer are released, nothing owns the module
+ * and its memory is returned immediately rather than at the next garbage
+ * collection.
+ *
+ * Releasing an already-released pointer does nothing, so this is safe to call
+ * twice.
+ *
+ * @param xp The module to invalidate.
+ */
+void release_data_(Rcpp::XPtr<SharedData> xp) { xp.release(); }
+
 /**
  * Function to register data classes with the Rcpp module system.
  */
@@ -90,9 +115,9 @@ Rcpp::XPtr<SharedBase> data_to_fims_xptr_(Rcpp::XPtr<SharedData> xp) {
  * @param m The Rcpp module to register into.
  */
 void register_data(Rcpp::Module& m) {
-  // Rcpp::class_<> registrations removed — users no longer call methods::new().
   // The trailing underscores prevent collision with the R wrapper functions
   // that own the clean names (Section 4b of the design doc).
   Rcpp::function("create_data_interface_", &create_data_interface_);
   Rcpp::function("data_to_fims_xptr_", &data_to_fims_xptr_);
+  Rcpp::function("release_data_", &release_data_);
 }

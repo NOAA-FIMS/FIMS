@@ -6,6 +6,11 @@
 
 // static id of the SelectivityInterfaceBase object
 uint32_t SelectivityInterfaceBase::id_g = 1;
+namespace {
+// Adds this counter to the list clear() rewinds.
+IdCounterRegistration selectivity_id_g_registration(
+    &SelectivityInterfaceBase::id_g);
+}  // namespace
 
 #include <Rcpp.h>
 
@@ -78,6 +83,26 @@ Rcpp::XPtr<SharedBase> selectivity_to_fims_xptr_(
   return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
 }
 
+// ── Invalidation for clear() ─────────────────────────────────────────────────
+/**
+ * @brief Invalidate a pointer to a selectivity module, releasing this
+ * pointer's share of the module.
+ *
+ * @details Called by the R `clear()` wrapper for every module in the registry.
+ * The external pointer is set to NULL in place, so the R variable still holding
+ * it reports "external pointer is not valid" on the next use instead of quietly
+ * operating on a module that is no longer part of any model. Once both this
+ * pointer and the module's base pointer are released, nothing owns the module
+ * and its memory is returned immediately rather than at the next garbage
+ * collection.
+ *
+ * Releasing an already-released pointer does nothing, so this is safe to call
+ * twice.
+ *
+ * @param xp The module to invalidate.
+ */
+void release_selectivity_(Rcpp::XPtr<SharedSelectivity> xp) { xp.release(); }
+
 /**
  * Function to register selectivity classes with the Rcpp module system.
  *
@@ -88,8 +113,8 @@ Rcpp::XPtr<SharedBase> selectivity_to_fims_xptr_(
  * @param m The Rcpp module to register into.
  */
 void register_selectivity(Rcpp::Module& m) {
-  // Rcpp::class_<> registrations removed — users no longer call methods::new().
   Rcpp::function("create_selectivity_", &create_selectivity_);
   Rcpp::function("evaluate_selectivity_", &evaluate_selectivity_);
   Rcpp::function("selectivity_to_fims_xptr_", &selectivity_to_fims_xptr_);
+  Rcpp::function("release_selectivity_", &release_selectivity_);
 }

@@ -550,15 +550,50 @@ inline void set_real_vector(fims::Vector<double> &target,
 class FIMSRcppInterfaceBase {
  public:
   /**
+   * @brief How many interface modules are alive right now.
+   *
+   * @details Every module -- population, fleet, selectivity, and the rest --
+   * adds one here when it is constructed and takes one away when it is
+   * destroyed.
+   *
+   * clear() reads it to check that R released every module before the ID
+   * counters are rewound. The R clear() wrapper releases them all, so this is
+   * normally zero by then, and a count above zero means something bypassed the
+   * wrapper. That matters because a surviving module keeps an ID that will be
+   * handed out again after the rewind, and IDs are how the model finds
+   * parameters.
+   */
+  static inline int live_module_count = 0;
+
+  /**
+   * @brief A vector of every ID counter that clear() has to rewind.
+   *
+   * @details Each family's id_g adds itself here where it is defined, in the
+   * corresponding src/rcpp_*.cpp, so clear() can loop over the counters rather
+   * than naming them one by one. Adding a module family therefore cannot leave
+   * a counter behind.
+   *
+   * A function-local static rather than a plain static member, so the vector
+   * is guaranteed to exist before the first registration runs, whatever order
+   * the translation units initialize in.
+   *
+   * @return The registered counters.
+   */
+  static std::vector<uint32_t *> &id_counters() {
+    static std::vector<uint32_t *> counters;
+    return counters;
+  }
+
+  /** @brief Count this module as alive. */
+  FIMSRcppInterfaceBase() { live_module_count++; }
+
+  /** @brief Stop counting this module as alive. */
+  virtual ~FIMSRcppInterfaceBase() { live_module_count--; }
+
+  /**
    * @brief Is the object already finalized? The default is false.
    */
   bool finalized = false;
-  /**
-   * @brief FIMS interface object vectors.
-   */
-  static std::vector<std::shared_ptr<FIMSRcppInterfaceBase>>
-      fims_interface_objects;
-
   /**
    * @brief This module's unique ID.
    *
@@ -685,5 +720,22 @@ class FIMSRcppInterfaceBase {
  * C++ runs the right version based on what the object actually is.
  */
 using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
+
+/**
+ * @brief Registers one ID counter with FIMSRcppInterfaceBase::id_counters().
+ *
+ * @details Declare one of these next to each `id_g` definition in
+ * src/rcpp_*.cpp. Its constructor runs at startup and adds the counter to the
+ * list clear() rewinds, so the counter cannot be forgotten there.
+ */
+struct IdCounterRegistration {
+  /**
+   * @brief Adds the counter to the list.
+   * @param counter The id_g to register.
+   */
+  explicit IdCounterRegistration(uint32_t *counter) {
+    FIMSRcppInterfaceBase::id_counters().push_back(counter);
+  }
+};
 
 #endif

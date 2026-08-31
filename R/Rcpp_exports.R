@@ -42,10 +42,9 @@ NULL
 #' [NOAA-FIMS C++ Documentation](https://noaa-fims.github.io/FIMS/doxygen/)
 #'
 #' @name Cpp_functions
-#' @aliases clear get_fixed get_log get_log_errors get_log_warnings get_parameter_names get_random get_random_names inv_logit log_error log_info log_warning logit set_fixed set_log_throw_on_error set_random CreateTMBModel
+#' @aliases get_fixed get_log get_log_errors get_log_warnings get_parameter_names get_random get_random_names inv_logit log_error log_info log_warning logit set_fixed set_log_throw_on_error set_random
 #'
 #' @details
-#' - [clear](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
 #' - [get_fixed](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
 #' - [get_log](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
 #' - [get_log_errors](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
@@ -61,5 +60,4 @@ NULL
 #' - [set_fixed](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
 #' - [set_log_throw_on_error](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
 #' - [set_random](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
-#' - [CreateTMBModel](https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html)
 NULL
