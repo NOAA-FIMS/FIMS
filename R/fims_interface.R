@@ -13,6 +13,8 @@
 .fims_registry <- new.env(parent = emptyenv())
 .fims_registry[["objects"]] <- list()
 .fims_registry[["metadata"]] <- list()
+# The handle CreateTMBModel() last returned, or NULL if no model is built.
+.fims_registry[["model_handle"]] <- NULL
 
 #' A FIMS module
 #'
@@ -425,7 +427,11 @@ create_catch_at_age_model <- function() {
 #' reused across scenarios.
 #'
 #' @return
-#' `TRUE`, invisibly, if the model was created successfully.
+#' A model handle: a number identifying this build. It changes every time the
+#' model is rebuilt, so two handles are equal only if they came from the same
+#' build. Keep it if you need to tell later whether a fitted object still
+#' matches the model in memory; ignore it otherwise. A failed build raises an
+#' error rather than returning anything.
 #' @seealso [clear()], [describe_model()]
 #' @export
 CreateTMBModel <- function() {
@@ -438,9 +444,13 @@ CreateTMBModel <- function() {
   }
   # The list holds whole modules; CreateTMBModel_() wants their base pointers,
   # which is what it calls add_to_fims_tmb() through.
-  CreateTMBModel_(
+  handle <- CreateTMBModel_(
     lapply(.fims_registry[["objects"]], `[[`, "base_pointer")
   )
+
+  # Kept so that a later call can report which build the current model is from.
+  .fims_registry[["model_handle"]] <- handle
+  handle
 }
 
 #' Reset FIMS
@@ -468,6 +478,7 @@ clear <- function() {
   clear_()
   .fims_registry[["objects"]] <- list()
   .fims_registry[["metadata"]] <- list()
+  .fims_registry[["model_handle"]] <- NULL
   invisible(NULL)
 }
 
