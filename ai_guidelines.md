@@ -8,6 +8,12 @@ The purpose is not merely to enforce formatting or programming style. These guid
 
 > **AI has considerable freedom over how FIMS code is implemented. It has very little freedom over what FIMS code means.**
 
+### Policy status
+
+This document is FIMS development policy for any contribution created or modified with assistance from generative AI, regardless of the tool used or the amount of AI involvement. Its requirements are normative and apply together with the general contribution, review, testing, documentation, and style requirements in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+The contributor remains responsible for every AI-assisted change. AI assistance does not reduce the evidence, review, testing, or validation required for acceptance. When these requirements conflict with a task-specific decision made by FIMS maintainers, the explicitly documented maintainer decision governs that task.
+
 ---
 
 ## 1. Foundational Principles
@@ -1035,4 +1041,3 @@ Testability
 > **AI-generated code must look, behave, and integrate as though it were written by a knowledgeable FIMS developer.**
 
 > **AI has considerable freedom over how FIMS code is implemented. It has very little freedom over what FIMS code means.**
-

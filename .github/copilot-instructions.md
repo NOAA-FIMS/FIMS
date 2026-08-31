@@ -3,6 +3,8 @@
 These guidelines are meant to help Copilot generate suggestions that fit the structure and development practices used in FIMS.  
 Copilot should treat the existing codebase, especially the `tests/` directory, as the main reference before suggesting any new patterns or structures.
 
+Before suggesting or modifying code, Copilot must read and follow the [FIMS AI-Assisted Development Guidelines](../ai_guidelines.md). Those project-wide requirements govern scientific correctness, semantics, architecture, numerical and derivative integrity, documentation, performance, and validation. If this file and the project-wide guidelines differ, follow the stricter requirement and surface any semantic conflict that cannot be resolved from authoritative FIMS sources.
+
 ## General Development Guidelines
 
 - Always follow the existing C++ and R coding style used in the repo.
