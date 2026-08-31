@@ -165,6 +165,7 @@ class Information {
     this->random_effects_parameters.clear();
     this->selectivity_models.clear();
     this->models_map.clear();
+    this->variable_map.clear();
     this->n_years = 0;
     this->n_ages = 0;
 

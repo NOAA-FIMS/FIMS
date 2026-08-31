@@ -6,6 +6,11 @@
 
 // static id of the DistributionsInterfaceBase object
 uint32_t DistributionsInterfaceBase::id_g = 1;
+namespace {
+// Adds this counter to the list clear() rewinds.
+IdCounterRegistration distribution_id_g_registration(
+    &DistributionsInterfaceBase::id_g);
+}  // namespace
 
 #include <Rcpp.h>
 
@@ -160,6 +165,26 @@ Rcpp::XPtr<SharedBase> distribution_to_fims_xptr_(
   return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
 }
 
+// ── Invalidation for clear() ─────────────────────────────────────────────────
+/**
+ * @brief Invalidate a pointer to a distribution module, releasing this
+ * pointer's share of the module.
+ *
+ * @details Called by the R `clear()` wrapper for every module in the registry.
+ * The external pointer is set to NULL in place, so the R variable still holding
+ * it reports "external pointer is not valid" on the next use instead of quietly
+ * operating on a module that is no longer part of any model. Once both this
+ * pointer and the module's base pointer are released, nothing owns the module
+ * and its memory is returned immediately rather than at the next garbage
+ * collection.
+ *
+ * Releasing an already-released pointer does nothing, so this is safe to call
+ * twice.
+ *
+ * @param xp The module to invalidate.
+ */
+void release_distribution_(Rcpp::XPtr<SharedDistribution> xp) { xp.release(); }
+
 /**
  * Function to register distribution classes with the Rcpp module system.
  *
@@ -170,7 +195,6 @@ Rcpp::XPtr<SharedBase> distribution_to_fims_xptr_(
  * @param m The Rcpp module to register into.
  */
 void register_distributions(Rcpp::Module& m) {
-  // Rcpp::class_<> registrations removed — users no longer call methods::new().
   Rcpp::function("create_distribution_", &create_distribution_);
   Rcpp::function("set_distribution_links_", &set_distribution_links_);
   Rcpp::function("set_distribution_observed_data_",
@@ -179,4 +203,5 @@ void register_distributions(Rcpp::Module& m) {
   Rcpp::function("set_distribution_note_", &set_distribution_note_);
   Rcpp::function("evaluate_distribution_", &evaluate_distribution_);
   Rcpp::function("distribution_to_fims_xptr_", &distribution_to_fims_xptr_);
+  Rcpp::function("release_distribution_", &release_distribution_);
 }

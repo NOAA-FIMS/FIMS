@@ -1,6 +1,4 @@
 ## usethis namespace: start
-#' @export clear
-#' @export CreateTMBModel
 #' @export set_fixed
 #' @export get_fixed
 #' @export set_random

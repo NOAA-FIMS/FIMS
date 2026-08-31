@@ -6,6 +6,11 @@
 #include <Rcpp.h>
 // static id of the RecruitmentInterfaceBase object
 uint32_t RecruitmentInterfaceBase::id_g = 1;
+namespace {
+// Adds this counter to the list clear() rewinds.
+IdCounterRegistration recruitment_id_g_registration(
+    &RecruitmentInterfaceBase::id_g);
+}  // namespace
 
 // ── Short name for the pointer type ─────────────────────────────────────────
 // SharedRecruitment is a short name for the pointer type used throughout this
@@ -59,6 +64,20 @@ Rcpp::XPtr<SharedRecruitment> create_recruitment_(std::string type) {
 void set_recruitment_process_id_(Rcpp::XPtr<SharedRecruitment> xp,
                                  int process_id) {
   (*xp)->process_id = process_id;
+}
+
+/**
+ * @brief Read the ID of the process module a recruitment module is linked to.
+ *
+ * @details The counterpart to set_recruitment_process_id_(). An unset link
+ * reads back as the value the module is constructed with, so a caller can
+ * tell "not linked" from "linked to module 0".
+ *
+ * @param xp The recruitment module.
+ * @return The linked process module's ID.
+ */
+int get_recruitment_process_id_(Rcpp::XPtr<SharedRecruitment> xp) {
+  return (*xp)->process_id;
 }
 
 // n_years sizes log_expected_recruitment, which only the stock--recruit module
@@ -132,6 +151,26 @@ Rcpp::XPtr<SharedBase> recruitment_to_fims_xptr_(
   return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
 }
 
+// ── Invalidation for clear() ─────────────────────────────────────────────────
+/**
+ * @brief Invalidate a pointer to a recruitment module, releasing this
+ * pointer's share of the module.
+ *
+ * @details Called by the R `clear()` wrapper for every module in the registry.
+ * The external pointer is set to NULL in place, so the R variable still holding
+ * it reports "external pointer is not valid" on the next use instead of quietly
+ * operating on a module that is no longer part of any model. Once both this
+ * pointer and the module's base pointer are released, nothing owns the module
+ * and its memory is returned immediately rather than at the next garbage
+ * collection.
+ *
+ * Releasing an already-released pointer does nothing, so this is safe to call
+ * twice.
+ *
+ * @param xp The module to invalidate.
+ */
+void release_recruitment_(Rcpp::XPtr<SharedRecruitment> xp) { xp.release(); }
+
 /**
  * Function to register recruitment classes with the Rcpp module system.
  *
@@ -142,12 +181,14 @@ Rcpp::XPtr<SharedBase> recruitment_to_fims_xptr_(
  * @param m The Rcpp module to register into.
  */
 void register_recruitment(Rcpp::Module& m) {
-  // Rcpp::class_<> registrations removed — users no longer call methods::new().
   Rcpp::function("create_recruitment_", &create_recruitment_);
   Rcpp::function("set_recruitment_process_id_", &set_recruitment_process_id_);
+  Rcpp::function("get_recruitment_process_id_",
+                 &get_recruitment_process_id_);
   Rcpp::function("set_recruitment_n_years_", &set_recruitment_n_years_);
   Rcpp::function("evaluate_recruitment_mean_", &evaluate_recruitment_mean_);
   Rcpp::function("evaluate_recruitment_process_",
                  &evaluate_recruitment_process_);
   Rcpp::function("recruitment_to_fims_xptr_", &recruitment_to_fims_xptr_);
+  Rcpp::function("release_recruitment_", &release_recruitment_);
 }
