@@ -14,27 +14,31 @@
 ## IO correctness ----
 test_that("rcpp maturity works with correct inputs", {
   # Create maturity1
-  maturity1 <- methods::new(LogisticMaturity)
+  maturity1 <- create_maturity("logistic")
 
-  maturity1$inflection_point[1]$value <- 10.0
-  maturity1$inflection_point[1]$set_estimation_status("fixed_effects")
-  maturity1$slope[1]$value <- 0.2
+  set_variable_vector(maturity1, "inflection_point", 10.0, "fixed_effects")
+  set_variable_vector(maturity1, "slope", 0.2, "assumed_known")
 
-  #' @description Test that `get_id()` from the maturity module returns the correct id.
-  expect_equal(maturity1$get_id(), 1)
+  #' @description Test that the maturity module reports the correct id.
+  expect_equal(get_module_id(maturity1), 1)
   #' @description Test that the value of `inflection_point` can be set and get correctly.
-  expect_equal(maturity1$inflection_point[1]$value, 10.0)
+  expect_equal(
+    get_variable_vector(maturity1, "inflection_point")[["values"]], 10.0
+  )
   #' @description Test that the `estimation_status` of `inflection_point` can be set and get correctly.
-  expect_equal(maturity1$inflection_point[1]$get_estimation_status(), "fixed_effects")
+  expect_equal(
+    get_variable_vector(maturity1, "inflection_point")[["estimation_status"]],
+    "fixed_effects"
+  )
   #' @description Test that the value of `slope` can be set and get correctly.
-  expect_equal(maturity1$slope[1]$value, 0.2)
-  #' @description Test that the `evaluate()` method from the maturity module works correctly.
-  expect_equal(maturity1$evaluate(10.0), 0.5)
+  expect_equal(get_variable_vector(maturity1, "slope")[["values"]], 0.2)
+  #' @description Test that evaluating the maturity module works correctly.
+  expect_equal(evaluate_maturity(maturity1, 10.0), 0.5)
 
   # Create maturity2
-  maturity2 <- methods::new(LogisticMaturity)
+  maturity2 <- create_maturity("logistic")
   #' @description Test that rcpp maturity returns the correct id.
-  expect_equal((maturity2$get_id()), 2)
+  expect_equal(get_module_id(maturity2), 2)
 
   clear()
 })

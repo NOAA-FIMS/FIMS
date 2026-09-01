@@ -15,67 +15,59 @@
 test_that("`get_random()` works with correct inputs", {
   clear()
   # Create selectivity
-  selectivity <- methods::new(LogisticSelectivity)
-  selectivity$inflection_point[1]$value <- 10.0
-  selectivity$inflection_point[1]$set_estimation_status("random_effects")
-  selectivity$slope[1]$value <- 0.2
-  selectivity$slope[1]$set_estimation_status("random_effects")
+  selectivity <- create_selectivity("logistic")
+  set_variable_vector(selectivity, "inflection_point", 10.0, "random_effects")
+  set_variable_vector(selectivity, "slope", 0.2, "random_effects")
 
   CreateTMBModel()
   #' @description Test that `get_random()` works with a logistic selectivity curve and returns the correct number of random effects parameters with their specified inputs.
   expect_equal(
-    c(selectivity$inflection_point[1]$value, selectivity$slope[1]$value),
+    c(get_variable_vector(selectivity, "inflection_point")[["values"]], get_variable_vector(selectivity, "slope")[["values"]]),
     get_random()
   )
   clear()
 
-  selectivity <- methods::new(LogisticSelectivity)
-  selectivity$inflection_point[1]$value <- 10.0
-  selectivity$slope[1]$value <- 0.2
-  selectivity$slope[1]$set_estimation_status("random_effects")
+  selectivity <- create_selectivity("logistic")
+  set_variable_vector(selectivity, "inflection_point", 10.0, "random_effects")
+  set_variable_vector(selectivity, "slope", 0.2, "random_effects")
   CreateTMBModel()
   #' @description Test that setting a selectivity parameter to `assumed_known` in a previously defined module changes the number of random effects parameters.
   expect_equal(
-    selectivity$slope[1]$value,
+    get_variable_vector(selectivity, "slope")[["values"]],
     get_random()
   )
   clear()
 
-  fish_selex <- methods::new(DoubleLogisticSelectivity)
-  fish_selex$inflection_point_asc[1]$value <- 2
-  fish_selex$inflection_point_asc[1]$set_estimation_status("random_effects")
-  fish_selex$inflection_point_desc[1]$value <- 3
-  fish_selex$inflection_point_desc[1]$set_estimation_status("random_effects")
-  fish_selex$slope_asc[1]$value <- 1
-  fish_selex$slope_asc[1]$set_estimation_status("assumed_known")
-  fish_selex$slope_desc[1]$value <- 1.5
-  fish_selex$slope_desc[1]$set_estimation_status("random_effects")
+  fish_selex <- create_selectivity("double_logistic")
+  set_variable_vector(fish_selex, "inflection_point_asc", 2, "random_effects")
+  set_variable_vector(fish_selex, "inflection_point_desc", 3, "random_effects")
+  set_variable_vector(fish_selex, "slope_asc", 1, "assumed_known")
+  set_variable_vector(fish_selex, "slope_desc", 1.5, "random_effects")
 
   CreateTMBModel()
   sel_parm <- c(
-    fish_selex$inflection_point_asc[1]$value,
-    fish_selex$inflection_point_desc[1]$value,
-    fish_selex$slope_desc[1]$value
+    get_variable_vector(fish_selex, "inflection_point_asc")[["values"]],
+    get_variable_vector(fish_selex, "inflection_point_desc")[["values"]],
+    get_variable_vector(fish_selex, "slope_desc")[["values"]]
   )
   #' @description Test that the correct number of random effects parameters are returned for a double logistic selectivity curve.
   expect_equal(get_random(), sel_parm)
   clear()
 
-  selectivity <- methods::new(LogisticSelectivity)
-  selectivity$inflection_point[1]$value <- 11.0
-  selectivity$inflection_point[1]$set_estimation_status("random_effects")
-  selectivity$slope[1]$value <- 0.5
-  selectivity$slope[1]$set_estimation_status("random_effects")
-  sel_parm <- c(selectivity$inflection_point[1]$value, selectivity$slope[1]$value)
-  recruitment <- methods::new(BevertonHoltRecruitment)
+  selectivity <- create_selectivity("logistic")
+  set_variable_vector(selectivity, "inflection_point", 11.0, "random_effects")
+  set_variable_vector(selectivity, "slope", 0.5, "random_effects")
+  sel_parm <- c(get_variable_vector(selectivity, "inflection_point")[["values"]], get_variable_vector(selectivity, "slope")[["values"]])
+  recruitment <- create_recruitment("beverton_holt")
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
   phi_0 <- 0.0102562
-  recruitment$logit_steep[1]$value <- -log(1.0 - h) + log(h - 0.2)
-  recruitment$logit_steep[1]$set_estimation_status("random_effects")
-  recruitment$log_rzero[1]$value <- log(r0)
-  recruitment$log_rzero[1]$set_estimation_status("random_effects")
+  set_variable_vector(
+    recruitment, "logit_steep",
+    -log(1.0 - h) + log(h - 0.2), "random_effects"
+  )
+  set_variable_vector(recruitment, "log_rzero", log(r0), "random_effects")
   # recruitment$n_years needs to be greater than 0 to avoid a CreateTMBModel() error
   recruitment$n_years <- 1
   rec_parm <- c(-log(1.0 - h) + log(h - 0.2), log(r0))

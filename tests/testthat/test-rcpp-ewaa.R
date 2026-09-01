@@ -16,34 +16,33 @@ on.exit(rm(fims_frame), add = TRUE)
 
 # Initialize an EWAAGrowth object
 clear()
-ewaa_growth <- methods::new(EWAAGrowth)
-ewaa_growth$n_years <- get_n_years(fims_frame)
+ewaa_growth <- create_growth("ewaa")
+set_growth_n_years(ewaa_growth, get_n_years(fims_frame))
 # Assign age data to the EWAAGrowth object
 ages <- get_ages(fims_frame)
-ewaa_growth$ages[] <- ages
-
+set_numeric_vector(ewaa_growth, "ages", ages)
 
 # Assign weight data to the EWAAGrowth object
 weights <- model_weight_at_age(fims_frame)
-ewaa_growth$weights[] <- weights
+set_numeric_vector(ewaa_growth, "weights", weights)
 
 on.exit(ewaa_growth)
 
 # Set up a different EWAAGrowth object
-ewaa_growth2 <- methods::new(EWAAGrowth)
+ewaa_growth2 <- create_growth("ewaa")
 on.exit(ewaa_growth2)
 
 ## IO correctness ----
 test_that("EWAAGrowth evaluate() works with correct input data", {
   #' @description Test that EWAAGrowth evaluate(1) returns the first value in the weight-at-age data.
-  expect_equal(ewaa_growth$evaluate(1), 0.00053065552)
+  expect_equal(evaluate_growth(ewaa_growth, 1), 0.00053065552)
 })
 
 test_that("EWAAGrowth get_id() works with correct input data", {
   #' @description Test that id of ewaa_growth is 1.
-  expect_equal(ewaa_growth$get_id(), 1)
+  expect_equal(get_module_id(ewaa_growth), 1)
   #' @description Test that id of ewaa_growth2 is 2.
-  expect_equal(ewaa_growth2$get_id(), 2)
+  expect_equal(get_module_id(ewaa_growth2), 2)
 })
 # Clear any previous FIMS settings
 clear()
@@ -51,13 +50,13 @@ clear()
 ## Edge handling ----
 test_that("EWAAGrowth evaluate() doesn't work when missing weights", {
   # Initialize an EWAAGrowth object
-  ewaa_growth <- methods::new(EWAAGrowth)
-  ewaa_growth$n_years <- get_n_years(fims_frame)
+  ewaa_growth <- create_growth("ewaa")
+  set_growth_n_years(ewaa_growth, get_n_years(fims_frame))
   # Assign age data to the EWAAGrowth object
-  ewaa_growth$ages[] <- ages
+  set_numeric_vector(ewaa_growth, "ages", ages)
 
   #' @description Test that EWAAGrowth evaluate(1) throws an error when weights are missing.
-  expect_error(ewaa_growth$evaluate(1))
+  expect_error(evaluate_growth(ewaa_growth, 1))
   # Clear any previous FIMS settings
   clear()
 })
@@ -65,19 +64,19 @@ test_that("EWAAGrowth evaluate() doesn't work when missing weights", {
 ## Error handling ----
 test_that("EWAAGrowth evaluate() returns expected error for mismatched input lengths", {
   # Initialize an EWAAGrowth object
-  ewaa_growth <- methods::new(EWAAGrowth)
-  ewaa_growth$n_years <- get_n_years(fims_frame)
-  # Assign age data and intentionally mismatch the length of ages and weights
+  ewaa_growth <- create_growth("ewaa")
+  set_growth_n_years(ewaa_growth, get_n_years(fims_frame))
+  # Assign age data and intentionally mismatch the length of ages and weights.
+  # set_numeric_vector() resizes to match, so no explicit resize is needed.
   age_vector_long <- c(get_ages(fims_frame), 13)
-  ewaa_growth$ages$resize(length(age_vector_long))
-  ewaa_growth$ages[] <- age_vector_long
+  set_numeric_vector(ewaa_growth, "ages", age_vector_long)
 
   # Assign weight data to the EWAAGrowth object
-  ewaa_growth$weights[] <- weights
+  set_numeric_vector(ewaa_growth, "weights", weights)
 
   #' @description Test that EWAAGrowth evaluate() throws an error when the lengths of ages and weights don't match.
   expect_error(
-    ewaa_growth$evaluate(1),
+    evaluate_growth(ewaa_growth, 1),
     regexp = "does not match ages size or ages size times \\(n_years \\+ 1\\)",
     ignore.case = FALSE
   )

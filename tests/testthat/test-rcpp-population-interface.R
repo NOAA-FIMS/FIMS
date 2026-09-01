@@ -14,7 +14,7 @@
 ## IO correctness ----
 test_that("rcpp population interface works with correct inputs", {
   # setup population to create test values
-  population <- methods::new(Population)
+  population <- create_population()
   n_years <- 10
   n_ages <- 10
   log_M_length <- n_years * n_ages
@@ -22,7 +22,6 @@ test_that("rcpp population interface works with correct inputs", {
 
   population$log_init_naa[] <- rep(0, n_ages)
 
-  population$log_init_naa$set_estimation_status(c("fixed_effects"))
   population$n_ages$set(n_ages)
   population$ages[] <- seq(1, n_ages)
   population$n_fleets$set(2)
@@ -31,60 +30,54 @@ test_that("rcpp population interface works with correct inputs", {
 
   #' @description Test that the population id is 1.
   expect_equal(
-    object = population$get_id(),
+    object = get_module_id(population),
     expected = 1
   )
 
-  for (i in 1:(n_years * n_ages)) {
-    #' @description Test that the log_M values are all -1.
-    expect_equal(
-      object = population$log_M[i]$value,
-      expected = -1
-    )
-    #' @description Test that the log_M values are not estimated.
-    expect_equal(
-      object = population$log_M[i]$get_estimation_status(), "assumed_known"
-    )
-  }
+  #' @description Test that the log_M values are all -1.
+  expect_equal(
+    object = get_variable_vector(population, "log_M")[["values"]],
+    expected = rep(-1, n_years * n_ages)
+  )
+  #' @description Test that the log_M values are not estimated.
+  expect_equal(
+    object = get_variable_vector(population, "log_M")[["estimation_status"]],
+    expected = rep("assumed_known", n_years * n_ages)
+  )
 
-  for (i in 1:n_years) {
-    #' @description Test that the log_init_naa values are all 0.
-    expect_equal(
-      object = population$log_init_naa[i]$value,
-      expected = 0
-    )
-    #' @description Test that the log_init_naa values are estimated.
-    expect_equal(
-      object = population$log_init_naa[i]$get_estimation_status(), "fixed_effects"
-    )
-  }
+  #' @description Test that the log_init_naa values are all 0.
+  expect_equal(
+    object = get_variable_vector(population, "log_init_naa")[["values"]],
+    expected = rep(0, n_years)
+  )
+  #' @description Test that the log_init_naa values are estimated.
+  expect_equal(
+    object = get_variable_vector(population, "log_init_naa")[["estimation_status"]],
+    expected = rep("fixed_effects", n_years)
+  )
 
-  population$log_init_naa$set_estimation_status(c("assumed_known"))
-  population$log_M$set_estimation_status(c("fixed_effects"))
 
-  for (i in 1:(n_years * n_ages)) {
-    #' @description Test that the log_M values are all -1.
-    expect_equal(
-      object = population$log_M[i]$value,
-      expected = -1
-    )
-    #' @description Test that the log_M values are now estimated.
-    expect_equal(
-      object = population$log_M[i]$get_estimation_status(), "fixed_effects"
-    )
-  }
+  #' @description Test that the log_M values are all -1.
+  expect_equal(
+    object = get_variable_vector(population, "log_M")[["values"]],
+    expected = rep(-1, n_years * n_ages)
+  )
+  #' @description Test that the log_M values are now estimated.
+  expect_equal(
+    object = get_variable_vector(population, "log_M")[["estimation_status"]],
+    expected = rep("fixed_effects", n_years * n_ages)
+  )
 
-  for (i in 1:n_years) {
-    #' @description Test that the log_init_naa values are all 0.
-    expect_equal(
-      object = population$log_init_naa[i]$value,
-      expected = 0
-    )
-    #' @description Test that the log_init_naa values not estimated.
-    expect_equal(
-      object = population$log_init_naa[i]$get_estimation_status(), "assumed_known"
-    )
-  }
+  #' @description Test that the log_init_naa values are all 0.
+  expect_equal(
+    object = get_variable_vector(population, "log_init_naa")[["values"]],
+    expected = rep(0, n_years)
+  )
+  #' @description Test that the log_init_naa values are not estimated.
+  expect_equal(
+    object = get_variable_vector(population, "log_init_naa")[["estimation_status"]],
+    expected = rep("assumed_known", n_years)
+  )
 
   clear()
 })

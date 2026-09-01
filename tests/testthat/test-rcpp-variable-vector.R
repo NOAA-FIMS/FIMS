@@ -210,29 +210,32 @@ test_that("VariableVector returns correct error messages", {
 })
 
 test_that("rcpp VariableVector supports indexed numeric replacement", {
-  distribution <- methods::new(DlnormDistribution)
-  distribution$log_sd[] <- 1:10
+  # A standalone VariableVector rather than a module's field: the `[<-` methods
+  # under test belong to the VariableVector class, and a module's fields are no
+  # longer reachable with `$` now that modules are not S4 objects.
+  log_sd <- methods::new(VariableVector, 10L)
+  log_sd[] <- 1:10
 
   #' @description Test that replacing one VariableVector element with a numeric scalar updates its value.
-  distribution$log_sd[1] <- 8
-  expect_equal(distribution$log_sd[1]$value, 8)
+  log_sd[1] <- 8
+  expect_equal(log_sd[1]$value, 8)
   expect_equal(
     vapply(
-      1:length(distribution$log_sd),
-      function(i) distribution$log_sd[i]$value,
+      1:length(log_sd),
+      function(i) log_sd[i]$value,
       numeric(1)
     ),
     c(8, 2:10)
   )
 
   #' @description Test that replacing an explicitly vector-indexed VariableVector element with a numeric scalar updates its value.
-  distribution$log_sd[c(1)] <- 9
-  expect_equal(distribution$log_sd[1]$value, 9)
+  log_sd[c(1)] <- 9
+  expect_equal(log_sd[1]$value, 9)
 
   #' @description Test that replacing multiple VariableVector elements with numeric values updates their values.
-  distribution$log_sd[c(2, 3)] <- c(20, 30)
-  expect_equal(distribution$log_sd[2]$value, 20)
-  expect_equal(distribution$log_sd[3]$value, 30)
+  log_sd[c(2, 3)] <- c(20, 30)
+  expect_equal(log_sd[2]$value, 20)
+  expect_equal(log_sd[3]$value, 30)
 })
 
 test_that("rcpp VariableVector deep copies have new ids and independent storage", {

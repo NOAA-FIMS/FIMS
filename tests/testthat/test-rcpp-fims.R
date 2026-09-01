@@ -17,33 +17,35 @@ test_that("Rcpp interface works for modules", {
   expect_no_error(variable <- methods::new(Variable, .1))
 
   #' @description Test that Rcpp interface works for recruitment module.
-  expect_no_error(beverton_holt <- methods::new(BevertonHoltRecruitment))
+  expect_no_error(beverton_holt <- create_recruitment("beverton_holt"))
   #' @description Test that `get_id()` method works for `BevertonHoltRecruitment` module.
-  expect_equal(beverton_holt$get_id(), 1)
+  expect_equal(get_module_id(beverton_holt), 1)
 
   #' @description Test that Rcpp interface works for selectivity module.
-  expect_no_error(logistic_selectivity <- methods::new(LogisticSelectivity))
-  logistic_selectivity$slope[1]$value <- .7
-  logistic_selectivity$inflection_point[1]$value <- 5.0
+  expect_no_error(logistic_selectivity <- create_selectivity("logistic"))
+  set_variable_vector(logistic_selectivity, "slope", .7, "assumed_known")
+  set_variable_vector(
+    logistic_selectivity, "inflection_point", 5.0, "assumed_known"
+  )
   #' @description Test that value for `slope` is set correctly in `LogisticSelectivity` module.
-  expect_equal(logistic_selectivity$slope[1]$value, 0.7)
+  expect_equal(get_variable_vector(logistic_selectivity, "slope")[["values"]], 0.7)
   #' @description Test that value for `inflection_point` is set correctly in `LogisticSelectivity` module.
-  expect_equal(logistic_selectivity$inflection_point[1]$value, 5.0)
+  expect_equal(get_variable_vector(logistic_selectivity, "inflection_point")[["values"]], 5.0)
   #' @description Test that `get_id()` method works for `LogisticSelectivity` module.
-  expect_equal(logistic_selectivity$get_id(), 1)
+  expect_equal(get_module_id(logistic_selectivity), 1)
 
   #' @description Test that Rcpp interface works for growth module.
-  expect_no_error(ewaa_growth <- methods::new(EWAAGrowth))
+  expect_no_error(ewaa_growth <- create_growth("ewaa"))
   #' @description Test that ages can be set correctly in `EWAAGrowth` module.
-  ewaa_growth$ages$set(0, 1.0)
+  set_numeric_vector(ewaa_growth, "ages", 1.0)
   #' @description Test that weights can be set correctly in `EWAAGrowth` module.
-  ewaa_growth$weights$set(0, 2.5)
+  set_numeric_vector(ewaa_growth, "weights", 2.5)
   #' @description Test that value for the first age is set correctly in `EWAAGrowth` module.
-  expect_equal(ewaa_growth$ages$get(0), 1.0)
+  expect_equal(get_numeric_vector(ewaa_growth, "ages"), 1.0)
   #' @description Test that value for the first weight is set correctly in `EWAAGrowth` module.
-  expect_equal(ewaa_growth$weights$get(0), 2.5)
+  expect_equal(get_numeric_vector(ewaa_growth, "weights"), 2.5)
   #' @description Test that `get_id()` method works for `EWAAGrowth` module.
-  expect_equal(ewaa_growth$get_id(), 1)
+  expect_equal(get_module_id(ewaa_growth), 1)
 
   clear()
 })
@@ -57,20 +59,20 @@ test_that("Rcpp interface returns correct error messages", {
     methods::new(Variable, "a"),
     regexp = "Not compatible with requested type"
   )
-  #' @description Test that `BevertonHoltRecruitment` module returns an error when given incorrect input.
+  #' @description Test that the recruitment module returns an error when given an unknown type.
   expect_error(
-    methods::new(BevertonHoltRecruitment, "a"),
-    regexp = "no valid constructor available for the argument list"
+    create_recruitment("a"),
+    regexp = "not a recruitment type FIMS knows about"
   )
-  #' @description Test that `LogisticSelectivity` module returns an error when given incorrect input.
+  #' @description Test that the selectivity module returns an error when given an unknown type.
   expect_error(
-    methods::new(LogisticSelectivity, "a"),
-    regexp = "no valid constructor available for the argument list"
+    create_selectivity("a"),
+    regexp = "not a selectivity type FIMS knows about"
   )
-  #' @description Test that `EWAAGrowth` module returns an error when given incorrect input.
+  #' @description Test that the growth module returns an error when given an unknown type.
   expect_error(
-    methods::new(EWAAGrowth, "a"),
-    regexp = "no valid constructor available for the argument list"
+    create_growth("a"),
+    regexp = "not a growth type FIMS knows about"
   )
   clear()
 })

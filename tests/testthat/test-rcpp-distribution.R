@@ -20,42 +20,42 @@ test_that("rcpp distribution works with correct inputs", {
   y <- stats::rnorm(1)
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_ <- create_distribution("dnorm")
   # populate class members
-  dnorm_$observed_values[1]$value <- y
-  dnorm_$expected_values[1]$value <- 0
-  dnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dnorm_, "expected_values", 0, "assumed_known")
+  set_variable_vector(dnorm_, "log_sd", log(1), "assumed_known")
   # evaluate the density and compare with R
   #' @description Test that dnorm works with a single value input, e.g. a prior on a parameter.
-  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
+  expect_equal(evaluate_distribution(dnorm_, ), stats::dnorm(y, 0, 1, TRUE))
   clear()
 
   # simulate normal data
   y <- stats::rnorm(10)
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_ <- create_distribution("dnorm")
   # populate class members
   dnorm_$observed_values[] <- y
   dnorm_$expected_values[] <- rep(0, length(y))
-  dnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dnorm_, "log_sd", log(1), "assumed_known")
   # evaluate the density and compare with R
   #' @description Test that dnorm works with a vector of state variables, but scalar arguments, e.g., a random effect vector.
-  expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))
+  expect_equal(evaluate_distribution(dnorm_, ), sum(stats::dnorm(y, 0, 1, TRUE)))
   clear()
 
   # simulate normal data
   y <- stats::rnorm(10)
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_ <- create_distribution("dnorm")
   # populate class members
   dnorm_$observed_values[] <- y
   dnorm_$expected_values[] <- rep(0, length(y))
   dnorm_$log_sd[] <- log(1)
   # evaluate the density and compare with R
   #' @description Test that dnorm works with vectors of state variables (x) and arguments, e.g., an index likelihood vector.
-  expect_equal(dnorm_$evaluate(), sum(stats::dnorm(y, 0, 1, TRUE)))
+  expect_equal(evaluate_distribution(dnorm_, ), sum(stats::dnorm(y, 0, 1, TRUE)))
   clear()
 
   # generate data using R stats::rlnorm
@@ -65,35 +65,35 @@ test_that("rcpp distribution works with correct inputs", {
 
   # create a fims Rcpp object
   # initialize the Dlnorm module
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
-  dlnorm_$observed_values[1]$value <- y
-  dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
+  set_variable_vector(dlnorm_, "log_sd", log(1), "assumed_known")
   # evaluate the density and compare with R
   #' @description Test that dlnorm works with a single value input, e.g. a prior on a parameter.
-  expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, 1, TRUE))
+  expect_equal(evaluate_distribution(dlnorm_, ), stats::dlnorm(y, 0, 1, TRUE))
   clear()
 
   y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
 
   # create a fims Rcpp object
   # initialize the Dlnorm module
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
   dlnorm_$observed_values[] <- y
   dlnorm_$expected_values[] <- rep(0, length(y))
-  dlnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dlnorm_, "log_sd", log(1), "assumed_known")
   # evaluate the density and compare with R
   #' @description Test that dlnorm works with a vector of state variables, but scalar arguments, e.g., a random effect vector.
-  expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)))
+  expect_equal(evaluate_distribution(dlnorm_, ), sum(stats::dlnorm(y, 0, 1, TRUE)))
   clear()
 
   y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
 
   # create a fims Rcpp object
   # initialize the Dlnorm module
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
   dlnorm_$observed_values[] <- y
   dlnorm_$expected_values[] <- rep(0, length(y))
@@ -101,7 +101,7 @@ test_that("rcpp distribution works with correct inputs", {
 
   # evaluate the density and compare with R
   #' @description Test that dlnorm with vectors of state variables (x) and arguments, e.g., an index likelihood vector.
-  expect_equal(dlnorm_$evaluate(), sum(stats::dlnorm(y, 0, 1, TRUE)))
+  expect_equal(evaluate_distribution(dlnorm_, ), sum(stats::dlnorm(y, 0, 1, TRUE)))
   clear()
 
   # generate data using R stats:rnorm
@@ -110,7 +110,7 @@ test_that("rcpp distribution works with correct inputs", {
   x_values <- t(stats::rmultinom(1, 100, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
-  dmultinom_ <- methods::new(DmultinomDistribution)
+  dmultinom_ <- create_distribution("dmultinom")
   # populate class members
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
@@ -124,7 +124,7 @@ test_that("rcpp distribution works with correct inputs", {
   # evaluate the density and compare with R
   #' @description Test that dmultinom works with vector inputs.
   expect_equal(
-    dmultinom_$evaluate(),
+    evaluate_distribution(dmultinom_, ),
     stats::dmultinom(x = x_values, prob = p, log = TRUE)
   )
 
@@ -138,145 +138,145 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- -1000
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_ <- create_distribution("dnorm")
   # populate class members
-  dnorm_$observed_values[1]$value <- y
-  dnorm_$expected_values[1]$value <- 0
-  dnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dnorm_, "expected_values", 0, "assumed_known")
+  set_variable_vector(dnorm_, "log_sd", log(1), "assumed_known")
   # evaluate the density and compare with R
   #' @description Test extreme observed values for dnorm (-1000) return expected output.
-  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
+  expect_equal(evaluate_distribution(dnorm_, ), stats::dnorm(y, 0, 1, TRUE))
   clear()
   y <- 1000
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_ <- create_distribution("dnorm")
   # populate class members
-  dnorm_$observed_values[1]$value <- y
-  dnorm_$expected_values[1]$value <- 0
-  dnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dnorm_, "expected_values", 0, "assumed_known")
+  set_variable_vector(dnorm_, "log_sd", log(1), "assumed_known")
   # evaluate the density and compare with R
   #' @description Test extreme observed values for dnorm (1000) return expected output.
-  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, 1, TRUE))
+  expect_equal(evaluate_distribution(dnorm_, ), stats::dnorm(y, 0, 1, TRUE))
   clear()
 
   y <- 1
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_ <- create_distribution("dnorm")
   # populate class members
-  dnorm_$observed_values[1]$value <- y
-  dnorm_$expected_values[1]$value <- -1000
-  dnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dnorm_, "expected_values", -1000, "assumed_known")
+  set_variable_vector(dnorm_, "log_sd", log(1), "assumed_known")
   # evaluate the density and compare with R
   #' @description Test extreme expected values for dnorm (-1000) return expected output.
-  expect_equal(dnorm_$evaluate(), stats::dnorm(y, -1000, 1, TRUE))
+  expect_equal(evaluate_distribution(dnorm_, ), stats::dnorm(y, -1000, 1, TRUE))
   clear()
   y <- 1
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_ <- create_distribution("dnorm")
   # populate class members
-  dnorm_$observed_values[1]$value <- y
-  dnorm_$expected_values[1]$value <- 1000
-  dnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dnorm_, "expected_values", 1000, "assumed_known")
+  set_variable_vector(dnorm_, "log_sd", log(1), "assumed_known")
   # evaluate the density and compare with R
   #' @description Test extreme expected values for dnorm (1000) return expected output.
-  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 1000, 1, TRUE))
+  expect_equal(evaluate_distribution(dnorm_, ), stats::dnorm(y, 1000, 1, TRUE))
   clear()
 
   y <- 1
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_ <- create_distribution("dnorm")
   # populate class members
-  dnorm_$observed_values[1]$value <- y
-  dnorm_$expected_values[1]$value <- 0
-  dnorm_$log_sd[1]$value <- 10
+  set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dnorm_, "expected_values", 0, "assumed_known")
+  set_variable_vector(dnorm_, "log_sd", 10, "assumed_known")
   # evaluate the density and compare with R
   #' @description Test extreme log_sd values for dnorm (10) return expected output.
-  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, exp(10), TRUE))
+  expect_equal(evaluate_distribution(dnorm_, ), stats::dnorm(y, 0, exp(10), TRUE))
   clear()
   y <- 1
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_ <- create_distribution("dnorm")
   # populate class members
-  dnorm_$observed_values[1]$value <- y
-  dnorm_$expected_values[1]$value <- 0
-  dnorm_$log_sd[1]$value <- -10
+  set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dnorm_, "expected_values", 0, "assumed_known")
+  set_variable_vector(dnorm_, "log_sd", -10, "assumed_known")
   # evaluate the density and compare with R
   #' @description Test extreme log_sd values for dnorm (-10) return expected output.
-  expect_equal(dnorm_$evaluate(), stats::dnorm(y, 0, exp(-10), TRUE))
+  expect_equal(evaluate_distribution(dnorm_, ), stats::dnorm(y, 0, exp(-10), TRUE))
   clear()
 
   y <- 0
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
-  dlnorm_$observed_values[1]$value <- y
-  dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
+  set_variable_vector(dlnorm_, "log_sd", log(1), "assumed_known")
   # evaluate the density and compare with R
   #' @description Test extreme observed values for dlnorm (0) return expected output.
-  expect_equal(dlnorm_$evaluate(), NaN)
+  expect_equal(evaluate_distribution(dlnorm_, ), NaN)
   clear()
 
   y <- -1
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
-  dlnorm_$observed_values[1]$value <- y
-  dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
+  set_variable_vector(dlnorm_, "log_sd", log(1), "assumed_known")
   #' @description Test extreme observed values for dlnorm (-1) return expected output.
-  expect_equal(dlnorm_$evaluate(), NaN)
+  expect_equal(evaluate_distribution(dlnorm_, ), NaN)
   clear()
 
   y <- 1000
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
-  dlnorm_$observed_values[1]$value <- y
-  dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
+  set_variable_vector(dlnorm_, "log_sd", log(1), "assumed_known")
   #' @description Test extreme observed values for dlnorm (1000) return expected output.
-  expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, 1, TRUE))
+  expect_equal(evaluate_distribution(dlnorm_, ), stats::dlnorm(y, 0, 1, TRUE))
   clear()
 
   y <- 1
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
-  dlnorm_$observed_values[1]$value <- y
-  dlnorm_$expected_values[1]$value <- -1000
-  dlnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dlnorm_, "expected_values", -1000, "assumed_known")
+  set_variable_vector(dlnorm_, "log_sd", log(1), "assumed_known")
   #' @description Test extreme expected values for dlnorm (-1000) return expected output.
-  expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, -1000, 1, TRUE))
+  expect_equal(evaluate_distribution(dlnorm_, ), stats::dlnorm(y, -1000, 1, TRUE))
   clear()
   y <- 1
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
-  dlnorm_$observed_values[1]$value <- y
-  dlnorm_$expected_values[1]$value <- 1000
-  dlnorm_$log_sd[1]$value <- log(1)
+  set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dlnorm_, "expected_values", 1000, "assumed_known")
+  set_variable_vector(dlnorm_, "log_sd", log(1), "assumed_known")
   #' @description Test extreme expected values for dlnorm (1000) return expected output.
-  expect_equal(dlnorm_$evaluate(), -500000.92)
+  expect_equal(evaluate_distribution(dlnorm_, ), -500000.92)
   clear()
 
   y <- 1
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
-  dlnorm_$observed_values[1]$value <- y
-  dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- 10
+  set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
+  set_variable_vector(dlnorm_, "log_sd", 10, "assumed_known")
   #' @description Test extreme log_sd values for dlnorm (10) return expected output.
-  expect_equal(dlnorm_$evaluate(), stats::dlnorm(y, 0, exp(10), TRUE))
+  expect_equal(evaluate_distribution(dlnorm_, ), stats::dlnorm(y, 0, exp(10), TRUE))
   clear()
   y <- 1
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
-  dlnorm_$observed_values[1]$value <- y
-  dlnorm_$expected_values[1]$value <- 0
-  dlnorm_$log_sd[1]$value <- -10
+  set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
+  set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
+  set_variable_vector(dlnorm_, "log_sd", -10, "assumed_known")
   #' @description Test extreme log_sd values for dlnorm (-10) return expected output.
-  expect_equal(dlnorm_$evaluate(), 9.0810615)
+  expect_equal(evaluate_distribution(dlnorm_, ), 9.0810615)
   clear()
 
   # generate data using R stats:rnorm
@@ -284,7 +284,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   x_values <- t(stats::rmultinom(1, 1000, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
-  dmultinom_ <- methods::new(DmultinomDistribution)
+  dmultinom_ <- create_distribution("dmultinom")
   # populate class members
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
@@ -296,7 +296,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   # evaluate the density and compare with R
   #' @description Test empty bins with large N (1000) in dmultinom return expected output.
   expect_equal(
-    dmultinom_$evaluate(), NaN
+    evaluate_distribution(dmultinom_, ), NaN
   )
   clear()
 
@@ -304,7 +304,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   x_values <- t(stats::rmultinom(1, 1, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
-  dmultinom_ <- methods::new(DmultinomDistribution)
+  dmultinom_ <- create_distribution("dmultinom")
   # populate class members
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
@@ -316,7 +316,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   #' @description Test empty bins with small N (1) in dmultinom return expected output.
   # Generate data using R `stats:rnorm()`.
   expect_equal(
-    dmultinom_$evaluate(), NaN
+    evaluate_distribution(dmultinom_, ), NaN
   )
   clear()
 })
@@ -326,7 +326,7 @@ test_that("rcpp distribution returns correct error messages", {
   y <- stats::rnorm(10)
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_ <- create_distribution("dnorm")
   # populate class members
   dnorm_$observed_values[] <- c(y, 0)
   dnorm_$expected_values[] <- rep(log(1), length(y))
@@ -334,19 +334,19 @@ test_that("rcpp distribution returns correct error messages", {
 
   #' @description dnorm should error out when there is a dimension mismatch where it is expecting `expected_values` to have a size 10 but is provided a size 11 vector.
   expect_error(
-    object = dnorm_$evaluate(),
+    object = evaluate_distribution(dnorm_, ),
     regexp = "NormalLPDF::Vector .* out of bounds. .* 11 .* 10"
   )
   clear()
 
-  dnorm_ <- methods::new(DnormDistribution)
+  dnorm_ <- create_distribution("dnorm")
   # populate class members
   dnorm_$observed_values[] <- y
   dnorm_$expected_values[] <- rep(log(1), length(y))
   dnorm_$log_sd[] <- rep(log(1), 3)
   #' @description dnorm should error out when there is a dimension mismatch where it is expecting `log_sd` to have a size 10 but is provided a size 3 vector.
   expect_error(
-    object = dnorm_$evaluate(),
+    object = evaluate_distribution(dnorm_, ),
     regexp = "NormalLPDF::Vector .* out of bounds. .* 10 .* 3"
   )
   clear()
@@ -354,20 +354,20 @@ test_that("rcpp distribution returns correct error messages", {
   y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
   # create a fims Rcpp object
   # initialize the Dlnorm module
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
   dlnorm_$observed_values[] <- y
   dlnorm_$expected_values[] <- rep(log(1), length(y) + 1)
   dlnorm_$log_sd[] <- rep(log(1), length(y))
   # TODO: skip test until dimension checking is fixed in lognormal_lpdf.hpp
   # dlnorm should error out when there is a dimension mismatch
-  # object <- dlnorm_$evaluate()
+  # object <- evaluate_distribution(dlnorm_, )
   # expected_error_message <- "LognormalLPDF::Vector .* out of bounds. .* 10 .* 11"
   # expect_error(object, expected_error_message)
   clear()
 
   # initialize the Dlnorm module
-  dlnorm_ <- methods::new(DlnormDistribution)
+  dlnorm_ <- create_distribution("dlnorm")
   # populate class members
   dlnorm_$observed_values[] <- y
   dlnorm_$expected_values$resize(length(y))
@@ -375,7 +375,7 @@ test_that("rcpp distribution returns correct error messages", {
 
   #' @description dlnorm should error out when there is a dimension mismatch where it is expecting log_sd to have a size 10 but is provided a size 3 vector.
   expect_error(
-    object = dlnorm_$evaluate(),
+    object = evaluate_distribution(dlnorm_, ),
     regexp = "LognormalLPDF::Vector .* out of bounds. .* 10 .* 3"
   )
   clear()
@@ -385,7 +385,7 @@ test_that("rcpp distribution returns correct error messages", {
   x_values <- t(stats::rmultinom(1, 100, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
-  dmultinom_ <- methods::new(DmultinomDistribution)
+  dmultinom_ <- create_distribution("dmultinom")
   # populate class members
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
@@ -396,7 +396,7 @@ test_that("rcpp distribution returns correct error messages", {
 
   #' @description dmultinom should error out when there is a dimension mismatch.
   expect_error(
-    object = dmultinom_$evaluate(),
+    object = evaluate_distribution(dmultinom_, ),
     regexp = "MultinomialLPDF: Vector index out of bounds. The dimension of the number of  rows times the number of columns is of size 10 and the observed vector is of size 12"
   )
   clear()
@@ -406,7 +406,7 @@ test_that("rcpp distribution returns correct error messages", {
   x_values <- t(stats::rmultinom(1, 100, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
-  dmultinom_ <- methods::new(DmultinomDistribution)
+  dmultinom_ <- create_distribution("dmultinom")
   # populate class members
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
@@ -416,7 +416,7 @@ test_that("rcpp distribution returns correct error messages", {
 
   #' @description dmultinom should error out when there is a dimension mismatch.
   expect_error(
-    object = dmultinom_$evaluate(),
+    object = evaluate_distribution(dmultinom_, ),
     regexp = "MultinomialLPDF: Vector index out of bounds. The dimension of the observed vector of size 9 and the expected vector is of size 10"
   )
   clear()

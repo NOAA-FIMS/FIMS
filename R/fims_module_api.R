@@ -119,6 +119,59 @@ set_data <- function(module, values, uncertainty = NULL) {
   invisible(module)
 }
 
+#' Read a module's values by field name
+#'
+#' @description
+#' The counterparts to [set_variable_vector()] and [set_numeric_vector()]: they
+#' return what those functions wrote, so a value can be checked after setting
+#' it.
+#'
+#' `get_variable_vector()` returns the estimation statuses alongside the values,
+#' because they are set together.
+#'
+#' Both report the values given as *input*. After a model is fitted the
+#' estimates live in the model rather than in the module, so these do not change
+#' when a model is fitted --- use [get_output()] or the fitted object for
+#' estimates.
+#'
+#' @param module A [fims_module].
+#' @param name The field name.
+#' @return
+#' For `get_variable_vector()`, a list with `values` and `estimation_status`,
+#' one status per element. For `get_numeric_vector()`, the values.
+#' @seealso [set_variable_vector()], [set_numeric_vector()]
+#' @export
+#' @rdname get_field
+get_variable_vector <- function(module, name) {
+  check_module(module)
+  get_variable_vector_(module[["base_pointer"]], name)
+}
+
+#' @export
+#' @rdname get_field
+get_numeric_vector <- function(module, name) {
+  check_module(module)
+  get_numeric_vector_(module[["base_pointer"]], name)
+}
+
+#' Ask whether a module has a field by this name
+#'
+#' @description
+#' Useful when deciding what to set from a table of parameters: the table may
+#' carry rows for a module and for the distribution attached to it, and only
+#' the module's own rows can be set on it.
+#'
+#' @param module A [fims_module].
+#' @param name The field name.
+#' @return
+#' `TRUE` if the module has a field by that name.
+#' @seealso [set_variable_vector()]
+#' @export
+has_variable_vector <- function(module, name) {
+  check_module(module)
+  has_variable_vector_(module[["base_pointer"]], name)
+}
+
 #' Get the ID of one of a module's estimable fields
 #'
 #' @description

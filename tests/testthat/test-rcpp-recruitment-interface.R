@@ -14,20 +14,22 @@
 ## IO correctness ----
 test_that("rcpp recruitment interface works with correct inputs", {
   # Create recruitment
-  recruitment <- methods::new(BevertonHoltRecruitment)
+  recruitment <- create_recruitment("beverton_holt")
   recruitment_process <- new(LogDevsRecruitmentProcess)
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
   phi_0 <- 0.0102562
 
-  recruitment$logit_steep[1]$value <- -log(1.0 - h) + log(h - 0.2)
-  recruitment$logit_steep[1]$set_estimation_status("random_effects")
-  recruitment$log_rzero[1]$value <- log(r0)
+  set_variable_vector(
+    recruitment, "logit_steep",
+    -log(1.0 - h) + log(h - 0.2), "random_effects"
+  )
+  set_variable_vector(recruitment, "log_rzero", log(r0), "assumed_known")
 
   #' @description Test that the recruitment id is 1.
   expect_equal(
-    object = recruitment$get_id(),
+    object = get_module_id(recruitment),
     expected = 1
   )
   #' @description Test that the scalar recruitment year count can be assigned directly through the Rcpp field binding.
@@ -35,34 +37,31 @@ test_that("rcpp recruitment interface works with correct inputs", {
   expect_equal(recruitment$n_years, 4)
   #' @description Test that the logit_steep value is 0.78845736.
   expect_equal(
-    object = recruitment$logit_steep[1]$value,
+    object = get_variable_vector(recruitment, "logit_steep")[["values"]],
     expected = 0.78845736
   )
   #' @description Test that the logit_steep is a random effect.
   expect_equal(
-    object = recruitment$logit_steep[1]$get_estimation_status(), "random_effects"
+    object = get_variable_vector(recruitment, "logit_steep")[["estimation_status"]], "random_effects"
   )
   #' @description Test that the log_rzero value is log(1000000.0).
   expect_equal(
-    object = recruitment$log_rzero[1]$value,
+    object = get_variable_vector(recruitment, "log_rzero")[["values"]],
     expected = log(1000000.0)
   )
   #' @description Test that recruitment$evaluate(spawns, phi_0) returns 1090802.68.
   expect_equal(
-    object = recruitment$evaluate_mean(spawns, phi_0),
+    object = evaluate_recruitment_mean(recruitment, spawns, phi_0),
     expected = 1090802.68
   )
   log_devs <- c(-1.0, 2.0, 3.0)
-  recruitment$log_devs[] <- log_devs
-
+  set_variable_vector(recruitment, "log_devs", log_devs, "assumed_known")
 
   #' @description Test that the log_devs are set correctly.
-  for (i in 1:length(log_devs)) {
-    expect_equal(
-      object = recruitment$log_devs[i]$value,
-      expected = log_devs[i]
-    )
-  }
+  expect_equal(
+    object = get_variable_vector(recruitment, "log_devs")[["values"]],
+    expected = log_devs
+  )
 
   # expected_lpdf <- sum(log(stats::dnorm(log_devs, 0, 0.7)))
   clear()
@@ -74,20 +73,19 @@ test_that("rcpp recruitment interface works with correct inputs", {
 ## Error handling ----
 test_that("test rcpp recruitment interface returns correct error messages", {
   # Create recruitment
-  recruitment <- methods::new(BevertonHoltRecruitment)
+  recruitment <- create_recruitment("beverton_holt")
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
   phi_0 <- 0.0102562
 
-  recruitment$logit_steep[1]$value <- 1
-  recruitment$logit_steep[1]$set_estimation_status("random_effects")
-  recruitment$log_rzero[1]$value <- log(r0)
+  set_variable_vector(recruitment, "logit_steep", 1, "random_effects")
+  set_variable_vector(recruitment, "log_rzero", log(r0), "assumed_known")
 
 
   #' @description Test that recruitment errors if logit_steep==1.
   expect_warning(
-    object = recruitment$evaluate_mean(spawns, phi_0),
+    object = evaluate_recruitment_mean(recruitment, spawns, phi_0),
     regexp = "Steepness is subject to a logit transformation. Fixing it at 1.0 is not currently possible."
   )
   clear()

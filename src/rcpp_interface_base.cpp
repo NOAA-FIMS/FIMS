@@ -128,6 +128,84 @@ uint32_t get_variable_vector_id_(Rcpp::XPtr<SharedBase> xp, std::string name) {
   return require_variable_vector(xp, name).id_m;
 }
 
+/**
+ * @brief Read one VariableVector field by name, on any module that has one.
+ *
+ * @details The counterpart to set_variable_vector_(): it returns what that
+ * function wrote, so a value can be checked after it is set. Values and
+ * statuses come back together because they are set together.
+ *
+ * The values are the ones given as input. After a model is fitted the
+ * estimates live in the model rather than in the module, so this reports
+ * starting values, not estimates.
+ *
+ * @param xp The module to read from.
+ * @param name The field name as used in R.
+ * @return A list with `values`, the numeric input values, and
+ * `estimation_status`, one status name per element.
+ */
+/**
+ * @brief Report whether a module has a VariableVector by this name.
+ *
+ * @details Lets R decide what to set without a hardcoded list of each module's
+ * fields. The parameters tibble carries rows for a module and for the
+ * distribution attached to it, and only the module's own rows can be set on
+ * it, so the caller needs to be able to ask.
+ *
+ * @param xp The module to ask.
+ * @param name The field name as used in R.
+ * @return true if the module has a field by that name.
+ */
+bool has_variable_vector_(Rcpp::XPtr<SharedBase> xp, std::string name) {
+  if (!xp || !(*xp)) {
+    Rcpp::stop("Cannot look up '" + name + "' on a null module.");
+  }
+  return (*xp)->get_variable_vector(name) != nullptr;
+}
+
+Rcpp::List get_variable_vector_(Rcpp::XPtr<SharedBase> xp, std::string name) {
+  VariableVector &variable_vector = require_variable_vector(xp, name);
+  const size_t size = variable_vector.size();
+
+  Rcpp::NumericVector values(size);
+  Rcpp::CharacterVector estimation_status(size);
+  for (size_t i = 0; i < size; i++) {
+    Variable &v = variable_vector.storage_m->at(i);
+    values[i] = v.initial_value_m;
+    estimation_status[i] = EstimationStatusToString(v.estimation_status_m);
+  }
+
+  return Rcpp::List::create(Rcpp::Named("values") = values,
+                            Rcpp::Named("estimation_status") =
+                                estimation_status);
+}
+
+/**
+ * @brief Read one plain numeric vector by name, on any module that has one.
+ *
+ * @details The counterpart to set_numeric_vector_(). These fields carry no
+ * estimation status, so only the values are returned.
+ *
+ * @param xp The module to read from.
+ * @param name The field name as used in R.
+ * @return The values.
+ */
+Rcpp::NumericVector get_numeric_vector_(Rcpp::XPtr<SharedBase> xp,
+                                        std::string name) {
+  if (!xp || !(*xp)) {
+    Rcpp::stop("Cannot read '" + name + "' from a null module.");
+  }
+  fims::Vector<double> *vector = (*xp)->get_numeric_vector(name);
+  if (vector == nullptr) {
+    Rcpp::stop("This module has no numeric vector named '" + name + "'.");
+  }
+  Rcpp::NumericVector values(vector->size());
+  for (size_t i = 0; i < vector->size(); i++) {
+    values[i] = (*vector)[i];
+  }
+  return values;
+}
+
 // ── Invalidation for clear() ─────────────────────────────────────────────────
 /**
  * @brief Invalidate a module's base pointer, releasing its share of the
@@ -156,5 +234,8 @@ void register_parameters(Rcpp::Module &m) {
   Rcpp::function("set_numeric_vector_", &set_numeric_vector_);
   Rcpp::function("get_module_id_", &get_module_id_);
   Rcpp::function("get_variable_vector_id_", &get_variable_vector_id_);
+  Rcpp::function("get_variable_vector_", &get_variable_vector_);
+  Rcpp::function("has_variable_vector_", &has_variable_vector_);
+  Rcpp::function("get_numeric_vector_", &get_numeric_vector_);
   Rcpp::function("release_base_", &release_base_);
 }
