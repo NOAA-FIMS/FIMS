@@ -78,6 +78,9 @@ class VonBertalanffySchnuteGrowthModelAdapter : public GrowthDerivedObservationB
  public:
   VonBertalanffySchnuteGrowthModelAdapter() : GrowthDerivedObservationBase<Type>() {}
 
+  /**
+   * @brief Options for how the two reference lengths are supplied.
+   */
   enum class LengthReferenceParameterization {
     kEstimatedL1EstimatedGap = 0,
     kConstantL1EstimatedGap,
@@ -85,12 +88,20 @@ class VonBertalanffySchnuteGrowthModelAdapter : public GrowthDerivedObservationB
     kBothConstant
   };
 
+  /**
+   * @brief Estimate the young reference length and the old-young length gap.
+   */
   void UseEstimatedMeanLengthYoungWithEstimatedGap() {
     length_reference_parameterization_ =
         LengthReferenceParameterization::kEstimatedL1EstimatedGap;
     growth_products_prepared_ = false;
   }
 
+  /**
+   * @brief Fix young reference length and estimate the old-young length gap.
+   *
+   * @param constant_mean_length_young Fixed mean length at the younger reference age.
+   */
   void UseConstantMeanLengthYoungWithEstimatedGap(
       Type constant_mean_length_young) {
     length_reference_parameterization_ =
@@ -99,6 +110,11 @@ class VonBertalanffySchnuteGrowthModelAdapter : public GrowthDerivedObservationB
     growth_products_prepared_ = false;
   }
 
+  /**
+   * @brief Estimate young reference length below a fixed old reference length.
+   *
+   * @param constant_mean_length_old Fixed mean length at the older reference age.
+   */
   void UseEstimatedMeanLengthYoungBelowConstantMeanLengthOld(
       Type constant_mean_length_old) {
     length_reference_parameterization_ =
@@ -107,6 +123,12 @@ class VonBertalanffySchnuteGrowthModelAdapter : public GrowthDerivedObservationB
     growth_products_prepared_ = false;
   }
 
+  /**
+   * @brief Fix both young and old reference mean lengths.
+   *
+   * @param constant_mean_length_young Fixed mean length at the younger reference age.
+   * @param constant_mean_length_old Fixed mean length at the older reference age.
+   */
   void UseConstantReferenceMeanLengths(Type constant_mean_length_young,
                                    Type constant_mean_length_old) {
     length_reference_parameterization_ =

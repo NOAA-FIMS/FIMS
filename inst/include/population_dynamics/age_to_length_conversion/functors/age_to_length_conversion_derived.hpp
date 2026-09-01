@@ -213,10 +213,10 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
   /**
    * @brief Validate a prepared population probability row and renormalize small
    * roundoff.
+   *
    * @param row Prepared population probability row.
    * @param expected_size Expected number of bins.
    * @param minimum_mass Minimum acceptable total probability mass.
-   * @param mass_tolerance Allowed deviation from unit mass before failing.
    * @return True if the row is a usable prepared probability row.
    */
   bool TryFinalizePreparedProbabilityRow(
@@ -245,9 +245,11 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
 
   /**
    * @brief Validate and normalize one mapped fleet probability row.
+   *
    * @param row Fleet probability row on observation bins.
    * @param expected_size Expected number of fleet bins.
    * @param minimum_mass Minimum acceptable total probability mass.
+   * @param minimum_bin_prob Minimum probability assigned to each bin before normalization.
    * @return True if the mapped fleet row can be used downstream.
    */
   bool TryFinalizeMappedProbabilityRow(

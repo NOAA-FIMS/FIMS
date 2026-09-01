@@ -297,6 +297,11 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 #endif
   }
 
+  /**
+   * @brief Turn reporting of the Growth-derived age-to-length tensor on or off.
+   *
+   * @param report Whether to include the derived tensor in model reports.
+   */
   void ReportAgeToLengthConversionDerivedTensor(bool report) {
 #ifdef TMB_MODEL
     std::shared_ptr<fims_info::Information<double>> info =

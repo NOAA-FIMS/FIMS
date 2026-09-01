@@ -20,6 +20,14 @@ namespace fims_popdy {
  * near 1.
  */
 struct SizeProbabilityNormalization {
+  /**
+   * @brief Return a stable denominator for probability-row normalization.
+   *
+   * @tparam Type Numeric or automatic-differentiation scalar type.
+   * @param row_sum Sum of probabilities in a row.
+   * @param minimum_sum Minimum denominator allowed during normalization.
+   * @return AD-safe denominator at least `minimum_sum`.
+   */
   template <typename Type>
   static Type SafeDenominator(
       const Type& row_sum,

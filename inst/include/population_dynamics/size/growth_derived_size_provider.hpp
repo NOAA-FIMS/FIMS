@@ -22,11 +22,25 @@
 
 namespace fims_popdy {
 
+/**
+ * @brief Size provider that converts growth outputs to population size products.
+ *
+ * The provider reads mean length, length standard deviation, and weight-at-age
+ * from a Growth-derived observation object, then builds probability rows on the
+ * population biological size grid.
+ *
+ * @tparam Type Numeric or automatic-differentiation scalar type.
+ */
 template <typename Type>
 class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
  public:
   GrowthDerivedSizeProvider() = default;
 
+  /**
+   * @brief Construct a provider linked to a Growth-derived observation object.
+   *
+   * @param growth Growth object that supplies mean length and weight outputs.
+   */
   explicit GrowthDerivedSizeProvider(
       std::shared_ptr<GrowthDerivedObservationBase<Type>> growth)
       : growth_observation_(growth) {}
@@ -193,6 +207,11 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     return size_products_.ProbSize(year_index, age_index, size_bin_index);
   }
 
+  /**
+   * @brief Replace the Growth-derived observation object used by this provider.
+   *
+   * @param growth Growth object that supplies mean length and weight outputs.
+   */
   void SetGrowth(
       std::shared_ptr<GrowthDerivedObservationBase<Type>> growth) {
     growth_observation_ = growth;
