@@ -32,8 +32,14 @@ struct LogDevs : public RecruitmentBase<Type> {
    * @param pos Position index, e.g., which year.
    */
   virtual const Type evaluate_process(size_t pos) {
-    return this->recruitment->log_expected_recruitment[pos] +
-           this->recruitment->log_recruit_devs[pos];
+    std::shared_ptr<RecruitmentBase<Type>> recruitment =
+        this->recruitment.lock();
+    if (!recruitment) {
+      throw std::runtime_error(
+          "LogDevs recruitment process has no recruitment model.");
+    }
+    return recruitment->log_expected_recruitment[pos] +
+           recruitment->log_recruit_devs[pos - 1];
   }
 
   /** @copydoc RecruitmentBase::evaluate_mean */

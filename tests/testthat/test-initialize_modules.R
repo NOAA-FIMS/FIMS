@@ -233,22 +233,14 @@ test_that("`initialize_fims()` returns correct error messages", {
 # test_initialize_recruitment ----
 ## IO correctness ----
 test_that("`initialize_recruitment()` works with correct inputs", {
-  #' @description Test that `initialize_recruitment()` returns an S4 object.
+  #' @description Test that `initialize_recruitment()` returns an XPtr-backed module.
   result <- initialize_recruitment(
     parameters = default_parameters,
     data = data
   )
-  expect_type(result, "S4")
-  #' @description Test that `initialize_recruitment()` creates a module with expected methods in the class definition method table.
-  expect_true(all(
-    c(
-      "initialize",
-      "finalize",
-      "get_id",
-      "evaluate_mean",
-      "SetRecruitmentProcessID"
-    ) %in% names(result$.refClassDef@refMethods)
-  ))
+  expect_s3_class(result, "fims_module")
+  expect_identical(result[["module_name"]], "Recruitment")
+  expect_true(has_variable_vector(result, "log_rzero"))
   clear()
 })
 
@@ -256,42 +248,28 @@ test_that("`initialize_recruitment()` works with correct inputs", {
 # test_initialize_growth ----
 ## IO correctness ----
 test_that("`initialize_growth()` works with correct inputs", {
-  #' @description Test that `initialize_growth()` returns an S4 object.
+  #' @description Test that `initialize_growth()` returns an XPtr-backed module.
   result <- initialize_growth(
     parameters = default_parameters,
     data = data
   )
-  expect_type(result, "S4")
-  #' @description Test that `initialize_growth()` creates a module with expected methods in the class definition method table.
-  expect_true(all(
-    c(
-      "initialize",
-      "finalize",
-      "get_id",
-      "evaluate"
-    ) %in% names(result$.refClassDef@refMethods)
-  ))
+  expect_s3_class(result, "fims_module")
+  expect_identical(result[["module_name"]], "Growth")
+  expect_equal(get_numeric_vector(result, "ages"), get_ages(data))
   clear()
 })
 
 # test_initialize_maturity ----
 ## IO correctness ----
 test_that("`initialize_maturity()` works with correct inputs", {
-  #' @description Test that `initialize_maturity()` returns an S4 object.
+  #' @description Test that `initialize_maturity()` returns an XPtr-backed module.
   result <- initialize_maturity(
     parameters = default_parameters,
     data = data
   )
-  expect_type(result, "S4")
-  #' @description Test that `initialize_maturity()` creates a module with expected methods in the class definition method table.
-  expect_true(all(
-    c(
-      "initialize",
-      "finalize",
-      "get_id",
-      "evaluate"
-    ) %in% names(result$.refClassDef@refMethods)
-  ))
+  expect_s3_class(result, "fims_module")
+  expect_identical(result[["module_name"]], "Maturity")
+  expect_true(has_variable_vector(result, "slope"))
   clear()
 })
 
@@ -312,46 +290,35 @@ test_that("`initialize_population()` works with correct inputs", {
     data = data
   )
 
-  linked_ids <- c(
-    recruitment = recruitment$get_id(),
-    growth = growth$get_id(),
-    maturity = maturity$get_id()
-  )
-
-  #' @description Test that `initialize_population()` returns an S4 object.
+  #' @description Test that `initialize_population()` returns an XPtr-backed module.
   result <- initialize_population(
     parameters = default_parameters,
     data = data,
-    linked_ids = linked_ids
+    recruitment = recruitment,
+    growth = growth,
+    maturity = maturity,
+    fleets = list()
   )
-  expect_type(result, "S4")
-  #' @description Test that `initialize_population()` creates a module with expected methods in the class definition method table.
-  expect_true(all(
-    c(
-      "initialize",
-      "finalize",
-      "get_id",
-      "SetRecruitmentID",
-      "SetName",
-      "SetMaturityID",
-      "SetGrowthID",
-      "GetName",
-      "AddFleet"
-    ) %in% names(result$.refClassDef@refMethods)
-  ))
+  expect_s3_class(result, "fims_module")
+  expect_equal(
+    unname(get_population_process_ids(result)[c("growth", "maturity", "recruitment")]),
+    c(get_module_id(growth), get_module_id(maturity), get_module_id(recruitment))
+  )
   clear()
 })
 
 ## Error handling ----
-test_that("`initialize_population()` returns correct error messages", {
-  #' @description Test that `initialize_population()` handles missing linked_ids correctly.
+test_that("`initialize_population()` requires its linked modules", {
+  #' @description Test that `initialize_population()` handles a missing growth module.
   expect_error(
     initialize_population(
       parameters = default_parameters,
       data = data,
-      linked_ids = c(growth = 1)
+      maturity = create_maturity("Logistic"),
+      recruitment = create_recruitment("BevertonHolt"),
+      fleets = list()
     ),
-    "`linked_ids` for population must include `growth`, `maturity`, and"
+    "argument .*growth.* is missing"
   )
   clear()
 })
@@ -365,16 +332,9 @@ test_that("`initialize_selectivity()` works with correct inputs", {
     data = data,
     fleet = "fleet1"
   )
-  expect_type(result, "S4")
-  #' @description Test that `initialize_selectivity()` creates a module with expected methods in the class definition method table.
-  expect_true(all(
-    c(
-      "initialize",
-      "finalize",
-      "get_id",
-      "evaluate"
-    ) %in% names(result$.refClassDef@refMethods)
-  ))
+  expect_s3_class(result, "fims_module")
+  expect_identical(result[["module_name"]], "Selectivity")
+  expect_true(has_variable_vector(result, "slope"))
   clear()
 })
 
@@ -400,39 +360,19 @@ test_that("`initialize_fleet()` works with correct inputs", {
     fleet = "fleet1",
     type = "LengthComp"
   )
-  linked_ids <- c(
-    selectivity = selectivity$get_id(),
-    catch = catch$get_id(),
-    age_comp = age_comp$get_id(),
-    length_comp = length_comp$get_id()
-  )
-
-  #' @description Test that `initialize_fleet()` returns an S4 object.
+  #' @description Test that `initialize_fleet()` returns an XPtr-backed module.
   result <- FIMS:::initialize_fleet(
     parameters = default_parameters,
     data = data,
     fleet = "fleet1",
-    linked_ids = linked_ids
+    selectivity = selectivity,
+    catch = catch,
+    age_comp = age_comp,
+    length_comp = length_comp
   )
-  expect_type(result, "S4")
-  #' @description Test that `initialize_fleet()` creates a module with expected methods in the class definition method table.
-  expect_true(all(
-    c(
-      "initialize",
-      "finalize",
-      "get_id",
-      "SetSelectivityID",
-      "SetObservedLengthCompDataID",
-      "SetObservedCatchDataID",
-      "SetObservedIndexDataID",
-      "SetObservedAgeCompDataID",
-      "SetName",
-      "GetObservedLengthCompDataID",
-      "GetObservedAgeCompDataID",
-      "GetObservedIndexDataID",
-      "GetObservedCatchDataID"
-    ) %in% names(result$.refClassDef@refMethods)
-  ))
+  expect_s3_class(result, "fims_module")
+  expect_equal(get_fleet_selectivity_id(result), get_module_id(selectivity))
+  expect_equal(get_fleet_observed_data_ids(result)[["catch"]], get_module_id(catch))
   clear()
 })
 
@@ -444,17 +384,9 @@ test_that("`initialize_catch()` works with correct inputs", {
     data = data,
     fleet = "fleet1"
   )
-  expect_type(result, "S4")
-  #' @description Test that `initialize_catch()` creates a module with expected methods in the class definition method table.
-  expect_true(all(
-    c(
-      "initialize",
-      "finalize",
-      "get_id"
-    ) %in% names(result$.refClassDef@refMethods)
-  ))
-  #' @description Test that `initialize_catch()` module contains catch_data field.
-  expect_true("catch_data" %in% names(result))
+  expect_s3_class(result, "fims_module")
+  expect_identical(result[["module_type"]], "catch")
+  expect_equal(get_numeric_vector(result, "values"), model_catch(data, "fleet1"))
   #' @description Test that `initialize_catch()` returns `NULL` if there are no catch for the fleet.
   expect_null(
     initialize_catch(
@@ -486,17 +418,9 @@ test_that("`initialize_index()` works with correct inputs", {
     data = data,
     fleet = "survey1"
   )
-  expect_type(result, "S4")
-  #' @description Test that `initialize_index()` creates a module with expected methods in the class definition method table.
-  expect_true(all(
-    c(
-      "initialize",
-      "finalize",
-      "get_id"
-    ) %in% names(result$.refClassDef@refMethods)
-  ))
-  #' @description Test that `initialize_index()` module contains index_data field.
-  expect_true("index_data" %in% names(result))
+  expect_s3_class(result, "fims_module")
+  expect_identical(result[["module_type"]], "index")
+  expect_equal(get_numeric_vector(result, "values"), model_index(data, "survey1"))
   #' @description Test that `initialize_index()` returns `NULL` if there are no catch for the fleet.
   expect_null(
     initialize_index(
@@ -529,20 +453,12 @@ test_that("`initialize_comp()` works with correct inputs", {
     type = "AgeComp"
   )
 
-  #' @description Test that `initialize_comp()` works with `AgeComp` type and returns an S4 object.
-  expect_type(result, "S4")
-  #' @description Test that `initialize_comp()` works with `AgeComp` type and does not produce an error.
-  expect_no_error(result[["age_comp_data"]])
-  #' @description Test that `initialize_comp()` works with `AgeComp` type and sets `length_comp_data` to NULL.
-  expect_null(result[["length_comp_data"]])
-  #' @description Test that `initialize_comp()` output contains the correct structure.
-  expect_true(
-    all(c("age_comp_data", "initialize", "finalize", ".pointer") %in%
-      names(result))
-  )
+  #' @description Test that `initialize_comp()` works with `AgeComp` type and returns an XPtr-backed object.
+  expect_s3_class(result, "fims_module")
+  expect_identical(result[["module_type"]], "age_comp")
   #' @description Test that the age-composition data in the returned object from `initialize_comp()` has the correct values.
   expect_equal(
-    result$age_comp_data$get_values(),
+    get_numeric_vector(result, "values"),
     data |>
       get_data() |>
       dplyr::filter(type == "age_comp", fleet == "fleet1") |>
@@ -561,20 +477,12 @@ test_that("`initialize_comp()` works with correct inputs", {
     fleet = "fleet1",
     type = "LengthComp"
   )
-  #' @description Test that `initialize_fims()` works with `LengthComp` type and returns an S4 object.
-  expect_type(result, "S4")
-  #' @description Test that `initialize_fims()` works with `LengthComp` type and does not produce an error.
-  expect_no_error(result[["length_comp_data"]])
-  #' @description Test that `initialize_fims()` works with `LengthComp` type and sets `age_comp_data` to NULL.
-  expect_null(result[["age_comp_data"]])
-  #' @description Test that `initialize_fims()` output contains the correct structure.
-  expect_true(
-    all(c("length_comp_data", "initialize", "finalize", ".pointer") %in%
-      names(result))
-  )
+  #' @description Test that `initialize_fims()` works with `LengthComp` type and returns an XPtr-backed object.
+  expect_s3_class(result, "fims_module")
+  expect_identical(result[["module_type"]], "length_comp")
   #' @description Test that the length-composition data in the returned object from `initialize_comp()` has the correct values.
   expect_equal(
-    result$length_comp_data$get_values(),
+    get_numeric_vector(result, "values"),
     data |>
       get_data() |>
       dplyr::filter(type == "length_comp", fleet == "fleet1") |>
@@ -676,38 +584,32 @@ test_that("`initialize_comp()` returns correct error messages", {
   clear()
 })
 
-# test_set_param_vector ----
+# test_set_variable_vector ----
 ## IO correctness ----
 
 ## Edge handling ----
 
 ## Error handling ----
 
-test_that("`set_param_vector()` returns correct error messages", {
-  #' @description Test that `set_param_vector()` requires the field argument.
+test_that("`set_variable_vector()` returns correct error messages", {
+  module <- create_growth("EWAA")
+
+  #' @description Test that `set_variable_vector()` requires the name argument.
   expect_error(
-    set_param_vector(),
-    "argument must be a non-empty character string."
+    set_variable_vector(module),
+    "argument .*name.* is missing"
   )
 
-
-  #' @description Test that `set_param_vector()` requires the module parameter is a reference class object.
+  #' @description Test that `set_variable_vector()` requires an XPtr-backed module.
   expect_error(
-    set_param_vector(
-      field = "x",
-      module = 1:10
-    ),
-    "argument must be a reference class"
+    set_variable_vector(1:10, "x", 1, "assumed_known"),
+    "FIMS module"
   )
 
-  #' @description Test that `set_param_vector()` requires the `module_input` argument to be a tibble.
+  #' @description Test that `set_variable_vector()` diagnoses unknown fields.
   expect_error(
-    set_param_vector(
-      field = "x",
-      module = methods::new(EWAAGrowth),
-      module_input = 1:10
-    ),
-    "argument must be a tibble"
+    set_variable_vector(module, "x", 1, "assumed_known"),
+    "no field named 'x'"
   )
   clear()
 })

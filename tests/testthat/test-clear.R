@@ -13,18 +13,75 @@
 load(test_path("fixtures", "integration_test_data.RData"))
 data_frame <- FIMSFrame(data_big)
 
-model_run <- setup_default_parameters(data = data_frame) |>
+# Built for its side effect of registering modules, so that clear() has
+# something to release.
+setup_default_parameters(data = data_frame) |>
   initialize_fims(data = data_frame)
 
 ## IO correctness ----
 test_that("`clear()` works with correct inputs", {
   #' @description No residual R or C++ memory structures remain after clear
   expect_no_warning(clear())
-  expect_warning(test_clear_with_leak_check())
+
+  #' @description Test that `clear()` empties the R registry as well as the C++ side.
+  expect_message(describe_model(), "No model components have been registered")
+})
+
+test_that("`clear()` is safe to call more than once", {
+  clear()
+  #' @description Test that calling `clear()` on an already-cleared session is not an error.
+  expect_no_warning(clear())
+  expect_no_error(clear())
+})
+
+test_that("a module cannot be used after `clear()`", {
+  selectivity <- create_selectivity("Logistic")
+  clear()
+
+  #' @description Test that reading from a module after `clear()` is an error rather than undefined behavior.
+  expect_error(get_variable_vector(selectivity, "slope"))
+
+  #' @description Test that writing to a module after `clear()` is an error rather than undefined behavior.
+  expect_error(set_variable_vector(selectivity, "slope", 1, "assumed_known"))
+
+  #' @description Test that a specialized accessor also errors, rather than dereferencing the released pointer.
+  # get_variable_vector() and set_variable_vector() take the base pointer,
+  # whose C++ side has always null-checked. The per-module functions take the
+  # module's own typed pointer, which is a separate path and the one that could
+  # terminate R.
+  expect_error(evaluate_selectivity(selectivity, 1))
+
+  fleet <- create_fleet()
+  maturity <- create_maturity("Logistic")
+  clear()
+  #' @description Test that a specialized setter errors after `clear()` rather than writing through a released pointer.
+  expect_error(set_fleet_constants(fleet, 30, 12, 20))
+  #' @description Test that a specialized evaluator errors after `clear()` rather than reading through a released pointer.
+  expect_error(evaluate_maturity(maturity, 1))
 })
 
 ## Error handling ----
 test_that("`clear()` throws warning when dangling pointer or module exists", {
   #' @description test_clear_with_leak_check() calls clear() with dangling module to trigger warning message
-  expect_warning(test_clear_with_leak_check())
+  # Matched on the message text because clear() can emit two different
+  # warnings; a bare expect_warning() passes on either, and so would not notice
+  # if the dangling-pointer check stopped working. Collected with
+  # capture_warnings() so that an unrelated second warning does not fail this.
+  warnings <- capture_warnings(test_clear_with_leak_check())
+  expect_true(any(grepl("Dangling Pointer or Module Detected", warnings)))
+  clear()
+})
+
+test_that("`clear()` warns when modules are still in use", {
+  selectivity <- create_selectivity("Logistic")
+
+  #' @description Test that calling the C++ clear() directly while modules are live warns that their IDs will be reissued.
+  # Reachable only through the C++ function: the R clear() wrapper releases
+  # every module first, so it can never trip this check.
+  warnings <- capture_warnings(clear_())
+  expect_true(any(grepl("module\\(s\\) are still in use", warnings)))
+
+  # clear_() resets the counters but does not delete the modules, which R still
+  # owns, so the registry entries are still valid and clear() can release them.
+  clear()
 })

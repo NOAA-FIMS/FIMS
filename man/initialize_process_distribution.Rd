@@ -8,7 +8,7 @@
 initialize_process_distribution(
   module,
   par,
-  family = NULL,
+  family = "dnorm",
   sd = tibble::tibble(value = 1, estimation_status = "fixed_effects")
 )
 
@@ -20,7 +20,7 @@ of interest.}
 
 \item{par}{A string specifying the parameter name the distribution applies
 to. Parameters must be members of the specified module. Use
-\code{methods::show(module)} to obtain names of parameters within the module.}
+\code{\link[=has_variable_vector]{has_variable_vector()}} to check whether a module has a given parameter.}
 
 \item{family}{A description of the error distribution and link function to
 be used in the model. The argument takes a family class, e.g.,
@@ -37,22 +37,23 @@ estimated as a fixed effect or assumed known. If \code{"value"} is a vector and
 Otherwise, the dimensions of the two must match.}
 }
 \value{
-A reference class. is returned. Use \code{\link[methods:show]{methods::show()}} to view the various
-Rcpp class fields, methods, and documentation.
+A \link{fims_module} distribution object. Internally it holds the C++ external
+pointer that FIMS uses to represent the distribution, and it is registered
+with the model so it can be included when the model is built.
 }
 \description{
-Use \code{\link[methods:new]{methods::new()}} to set up a distribution within an existing module with
-the necessary linkages between the two. For example, a recruitment
-module, like the Beverton--Holt stock--recruit relationship, will need a
-distribution associated with the recruitment deviations.
+Sets up a distribution within an existing module, with the necessary linkages
+between the two. For example, a recruitment module, like the Beverton--Holt
+stock--recruit relationship, will need a distribution associated with the
+recruitment deviations.
 }
 \examples{
 \dontrun{
 # Set up a new process distribution
 # Create a new recruitment module
-recruitment <- methods::new(BevertonHoltRecruitment)
-# view parameter names of the recruitment module
-methods::show(BevertonHoltRecruitment)
+recruitment <- create_recruitment("BevertonHolt")
+# Check that the module has the parameter the distribution will apply to
+has_variable_vector(recruitment, "log_devs")
 # Create a distribution for the recruitment module
 recruitment_distribution <- initialize_process_distribution(
   module = recruitment,
@@ -64,6 +65,8 @@ recruitment_distribution <- initialize_process_distribution(
 }
 \seealso{
 \itemize{
+\item \code{\link[=create_recruitment]{create_recruitment()}}
+\item \code{\link[=has_variable_vector]{has_variable_vector()}}
 \item \code{\link[=initialize_data_distribution]{initialize_data_distribution()}}
 }
 }

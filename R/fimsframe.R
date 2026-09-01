@@ -921,7 +921,7 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
 #' distributions that have density functions in base R. To get information on
 #' available derived quantities to set the central tendency of the distribution
 #' to, you can create a fleet object and inspect the available names, e.g.,
-#' `names(methods::new(Fleet))`, or you can navigate to the Public Attributes
+#' the fields of a fleet module, or you can navigate to the Public Attributes
 #' section of the doxygen documentation for Fleet by running `?Fleet`.
 #' ### Sorting
 #' It is important that the order of the rows in the data are correct but it is
