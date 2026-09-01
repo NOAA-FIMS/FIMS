@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <stdexcept>
 
 #include "../../../common/fims_math.hpp"
 #include "age_to_length_conversion_base.hpp"
@@ -21,7 +22,6 @@
 #include "../../growth/growth_model_adapter.hpp"
 #include "../../size/size_distribution_provider_base.hpp"
 #include "../../size/functors/size_bin_mapping.hpp"
-#include "../../size/functors/size_probability_normalization.hpp"
 
 namespace fims_popdy {
 
@@ -160,117 +160,37 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
 
     fims::Vector<Type> prob_size_row(population_size_grid->n_bins);
 
-    try {
-      for (std::size_t size_bin_index = 0;
-           size_bin_index < population_size_grid->n_bins;
-           ++size_bin_index) {
-        prob_size_row[size_bin_index] =
-            size_provider_ptr->ProbSize(
-                year_index, age_index, size_bin_index);
-      }
-    } catch (const std::runtime_error&) {
-      return fims::Vector<Type>();
-    }
-
-    if (!TryFinalizePreparedProbabilityRow(
-            prob_size_row, population_size_grid->n_bins)) {
-      throw std::runtime_error(
-          "AgeToLengthConversionDerived received an invalid prepared population size row");
+    for (std::size_t size_bin_index = 0;
+         size_bin_index < population_size_grid->n_bins;
+         ++size_bin_index) {
+      prob_size_row[size_bin_index] =
+          size_provider_ptr->ProbSize(
+              year_index, age_index, size_bin_index);
     }
 
     return prob_size_row;
   }
 
   /**
-   * @brief Clamp tiny negative roundoff and reject materially invalid
-   * probability rows.
-   * @param row Probability row to sanitize in place.
-   * @param expected_size Expected number of bins.
-   * @param negative_tolerance Smallest allowed negative value before failing.
-   * @return True if the row is usable after sanitization.
-   */
-  bool TrySanitizeProbabilityRowInPlace(
-      fims::Vector<Type>& row,
-      std::size_t expected_size,
-      const Type& negative_tolerance = static_cast<Type>(1e-12)) const {
-    if (row.size() != expected_size) {
-      return false;
-    }
-
-    for (std::size_t i = 0; i < row.size(); ++i) {
-      if (!(row[i] >= -negative_tolerance)) {
-        return false;
-      }
-
-      if (row[i] < static_cast<Type>(0.0)) {
-        row[i] = static_cast<Type>(0.0);
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * @brief Validate a prepared population probability row and renormalize small
-   * roundoff.
-   *
-   * @param row Prepared population probability row.
-   * @param expected_size Expected number of bins.
-   * @param minimum_mass Minimum acceptable total probability mass.
-   * @return True if the row is a usable prepared probability row.
-   */
-  bool TryFinalizePreparedProbabilityRow(
-      fims::Vector<Type>& row,
-      std::size_t expected_size,
-      const Type& minimum_mass = static_cast<Type>(1e-12)) const {
-    if (!TrySanitizeProbabilityRowInPlace(row, expected_size)) {
-      return false;
-    }
-
-    Type row_sum = static_cast<Type>(0.0);
-    for (std::size_t i = 0; i < row.size(); ++i) {
-      row_sum += row[i];
-    }
-
-    if (!(row_sum > minimum_mass)) {
-      return false;
-    }
-
-    for (std::size_t i = 0; i < row.size(); ++i) {
-      row[i] /= row_sum;
-    }
-
-    return true;
-  }
-
-  /**
-   * @brief Validate and normalize one mapped fleet probability row.
+   * @brief Normalize one mapped fleet probability row.
    *
    * @param row Fleet probability row on observation bins.
    * @param expected_size Expected number of fleet bins.
-   * @param minimum_mass Minimum acceptable total probability mass.
-   * @param minimum_bin_prob Minimum probability assigned to each bin before normalization.
-   * @return True if the mapped fleet row can be used downstream.
+   * @param minimum_bin_prob Minimum probability added to each bin before normalization.
+   * @return True if the mapped fleet row has the expected size.
    */
   bool TryFinalizeMappedProbabilityRow(
       fims::Vector<Type>& row,
       std::size_t expected_size,
-      const Type& minimum_mass = static_cast<Type>(1e-12),
       const Type& minimum_bin_prob = static_cast<Type>(1e-12)) const {
-    if (!TrySanitizeProbabilityRowInPlace(row, expected_size)) {
+    if (row.size() != expected_size) {
       return false;
     }
 
     Type row_sum = static_cast<Type>(0.0);
     for (std::size_t i = 0; i < row.size(); ++i) {
-      if (row[i] < minimum_bin_prob) {
-        row[i] = minimum_bin_prob;
-      }
+      row[i] += minimum_bin_prob;
       row_sum += row[i];
-    }
-
-    if (!(row_sum > minimum_mass)) {
-      return false;
     }
 
     for (std::size_t i = 0; i < row.size(); ++i) {

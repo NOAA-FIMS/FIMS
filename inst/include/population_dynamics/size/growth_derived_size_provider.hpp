@@ -18,7 +18,6 @@
 #include "size_products.hpp"
 #include "../../common/def.hpp"
 #include "../../common/fims_math.hpp"
-#include "functors/size_probability_normalization.hpp"
 
 namespace fims_popdy {
 
@@ -114,42 +113,24 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
       for (std::size_t age_index = 0; age_index < n_ages_; ++age_index) {
         fims::Vector<Type> prob_row(population_size_grid_->n_bins);
         Type row_sum = static_cast<Type>(0.0);
-        const Type negative_tolerance = static_cast<Type>(1e-10);
+        const Type minimum_bin_prob = static_cast<Type>(1e-12);
 
         for (std::size_t size_bin_index = 0;
              size_bin_index < population_size_grid_->n_bins;
              ++size_bin_index) {
           Type bin_prob = PopulationSizeBinProb(
-              growth_products, year_index, age_index, size_bin_index);
-
-          if (!(bin_prob >= -negative_tolerance)) {
-            throw std::runtime_error(
-                "GrowthDerivedSizeProvider produced a materially negative "
-                "population size probability");
-          }
-
-          if (bin_prob < static_cast<Type>(0.0)) {
-            bin_prob = static_cast<Type>(0.0);
-          }
+              growth_products, year_index, age_index, size_bin_index) +
+              minimum_bin_prob;
 
           prob_row[size_bin_index] = bin_prob;
           row_sum += bin_prob;
         }
 
-        if (!(row_sum > static_cast<Type>(1e-12))) {
-          throw std::runtime_error(
-              "GrowthDerivedSizeProvider produced a zero-mass population "
-              "size row");
-        }
-
-        const Type safe_row_sum =
-            SizeProbabilityNormalization::SafeDenominator(row_sum);
-
         for (std::size_t size_bin_index = 0;
              size_bin_index < population_size_grid_->n_bins;
              ++size_bin_index) {
           size_products_.ProbSize(year_index, age_index, size_bin_index) =
-              prob_row[size_bin_index] / safe_row_sum;
+              prob_row[size_bin_index] / row_sum;
         }
 
         const Type plus_group_prob =
@@ -247,8 +228,8 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     if (size_bin_index + 1 == population_size_grid_->n_bins) {
       const Type lower = static_cast<Type>(
           population_size_grid_->edges[population_size_grid_->n_bins - 1]);
-      return static_cast<Type>(1.0) -
-             fims_math::normalcdf(lower, mean_laa, sd_laa);
+      return fims_math::normalcdf(
+          static_cast<Type>(2.0) * mean_laa - lower, mean_laa, sd_laa);
     }
 
     const Type lower =

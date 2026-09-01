@@ -463,7 +463,7 @@ TEST(AgeToLengthConversionDerived, IsActiveDoesNotPrepareGrowthProducts) {
   EXPECT_EQ(growth->prepare_calls, 0);
 }
 
-TEST(AgeToLengthConversionDerived, BuildAgeToLengthConversionRowFailsBeforePrepareForCurrentState) {
+TEST(AgeToLengthConversionDerived, BuildAgeToLengthConversionRowThrowsBeforePrepareForCurrentState) {
   auto fleet = MakeFleet();
   auto growth = std::make_shared<FakeGrowthDerivedObservation>();
 
@@ -482,7 +482,9 @@ TEST(AgeToLengthConversionDerived, BuildAgeToLengthConversionRowFailsBeforePrepa
   fims::Vector<double> row;
 
   ASSERT_TRUE(age_to_length_conversion.IsActive());
-  EXPECT_FALSE(age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row));
+  EXPECT_THROW(
+      age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row),
+      std::runtime_error);
   EXPECT_EQ(growth->prepare_calls, 0);
 }
 
