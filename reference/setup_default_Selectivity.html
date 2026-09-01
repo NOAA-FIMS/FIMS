@@ -72,7 +72,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">setup_default_Selectivity</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
 <span>  <span class="va">fleet</span>,</span>
-<span>  module_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Logistic"</span>, <span class="st">"DoubleLogistic"</span><span class="op">)</span></span>
+<span>  module_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Logistic"</span>, <span class="st">"DoubleLogistic"</span>, <span class="st">"AgeSpecific"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -92,7 +92,7 @@ parameters are being created.</p></dd>
 
 <dt id="arg-module-type">module_type<a class="anchor" aria-label="anchor" href="#arg-module-type"></a></dt>
 <dd><p>A string specifying the desired form of selectivity. Allowable
-forms include Logistic, DoubleLogistic
+forms include Logistic, DoubleLogistic, AgeSpecific
 and the default is
 Logistic.
 See <code><a href="setup_default_parameters.html">setup_default_parameters</a></code> for full column descriptions.</p></dd>

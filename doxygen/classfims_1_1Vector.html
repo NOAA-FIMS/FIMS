@@ -291,6 +291,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a70bfdc38a54b251b3d5dbebdb06df49d" id="r_a70bfdc38a54b251b3d5dbebdb06df49d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#a70bfdc38a54b251b3d5dbebdb06df49d">get_force_scalar</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>)</td></tr>
 <tr class="memdesc:a70bfdc38a54b251b3d5dbebdb06df49d"><td class="mdescLeft">&#160;</td><td class="mdescRight">If this vector is size 1 and pos is greater than zero, the first index is returned. If this vector has size greater than 1 and pos is greater than size, a invalid_argument exception is thrown. Otherwise, the value at index pos is returned.  <br /></td></tr>
 <tr class="separator:a70bfdc38a54b251b3d5dbebdb06df49d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f127ad3d57f715f39d2c2a2f9b6c61c" id="r_a9f127ad3d57f715f39d2c2a2f9b6c61c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1Vector.html#a9f127ad3d57f715f39d2c2a2f9b6c61c">get_force_scalar_wrap</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">pos</a>)</td></tr>
+<tr class="memdesc:a9f127ad3d57f715f39d2c2a2f9b6c61c"><td class="mdescLeft">&#160;</td><td class="mdescRight">If this vector is size 1 and pos is greater than zero, the first index is returned. If this vector has size greater than 1 and pos is greater than size, a wrapped index is returned. For example, if pos=10 and vector size=4, the value 2 will be returned Otherwise, the value at index pos is returned. This function allows for time-varying formulations to be applied to a parameter vector that is not time-varying.  <br /></td></tr>
+<tr class="separator:a9f127ad3d57f715f39d2c2a2f9b6c61c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50b58c7402c75b14d1dfbfba85e08bbd" id="r_a50b58c7402c75b14d1dfbfba85e08bbd"><td class="memItemLeft" align="right" valign="top"><a id="a50b58c7402c75b14d1dfbfba85e08bbd" name="a50b58c7402c75b14d1dfbfba85e08bbd"></a>
 <a class="el" href="classfims_1_1Vector.html#a2c822b39eaad468f2e61cca61956fb85">reference</a>&#160;</td><td class="memItemRight" valign="bottom"><b>front</b> ()</td></tr>
 <tr class="memdesc:a50b58c7402c75b14d1dfbfba85e08bbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a reference to the first element in the container. <br /></td></tr>
@@ -738,6 +741,44 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 </div><div class="memdoc">
 
 <p>If this vector is size 1 and pos is greater than zero, the first index is returned. If this vector has size greater than 1 and pos is greater than size, a invalid_argument exception is thrown. Otherwise, the value at index pos is returned. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pos</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a constant reference to the element at specified location </dd></dl>
+
+</div>
+</div>
+<a id="a9f127ad3d57f715f39d2c2a2f9b6c61c" name="a9f127ad3d57f715f39d2c2a2f9b6c61c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f127ad3d57f715f39d2c2a2f9b6c61c">&#9670;&#160;</a></span>get_force_scalar_wrap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">typename</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &amp; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::get_force_scalar_wrap </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td>
+          <td class="paramname"><em>pos</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>If this vector is size 1 and pos is greater than zero, the first index is returned. If this vector has size greater than 1 and pos is greater than size, a wrapped index is returned. For example, if pos=10 and vector size=4, the value 2 will be returned Otherwise, the value at index pos is returned. This function allows for time-varying formulations to be applied to a parameter vector that is not time-varying. </p>
+<p>Currently only used for sel_at_age.hpp</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pos</td><td></td></tr>

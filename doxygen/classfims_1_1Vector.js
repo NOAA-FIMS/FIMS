@@ -35,6 +35,7 @@ var classfims_1_1Vector =
     [ "front", "classfims_1_1Vector.html#a50b58c7402c75b14d1dfbfba85e08bbd", null ],
     [ "front", "classfims_1_1Vector.html#a20686856d7e697c8245400c5fe793aa9", null ],
     [ "get_force_scalar", "classfims_1_1Vector.html#a70bfdc38a54b251b3d5dbebdb06df49d", null ],
+    [ "get_force_scalar_wrap", "classfims_1_1Vector.html#a9f127ad3d57f715f39d2c2a2f9b6c61c", null ],
     [ "get_tag", "classfims_1_1Vector.html#a511709eee676fd7defff0b4460400370", null ],
     [ "insert", "classfims_1_1Vector.html#ab0ee9390e43439d6ef5bc8f391095dbc", null ],
     [ "insert", "classfims_1_1Vector.html#a5c11e84813c979560191675f1a5c9765", null ],

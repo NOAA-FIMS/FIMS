@@ -27,6 +27,7 @@ var annotated_dup =
       [ "FIMSObject", "structfims__model__object_1_1FIMSObject.html", "structfims__model__object_1_1FIMSObject" ]
     ] ],
     [ "fims_popdy", "namespacefims__popdy.html", [
+      [ "AgeSpecificSelectivity", "structfims__popdy_1_1AgeSpecificSelectivity.html", "structfims__popdy_1_1AgeSpecificSelectivity" ],
       [ "CatchAtAge", "classfims__popdy_1_1CatchAtAge.html", "classfims__popdy_1_1CatchAtAge" ],
       [ "DimensionInfo", "structfims__popdy_1_1DimensionInfo.html", "structfims__popdy_1_1DimensionInfo" ],
       [ "DoubleLogisticSelectivity", "structfims__popdy_1_1DoubleLogisticSelectivity.html", "structfims__popdy_1_1DoubleLogisticSelectivity" ],
@@ -46,6 +47,7 @@ var annotated_dup =
       [ "Subpopulation", "classfims__popdy_1_1Subpopulation.html", null ]
     ] ],
     [ "AgeCompDataInterface", "classAgeCompDataInterface.html", "classAgeCompDataInterface" ],
+    [ "AgeSpecificSelectivityInterface", "classAgeSpecificSelectivityInterface.html", "classAgeSpecificSelectivityInterface" ],
     [ "BevertonHoltRecruitmentInterface", "classBevertonHoltRecruitmentInterface.html", "classBevertonHoltRecruitmentInterface" ],
     [ "CatchAtAgeInterface", "classCatchAtAgeInterface.html", "classCatchAtAgeInterface" ],
     [ "CatchDataInterface", "classCatchDataInterface.html", "classCatchDataInterface" ],

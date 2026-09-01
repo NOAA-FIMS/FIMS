@@ -306,7 +306,7 @@ parameters_4_model <- default_parameters |>
     ),
     by = c("fleet", "label", "timing")
   ) |>
-  # Update selectivity parameters and log_q for survey1
+  # Update log_q for survey1
   dplyr::rows_update(
     tibble::tibble(
       fleet = "survey1",
@@ -414,7 +414,7 @@ fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 1.26843 minutes
+    ## ℹ Total run time was 1.31952 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00098
     ## ℹ Negative log likelihood (NLL):
@@ -451,7 +451,7 @@ log_data_frame[1, ]
 ```
 
     ##                  timestamp   level
-    ## 1 Thu Aug 27 21:07:34 2026 warning
+    ## 1 Tue Sep  1 17:08:04 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ##     user                                    wd
@@ -487,8 +487,8 @@ log_data_frame |> dplyr::filter(level == "warning")
 ```
 
     ##                  timestamp   level
-    ## 1 Thu Aug 27 21:07:34 2026 warning
-    ## 2 Thu Aug 27 21:07:34 2026 warning
+    ## 1 Tue Sep  1 17:08:04 2026 warning
+    ## 2 Tue Sep  1 17:08:04 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1
@@ -653,7 +653,7 @@ high_slope_fit <- parameters_high_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 1.19819 minutes
+    ## ℹ Total run time was 1.24183 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 3e-04
     ## ℹ Negative log likelihood (NLL):
@@ -676,13 +676,150 @@ low_slope_fit <- parameters_low_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 1.22788 minutes
+    ## ℹ Total run time was 1.27943 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00057
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
     ## ℹ Terminal SB= 1791.58654
+
+``` r
+
+clear()
+```
+
+#### Age-specific selectivity
+
+One could also change the default selectivity configuration for the
+survey, update default parameterization, and evaluate the ability to
+estimate a small number of age-specific parameter values.
+
+``` r
+
+# Update "survey1" selectivity from "Logistic" to "AgeSpecificSelectivity"
+# This function is also used by setup_default_parameters()
+age_specific_selectivity_default <- setup_default_Selectivity(
+  data = data_4_model,
+  fleet = "survey1",
+  module_type = "AgeSpecific"
+)
+age_specific_selectivity_default
+```
+
+    ## # A tibble: 12 × 11
+    ##    module_name fleet module_type label   age length timing value estimation_type
+    ##    <chr>       <chr> <chr>       <chr> <int>  <dbl>  <int> <dbl> <chr>          
+    ##  1 Selectivity surv… AgeSpecific logi…     1     NA     NA -1    fixed_effects  
+    ##  2 Selectivity surv… AgeSpecific logi…     2     NA     NA  0    fixed_effects  
+    ##  3 Selectivity surv… AgeSpecific logi…     3     NA     NA  1    fixed_effects  
+    ##  4 Selectivity surv… AgeSpecific logi…     4     NA     NA  2.00 fixed_effects  
+    ##  5 Selectivity surv… AgeSpecific logi…     5     NA     NA  3.00 fixed_effects  
+    ##  6 Selectivity surv… AgeSpecific logi…     6     NA     NA  4    fixed_effects  
+    ##  7 Selectivity surv… AgeSpecific logi…     7     NA     NA  5.00 fixed_effects  
+    ##  8 Selectivity surv… AgeSpecific logi…     8     NA     NA  6.00 fixed_effects  
+    ##  9 Selectivity surv… AgeSpecific logi…     9     NA     NA  7.00 fixed_effects  
+    ## 10 Selectivity surv… AgeSpecific logi…    10     NA     NA  8.00 fixed_effects  
+    ## 11 Selectivity surv… AgeSpecific logi…    11     NA     NA  9.00 fixed_effects  
+    ## 12 Selectivity surv… AgeSpecific logi…    12     NA     NA 10.0  constant       
+    ## # ℹ 2 more variables: distribution_type <chr>, distribution <chr>
+
+``` r
+
+parameters_age_specific_selectivity <- parameters_4_model |>
+  dplyr::filter(!(fleet == "survey1" & module_name == "Selectivity")) |>
+  dplyr::bind_rows(age_specific_selectivity_default)
+
+# Look at updated default parameters
+parameters_age_specific_selectivity |>
+  dplyr::filter(fleet == "survey1", module_name == "Selectivity") |>
+  dplyr::select(module_type, fleet, label, age, value, estimation_type)
+```
+
+    ## # A tibble: 12 × 6
+    ##    module_type fleet   label              age value estimation_type
+    ##    <chr>       <chr>   <chr>            <dbl> <dbl> <chr>          
+    ##  1 AgeSpecific survey1 logit_sel_at_age     1 -1    fixed_effects  
+    ##  2 AgeSpecific survey1 logit_sel_at_age     2  0    fixed_effects  
+    ##  3 AgeSpecific survey1 logit_sel_at_age     3  1    fixed_effects  
+    ##  4 AgeSpecific survey1 logit_sel_at_age     4  2.00 fixed_effects  
+    ##  5 AgeSpecific survey1 logit_sel_at_age     5  3.00 fixed_effects  
+    ##  6 AgeSpecific survey1 logit_sel_at_age     6  4    fixed_effects  
+    ##  7 AgeSpecific survey1 logit_sel_at_age     7  5.00 fixed_effects  
+    ##  8 AgeSpecific survey1 logit_sel_at_age     8  6.00 fixed_effects  
+    ##  9 AgeSpecific survey1 logit_sel_at_age     9  7.00 fixed_effects  
+    ## 10 AgeSpecific survey1 logit_sel_at_age    10  8.00 fixed_effects  
+    ## 11 AgeSpecific survey1 logit_sel_at_age    11  9.00 fixed_effects  
+    ## 12 AgeSpecific survey1 logit_sel_at_age    12 10.0  constant
+
+``` r
+
+# Update the age-specific selectivity parameterization to facilitate estimation
+# Values for first two ages are set to generic initial values and estimated
+# using "fixed_effects"
+# Other values are fixed to true approximate values used in generating demo data
+parameters_age_specific_selectivity <- parameters_age_specific_selectivity |>
+  dplyr::rows_update(
+    tibble::tibble(
+      fleet = "survey1",
+      label = "logit_sel_at_age",
+      age = seq(get_n_ages(data_4_model)),
+      value = c(
+        0, 0, 2.999999, 4.999993, 6.999946,
+        8.999956, 11.000085, 12.982599, 15.019483, 18.420681,
+        18.420681, 18.420681
+      ),
+      estimation_type = c(rep("fixed_effects", 2), rep("constant", 10))
+    ),
+    by = c("fleet", "label", "age")
+  )
+
+# Run the model and look at estimated parameter values
+# True parameter values for the first two ages are -1 and 1, respectively
+age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(optimize = TRUE)
+```
+
+    ## ✔ Starting optimization ...
+    ## ℹ Restarting optimizer 3 times to improve gradient.
+    ## ℹ Maximum gradient went from 0.01095 to 0.00033 after 3 steps.
+    ## ✔ Finished optimization
+    ## ✔ Finished sdreport
+    ## ℹ FIMS model version: 0.10.0.9000
+    ## ℹ Total run time was 1.25123 minutes
+    ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
+    ## ℹ Maximum gradient= 0.00033
+    ## ℹ Negative log likelihood (NLL):
+    ## • Marginal NLL= 3231.29832
+    ## • Total NLL= 3164.88132
+    ## ℹ Terminal SB= 1791.01536
+
+``` r
+
+get_estimates(age_specific_selectivity_fit) |>
+  dplyr::filter(module_name == "Selectivity", module_type == "AgeSpecific")
+```
+
+    ## # A tibble: 12 × 24
+    ##    module_name module_id module_type label      type  type_id parameter_id fleet
+    ##    <chr>           <int> <chr>       <chr>      <chr>   <int>        <int> <chr>
+    ##  1 Selectivity         2 AgeSpecific logit_sel… vect…      31          364 <NA> 
+    ##  2 Selectivity         2 AgeSpecific logit_sel… vect…      31          365 <NA> 
+    ##  3 Selectivity         2 AgeSpecific logit_sel… vect…      31          366 <NA> 
+    ##  4 Selectivity         2 AgeSpecific logit_sel… vect…      31          367 <NA> 
+    ##  5 Selectivity         2 AgeSpecific logit_sel… vect…      31          368 <NA> 
+    ##  6 Selectivity         2 AgeSpecific logit_sel… vect…      31          369 <NA> 
+    ##  7 Selectivity         2 AgeSpecific logit_sel… vect…      31          370 <NA> 
+    ##  8 Selectivity         2 AgeSpecific logit_sel… vect…      31          371 <NA> 
+    ##  9 Selectivity         2 AgeSpecific logit_sel… vect…      31          372 <NA> 
+    ## 10 Selectivity         2 AgeSpecific logit_sel… vect…      31          373 <NA> 
+    ## 11 Selectivity         2 AgeSpecific logit_sel… vect…      31          374 <NA> 
+    ## 12 Selectivity         2 AgeSpecific logit_sel… vect…      31          375 <NA> 
+    ## # ℹ 16 more variables: year_i <int>, age_i <int>, length_i <int>, input <dbl>,
+    ## #   estimated <dbl>, expected <dbl>, observed <dbl>, estimation_type <chr>,
+    ## #   uncertainty <dbl>, distribution <chr>, input_type <chr>, lpdf <dbl>,
+    ## #   likelihood <dbl>, log_sd <dbl>, log_like_cv <dbl>, gradient <dbl>
 
 ``` r
 
@@ -749,7 +886,7 @@ age_only_fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 11.33052 seconds
+    ## ℹ Total run time was 11.85112 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00021
     ## ℹ Negative log likelihood (NLL):
@@ -789,7 +926,7 @@ length_only_fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 1.14715 minutes
+    ## ℹ Total run time was 1.19994 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 3e-04
     ## ℹ Negative log likelihood (NLL):

@@ -27,6 +27,7 @@ var hierarchy =
           [ "fims_popdy::SRBevertonHolt< Type >", "structfims__popdy_1_1SRBevertonHolt.html", null ]
         ] ],
         [ "fims_popdy::SelectivityBase< Type >", "structfims__popdy_1_1SelectivityBase.html", [
+          [ "fims_popdy::AgeSpecificSelectivity< Type >", "structfims__popdy_1_1AgeSpecificSelectivity.html", null ],
           [ "fims_popdy::DoubleLogisticSelectivity< Type >", "structfims__popdy_1_1DoubleLogisticSelectivity.html", null ],
           [ "fims_popdy::LogisticSelectivity< Type >", "structfims__popdy_1_1LogisticSelectivity.html", null ]
         ] ]
@@ -65,6 +66,7 @@ var hierarchy =
         [ "LogRRecruitmentInterface", "classLogRRecruitmentInterface.html", null ]
       ] ],
       [ "SelectivityInterfaceBase", "classSelectivityInterfaceBase.html", [
+        [ "AgeSpecificSelectivityInterface", "classAgeSpecificSelectivityInterface.html", null ],
         [ "DoubleLogisticSelectivityInterface", "classDoubleLogisticSelectivityInterface.html", null ],
         [ "LogisticSelectivityInterface", "classLogisticSelectivityInterface.html", null ]
       ] ]

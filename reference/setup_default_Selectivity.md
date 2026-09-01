@@ -8,7 +8,7 @@ This function sets up default parameters for a selectivity module.
 setup_default_Selectivity(
   data,
   fleet,
-  module_type = c("Logistic", "DoubleLogistic")
+  module_type = c("Logistic", "DoubleLogistic", "AgeSpecific")
 )
 ```
 
@@ -28,7 +28,8 @@ setup_default_Selectivity(
 - module_type:
 
   A string specifying the desired form of selectivity. Allowable forms
-  include Logistic, DoubleLogistic and the default is Logistic. See
+  include Logistic, DoubleLogistic, AgeSpecific and the default is
+  Logistic. See
   [`setup_default_parameters`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)
   for full column descriptions.
 
