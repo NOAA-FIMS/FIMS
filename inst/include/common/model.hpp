@@ -84,8 +84,18 @@ class Model {  // may need singleton
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
-      m->Prepare();
-      m->Evaluate();
+      try {
+        m->Prepare();
+      } catch (const std::exception& error) {
+        throw std::runtime_error("Model " + fims::to_string(m->GetId()) +
+                                 " failed during Prepare(): " + error.what());
+      }
+      try {
+        m->Evaluate();
+      } catch (const std::exception& error) {
+        throw std::runtime_error("Model " + fims::to_string(m->GetId()) +
+                                 " failed during Evaluate(): " + error.what());
+      }
     }
 
     // Loop over densities and evaluate joint negative log densities for priors

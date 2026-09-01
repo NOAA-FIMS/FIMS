@@ -1,8 +1,8 @@
 /**
  * @file rcpp_recruitment.hpp
  * @brief The Rcpp interface to declare different types of recruitment, e.g.,
- * Beverton--Holt stock--recruitment relationship. Allows for the use of
- * methods::new() in R.
+ * Beverton--Holt stock--recruitment relationship. Allows the module to be
+ * created from R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -17,8 +17,8 @@
  * @brief The recruitment forms FIMS can build.
  *
  * @details The create_recruitment_() function takes one of these names from R
- * and builds the matching class: "beverton_holt" builds a
- * BevertonHoltRecruitmentInterface, "log_devs_process" builds a
+ * and builds the matching class: "BevertonHolt" builds a
+ * BevertonHoltRecruitmentInterface, "LogDevsProcess" builds a
  * LogDevsRecruitmentInterface, and so on. RecruitmentInterfaceBase is never
  * built on its own; it only holds what all recruitment forms have in common.
  *
@@ -28,21 +28,20 @@
  */
 enum class RecruitmentType : uint8_t {
   beverton_holt = 0,
-  log_devs_process = 1,
-  log_r_process = 2
+  log_devs = 1,
+  log_r = 2
 };
 
 /**
  * @brief Convert a type name supplied from R to a RecruitmentType.
  */
 inline RecruitmentType RecruitmentTypeFromString(const std::string &name) {
-  if (name == "beverton_holt") return RecruitmentType::beverton_holt;
-  if (name == "log_devs_process") return RecruitmentType::log_devs_process;
-  if (name == "log_r_process") return RecruitmentType::log_r_process;
+  if (name == "BevertonHolt") return RecruitmentType::beverton_holt;
+  if (name == "log_devs") return RecruitmentType::log_devs;
+  if (name == "log_r") return RecruitmentType::log_r;
   throw std::invalid_argument(
       "Invalid type: '" + name +
-      "'. Valid options are: beverton_holt, log_devs_process, "
-      "log_r_process.");
+      "'. Valid options are: BevertonHolt, log_devs, log_r.");
 }
 
 /**
@@ -94,7 +93,7 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 
 /**
  * @brief Rcpp interface for Beverton--Holt to instantiate from R:
- * beverton_holt <- methods::new(beverton_holt).
+ * beverton_holt <- create_recruitment("BevertonHolt").
  */
 class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
@@ -148,13 +147,15 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "logit_steep") return &this->logit_steep;
     if (name == "log_rzero") return &this->log_rzero;
     if (name == "log_devs") return &this->log_devs;
     if (name == "log_r") return &this->log_r;
+    if (name == "log_expected_recruitment")
+      return &this->log_expected_recruitment;
     return nullptr;
   }
 
@@ -352,9 +353,18 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     }
     info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
     
+    // Subtracting from zero and passing the result to resize() converts -1 to
+    // a huge size_t, which otherwise surfaces as the unhelpful
+    // vector::_M_default_append allocation error.
+    if (this->n_years <= 0) {
+      throw std::invalid_argument(
+          "BevertonHoltRecruitment requires n_years to be greater than zero "
+          "before CreateTMBModel().");
+    }
+
     // set log_expected_recruitment
-    recruitment->log_expected_recruitment.resize(this->n_years - 1);
-    for (size_t i = 0; i < static_cast<size_t>(this->n_years - 1); i++) {
+    recruitment->log_expected_recruitment.resize(this->n_years + 1);
+    for (size_t i = 0; i < static_cast<size_t>(this->n_years + 1); i++) {
       recruitment->log_expected_recruitment[i] = 0;
     }
     info->variable_map[this->log_expected_recruitment.id_m] =
@@ -382,7 +392,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
 /**
  * @brief Rcpp interface for Log--Devs to instantiate from R:
- * log_devs <- methods::new(log_devs).
+ * log_devs <- create_recruitment("LogDevsProcess").
  */
 class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
  public:
@@ -458,7 +468,7 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
 
 /**
  * @brief Rcpp interface for Log--R to instantiate from R:
- * log_r <- methods::new(log_r).
+ * log_r <- create_recruitment("LogRProcess").
  */
 class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
  public:

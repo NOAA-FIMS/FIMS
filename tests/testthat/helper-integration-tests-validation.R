@@ -450,14 +450,28 @@ verify_fims_deterministic <- function(
 verify_fims_nll <- function(report,
                             om_input,
                             om_output,
-                            em_input) {
+                            em_input,
+                            log_devs = TRUE) {
   # recruitment likelihood
-  # log_devs is of length nyr-1
-  rec_nll <- -sum(dnorm(
-    om_input[["logR.resid"]][-1], rep(0, om_input[["nyr"]] - 1),
-    om_input[["logR_sd"]], TRUE
-  ))
-
+  if (log_devs) {
+    # log_devs is of length nyr-1
+    rec_nll <- -sum(dnorm(
+      om_input[["logR.resid"]][-1], rep(0, om_input[["nyr"]] - 1),
+      om_input[["logR_sd"]], TRUE
+    ))
+  } else {
+    log_recruits_true <- matrix(c(t(om_output[["N.age"]])),
+        om_input[["nyr"]], om_input[["nages"]],
+        byrow = TRUE
+      )[, 1] |> log()
+    log_recruits_expected <- c(log_recruits_true[1], log_recruits_true[2:30] -
+                                 om_input[["logR.resid"]][2:30])
+    rec_nll <- -sum(dnorm(
+      log_recruits_true,
+      log_recruits_expected,
+      om_input[["logR_sd"]], TRUE
+    ))
+  }
   # fishery catch expected likelihood
   catch_nll <- catch_nll_fleet <- -sum(dlnorm(
     em_input[["L.obs"]][["fleet1"]],

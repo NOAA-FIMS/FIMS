@@ -1,7 +1,7 @@
 /**
  * @file rcpp_natural_mortality.hpp
  * @brief The Rcpp interface to declare different types of natural mortality.
- * Allows for the use of methods::new() in R.
+ * Allows the module to be created from R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.

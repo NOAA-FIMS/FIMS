@@ -26,7 +26,7 @@ using SharedGrowth = std::shared_ptr<GrowthInterfaceBase>;
  * binds the XPtr to R's garbage collector: when the R variable is garbage 
  * collected, 'delete shared_ptr*' runs and the reference count is decremented.
  *
- * @param type Currently only "ewaa", for empirical weight-at-age.
+ * @param type Currently only "EWAA", for empirical weight-at-age.
  *
  * @return A pointer to the new growth module.
  */
@@ -52,6 +52,7 @@ Rcpp::XPtr<SharedGrowth> create_growth_(std::string type) {
  * @param n_years Number of years.
  */
 void set_growth_n_years_(Rcpp::XPtr<SharedGrowth> xp, int n_years) {
+  require_module(xp, "growth");
   (*xp)->set_n_years(n_years);
 }
 
@@ -68,6 +69,7 @@ void set_growth_n_years_(Rcpp::XPtr<SharedGrowth> xp, int n_years) {
  * @return Weight at that age.
  */
 double evaluate_growth_(Rcpp::XPtr<SharedGrowth> xp, double age) {
+  require_module(xp, "growth");
   return (*xp)->evaluate(age);
 }
 

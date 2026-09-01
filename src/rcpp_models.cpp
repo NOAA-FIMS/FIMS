@@ -30,7 +30,7 @@ using SharedPopulationModel = std::shared_ptr<PopulationInterface>;
  * binds the XPtr to R's garbage collector: when the R variable is garbage 
  * collected, 'delete shared_ptr*' runs and the reference count is decremented.
  *
- * @param type Currently only "catch_at_age".
+ * @param type Currently only "CatchAtAge".
  *
  * @return A pointer to the new model.
  */
@@ -57,6 +57,7 @@ Rcpp::XPtr<SharedFisheryModel> create_fishery_model_(std::string type) {
  */
 void set_model_populations_(Rcpp::XPtr<SharedFisheryModel> xp,
                             Rcpp::List populations) {
+  require_module(xp, "model");
   std::vector<std::shared_ptr<PopulationInterface>> population_interfaces;
   population_interfaces.reserve(populations.size());
   for (int i = 0; i < populations.size(); i++) {
@@ -75,6 +76,7 @@ void set_model_populations_(Rcpp::XPtr<SharedFisheryModel> xp,
  * @param report true to report derived quantities, false to skip them.
  */
 void do_model_reporting_(Rcpp::XPtr<SharedFisheryModel> xp, bool report) {
+  require_module(xp, "model");
   (*xp)->DoReporting(report);
 }
 
@@ -86,6 +88,7 @@ void do_model_reporting_(Rcpp::XPtr<SharedFisheryModel> xp, bool report) {
  *   not support it.
  */
 bool is_model_reporting_(Rcpp::XPtr<SharedFisheryModel> xp) {
+  require_module(xp, "model");
   return (*xp)->IsReporting();
 }
 
@@ -106,6 +109,7 @@ bool is_model_reporting_(Rcpp::XPtr<SharedFisheryModel> xp) {
  */
 std::string get_model_output_(Rcpp::XPtr<SharedFisheryModel> xp,
                               Rcpp::List report_modules) {
+  require_module(xp, "model");
   std::vector<SharedBase> modules;
   modules.reserve(report_modules.size());
   for (int i = 0; i < report_modules.size(); i++) {

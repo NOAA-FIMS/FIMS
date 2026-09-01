@@ -30,7 +30,7 @@ using SharedRecruitment = std::shared_ptr<RecruitmentInterfaceBase>;
  * binds the XPtr to R's garbage collector: when the R variable is garbage 
  * collected, 'delete shared_ptr*' runs and the reference count is decremented.
  *
- * @param type One of "beverton_holt", "log_devs_process", or "log_r_process".
+ * @param type One of "BevertonHolt", "log_devs", or "log_r".
  *   The latter two are recruitment process modules, which carry no parameters
  *   of their own and are linked to a stock--recruit module by ID.
  */
@@ -41,10 +41,10 @@ Rcpp::XPtr<SharedRecruitment> create_recruitment_(std::string type) {
       recruitment_interface =
           std::make_shared<BevertonHoltRecruitmentInterface>();
       break;
-    case RecruitmentType::log_devs_process:
+    case RecruitmentType::log_devs:
       recruitment_interface = std::make_shared<LogDevsRecruitmentInterface>();
       break;
-    case RecruitmentType::log_r_process:
+    case RecruitmentType::log_r:
       recruitment_interface = std::make_shared<LogRRecruitmentInterface>();
       break;
   }
@@ -63,6 +63,7 @@ Rcpp::XPtr<SharedRecruitment> create_recruitment_(std::string type) {
  */
 void set_recruitment_process_id_(Rcpp::XPtr<SharedRecruitment> xp,
                                  int process_id) {
+  require_module(xp, "recruitment");
   (*xp)->process_id = process_id;
 }
 
@@ -77,6 +78,7 @@ void set_recruitment_process_id_(Rcpp::XPtr<SharedRecruitment> xp,
  * @return The linked process module's ID.
  */
 int get_recruitment_process_id_(Rcpp::XPtr<SharedRecruitment> xp) {
+  require_module(xp, "recruitment");
   return (*xp)->process_id;
 }
 
@@ -92,6 +94,7 @@ int get_recruitment_process_id_(Rcpp::XPtr<SharedRecruitment> xp) {
  * @param n_years Number of years.
  */
 void set_recruitment_n_years_(Rcpp::XPtr<SharedRecruitment> xp, int n_years) {
+  require_module(xp, "recruitment");
   std::shared_ptr<BevertonHoltRecruitmentInterface> beverton_holt =
       std::dynamic_pointer_cast<BevertonHoltRecruitmentInterface>(*xp);
   if (!beverton_holt) {
@@ -115,6 +118,7 @@ void set_recruitment_n_years_(Rcpp::XPtr<SharedRecruitment> xp, int n_years) {
  */
 double evaluate_recruitment_mean_(Rcpp::XPtr<SharedRecruitment> xp,
                                   double spawners, double phi_0) {
+  require_module(xp, "recruitment");
   return (*xp)->evaluate_mean(spawners, phi_0);
 }
 
@@ -128,6 +132,7 @@ double evaluate_recruitment_mean_(Rcpp::XPtr<SharedRecruitment> xp,
  */
 double evaluate_recruitment_process_(Rcpp::XPtr<SharedRecruitment> xp,
                                      size_t pos) {
+  require_module(xp, "recruitment");
   return (*xp)->evaluate_process(pos);
 }
 

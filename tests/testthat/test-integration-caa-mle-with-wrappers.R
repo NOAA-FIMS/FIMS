@@ -273,15 +273,10 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
       ),
       by = c("label", "timing")
     ) |>
-    dplyr::rows_update(
-      # log_sd has a special error when there isn't a log_devs or log_r parameter set
-      y = tibble::tibble(
-        module_name = "Recruitment",
-        label = "log_sd",
-        distribution_type = NA_character_,
-        distribution = NA_character_,
-      ),
-      by = c("module_name", "label")
+    dplyr::filter(
+      # log_sd belongs to the recruitment-process distribution, so remove it
+      # when that distribution is removed.
+      !(module_name == "Recruitment" & label == "log_sd")
     ) |>
     dplyr::mutate(
       estimation_status = dplyr::if_else(
@@ -391,7 +386,7 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
   initialized_parameters <- parameters |>
     dplyr::mutate(
       distribution = dplyr::if_else(
-        module_name == "Recruitment" & !is.na(distribution),
+        module_name == "Recruitment" & label == "log_devs",
         NA_character_,
         distribution
       )

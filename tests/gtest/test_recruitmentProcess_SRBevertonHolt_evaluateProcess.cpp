@@ -52,10 +52,15 @@ namespace
       // (0.8 * 1000.0 * 0.75 * 30.0) / (0.2 * 100.0 * (1.0 - 0.75) + 30.0 * (0.75 - 0.2)) = 837.2093
       // log(837.2093) - 1.0 = 5.730074
       double log_expect_recruit1_plus_devs = 5.730074;
-      recruit1->log_expected_recruitment.resize(1);
-      recruit1->log_expected_recruitment[0] = log(recruit1->evaluate_mean(spawners,phi_0));
-      EXPECT_NEAR(recruit1->process->evaluate_process(0), recruit1->log_expected_recruitment[0] + recruit1->log_recruit_devs[0], 0.0001);
-      EXPECT_NEAR(recruit1->process->evaluate_process(0), log_expect_recruit1_plus_devs, 0.0001);
+      recruit1->log_expected_recruitment.resize(2);
+      recruit1->log_expected_recruitment[0] = 0.0;
+      recruit1->log_expected_recruitment[1] =
+          log(recruit1->evaluate_mean(spawners, phi_0));
+      EXPECT_NEAR(recruit1->process->evaluate_process(1),
+                  recruit1->log_expected_recruitment[1] +
+                      recruit1->log_recruit_devs[0],
+                  0.0001);
+      EXPECT_NEAR(recruit1->process->evaluate_process(1), log_expect_recruit1_plus_devs, 0.0001);
 
       auto recruit2= std::make_shared<fims_popdy::SRBevertonHolt<double>>();
       auto log_r = std::make_shared<fims_popdy::LogR<double>>();
@@ -79,12 +84,13 @@ namespace
       // log(200) = 5.298317
       //log_r = log(200) + 1
 
-      recruit2->log_r.resize(1);
-      recruit2->log_r[0] = 6.298317;
+      recruit2->log_r.resize(2);
+      recruit2->log_r[0] = 0.0;
+      recruit2->log_r[1] = 6.298317;
 
       double expect_log_r = 6.298317;
-      EXPECT_NEAR(recruit2->process->evaluate_process(0), recruit2->log_r[0], 0.0001);
-      EXPECT_NEAR(recruit2->process->evaluate_process(0), expect_log_r, 0.0001);
+      EXPECT_NEAR(recruit2->process->evaluate_process(1), recruit2->log_r[1], 0.0001);
+      EXPECT_NEAR(recruit2->process->evaluate_process(1), expect_log_r, 0.0001);
 
   }
 

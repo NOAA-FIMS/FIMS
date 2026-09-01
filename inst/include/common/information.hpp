@@ -164,6 +164,12 @@ class Information {
     this->random_effects_names.clear();
     this->random_effects_parameters.clear();
     this->selectivity_models.clear();
+    for (model_map_iterator it = this->models_map.begin();
+       it != this->models_map.end(); ++it) {
+      FIMS_INFO_LOG("Clearing model " + fims::to_string((*it).first) +
+            " with shared pointer use count " +
+            fims::to_string((*it).second.use_count()));
+    }
     this->models_map.clear();
     this->variable_map.clear();
     this->n_years = 0;
@@ -176,9 +182,7 @@ class Information {
       if (recruitment->process) {
         recruitment->process.reset();
       }
-      if (recruitment->recruitment) {
-        recruitment->recruitment.reset();
-      }
+      recruitment->recruitment.reset();
     }
     for (recruitment_process_iterator it = recruitment_process_models.begin();
          it != recruitment_process_models.end(); ++it) {
@@ -187,9 +191,7 @@ class Information {
       if (recruitment->process) {
         recruitment->process.reset();
       }
-      if (recruitment->recruitment) {
-        recruitment->recruitment.reset();
-      }
+      recruitment->recruitment.reset();
     }
     this->recruitment_models.clear();
     this->recruitment_process_models.clear();

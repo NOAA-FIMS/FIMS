@@ -44,8 +44,8 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
   int process_id = -999; /*!< id of recruitment process model object*/
   std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
       process; /*!< shared pointer to recruitment processmodule */
-  std::shared_ptr<fims_popdy::RecruitmentBase<Type>>
-      recruitment; /*!< shared pointer to recruitment module */
+    std::weak_ptr<fims_popdy::RecruitmentBase<Type>>
+      recruitment; /*!< non-owning pointer to recruitment module */
 
   /** @brief Constructor.
    */

@@ -59,13 +59,17 @@ reshape_json_estimates <- function(model_output) {
           "density_components", "population_ids", "fleet_ids"
         )
     ],
-    .f = \(y) dplyr::mutate(
-      y,
-      parameters = purrr::map(
-        .data$parameters,
-        \(x) purrr::map_df(x, dimension_folded_to_tibble)
+    .f = \(y) y |>
+      # Process-module placeholders can carry a top-level `name`, which would
+      # collide with the parameter `name` when the list-column is unpacked.
+      dplyr::select(-dplyr::any_of(c("name", "type"))) |>
+      dplyr::filter(!purrr::map_lgl(.data$parameters, is.null)) |>
+      dplyr::mutate(
+        parameters = purrr::map(
+          .data$parameters,
+          \(x) purrr::map_df(x, dimension_folded_to_tibble)
+        )
       )
-    )
   ) |>
     tidyr::unnest(dplyr::all_of("parameters")) |>
     join_density_information(density_information)
