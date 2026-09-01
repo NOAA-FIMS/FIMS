@@ -180,8 +180,18 @@ test_that("get_fit_metrics() returns correct error messages", {
 test_that("get_fit_stream() works with correct inputs", {
   #' @description Test that FIMS::get_fit_stream(fit, stream_label, module_id) returns only rows matching both filters.
   result <- FIMS::get_fit_stream(fit, stream_label = "catch_expected", module_id = 1L)
+  expect_gt(nrow(result), 0L)
   expect_true(all(result[["label"]] == "catch_expected"))
   expect_true(all(result[["module_id"]] == 1L))
+  expect_true(all(is.finite(result[["estimated"]])))
+  expect_equal(result[["estimated"]], result[["expected"]])
+
+  index_result <- FIMS::get_fit_stream(
+    fit,
+    stream_label = "index_expected", module_id = 2L
+  )
+  expect_gt(nrow(index_result), 0L)
+  expect_true(all(is.finite(index_result[["estimated"]])))
 
   #' @description Test that FIMS::get_fit_stream() accepts a pre-augmented tibble and filters correctly.
   aug <- generics::augment(fit)

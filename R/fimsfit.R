@@ -244,14 +244,15 @@ methods::setGeneric("get_estimates", function(x) standardGeneric("get_estimates"
       }
 
       tibble::tibble(
-        module_name = "Data", module_id = NA_integer_,
+        module_name = "Data", module_id = unname(fleet_ids[[fleet]]),
         module_type = data_type, label = report_names[[data_type]],
         type = "derived_quantity", type_id = NA_integer_,
         parameter_id = NA_integer_, fleet = fleet,
         year_i = rows$timing,
         age_i = if ("age" %in% names(rows)) rows$age else NA_integer_,
         length_i = if ("length" %in% names(rows)) rows$length else NA_real_,
-        input = NA_real_, estimated = NA_real_, expected = as.numeric(expected),
+        input = NA_real_, estimated = as.numeric(expected),
+        expected = as.numeric(expected),
         observed = rows$observed, estimation_type = NA_character_,
         uncertainty = NA_real_, distribution = NA_character_,
         input_type = "data", lpdf = NA_real_, likelihood = NA_real_,
