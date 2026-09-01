@@ -467,7 +467,7 @@ FIMSFit <- function(
     dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
   }
 
-  model_output <- input[["model"]]$get_output()
+  model_output <- get_output(input[["model"]])
 
 
   fit <- methods::new(

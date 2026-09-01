@@ -25,8 +25,8 @@ element of the list can also be passed to the \code{parameters} argument of
 \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}} if you wish to have more control over the model-fitting
 process.
 The model element of the returned list stores the instantiated C++ model
-module, e.g., the results of \code{methods::new(CatchAtAge)} for a catch-at-age
-model.
+module, e.g., the results of \code{create_fishery_model("CatchAtAge")} for a
+catch-at-age model.
 It is important that you only have one FIMS model initialized in your R
 workspace at a time. Thus, after you initialize and fit the model, you should
 run \code{\link[=clear]{clear()}}.

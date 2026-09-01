@@ -1,7 +1,7 @@
 /**
  * @file rcpp_selectivity.hpp
  * @brief The Rcpp interface to declare different types of selectivity, e.g.,
- * logistic and double logistic. Allows for the use of methods::new() in R.
+ * logistic and double logistic. Allows the module to be created from R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -16,8 +16,8 @@
  * @brief The selectivity forms FIMS can build.
  *
  * @details The create_selectivity_() function takes one of these names from R
- * and builds the matching class: "logistic" builds a
- * LogisticSelectivityInterface, "double_logistic" builds a
+ * and builds the matching class: "Logistic" builds a
+ * LogisticSelectivityInterface, "DoubleLogistic" builds a
  * DoubleLogisticSelectivityInterface. SelectivityInterfaceBase is never built
  * on its own; it only holds what all selectivity forms have in common.
  *
@@ -34,11 +34,11 @@ enum class SelectivityType : uint8_t {
  * @brief Convert a type name supplied from R to a SelectivityType.
  */
 inline SelectivityType SelectivityTypeFromString(const std::string &name) {
-  if (name == "logistic") return SelectivityType::logistic;
-  if (name == "double_logistic") return SelectivityType::double_logistic;
+  if (name == "Logistic") return SelectivityType::logistic;
+  if (name == "DoubleLogistic") return SelectivityType::double_logistic;
   throw std::invalid_argument(
       "Invalid type: '" + name +
-      "'. Valid options are: logistic, double_logistic.");
+      "'. Valid options are: Logistic, DoubleLogistic.");
 }
 
 /**
@@ -83,7 +83,7 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 /**
  * @brief Rcpp interface for logistic selectivity to instantiate the object
  * from R:
- * logistic_selectivity <- methods::new(logistic_selectivity).
+ * logistic_selectivity <- create_selectivity("Logistic").
  */
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
@@ -119,9 +119,9 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "inflection_point") return &this->inflection_point;
     if (name == "slope") return &this->slope;
     return nullptr;
@@ -276,9 +276,9 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 };
 
 /**
- * @brief Rcpp interface for logistic selectivity as an S4 object. To
- * instantiate from R: logistic_selectivity <-
- * methods::new(logistic_selectivity)
+ * @brief Rcpp interface for double logistic selectivity. To instantiate
+ * from R: double_logistic_selectivity <-
+ * create_selectivity("DoubleLogistic")
  */
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
@@ -305,9 +305,9 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "inflection_point_asc") return &this->inflection_point_asc;
     if (name == "slope_asc") return &this->slope_asc;
     if (name == "inflection_point_desc") return &this->inflection_point_desc;

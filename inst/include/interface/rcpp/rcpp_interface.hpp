@@ -114,7 +114,12 @@ uint32_t CreateTMBModel(Rcpp::List xptr_list) {
                  " is an empty pointer. This usually means clear() was called "
                  "while the module was still held in R.");
     }
-    (*xp)->add_to_fims_tmb();
+    try {
+      (*xp)->add_to_fims_tmb();
+    } catch (const std::exception& error) {
+      Rcpp::stop("Failed to register model component " +
+                 std::to_string(i + 1) + ": " + error.what());
+    }
   }
 
   // base model
@@ -142,7 +147,7 @@ uint32_t CreateTMBModel(Rcpp::List xptr_list) {
   \code{.R}
   set_fixed_parameters(c(1, 2, 3))
   set_random_parameters(c(1, 2, 3))
-  catch_at_age$get_output()
+  get_output(catch_at_age)
   \endcode
   [details_set_x_parameters]
 */

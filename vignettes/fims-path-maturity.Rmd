@@ -89,18 +89,17 @@ maturity <- FIMS:::initialize_maturity(
 )
 ```
 
-For power users, the methods package can be used to call Rcpp and create the module without using lists of parameters or any wrapper functions. The following code also creates the same maturity module.
+For power users, the module can be created directly, without using lists of parameters or any wrapper functions. The following code also creates the same maturity module.
 
 ```{r maturity-power-user, class.source = "rchunk", eval = FALSE}
 # load FIMS
 library(FIMS)
 # Create a new maturity model
-maturity <- methods::new(LogisticMaturity)
-# Populate the maturity module with parameter values.
-maturity$inflection_point[1]$value <- 10
-maturity$inflection_point[1]$set_estimation_status("assumed_known")
-maturity$slope[1]$value <- 0.2
-maturity$slope[1]$set_estimation_status("assumed_known")
+maturity <- create_maturity("Logistic")
+# Populate the maturity module with parameter values. Each call sets a whole
+# field at once, giving its values and how each one is to be estimated.
+set_variable_vector(maturity, "inflection_point", 10, "assumed_known")
+set_variable_vector(maturity, "slope", 0.2, "assumed_known")
 ```
 
 To run a FIMS model, more modules than just a maturity module need to be linked to a population module. But, this example only includes a maturity module so the code below is just pseudo code showing how to link a maturity module to a population module. The code below assumes that growth and recruitment modules, i.e., modules 2 and 3, have already been set up.
@@ -134,20 +133,25 @@ population <- population_defaults |>
   dplyr::bind_rows(parameters) |>
   FIMS:::initialize_population(
     data = fims_frame,
-    linked_ids = setNames(
-      c(maturity$get_id(), 2, 3),
-      c("maturity", "growth", "recruitment")
-    )
+    maturity = maturity,
+    # Growth and recruitment are given as bare IDs because this example never
+    # creates those modules; normally you would pass the modules themselves.
+    growth = 2,
+    recruitment = 3,
+    fleets = list()
   )
 ```
 
-For power users, the methods package can be used to call Rcpp and create the population module without using lists of parameters or any wrapper functions.
+For power users, the population module can be created directly, without using lists of parameters or any wrapper functions. One call links all three processes.
 
 ```{r,  class.source = "rchunk", eval = FALSE}
-population <- methods::new(Population)
-population$SetMaturityID(maturity$get_id())
-population$SetGrowthID(2)
-population$SetRecruitmentID(3)
+population <- create_population()
+set_population_processes(
+  population,
+  maturity = maturity,
+  growth = 2,
+  recruitment = 3
+)
 ```
 
 Because FIMS sets up objects that are stored in memory simply running `rm(population)` will not free this memory back up. Instead, users need to use `clear()`, which is a function written in the Rcpp interface but callable from R. Restarting or closing your R session will also work to free up the memory.
@@ -160,18 +164,17 @@ rm(list = ls())
 
 ## Rcpp Interface
 
-For each module, the Rcpp code in [rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) defines what fields the R user can see and set. Additional code for methods, e.g., `get_id`, constructors, and destructors are defined for each module in .hpp files found in the [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp) directory. Only the fields and methods that are listed in the module interface, see below, are exposed to the R user. Additionally, this directory stores the code for Rcpp functions like `clear()`.
+R does not hold the maturity module as an object with fields of its own. It holds an external pointer to the C++ interface object, and reaches that object's fields by name. Each module declares which names it answers to, in `get_variable_vector()`, defined for each module in the .hpp files under [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp/rcpp_objects). A field with no entry there cannot be reached from R, whatever else is true of it.
 
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
-Rcpp::class_<LogisticMaturityInterface>("LogisticMaturity")
-  .constructor()
-  .field("inflection_point", &LogisticMaturityInterface::inflection_point)
-  .field("slope", &LogisticMaturityInterface::slope)
-  .method("get_id", &LogisticMaturityInterface::get_id)
-  .method("evaluate", &LogisticMaturityInterface::evaluate);
+virtual VariableVector *get_variable_vector(const std::string &name) {
+  if (name == "inflection_point") return &this->inflection_point;
+  if (name == "slope") return &this->slope;
+  return nullptr;
+}
 ```
 
-The code above shows that there are two fields specific to the maturity module (i.e., parameters), `inflection_point` and `slope`, and methods (i.e., functions), `get_id` and `evaluate`. `get_id` method returns a unique ID for a created module. Where, you can have multiple instances of a maturity module defined in memory but only one can be used per model. Methods are functions that can be called from R. You can view all the fields and methods that are exposed to the R user for any Rcpp class by passing the quoted name inside the round brackets of any call to `Rcpp::class_<*>("")` as an unquoted string to `methods::show()`, e.g., `methods::show(LogisticMaturity)`.
+The code above shows that there are two fields specific to the maturity module, `inflection_point` and `slope`. `get_module_id()` returns a unique ID for a created module: you can have multiple instances of a maturity module in memory, but only one can be used per model. To see which fields a module has, ask it -- `has_variable_vector(maturity, "slope")` answers for one name, and the `get_variable_vector()` code above lists every name it will answer to.
 
 LogisticMaturity references the maturity rcpp class, `LogisticMaturityInterface` defined in [rcpp_maturity.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_maturity.hpp) in the directory [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp/rcpp_objects). This file consists of a `MaturityInterfaceBase` class and a `LogisticMaturityInterface` class, with the former being the **parent class** and the latter being the **child class**. Sometimes there are multiple child classes under a parent class but as of now, there is only one child class, i.e., option, for maturity. It is the child classes which are referenced from R, the parent classes are just used in Rcpp to set the structure.
 
@@ -205,8 +208,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 knitr::include_graphics("figures/fims-path-maturity-1.png")
 ```
 
-All Rcpp interface classes from FIMS define parameters (e.g., `inflection_point`, `slope`) using the `VariableVector` class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) in the directory [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects). VariableVectors allow parameters to vary with time. Whereas, the Variable class is only used for time-invariant parameters. The fields for these classes that are accessible from R are defined in the
-[rcpp_interface.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_interface.hpp) file in the directory [inst/include/interface/rcpp](https://github.com/NOAA-FIMS/FIMS/tree/main/inst/include/interface/rcpp). For example,
+All Rcpp interface classes from FIMS define parameters (e.g., `inflection_point`, `slope`) using the `VariableVector` class defined in [rcpp_interface_base.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp) in the directory [inst/include/interface/rcpp/rcpp_objects](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/rcpp_objects). VariableVectors allow parameters to vary with time. Whereas, the Variable class is only used for time-invariant parameters. `Variable` and `VariableVector` are themselves still registered as Rcpp classes, in [src/rcpp_variable.cpp](https://github.com/NOAA-FIMS/FIMS/blob/main/src/rcpp_variable.cpp), which is what makes their fields reachable once a module hands one back. For example,
 
 ```{Rcpp, class.source = "rcppchunk", eval = FALSE}
 Rcpp::class_<Variable>(
@@ -387,7 +389,7 @@ int maturity_id = -999;
 std::shared_ptr<fims_popdy::MaturityBase<Type>> maturity;
 ```
 
-The `maturity_id` was set from R using the `SetMaturity()` method from the `PopulationInterface` class, which as a reminder is done internally within `FIMS::initialize_population` but can also be done by hand with `SetMaturity`. Where both options are shown, again, below.
+The `maturity_id` was set from R using `set_population_processes()`, which as a reminder is done internally within `FIMS::initialize_population` but can also be done by hand. Where both options are shown, again, below.
 ```{r,  class.source = "rchunk", eval = FALSE}
 # Helper function
 recruitment_defaults <- FIMS::setup_default_Recruitment(data = fims_frame)
@@ -406,14 +408,16 @@ population <- FIMS::setup_default_Population(
   dplyr::bind_rows(parameters) |>
   FIMS:::initialize_population(
     data = fims_frame,
-    linked_ids = setNames(
-      c(maturity$get_id(), 2, 3),
-      c("maturity", "growth", "recruitment")
-    )
+    maturity = maturity,
+    # Growth and recruitment are given as bare IDs because this example never
+    # creates those modules; normally you would pass the modules themselves.
+    growth = 2,
+    recruitment = 3,
+    fleets = list()
   )
 
 # Manual
-population$SetMaturity(maturity$get_id())
+set_population_processes(population, maturity = maturity)
 ```
 
 Notice above that population by default declares a pointer of type `MaturityBase` (parent class), not the specific maturity class we are using in this example, i.e., `LogisticMaturity` (child class). `MaturityBase` has an `evaluate` method with input arguments that match the inputs of each child class:
@@ -485,7 +489,7 @@ knitr::include_graphics("figures/fims-path-maturity-4.png")
 
 ## Overview
 
-The above material demonstrates how values passed in from R are propagated into population.hpp, where they are used in biologically relevant calculations. This, however, relies on population referencing the correct child class (e.g., `LogisticMaturity`) even though it only calls the parent class (`MaturityBase`). We defined the `maturity_id` in population for the specific logistic maturity module we wanted to use, `population$SetMaturity(maturity$get_id())`, but we still need to connect this ID with the actual module in memory.
+The above material demonstrates how values passed in from R are propagated into population.hpp, where they are used in biologically relevant calculations. This, however, relies on population referencing the correct child class (e.g., `LogisticMaturity`) even though it only calls the parent class (`MaturityBase`). We defined the `maturity_id` in population for the specific logistic maturity module we wanted to use, `set_population_processes(population, maturity = maturity)`, but we still need to connect this ID with the actual module in memory.
 
 This *information* is managed in FIMS through the `Information` class in [inst/include/common/information.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/common/information.hpp). The Information class sets up a number of [C++ maps](https://cplusplus.com/reference/map/map/) (a container with a key value and mapped value - think of named lists in R) where the key is the unique ID to the module and the mapped value is a shared pointer to the module. C++ `std::maps` have an iterator member for stepping through the elements of the map. This iterator is also declared in the Information class so that we can loop through all the unique maturity modules being called in FIMS. We currently only have one but if FIMS is ever extended to include multiple populations, we could have a unique maturity module for each population or subset of populations.
 
@@ -631,26 +635,26 @@ maturity_modules <- list(
 `population_modules` and `maturity_modules` are the equivalent of instantiated C++ classes stored in memory. This R code chunk above is comparable to using Rcpp in R to set up the modules and store them in memory.
 
 ```{r, eval = FALSE}
-# maturity1 <- methods::new(LogisticMaturity)
-# maturity1$inflection_point$value <- 10
-# maturity1$slope$value <- 0.2
-# maturity2 <- methods::new(LogisticMaturity)
-# maturity2$inflection_point$value <- 8
-# maturity2$slope$value <- 0.3
-# population1 <- methods::new(Population)
-# population2 <- methods::new(Population)
-# population3 <- methods::new(Population)
+# maturity1 <- create_maturity("Logistic")
+# set_variable_vector(maturity1, "inflection_point", 10, "assumed_known")
+# set_variable_vector(maturity1, "slope", 0.2, "assumed_known")
+# maturity2 <- create_maturity("Logistic")
+# set_variable_vector(maturity2, "inflection_point", 8, "assumed_known")
+# set_variable_vector(maturity2, "slope", 0.3, "assumed_known")
+# population1 <- create_population()
+# population2 <- create_population()
+# population3 <- create_population()
 ```
 
-Next, the maturity IDS are assigned to each `maturity_id` in one of the three populations. Which is actually done using `SetMaturity` in R (i.e., the commented out code).
+Next, the maturity IDS are assigned to each `maturity_id` in one of the three populations. Which is actually done using `set_population_processes()` in R (i.e., the commented out code).
 ```{r}
 population_modules[[1]]$maturity_id <- maturity_modules[[1]]$id
 population_modules[[2]]$maturity_id <- maturity_modules[[1]]$id
 population_modules[[3]]$maturity_id <- maturity_modules[[2]]$id
 
-# population1$SetMaturity(maturity1$get_id())
-# population2$SetMaturity(maturity1$get_id())
-# population3$SetMaturity(maturity2$get_id())
+# set_population_processes(population1, maturity = maturity1)
+# set_population_processes(population2, maturity = maturity1)
+# set_population_processes(population3, maturity = maturity2)
 ```
 
 In FIMS, the Information class has the objects, population and maturity, which are C++ maps. The first element of the map is the ID, the second element of the map is the pointer to the Population or Maturity class. This can be thought about in R using a list but in C++ maps are used.

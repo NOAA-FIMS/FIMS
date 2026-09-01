@@ -1,7 +1,7 @@
 /**
  * @file rcpp_distribution.hpp
  * @brief The Rcpp interface to declare different distributions, e.g.,
- * normal and log normal. Allows for the use of methods::new() in R.
+ * normal and log normal. Allows the module to be created from R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -148,7 +148,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
 
 /**
  * @brief The Rcpp interface for Dnorm to instantiate from R:
- * dnorm_ <- methods::new(DnormDistribution).
+ * dnorm_ <- create_distribution("Dnorm").
  */
 class DnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
@@ -200,9 +200,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual uint32_t get_id() { return this->id_m; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "observed_values") return &this->observed_values;
     if (name == "expected_values") return &this->expected_values;
     if (name == "expected_mean") return &this->expected_mean;
@@ -494,7 +494,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
 /**
  * @brief The Rcpp interface for Dlnorm to instantiate from R:
- * dlnorm_ <- methods::new(DlnormDistribution).
+ * dlnorm_ <- create_distribution("Dlnorm").
  */
 class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  public:
@@ -544,9 +544,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual uint32_t get_id() { return this->id_m; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "observed_values") return &this->observed_values;
     if (name == "expected_values") return &this->expected_values;
     if (name == "log_sd") return &this->log_sd;
@@ -807,7 +807,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
 
 /**
  * @brief The Rcpp interface for Dmultinom to instantiate from R:
- * dmultinom_ <- methods::new(DmultinomDistribution).
+ * dmultinom_ <- create_distribution("Dmultinom").
  */
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  public:
@@ -860,18 +860,18 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   virtual uint32_t get_id() { return this->id_m; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "observed_values") return &this->observed_values;
     if (name == "expected_values") return &this->expected_values;
     return nullptr;
   }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "dims") return &this->dims;
     return nullptr;
   }
