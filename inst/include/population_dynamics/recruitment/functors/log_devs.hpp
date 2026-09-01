@@ -33,7 +33,7 @@ struct LogDevs : public RecruitmentBase<Type> {
    */
   virtual const Type evaluate_process(size_t pos) {
     return this->recruitment->log_expected_recruitment[pos] +
-           this->recruitment->log_recruit_devs[pos];
+           this->recruitment->log_recruit_devs[pos-1];
   }
 
   /** @copydoc RecruitmentBase::evaluate_mean */

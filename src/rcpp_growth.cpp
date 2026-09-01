@@ -26,7 +26,7 @@ using SharedGrowth = std::shared_ptr<GrowthInterfaceBase>;
  * binds the XPtr to R's garbage collector: when the R variable is garbage 
  * collected, 'delete shared_ptr*' runs and the reference count is decremented.
  *
- * @param type Currently only "ewaa", for empirical weight-at-age.
+ * @param type Currently only "EWAA", for empirical weight-at-age.
  *
  * @return A pointer to the new growth module.
  */

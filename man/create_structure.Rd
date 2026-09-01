@@ -3,22 +3,17 @@
 \name{create_fleet}
 \alias{create_fleet}
 \alias{create_population}
-\alias{create_catch_at_age_model}
-\title{Create a fleet, population, or fishery model module}
+\title{Create a fleet or a population}
 \usage{
 create_fleet()
 
 create_population()
-
-create_catch_at_age_model()
 }
 \value{
-A \link{fims_module} of the requested type.
+A \link{fims_module}.
 }
 \description{
-Each function creates one structural module and registers it, so that
-\code{CreateTMBModel()} picks it up without the module having to be passed in by
-hand. These modules hold links to other modules: a fleet names its
-selectivity and its observed data, a population names its growth, maturity,
-recruitment, and fleets, and the fishery model names its populations.
+These take no type because there is only one kind of each. Both hold links
+to other modules: a fleet names its selectivity and observed data, a
+population names its growth, maturity, recruitment, and fleets.
 }

@@ -39,17 +39,19 @@ PopulationInterface() : PopulationInterfaceBase() {
 }
 ```
 
-Because these global static collections (variables that are shared across the program and persist for the lifetime of the program) maintain strong `std::shared_ptr` references to
+Because these global static collections (variables that are shared across the program and
+persist for the lifetime of the program) maintain strong `std::shared_ptr` references to
 every object created, their reference counts never drop to zero. Even when an R variable is
-overwritten (e.g., `my_fleet <- NULL`), the underlying C++ memory is never deallocated
-until an explicit manual call to `clear()`. This prevents clean iterative modeling workflows
+overwritten (e.g., `my_fleet <- NULL`), the underlying C++ memory is never deallocated until
+an explicit manual call to `clear()`. This prevents clean iterative modeling workflows
 (bootstrapping, sensitivity runs, profile likelihood) within a single R session.
 
 ### 1.2 The SharedPrimitive Overhead Problem
 
-When users initialize a module (e.g. pop <- methods::new(Population)), a copy gets stored in the registry. When the user later sets
-`pop$n_years <- 30` on the R-side S4 object, this modifies the original Rcpp-managed object
-but not the registry copy. `CreateTMBModel()` would see stale initial values.
+When users initialize a module (e.g. pop <- methods::new(Population)), a copy gets stored in
+the registry. When the user later sets `pop$n_years <- 30` on the R-side S4 object, this
+modifies the original Rcpp-managed object but not the registry copy. `CreateTMBModel()`
+would see stale initial values.
 
 The `SharedInt`, `SharedBoolean`, `SharedReal`, and `SharedString` wrapper classes were
 introduced to solve this synchronization problem: by wrapping scalar fields in `shared_ptr`,
@@ -95,9 +97,9 @@ call.
 ### Step 1: Replace `SharedPrimitive` scalar fields with plain C++ types
 
 In every interface class, replace `SharedInt`, `SharedBoolean`, `SharedReal`, and
-`SharedString` fields that hold scalar configuration values with their plain C++ equivalents.
-This is only safe under XPtr because there is no registry copy that needs to remain
-synchronized with user modifications.
+`SharedString` fields that hold scalar configuration values with their plain C++
+equivalents. This is only safe under XPtr because there is no registry copy that needs to
+remain synchronized with user modifications.
 
 ```cpp
 // inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp
@@ -122,6 +124,8 @@ int maturity_id = -1;
 int growth_id = -1;
 int recruitment_id = -1;
 int recruitment_err_id = -1;
+// n_lengths was converted with the rest and later removed: nothing ever read
+// it. Populations are age-structured, and length belongs to the fleets.
 std::string name = "NA";
 ```
 
@@ -329,10 +333,10 @@ list of the names it recognizes:
 class FIMSRcppInterfaceBase {
  public:
   virtual uint32_t get_id() = 0;
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     return nullptr;
   }
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     return nullptr;
   }
   // ...
@@ -342,7 +346,7 @@ class FIMSRcppInterfaceBase {
 ```cpp
 // inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp — AgeCompDataInterface
 
-virtual fims::Vector<double> *get_vector(const std::string &name) {
+virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
   if (name == "values")      return &this->age_comp_data;
   if (name == "uncertainty") return &this->uncertainty;
   return nullptr;
@@ -360,19 +364,20 @@ they were handed:
 ```cpp
 // src/rcpp_interface_base.cpp
 
-void set_parameter_(Rcpp::XPtr<SharedBase> xp, std::string name,
+void set_variable_vector_(Rcpp::XPtr<SharedBase> xp, std::string name,
                     Rcpp::NumericVector values,
                     Rcpp::CharacterVector estimation_status);
-void set_vector_(Rcpp::XPtr<SharedBase> xp, std::string name,
+void set_numeric_vector_(Rcpp::XPtr<SharedBase> xp, std::string name,
                  Rcpp::NumericVector values);
 uint32_t get_module_id_(Rcpp::XPtr<SharedBase> xp);
-uint32_t get_parameter_id_(Rcpp::XPtr<SharedBase> xp, std::string name);
+uint32_t get_variable_vector_id_(Rcpp::XPtr<SharedBase> xp, std::string name);
 ```
 
-`set_parameter_` writes estimable quantities (a `VariableVector`, carrying an estimation
-status per element); `set_vector_` writes fixed numeric input such as observations and
-uncertainties. `get_parameter_id_` returns a parameter's `VariableVector` ID, which is
-what links a distribution to the quantity it applies to — see Section 4c.
+`set_variable_vector_` writes estimable quantities (a `VariableVector`, carrying an
+estimation status per element); `set_numeric_vector_` writes fixed numeric input such as
+observations and uncertainties. `get_variable_vector_id_` returns a parameter's
+`VariableVector` ID, which is what links a distribution to the quantity it applies to — see
+Section 4c.
 
 Fields that are neither, because they are plain scalars rather than vectors, still get a
 small family-specific setter:
@@ -381,10 +386,9 @@ small family-specific setter:
 // src/rcpp_population.cpp
 
 void set_population_constants_(Rcpp::XPtr<SharedPopulation> xp,
-                               int n_years, int n_ages, int n_lengths) {
+                               int n_years, int n_ages) {
     (*xp)->n_years   = n_years;
     (*xp)->n_ages    = n_ages;
-    (*xp)->n_lengths = n_lengths;
 }
 ```
 
@@ -464,7 +468,7 @@ by hand.
 
 #### 4a. Why two XPtr types are needed
 
-Each concrete creator function (e.g., `create_age_comp()`, `create_population()`) returns
+Each concrete creator function (e.g., `create_data()`, `create_population()`) returns
 an XPtr typed to its specific class — `XPtr<SharedAgeComp>`, `XPtr<SharedPopulation>`, etc.
 These types are all different, so they cannot be stored together in a single list and passed
 to `CreateTMBModel()`.
@@ -536,7 +540,7 @@ Rcpp::function("clear_",          &clear_impl);
 ```cpp
 // inst/include/interface/rcpp/rcpp_interface.hpp
 
-bool CreateTMBModel(Rcpp::List xptr_list) {
+uint32_t CreateTMBModel(Rcpp::List xptr_list) {
     init_logging();
 
     std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
@@ -579,13 +583,13 @@ registration happens at the moment of creation — it is not affected by variabl
 scoping, or objects stored inside lists.
 
 **A wrapper must return both pointers, not just the concrete one.** The obvious design
-is for `create_age_comp()` to return the concrete XPtr and keep the base XPtr private in
-the registry. That does not work. The shared functions from Step 3 — `set_parameter_()`,
-`set_vector_()`, `get_parameter_id_()`, `get_module_id_()` — all take the **base** XPtr,
-and a concrete XPtr cannot be converted to one without knowing its family, because the
-`*_to_fims_xptr_()` functions are per family. A concrete XPtr on its own cannot even
-report its own ID. So a user handed only the concrete pointer could call the
-family-specific setters and nothing else.
+is for `create_data()` to return the concrete XPtr and keep the base XPtr private in
+the registry. That does not work. The shared functions from Step 3 —
+`set_variable_vector_()`, `set_numeric_vector_()`, `get_variable_vector_id_()`,
+`get_module_id_()` — all take the **base** XPtr, and a concrete XPtr cannot be converted to
+one without knowing its family, because the `*_to_fims_xptr_()` functions are per family. A
+concrete XPtr on its own cannot even report its own ID. So a user handed only the concrete
+pointer could call the family-specific setters and nothing else.
 
 The wrapper therefore returns a small S3 object carrying both pointers, the module type,
 and the ID. This is the same pair the R6 wrappers in Section 3.2 hold in `.xp` and
@@ -635,26 +639,34 @@ register_module <- function(pointer, family, type, ...) {
   module
 }
 
-# The C++ side has one creator per family; the R side keeps a friendly name per
-# type, so the type string never appears in user code. The trailing underscore
-# on the C++ names avoids collision with these R wrappers, which own the clean
-# names.
-create_age_comp <- function(n_years, n_ages) {
-  pointer <- create_data_interface_("age_comp", as.integer(n_years),
-                                    as.integer(n_ages))
-  register_module(pointer, "data", "AgeComp",
-                  n_years = n_years, n_ages = n_ages)
-}
-
-create_index <- function(n_years) {
+# One creator per family on the R side too, mirroring C++. An earlier draft
+# gave each type its own R function so the type string never appeared in user
+# code, but that meant seventeen R functions over nine C++ ones, and adding a
+# type meant an addition in both places. Passing the type through keeps the two
+# layers in step. The type is checked against a table first, so a bad one is
+# reported with the valid options rather than reaching C++.
+create_data <- function(type, n_years, n_bins = 0) {
+  label <- module_type_label("data", type)
   # Rcpp modules do not carry C++ default arguments across to R, so n_bins is
   # passed explicitly even though the C++ signature defaults it to 0.
-  pointer <- create_data_interface_("index", as.integer(n_years), 0L)
-  register_module(pointer, "data", "Index", n_years = n_years)
+  pointer <- create_data_interface_(type, as.integer(n_years),
+                                    as.integer(n_bins))
+  # The bin count is named for what it counts, so describe_model() reads well.
+  extras <- list(n_years = n_years)
+  if (type == "age_comp") extras[["n_ages"]] <- n_bins
+  if (type == "length_comp") extras[["n_lengths"]] <- n_bins
+  do.call(register_module,
+          c(list(pointer = pointer, family = "data", type = label), extras))
 }
 
-# Repeat for every module type:
-# create_length_comp(), create_catch(), create_population(), create_fleet(), ...
+create_selectivity <- function(type) {
+  register_module(create_selectivity_(type), "selectivity",
+                  module_type_label("selectivity", type))
+}
+
+# Repeat for every family: create_maturity(), create_growth(),
+# create_recruitment(), create_distribution(), create_fishery_model(), and
+# create_fleet() and create_population(), which take no type.
 
 # R wrapper around C++ CreateTMBModel_ — uses the registry automatically.
 # The registry holds whole modules, so the base pointers are pulled out here.
@@ -730,15 +742,65 @@ for (i in seq_along(field_value)) {
 }
 ```
 
-The whole block becomes one call. `set_variable_vector()` resizes to match the values it is
+The whole block becomes one call. `fill_variable_vector()` resizes to match the values it is
 given, so the explicit resize goes too:
 
 ```{r eval=FALSE}
-set_parameter_(module_base, field, field_value, field_estimation_status)
+set_variable_vector_(module_base, field, field_value, field_estimation_status)
 ```
 
 Everything above that in the function — the filtering, the grouping by label, the missing
 value check — stays in R and stays unchanged.
+
+**Migrating `initialize_module()`: invert the loop.** The generic populator worked by
+reflection. It derived the S4 class name from the tibble's `module_type` and `module_name`
+columns, read `names(module_class@fields)` to enumerate every field, subtracted the ones
+that should not be set, and called `set_param_vector()` for each survivor.
+
+Reflection is not available under XPtr — there is no class object to enumerate — and the
+subtraction was already the weak point: **38 distinct field names** hardcoded across
+`Population`, `Fleet`, and `BevertonHoltRecruitment`, existing only to strip derived
+quantities back out of the reflected list. Exposing the derived quantities in
+`get_variable_vector()` makes that list longer, not shorter.
+
+The tibble already knows the answer. `set_param_vector()` aborted if a reflected field was
+absent from the tibble, so every field it set was in the tibble to begin with; the
+reflection and the exclusion list existed only to derive a set the tibble already held.
+Iterating the tibble's labels instead removes both, and adding a parameter to a module then
+needs a tibble row and no R change.
+
+One predicate makes that work: `has_variable_vector()`, which asks a module whether it has
+a field by a given name. The tibble mixes rows for a module with rows for the distribution
+attached to it — a recruitment module carries a `log_sd` row belonging to its process
+distribution — and `distribution_type` does not separate them, because `log_devs` carries
+`"process"` too and *is* a recruitment field. So the module is asked rather than a list
+being kept.
+
+A label the module does not have is an error unless the row has a distribution attached,
+which is what separates the two cases: in the default parameters tibble every label without
+a distribution is a module field, and the only non-field label, `log_sd`, carries one. A
+typo therefore fails loudly rather than being silently ignored. The remaining hole is a typo
+on a label that also carries a distribution, which stays silent; closing it would need the
+distribution setup to declare which labels it consumes so that anything unconsumed is a
+mistake.
+
+**Which module to create is derived, not tabled.** The obvious approach is a lookup from
+`module_name` to a creator function, but that is one more place to edit when a functional
+form is added — a Ricker recruitment would mean touching the C++ enum, the C++ creator, and
+that table. It is unnecessary: `paste0(module_type, module_name)` spells exactly the display
+labels `.fims_module_types` already holds for `describe_model()`, so the family and type can
+be recovered from the label. `.fims_module_family` gained a `create` entry per family to
+complete the path.
+
+The two tables divide along the axis that matters. `.fims_module_types` is keyed by type and
+grows when a functional form is added; `.fims_module_family` is keyed by family and does
+not. Adding Ricker touches the C++ enum, the C++ creator, and one line of
+`.fims_module_types`.
+
+This does couple the R side to a naming convention: the label is built by concatenation, so
+it works only while a module's C++ class name equals its type followed by its name. A module
+breaking that convention fails the lookup with an error naming `.fims_module_types`, which
+is the right failure, but the coupling is worth knowing about.
 
 **Bulk assignment belongs in R, not C++.** It is tempting to hand the parameters tibble
 across the boundary and let C++ set every field of a module at once. That would be the wrong
@@ -750,15 +812,15 @@ parameters, and even a large model is a few dozen calls made once during setup. 
 produces far better diagnostics, because it knows which row of the tibble a bad label came
 from, and C++ sees only the name.
 
-**What C++ does still owe: enumerating parameter names.** `get_parameter()` answers *"do you
-have a parameter called this?"*, but nothing can ask a module *"what parameters do you
-have?"* That gap has three consequences: R cannot validate a label against the module before
-sending it, `describe_model()` (Section 4c) cannot list a module's parameters, and the module
-manifest in Step E of `Parameter_Registry.Rmd` has nothing to build from.
+**What C++ does still owe: enumerating parameter names.** `get_variable_vector()` answers
+*"do you have a parameter called this?"*, but nothing can ask a module *"what parameters do
+you have?"* That gap has three consequences: R cannot validate a label against the module
+before sending it, `describe_model()` (Section 4c) cannot list a module's parameters, and
+the module manifest in Step E of `Parameter_Registry.Rmd` has nothing to build from.
 
-Enumeration should not be added to the current hand-written `get_parameter()` overrides,
-which are `if` chains and hold no list to return. It arrives for free with Step A of
-`Parameter_Registry.Rmd`, where `declare_parameter()` in each constructor populates a
+Enumeration should not be added to the current hand-written `get_variable_vector()`
+overrides, which are `if` chains and hold no list to return. It arrives for free with Step A
+of `Parameter_Registry.Rmd`, where `declare_parameter()` in each constructor populates a
 `parameters_m` vector that already holds every name.
 
 Nor should the names become an enum in the sense that `SelectivityType` is one. Parameter
@@ -811,18 +873,19 @@ new_module$set_distribution_links("random_effects", module$field(par)$get_id())
 
 `$field()` and `VariableVector$get_id()` were both `Rcpp::class_<>` mechanics, so with those
 registrations removed there is no path from R to a parameter's ID. That is why
-`get_parameter_id_(module_base, name)` exists; it is the replacement for this exact call:
+`get_variable_vector_id_(module_base, name)` exists; it is the replacement for this exact
+call:
 
 ```{r eval=FALSE}
 set_distribution_links_(new_module, "random_effects",
-                        get_parameter_id_(module_base, par))
+                        get_variable_vector_id_(module_base, par))
 ```
 
-Two details worth carrying into the rewrite. `get_parameter_id_()` takes the **base** XPtr,
-so the wrapper needs the module's base pointer here, not only its family-typed one. And
-`par` and `link` come from the parameters tibble as strings, which is exactly what
-`get_parameter_id_()` wants — the names line up without translation, unlike the data-ID
-path above.
+Two details worth carrying into the rewrite. `get_variable_vector_id_()` takes the **base**
+XPtr, so the wrapper needs the module's base pointer here, not only its family-typed one.
+And `par` and `link` come from the parameters tibble as strings, which is exactly what
+`get_variable_vector_id_()` wants — the names line up without translation, unlike the
+data-ID path above.
 
 #### 4c. Model description from the registry
 
@@ -839,16 +902,14 @@ The `metadata` list is populated by the same `register_module()` call shown in S
 4b, so a wrapper adds a metadata field simply by naming it in `...`:
 
 ```r
-create_age_comp <- function(n_years, n_ages) {
-  pointer <- create_data_interface_("age_comp", as.integer(n_years),
-                                    as.integer(n_ages))
-  register_module(pointer, data_to_fims_xptr_(pointer), "AgeComp",
-                  n_years = n_years, n_ages = n_ages)   # extra metadata
+create_data <- function(type, n_years, n_bins = 0) {
+  # ... resolve the label and create the pointer, then:
+  register_module(pointer, "data", label,
+                  n_years = n_years, n_ages = n_bins)   # extra metadata
 }
 
 create_population <- function() {
-  pointer <- create_population_()
-  register_module(pointer, population_to_fims_xptr_(pointer), "Population")
+  register_module(create_population_(), "population", "Population")
 }
 ```
 
@@ -902,11 +963,12 @@ function without modifying any C++ code.
 
 Parameter names, values, and estimation statuses are the exception: they cannot be added
 this way, because nothing can ask a module what parameters it has, and there is no getter
-for a parameter's values or status either — only `set_parameter_()` and
-`get_parameter_id_()` are exported. Adding enumeration to the hand-written
-`get_parameter()` overrides would mean maintaining a second list beside the `if` chain, so
-it waits for Step A of `Parameter_Registry.Rmd`, where `declare_parameter()` produces the
-list as a side effect of declaring the fields. See the discussion at the end of Section 4b.
+for a parameter's values or status either — only `set_variable_vector_()` and
+`get_variable_vector_id_()` are exported. Adding enumeration to the hand-written
+`get_variable_vector()` overrides would mean maintaining a second list beside the `if`
+chain, so it waits for Step A of `Parameter_Registry.Rmd`, where `declare_parameter()`
+produces the list as a side effect of declaring the fields. See the discussion at the end of
+Section 4b.
 
 When it does land, one distinction belongs in `describe_model()`'s own documentation: an
 interface module holds a parameter's *starting* value. After a fit the estimates live in
@@ -924,7 +986,7 @@ way to run a selectivity sensitivity. The obvious sequence looks right and is wr
 
 ```{r eval=FALSE}
 new_selectivity <- create_double_logistic_selectivity()
-set_parameter_(new_selectivity$base_pointer, "inflection_point_asc", ...)
+set_variable_vector_(new_selectivity$base_pointer, "inflection_point_asc", ...)
 set_fleet_selectivity_id_(fleet$pointer, new_selectivity$id)
 CreateTMBModel()
 ```
@@ -943,7 +1005,7 @@ that repoint a link and retire whatever the link used to reach:
 
 ```{r eval=FALSE}
 new_selectivity <- create_double_logistic_selectivity()
-set_parameter_(new_selectivity$base_pointer, "inflection_point_asc", ...)
+set_variable_vector_(new_selectivity$base_pointer, "inflection_point_asc", ...)
 update_fleet_selectivity(fleet, new_selectivity)
 CreateTMBModel()
 ```
@@ -1027,11 +1089,19 @@ unchanged. What changes is that every interface object now reads its `Informatio
 argument instead of a global, and switching to a per-model registry later becomes a change
 to one function rather than to forty-six.
 
-**Return a model handle from `CreateTMBModel()`.** It currently returns `bool` and always
-returns `true`, and there is a single R call site. Returning an identifier — or an XPtr to
-the context — costs nothing now and means the R wrappers carry a handle from the outset.
-That handle is both the key a future registry looks up and the object R attaches to the
-TMB objective function to tie their lifetimes together.
+**Return a model handle from `CreateTMBModel()`.** Done. It returned `bool` and always
+returned `true`, so the return value carried nothing. It now returns a `uint32_t` that
+increments on every successful build and is never rewound, so two handles are equal only
+if they came from the same build, and the R wrapper keeps the latest in the registry.
+
+Failure is still reported by throwing rather than by the return value, so a returned
+handle always means the model was built.
+
+The handle is useful now, not only later: with `CreateTMBModel()` callable repeatedly to
+rebuild from the same modules, a fitted `obj` can outlive the model it was built from, and
+comparing handles is how R can tell. It is also what a per-model registry would look up,
+and what the R wrapper should attach to `obj` as an attribute so the garbage collector
+keeps the two alive together — that attachment is still to do.
 
 **Keep the `id_g` resets; give each model its own ID namespace instead.** An earlier
 draft of this section argued the opposite --- that `clear()` should stop rewinding the
@@ -1118,19 +1188,19 @@ library(FIMS)
 # 1. Create model components.
 #    Each R wrapper calls the C++ creator AND registers the object automatically.
 #    The concrete XPtr is returned for use in setter calls below.
-age_comp <- create_age_comp(n_years = 10, n_ages = 5)
-index    <- create_index(n_years = 10)
+age_comp <- create_data("age_comp", n_years = 10, n_bins = 5)
+index    <- create_data("index", n_years = 10)
 pop      <- create_population()
 growth   <- create_empirical_growth()
 
 # 2. Set values via the shared setter functions.
-#    set_vector_() and set_parameter_() cover every module in FIMS: the field is
+#    set_numeric_vector_() and set_variable_vector_() cover every module in FIMS: the field is
 #    named rather than typed, so no module type appears in the call. They take
 #    the base XPtr, which the R wrappers hold alongside the concrete one.
 set_vector(age_comp, "values", my_age_comp_data)
 set_vector(age_comp, "uncertainty", my_age_comp_cv)
 set_vector(index, "values", my_index_data)
-set_population_constants(pop, n_years = 10L, n_ages = 5L, n_lengths = 0L)
+set_population_constants(pop, n_years = 10L, n_ages = 5L)
 set_population_process_ids(pop, growth_id = get_module_id(growth))
 
 # 3. Build the TMB model — registry is passed automatically, no list needed
@@ -1194,7 +1264,7 @@ AgeComp <- R6::R6Class("AgeComp",
       private$.base_xp <- data_to_fims_xptr_(private$.xp)
     },
     set_values = function(values) {
-      set_vector_(private$.base_xp, "values", values)
+      set_numeric_vector_(private$.base_xp, "values", values)
     },
     fims_xptr = function() private$.base_xp
   )
@@ -1284,12 +1354,22 @@ to the main R thread.
   cover `initialize_population()`, `set_param_vector()`, and `distribution_formulas.R`.
 - The vignettes still document `live_objects` and `methods::new()` as the current API and
   need rewriting once the R side lands.
+- `initialize_recruitment()` lost a validation warning in the migration. The reflective
+  `initialize_module()` warned when the parameters tibble specified both `log_devs` and
+  `log_r` for recruitment, since a model can use only one, and advised `log_r` when fitting
+  an AR1 to recruitment. The check lived in the reflection path that inverting the loop
+  removed, and belongs in `initialize_recruitment()` rather than in the generic. The
+  validations that remain at the recruitment-process distribution are a different check and
+  do not cover this case.
+- `initialize_selectivity()`, and its neighbours, say in their documentation that they
+  "handle specific requirements for population initialization" --- a copy-paste from
+  `initialize_population()` that predates this refactor.
 - The doxygen examples in the interface headers still tell users to call
   `methods::new()` --- `acomp <- methods::new(AgeComp)` and the like, about two dozen of
   them across the nine `rcpp_objects/*.hpp` files, plus several file-level headers saying
   "Allows for the use of methods::new() in R." These are not stale history; they are
   instructions that now fail, because those class registrations are gone. They become
-  `create_age_comp()` and its siblings.
+  `create_data()` and its siblings.
 - `tests/testthat/test-clear.R` needs work that has to wait for the R migration, because
   its setup calls `initialize_fims()` and so cannot run until `initialize_modules.R` is
   converted. Deferred deliberately rather than carried as failing tests:

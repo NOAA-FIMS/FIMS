@@ -30,7 +30,7 @@ using SharedSelectivity = std::shared_ptr<SelectivityInterfaceBase>;
  * binds the XPtr to R's garbage collector: when the R variable is garbage 
  * collected, 'delete shared_ptr*' runs and the reference count is decremented.
  *
- * @param type Either "logistic" or "double_logistic".
+ * @param type Either "Logistic" or "DoubleLogistic".
  *
  * @return A pointer to the new selectivity module.
  */

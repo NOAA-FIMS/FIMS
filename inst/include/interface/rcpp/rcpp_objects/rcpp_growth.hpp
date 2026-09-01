@@ -1,7 +1,7 @@
 /**
  * @file rcpp_growth.hpp
  * @brief The Rcpp interface to declare different types of growth, e.g.,
- * empirical weight-at-age data. Allows for the use of methods::new() in R.
+ * empirical weight-at-age data. Allows the module to be created from R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -16,7 +16,7 @@
  * @brief The growth forms FIMS can build.
  *
  * @details The create_growth_() function takes one of these names from R and
- * builds the matching class: "ewaa" builds an EWAAGrowthInterface.
+ * builds the matching class: "EWAA" builds an EWAAGrowthInterface.
  * GrowthInterfaceBase is never built on its own; it only holds what all growth
  * forms have in common.
  *
@@ -32,10 +32,10 @@ enum class GrowthType : uint8_t {
  * @brief Convert a type name supplied from R to a GrowthType.
  */
 inline GrowthType GrowthTypeFromString(const std::string &name) {
-  if (name == "ewaa") return GrowthType::ewaa;
+  if (name == "EWAA") return GrowthType::ewaa;
   throw std::invalid_argument(
       "Invalid type: '" + name +
-      "'. Valid options are: ewaa.");
+      "'. Valid options are: EWAA.");
 }
 
 /**
@@ -88,7 +88,7 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
 
 /**
  * @brief Rcpp interface for EWAAGrowth to instantiate the object from R:
- * ewaa <- methods::new(EWAAGrowth). Where, EWAA stands for empirical weight at
+ * ewaa <- create_growth("EWAA"). Where, EWAA stands for empirical weight at
  * age and growth is not actually estimated.
  */
 class EWAAGrowthInterface : public GrowthInterfaceBase {
@@ -141,9 +141,9 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "weights") return &this->weights;
     if (name == "ages") return &this->ages;
     return nullptr;

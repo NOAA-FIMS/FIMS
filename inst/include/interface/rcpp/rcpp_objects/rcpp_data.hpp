@@ -1,7 +1,7 @@
 /**
  * @file rcpp_data.hpp
  * @brief The Rcpp interface to declare different types of data, e.g.,
- * age-composition and index data. Allows for the use of methods::new() in R.
+ * age-composition and index data. Allows the module to be created from R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -93,7 +93,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
 
 /**
  * @brief  The Rcpp interface for AgeComp to instantiate the object from R:
- * acomp <- methods::new(AgeComp).
+ * acomp <- create_data("age_comp", n_years, n_ages).
  */
 class AgeCompDataInterface : public DataInterfaceBase {
  public:
@@ -140,9 +140,9 @@ class AgeCompDataInterface : public DataInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "values") return &this->age_comp_data;
     if (name == "uncertainty") return &this->uncertainty;
     return nullptr;
@@ -220,7 +220,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
 
 /**
  * @brief The Rcpp interface for LengthComp to instantiate the object from R:
- * lcomp <- methods::new(LengthComp).
+ * lcomp <- create_data("length_comp", n_years, n_lengths).
  */
 class LengthCompDataInterface : public DataInterfaceBase {
  public:
@@ -266,9 +266,9 @@ class LengthCompDataInterface : public DataInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "values") return &this->length_comp_data;
     if (name == "uncertainty") return &this->uncertainty;
     return nullptr;
@@ -341,7 +341,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
 
 /**
  * @brief  The Rcpp interface for Index to instantiate the object from R:
- * fleet <- methods::new(Index).
+ * index <- create_data("index", n_years).
  */
 class IndexDataInterface : public DataInterfaceBase {
  public:
@@ -381,9 +381,9 @@ class IndexDataInterface : public DataInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "values") return &this->index_data;
     if (name == "uncertainty") return &this->uncertainty;
     return nullptr;
@@ -457,7 +457,7 @@ class IndexDataInterface : public DataInterfaceBase {
 
 /**
  * @brief  The Rcpp interface for Catch to instantiate the object from R:
- * fleet <- methods::new(Catch).
+ * catch <- create_data("catch", n_years).
  */
 class CatchDataInterface : public DataInterfaceBase {
  public:
@@ -497,9 +497,9 @@ class CatchDataInterface : public DataInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "values") return &this->catch_data;
     if (name == "uncertainty") return &this->uncertainty;
     return nullptr;

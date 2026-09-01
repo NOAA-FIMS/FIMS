@@ -45,13 +45,11 @@ Rcpp::XPtr<SharedPopulation> create_population_() {
  * @param xp The population module.
  * @param n_years Number of years.
  * @param n_ages Number of age bins.
- * @param n_lengths Number of length bins, or 0 if the model is age-based.
  */
 void set_population_constants_(Rcpp::XPtr<SharedPopulation> xp,
-                               int n_years, int n_ages, int n_lengths) {
+                               int n_years, int n_ages) {
   (*xp)->n_years   = n_years;
   (*xp)->n_ages    = n_ages;
-  (*xp)->n_lengths = n_lengths;
 }
 /**
  * @brief Set the population's name, used to label it in the output.

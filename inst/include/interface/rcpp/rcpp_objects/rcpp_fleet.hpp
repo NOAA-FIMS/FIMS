@@ -1,7 +1,7 @@
 /**
  * @file rcpp_fleet.hpp
- * @brief The Rcpp interface to declare fleets. Allows for the use of
- * methods::new() in R.
+ * @brief The Rcpp interface to declare fleets. Allows the module to be
+ * created from R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -47,7 +47,7 @@ class FleetInterfaceBase : public FIMSRcppInterfaceBase {
 
 /**
  * @brief The Rcpp interface for Fleet to instantiate from R:
- * fleet <- methods::new(Fleet)
+ * fleet <- create_fleet()
  */
 class FleetInterface : public FleetInterfaceBase {
   /**
@@ -218,13 +218,33 @@ class FleetInterface : public FleetInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "log_q") return &this->log_q;
     if (name == "log_Fmort") return &this->log_Fmort;
     if (name == "age_to_length_conversion")
       return &this->age_to_length_conversion;
+    if (name == "catch_numbers_at_age") return &this->catch_numbers_at_age;
+    if (name == "catch_weight_at_age") return &this->catch_weight_at_age;
+    if (name == "catch_numbers_at_length")
+      return &this->catch_numbers_at_length;
+    if (name == "catch_weight") return &this->catch_weight;
+    if (name == "catch_numbers") return &this->catch_numbers;
+    if (name == "catch_expected") return &this->catch_expected;
+    if (name == "log_catch_expected") return &this->log_catch_expected;
+    if (name == "agecomp_proportion") return &this->agecomp_proportion;
+    if (name == "lengthcomp_proportion") return &this->lengthcomp_proportion;
+    if (name == "index_numbers_at_age") return &this->index_numbers_at_age;
+    if (name == "index_weight_at_age") return &this->index_weight_at_age;
+    if (name == "index_numbers_at_length")
+      return &this->index_numbers_at_length;
+    if (name == "index_weight") return &this->index_weight;
+    if (name == "index_numbers") return &this->index_numbers;
+    if (name == "index_expected") return &this->index_expected;
+    if (name == "log_index_expected") return &this->log_index_expected;
+    if (name == "agecomp_expected") return &this->agecomp_expected;
+    if (name == "lengthcomp_expected") return &this->lengthcomp_expected;
     return nullptr;
   }
 
@@ -428,10 +448,10 @@ class FleetInterface : public FleetInterfaceBase {
 
       if (this->age_to_length_conversion.size() !=
           static_cast<size_t>(this->n_ages * this->n_lengths)) {
-        FIMS_ERROR_LOG(
-            "age_to_length_conversion don't match, " +
-            fims::to_string(this->age_to_length_conversion.size()) + " != " +
-            fims::to_string((this->n_ages * this->n_lengths)));
+        throw std::invalid_argument(
+            "Fleet age_to_length_conversion size mismatch: expected " +
+            fims::to_string(this->n_ages * this->n_lengths) + ", got " +
+            fims::to_string(this->age_to_length_conversion.size()) + ".");
       }
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {

@@ -7,7 +7,11 @@
 CreateTMBModel()
 }
 \value{
-\code{TRUE}, invisibly, if the model was created successfully.
+A model handle: a number identifying this build. It changes every time the
+model is rebuilt, so two handles are equal only if they came from the same
+build. Keep it if you need to tell later whether a fitted object still
+matches the model in memory; ignore it otherwise. A failed build raises an
+error rather than returning anything.
 }
 \description{
 Passes every module created since the last \code{clear()} to the C++ model
