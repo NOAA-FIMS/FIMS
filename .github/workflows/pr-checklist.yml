@@ -36,7 +36,8 @@ jobs:
             '## Checklist\n\n' +
             '- [ ] The code is well-designed\n' +
             '- [ ] The code is designed well for both users and developers\n' +
-            '- [ ] Code coverage remains high' +
+            '- [ ] For AI-assisted changes, the implementation complies with the [FIMS AI-Assisted Development Guidelines](https://github.com/NOAA-FIMS/FIMS/blob/main/AI_GUIDELINES.md)\n' +
+            '- [ ] Code coverage remains high\n' +
             '- [ ] Comments are clear, useful, and explain why instead of what\n' +
             '- [ ] Code is appropriately documented (doxygen and roxygen)\n';
             

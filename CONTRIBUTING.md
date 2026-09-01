@@ -1,6 +1,6 @@
 # Contributing to the NOAA Fisheries Integrated Modeling System
 
-External contributions and feedback are important to the development and future maintenance of the Fisheries Integrated Modeling System (FIMS) and are welcome. This section provides contributing guidelines and workflows for developers of FIMS and the ecosystem surrounding FIMS. All contributors, both internal and external, are required to abide by the [Code of Conduct](https://github.com/NOAA-FIMS/.github/blob/main/CODE_OF_CONDUCT.md).
+External contributions and feedback are important to the development and future maintenance of the Fisheries Integrated Modeling System (FIMS) and are welcome. This section provides contributing guidelines and workflows for developers of FIMS and the ecosystem surrounding FIMS. All contributors, both internal and external, are required to abide by the [Code of Conduct](https://github.com/NOAA-FIMS/.github/blob/main/CODE_OF_CONDUCT.md). Contributions created or modified with generative AI must also comply with the [FIMS AI-Assisted Development Guidelines](AI_GUIDELINES.md).
 
 ## TLDR --- I just have a question
 
@@ -14,7 +14,7 @@ Please use [GitHub Issues](https://github.com/NOAA-FIMS/FIMS/issues/new?template
 
 ### AI-assisted contributions
 
-Contributions created or modified with generative AI must comply with the [FIMS AI-Assisted Development Guidelines](ai_guidelines.md). These guidelines are FIMS development policy and apply to all generative-AI tools and workflows, including code completion, chat-based generation, automated refactoring, documentation generation, and test generation.
+Contributions created or modified with generative AI must comply with the [FIMS AI-Assisted Development Guidelines](AI_GUIDELINES.md). These guidelines are FIMS development policy and apply to all generative-AI tools and workflows, including code completion, chat-based generation, automated refactoring, documentation generation, and test generation.
 
 Contributors remain accountable for understanding, reviewing, testing, documenting, and validating every AI-assisted change they submit. In particular, contributors must preserve FIMS scientific meaning, numerical and derivative behavior, architectural conventions, and semantic traceability. Unresolved scientific, statistical, architectural, or public-API ambiguity must be raised for maintainer direction rather than decided by an AI tool.
 
@@ -77,7 +77,7 @@ Along the development process it is important to add tests and ensure that the c
 
 #### Standard contributor checks
 
-* For AI-assisted changes, confirm compliance with the [FIMS AI-Assisted Development Guidelines](ai_guidelines.md), including the requirements for scientific correctness, semantic traceability, numerical and derivative integrity, documentation, and validation.
+* For AI-assisted changes, confirm compliance with the [FIMS AI-Assisted Development Guidelines](AI_GUIDELINES.md), including the requirements for scientific correctness, semantic traceability, numerical and derivative integrity, documentation, and validation.
 * Build the doxygen-generated C++ documentation using `cmake --build build`, where the resulting html files will be in build/html. This can also be done using `setup_and_run_gtest()` in R.
 * Implement the suite of Google tests using `cmake --build build` and `ctest --test-dir build`. This can also be done using `setup_and_run_gtest()` in R. If there are failing tests, run `ctest --test-dir --rerun-failed --output-on-failure` to re-run the failed tests verbosely.
 * Format C++ code using clang-format version 18.0.0 with Google style: `clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")`. If you are contributing from a fork, the automated formatting workflow will add a comment to your pull request with detailed instructions on how to format your code locally.
