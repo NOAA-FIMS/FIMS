@@ -33,14 +33,15 @@ void register_fleet(Rcpp::Module& m) {
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
       .field("catch_numbers_at_age",
-             &FleetInterface::
-                 catch_numbers_at_age)
+             &FleetInterface::catch_numbers_at_age)
+      .field("catch_numbers_at_age_by_partition",
+             &FleetInterface::catch_numbers_at_age_by_partition)
       .field("catch_weight_at_age",
-             &FleetInterface::
-                 catch_weight_at_age)
+             &FleetInterface::catch_weight_at_age)
+      .field("catch_weight_at_age_by_partition",
+             &FleetInterface::catch_weight_at_age_by_partition)
       .field("catch_numbers_at_length",
-             &FleetInterface::
-                 catch_numbers_at_length)
+             &FleetInterface::catch_numbers_at_length)
       .field("catch_weight",
              &FleetInterface::catch_weight)
       .field("catch_numbers",
@@ -55,8 +56,12 @@ void register_fleet(Rcpp::Module& m) {
              &FleetInterface::lengthcomp_proportion)
       .field("index_numbers_at_age",
              &FleetInterface::index_numbers_at_age)
+      .field("index_numbers_at_age_by_partition",
+             &FleetInterface::index_numbers_at_age_by_partition)
       .field("index_weight_at_age",
              &FleetInterface::index_weight_at_age)
+      .field("index_weight_at_age_by_partition",
+             &FleetInterface::index_weight_at_age_by_partition)
       .field("index_numbers_at_length",
              &FleetInterface::
                  index_numbers_at_length)

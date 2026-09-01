@@ -190,6 +190,28 @@ target_link_libraries(population_Population_InitializePrepare
 )
 gtest_discover_tests(population_Population_InitializePrepare)
 
+# test_population_Subpopulation.cpp
+add_executable(population_Subpopulation
+  test_population_Subpopulation.cpp
+)
+add_as_invoker_manifest(population_Subpopulation)
+target_link_libraries(population_Subpopulation
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(population_Subpopulation)
+
+# test_population_CatchAtAge_InitializePartition.cpp
+add_executable(population_CatchAtAge_InitializePartition
+  test_population_CatchAtAge_InitializePartition.cpp
+)
+add_as_invoker_manifest(population_CatchAtAge_InitializePartition)
+target_link_libraries(population_CatchAtAge_InitializePartition
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(population_CatchAtAge_InitializePartition)
+
 # test_population_CatchAtAge_CalculateBiomass.cpp
 add_executable(population_CatchAtAge_CalculateBiomass
   test_population_CatchAtAge_CalculateBiomass.cpp
