@@ -1,3 +1,4 @@
+#' file = R/use-testthat-template.R
 #' Create tests/testthat/test-*.R test file
 #'
 #' This helper function creates a new test file for testthat using a template

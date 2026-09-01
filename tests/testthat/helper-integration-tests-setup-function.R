@@ -1,9 +1,10 @@
+# file = FIMS/tests/testthat/helper-integration-tests-setup-function.R
 # Helper file for FIMS R tests----
 # This file contains multiple functions that are used to set up and run
 # FIMS models with or without wrapper functions. The functions are sourced by
 # devtools::load_all().
 
-# FIMS dmultinorm function ----
+# FIMS dmultinom function ----
 #' FIMS dmultinom()
 #' This function matches the dmultinom() function in TMB and differs from R
 #' by NOT rounding obs to the nearest integer. The function is evaluated in
@@ -14,12 +15,47 @@
 #' for the K classes; must sum 1.
 #'
 #' @return The log of the probability mass function for the multinomial.
+
 FIMS_dmultinom <- function(x, p) {
   xp1 <- x + 1
   log_pmf <- lgamma(sum(x) + 1) - sum(lgamma(xp1)) + sum(x * log(p))
   return(log_pmf)
 }
 
+# FIMS ddirichlet_multinom function ----
+#' FIMS ddirichlet_multinom()
+#'
+#' This function matches the Dirichlet-multinomial log PMF implemented in
+#' `fims_math.hpp` as `ddirichlet_multinom()`. It is evaluated in log space.
+#'
+#' @param x A vector of length K of counts.
+#' @param p A numeric non-negative vector of length K of probabilities; must sum 1.
+#' @param theta A positive scalar concentration parameter.
+#'
+#' @return The log of the probability mass function for the Dirichlet-multinomial.
+
+FIMS_ddirichlet_multinom <- function(x, p, theta) {
+  stopifnot(length(x) == length(p))
+  stopifnot(all(is.finite(x)))
+  stopifnot(all(x >= 0))
+  stopifnot(all(is.finite(p)))
+  stopifnot(all(p > 0))
+  stopifnot(abs(sum(p) - 1) < 1e-8)
+  stopifnot(is.finite(theta))
+  stopifnot(theta > 0)
+
+  n <- sum(x)
+  alpha <- theta * n * p
+
+  log_pmf <-
+    lgamma(n + 1) -
+    sum(lgamma(x + 1)) +
+    lgamma(sum(alpha)) -
+    lgamma(n + sum(alpha)) +
+    sum(lgamma(x + alpha) - lgamma(alpha))
+
+  return(log_pmf)
+}
 
 # FIMS helper function to run FIMS model without wrappers ----
 #' Set up and run FIMS model without using wrapper functions
