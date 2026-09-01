@@ -12,11 +12,12 @@
 #ifndef R_NO_REMAP
 #define R_NO_REMAP
 #endif
-#include <Rinternals.h>
 #include <R_ext/Rdynload.h>
+#include <Rinternals.h>
 
 #include "../call/fleet.hpp"
 #include "../call/growth.hpp"
+#include "../call/log.hpp"
 #include "../call/maturity.hpp"
 #include "../call/model.hpp"
 #include "../call/population.hpp"
@@ -45,6 +46,17 @@ extern "C" {
  * @brief Callback definition to load the FIMS module.
  */
 static const R_CallMethodDef CallEntries[] = {
+    {"fims_call_log_get", (DL_FUNC)&fims_call_log_get, 0},
+    {"fims_call_log_get_errors", (DL_FUNC)&fims_call_log_get_errors, 0},
+    {"fims_call_log_get_warnings", (DL_FUNC)&fims_call_log_get_warnings, 0},
+    {"fims_call_log_get_info", (DL_FUNC)&fims_call_log_get_info, 0},
+    {"fims_call_log_info", (DL_FUNC)&fims_call_log_info, 1},
+    {"fims_call_log_warning", (DL_FUNC)&fims_call_log_warning, 1},
+    {"fims_call_log_error", (DL_FUNC)&fims_call_log_error, 1},
+    {"fims_call_log_write_on_exit", (DL_FUNC)&fims_call_log_write_on_exit, 1},
+    {"fims_call_log_set_path", (DL_FUNC)&fims_call_log_set_path, 1},
+    {"fims_call_log_set_throw_on_error",
+     (DL_FUNC)&fims_call_log_set_throw_on_error, 1},
     {"fims_call_create_logistic_selectivity",
      (DL_FUNC)&fims_call_create_logistic_selectivity, 4},
     {"fims_call_logistic_selectivity", (DL_FUNC)&fims_call_logistic_selectivity,
@@ -91,7 +103,7 @@ static const R_CallMethodDef CallEntries[] = {
  * @brief FIMS shared object initializer.
  *
  */
-__attribute__((visibility("default"))) void R_init_FIMS(DllInfo* dll) {
+__attribute__((visibility("default"))) void R_init_FIMS(DllInfo *dll) {
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
 #ifdef TMB_CCALLABLES
@@ -100,6 +112,6 @@ __attribute__((visibility("default"))) void R_init_FIMS(DllInfo* dll) {
 }
 }
 
-#endif  // FIMS_ONLOAD_INIT_TMB
+#endif // FIMS_ONLOAD_INIT_TMB
 
-#endif  // SRC_INIT_HPP
+#endif // SRC_INIT_HPP

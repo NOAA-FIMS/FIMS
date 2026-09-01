@@ -3,19 +3,20 @@
  * \brief Native .Call model-construction interface for the FIMS framework.
  */
 
-#include "../inst/include/interface/call/model.hpp"
 #include "../inst/include/interface/call/fleet_registry.hpp"
 #include "../inst/include/interface/call/growth_registry.hpp"
 #include "../inst/include/interface/call/maturity_registry.hpp"
+#include "../inst/include/interface/call/model.hpp"
 #include "../inst/include/interface/call/population_registry.hpp"
 #include "../inst/include/interface/call/recruitment_registry.hpp"
 #include "../inst/include/interface/call/selectivity_registry.hpp"
 
+#include "../inst/include/common/def.hpp"
 #include "../inst/include/common/information.hpp"
 #include "../inst/include/common/model.hpp"
-#include "../inst/include/models/fisheries_models.hpp"
-#include "../inst/include/distributions/functors/normal_lpdf.hpp"
 #include "../inst/include/distributions/functors/lognormal_lpdf.hpp"
+#include "../inst/include/distributions/functors/normal_lpdf.hpp"
+#include "../inst/include/models/fisheries_models.hpp"
 
 #include <Rinternals.h>
 
@@ -34,61 +35,81 @@ enum PriorEstimationTypeCode {
 };
 
 template <typename Type>
-fims::Vector<Type>* find_prior_target(const std::string& module,
+fims::Vector<Type> *find_prior_target(const std::string &module,
                                       uint32_t object_id,
-                                      const std::string& parameter) {
+                                      const std::string &parameter) {
   if (module == "Fleet") {
     auto object = NativeFleetRegistry<Type>::GetInstance()->GetFleet(object_id);
-    if (!object) return NULL;
-    if (parameter == "log_Fmort") return &object->log_Fmort;
-    if (parameter == "log_q") return &object->log_q;
+    if (!object)
+      return NULL;
+    if (parameter == "log_Fmort")
+      return &object->log_Fmort;
+    if (parameter == "log_q")
+      return &object->log_q;
   } else if (module == "Population") {
     auto object =
         NativePopulationRegistry<Type>::GetInstance()->GetPopulation(object_id);
-    if (!object) return NULL;
-    if (parameter == "log_M") return &object->log_M;
-    if (parameter == "log_f_multiplier") return &object->log_f_multiplier;
-    if (parameter == "log_init_naa") return &object->log_init_naa;
+    if (!object)
+      return NULL;
+    if (parameter == "log_M")
+      return &object->log_M;
+    if (parameter == "log_f_multiplier")
+      return &object->log_f_multiplier;
+    if (parameter == "log_init_naa")
+      return &object->log_init_naa;
   } else if (module == "Recruitment") {
     auto object = NativeRecruitmentRegistry<Type>::GetInstance()
                       ->GetBevertonHoltRecruitment(object_id);
-    if (!object) return NULL;
-    if (parameter == "logit_steep") return &object->logit_steep;
-    if (parameter == "log_rzero") return &object->log_rzero;
-    if (parameter == "log_devs") return &object->log_recruit_devs;
+    if (!object)
+      return NULL;
+    if (parameter == "logit_steep")
+      return &object->logit_steep;
+    if (parameter == "log_rzero")
+      return &object->log_rzero;
+    if (parameter == "log_devs")
+      return &object->log_recruit_devs;
   } else if (module == "Maturity") {
     auto object =
         NativeMaturityRegistry<Type>::GetInstance()->GetLogisticMaturity(
             object_id);
-    if (!object) return NULL;
-    if (parameter == "inflection_point") return &object->inflection_point;
-    if (parameter == "slope") return &object->slope;
+    if (!object)
+      return NULL;
+    if (parameter == "inflection_point")
+      return &object->inflection_point;
+    if (parameter == "slope")
+      return &object->slope;
   } else if (module == "Selectivity") {
     auto logistic =
         NativeSelectivityRegistry<Type>::GetInstance()->GetLogisticSelectivity(
             object_id);
     if (logistic) {
-      if (parameter == "inflection_point") return &logistic->inflection_point;
-      if (parameter == "slope") return &logistic->slope;
+      if (parameter == "inflection_point")
+        return &logistic->inflection_point;
+      if (parameter == "slope")
+        return &logistic->slope;
     }
     auto double_logistic = NativeSelectivityRegistry<Type>::GetInstance()
                                ->GetDoubleLogisticSelectivity(object_id);
-    if (!double_logistic) return NULL;
+    if (!double_logistic)
+      return NULL;
     if (parameter == "inflection_point_asc")
       return &double_logistic->inflection_point_asc;
-    if (parameter == "slope_asc") return &double_logistic->slope_asc;
+    if (parameter == "slope_asc")
+      return &double_logistic->slope_asc;
     if (parameter == "inflection_point_desc")
       return &double_logistic->inflection_point_desc;
-    if (parameter == "slope_desc") return &double_logistic->slope_desc;
+    if (parameter == "slope_desc")
+      return &double_logistic->slope_desc;
   }
   return NULL;
 }
 
 template <typename Type>
 void register_prior_parameter(
-    std::shared_ptr<fims_info::Information<Type>> info, Type& value,
-    int estimation_type, const std::string& name) {
-  if (estimation_type == kPriorConstant) return;
+    std::shared_ptr<fims_info::Information<Type>> info, Type &value,
+    int estimation_type, const std::string &name) {
+  if (estimation_type == kPriorConstant)
+    return;
   if (estimation_type == kPriorFixedEffects) {
     info->RegisterParameterName(name);
     info->RegisterParameter(value);
@@ -100,13 +121,13 @@ void register_prior_parameter(
 }
 
 template <typename Type, typename Distribution>
-void add_prior_internal(const std::string& module, uint32_t object_id,
-                        const std::string& parameter, const double* mean,
-                        size_t mean_size, const double* log_sd,
+void add_prior_internal(const std::string &module, uint32_t object_id,
+                        const std::string &parameter, const double *mean,
+                        size_t mean_size, const double *log_sd,
                         size_t log_sd_size, int mean_estimation_type,
                         int log_sd_estimation_type,
-                        const std::string& distribution_name) {
-  fims::Vector<Type>* target =
+                        const std::string &distribution_name) {
+  fims::Vector<Type> *target =
       find_prior_target<Type>(module, object_id, parameter);
   if (target == NULL)
     Rf_error("Could not find native prior target `%s.%u.%s`.", module.c_str(),
@@ -152,8 +173,7 @@ void add_prior_internal(const std::string& module, uint32_t object_id,
   info->density_components[prior->id] = prior;
 }
 
-template <typename Type>
-void clear_native_registries() {
+template <typename Type> void clear_native_registries() {
   NativeFleetRegistry<Type>::GetInstance()->Clear();
   NativeGrowthRegistry<Type>::GetInstance()->Clear();
   NativeMaturityRegistry<Type>::GetInstance()->Clear();
@@ -163,8 +183,8 @@ void clear_native_registries() {
 }
 
 template <typename Type>
-void resize_with_recycled_last(fims::Vector<Type>& values, size_t new_size,
-                               const Type& default_value) {
+void resize_with_recycled_last(fims::Vector<Type> &values, size_t new_size,
+                               const Type &default_value) {
   if (new_size == 0) {
     values.clear();
     return;
@@ -276,12 +296,11 @@ void reconcile_native_population_layout(
       fleet->n_ages = n_ages;
 
       if (fleet->log_Fmort.size() != n_years) {
-        Rf_error(
-            "Fleet %u has log_Fmort size %zu but expected n_years=%zu. "
-            "Refusing to resize estimable vectors after parameter "
-            "registration.",
-            static_cast<unsigned int>(fleet->GetId()), fleet->log_Fmort.size(),
-            n_years);
+        Rf_error("Fleet %u has log_Fmort size %zu but expected n_years=%zu. "
+                 "Refusing to resize estimable vectors after parameter "
+                 "registration.",
+                 static_cast<unsigned int>(fleet->GetId()),
+                 fleet->log_Fmort.size(), n_years);
       }
       resize_with_recycled_last<Type>(fleet->Fmort, n_years,
                                       static_cast<Type>(0.0));
@@ -290,12 +309,11 @@ void reconcile_native_population_layout(
       // by the interface; Fleet::q.get_force_scalar(year) handles the
       // scalar broadcast during model evaluation.
       if (fleet->log_q.size() != 1 && fleet->log_q.size() != n_years) {
-        Rf_error(
-            "Fleet %u has log_q size %zu but expected 1 or n_years=%zu. "
-            "Refusing to resize estimable vectors after parameter "
-            "registration.",
-            static_cast<unsigned int>(fleet->GetId()), fleet->log_q.size(),
-            n_years);
+        Rf_error("Fleet %u has log_q size %zu but expected 1 or n_years=%zu. "
+                 "Refusing to resize estimable vectors after parameter "
+                 "registration.",
+                 static_cast<unsigned int>(fleet->GetId()), fleet->log_q.size(),
+                 n_years);
       }
       resize_with_recycled_last<Type>(fleet->q, fleet->log_q.size(),
                                       static_cast<Type>(1.0));
@@ -312,7 +330,7 @@ void reconcile_native_population_layout(
 }
 
 template <typename Type>
-[[noreturn]] void fail_dimension_check(const std::string& message) {
+[[noreturn]] void fail_dimension_check(const std::string &message) {
   Rf_error("Native model dimension check failed: %s", message.c_str());
 }
 
@@ -496,7 +514,7 @@ void validate_backend_model_inputs(
 
 template <typename Type>
 void assign_population_derived_vectors(
-    std::map<std::string, fims::Vector<Type>>& derived_quantities,
+    std::map<std::string, fims::Vector<Type>> &derived_quantities,
     size_t n_years, size_t n_ages) {
   derived_quantities["total_catch_weight"] =
       fims::Vector<Type>(n_years, Type(), "total_catch_weight");
@@ -530,7 +548,7 @@ void assign_population_derived_vectors(
 
 template <typename Type>
 void assign_fleet_derived_vectors(
-    std::map<std::string, fims::Vector<Type>>& derived_quantities,
+    std::map<std::string, fims::Vector<Type>> &derived_quantities,
     size_t n_years, size_t n_ages, size_t n_lengths) {
   derived_quantities["catch_numbers_at_age"] =
       fims::Vector<Type>(n_years * n_ages, Type(), "catch_numbers_at_age");
@@ -603,7 +621,7 @@ void initialize_model_derived_quantity_maps(
       }
 
       model->InitializePopulationDerivedQuantities((*population_it)->GetId());
-      std::map<std::string, fims::Vector<Type>>& population_derived_quantities =
+      std::map<std::string, fims::Vector<Type>> &population_derived_quantities =
           model->GetPopulationDerivedQuantities((*population_it)->GetId());
       assign_population_derived_vectors<Type>(population_derived_quantities,
                                               (*population_it)->n_years,
@@ -618,7 +636,7 @@ void initialize_model_derived_quantity_maps(
     for (auto fleet_it = model->fleets.begin(); fleet_it != model->fleets.end();
          ++fleet_it) {
       model->InitializeFleetDerivedQuantities(fleet_it->first);
-      std::map<std::string, fims::Vector<Type>>& fleet_derived_quantities =
+      std::map<std::string, fims::Vector<Type>> &fleet_derived_quantities =
           model->GetFleetDerivedQuantities(fleet_it->first);
       assign_fleet_derived_vectors<Type>(
           fleet_derived_quantities, fleet_it->second->n_years,
@@ -627,8 +645,7 @@ void initialize_model_derived_quantity_maps(
   }
 }
 
-template <typename Type>
-void reset_backend_id_counters() {
+template <typename Type> void reset_backend_id_counters() {
   fims_data_object::DataObject<Type>::id_g = 0;
   fims_distributions::DensityComponentBase<Type>::id_g = 0;
   fims_popdy::Fleet<Type>::id_g = 0;
@@ -649,8 +666,7 @@ void reset_backend_id_counters() {
  * the corresponding native pre-assembly state while deliberately postponing
  * Information::CreateModel() until fims_call_create_model().
  */
-template <typename Type>
-void prepare_backend_model_shell_internal() {
+template <typename Type> void prepare_backend_model_shell_internal() {
   std::shared_ptr<fims_info::Information<Type>> info =
       fims_info::Information<Type>::GetInstance();
 
@@ -675,7 +691,7 @@ void prepare_backend_model_shell_internal() {
       model->AddPopulation(population_it->first);
       model->InitializePopulationDerivedQuantities(population_it->first);
 
-      std::map<std::string, fims::Vector<Type>>& population_dq =
+      std::map<std::string, fims::Vector<Type>> &population_dq =
           model->GetPopulationDerivedQuantities(population_it->first);
       assign_population_derived_vectors<Type>(population_dq,
                                               population_it->second->n_years,
@@ -701,7 +717,7 @@ void prepare_backend_model_shell_internal() {
         }
 
         model->InitializeFleetDerivedQuantities(*fleet_id_it);
-        std::map<std::string, fims::Vector<Type>>& fleet_dq =
+        std::map<std::string, fims::Vector<Type>> &fleet_dq =
             model->GetFleetDerivedQuantities(*fleet_id_it);
         assign_fleet_derived_vectors<Type>(fleet_dq, fleet->n_years,
                                            fleet->n_ages, fleet->n_lengths);
@@ -731,7 +747,7 @@ void prepare_backend_model_shell_internal() {
         // is a CatchAtAge-only API and is not available through
         // FisheryModelBase, so only refresh the derived-quantity map.
         model->InitializePopulationDerivedQuantities(population_it->first);
-        std::map<std::string, fims::Vector<Type>>& population_dq =
+        std::map<std::string, fims::Vector<Type>> &population_dq =
             model->GetPopulationDerivedQuantities(population_it->first);
         assign_population_derived_vectors<Type>(population_dq,
                                                 population_it->second->n_years,
@@ -755,7 +771,7 @@ void prepare_backend_model_shell_internal() {
           }
 
           model->InitializeFleetDerivedQuantities(*fleet_id_it);
-          std::map<std::string, fims::Vector<Type>>& fleet_dq =
+          std::map<std::string, fims::Vector<Type>> &fleet_dq =
               model->GetFleetDerivedQuantities(*fleet_id_it);
           assign_fleet_derived_vectors<Type>(fleet_dq, fleet->n_years,
                                              fleet->n_ages, fleet->n_lengths);
@@ -765,8 +781,7 @@ void prepare_backend_model_shell_internal() {
   }
 }
 
-template <typename Type>
-bool create_backend_model_internal() {
+template <typename Type> bool create_backend_model_internal() {
   std::shared_ptr<fims_info::Information<Type>> info =
       fims_info::Information<Type>::GetInstance();
 
@@ -828,14 +843,14 @@ bool create_backend_model_internal() {
   return model_created && model_valid;
 }
 
-SEXP require_numeric_vector(SEXP sexp, const char* argument_name) {
+SEXP require_numeric_vector(SEXP sexp, const char *argument_name) {
   if (!Rf_isNumeric(sexp)) {
     Rf_error("`%s` must be numeric.", argument_name);
   }
   return Rf_coerceVector(sexp, REALSXP);
 }
 
-int require_scalar_integer(SEXP sexp, const char* argument_name, int minimum) {
+int require_scalar_integer(SEXP sexp, const char *argument_name, int minimum) {
   if (!Rf_isNumeric(sexp) || XLENGTH(sexp) != 1) {
     Rf_error("`%s` must be one numeric value.", argument_name);
   }
@@ -850,7 +865,7 @@ int require_scalar_integer(SEXP sexp, const char* argument_name, int minimum) {
   return static_cast<int>(value);
 }
 
-std::string require_scalar_string(SEXP sexp, const char* argument_name) {
+std::string require_scalar_string(SEXP sexp, const char *argument_name) {
   if (!Rf_isString(sexp) || XLENGTH(sexp) != 1 ||
       STRING_ELT(sexp, 0) == NA_STRING) {
     Rf_error("`%s` must be one non-missing string.", argument_name);
@@ -858,8 +873,8 @@ std::string require_scalar_string(SEXP sexp, const char* argument_name) {
   return CHAR(STRING_ELT(sexp, 0));
 }
 
-void require_finite_values(SEXP values, const char* argument_name) {
-  const double* value_ptr = REAL(values);
+void require_finite_values(SEXP values, const char *argument_name) {
+  const double *value_ptr = REAL(values);
   for (R_xlen_t index = 0; index < XLENGTH(values); ++index) {
     if (!std::isfinite(value_ptr[index])) {
       Rf_error("`%s` must contain only finite values.", argument_name);
@@ -868,9 +883,10 @@ void require_finite_values(SEXP values, const char* argument_name) {
 }
 
 template <typename Type>
-std::shared_ptr<fims_data_object::DataObject<Type>> create_data_object_1d(
-    std::shared_ptr<fims_info::Information<Type>> info, SEXP data_sexp,
-    size_t expected_size, const char* argument_name) {
+std::shared_ptr<fims_data_object::DataObject<Type>>
+create_data_object_1d(std::shared_ptr<fims_info::Information<Type>> info,
+                      SEXP data_sexp, size_t expected_size,
+                      const char *argument_name) {
   SEXP data_real = PROTECT(require_numeric_vector(data_sexp, argument_name));
   if (static_cast<size_t>(XLENGTH(data_real)) != expected_size) {
     UNPROTECT(1);
@@ -879,7 +895,7 @@ std::shared_ptr<fims_data_object::DataObject<Type>> create_data_object_1d(
 
   std::shared_ptr<fims_data_object::DataObject<Type>> data_object =
       std::make_shared<fims_data_object::DataObject<Type>>(expected_size);
-  const double* data_ptr = REAL(data_real);
+  const double *data_ptr = REAL(data_real);
   for (size_t index = 0; index < expected_size; ++index) {
     data_object->at(index) = static_cast<Type>(data_ptr[index]);
     data_object->uncertainty[index] = static_cast<Type>(0.0);
@@ -891,9 +907,10 @@ std::shared_ptr<fims_data_object::DataObject<Type>> create_data_object_1d(
 }
 
 template <typename Type>
-std::shared_ptr<fims_data_object::DataObject<Type>> create_data_object_2d(
-    std::shared_ptr<fims_info::Information<Type>> info, SEXP data_sexp,
-    size_t n_years, size_t n_bins, const char* argument_name) {
+std::shared_ptr<fims_data_object::DataObject<Type>>
+create_data_object_2d(std::shared_ptr<fims_info::Information<Type>> info,
+                      SEXP data_sexp, size_t n_years, size_t n_bins,
+                      const char *argument_name) {
   const size_t expected_size = n_years * n_bins;
   SEXP data_real = PROTECT(require_numeric_vector(data_sexp, argument_name));
   if (static_cast<size_t>(XLENGTH(data_real)) != expected_size) {
@@ -904,7 +921,7 @@ std::shared_ptr<fims_data_object::DataObject<Type>> create_data_object_2d(
 
   std::shared_ptr<fims_data_object::DataObject<Type>> data_object =
       std::make_shared<fims_data_object::DataObject<Type>>(n_years, n_bins);
-  const double* data_ptr = REAL(data_real);
+  const double *data_ptr = REAL(data_real);
   for (size_t year = 0; year < n_years; ++year) {
     for (size_t bin = 0; bin < n_bins; ++bin) {
       const size_t index = year * n_bins + bin;
@@ -919,9 +936,9 @@ std::shared_ptr<fims_data_object::DataObject<Type>> create_data_object_2d(
 }
 
 template <typename Type>
-std::shared_ptr<fims_popdy::Fleet<Type>> require_fleet(
-    std::shared_ptr<fims_info::Information<Type>> info, uint32_t fleet_id,
-    const char* argument_name) {
+std::shared_ptr<fims_popdy::Fleet<Type>>
+require_fleet(std::shared_ptr<fims_info::Information<Type>> info,
+              uint32_t fleet_id, const char *argument_name) {
   auto fleet_it = info->fleets.find(fleet_id);
   if (fleet_it == info->fleets.end() || fleet_it->second == nullptr) {
     Rf_error("No fleet with id %u was found for `%s`.",
@@ -931,9 +948,9 @@ std::shared_ptr<fims_popdy::Fleet<Type>> require_fleet(
 }
 
 template <typename Type>
-fims::Vector<Type>* require_fleet_derived_quantity(
+fims::Vector<Type> *require_fleet_derived_quantity(
     std::shared_ptr<fims_info::Information<Type>> info, uint32_t fleet_id,
-    const std::string& derived_name) {
+    const std::string &derived_name) {
   std::shared_ptr<fims_popdy::FisheryModelBase<Type>> model =
       info->models_map.begin()->second;
   if (model == nullptr) {
@@ -941,7 +958,7 @@ fims::Vector<Type>* require_fleet_derived_quantity(
              derived_name.c_str());
   }
 
-  std::map<std::string, fims::Vector<Type>>& derived_quantities =
+  std::map<std::string, fims::Vector<Type>> &derived_quantities =
       model->GetFleetDerivedQuantities(fleet_id);
   auto derived_it = derived_quantities.find(derived_name);
   if (derived_it == derived_quantities.end()) {
@@ -956,8 +973,8 @@ template <typename Type>
 void add_continuous_data_component(
     std::shared_ptr<fims_info::Information<Type>> info,
     std::shared_ptr<fims_data_object::DataObject<Type>> observed_data,
-    fims::Vector<Type>* expected_values, size_t n_years,
-    const std::string& family, const std::vector<double>& sd) {
+    fims::Vector<Type> *expected_values, size_t n_years,
+    const std::string &family, const std::vector<double> &sd) {
   if (expected_values == nullptr) {
     Rf_error("Continuous-data expected-values pointer is null.");
   }
@@ -1008,7 +1025,7 @@ void add_continuous_data_component(
 template <typename Type>
 void add_normal_observed_component(
     std::shared_ptr<fims_info::Information<Type>> info,
-    fims::Vector<Type>* values, double log_sd, int log_sd_estimation_type) {
+    fims::Vector<Type> *values, double log_sd, int log_sd_estimation_type) {
   if (values == nullptr || values->size() == 0) {
     return;
   }
@@ -1051,7 +1068,7 @@ template <typename Type>
 void add_multinomial_component(
     std::shared_ptr<fims_info::Information<Type>> info,
     std::shared_ptr<fims_data_object::DataObject<Type>> observed_data,
-    fims::Vector<Type>* expected_values, size_t n_years, size_t n_bins) {
+    fims::Vector<Type> *expected_values, size_t n_years, size_t n_bins) {
   const size_t expected_size = n_years * n_bins;
   if (expected_values == nullptr) {
     Rf_error("Multinomial expected-values pointer is null.");
@@ -1078,11 +1095,11 @@ void add_multinomial_component(
 template <typename Type>
 void build_default_likelihood_internal(
     uint32_t fishing_fleet_id, uint32_t survey_fleet_id, SEXP landings_sexp,
-    const std::string& landings_distribution,
-    const std::vector<double>& landings_sd, SEXP landings_age_comp_sexp,
+    const std::string &landings_distribution,
+    const std::vector<double> &landings_sd, SEXP landings_age_comp_sexp,
     SEXP landings_length_comp_sexp, SEXP survey_index_sexp,
-    const std::string& survey_distribution,
-    const std::vector<double>& survey_sd, SEXP survey_age_comp_sexp,
+    const std::string &survey_distribution,
+    const std::vector<double> &survey_sd, SEXP survey_age_comp_sexp,
     SEXP survey_length_comp_sexp, double recruitment_log_sd,
     int recruitment_log_sd_estimation_type, size_t n_years, size_t n_ages,
     size_t n_lengths) {
@@ -1180,9 +1197,10 @@ void build_default_likelihood_internal(
   if (enable_length_comp && !Rf_isNull(landings_length_comp_sexp) &&
       XLENGTH(landings_length_comp_sexp) > 0) {
     std::shared_ptr<fims_data_object::DataObject<Type>>
-        fishing_length_comp_data = create_data_object_2d<Type>(
-            info, landings_length_comp_sexp, n_years, n_lengths,
-            "landings_length_comp");
+        fishing_length_comp_data =
+            create_data_object_2d<Type>(info, landings_length_comp_sexp,
+                                        n_years, n_lengths,
+                                        "landings_length_comp");
     fishing_fleet->fleet_observed_lengthcomp_data_id_m =
         static_cast<int>(fishing_length_comp_data->id);
     fishing_fleet->observed_lengthcomp_data = fishing_length_comp_data;
@@ -1252,7 +1270,7 @@ void build_default_likelihood_internal(
   }
 }
 
-}  // namespace
+} // namespace
 
 extern "C" SEXP fims_call_create_model() {
   bool created = create_backend_model_internal<double>();
@@ -1286,9 +1304,9 @@ extern "C" SEXP fims_call_build_default_likelihood(
       require_scalar_string(survey_distribution_sexp, "survey_distribution");
   if (TYPEOF(landings_sd_sexp) != REALSXP || TYPEOF(survey_sd_sexp) != REALSXP)
     Rf_error("Distribution standard deviations must be numeric vectors.");
-  const std::vector<double> landings_sd(
-      REAL(landings_sd_sexp),
-      REAL(landings_sd_sexp) + XLENGTH(landings_sd_sexp));
+  const std::vector<double> landings_sd(REAL(landings_sd_sexp),
+                                        REAL(landings_sd_sexp) +
+                                            XLENGTH(landings_sd_sexp));
   const std::vector<double> survey_sd(
       REAL(survey_sd_sexp), REAL(survey_sd_sexp) + XLENGTH(survey_sd_sexp));
   require_finite_values(landings_sd_sexp, "landings_sd");
@@ -1357,18 +1375,18 @@ extern "C" SEXP fims_call_add_prior(SEXP module_sexp, SEXP object_id_sexp,
   const int log_sd_estimation_type = require_scalar_integer(
       log_sd_estimation_type_sexp, "log_sd_estimation_type", 0);
 
-#define FIMS_ADD_PRIOR(TYPE)                                           \
-  if (distribution == "normal")                                        \
-    add_prior_internal<TYPE, fims_distributions::NormalLPDF<TYPE>>(    \
-        module, object_id, parameter, REAL(mean_real), mean_size,      \
-        REAL(log_sd_real), log_sd_size, mean_estimation_type,          \
-        log_sd_estimation_type, "Dnorm");                              \
-  else if (distribution == "lognormal")                                \
-    add_prior_internal<TYPE, fims_distributions::LogNormalLPDF<TYPE>>( \
-        module, object_id, parameter, REAL(mean_real), mean_size,      \
-        REAL(log_sd_real), log_sd_size, mean_estimation_type,          \
-        log_sd_estimation_type, "Dlnorm");                             \
-  else                                                                 \
+#define FIMS_ADD_PRIOR(TYPE)                                                   \
+  if (distribution == "normal")                                                \
+    add_prior_internal<TYPE, fims_distributions::NormalLPDF<TYPE>>(            \
+        module, object_id, parameter, REAL(mean_real), mean_size,              \
+        REAL(log_sd_real), log_sd_size, mean_estimation_type,                  \
+        log_sd_estimation_type, "Dnorm");                                      \
+  else if (distribution == "lognormal")                                        \
+    add_prior_internal<TYPE, fims_distributions::LogNormalLPDF<TYPE>>(         \
+        module, object_id, parameter, REAL(mean_real), mean_size,              \
+        REAL(log_sd_real), log_sd_size, mean_estimation_type,                  \
+        log_sd_estimation_type, "Dlnorm");                                     \
+  else                                                                         \
     Rf_error("Unsupported prior distribution `%s`.", distribution.c_str())
 
   FIMS_ADD_PRIOR(double);
@@ -1412,6 +1430,7 @@ extern "C" SEXP fims_call_information_model_counts() {
 }
 
 extern "C" SEXP fims_call_information_clear() {
+  fims::FIMSLog::fims_log->clear();
   std::shared_ptr<fims_info::Information<double>> info_double =
       fims_info::Information<double>::GetInstance();
   info_double->Clear();
