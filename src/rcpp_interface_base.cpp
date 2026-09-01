@@ -28,57 +28,68 @@ IdCounterRegistration variable_vector_id_g_registration(
 
 namespace {
 /**
- * @brief Find a parameter or stop with a message naming the module and field.
+ * @brief Find a VariableVector or stop with a message naming the module and
+ * field.
  */
-VariableVector &require_parameter(Rcpp::XPtr<SharedBase> xp,
+VariableVector &require_variable_vector(Rcpp::XPtr<SharedBase> xp,
                                   const std::string &name) {
   if (!xp || !(*xp)) {
-    Rcpp::stop("Cannot look up parameter '" + name + "' on a null module.");
+    Rcpp::stop("Cannot look up '" + name + "' on a null module.");
   }
-  VariableVector *parameter = (*xp)->get_parameter(name);
-  if (parameter == nullptr) {
-    Rcpp::stop("This module has no parameter named '" + name + "'.");
+  VariableVector *variable_vector = (*xp)->get_variable_vector(name);
+  if (variable_vector == nullptr) {
+    Rcpp::stop("This module has no field named '" + name + "'.");
   }
-  return *parameter;
+  return *variable_vector;
 }
 }  // namespace
 
 /**
- * @brief Set one parameter vector by name, on any module that has one.
+ * @brief Set one VariableVector field by name, on any module that has one.
  *
  * @details Resizes the vector, assigns initial values, and sets estimation
  * statuses from a character vector (length 1 is recycled across all elements).
- * Naming a parameter the module does not have is an error rather than a silent
+ * Naming a field the module does not have is an error rather than a silent
  * no-op.
+ *
+ * The estimation status is given per call rather than being a fixed property
+ * of the field, which is what lets the same quantity be estimated in one model
+ * and assumed known or derived in another.
+ *
+ * @param xp The module to act on.
+ * @param name The field name as used in R.
+ * @param values The values to write. The vector is resized to match.
+ * @param estimation_status One status name, or one per element.
  */
-void set_parameter_(Rcpp::XPtr<SharedBase> xp, std::string name,
+void set_variable_vector_(Rcpp::XPtr<SharedBase> xp, std::string name,
                     Rcpp::NumericVector values,
                     Rcpp::CharacterVector estimation_status) {
-  set_variable_vector(require_parameter(xp, name), values, estimation_status);
+  fill_variable_vector(require_variable_vector(xp, name), values,
+                       estimation_status);
 }
 
 /**
- * @brief Set one fixed numeric vector by name, on any module that has one.
+ * @brief Set one plain numeric vector by name, on any module that has one.
  *
- * @details The counterpart to set_parameter_(), for vectors that hold plain
- * numbers rather than estimable parameters: observations, uncertainties, ages,
- * empirical weights. These carry no estimation status, so only values are
- * given. The vector is resized to match.
+ * @details The counterpart to set_variable_vector_(), for fields declared as
+ * fims::Vector<double> rather than VariableVector: observations,
+ * uncertainties, ages, empirical weights. These carry no estimation status, so
+ * only values are given, and nothing can be estimated from them.
  *
  * @param xp The module to act on.
  * @param name The vector name as used in R.
  * @param values The values to write.
  */
-void set_vector_(Rcpp::XPtr<SharedBase> xp, std::string name,
+void set_numeric_vector_(Rcpp::XPtr<SharedBase> xp, std::string name,
                  Rcpp::NumericVector values) {
   if (!xp || !(*xp)) {
     Rcpp::stop("Cannot set vector '" + name + "' on a null module.");
   }
-  fims::Vector<double> *vector = (*xp)->get_vector(name);
+  fims::Vector<double> *vector = (*xp)->get_numeric_vector(name);
   if (vector == nullptr) {
     Rcpp::stop("This module has no vector named '" + name + "'.");
   }
-  set_real_vector(*vector, values);
+  fill_numeric_vector(*vector, values);
 }
 
 /**
@@ -86,8 +97,8 @@ void set_vector_(Rcpp::XPtr<SharedBase> xp, std::string name,
  *
  * @details This is the ID other modules refer to it by: a fleet's selectivity
  * ID, a population's growth ID, the data IDs a distribution is linked to. Not
- * to be confused with get_parameter_id_(), which returns the ID of one
- * parameter vector inside a module rather than the module's own.
+ * to be confused with get_variable_vector_id_(), which returns the ID of one
+ * VariableVector inside a module rather than the module's own.
  *
  * @param xp The module to read.
  * @return The module's unique ID.
@@ -100,14 +111,21 @@ uint32_t get_module_id_(Rcpp::XPtr<SharedBase> xp) {
 }
 
 /**
- * @brief Get the id of one parameter vector by name.
+ * @brief Get the id of one VariableVector field by name.
  *
  * @details This is the id that fims_info::Information::variable_map is keyed
  * by, so it is what set_distribution_links_() needs in order to attach a
- * distribution to this parameter.
+ * distribution to this field. It works for any VariableVector the module
+ * exposes, whether the model reads it as an input or computes it -- a
+ * distribution on observed catch names a computed quantity, and a prior on a
+ * parameter names an input.
+ *
+ * @param xp The module to read from.
+ * @param name The field name as used in R.
+ * @return The id.
  */
-uint32_t get_parameter_id_(Rcpp::XPtr<SharedBase> xp, std::string name) {
-  return require_parameter(xp, name).id_m;
+uint32_t get_variable_vector_id_(Rcpp::XPtr<SharedBase> xp, std::string name) {
+  return require_variable_vector(xp, name).id_m;
 }
 
 // ── Invalidation for clear() ─────────────────────────────────────────────────
@@ -130,13 +148,13 @@ uint32_t get_parameter_id_(Rcpp::XPtr<SharedBase> xp, std::string name) {
 void release_base_(Rcpp::XPtr<SharedBase> xp) { xp.release(); }
 
 /**
- * Function to register the shared parameter accessors with the Rcpp module
+ * Function to register the shared field accessors with the Rcpp module
  * system.
  */
 void register_parameters(Rcpp::Module &m) {
-  Rcpp::function("set_parameter_", &set_parameter_);
-  Rcpp::function("set_vector_", &set_vector_);
+  Rcpp::function("set_variable_vector_", &set_variable_vector_);
+  Rcpp::function("set_numeric_vector_", &set_numeric_vector_);
   Rcpp::function("get_module_id_", &get_module_id_);
-  Rcpp::function("get_parameter_id_", &get_parameter_id_);
+  Rcpp::function("get_variable_vector_id_", &get_variable_vector_id_);
   Rcpp::function("release_base_", &release_base_);
 }

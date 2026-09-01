@@ -512,13 +512,13 @@ RCPP_EXPOSED_CLASS(VariableVector)
  * @param values The initial values.
  * @param estimation_status One status name, or one per element.
  */
-inline void set_variable_vector(VariableVector &target,
+inline void fill_variable_vector(VariableVector &target,
                                 Rcpp::NumericVector values,
                                 Rcpp::CharacterVector estimation_status) {
   if (estimation_status.size() != 1 &&
       estimation_status.size() != values.size()) {
     Rcpp::stop(
-        "set_variable_vector(): `estimation_status` must be length 1 or the "
+        "fill_variable_vector(): `estimation_status` must be length 1 or the "
         "same length as `values`.");
   }
   target.resize(values.size());
@@ -536,7 +536,7 @@ inline void set_variable_vector(VariableVector &target,
  * @param target The vector to fill.
  * @param values The values to copy in.
  */
-inline void set_real_vector(fims::Vector<double> &target,
+inline void fill_numeric_vector(fims::Vector<double> &target,
                             Rcpp::NumericVector values) {
   target.resize(values.size());
   for (int i = 0; i < values.size(); i++) {
@@ -607,43 +607,51 @@ class FIMSRcppInterfaceBase {
   virtual uint32_t get_id() = 0;
 
   /**
-   * @brief Look up one of this module's parameter vectors by name.
+   * @brief Look up one of this module's VariableVector fields by name.
    *
-   * @details Declared on the root so that one exported setter and one id
-   * getter serve every module, reached through an XPtr typed to this class.
-   * Modules that carry no named parameters -- the data modules and the
-   * fishery models -- inherit this default and report that the name is
-   * unknown.
+   * @details A VariableVector carries an estimation status per element and is
+   * registered in fims_info::Information::variable_map under an id. Those two
+   * properties are what this accessor selects on, and they are what the id is
+   * for: naming a quantity so a distribution can say which one it applies to.
    *
-   * Section 2.1 of Parameter_Registry.Rmd replaces these hand-written
-   * overrides with a declare_parameter() call per field in each constructor.
-   * The signature here is what that design calls find_parameter(), so the
-   * exported functions do not change when that lands.
+   * Declared on the root so that one exported setter and one id getter serve
+   * every module, reached through an XPtr typed to this class. Modules with no
+   * VariableVector fields -- the data modules and the fishery models -- inherit
+   * this default and report that the name is unknown.
    *
-   * @param name The parameter name as used in R.
+   * Section 2.1 of Parameter_Registry.Rmd replaces these hand-written overrides
+   * with one declaration per field in each constructor, which also gives the
+   * enumeration this design currently lacks: there is no way to ask a module
+   * what fields it has, only whether it has a given one.
+   *
+   * @param name The field name as used in R.
    * @return A pointer to the vector, or nullptr if this module has no
-   * parameter by that name.
+   * VariableVector by that name.
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     return nullptr;
   }
 
   /**
-   * @brief Look up one of this module's fixed numeric vectors by name.
+   * @brief Look up one of this module's plain numeric vectors by name.
    *
-   * @details The counterpart to get_parameter(), for vectors that hold plain
-   * numbers rather than estimable parameters: observations, uncertainties,
-   * ages, empirical weights. These carry no estimation status and no
-   * variable_map id, so one setter writes them with values alone.
+   * @details The counterpart to get_variable_vector(), for fields that are
+   * fims::Vector<double> rather than VariableVector: observations,
+   * uncertainties, ages, empirical weights. These carry no estimation status
+   * and no variable_map id, so nothing can be estimated from them and no
+   * distribution can name them; one setter writes them with values alone.
    *
-   * A module author picks between the two by what the field is, not by which
-   * family it belongs to: estimable goes in get_parameter(), fixed goes here.
+   * The split between the two accessors is by type, not by role. A module
+   * author picks by asking which type the field is declared as, and that
+   * choice was already made when the field was declared: a quantity that could
+   * ever be estimated, or that a distribution might need to name, has to be a
+   * VariableVector.
    *
-   * @param name The vector name as used in R.
-   * @return A pointer to the vector, or nullptr if this module has no vector
-   * by that name.
+   * @param name The field name as used in R.
+   * @return A pointer to the vector, or nullptr if this module has no numeric
+   * vector by that name.
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     return nullptr;
   }
 

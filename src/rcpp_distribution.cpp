@@ -71,7 +71,7 @@ Rcpp::XPtr<SharedDistribution> create_distribution_(std::string type) {
  *   effect, or data. Determines which expected values the distribution reads
  *   during evaluation.
  * @param ids The variable_map IDs of the quantities being linked, as returned
- *   by get_parameter_id_().
+ *   by get_variable_vector_id_().
  * @return true if the distribution accepted the links, false otherwise.
  */
 bool set_distribution_links_(Rcpp::XPtr<SharedDistribution> xp,
@@ -113,7 +113,7 @@ bool set_distribution_fixed_mean_(Rcpp::XPtr<SharedDistribution> xp,
 // ── Multinomial-only settings ────────────────────────────────────────────────
 // `dims` is a plain numeric vector rather than a parameter vector, and
 // `notes` is a
-// string, so neither goes through get_parameter().
+// string, so neither goes through get_variable_vector().
 
 /**
  * @brief Attach a free-text note, carried through to the JSON output.

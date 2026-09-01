@@ -140,9 +140,9 @@ class AgeCompDataInterface : public DataInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "values") return &this->age_comp_data;
     if (name == "uncertainty") return &this->uncertainty;
     return nullptr;
@@ -266,9 +266,9 @@ class LengthCompDataInterface : public DataInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "values") return &this->length_comp_data;
     if (name == "uncertainty") return &this->uncertainty;
     return nullptr;
@@ -381,9 +381,9 @@ class IndexDataInterface : public DataInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "values") return &this->index_data;
     if (name == "uncertainty") return &this->uncertainty;
     return nullptr;
@@ -497,9 +497,9 @@ class CatchDataInterface : public DataInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "values") return &this->catch_data;
     if (name == "uncertainty") return &this->uncertainty;
     return nullptr;

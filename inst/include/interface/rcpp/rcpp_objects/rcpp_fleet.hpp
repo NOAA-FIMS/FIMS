@@ -218,13 +218,33 @@ class FleetInterface : public FleetInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "log_q") return &this->log_q;
     if (name == "log_Fmort") return &this->log_Fmort;
     if (name == "age_to_length_conversion")
       return &this->age_to_length_conversion;
+    if (name == "catch_numbers_at_age") return &this->catch_numbers_at_age;
+    if (name == "catch_weight_at_age") return &this->catch_weight_at_age;
+    if (name == "catch_numbers_at_length")
+      return &this->catch_numbers_at_length;
+    if (name == "catch_weight") return &this->catch_weight;
+    if (name == "catch_numbers") return &this->catch_numbers;
+    if (name == "catch_expected") return &this->catch_expected;
+    if (name == "log_catch_expected") return &this->log_catch_expected;
+    if (name == "agecomp_proportion") return &this->agecomp_proportion;
+    if (name == "lengthcomp_proportion") return &this->lengthcomp_proportion;
+    if (name == "index_numbers_at_age") return &this->index_numbers_at_age;
+    if (name == "index_weight_at_age") return &this->index_weight_at_age;
+    if (name == "index_numbers_at_length")
+      return &this->index_numbers_at_length;
+    if (name == "index_weight") return &this->index_weight;
+    if (name == "index_numbers") return &this->index_numbers;
+    if (name == "index_expected") return &this->index_expected;
+    if (name == "log_index_expected") return &this->log_index_expected;
+    if (name == "agecomp_expected") return &this->agecomp_expected;
+    if (name == "lengthcomp_expected") return &this->lengthcomp_expected;
     return nullptr;
   }
 

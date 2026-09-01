@@ -44,7 +44,7 @@
 #'
 #' ```r
 #' set_population_constants_(population$pointer, n_years = 30, ...)
-#' set_parameter_(population$base_pointer, "log_M", values, status)
+#' set_variable_vector_(population$base_pointer, "log_M", values, status)
 #' ```
 #'
 #' `family` records which kind of module this is, for FIMS's own use.
@@ -177,238 +177,178 @@ print.fims_module <- function(x, ...) {
   invisible(x)
 }
 
-# ---- Data ------------------------------------------------------------------
+# ---- Creating modules --------------------------------------------------------
+
+# Display labels for describe_model(), one per type. The C++ creators take the
+# type string on the left; the label on the right is what a user recognises.
+.fims_module_types <- list(
+  data = c(
+    age_comp = "AgeComp", length_comp = "LengthComp",
+    index = "Index", catch = "Catch"
+  ),
+  selectivity = c(
+    logistic = "LogisticSelectivity",
+    double_logistic = "DoubleLogisticSelectivity"
+  ),
+  recruitment = c(
+    beverton_holt = "BevertonHoltRecruitment",
+    log_devs_process = "LogDevsRecruitmentProcess",
+    log_r_process = "LogRRecruitmentProcess"
+  ),
+  distribution = c(
+    dnorm = "DnormDistribution", dlnorm = "DlnormDistribution",
+    dmultinom = "DmultinomDistribution"
+  ),
+  growth = c(ewaa = "EWAAGrowth"),
+  maturity = c(logistic = "LogisticMaturity"),
+  model = c(catch_at_age = "CatchAtAge")
+)
+
+#' Look up a type's display label, or stop listing what is available
+#'
+#' @param family The module family.
+#' @param type The type string the user gave.
+#' @return The display label.
+#' @noRd
+module_type_label <- function(family, type) {
+  labels <- .fims_module_types[[family]]
+  if (!is.character(type) || length(type) != 1 || !type %in% names(labels)) {
+    cli::cli_abort(c(
+      "{.arg type} is not a {family} type FIMS knows about.",
+      "x" = "Got {.val {type}}.",
+      "i" = "Available: {.val {names(labels)}}."
+    ))
+  }
+  labels[[type]]
+}
 
 #' Create a data module
 #'
 #' @description
-#' Each function creates one observed-data module and registers it, so that
-#' `CreateTMBModel()` picks it up without the module having to be passed in by
-#' hand. Set the observations and their uncertainty with `set_vector_()`, using
-#' the field names `"values"` and `"uncertainty"`.
+#' Creates one observed-data module and registers it, so that
+#' [CreateTMBModel()] picks it up without the module having to be passed in by
+#' hand. Set the observations with [set_data()].
 #'
+#' @param type The kind of data: `"age_comp"`, `"length_comp"`, `"index"`, or
+#'   `"catch"`.
 #' @param n_years The number of years of observations.
-#' @param n_ages The number of age bins.
-#' @param n_lengths The number of length bins.
+#' @param n_bins The number of age bins for `"age_comp"` or length bins for
+#'   `"length_comp"`. Index and catch data are one value per year, so leave
+#'   this at 0 for them.
 #' @return
 #' A [fims_module] of the requested data type.
+#' @seealso [set_data()]
 #' @export
-#' @rdname create_data
-create_age_comp <- function(n_years, n_ages) {
+create_data <- function(type, n_years, n_bins = 0) {
+  label <- module_type_label("data", type)
   pointer <- create_data_interface_(
-    "age_comp",
-    as.integer(n_years),
-    as.integer(n_ages)
+    type, as.integer(n_years), as.integer(n_bins)
   )
-  register_module(
-    pointer,
-    "data",
-    "AgeComp",
-    n_years = n_years,
-    n_ages = n_ages
+  # The bin count is named for what it counts, so describe_model() reads well.
+  extras <- list(n_years = n_years)
+  if (type == "age_comp") extras[["n_ages"]] <- n_bins
+  if (type == "length_comp") extras[["n_lengths"]] <- n_bins
+  do.call(
+    register_module,
+    c(list(pointer = pointer, family = "data", type = label), extras)
   )
 }
 
+#' Create a selectivity module
+#'
+#' @param type The functional form: `"logistic"` or `"double_logistic"`.
+#' @return
+#' A [fims_module] of the requested selectivity type.
 #' @export
-#' @rdname create_data
-create_length_comp <- function(n_years, n_lengths) {
-  pointer <- create_data_interface_(
-    "length_comp",
-    as.integer(n_years),
-    as.integer(n_lengths)
-  )
-  register_module(
-    pointer,
-    "data",
-    "LengthComp",
-    n_years = n_years,
-    n_lengths = n_lengths
-  )
+create_selectivity <- function(type) {
+  label <- module_type_label("selectivity", type)
+  register_module(create_selectivity_(type), "selectivity", label)
 }
 
+#' Create a maturity module
+#'
+#' @param type The functional form: `"logistic"`.
+#' @return
+#' A [fims_module] of the requested maturity type.
 #' @export
-#' @rdname create_data
-create_index <- function(n_years) {
-  # create_data_interface_() takes n_bins as a third argument. Rcpp does not
-  # carry C++ default arguments across to R, so the 0 is passed explicitly
-  # here; it rejects a non-zero value for one-dimensional data types.
-  pointer <- create_data_interface_("index", as.integer(n_years), 0L)
-  register_module(
-    pointer,
-    "data",
-    "Index",
-    n_years = n_years
-  )
+create_maturity <- function(type) {
+  label <- module_type_label("maturity", type)
+  register_module(create_maturity_(type), "maturity", label)
 }
 
+#' Create a growth module
+#'
+#' @param type The functional form: `"ewaa"`, empirical weight at age.
+#' @return
+#' A [fims_module] of the requested growth type.
 #' @export
-#' @rdname create_data
-create_catch <- function(n_years) {
-  pointer <- create_data_interface_("catch", as.integer(n_years), 0L)
-  register_module(
-    pointer,
-    "data",
-    "Catch",
-    n_years = n_years
-  )
+create_growth <- function(type) {
+  label <- module_type_label("growth", type)
+  register_module(create_growth_(type), "growth", label)
 }
 
-# ---- Population processes --------------------------------------------------
-
-#' Create a population process module
+#' Create a recruitment module
 #'
 #' @description
-#' Each function creates one population process module and registers it, so
-#' that `CreateTMBModel()` picks it up without the module having to be passed
-#' in by hand. Set the module's parameters with `set_parameter_()`.
+#' Covers both the stock--recruit relationship and the process that supplies
+#' its deviations, since both are recruitment modules on the C++ side.
 #'
+#' @param type `"beverton_holt"` for the stock--recruit relationship, or
+#'   `"log_devs_process"` or `"log_r_process"` for the deviation process.
 #' @return
-#' A [fims_module] of the requested process type.
+#' A [fims_module] of the requested recruitment type.
 #' @export
-#' @rdname create_process
-create_ewaa_growth <- function() {
-  pointer <- create_growth_("ewaa")
-  register_module(pointer, "growth", "EWAAGrowth")
+create_recruitment <- function(type) {
+  label <- module_type_label("recruitment", type)
+  register_module(create_recruitment_(type), "recruitment", label)
 }
-
-#' @export
-#' @rdname create_process
-create_logistic_maturity <- function() {
-  pointer <- create_maturity_("logistic")
-  register_module(pointer, "maturity", "LogisticMaturity")
-}
-
-#' @export
-#' @rdname create_process
-create_logistic_selectivity <- function() {
-  pointer <- create_selectivity_("logistic")
-  register_module(
-    pointer,
-    "selectivity",
-    "LogisticSelectivity"
-  )
-}
-
-#' @export
-#' @rdname create_process
-create_double_logistic_selectivity <- function() {
-  pointer <- create_selectivity_("double_logistic")
-  register_module(
-    pointer,
-    "selectivity",
-    "DoubleLogisticSelectivity"
-  )
-}
-
-#' @export
-#' @rdname create_process
-create_beverton_holt_recruitment <- function() {
-  pointer <- create_recruitment_("beverton_holt")
-  register_module(
-    pointer,
-    "recruitment",
-    "BevertonHoltRecruitment"
-  )
-}
-
-#' @export
-#' @rdname create_process
-create_log_devs_recruitment_process <- function() {
-  pointer <- create_recruitment_("log_devs_process")
-  register_module(
-    pointer,
-    "recruitment",
-    "LogDevsRecruitmentProcess"
-  )
-}
-
-#' @export
-#' @rdname create_process
-create_log_r_recruitment_process <- function() {
-  pointer <- create_recruitment_("log_r_process")
-  register_module(
-    pointer,
-    "recruitment",
-    "LogRRecruitmentProcess"
-  )
-}
-
-# ---- Distributions ---------------------------------------------------------
 
 #' Create a distribution module
 #'
 #' @description
-#' Each function creates one distribution module and registers it, so that
-#' `CreateTMBModel()` picks it up without the module having to be passed in by
-#' hand.
+#' Distributions are not linked to the fishery model directly; they reach the
+#' model by being registered, and name the quantities they apply to with
+#' [set_distribution_links()].
 #'
+#' @param type The distribution: `"dnorm"`, `"dlnorm"`, or `"dmultinom"`.
 #' @return
 #' A [fims_module] of the requested distribution type.
 #' @export
-#' @rdname create_distribution
-create_dnorm_distribution <- function() {
-  pointer <- create_distribution_("dnorm")
-  register_module(
-    pointer,
-    "distribution",
-    "DnormDistribution"
-  )
+create_distribution <- function(type) {
+  label <- module_type_label("distribution", type)
+  register_module(create_distribution_(type), "distribution", label)
 }
 
+#' Create a fishery model module
+#'
+#' @param type The model structure: `"catch_at_age"`.
+#' @return
+#' A [fims_module] of the requested model type.
 #' @export
-#' @rdname create_distribution
-create_dlnorm_distribution <- function() {
-  pointer <- create_distribution_("dlnorm")
-  register_module(
-    pointer,
-    "distribution",
-    "DlnormDistribution"
-  )
+create_fishery_model <- function(type) {
+  label <- module_type_label("model", type)
+  register_module(create_fishery_model_(type), "model", label)
 }
 
-#' @export
-#' @rdname create_distribution
-create_dmultinom_distribution <- function() {
-  pointer <- create_distribution_("dmultinom")
-  register_module(
-    pointer,
-    "distribution",
-    "DmultinomDistribution"
-  )
-}
-
-# ---- Structural modules ----------------------------------------------------
-
-#' Create a fleet, population, or fishery model module
+#' Create a fleet or a population
 #'
 #' @description
-#' Each function creates one structural module and registers it, so that
-#' `CreateTMBModel()` picks it up without the module having to be passed in by
-#' hand. These modules hold links to other modules: a fleet names its
-#' selectivity and its observed data, a population names its growth, maturity,
-#' recruitment, and fleets, and the fishery model names its populations.
+#' These take no type because there is only one kind of each. Both hold links
+#' to other modules: a fleet names its selectivity and observed data, a
+#' population names its growth, maturity, recruitment, and fleets.
 #'
 #' @return
-#' A [fims_module] of the requested type.
+#' A [fims_module].
 #' @export
 #' @rdname create_structure
 create_fleet <- function() {
-  pointer <- create_fleet_()
-  register_module(pointer, "fleet", "Fleet")
+  register_module(create_fleet_(), "fleet", "Fleet")
 }
 
 #' @export
 #' @rdname create_structure
 create_population <- function() {
-  pointer <- create_population_()
-  register_module(pointer, "population", "Population")
-}
-
-#' @export
-#' @rdname create_structure
-create_catch_at_age_model <- function() {
-  pointer <- create_fishery_model_("catch_at_age")
-  register_module(pointer, "model", "CatchAtAge")
+  register_module(create_population_(), "population", "Population")
 }
 
 # ---- Model lifecycle -------------------------------------------------------

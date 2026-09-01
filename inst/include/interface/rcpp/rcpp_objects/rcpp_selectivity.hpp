@@ -119,9 +119,9 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "inflection_point") return &this->inflection_point;
     if (name == "slope") return &this->slope;
     return nullptr;
@@ -305,9 +305,9 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "inflection_point_asc") return &this->inflection_point_asc;
     if (name == "slope_asc") return &this->slope_asc;
     if (name == "inflection_point_desc") return &this->inflection_point_desc;

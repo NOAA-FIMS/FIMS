@@ -148,13 +148,15 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "logit_steep") return &this->logit_steep;
     if (name == "log_rzero") return &this->log_rzero;
     if (name == "log_devs") return &this->log_devs;
     if (name == "log_r") return &this->log_r;
+    if (name == "log_expected_recruitment")
+      return &this->log_expected_recruitment;
     return nullptr;
   }
 

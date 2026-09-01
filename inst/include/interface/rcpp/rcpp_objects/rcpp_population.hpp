@@ -95,11 +95,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief The number of years.
    */
   int n_years = 0;
-  /**
-   * @brief The number of length bins.
-   */
-  int n_lengths = 0;
-  /**
+    /**
    * @brief The ID of the maturity module.
    */
   int maturity_id = -999;
@@ -250,22 +246,44 @@ class PopulationInterface : public PopulationInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "ages") return &this->ages;
     return nullptr;
   }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "log_M") return &this->log_M;
     if (name == "log_init_naa") return &this->log_init_naa;
     if (name == "log_f_multiplier") return &this->log_f_multiplier;
     if (name == "proportion_female") return &this->proportion_female;
     if (name == "spawning_biomass_ratio") return &this->spawning_biomass_ratio;
+
+    // Quantities the model computes. Reachable by name for the same reason
+    // the inputs are: each is a VariableVector with an id in
+    // Information::variable_map, which is how a distribution says which
+    // quantity it applies to.
+    if (name == "numbers_at_age") return &this->numbers_at_age;
+    if (name == "unfished_numbers_at_age")
+      return &this->unfished_numbers_at_age;
+    if (name == "biomass") return &this->biomass;
+    if (name == "spawning_biomass") return &this->spawning_biomass;
+    if (name == "unfished_biomass") return &this->unfished_biomass;
+    if (name == "unfished_spawning_biomass")
+      return &this->unfished_spawning_biomass;
+    if (name == "proportion_mature_at_age")
+      return &this->proportion_mature_at_age;
+    if (name == "expected_recruitment") return &this->expected_recruitment;
+    if (name == "sum_selectivity") return &this->sum_selectivity;
+    if (name == "mortality_F") return &this->mortality_F;
+    if (name == "mortality_M") return &this->mortality_M;
+    if (name == "mortality_Z") return &this->mortality_Z;
+    if (name == "total_catch_numbers") return &this->total_catch_numbers;
+    if (name == "total_catch_weight") return &this->total_catch_weight;
     return nullptr;
   }
 
@@ -337,6 +355,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
       this->fleets_m.push_back(fleets[i]);
     }
+    this->n_fleets = static_cast<int>(this->fleets_m.size());
   }
 
   /**

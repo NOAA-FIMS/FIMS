@@ -200,9 +200,9 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual uint32_t get_id() { return this->id_m; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "observed_values") return &this->observed_values;
     if (name == "expected_values") return &this->expected_values;
     if (name == "expected_mean") return &this->expected_mean;
@@ -544,9 +544,9 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual uint32_t get_id() { return this->id_m; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "observed_values") return &this->observed_values;
     if (name == "expected_values") return &this->expected_values;
     if (name == "log_sd") return &this->log_sd;
@@ -860,18 +860,18 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   virtual uint32_t get_id() { return this->id_m; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "observed_values") return &this->observed_values;
     if (name == "expected_values") return &this->expected_values;
     return nullptr;
   }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_vector
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
    */
-  virtual fims::Vector<double> *get_vector(const std::string &name) {
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
     if (name == "dims") return &this->dims;
     return nullptr;
   }

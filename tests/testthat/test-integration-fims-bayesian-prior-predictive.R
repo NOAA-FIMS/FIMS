@@ -21,179 +21,238 @@ test_that("posterior equals prior with no data", {
   catch <- em_input[["L.obs"]][["fleet1"]]
   # set fishing fleet catch data, need to set dimensions of data index
   # currently FIMS only has a fleet module that takes index for both survey index and fishery catch
-  fishing_fleet_index <- methods::new(Index, om_input[["nyr"]])
-  fishing_fleet_index$index_data[] <- catch
+  fishing_fleet_index <- create_data("index", om_input[["nyr"]])
+  set_data(fishing_fleet_index, catch)
 
   # set fishing fleet age comp data, need to set dimensions of age comps
-  # Here the new function initializes the object with length nyr*nages
-  fishing_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
+  # Here the create function initializes the object with length nyr*nages
   # Here we fill in the values for the object with the observed age comps for fleet one
   # we multiply these proportions by the sample size for likelihood weighting
-  fishing_fleet_age_comp$age_comp_data[] <- c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]]
-
+  fishing_fleet_age_comp <- create_data(
+    "age_comp", om_input[["nyr"]], om_input[["nages"]]
+  )
+  set_data(
+    fishing_fleet_age_comp,
+    c(t(em_input[["L.age.obs"]][["fleet1"]])) * em_input[["n.L"]][["fleet1"]]
+  )
 
   # set fishing fleet length comp data, need to set dimensions of length comps
-  fishing_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])
-  fishing_fleet_length_comp$length_comp_data[] <- c(t(em_input[["L.length.obs"]][["fleet1"]])) * em_input[["n.L.lengthcomp"]][["fleet1"]]
+  fishing_fleet_length_comp <- create_data(
+    "length_comp", om_input[["nyr"]], om_input[["nlengths"]]
+  )
+  set_data(
+    fishing_fleet_length_comp,
+    c(t(em_input[["L.length.obs"]][["fleet1"]])) *
+      em_input[["n.L.lengthcomp"]][["fleet1"]]
+  )
 
   # Fleet
   # Create the fishing fleet
-  fishing_fleet_selectivity <- methods::new(LogisticSelectivity)
-  fishing_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]]
-  # turn on estimation of inflection_point
-  fishing_fleet_selectivity$inflection_point[1]$set_estimation_status("fixed_effects")
-  fishing_fleet_selectivity$slope[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]]
-  # turn on estimation of slope
-  fishing_fleet_selectivity$slope[1]$set_estimation_status("fixed_effects")
+  # turn on estimation of inflection_point and slope
+  fishing_fleet_selectivity <- create_selectivity("logistic")
+  set_variable_vector(
+    fishing_fleet_selectivity, "inflection_point",
+    om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], "fixed_effects"
+  )
+  set_variable_vector(
+    fishing_fleet_selectivity, "slope",
+    om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]], "fixed_effects"
+  )
 
-  # Initialize the fishing fleet module
-  # Initialize the fishing fleet module
-  fishing_fleet <- methods::new(Fleet)
-  # Set number of years
-  fishing_fleet$n_years$set(om_input[["nyr"]])
-  # Set number of age classes
-  fishing_fleet$n_ages$set(om_input[["nages"]])
-  # Set number of length bins
-  fishing_fleet$n_lengths$set(om_input[["nlengths"]])
+  # Initialize the fishing fleet module and set its dimensions
+  fishing_fleet <- create_fleet()
+  set_fleet_constants(
+    fishing_fleet,
+    om_input[["nyr"]], om_input[["nages"]], om_input[["nlengths"]]
+  )
 
-  fishing_fleet$log_Fmort$resize(om_input[["nyr"]])
-  for (y in 1:om_input$nyr) {
-    # Log-transform OM fishing mortality
-    fishing_fleet$log_Fmort[y]$value <- log(om_output[["f"]][y])
-  }
-  fishing_fleet$log_q[1]$value <- log(1.0)
-  fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
-  fishing_fleet$SetObservedIndexDataID(fishing_fleet_index$get_id())
-  fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
-  fishing_fleet$SetObservedLengthCompDataID(fishing_fleet_length_comp$get_id())
+  # Log-transform OM fishing mortality. Left assumed known, as before.
+  set_variable_vector(
+    fishing_fleet, "log_Fmort",
+    log(om_output[["f"]][1:om_input[["nyr"]]]), "assumed_known"
+  )
+  set_variable_vector(fishing_fleet, "log_q", log(1.0), "assumed_known")
+  set_fleet_selectivity(fishing_fleet, fishing_fleet_selectivity)
+  set_fleet_observed_data(
+    fishing_fleet,
+    age_comp = fishing_fleet_age_comp,
+    length_comp = fishing_fleet_length_comp,
+    index = fishing_fleet_index
+  )
 
   # Set age-to-length conversion matrix
   # TODO: If an age_to_length_conversion matrix is provided, the code below
   # still executes. Consider adding a check in the Rcpp interface to ensure
   # users provide a vector of inputs.
-  fishing_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
-  for (i in 1:(om_input[["nages"]] * om_input[["nlengths"]])) {
-    # Set the age-length conversion matrix values
-    fishing_fleet$age_to_length_conversion[i]$value <- c(t(em_input[["age_to_length_conversion"]]))[i]
-  }
+  set_variable_vector(
+    fishing_fleet, "age_to_length_conversion",
+    c(t(em_input[["age_to_length_conversion"]])), "assumed_known"
+  )
 
   # Repeat similar setup for the survey fleet (e.g., index, age comp, and length comp)
   # This includes initializing logistic selectivity, observed data modules, and distribution links.
   survey_index <- em_input[["surveyB.obs"]][["survey1"]]
-  survey_fleet_index <- methods::new(Index, om_input[["nyr"]])
-  survey_fleet_index$index_data[] <- survey_index
+  survey_fleet_index <- create_data("index", om_input[["nyr"]])
+  set_data(survey_fleet_index, survey_index)
 
-  survey_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
-  survey_fleet_age_comp$age_comp_data[] <- c(t(em_input[["survey.age.obs"]][["survey1"]]) * em_input[["n.survey"]][["survey1"]])
-
+  survey_fleet_age_comp <- create_data(
+    "age_comp", om_input[["nyr"]], om_input[["nages"]]
+  )
+  set_data(
+    survey_fleet_age_comp,
+    c(t(em_input[["survey.age.obs"]][["survey1"]]) *
+      em_input[["n.survey"]][["survey1"]])
+  )
 
   survey_lengthcomp <- em_input[["survey.length.obs"]][["survey1"]]
-  survey_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])
-  survey_fleet_length_comp$length_comp_data[] <- c(t(em_input[["survey.length.obs"]][["survey1"]])) * em_input[["n.survey.lengthcomp"]][["survey1"]]
-
+  survey_fleet_length_comp <- create_data(
+    "length_comp", om_input[["nyr"]], om_input[["nlengths"]]
+  )
+  set_data(
+    survey_fleet_length_comp,
+    c(t(em_input[["survey.length.obs"]][["survey1"]])) *
+      em_input[["n.survey.lengthcomp"]][["survey1"]]
+  )
 
   # Fleet
   # Create the survey fleet
-  survey_fleet_selectivity <- methods::new(LogisticSelectivity)
-  survey_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]
-  # turn on estimation of inflection_point
-  survey_fleet_selectivity$inflection_point[1]$set_estimation_status("fixed_effects")
-  survey_fleet_selectivity$slope[1]$value <- om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]
-  # turn on estimation of slope
-  survey_fleet_selectivity$slope[1]$set_estimation_status("fixed_effects")
+  # turn on estimation of inflection_point and slope
+  survey_fleet_selectivity <- create_selectivity("logistic")
+  set_variable_vector(
+    survey_fleet_selectivity, "inflection_point",
+    om_input[["sel_survey"]][["survey1"]][["A50.sel1"]], "fixed_effects"
+  )
+  set_variable_vector(
+    survey_fleet_selectivity, "slope",
+    om_input[["sel_survey"]][["survey1"]][["slope.sel1"]], "fixed_effects"
+  )
 
-  survey_fleet <- methods::new(Fleet)
-  survey_fleet$n_ages$set(om_input[["nages"]])
-  survey_fleet$n_years$set(om_input[["nyr"]])
-  survey_fleet$n_lengths$set(om_input[["nlengths"]])
-  survey_fleet$log_Fmort$resize(om_input[["nyr"]])
-  for (y in 1:om_input$nyr) {
-    # Log-transform OM fishing mortality
-    survey_fleet$log_Fmort[y]$value <- (-200)
-  }
-  survey_fleet$log_q[1]$value <- log(om_output[["survey_q"]][["survey1"]])
-  survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
-  survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
-  survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
-  survey_fleet$SetObservedLengthCompDataID(survey_fleet_length_comp$get_id())
+  survey_fleet <- create_fleet()
+  set_fleet_constants(
+    survey_fleet,
+    om_input[["nyr"]], om_input[["nages"]], om_input[["nlengths"]]
+  )
+  # Set very low survey fishing mortality
+  set_variable_vector(
+    survey_fleet, "log_Fmort",
+    rep(-200, om_input[["nyr"]]), "assumed_known"
+  )
+  set_variable_vector(
+    survey_fleet, "log_q",
+    log(om_output[["survey_q"]][["survey1"]]), "assumed_known"
+  )
+  set_fleet_selectivity(survey_fleet, survey_fleet_selectivity)
+  set_fleet_observed_data(
+    survey_fleet,
+    age_comp = survey_fleet_age_comp,
+    length_comp = survey_fleet_length_comp,
+    index = survey_fleet_index
+  )
 
-  survey_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])
-  for (i in 1:(om_input[["nages"]] * om_input[["nlengths"]])) {
-    survey_fleet$age_to_length_conversion[i]$value <-
-      c(t(em_input[["age_to_length_conversion"]]))[i]
-  }
+  set_variable_vector(
+    survey_fleet, "age_to_length_conversion",
+    c(t(em_input[["age_to_length_conversion"]])), "assumed_known"
+  )
 
   # Set up priors for selectivity parameters and link to both fishery and survey selectivity
   slope_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]], om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]))
   slope_sd <- 3
-  slope_prior <- methods::new(DnormDistribution)
-  slope_prior$expected_values$resize(2)
-  slope_prior$expected_values[1]$value <- slope_mean
-  slope_prior$expected_values[2]$value <- slope_mean
-  slope_prior$log_sd$resize(1)
-  slope_prior$log_sd[1]$value <- log(slope_sd)
-  slope_prior$set_distribution_links("prior", c(fishing_fleet_selectivity$slope$get_id(), survey_fleet_selectivity$slope$get_id()))
+  slope_prior <- create_distribution("dnorm")
+  set_variable_vector(
+    slope_prior, "expected_values", rep(slope_mean, 2), "assumed_known"
+  )
+  set_variable_vector(
+    slope_prior, "log_sd", log(slope_sd), "assumed_known"
+  )
+  set_distribution_links(
+    slope_prior, "prior",
+    c(
+      get_variable_vector_id(fishing_fleet_selectivity, "slope"),
+      get_variable_vector_id(survey_fleet_selectivity, "slope")
+    )
+  )
 
   inflection_point_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]))
   inflection_point_sd <- 3
-  inflection_point_prior <- methods::new(DnormDistribution)
-  inflection_point_prior$expected_values$resize(2)
-  inflection_point_prior$expected_values[1]$value <- inflection_point_mean
-  inflection_point_prior$expected_values[2]$value <- inflection_point_mean
-  inflection_point_prior$log_sd$resize(1)
-  inflection_point_prior$log_sd[1]$value <- log(inflection_point_sd)
-  inflection_point_prior$set_distribution_links("prior", c(fishing_fleet_selectivity$inflection_point$get_id(), survey_fleet_selectivity$inflection_point$get_id()))
+  inflection_point_prior <- create_distribution("dnorm")
+  set_variable_vector(
+    inflection_point_prior, "expected_values",
+    rep(inflection_point_mean, 2), "assumed_known"
+  )
+  set_variable_vector(
+    inflection_point_prior, "log_sd", log(inflection_point_sd), "assumed_known"
+  )
+  set_distribution_links(
+    inflection_point_prior, "prior",
+    c(
+      get_variable_vector_id(fishing_fleet_selectivity, "inflection_point"),
+      get_variable_vector_id(survey_fleet_selectivity, "inflection_point")
+    )
+  )
 
-
-  recruitment <- methods::new(BevertonHoltRecruitment)
-  recruitment_process <- new(LogDevsRecruitmentProcess)
+  recruitment <- create_recruitment("beverton_holt")
+  recruitment_process <- create_recruitment("log_devs_process")
 
   # set up recruitment parameters and fix as assumed_known (default)
   # do not set up a recruitment distribution as devs will be assumed known
   # set up log_rzero (equilibrium recruitment)
-  recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
+  set_variable_vector(
+    recruitment, "log_rzero", log(om_input[["R0"]]), "assumed_known"
+  )
   # set up logit_steep
-  recruitment$logit_steep[1]$value <- -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2)
+  set_variable_vector(
+    recruitment, "logit_steep",
+    -log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2), "assumed_known"
+  )
   # recruit deviations should enter the model in normal space.
   # The log is taken in the likelihood calculations
-  recruitment$log_devs$resize(om_input[["nyr"]] - 1)
-  for (y in 1:(om_input[["nyr"]] - 1)) {
-    recruitment$log_devs[y]$value <- om_input[["logR.resid"]][y + 1]
-  }
-  recruitment$n_years <- om_input[["nyr"]]
-  recruitment$SetRecruitmentProcessID(recruitment_process$get_id())
+  set_variable_vector(
+    recruitment, "log_devs",
+    om_input[["logR.resid"]][2:om_input[["nyr"]]], "assumed_known"
+  )
+  set_recruitment_n_years(recruitment, om_input[["nyr"]])
+  set_recruitment_process(recruitment, recruitment_process)
 
   # Growth
-  ewaa_growth <- methods::new(EWAAGrowth)
-  ewaa_growth$n_years <- om_input[["nyr"]]
-  ewaa_growth$ages[] <- om_input[["ages"]]
-  ewaa_growth$weights[] <- c(t(om_input[["W.mt"]]))
-
+  ewaa_growth <- create_growth("ewaa")
+  set_growth_n_years(ewaa_growth, om_input[["nyr"]])
+  set_numeric_vector(ewaa_growth, "ages", om_input[["ages"]])
+  set_numeric_vector(ewaa_growth, "weights", c(t(om_input[["W.mt"]])))
 
   # Maturity
-  maturity <- methods::new(LogisticMaturity)
-  maturity$inflection_point[1]$value <- om_input[["A50.mat"]]
-  maturity$inflection_point[1]$set_estimation_status("assumed_known")
-  maturity$slope[1]$value <- om_input[["slope.mat"]]
-  maturity$slope[1]$set_estimation_status("assumed_known")
+  maturity <- create_maturity("logistic")
+  set_variable_vector(
+    maturity, "inflection_point", om_input[["A50.mat"]], "assumed_known"
+  )
+  set_variable_vector(
+    maturity, "slope", om_input[["slope.mat"]], "assumed_known"
+  )
 
   # Population
-  population <- methods::new(Population)
-  population$log_M$resize(om_input[["nyr"]] * om_input[["nages"]])
-  for (i in 1:(om_input[["nyr"]] * om_input[["nages"]])) {
-    population$log_M[i]$value <- log(om_input[["M.age"]][1])
-  }
-  population$log_init_naa$resize(om_input[["nages"]])
-  for (i in 1:om_input$nages) {
-    population$log_init_naa[i]$value <- log(om_output[["N.age"]][1, i])
-  }
-  population$n_ages$set(om_input[["nages"]])
-  population$ages[] <- om_input[["ages"]]
-  population$n_fleets$set(sum(om_input[["fleet_num"]], om_input[["survey_num"]]))
-  population$n_years$set(om_input[["nyr"]])
-  population$SetRecruitmentID(recruitment$get_id())
-  population$SetGrowthID(ewaa_growth$get_id())
-  population$SetMaturityID(maturity$get_id())
+  population <- create_population()
+  set_variable_vector(
+    population, "log_M",
+    rep(
+      log(om_input[["M.age"]][1]),
+      om_input[["nyr"]] * om_input[["nages"]]
+    ),
+    "assumed_known"
+  )
+  set_variable_vector(
+    population, "log_init_naa",
+    log(om_output[["N.age"]][1, ]), "assumed_known"
+  )
+  set_population_constants(population, om_input[["nyr"]], om_input[["nages"]])
+  set_numeric_vector(population, "ages", om_input[["ages"]])
+  # No fleets are linked: this model has no fishery model module, so the
+  # population is never evaluated. The fleet count follows from the linked
+  # fleets and is no longer set by hand.
+  set_population_processes(
+    population,
+    maturity = maturity,
+    growth = ewaa_growth,
+    recruitment = recruitment
+  )
 
 
   # Set-up TMB

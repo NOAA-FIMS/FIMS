@@ -11,7 +11,7 @@
 ## Setup ----
 # Load necessary data for the integration test
 if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
+ # prepare_test_data()
 }
 
 load(testthat::test_path("fixtures", "integration_test_data.RData"))
