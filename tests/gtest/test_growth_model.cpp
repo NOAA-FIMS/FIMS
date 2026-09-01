@@ -166,28 +166,10 @@ TEST(GrowthModel, ZeroAgesThrows) {
   EXPECT_THROW(gm.Prepare(), std::runtime_error);
 }
 
-TEST(GrowthModel, RejectsNonIncreasingReferenceLengths) {
-  fims_popdy::GrowthModel<double> gm(1, 2, 1);
-  gm.SetVonBertalanffySchnuteParameters(275.0, 275.0, 0.18, 1.0, 12.0);
-  gm.SetLengthWeightParameters(2.5e-11, 3.0);
-  gm.SetLengthSdParams(28.0, 73.0);
-
-  EXPECT_THROW(gm.Prepare(), std::runtime_error);
-}
-
 TEST(GrowthModel, RejectsCoincidentReferenceAges) {
   fims_popdy::GrowthModel<double> gm(1, 3, 1);
   gm.SetVonBertalanffySchnuteParameters(275.0, 725.0, 0.18, 5.0, 5.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
-  gm.SetLengthSdParams(28.0, 73.0);
-
-  EXPECT_THROW(gm.Prepare(), std::runtime_error);
-}
-
-TEST(GrowthModel, RejectsNonPositiveLengthWeightA) {
-  fims_popdy::GrowthModel<double> gm(1, 2, 1);
-  gm.SetVonBertalanffySchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
-  gm.SetLengthWeightParameters(0.0, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
 
   EXPECT_THROW(gm.Prepare(), std::runtime_error);

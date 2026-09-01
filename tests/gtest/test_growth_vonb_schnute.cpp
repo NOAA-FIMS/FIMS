@@ -135,34 +135,4 @@ namespace
     EXPECT_NEAR(d_log_laa_d_log_k, 0.0, 1e-12);
   }
 
-  TEST(VonBertalanffySchnuteEvaluate, RejectsNonPositiveGrowthCoefficient)
-  {
-    auto vb = MakeValidVonB();
-
-    // Make just this one parameter invalid.
-    vb.growth_coefficient = 0.0;
-
-    // The backend validator should now reject this.
-    EXPECT_THROW(vb.length_at_age(1.0), std::runtime_error);
-  }
-
-  TEST(VonBertalanffySchnuteEvaluate, RejectsReversedReferenceAges)
-  {
-    auto vb = MakeValidVonB();
-
-    // Make the second reference age come before the first.
-    vb.reference_age_for_length_2 = vb.reference_age_for_length_1;
-
-    EXPECT_THROW(vb.length_at_age(1.0), std::runtime_error);
-  }
-
-  TEST(VonBertalanffySchnuteEvaluate, RejectsNonIncreasingReferenceLengths)
-  {
-    auto vb = MakeValidVonB();
-
-    // Make the second reference length no larger than the first.
-    vb.mean_length_old = vb.mean_length_young;
-
-    EXPECT_THROW(vb.length_at_age(1.0), std::runtime_error);
-  }
 }

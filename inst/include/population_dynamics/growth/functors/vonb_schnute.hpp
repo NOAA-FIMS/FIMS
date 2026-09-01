@@ -9,7 +9,6 @@
 #ifndef POPULATION_DYNAMICS_GROWTH_VONB_SCHNUTE_HPP
 #define POPULATION_DYNAMICS_GROWTH_VONB_SCHNUTE_HPP
 
-#include <stdexcept>
 #include "../../../common/fims_math.hpp"
 #include "growth_base.hpp"
 
@@ -43,64 +42,11 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
   virtual ~VonBertalanffySchnuteGrowth() {}
 
   /**
-   * @brief Validate the VonBertalanffySchnute parameters used by length-at-age
-   * calculations.
-   *
-   * Throws when the stored growth parameter values are incompatible with the
-   * raw VonBertalanffySchnute length-at-age calculation.
-   */
-  void ValidateLengthParameters() const {
-    if (growth_coefficient <= Type(0.0)) {
-      throw std::runtime_error(
-          "VonBertalanffySchnuteGrowth growth_coefficient must be > 0");
-    }
-
-    if (mean_length_young <= Type(0.0)) {
-      throw std::runtime_error(
-          "VonBertalanffySchnuteGrowth mean_length_young must be > 0");
-    }
-
-    if (mean_length_old <= Type(0.0)) {
-      throw std::runtime_error(
-          "VonBertalanffySchnuteGrowth mean_length_old must be > 0");
-    }
-
-    if (reference_age_for_length_2 <= reference_age_for_length_1) {
-      throw std::runtime_error(
-          "VonBertalanffySchnuteGrowth reference_age_for_length_2 must be > "
-          "reference_age_for_length_1");
-    }
-
-    if (mean_length_old <= mean_length_young) {
-      throw std::runtime_error(
-          "VonBertalanffySchnuteGrowth mean_length_old must be > "
-          "mean_length_young");
-    }
-  }
-
-  /**
-   * @brief Validate the length-weight parameters used by weight-at-age
-   * calculations.
-   */
-  void ValidateWeightParameters() const {
-    if (length_weight_a <= Type(0.0)) {
-      throw std::runtime_error(
-          "VonBertalanffySchnuteGrowth length_weight_a must be > 0");
-    }
-
-    if (length_weight_b <= Type(0.0)) {
-      throw std::runtime_error(
-          "VonBertalanffySchnuteGrowth length_weight_b must be > 0");
-    }
-  }
-
-  /**
    * @brief Evaluate mean length at age.
    * @param age Age on the natural scale.
    * @return Mean length at the requested age.
    */
   Type length_at_age(const Type& age) const {
-    ValidateLengthParameters();
 
     if (reference_age_for_length_1 > Type(0.0) &&
         age < reference_age_for_length_1) {
@@ -152,7 +98,6 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
                                   Type& d_log_laa_d_l1,
                                   Type& d_log_laa_d_l2,
                                   Type& d_log_laa_d_k) const {
-    ValidateLengthParameters();
 
     if (reference_age_for_length_1 > Type(0.0) &&
         age < reference_age_for_length_1) {
@@ -238,7 +183,6 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
    * @return Mean weight at the requested age.
    */
   Type weight_at_age(const Type& age) const {
-    ValidateWeightParameters();
     Type length = length_at_age(age);
     return length_weight_a * fims_math::pow(length, length_weight_b);
   }

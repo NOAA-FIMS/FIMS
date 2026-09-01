@@ -538,8 +538,8 @@ class VonBertalanffySchnuteGrowthInterface
 
  private:
   enum class LengthReferenceParameterization {
-    kEstimatedL1EstimatedGap = 0,
-    kConstantL1EstimatedGap,
+    kEstimatedReferenceLengths = 0,
+    kConstantL1EstimatedL2,
     kEstimatedL1BelowConstantL2,
     kBothConstant
   };
@@ -561,10 +561,10 @@ class VonBertalanffySchnuteGrowthInterface
     const bool estimate_l2 = IsEstimated(this->mean_length_old);
 
     if (estimate_l1 && estimate_l2) {
-      return LengthReferenceParameterization::kEstimatedL1EstimatedGap;
+      return LengthReferenceParameterization::kEstimatedReferenceLengths;
     }
     if (!estimate_l1 && estimate_l2) {
-      return LengthReferenceParameterization::kConstantL1EstimatedGap;
+      return LengthReferenceParameterization::kConstantL1EstimatedL2;
     }
     if (estimate_l1 && !estimate_l2) {
       return LengthReferenceParameterization::kEstimatedL1BelowConstantL2;
@@ -572,45 +572,13 @@ class VonBertalanffySchnuteGrowthInterface
     return LengthReferenceParameterization::kBothConstant;
   }
 
-  double WorkingScaleInitialLengthAtRefAge1() {
-    switch (GetLengthReferenceParameterization()) {
-      case LengthReferenceParameterization::kEstimatedL1BelowConstantL2:
-        return fims_math::logit(
-            0.0,
-            InitialLengthAtRefAge2(),
-            InitialLengthAtRefAge1());
-
-      case LengthReferenceParameterization::kEstimatedL1EstimatedGap:
-      case LengthReferenceParameterization::kConstantL1EstimatedGap:
-      case LengthReferenceParameterization::kBothConstant:
-        return fims_math::log(InitialLengthAtRefAge1());
-    }
-
-    return fims_math::log(InitialLengthAtRefAge1());
-  }
-
-  double WorkingScaleInitialLengthAtRefAge2() {
-    switch (GetLengthReferenceParameterization()) {
-      case LengthReferenceParameterization::kEstimatedL1EstimatedGap:
-      case LengthReferenceParameterization::kConstantL1EstimatedGap:
-        return fims_math::log(
-            InitialLengthAtRefAge2() - InitialLengthAtRefAge1());
-
-      case LengthReferenceParameterization::kEstimatedL1BelowConstantL2:
-      case LengthReferenceParameterization::kBothConstant:
-        return fims_math::log(InitialLengthAtRefAge2());
-    }
-
-    return fims_math::log(InitialLengthAtRefAge2());
-  }
-
   double FinalMeanLengthYoungFromWorkingScale(
       const fims::Vector<double>& mean_length_young_src) {
     switch (GetLengthReferenceParameterization()) {
-      case LengthReferenceParameterization::kEstimatedL1EstimatedGap:
+      case LengthReferenceParameterization::kEstimatedReferenceLengths:
         return fims_math::exp(mean_length_young_src[0]);
 
-      case LengthReferenceParameterization::kConstantL1EstimatedGap:
+      case LengthReferenceParameterization::kConstantL1EstimatedL2:
         return InitialLengthAtRefAge1();
 
       case LengthReferenceParameterization::kEstimatedL1BelowConstantL2:
@@ -630,13 +598,9 @@ class VonBertalanffySchnuteGrowthInterface
       const fims::Vector<double>& mean_length_young_src,
       const fims::Vector<double>& mean_length_old_src) {
     switch (GetLengthReferenceParameterization()) {
-      case LengthReferenceParameterization::kEstimatedL1EstimatedGap:
-        return FinalMeanLengthYoungFromWorkingScale(mean_length_young_src) +
-               fims_math::exp(mean_length_old_src[0]);
-
-      case LengthReferenceParameterization::kConstantL1EstimatedGap:
-        return InitialLengthAtRefAge1() +
-               fims_math::exp(mean_length_old_src[0]);
+      case LengthReferenceParameterization::kEstimatedReferenceLengths:
+      case LengthReferenceParameterization::kConstantL1EstimatedL2:
+        return fims_math::exp(mean_length_old_src[0]);
 
       case LengthReferenceParameterization::kEstimatedL1BelowConstantL2:
         return InitialLengthAtRefAge2();
@@ -663,12 +627,12 @@ class VonBertalanffySchnuteGrowthInterface
       const std::shared_ptr<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<Type>>&
           vb) {
     switch (GetLengthReferenceParameterization()) {
-      case LengthReferenceParameterization::kEstimatedL1EstimatedGap:
-        vb->UseEstimatedMeanLengthYoungWithEstimatedGap();
+      case LengthReferenceParameterization::kEstimatedReferenceLengths:
+        vb->UseEstimatedReferenceMeanLengths();
         break;
 
-      case LengthReferenceParameterization::kConstantL1EstimatedGap:
-        vb->UseConstantMeanLengthYoungWithEstimatedGap(
+      case LengthReferenceParameterization::kConstantL1EstimatedL2:
+        vb->UseConstantMeanLengthYoungWithEstimatedMeanLengthOld(
             static_cast<Type>(InitialLengthAtRefAge1()));
         break;
 
@@ -983,31 +947,6 @@ bool add_to_fims_tmb_internal() {
     info->variable_map[pv.id_m] = &target;
   };
 
-  auto load_transformed_and_register = [&](VariableVector& pv,
-                                           fims::Vector<Type>& target,
-                                           const std::string& base_name,
-                                           double transformed_value) {
-    target.resize(pv.size());
-    for (size_t i = 0; i < pv.size(); i++) {
-      target[i] = static_cast<Type>(transformed_value);
-      if (pv[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Growth." << this->id << "." << base_name << "."
-           << pv[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(target[i]);
-      }
-      if (pv[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Growth." << this->id << "." << base_name << "."
-           << pv[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(target[i]);
-      }
-    }
-    info->variable_map[pv.id_m] = &target;
-  };
-
   auto load_optional_and_register = [&](VariableVector& pv,
                                         fims::Vector<Type>& target,
                                         const std::string& base_name,
@@ -1021,14 +960,10 @@ bool add_to_fims_tmb_internal() {
 
   ConfigureLengthReferenceParameterization<Type>(vb);
 
-  load_transformed_and_register(this->mean_length_young,
-                                vb->MeanLengthYoungVector(),
-                                "mean_length_young",
-                                WorkingScaleInitialLengthAtRefAge1());
-  load_transformed_and_register(this->mean_length_old,
-                                vb->MeanLengthOldVector(),
-                                "mean_length_old",
-                                WorkingScaleInitialLengthAtRefAge2());
+  load_and_register(this->mean_length_young, vb->MeanLengthYoungVector(),
+                    "mean_length_young", true);
+  load_and_register(this->mean_length_old, vb->MeanLengthOldVector(),
+                    "mean_length_old", true);
   load_and_register(this->growth_coefficient, vb->GrowthCoefficientVector(),
                     "growth_coefficient", true);
   load_and_register(this->reference_age_for_length_1,

@@ -82,30 +82,30 @@ class VonBertalanffySchnuteGrowthModelAdapter : public GrowthDerivedObservationB
    * @brief Options for how the two reference lengths are supplied.
    */
   enum class LengthReferenceParameterization {
-    kEstimatedL1EstimatedGap = 0,
-    kConstantL1EstimatedGap,
+    kEstimatedReferenceLengths = 0,
+    kConstantL1EstimatedL2,
     kEstimatedL1BelowConstantL2,
     kBothConstant
   };
 
   /**
-   * @brief Estimate the young reference length and the old-young length gap.
+   * @brief Estimate both reference mean lengths.
    */
-  void UseEstimatedMeanLengthYoungWithEstimatedGap() {
+  void UseEstimatedReferenceMeanLengths() {
     length_reference_parameterization_ =
-        LengthReferenceParameterization::kEstimatedL1EstimatedGap;
+        LengthReferenceParameterization::kEstimatedReferenceLengths;
     growth_products_prepared_ = false;
   }
 
   /**
-   * @brief Fix young reference length and estimate the old-young length gap.
+   * @brief Fix young reference length and estimate older reference mean length.
    *
    * @param constant_mean_length_young Fixed mean length at the younger reference age.
    */
-  void UseConstantMeanLengthYoungWithEstimatedGap(
+  void UseConstantMeanLengthYoungWithEstimatedMeanLengthOld(
       Type constant_mean_length_young) {
     length_reference_parameterization_ =
-        LengthReferenceParameterization::kConstantL1EstimatedGap;
+        LengthReferenceParameterization::kConstantL1EstimatedL2;
     constant_mean_length_young_ = constant_mean_length_young;
     growth_products_prepared_ = false;
   }
@@ -445,7 +445,7 @@ class VonBertalanffySchnuteGrowthModelAdapter : public GrowthDerivedObservationB
   fims::Vector<Type> logit_corr_length_at_ref_age_2_growth_coefficient_vector_;
   bool use_param_vectors_ = false;
   LengthReferenceParameterization length_reference_parameterization_ =
-      LengthReferenceParameterization::kEstimatedL1EstimatedGap;
+      LengthReferenceParameterization::kEstimatedReferenceLengths;
   Type constant_mean_length_young_ = Type(0.0);
   Type constant_mean_length_old_ = Type(0.0);
   std::size_t n_years_ = 0;
@@ -511,10 +511,10 @@ class VonBertalanffySchnuteGrowthModelAdapter : public GrowthDerivedObservationB
 
   Type CurrentMeanLengthYoung() const {
     switch (length_reference_parameterization_) {
-      case LengthReferenceParameterization::kEstimatedL1EstimatedGap:
+      case LengthReferenceParameterization::kEstimatedReferenceLengths:
         return CurrentMeanLengthYoungStorage();
 
-      case LengthReferenceParameterization::kConstantL1EstimatedGap:
+      case LengthReferenceParameterization::kConstantL1EstimatedL2:
         return constant_mean_length_young_;
 
       case LengthReferenceParameterization::kEstimatedL1BelowConstantL2:
@@ -532,13 +532,9 @@ class VonBertalanffySchnuteGrowthModelAdapter : public GrowthDerivedObservationB
 
   Type CurrentMeanLengthOld() const {
     switch (length_reference_parameterization_) {
-      case LengthReferenceParameterization::kEstimatedL1EstimatedGap:
-        return CurrentMeanLengthYoungStorage() +
-               CurrentMeanLengthOldStorage();
-
-      case LengthReferenceParameterization::kConstantL1EstimatedGap:
-        return constant_mean_length_young_ +
-               CurrentMeanLengthOldStorage();
+      case LengthReferenceParameterization::kEstimatedReferenceLengths:
+      case LengthReferenceParameterization::kConstantL1EstimatedL2:
+        return CurrentMeanLengthOldStorage();
 
       case LengthReferenceParameterization::kEstimatedL1BelowConstantL2:
         return constant_mean_length_old_;
