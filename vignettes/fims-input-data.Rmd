@@ -149,7 +149,9 @@ FIMS::data_big |>
 
 ## Length compositions (`type == "length_comp"`)
 
-The length-composition data are similar to the age compositions, except with values in the `length` column and `age = NA`. FIMS does not yet have parametric growth implemented so the length bins can be any values as long as the distribution of each age among those bins is provided by the `age_to_length_conversion` data type described below.
+The length-composition data are similar to the age compositions, except with values in the `length` column and `age = NA`. The `length` column identifies the length bin for each observation. The `observed` column contains either the number or the proportion of fish in each length bin. The `unit` column should be either "number" or "proportion". The `uncertainty` column should be the input sample size for the time step, repeated across all length bins in that time step.
+
+When length compositions are included, FIMS needs a way to convert numbers at age into numbers at length. This can come from fixed `age_to_length_conversion` rows or from a growth-derived age-to-length conversion using the VonB-Schnute Growth module.
 
 ```{r data_big-length_comp}
 # first three rows of the length composition data
@@ -172,6 +174,12 @@ FIMS::data_big |>
   ggplot2::facet_wrap(~timing) +
   ggtitle("Length compositions by time step in data_big example data set")
 ```
+
+## Length bins (`type == "length_bin"`)
+
+The `length_bin` data type defines length bins without providing length-composition observations. These rows are useful when a model needs length-bin geometry for a growth-derived age-to-length conversion, but the user is not fitting length-composition data for that fleet.
+
+For `length_bin` rows, the `length` column contains the length-bin values. The `observed`, `age`, and `uncertainty` columns should usually be `NA`. The `fleet` column identifies which fleet or survey the length bins apply to, and `timing` can be `NA` unless fleet-specific timing is needed.
 
 ## Weight-at-age data (`type == "weight_at_age"`)
 
