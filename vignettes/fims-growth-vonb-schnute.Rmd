@@ -77,12 +77,13 @@ library(ggplot2)
 # Define the Schnute parameterization of the von Bertalanffy growth function
 # used to generate the known Growth truth for this example.
 vonb_two_reference_age <- function(
-    age,
-    mean_length_young,
-    mean_length_old,
-    growth_coefficient,
-    reference_age_for_length_1,
-    reference_age_for_length_2) {
+  age,
+  mean_length_young,
+  mean_length_old,
+  growth_coefficient,
+  reference_age_for_length_1,
+  reference_age_for_length_2
+) {
   # Normalizes the curve so it is anchored to both reference-age lengths.
   denominator <- 1 - exp(
     -growth_coefficient *
@@ -102,11 +103,12 @@ vonb_two_reference_age <- function(
 
 # Calculate the asymptotic length implied by the two-reference-age form.
 vonb_implied_linf <- function(
-    mean_length_young,
-    mean_length_old,
-    growth_coefficient,
-    reference_age_for_length_1,
-    reference_age_for_length_2) {
+  mean_length_young,
+  mean_length_old,
+  growth_coefficient,
+  reference_age_for_length_1,
+  reference_age_for_length_2
+) {
   mean_length_young +
     (mean_length_old - mean_length_young) /
       (
@@ -120,19 +122,20 @@ vonb_implied_linf <- function(
 # Build a compact generated data set with one population and one fleet.
 # FIMS fits the model later; this function only creates the example data.
 make_vonb_demo_data <- function(
-    ages = 1:30,
-    lengths = seq(0, 1400, 50),
-    years = 1:2,
-    fleet = "fleet_demo",
-    sample_size = 300,
-    mean_length_young = 180,
-    mean_length_old = 850,
-    growth_coefficient = 0.18,
-    reference_age_for_length_1 = 1,
-    reference_age_for_length_2 = 12,
-    length_weight_a = 2.5e-11,
-    length_weight_b = 3,
-    sd_at_ref_ages = c(30, 73)) {
+  ages = 1:30,
+  lengths = seq(0, 1400, 50),
+  years = 1:2,
+  fleet = "fleet_demo",
+  sample_size = 300,
+  mean_length_young = 180,
+  mean_length_old = 850,
+  growth_coefficient = 0.18,
+  reference_age_for_length_1 = 1,
+  reference_age_for_length_2 = 12,
+  length_weight_a = 2.5e-11,
+  length_weight_b = 3,
+  sd_at_ref_ages = c(30, 73)
+) {
   # Calculate the "true" growth products used to generate the example.
   true_curve <- tibble::tibble(
     age = ages,
@@ -415,7 +418,7 @@ growth_sd_rows <- parameters |>
 parameters <- parameters |>
   dplyr::filter(
     !(module_name == "Growth" &
-        label == "length_at_age_sd_at_ref_ages")
+      label == "length_at_age_sd_at_ref_ages")
   ) |>
   dplyr::bind_rows(growth_sd_rows) |>
   dplyr::rows_update(

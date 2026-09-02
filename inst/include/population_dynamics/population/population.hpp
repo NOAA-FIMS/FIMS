@@ -64,7 +64,8 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
   // size
   SizeGrid size_grid; /*!< population-level biological size grid */
   std::shared_ptr<fims_popdy::SizeDistributionProviderBase<Type>>
-      size_distribution_provider; /*!< population-level size distribution provider */
+      size_distribution_provider; /*!< population-level size distribution
+                                     provider */
 
   // maturity
   int maturity_id = -999; /*!< id of maturity model object*/

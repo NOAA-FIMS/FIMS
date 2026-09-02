@@ -273,7 +273,13 @@ initialize_test_fleet <- function(parameters, data, fleet) {
 ## IO correctness ----
 test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   ctx <- make_vonb_convergence_context()
-  on.exit({ rm(ctx); gc() }, add = TRUE)
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
 
   input <- ctx$parameters |>
     FIMS::initialize_fims(data = ctx$data)
@@ -389,12 +395,17 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
 
   #' @description Test that the realized growth-derived age-to-length conversion rows sum to one for each year and age.
   expect_true(all(abs(apply(realized_age_to_length_conversion_array, c(2, 3), sum) - 1) < 1e-5))
-
 })
 
 test_that("von bertalanffy growth estimates stay close to Model Comparison OM growth values", {
   ctx <- make_vonb_model_comparison_context()
-  on.exit({ rm(ctx); gc() }, add = TRUE)
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
 
   # Model Comparison base-case OM values from save_initial_input.R
   Linf <- 800
@@ -486,7 +497,13 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
 
 test_that("von bertalanffy report defaults to lightweight derived age-to-length conversion diagnostics", {
   ctx <- make_vonb_convergence_context()
-  on.exit({ rm(ctx); gc() }, add = TRUE)
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
 
   fit <- ctx$parameters |>
     FIMS::initialize_fims(data = ctx$data) |>
@@ -506,7 +523,13 @@ test_that("von bertalanffy report defaults to lightweight derived age-to-length 
 
 test_that("von bertalanffy uses fleet length-comp bins when fixed fleet age-to-length conversion rows are absent", {
   ctx <- make_vonb_no_age_to_length_conversion_fixed_context()
-  on.exit({ rm(ctx); gc() }, add = TRUE)
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
 
   fit <- ctx$parameters |>
     FIMS::initialize_fims(data = ctx$data) |>
@@ -545,7 +568,13 @@ test_that("von bertalanffy uses fleet length-comp bins when fixed fleet age-to-l
 
 test_that("von bertalanffy keeps explicit length_bin geometry when fixed age-to-length conversion rows are also present", {
   expect_no_warning(ctx <- make_vonb_explicit_length_bin_context())
-  on.exit({ rm(ctx); gc() }, add = TRUE)
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
 
   fit <- ctx$parameters |>
     FIMS::initialize_fims(data = ctx$data) |>
@@ -573,7 +602,13 @@ test_that("von bertalanffy keeps explicit length_bin geometry when fixed age-to-
 
 test_that("von bertalanffy can use explicit length_bin geometry without length compositions", {
   ctx <- make_vonb_length_bin_only_context()
-  on.exit({ rm(ctx); gc() }, add = TRUE)
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
 
   input <- ctx$parameters |>
     FIMS::initialize_fims(data = ctx$data)
@@ -601,7 +636,13 @@ test_that("von bertalanffy can use explicit length_bin geometry without length c
 
 test_that("default non-derived growth keeps the historical fixed age-to-length conversion path", {
   ctx <- make_default_growth_age_to_length_conversion_fixed_context()
-  on.exit({ rm(ctx); gc() }, add = TRUE)
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
 
   fit <- ctx$parameters |>
     FIMS::initialize_fims(data = ctx$data) |>
@@ -629,7 +670,13 @@ test_that("von bertalanffy Newton polishing does not worsen objective or gradien
   )
 
   ctx <- make_vonb_convergence_context()
-  on.exit({ rm(ctx); gc() }, add = TRUE)
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
 
   fit_base <- ctx$parameters |>
     FIMS::initialize_fims(data = ctx$data) |>
@@ -668,7 +715,13 @@ test_that("von bertalanffy Newton polishing does not worsen objective or gradien
 
 test_that("fleet-specific length bins initialize n_lengths consistently", {
   expect_no_warning(ctx <- make_two_fleet_length_context())
-  on.exit({ rm(ctx); gc() }, add = TRUE)
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
 
   fleet1_obj <- initialize_test_fleet(
     parameters = ctx$parameters,
@@ -754,7 +807,6 @@ test_that("fleet-specific length bins initialize n_lengths consistently", {
       ) |>
       dplyr::pull(out)
   )
-
 })
 ## Edge handling ----
 # No edge cases to test.
@@ -762,7 +814,13 @@ test_that("fleet-specific length bins initialize n_lengths consistently", {
 ## Error handling ----
 test_that("von bertalanffy initialization rejects decreasing reference lengths", {
   ctx <- make_vonb_convergence_context()
-  on.exit({ rm(ctx); gc() }, add = TRUE)
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
 
   bad_parameters <- ctx$parameters |>
     dplyr::mutate(

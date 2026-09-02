@@ -4,7 +4,10 @@
 \alias{setup_default_Growth}
 \title{Set up default growth parameters}
 \usage{
-setup_default_Growth(data = NULL, module_type = c("EWAA", "VonBertalanffySchnute"))
+setup_default_Growth(
+  data = NULL,
+  module_type = c("EWAA", "VonBertalanffySchnute")
+)
 }
 \arguments{
 \item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
