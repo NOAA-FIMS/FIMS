@@ -146,8 +146,8 @@ The most important parameters to update will typically be those which are consta
 
 Counting the constant parameters by `module`, `fleet`, `label`, and `value` helps identify which parameters to focus on first.
 ```{r parameter-values}
-default_parameters |> 
-  dplyr::filter(estimation_type == "constant") |> 
+default_parameters |>
+  dplyr::filter(estimation_type == "constant") |>
   dplyr::count(module_name, fleet, label, value)
 ```
 Here we can see that the defaults for the constant parameters include `log_M` values (by age and time step) which are all equal to `log(0.2) = -1.61`, maturity intercept and slope values with values of 2 and 1, respectively, and the stock-recruit parameter `logit_steepness = 0.788` (converted to and from a default steepness = 0.75 via the logit transformation `-log(1.0 - 0.75) + log(0.75 - 0.2) = 0.788` and the inverse-logit transformation `(exp(0.788) + 0.2)/(1 + exp(0.788)) = 0.75`). These are all parameters which would be good to update to species- or stock-specific values in a real-world application.
