@@ -214,7 +214,10 @@ index_to_dimension_value <- function(index, values) {
   if (length(values) == 0) {
     return(as.numeric(index))
   }
-  unname(values[index])
+  out <- rep(NA_real_, length(index))
+  valid_index <- !is.na(index) & index >= 1 & index <= length(values)
+  out[valid_index] <- values[index[valid_index]]
+  out
 }
 
 #' Convert annual indices to model timing values
@@ -228,7 +231,7 @@ year_index_to_timing <- function(year_index, modeled_years) {
     return(as.numeric(year_index))
   }
   timing_lookup <- c(modeled_years, max(modeled_years) + 1)
-  unname(timing_lookup[year_index])
+  index_to_dimension_value(year_index, timing_lookup)
 }
 
 #' Reshape TMB estimates

@@ -19,6 +19,12 @@ test_that("`year_index_to_timing()` maps annual indices to calendar years", {
     year_index_to_timing(c(1, 2, NA), numeric()),
     c(1, 2, NA)
   )
+
+  #' @description Test that invalid annual indices preserve output length as missing values.
+  expect_equal(
+    year_index_to_timing(c(1, 0, -1, 5, NA), 2001:2003),
+    c(2001, NA, NA, NA, NA)
+  )
 })
 
 test_that("`index_to_dimension_value()` maps indices to modeled bins", {
@@ -46,9 +52,9 @@ test_that("`index_to_dimension_value()` maps indices to modeled bins", {
     c(12.5, 2.5, 12.5, NA)
   )
 
-  #' @description Test that an index beyond the modeled bins maps to a missing value.
+  #' @description Test that invalid indices map to missing values without dropping rows.
   expect_equal(
-    index_to_dimension_value(c(1, 4), c(10, 20, 30)),
-    c(10, NA)
+    index_to_dimension_value(c(1, 0, -1, 4, NA), c(10, 20, 30)),
+    c(10, NA, NA, NA, NA)
   )
 })
