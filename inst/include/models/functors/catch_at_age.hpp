@@ -128,15 +128,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * Default is false to avoid large report-side allocations.
    */
   bool report_age_to_length_conversion_derived_tensor = false;
-  /**
-   * @brief Optional per-evaluation cache of growth-derived fleet mean WAA.
-   *
-   * Storage is flattened as [year, age] for each fleet and only populated
-   * when the fleet is eligible for the supported growth-derived age-to-length conversion path.
-   * This avoids repeated row-by-row age-to-length conversion reconstruction in objective-side
-   * weight calculations while avoiding full [year, age, length] allocation.
-   */
-  std::map<uint32_t, fims::Vector<Type>> fleet_growth_derived_mean_waa_cache;
 
  public:
   std::vector<Type> ages; /*!< vector of the ages for referencing*/
@@ -209,7 +200,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * fleet to a given value.
    */
   virtual void Prepare() {
-    this->fleet_growth_derived_mean_waa_cache.clear();
     for (size_t p = 0; p < this->populations.size(); p++) {
       std::shared_ptr<fims_popdy::Population<Type>> &population =
           this->populations[p];
@@ -1081,84 +1071,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Try to read fleet-specific mean WAA from the per-evaluation cache.
-   *
-   * @param fleet Shared pointer to the fleet object.
-   * @param year Year index.
-   * @param age Age index.
-   * @param mean_weight Output cached expected mean WAA.
-   * @return True when a valid cached value was found.
-   */
-  bool TryGetCachedGrowthDerivedFleetMeanWeightAA(
-      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
-      size_t year,
-      size_t age,
-      Type& mean_weight) {
-    if (fleet == nullptr || fleet->n_ages == 0) {
-      return false;
-    }
-
-    auto cache_it =
-        this->fleet_growth_derived_mean_waa_cache.find(fleet->GetId());
-    if (cache_it == this->fleet_growth_derived_mean_waa_cache.end()) {
-      return false;
-    }
-
-    const fims::Vector<Type>& cached = cache_it->second;
-    if (cached.size() == 0) {
-      return false;
-    }
-
-    const size_t y =
-        (fleet->n_years == 0) ? 0 : (std::min)(year, fleet->n_years - 1);
-    const size_t a = (std::min)(age, fleet->n_ages - 1);
-    const size_t i_age_year = y * fleet->n_ages + a;
-    if (i_age_year >= cached.size()) {
-      return false;
-    }
-
-    mean_weight = cached[i_age_year];
-    return true;
-  }
-
-  /**
-   * @brief Build growth-derived fleet mean WAA cache for the current
-   * evaluation.
-   *
-   * Only [year, age] mean WAA is cached. The full derived age-to-length conversion tensor is not
-   * materialized in objective-side evaluation.
-   */
-  void RefreshFleetGrowthDerivedMeanWAACache() {
-    this->fleet_growth_derived_mean_waa_cache.clear();
-
-    fleet_iterator fit;
-    for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
-      std::shared_ptr<fims_popdy::Fleet<Type>>& fleet = (*fit).second;
-      std::shared_ptr<fims_popdy::AgeToLengthConversionDerived<Type>> age_to_length_conversion_derived_model =
-          std::dynamic_pointer_cast<fims_popdy::AgeToLengthConversionDerived<Type>>(
-              fleet->age_to_length_conversion_model);
-
-      if (age_to_length_conversion_derived_model == nullptr || !age_to_length_conversion_derived_model->IsActive()) {
-        continue;
-      }
-
-      fims::Vector<Type> growth_derived_mean_WAA;
-      growth_derived_mean_WAA.resize(fleet->n_years * fleet->n_ages);
-
-      for (size_t y = 0; y < fleet->n_years; ++y) {
-        for (size_t a = 0; a < fleet->n_ages; ++a) {
-          const size_t i_age_year = y * fleet->n_ages + a;
-          growth_derived_mean_WAA[i_age_year] =
-              MeanWeightFromAgeToLengthConversionDerived(age_to_length_conversion_derived_model, fleet, y, a);
-        }
-      }
-
-      this->fleet_growth_derived_mean_waa_cache[fleet->GetId()] =
-          growth_derived_mean_WAA;
-    }
-  }
-
-  /**
    * @brief Ensure all fleets linked to this model have a usable age-to-length conversion.
    *
    * Reuses each fleet's current age-to-length conversion when it matches the current population
@@ -1225,18 +1137,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
           "Fleet pointer was null while resolving growth-derived fleet mean weight-at-age.");
     }
 
-    Type cached_mean_weight = static_cast<Type>(0.0);
-    if (TryGetCachedGrowthDerivedFleetMeanWeightAA(
-            fleet, year, age, cached_mean_weight)) {
-      return cached_mean_weight;
-    }
+    std::shared_ptr<fims_popdy::AgeToLengthConversionDerived<Type>>
+        age_to_length_conversion_derived_model =
+            std::dynamic_pointer_cast<
+                fims_popdy::AgeToLengthConversionDerived<Type>>(
+                fleet->age_to_length_conversion_model);
 
-    std::shared_ptr<fims_popdy::AgeToLengthConversionDerived<Type>> age_to_length_conversion_derived_model =
-        std::dynamic_pointer_cast<fims_popdy::AgeToLengthConversionDerived<Type>>(
-            fleet->age_to_length_conversion_model);
-
-    if (age_to_length_conversion_derived_model != nullptr && age_to_length_conversion_derived_model->IsActive()) {
-      return MeanWeightFromAgeToLengthConversionDerived(age_to_length_conversion_derived_model, fleet, year, age);
+    if (age_to_length_conversion_derived_model != nullptr &&
+        age_to_length_conversion_derived_model->IsActive()) {
+      return MeanWeightFromAgeToLengthConversionDerived(
+          age_to_length_conversion_derived_model, fleet, year, age);
     }
 
     std::stringstream ss;
@@ -1480,7 +1390,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
     Prepare();
     PreparePopulationGrowthProducts();
     EnsureAllFleetAgeToLengthConversion();
-    RefreshFleetGrowthDerivedMeanWAACache();
     /*
      start at year=0, age=0;
      here year 0 is the estimated initial population structure and age 0 are
