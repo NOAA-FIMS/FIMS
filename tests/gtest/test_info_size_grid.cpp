@@ -238,4 +238,35 @@ TEST(InformationSizeGrid,
   fims::FIMSLog::fims_log->clear();
 }
 
+TEST(InformationSizeGrid,
+     SetFleetAgeToLengthConversionModelFailsWhenMappingRequiredWithoutLengthBins) {
+  fims::FIMSLog::fims_log->clear();
+
+  fims_info::Information<double> info;
+  bool valid_model = true;
+
+  auto population = MakePopulation();
+  auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
+  fleet->id = 1;
+  fleet->n_years = 1;
+  fleet->n_ages = 1;
+  fleet->n_lengths = 0;
+  fleet->requires_age_length_mapping = true;
+
+  const std::size_t error_count_before =
+      fims::FIMSLog::fims_log->get_error_count();
+
+  ASSERT_NO_THROW(
+      info.SetFleetAgeToLengthConversionModel(valid_model, population, fleet));
+
+  EXPECT_FALSE(valid_model);
+  EXPECT_GT(fims::FIMSLog::fims_log->get_error_count(), error_count_before);
+  EXPECT_NE(
+      fims::FIMSLog::fims_log->get_errors().find(
+          "requires age-to-length conversion but has no fleet length observation bins"),
+      std::string::npos);
+
+  fims::FIMSLog::fims_log->clear();
+}
+
 }  // namespace

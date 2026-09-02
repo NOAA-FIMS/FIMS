@@ -473,23 +473,26 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
   )
 
   has_length_comp_data <- "length_comp" %in% fleet_types
+  has_length_bin_data <- "length_bin" %in% fleet_types
+  has_length_bin_support <- has_length_comp_data || has_length_bin_data
 
   use_age_to_length_conversion_fixed_path <-
     !has_growth_derived_support &&
     has_fixed_age_length_conversion_support &&
-    has_length_comp_data
+    has_length_bin_support
   use_growth_derived_path <-
-    has_growth_derived_support && has_length_comp_data
-  requires_age_length_mapping <- has_length_comp_data
+    has_growth_derived_support && has_length_bin_support
+  requires_age_length_mapping <-
+    has_length_comp_data ||
+    use_age_to_length_conversion_fixed_path ||
+    use_growth_derived_path
 
   fleet_length_bins <- resolve_fleet_length_bins(
     get_data(data),
     allow_global_conversion_fallback = !use_growth_derived_path
   )[[fleet]]
 
-  fleet_needs_length_bins <- any(
-    c("length_comp", "age_to_length_conversion") %in% fleet_types
-  )
+  fleet_needs_length_bins <- requires_age_length_mapping
 
   if (fleet_needs_length_bins &&
       (is.null(fleet_length_bins) || length(fleet_length_bins) == 0)) {

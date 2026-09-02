@@ -555,19 +555,31 @@ class Information {
 
     f->age_to_length_conversion_model = fims_popdy::BuildAgeToLengthConversionFleet<Type>(p, f);
 
-    if (f->age_to_length_conversion_model != nullptr && f->age_to_length_conversion_model->IsActive()) {
+    if (f->age_to_length_conversion_model != nullptr &&
+        f->age_to_length_conversion_model->IsActive()) {
       return;
     }
 
-    if (f->n_lengths > 0) {
+    if (!f->requires_age_length_mapping) {
+      return;
+    }
+
+    if (f->n_lengths == 0) {
       valid_model = false;
       FIMS_ERROR_LOG("Fleet " + fims::to_string(f->id) +
-                     " has fleet length observation bins but no usable "
-                     "age-to-length conversion path. Provide fixed "
-                     "age-to-length conversion of size " +
-                     fims::to_string(f->n_ages * f->n_lengths) +
-                     " or use a supported growth-derived age-to-length conversion path.");
+                     " requires age-to-length conversion but has no fleet "
+                     "length observation bins. Provide length_bin rows or "
+                     "length_comp rows with length values.");
+      return;
     }
+
+    valid_model = false;
+    FIMS_ERROR_LOG("Fleet " + fims::to_string(f->id) +
+                   " has fleet length observation bins but no usable "
+                   "age-to-length conversion path. Provide fixed "
+                   "age-to-length conversion of size " +
+                   fims::to_string(f->n_ages * f->n_lengths) +
+                   " or use a supported growth-derived age-to-length conversion path.");
   }
 
   /**

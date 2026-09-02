@@ -153,6 +153,46 @@ make_default_growth_age_to_length_conversion_fixed_context <- function() {
   )
 }
 
+make_vonb_length_bin_only_context <- function() {
+  data("data_big", package = "FIMS")
+
+  fleet1_bins <- data_big |>
+    dplyr::filter(
+      .data[["fleet"]] == "fleet1",
+      .data[["type"]] == "length_comp",
+      !is.na(.data[["length"]])
+    ) |>
+    dplyr::pull(.data[["length"]]) |>
+    unique() |>
+    sort()
+
+  fleet1_length_bins <- tibble::tibble(
+    type = "length_bin",
+    fleet = "fleet1",
+    age = NA_real_,
+    length = fleet1_bins,
+    observed = NA_real_,
+    unit = unique(data_big$unit[which(data_big$fleet == "fleet1")])[1],
+    timing = NA_real_,
+    uncertainty = NA_character_
+  )
+
+  custom_data <- data_big |>
+    dplyr::filter(
+      !(.data[["type"]] %in% c("length_comp", "age_to_length_conversion"))
+    ) |>
+    dplyr::bind_rows(fleet1_length_bins)
+
+  fims_frame <- FIMS::FIMSFrame(custom_data)
+  parameters <- make_vonb_parameters(fims_frame)
+
+  list(
+    data = fims_frame,
+    parameters = parameters,
+    explicit_bins = fleet1_bins
+  )
+}
+
 make_vonb_model_comparison_context <- function() {
   data("data_big", package = "FIMS")
   fims_frame <- FIMS::FIMSFrame(data_big)
@@ -529,6 +569,34 @@ test_that("von bertalanffy keeps explicit length_bin geometry when fixed age-to-
 
   #' @description Test that the growth-derived path does not fall back to a legacy fixed age-to-length matrix.
   expect_equal(length(report[["age_to_length_conversion"]][[1]]), 0)
+})
+
+test_that("von bertalanffy can use explicit length_bin geometry without length compositions", {
+  ctx <- make_vonb_length_bin_only_context()
+  on.exit({ rm(ctx); gc() }, add = TRUE)
+
+  input <- ctx$parameters |>
+    FIMS::initialize_fims(data = ctx$data)
+  input$model$ReportAgeToLengthConversionDerivedTensor(TRUE)
+
+  fit <- FIMS::fit_fims(
+    input = input,
+    optimize = FALSE,
+    get_sd = FALSE
+  )
+
+  report <- FIMS::get_report(fit)
+  fleet_obj <- initialize_test_fleet(
+    parameters = ctx$parameters,
+    data = ctx$data,
+    fleet = "fleet1"
+  )
+
+  expect_equal(fleet_obj$lengths$get_values(), ctx$explicit_bins)
+  expect_equal(fleet_obj$n_lengths$get(), length(ctx$explicit_bins))
+  expect_true(fleet_obj$GetRequiresAgeLengthMapping())
+  expect_true(any(report[["age_to_length_conversion_derived_used"]][[1]] == 1))
+  expect_gt(length(report[["age_to_length_conversion_derived"]][[1]]), 0)
 })
 
 test_that("default non-derived growth keeps the historical fixed age-to-length conversion path", {
