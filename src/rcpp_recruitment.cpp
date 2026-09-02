@@ -30,7 +30,7 @@ using SharedRecruitment = std::shared_ptr<RecruitmentInterfaceBase>;
  * binds the XPtr to R's garbage collector: when the R variable is garbage 
  * collected, 'delete shared_ptr*' runs and the reference count is decremented.
  *
- * @param type One of "beverton_holt", "log_devs_process", or "log_r_process".
+ * @param type One of "BevertonHolt", "LogDevsProcess", or "LogRProcess".
  *   The latter two are recruitment process modules, which carry no parameters
  *   of their own and are linked to a stock--recruit module by ID.
  */

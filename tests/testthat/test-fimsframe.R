@@ -340,7 +340,7 @@ test_that("`model_*()` works with the correct inputs", {
   names(age_comp_dat) <- fleet_names_age_comp
 
   for (fleet_f in 1:n_age_comp) {
-    age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- methods::new(AgeComp, n_years, n_ages)
+    age_comp_dat[[fleet_names_age_comp[fleet_f]]] <- create_data("age_comp", n_years, n_ages)
     #' @description Test that `model_age_comp()` works with correct inputs.
     age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data[] <- model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])
     expect_silent(

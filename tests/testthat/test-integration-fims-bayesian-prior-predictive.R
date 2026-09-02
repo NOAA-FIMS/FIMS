@@ -49,7 +49,7 @@ test_that("posterior equals prior with no data", {
   # Fleet
   # Create the fishing fleet
   # turn on estimation of inflection_point and slope
-  fishing_fleet_selectivity <- create_selectivity("logistic")
+  fishing_fleet_selectivity <- create_selectivity("Logistic")
   set_variable_vector(
     fishing_fleet_selectivity, "inflection_point",
     om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], "fixed_effects"
@@ -117,7 +117,7 @@ test_that("posterior equals prior with no data", {
   # Fleet
   # Create the survey fleet
   # turn on estimation of inflection_point and slope
-  survey_fleet_selectivity <- create_selectivity("logistic")
+  survey_fleet_selectivity <- create_selectivity("Logistic")
   set_variable_vector(
     survey_fleet_selectivity, "inflection_point",
     om_input[["sel_survey"]][["survey1"]][["A50.sel1"]], "fixed_effects"
@@ -157,7 +157,7 @@ test_that("posterior equals prior with no data", {
   # Set up priors for selectivity parameters and link to both fishery and survey selectivity
   slope_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]], om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]))
   slope_sd <- 3
-  slope_prior <- create_distribution("dnorm")
+  slope_prior <- create_distribution("Dnorm")
   set_variable_vector(
     slope_prior, "expected_values", rep(slope_mean, 2), "assumed_known"
   )
@@ -174,7 +174,7 @@ test_that("posterior equals prior with no data", {
 
   inflection_point_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]))
   inflection_point_sd <- 3
-  inflection_point_prior <- create_distribution("dnorm")
+  inflection_point_prior <- create_distribution("Dnorm")
   set_variable_vector(
     inflection_point_prior, "expected_values",
     rep(inflection_point_mean, 2), "assumed_known"
@@ -190,8 +190,8 @@ test_that("posterior equals prior with no data", {
     )
   )
 
-  recruitment <- create_recruitment("beverton_holt")
-  recruitment_process <- create_recruitment("log_devs_process")
+  recruitment <- create_recruitment("BevertonHolt")
+  recruitment_process <- create_recruitment("LogDevsProcess")
 
   # set up recruitment parameters and fix as assumed_known (default)
   # do not set up a recruitment distribution as devs will be assumed known
@@ -214,13 +214,13 @@ test_that("posterior equals prior with no data", {
   set_recruitment_process(recruitment, recruitment_process)
 
   # Growth
-  ewaa_growth <- create_growth("ewaa")
+  ewaa_growth <- create_growth("EWAA")
   set_growth_n_years(ewaa_growth, om_input[["nyr"]])
   set_numeric_vector(ewaa_growth, "ages", om_input[["ages"]])
   set_numeric_vector(ewaa_growth, "weights", c(t(om_input[["W.mt"]])))
 
   # Maturity
-  maturity <- create_maturity("logistic")
+  maturity <- create_maturity("Logistic")
   set_variable_vector(
     maturity, "inflection_point", om_input[["A50.mat"]], "assumed_known"
   )

@@ -3,19 +3,20 @@
 # Each C++ function takes an external pointer and, because Rcpp::XPtr does not
 # check what it was handed, will accept a pointer to the wrong kind of module
 # and behave unpredictably. These wrappers take a [fims_module], pick the right
-# pointer from it, and check the module's family first, so a mistake produces
+# pointer from it, and check the module's name first, so a mistake produces
 # an R error instead. Nothing here needs `$pointer` or `$base_pointer`.
 #
 # See R/fims_interface.R for the create_*() functions that produce modules.
 
-#' Check that an argument is a module, and optionally of a given family
+#' Check that an argument is a module, and optionally of a given module name
 #'
 #' @param module The object to check.
-#' @param family Character vector of acceptable families, or NULL for any.
+#' @param module_name Character vector of acceptable module names, or NULL
+#'   for any.
 #' @param arg The argument name to use in the error message.
 #' @return `module`, invisibly.
 #' @noRd
-check_module <- function(module, family = NULL, arg = "module") {
+check_module <- function(module, module_name = NULL, arg = "module") {
   if (!inherits(module, "fims_module")) {
     cli::cli_abort(c(
       "{.arg {arg}} must be a FIMS module.",
@@ -23,10 +24,10 @@ check_module <- function(module, family = NULL, arg = "module") {
       "i" = "Modules come from the {.code create_*()} functions."
     ))
   }
-  if (!is.null(family) && !module[["family"]] %in% family) {
+  if (!is.null(module_name) && !module[["module_name"]] %in% module_name) {
     cli::cli_abort(c(
-      "{.arg {arg}} must be a {.val {family}} module.",
-      "x" = "Got a {.val {module[['type']]}} module."
+      "{.arg {arg}} must be a {.val {module_name}} module.",
+      "x" = "Got a {.val {module[['module_name']]}} module."
     ))
   }
   invisible(module)
@@ -35,16 +36,16 @@ check_module <- function(module, family = NULL, arg = "module") {
 #' Take an ID from either a module or a number
 #'
 #' @param x A [fims_module] or a module ID.
-#' @param family Character vector of acceptable families when `x` is a module.
+#' @param module_name Acceptable module names when `x` is a module.
 #' @param arg The argument name to use in the error message.
 #' @return An integer ID, or -999L for NULL, which FIMS reads as "no link".
 #' @noRd
-module_id <- function(x, family = NULL, arg = "x") {
+module_id <- function(x, module_name = NULL, arg = "x") {
   if (is.null(x)) {
     return(-999L)
   }
   if (inherits(x, "fims_module")) {
-    check_module(x, family, arg)
+    check_module(x, module_name, arg)
     return(x[["id"]])
   }
   as.integer(x)
@@ -111,7 +112,7 @@ set_numeric_vector <- function(module, name, values) {
 #' @seealso [set_variable_vector()]
 #' @export
 set_data <- function(module, values, uncertainty = NULL) {
-  check_module(module, "data", "module")
+  check_module(module, "Data", "module")
   set_numeric_vector_(module[["base_pointer"]], "values", values)
   if (!is.null(uncertainty)) {
     set_numeric_vector_(module[["base_pointer"]], "uncertainty", uncertainty)
@@ -213,7 +214,7 @@ get_module_id <- function(module) {
 #' `fleet`, invisibly.
 #' @export
 set_fleet_constants <- function(fleet, n_years, n_ages, n_lengths) {
-  check_module(fleet, "fleet", "fleet")
+  check_module(fleet, "Fleet", "fleet")
   set_fleet_constants_(
     fleet[["pointer"]],
     as.integer(n_years), as.integer(n_ages), as.integer(n_lengths)
@@ -230,7 +231,7 @@ set_fleet_constants <- function(fleet, n_years, n_ages, n_lengths) {
 #' @export
 #' @rdname fleet_name
 set_fleet_name <- function(fleet, name) {
-  check_module(fleet, "fleet", "fleet")
+  check_module(fleet, "Fleet", "fleet")
   set_fleet_name_(fleet[["pointer"]], name)
   invisible(fleet)
 }
@@ -238,7 +239,7 @@ set_fleet_name <- function(fleet, name) {
 #' @export
 #' @rdname fleet_name
 get_fleet_name <- function(fleet) {
-  check_module(fleet, "fleet", "fleet")
+  check_module(fleet, "Fleet", "fleet")
   get_fleet_name_(fleet[["pointer"]])
 }
 
@@ -250,7 +251,7 @@ get_fleet_name <- function(fleet) {
 #' `fleet`, invisibly.
 #' @export
 set_fleet_units <- function(fleet, catch_units, index_units) {
-  check_module(fleet, "fleet", "fleet")
+  check_module(fleet, "Fleet", "fleet")
   set_fleet_units_(fleet[["pointer"]], catch_units, index_units)
   invisible(fleet)
 }
@@ -266,9 +267,9 @@ set_fleet_units <- function(fleet, catch_units, index_units) {
 #' @export
 #' @rdname fleet_selectivity
 set_fleet_selectivity <- function(fleet, selectivity) {
-  check_module(fleet, "fleet", "fleet")
+  check_module(fleet, "Fleet", "fleet")
   set_fleet_selectivity_id_(
-    fleet[["pointer"]], module_id(selectivity, "selectivity", "selectivity")
+    fleet[["pointer"]], module_id(selectivity, "Selectivity", "selectivity")
   )
   invisible(fleet)
 }
@@ -276,7 +277,7 @@ set_fleet_selectivity <- function(fleet, selectivity) {
 #' @export
 #' @rdname fleet_selectivity
 get_fleet_selectivity_id <- function(fleet) {
-  check_module(fleet, "fleet", "fleet")
+  check_module(fleet, "Fleet", "fleet")
   get_fleet_selectivity_id_(fleet[["pointer"]])
 }
 
@@ -300,13 +301,13 @@ set_fleet_observed_data <- function(fleet,
                                     length_comp = NULL,
                                     index = NULL,
                                     catch = NULL) {
-  check_module(fleet, "fleet", "fleet")
+  check_module(fleet, "Fleet", "fleet")
   set_fleet_observed_data_ids_(
     fleet[["pointer"]],
-    module_id(age_comp, "data", "age_comp"),
-    module_id(length_comp, "data", "length_comp"),
-    module_id(index, "data", "index"),
-    module_id(catch, "data", "catch")
+    module_id(age_comp, "Data", "age_comp"),
+    module_id(length_comp, "Data", "length_comp"),
+    module_id(index, "Data", "index"),
+    module_id(catch, "Data", "catch")
   )
   invisible(fleet)
 }
@@ -314,7 +315,7 @@ set_fleet_observed_data <- function(fleet,
 #' @export
 #' @rdname fleet_observed_data
 get_fleet_observed_data_ids <- function(fleet) {
-  check_module(fleet, "fleet", "fleet")
+  check_module(fleet, "Fleet", "fleet")
   get_fleet_observed_data_ids_(fleet[["pointer"]])
 }
 
@@ -330,7 +331,7 @@ get_fleet_observed_data_ids <- function(fleet) {
 #' `population`, invisibly.
 #' @export
 set_population_constants <- function(population, n_years, n_ages) {
-  check_module(population, "population", "population")
+  check_module(population, "Population", "population")
   set_population_constants_(
     population[["pointer"]],
     as.integer(n_years), as.integer(n_ages)
@@ -348,7 +349,7 @@ set_population_constants <- function(population, n_years, n_ages) {
 #' @export
 #' @rdname population_name
 set_population_name <- function(population, name) {
-  check_module(population, "population", "population")
+  check_module(population, "Population", "population")
   set_population_name_(population[["pointer"]], name)
   invisible(population)
 }
@@ -356,7 +357,7 @@ set_population_name <- function(population, name) {
 #' @export
 #' @rdname population_name
 get_population_name <- function(population) {
-  check_module(population, "population", "population")
+  check_module(population, "Population", "population")
   get_population_name_(population[["pointer"]])
 }
 
@@ -383,13 +384,13 @@ set_population_processes <- function(population,
                                      growth = NULL,
                                      recruitment = NULL,
                                      recruitment_err = NULL) {
-  check_module(population, "population", "population")
+  check_module(population, "Population", "population")
   set_population_process_ids_(
     population[["pointer"]],
-    module_id(maturity, "maturity", "maturity"),
-    module_id(growth, "growth", "growth"),
-    module_id(recruitment, "recruitment", "recruitment"),
-    module_id(recruitment_err, "recruitment", "recruitment_err")
+    module_id(maturity, "Maturity", "maturity"),
+    module_id(growth, "Growth", "growth"),
+    module_id(recruitment, "Recruitment", "recruitment"),
+    module_id(recruitment_err, "Recruitment", "recruitment_err")
   )
   invisible(population)
 }
@@ -397,7 +398,7 @@ set_population_processes <- function(population,
 #' @export
 #' @rdname population_processes
 get_population_process_ids <- function(population) {
-  check_module(population, "population", "population")
+  check_module(population, "Population", "population")
   get_population_process_ids_(population[["pointer"]])
 }
 
@@ -414,12 +415,12 @@ get_population_process_ids <- function(population) {
 #' `population`, invisibly.
 #' @export
 set_population_fleets <- function(population, fleets) {
-  check_module(population, "population", "population")
+  check_module(population, "Population", "population")
   if (!is.list(fleets)) {
     fleets <- list(fleets)
   }
   for (i in seq_along(fleets)) {
-    check_module(fleets[[i]], "fleet", paste0("fleets[[", i, "]]"))
+    check_module(fleets[[i]], "Fleet", paste0("fleets[[", i, "]]"))
   }
   set_population_fleets_(
     population[["pointer"]],
@@ -442,13 +443,13 @@ set_population_fleets <- function(population, fleets) {
 #' `model`, invisibly.
 #' @export
 set_model_populations <- function(model, populations) {
-  check_module(model, "model", "model")
+  check_module(model, "Model", "model")
   if (!is.list(populations)) {
     populations <- list(populations)
   }
   for (i in seq_along(populations)) {
     check_module(
-      populations[[i]], "population", paste0("populations[[", i, "]]")
+      populations[[i]], "Population", paste0("populations[[", i, "]]")
     )
   }
   set_model_populations_(
@@ -468,7 +469,7 @@ set_model_populations <- function(model, populations) {
 #' @export
 #' @rdname model_reporting
 do_model_reporting <- function(model, report) {
-  check_module(model, "model", "model")
+  check_module(model, "Model", "model")
   do_model_reporting_(model[["pointer"]], report)
   invisible(model)
 }
@@ -476,7 +477,7 @@ do_model_reporting <- function(model, report) {
 #' @export
 #' @rdname model_reporting
 is_model_reporting <- function(model) {
-  check_module(model, "model", "model")
+  check_module(model, "Model", "model")
   is_model_reporting_(model[["pointer"]])
 }
 
@@ -502,7 +503,7 @@ is_model_reporting <- function(model) {
 #' A JSON string.
 #' @export
 get_output <- function(model, modules = NULL) {
-  check_module(model, "model", "model")
+  check_module(model, "Model", "model")
   pointers <- if (is.null(modules)) {
     lapply(.fims_registry[["objects"]], `[[`, "base_pointer")
   } else {
@@ -527,9 +528,9 @@ get_output <- function(model, modules = NULL) {
 #' `distribution`, invisibly.
 #' @export
 set_distribution_observed_data <- function(distribution, data) {
-  check_module(distribution, "distribution", "distribution")
+  check_module(distribution, "Distribution", "distribution")
   set_distribution_observed_data_(
-    distribution[["pointer"]], module_id(data, "data", "data")
+    distribution[["pointer"]], module_id(data, "Data", "data")
   )
   invisible(distribution)
 }
@@ -549,7 +550,7 @@ set_distribution_observed_data <- function(distribution, data) {
 #' @seealso [get_variable_vector_id()]
 #' @export
 set_distribution_links <- function(distribution, input_type, ids) {
-  check_module(distribution, "distribution", "distribution")
+  check_module(distribution, "Distribution", "distribution")
   set_distribution_links_(
     distribution[["pointer"]], input_type, as.integer(ids)
   )
@@ -564,7 +565,7 @@ set_distribution_links <- function(distribution, input_type, ids) {
 #' `distribution`, invisibly.
 #' @export
 set_distribution_note <- function(distribution, note) {
-  check_module(distribution, "distribution", "distribution")
+  check_module(distribution, "Distribution", "distribution")
   set_distribution_note_(distribution[["pointer"]], note)
   invisible(distribution)
 }
@@ -577,7 +578,7 @@ set_distribution_note <- function(distribution, note) {
 #' `distribution`, invisibly.
 #' @export
 set_distribution_fixed_mean <- function(distribution, value) {
-  check_module(distribution, "distribution", "distribution")
+  check_module(distribution, "Distribution", "distribution")
   set_distribution_fixed_mean_(distribution[["pointer"]], value)
   invisible(distribution)
 }
@@ -589,7 +590,7 @@ set_distribution_fixed_mean <- function(distribution, value) {
 #' The log density, as a numeric value.
 #' @export
 evaluate_distribution <- function(distribution) {
-  check_module(distribution, "distribution", "distribution")
+  check_module(distribution, "Distribution", "distribution")
   evaluate_distribution_(distribution[["pointer"]])
 }
 
@@ -605,9 +606,9 @@ evaluate_distribution <- function(distribution) {
 #' @export
 #' @rdname recruitment_process
 set_recruitment_process <- function(recruitment, process) {
-  check_module(recruitment, "recruitment", "recruitment")
+  check_module(recruitment, "Recruitment", "recruitment")
   set_recruitment_process_id_(
-    recruitment[["pointer"]], module_id(process, "recruitment", "process")
+    recruitment[["pointer"]], module_id(process, "Recruitment", "process")
   )
   invisible(recruitment)
 }
@@ -615,7 +616,7 @@ set_recruitment_process <- function(recruitment, process) {
 #' @export
 #' @rdname recruitment_process
 get_recruitment_process_id <- function(recruitment) {
-  check_module(recruitment, "recruitment", "recruitment")
+  check_module(recruitment, "Recruitment", "recruitment")
   get_recruitment_process_id_(recruitment[["pointer"]])
 }
 
@@ -629,7 +630,7 @@ get_recruitment_process_id <- function(recruitment) {
 #' @export
 #' @rdname set_n_years
 set_recruitment_n_years <- function(recruitment, n_years) {
-  check_module(recruitment, "recruitment", "recruitment")
+  check_module(recruitment, "Recruitment", "recruitment")
   set_recruitment_n_years_(recruitment[["pointer"]], as.integer(n_years))
   invisible(recruitment)
 }
@@ -637,7 +638,7 @@ set_recruitment_n_years <- function(recruitment, n_years) {
 #' @export
 #' @rdname set_n_years
 set_growth_n_years <- function(growth, n_years) {
-  check_module(growth, "growth", "growth")
+  check_module(growth, "Growth", "growth")
   set_growth_n_years_(growth[["pointer"]], as.integer(n_years))
   invisible(growth)
 }
@@ -662,34 +663,34 @@ set_growth_n_years <- function(growth, n_years) {
 #' @export
 #' @rdname evaluate_module
 evaluate_growth <- function(growth, age) {
-  check_module(growth, "growth", "growth")
+  check_module(growth, "Growth", "growth")
   evaluate_growth_(growth[["pointer"]], age)
 }
 
 #' @export
 #' @rdname evaluate_module
 evaluate_maturity <- function(maturity, x) {
-  check_module(maturity, "maturity", "maturity")
+  check_module(maturity, "Maturity", "maturity")
   evaluate_maturity_(maturity[["pointer"]], x)
 }
 
 #' @export
 #' @rdname evaluate_module
 evaluate_selectivity <- function(selectivity, x) {
-  check_module(selectivity, "selectivity", "selectivity")
+  check_module(selectivity, "Selectivity", "selectivity")
   evaluate_selectivity_(selectivity[["pointer"]], x)
 }
 
 #' @export
 #' @rdname evaluate_module
 evaluate_recruitment_mean <- function(recruitment, spawners, ssbzero) {
-  check_module(recruitment, "recruitment", "recruitment")
+  check_module(recruitment, "Recruitment", "recruitment")
   evaluate_recruitment_mean_(recruitment[["pointer"]], spawners, ssbzero)
 }
 
 #' @export
 #' @rdname evaluate_module
 evaluate_recruitment_process <- function(recruitment, value) {
-  check_module(recruitment, "recruitment", "recruitment")
+  check_module(recruitment, "Recruitment", "recruitment")
   evaluate_recruitment_process_(recruitment[["pointer"]], value)
 }

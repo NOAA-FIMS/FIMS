@@ -15,7 +15,7 @@
 test_that("`get_fixed()` works with correct inputs", {
   clear()
   # Create selectivity
-  selectivity <- create_selectivity("logistic")
+  selectivity <- create_selectivity("Logistic")
   set_variable_vector(selectivity, "inflection_point", 10.0, "fixed_effects")
   set_variable_vector(selectivity, "slope", 0.2, "fixed_effects")
 
@@ -27,7 +27,7 @@ test_that("`get_fixed()` works with correct inputs", {
   )
   clear()
 
-  selectivity <- create_selectivity("logistic")
+  selectivity <- create_selectivity("Logistic")
   set_variable_vector(selectivity, "inflection_point", 10.0, "fixed_effects")
   set_variable_vector(selectivity, "slope", 0.2, "fixed_effects")
   CreateTMBModel()
@@ -38,7 +38,7 @@ test_that("`get_fixed()` works with correct inputs", {
   )
   clear()
 
-  fish_selex <- create_selectivity("double_logistic")
+  fish_selex <- create_selectivity("DoubleLogistic")
   set_variable_vector(fish_selex, "inflection_point_asc", 2, "fixed_effects")
   set_variable_vector(fish_selex, "inflection_point_desc", 3, "fixed_effects")
   set_variable_vector(fish_selex, "slope_asc", 1, "assumed_known")
@@ -54,11 +54,11 @@ test_that("`get_fixed()` works with correct inputs", {
   expect_equal(get_fixed(), sel_parm)
   clear()
 
-  selectivity <- create_selectivity("logistic")
+  selectivity <- create_selectivity("Logistic")
   set_variable_vector(selectivity, "inflection_point", 11.0, "fixed_effects")
   set_variable_vector(selectivity, "slope", 0.5, "fixed_effects")
   sel_parm <- c(get_variable_vector(selectivity, "inflection_point")[["values"]], get_variable_vector(selectivity, "slope")[["values"]])
-  recruitment <- create_recruitment("beverton_holt")
+  recruitment <- create_recruitment("BevertonHolt")
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6

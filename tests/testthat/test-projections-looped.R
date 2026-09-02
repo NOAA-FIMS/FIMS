@@ -78,7 +78,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # Fleet
   # Create the fishing fleet
   # turn on estimation of inflection_point and slope
-  fishing_fleet_selectivity <- create_selectivity("logistic")
+  fishing_fleet_selectivity <- create_selectivity("Logistic")
   set_variable_vector(
     fishing_fleet_selectivity, "inflection_point",
     om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], "fixed_effects"
@@ -122,7 +122,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # Set up fishery index data using the lognormal
   # lognormal observation error transformed on the log scale
   # Compute lognormal SD from OM coefficient of variation (CV)
-  fishing_fleet_catch_distribution <- create_distribution("dlnorm")
+  fishing_fleet_catch_distribution <- create_distribution("Dlnorm")
   set_variable_vector(
     fishing_fleet_catch_distribution, "log_sd",
     rep(log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1))), n_total_years),
@@ -139,7 +139,7 @@ run_FIMS_projection_scenario <- function(om_input,
   )
 
   # Set up fishery age composition data using the multinomial
-  fishing_fleet_agecomp_distribution <- create_distribution("dmultinom")
+  fishing_fleet_agecomp_distribution <- create_distribution("Dmultinom")
   set_distribution_observed_data(
     fishing_fleet_agecomp_distribution,
     get_fleet_observed_data_ids(fishing_fleet)[["agecomp"]]
@@ -150,7 +150,7 @@ run_FIMS_projection_scenario <- function(om_input,
   )
 
   # Set up fishery length composition data using the multinomial
-  fishing_fleet_lengthcomp_distribution <- create_distribution("dmultinom")
+  fishing_fleet_lengthcomp_distribution <- create_distribution("Dmultinom")
   set_distribution_observed_data(
     fishing_fleet_lengthcomp_distribution,
     get_fleet_observed_data_ids(fishing_fleet)[["lengthcomp"]]
@@ -203,7 +203,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # Fleet
   # Create the survey fleet
   # turn on estimation of inflection_point and slope
-  survey_fleet_selectivity <- create_selectivity("logistic")
+  survey_fleet_selectivity <- create_selectivity("Logistic")
   set_variable_vector(
     survey_fleet_selectivity, "inflection_point",
     om_input[["sel_survey"]][["survey1"]][["A50.sel1"]], "fixed_effects"
@@ -236,7 +236,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # Set up survey index data using the lognormal
   # lognormal observation error transformed on the log scale
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-  survey_fleet_index_distribution <- create_distribution("dlnorm")
+  survey_fleet_index_distribution <- create_distribution("Dlnorm")
   set_variable_vector(
     survey_fleet_index_distribution, "log_sd",
     rep(
@@ -256,7 +256,7 @@ run_FIMS_projection_scenario <- function(om_input,
   )
 
   # Age composition distribution
-  survey_fleet_agecomp_distribution <- create_distribution("dmultinom")
+  survey_fleet_agecomp_distribution <- create_distribution("Dmultinom")
   set_distribution_observed_data(
     survey_fleet_agecomp_distribution,
     get_fleet_observed_data_ids(survey_fleet)[["agecomp"]]
@@ -267,7 +267,7 @@ run_FIMS_projection_scenario <- function(om_input,
   )
 
   # Length composition distribution
-  survey_fleet_lengthcomp_distribution <- create_distribution("dmultinom")
+  survey_fleet_lengthcomp_distribution <- create_distribution("Dmultinom")
   set_distribution_observed_data(
     survey_fleet_lengthcomp_distribution,
     get_fleet_observed_data_ids(survey_fleet)[["lengthcomp"]]
@@ -293,8 +293,8 @@ run_FIMS_projection_scenario <- function(om_input,
   # Recruitment
   # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be chosen)
-  recruitment <- create_recruitment("beverton_holt")
-  recruitment_process <- create_recruitment("log_devs_process")
+  recruitment <- create_recruitment("BevertonHolt")
+  recruitment_process <- create_recruitment("LogDevsProcess")
   set_recruitment_process(recruitment, recruitment_process)
 
   # NOTE: the estimation status is given on every call, including where it is
@@ -336,7 +336,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
   # taken before the likelihood calculation
-  recruitment_distribution <- create_distribution("dnorm")
+  recruitment_distribution <- create_distribution("Dnorm")
   set_variable_vector(
     recruitment_distribution, "log_sd",
     log(om_input[["logR_sd"]]), "fixed_effects"
@@ -360,14 +360,14 @@ run_FIMS_projection_scenario <- function(om_input,
   )
 
   # Growth
-  ewaa_growth <- create_growth("ewaa")
+  ewaa_growth <- create_growth("EWAA")
   set_growth_n_years(ewaa_growth, n_total_years)
   set_numeric_vector(ewaa_growth, "ages", om_input[["ages"]])
   set_numeric_vector(ewaa_growth, "weights", om_input[["W.mt"]])
 
 
   # Maturity
-  maturity <- create_maturity("logistic")
+  maturity <- create_maturity("Logistic")
   set_variable_vector(
     maturity, "inflection_point", om_input[["A50.mat"]], "assumed_known"
   )
@@ -418,7 +418,7 @@ run_FIMS_projection_scenario <- function(om_input,
     )
     if (n_projection_years > 0) {
 
-      F_mult_distribution <- create_distribution("dnorm")
+      F_mult_distribution <- create_distribution("Dnorm")
 
       # log_f_multiplier likelihood is setup with an expected mean target
       # to force the values to be close to equal. This setup is needed because
@@ -484,7 +484,7 @@ run_FIMS_projection_scenario <- function(om_input,
       ] <- -5
     }
 
-    SSB_ratio_prior <- create_distribution("dnorm")
+    SSB_ratio_prior <- create_distribution("Dnorm")
     set_variable_vector(
       SSB_ratio_prior, "observed_values",
       rep(ssb_ratio_target, n_ssb), "assumed_known"
@@ -502,7 +502,7 @@ run_FIMS_projection_scenario <- function(om_input,
     )
   }
   # Set up catch at age model
-  caa <- create_fishery_model("catch_at_age")
+  caa <- create_fishery_model("CatchAtAge")
   set_model_populations(caa, list(population))
 
   # Set-up TMB

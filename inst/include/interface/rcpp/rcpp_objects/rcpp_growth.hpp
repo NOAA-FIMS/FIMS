@@ -16,7 +16,7 @@
  * @brief The growth forms FIMS can build.
  *
  * @details The create_growth_() function takes one of these names from R and
- * builds the matching class: "ewaa" builds an EWAAGrowthInterface.
+ * builds the matching class: "EWAA" builds an EWAAGrowthInterface.
  * GrowthInterfaceBase is never built on its own; it only holds what all growth
  * forms have in common.
  *
@@ -32,10 +32,10 @@ enum class GrowthType : uint8_t {
  * @brief Convert a type name supplied from R to a GrowthType.
  */
 inline GrowthType GrowthTypeFromString(const std::string &name) {
-  if (name == "ewaa") return GrowthType::ewaa;
+  if (name == "EWAA") return GrowthType::ewaa;
   throw std::invalid_argument(
       "Invalid type: '" + name +
-      "'. Valid options are: ewaa.");
+      "'. Valid options are: EWAA.");
 }
 
 /**

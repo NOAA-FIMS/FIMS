@@ -30,7 +30,7 @@ using SharedPopulationModel = std::shared_ptr<PopulationInterface>;
  * binds the XPtr to R's garbage collector: when the R variable is garbage 
  * collected, 'delete shared_ptr*' runs and the reference count is decremented.
  *
- * @param type Currently only "catch_at_age".
+ * @param type Currently only "CatchAtAge".
  *
  * @return A pointer to the new model.
  */

@@ -118,7 +118,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Fleet
   # Create the fishing fleet
   # turn on estimation of inflection_point and slope
-  fishing_fleet_selectivity <- create_selectivity("logistic")
+  fishing_fleet_selectivity <- create_selectivity("Logistic")
   set_variable_vector(
     fishing_fleet_selectivity, "inflection_point",
     om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], "fixed_effects"
@@ -155,7 +155,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set up fishery index data using the lognormal
   # lognormal observation error transformed on the log scale
   # Compute lognormal SD from OM coefficient of variation (CV)
-  fishing_fleet_catch_distribution <- create_distribution("dlnorm")
+  fishing_fleet_catch_distribution <- create_distribution("Dlnorm")
   set_variable_vector(
     fishing_fleet_catch_distribution, "log_sd",
     rep(
@@ -175,7 +175,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
 
   # Set up fishery age composition data using the multinomial
-  fishing_fleet_agecomp_distribution <- create_distribution("dmultinom")
+  fishing_fleet_agecomp_distribution <- create_distribution("Dmultinom")
   set_distribution_observed_data(
     fishing_fleet_agecomp_distribution,
     get_fleet_observed_data_ids(fishing_fleet)[["agecomp"]]
@@ -186,7 +186,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
 
   # Set up fishery length composition data using the multinomial
-  fishing_fleet_lengthcomp_distribution <- create_distribution("dmultinom")
+  fishing_fleet_lengthcomp_distribution <- create_distribution("Dmultinom")
   set_distribution_observed_data(
     fishing_fleet_lengthcomp_distribution,
     get_fleet_observed_data_ids(fishing_fleet)[["lengthcomp"]]
@@ -237,7 +237,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Fleet
   # Create the survey fleet
   # turn on estimation of inflection_point and slope
-  survey_fleet_selectivity <- create_selectivity("logistic")
+  survey_fleet_selectivity <- create_selectivity("Logistic")
   set_variable_vector(
     survey_fleet_selectivity, "inflection_point",
     om_input[["sel_survey"]][["survey1"]][["A50.sel1"]], "fixed_effects"
@@ -272,7 +272,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set up survey index data using the lognormal
   # lognormal observation error transformed on the log scale
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-  survey_fleet_index_distribution <- create_distribution("dlnorm")
+  survey_fleet_index_distribution <- create_distribution("Dlnorm")
   set_variable_vector(
     survey_fleet_index_distribution, "log_sd",
     rep(
@@ -292,7 +292,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
 
   # Age composition distribution
-  survey_fleet_agecomp_distribution <- create_distribution("dmultinom")
+  survey_fleet_agecomp_distribution <- create_distribution("Dmultinom")
   set_distribution_observed_data(
     survey_fleet_agecomp_distribution,
     get_fleet_observed_data_ids(survey_fleet)[["agecomp"]]
@@ -303,7 +303,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
 
   # Length composition distribution
-  survey_fleet_lengthcomp_distribution <- create_distribution("dmultinom")
+  survey_fleet_lengthcomp_distribution <- create_distribution("Dmultinom")
   set_distribution_observed_data(
     survey_fleet_lengthcomp_distribution,
     get_fleet_observed_data_ids(survey_fleet)[["lengthcomp"]]
@@ -331,11 +331,11 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Recruitment
   # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be chosen)
-  recruitment <- create_recruitment("beverton_holt")
+  recruitment <- create_recruitment("BevertonHolt")
   if (is.null(random_effects) || random_effects[["recruitment"]] == "log_devs") {
-    recruitment_process <- create_recruitment("log_devs_process")
+    recruitment_process <- create_recruitment("LogDevsProcess")
   } else {
-    recruitment_process <- create_recruitment("log_r_process")
+    recruitment_process <- create_recruitment("LogRProcess")
   }
   set_recruitment_process(recruitment, recruitment_process)
 
@@ -410,7 +410,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
   # taken before the likelihood calculation
-  recruitment_distribution <- create_distribution("dnorm")
+  recruitment_distribution <- create_distribution("Dnorm")
   set_variable_vector(
     recruitment_distribution, "log_sd",
     log(om_input[["logR_sd"]]), "assumed_known"
@@ -459,7 +459,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   }
 
   # Growth
-  ewaa_growth <- create_growth("ewaa")
+  ewaa_growth <- create_growth("EWAA")
   set_growth_n_years(ewaa_growth, om_input[["nyr"]])
   set_numeric_vector(
     ewaa_growth, "ages", om_input[["ages"]]
@@ -469,7 +469,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
 
   # Maturity
-  maturity <- create_maturity("logistic")
+  maturity <- create_maturity("Logistic")
   set_variable_vector(
     maturity, "inflection_point",
     om_input[["A50.mat"]], "assumed_known"
@@ -508,7 +508,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   set_population_fleets(population, list(fishing_fleet, survey_fleet))
 
   # Set up catch at age model
-  caa <- create_fishery_model("catch_at_age")
+  caa <- create_fishery_model("CatchAtAge")
   set_model_populations(caa, list(population))
 browser()
   # Set-up TMB

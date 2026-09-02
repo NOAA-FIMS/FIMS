@@ -14,7 +14,7 @@
 ## IO correctness ----
 test_that("rcpp maturity works with correct inputs", {
   # Create maturity1
-  maturity1 <- create_maturity("logistic")
+  maturity1 <- create_maturity("Logistic")
 
   set_variable_vector(maturity1, "inflection_point", 10.0, "fixed_effects")
   set_variable_vector(maturity1, "slope", 0.2, "assumed_known")
@@ -36,7 +36,7 @@ test_that("rcpp maturity works with correct inputs", {
   expect_equal(evaluate_maturity(maturity1, 10.0), 0.5)
 
   # Create maturity2
-  maturity2 <- create_maturity("logistic")
+  maturity2 <- create_maturity("Logistic")
   #' @description Test that rcpp maturity returns the correct id.
   expect_equal(get_module_id(maturity2), 2)
 

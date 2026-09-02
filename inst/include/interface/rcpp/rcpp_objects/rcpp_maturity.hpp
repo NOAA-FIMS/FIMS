@@ -16,7 +16,7 @@
  * @brief The maturity forms FIMS can build.
  *
  * @details The create_maturity_() function takes one of these names from R and
- * builds the matching class: "logistic" builds a LogisticMaturityInterface.
+ * builds the matching class: "Logistic" builds a LogisticMaturityInterface.
  * MaturityInterfaceBase is never built on its own; it only holds what all
  * maturity forms have in common.
  *
@@ -32,10 +32,10 @@ enum class MaturityType : uint8_t {
  * @brief Convert a type name supplied from R to a MaturityType.
  */
 inline MaturityType MaturityTypeFromString(const std::string &name) {
-  if (name == "logistic") return MaturityType::logistic;
+  if (name == "Logistic") return MaturityType::logistic;
   throw std::invalid_argument(
       "Invalid type: '" + name +
-      "'. Valid options are: logistic.");
+      "'. Valid options are: Logistic.");
 }
 
 /**

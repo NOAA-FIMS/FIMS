@@ -16,8 +16,8 @@
  * @brief The selectivity forms FIMS can build.
  *
  * @details The create_selectivity_() function takes one of these names from R
- * and builds the matching class: "logistic" builds a
- * LogisticSelectivityInterface, "double_logistic" builds a
+ * and builds the matching class: "Logistic" builds a
+ * LogisticSelectivityInterface, "DoubleLogistic" builds a
  * DoubleLogisticSelectivityInterface. SelectivityInterfaceBase is never built
  * on its own; it only holds what all selectivity forms have in common.
  *
@@ -34,11 +34,11 @@ enum class SelectivityType : uint8_t {
  * @brief Convert a type name supplied from R to a SelectivityType.
  */
 inline SelectivityType SelectivityTypeFromString(const std::string &name) {
-  if (name == "logistic") return SelectivityType::logistic;
-  if (name == "double_logistic") return SelectivityType::double_logistic;
+  if (name == "Logistic") return SelectivityType::logistic;
+  if (name == "DoubleLogistic") return SelectivityType::double_logistic;
   throw std::invalid_argument(
       "Invalid type: '" + name +
-      "'. Valid options are: logistic, double_logistic.");
+      "'. Valid options are: Logistic, DoubleLogistic.");
 }
 
 /**

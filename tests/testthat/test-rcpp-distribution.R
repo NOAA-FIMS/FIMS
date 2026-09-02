@@ -20,7 +20,7 @@ test_that("rcpp distribution works with correct inputs", {
   y <- stats::rnorm(1)
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- create_distribution("dnorm")
+  dnorm_ <- create_distribution("Dnorm")
   # populate class members
   set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dnorm_, "expected_values", 0, "assumed_known")
@@ -34,7 +34,7 @@ test_that("rcpp distribution works with correct inputs", {
   y <- stats::rnorm(10)
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- create_distribution("dnorm")
+  dnorm_ <- create_distribution("Dnorm")
   # populate class members
   dnorm_$observed_values[] <- y
   dnorm_$expected_values[] <- rep(0, length(y))
@@ -48,7 +48,7 @@ test_that("rcpp distribution works with correct inputs", {
   y <- stats::rnorm(10)
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- create_distribution("dnorm")
+  dnorm_ <- create_distribution("Dnorm")
   # populate class members
   dnorm_$observed_values[] <- y
   dnorm_$expected_values[] <- rep(0, length(y))
@@ -65,7 +65,7 @@ test_that("rcpp distribution works with correct inputs", {
 
   # create a fims Rcpp object
   # initialize the Dlnorm module
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
@@ -79,7 +79,7 @@ test_that("rcpp distribution works with correct inputs", {
 
   # create a fims Rcpp object
   # initialize the Dlnorm module
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   dlnorm_$observed_values[] <- y
   dlnorm_$expected_values[] <- rep(0, length(y))
@@ -93,7 +93,7 @@ test_that("rcpp distribution works with correct inputs", {
 
   # create a fims Rcpp object
   # initialize the Dlnorm module
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   dlnorm_$observed_values[] <- y
   dlnorm_$expected_values[] <- rep(0, length(y))
@@ -110,7 +110,7 @@ test_that("rcpp distribution works with correct inputs", {
   x_values <- t(stats::rmultinom(1, 100, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
-  dmultinom_ <- create_distribution("dmultinom")
+  dmultinom_ <- create_distribution("Dmultinom")
   # populate class members
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
@@ -138,7 +138,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- -1000
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- create_distribution("dnorm")
+  dnorm_ <- create_distribution("Dnorm")
   # populate class members
   set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dnorm_, "expected_values", 0, "assumed_known")
@@ -150,7 +150,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- 1000
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- create_distribution("dnorm")
+  dnorm_ <- create_distribution("Dnorm")
   # populate class members
   set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dnorm_, "expected_values", 0, "assumed_known")
@@ -163,7 +163,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- 1
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- create_distribution("dnorm")
+  dnorm_ <- create_distribution("Dnorm")
   # populate class members
   set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dnorm_, "expected_values", -1000, "assumed_known")
@@ -175,7 +175,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- 1
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- create_distribution("dnorm")
+  dnorm_ <- create_distribution("Dnorm")
   # populate class members
   set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dnorm_, "expected_values", 1000, "assumed_known")
@@ -188,7 +188,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- 1
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- create_distribution("dnorm")
+  dnorm_ <- create_distribution("Dnorm")
   # populate class members
   set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dnorm_, "expected_values", 0, "assumed_known")
@@ -200,7 +200,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   y <- 1
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- create_distribution("dnorm")
+  dnorm_ <- create_distribution("Dnorm")
   # populate class members
   set_variable_vector(dnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dnorm_, "expected_values", 0, "assumed_known")
@@ -211,7 +211,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   clear()
 
   y <- 0
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
@@ -222,7 +222,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   clear()
 
   y <- -1
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
@@ -232,7 +232,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   clear()
 
   y <- 1000
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
@@ -242,7 +242,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   clear()
 
   y <- 1
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dlnorm_, "expected_values", -1000, "assumed_known")
@@ -251,7 +251,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   expect_equal(evaluate_distribution(dlnorm_, ), stats::dlnorm(y, -1000, 1, TRUE))
   clear()
   y <- 1
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dlnorm_, "expected_values", 1000, "assumed_known")
@@ -261,7 +261,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   clear()
 
   y <- 1
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
@@ -270,7 +270,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   expect_equal(evaluate_distribution(dlnorm_, ), stats::dlnorm(y, 0, exp(10), TRUE))
   clear()
   y <- 1
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   set_variable_vector(dlnorm_, "observed_values", y, "assumed_known")
   set_variable_vector(dlnorm_, "expected_values", 0, "assumed_known")
@@ -284,7 +284,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   x_values <- t(stats::rmultinom(1, 1000, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
-  dmultinom_ <- create_distribution("dmultinom")
+  dmultinom_ <- create_distribution("Dmultinom")
   # populate class members
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
@@ -304,7 +304,7 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   x_values <- t(stats::rmultinom(1, 1, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
-  dmultinom_ <- create_distribution("dmultinom")
+  dmultinom_ <- create_distribution("Dmultinom")
   # populate class members
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
@@ -326,7 +326,7 @@ test_that("rcpp distribution returns correct error messages", {
   y <- stats::rnorm(10)
   # create a fims Rcpp object
   # initialize the Dnorm module
-  dnorm_ <- create_distribution("dnorm")
+  dnorm_ <- create_distribution("Dnorm")
   # populate class members
   dnorm_$observed_values[] <- c(y, 0)
   dnorm_$expected_values[] <- rep(log(1), length(y))
@@ -339,7 +339,7 @@ test_that("rcpp distribution returns correct error messages", {
   )
   clear()
 
-  dnorm_ <- create_distribution("dnorm")
+  dnorm_ <- create_distribution("Dnorm")
   # populate class members
   dnorm_$observed_values[] <- y
   dnorm_$expected_values[] <- rep(log(1), length(y))
@@ -354,7 +354,7 @@ test_that("rcpp distribution returns correct error messages", {
   y <- stats::rlnorm(n = 10, meanlog = 0, sdlog = 1)
   # create a fims Rcpp object
   # initialize the Dlnorm module
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   dlnorm_$observed_values[] <- y
   dlnorm_$expected_values[] <- rep(log(1), length(y) + 1)
@@ -367,7 +367,7 @@ test_that("rcpp distribution returns correct error messages", {
   clear()
 
   # initialize the Dlnorm module
-  dlnorm_ <- create_distribution("dlnorm")
+  dlnorm_ <- create_distribution("Dlnorm")
   # populate class members
   dlnorm_$observed_values[] <- y
   dlnorm_$expected_values$resize(length(y))
@@ -385,7 +385,7 @@ test_that("rcpp distribution returns correct error messages", {
   x_values <- t(stats::rmultinom(1, 100, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
-  dmultinom_ <- create_distribution("dmultinom")
+  dmultinom_ <- create_distribution("Dmultinom")
   # populate class members
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)
@@ -406,7 +406,7 @@ test_that("rcpp distribution returns correct error messages", {
   x_values <- t(stats::rmultinom(1, 100, p))
   # create a fims Rcpp object
   # initialize the Dmultinom module
-  dmultinom_ <- create_distribution("dmultinom")
+  dmultinom_ <- create_distribution("Dmultinom")
   # populate class members
   dmultinom_$dims$resize(2)
   dmultinom_$dims$set(0, 1)

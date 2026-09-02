@@ -31,7 +31,7 @@
  * @brief The fishery model types FIMS can build.
  *
  * @details The create_fishery_model_() function takes one of these names from
- * R and builds the matching class: "catch_at_age" builds a
+ * R and builds the matching class: "CatchAtAge" builds a
  * CatchAtAgeInterface. FisheryModelInterfaceBase is never built on its own; it
  * only holds what all model types have in common.
  *
@@ -45,9 +45,9 @@ enum class FisheryModelType : uint8_t { catch_at_age = 0 };
  * @brief Convert a type name supplied from R to a FisheryModelType.
  */
 inline FisheryModelType FisheryModelTypeFromString(const std::string &name) {
-  if (name == "catch_at_age") return FisheryModelType::catch_at_age;
+  if (name == "CatchAtAge") return FisheryModelType::catch_at_age;
   throw std::invalid_argument(
-      "Invalid type: '" + name + "'. Valid options are: catch_at_age.");
+      "Invalid type: '" + name + "'. Valid options are: CatchAtAge.");
 }
 
 /**

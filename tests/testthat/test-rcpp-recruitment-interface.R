@@ -14,7 +14,7 @@
 ## IO correctness ----
 test_that("rcpp recruitment interface works with correct inputs", {
   # Create recruitment
-  recruitment <- create_recruitment("beverton_holt")
+  recruitment <- create_recruitment("BevertonHolt")
   recruitment_process <- new(LogDevsRecruitmentProcess)
   h <- 0.75
   r0 <- 1000000.0
@@ -73,7 +73,7 @@ test_that("rcpp recruitment interface works with correct inputs", {
 ## Error handling ----
 test_that("test rcpp recruitment interface returns correct error messages", {
   # Create recruitment
-  recruitment <- create_recruitment("beverton_holt")
+  recruitment <- create_recruitment("BevertonHolt")
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6

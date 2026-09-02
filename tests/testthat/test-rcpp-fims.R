@@ -17,12 +17,12 @@ test_that("Rcpp interface works for modules", {
   expect_no_error(variable <- methods::new(Variable, .1))
 
   #' @description Test that Rcpp interface works for recruitment module.
-  expect_no_error(beverton_holt <- create_recruitment("beverton_holt"))
+  expect_no_error(beverton_holt <- create_recruitment("BevertonHolt"))
   #' @description Test that `get_id()` method works for `BevertonHoltRecruitment` module.
   expect_equal(get_module_id(beverton_holt), 1)
 
   #' @description Test that Rcpp interface works for selectivity module.
-  expect_no_error(logistic_selectivity <- create_selectivity("logistic"))
+  expect_no_error(logistic_selectivity <- create_selectivity("Logistic"))
   set_variable_vector(logistic_selectivity, "slope", .7, "assumed_known")
   set_variable_vector(
     logistic_selectivity, "inflection_point", 5.0, "assumed_known"
@@ -35,7 +35,7 @@ test_that("Rcpp interface works for modules", {
   expect_equal(get_module_id(logistic_selectivity), 1)
 
   #' @description Test that Rcpp interface works for growth module.
-  expect_no_error(ewaa_growth <- create_growth("ewaa"))
+  expect_no_error(ewaa_growth <- create_growth("EWAA"))
   #' @description Test that ages can be set correctly in `EWAAGrowth` module.
   set_numeric_vector(ewaa_growth, "ages", 1.0)
   #' @description Test that weights can be set correctly in `EWAAGrowth` module.

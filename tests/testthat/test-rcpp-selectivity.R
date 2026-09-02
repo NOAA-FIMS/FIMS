@@ -14,7 +14,7 @@
 ## IO correctness ----
 test_that("rcpp logistic selectivity works with correct inputs", {
   # Create selectivity1
-  selectivity1 <- create_selectivity("logistic")
+  selectivity1 <- create_selectivity("Logistic")
 
   set_variable_vector(selectivity1, "inflection_point", 10.0, "random_effects")
   set_variable_vector(selectivity1, "slope", 0.2, "assumed_known")
@@ -30,7 +30,7 @@ test_that("rcpp logistic selectivity works with correct inputs", {
   expect_equal(evaluate_selectivity(selectivity1, 10.0), 0.5)
 
   # Create selectivity2
-  selectivity2 <- create_selectivity("logistic")
+  selectivity2 <- create_selectivity("Logistic")
   #' @description Test that `get_id()` for `LogisticSelectivity` works when a second object is created.
   expect_equal(get_module_id(selectivity2), 2)
 
@@ -39,7 +39,7 @@ test_that("rcpp logistic selectivity works with correct inputs", {
 
 test_that("rcpp double logistic selectivity works with correct inputs", {
   # Create selectivity1
-  selectivity1 <- create_selectivity("double_logistic")
+  selectivity1 <- create_selectivity("DoubleLogistic")
 
   set_variable_vector(
     selectivity1, "inflection_point_asc",
@@ -67,7 +67,7 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
   )
 
   # Create selectivity2
-  selectivity2 <- create_selectivity("double_logistic")
+  selectivity2 <- create_selectivity("DoubleLogistic")
 
   set_variable_vector(
     selectivity2, "inflection_point_asc",
@@ -108,7 +108,7 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
 ## Edge handling ----
 test_that("rcpp selectivity returns correct outputs for edge cases", {
   # emptyLogistic
-  emptyLogistic <- create_selectivity("logistic")
+  emptyLogistic <- create_selectivity("Logistic")
   #' @description Test that rcpp selectivity returns default values when no parameters are set for input values of 20.
   expect_equal(
     object = evaluate_selectivity(emptyLogistic, 20),
@@ -116,7 +116,7 @@ test_that("rcpp selectivity returns correct outputs for edge cases", {
   )
 
   # emptyDoubleLogistic
-  emptyDoubleLogistic <- create_selectivity("double_logistic")
+  emptyDoubleLogistic <- create_selectivity("DoubleLogistic")
   #' @description Test that rcpp double selectivity returns default values when no parameters are set for input values of 20.
   expect_equal(
     object = evaluate_selectivity(emptyDoubleLogistic, 20),

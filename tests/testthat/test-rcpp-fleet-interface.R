@@ -14,42 +14,49 @@
 ## IO correctness ----
 test_that("rcpp fleet works with correct inputs", {
   # Create selectivity for fleet 1
-  selectivity_fleet1 <- create_selectivity("logistic")
+  selectivity_fleet1 <- create_selectivity("Logistic")
   #' @description Test that one selectivity module can be set up without any errors and it has the appropriate id.
   expect_equal(get_module_id(selectivity_fleet1), 1)
 
   # Create selectivity for fleet 2
-  selectivity_fleet2 <- create_selectivity("logistic")
+  selectivity_fleet2 <- create_selectivity("Logistic")
   #' @description Test that two selectivity modules can be set up without any errors and they have the appropriate ids.
   expect_equal(get_module_id(selectivity_fleet2), 2)
 
   # Add selectivity to fleet
   fleet1 <- create_fleet()
   fleet2 <- create_fleet()
-  #' @description Test that rcpp fleet interface works with the first `LogisticSelectivity` module and no output, errors, messages, or warnings are produced when setting the SelectivityIDs for the fleets.
-  expect_silent(fleet1$SetSelectivityIDget_module_id(selectivity_fleet1))
-  #' @description Test that rcpp fleet interface works with the second `LogisticSelectivity` module and no output, errors, messages, or warnings are produced when setting the SelectivityIDs for the fleets.
-  expect_silent(fleet2$SetSelectivityIDget_module_id(selectivity_fleet2))
+  #' @description Test that rcpp fleet interface works with the first `LogisticSelectivity` module and no output, errors, messages, or warnings are produced when setting the selectivity for the fleets.
+  expect_silent(set_fleet_selectivity(fleet1, selectivity_fleet1))
+  #' @description Test that rcpp fleet interface works with the second `LogisticSelectivity` module and no output, errors, messages, or warnings are produced when setting the selectivity for the fleets.
+  expect_silent(set_fleet_selectivity(fleet2, selectivity_fleet2))
+  #' @description Test that the linked selectivity can be read back from the fleet module.
+  expect_equal(
+    get_fleet_selectivity_id(fleet1), get_module_id(selectivity_fleet1)
+  )
 
-  #' @description Test that setting the age-composition ID works within the fleet module.
-  expect_silent(fleet1$SetObservedAgeCompDataID(1))
-  #' @description Test that getting the age-composition ID works within the fleet module.
-  expect_equal(fleet1$GetObservedAgeCompDataID(), 1)
+  #' @description Test that setting the observed data links works within the fleet module.
+  age_comp <- create_data("age_comp", 1, 1)
+  index <- create_data("index", 1)
+  expect_silent(
+    set_fleet_observed_data(fleet1, age_comp = age_comp, index = index)
+  )
+  #' @description Test that getting the observed data ids works within the fleet module.
+  expect_equal(
+    get_fleet_observed_data_ids(fleet1)[["agecomp"]], get_module_id(age_comp)
+  )
+  expect_equal(
+    get_fleet_observed_data_ids(fleet1)[["index"]], get_module_id(index)
+  )
+  #' @description Test that a data kind the fleet was not given reads back as -999.
+  expect_equal(get_fleet_observed_data_ids(fleet1)[["catch"]], -999)
 
-  #' @description Test that setting and getting the fleet name continue to work when the scalar field is stored directly.
-  expect_silent(fleet1$SetName("fleet one"))
-  expect_equal(fleet1$GetName(), "fleet one")
+  #' @description Test that setting and getting the fleet name continue to work.
+  expect_silent(set_fleet_name(fleet1, "fleet one"))
+  expect_equal(get_fleet_name(fleet1), "fleet one")
 
-  #' @description Test that observed units can be assigned directly through the Rcpp field bindings.
-  fleet1$observed_catch_units <- "numbers"
-  fleet1$observed_index_units <- "numbers"
-  expect_equal(fleet1$observed_catch_units, "numbers")
-  expect_equal(fleet1$observed_index_units, "numbers")
-
-  #' @description Test that setting the index ID works within the fleet module.
-  expect_silent(fleet1$SetObservedIndexDataID(1))
-  #' @description Test that getting the index ID works within the fleet module.
-  expect_equal(fleet1$GetObservedIndexDataID(), 1)
+  #' @description Test that observed units can be assigned through the interface.
+  expect_silent(set_fleet_units(fleet1, "numbers", "numbers"))
 
   clear()
 })
@@ -58,13 +65,15 @@ test_that("rcpp fleet works with correct inputs", {
 ## Error handling ----
 test_that("rcpp fleet returns correct error messages", {
   fleet1 <- create_fleet()
-  #' @description Test that the rcpp fleet interface returns an error when given a string as a selectivity ID rather than an integer.
-  expect_error(fleet1$SetSelectivityID("id"))
-  #' @description Test that the rcpp fleet interface returns an error when given a string as an age-composition ID rather than an integer.
-  expect_error(fleet1$SetObservedAgeCompDataID("id"))
-  #' @description Test that the rcpp fleet interface returns an error when given a string as an length-composition ID rather than an integer.
-  expect_error(fleet1$SetObservedLengthCompDataID("id"))
-  #' @description Test that the rcpp fleet interface returns an error when given a string as an index ID rather than an integer.
-  expect_error(fleet1$SetObservedIndexDataID("id"))
+  selectivity <- create_selectivity("Logistic")
+  #' @description Test that the fleet interface rejects a module of the wrong kind as a selectivity.
+  expect_error(set_fleet_selectivity(fleet1, fleet1), "must be a .*Selectivity")
+  #' @description Test that the fleet interface rejects a module of the wrong kind as observed data.
+  expect_error(
+    set_fleet_observed_data(fleet1, age_comp = selectivity),
+    "must be a .*Data"
+  )
+  #' @description Test that the fleet interface rejects an object that is not a module at all.
+  expect_error(set_fleet_selectivity(fleet1, "id"), "must be a FIMS module")
   clear()
 })

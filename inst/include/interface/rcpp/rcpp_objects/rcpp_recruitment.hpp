@@ -17,8 +17,8 @@
  * @brief The recruitment forms FIMS can build.
  *
  * @details The create_recruitment_() function takes one of these names from R
- * and builds the matching class: "beverton_holt" builds a
- * BevertonHoltRecruitmentInterface, "log_devs_process" builds a
+ * and builds the matching class: "BevertonHolt" builds a
+ * BevertonHoltRecruitmentInterface, "LogDevsProcess" builds a
  * LogDevsRecruitmentInterface, and so on. RecruitmentInterfaceBase is never
  * built on its own; it only holds what all recruitment forms have in common.
  *
@@ -36,13 +36,13 @@ enum class RecruitmentType : uint8_t {
  * @brief Convert a type name supplied from R to a RecruitmentType.
  */
 inline RecruitmentType RecruitmentTypeFromString(const std::string &name) {
-  if (name == "beverton_holt") return RecruitmentType::beverton_holt;
-  if (name == "log_devs_process") return RecruitmentType::log_devs_process;
-  if (name == "log_r_process") return RecruitmentType::log_r_process;
+  if (name == "BevertonHolt") return RecruitmentType::beverton_holt;
+  if (name == "LogDevsProcess") return RecruitmentType::log_devs_process;
+  if (name == "LogRProcess") return RecruitmentType::log_r_process;
   throw std::invalid_argument(
       "Invalid type: '" + name +
-      "'. Valid options are: beverton_holt, log_devs_process, "
-      "log_r_process.");
+      "'. Valid options are: BevertonHolt, LogDevsProcess, "
+      "LogRProcess.");
 }
 
 /**
