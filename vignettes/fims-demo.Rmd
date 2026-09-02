@@ -265,7 +265,7 @@ The results can be plotted with either base R, {ggplot2}, or {stockplotr}. Where
 output <- get_estimates(fit) |>
   dplyr::mutate(
     uncertainty_label = "se",
-    year = year_i,
+    year = timing,
     estimate = estimated
   )
 ```
@@ -418,13 +418,13 @@ stockplotr::plot_biomass(
     "age" = get_estimates(age_only_fit) |>
       dplyr::mutate(
         uncertainty_label = "se",
-        year = year_i,
+        year = timing,
         estimate = estimated
       ),
     "length" = get_estimates(length_only_fit) |>
       dplyr::mutate(
         uncertainty_label = "se",
-        year = year_i,
+        year = timing,
         estimate = estimated
       )
   )

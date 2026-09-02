@@ -271,7 +271,7 @@ stockplotr::plot_biomass(
     "age" = get_estimates(projection_fit) |>
       dplyr::mutate(
         uncertainty_label = "se",
-        year = year_i,
+        year = timing,
         estimate = estimated
       )
   )
