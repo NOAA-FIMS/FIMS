@@ -642,7 +642,9 @@ class CAAPrepareTestFixture : public testing::Test {
       for (int j = 0; j < n_ages * n_lengths; j++) {
         fleet->age_to_length_conversion[j] = alc_distribution(generator);
       }
-      fleet->age_to_length_conversion_model = std::make_shared<fims_popdy::AgeToLengthConversionFixed<double>>(fleet);
+      fleet->age_to_length_conversion_model =
+          std::make_shared<fims_popdy::AgeToLengthConversionFixed<double>>(
+              fleet);
       auto selectivity =
           std::make_shared<fims_popdy::LogisticSelectivity<double>>();
       selectivity->inflection_point.resize(1);

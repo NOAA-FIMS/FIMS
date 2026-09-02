@@ -13,7 +13,6 @@
 
 #include "size_grid.hpp"
 
-
 namespace fims_popdy {
 
 /**
@@ -79,7 +78,8 @@ class SizeDistributionProviderBase {
    * @param age_index Age index.
    * @return Read-only mean length-at-age value.
    */
-  virtual const Type& MeanLAA(std::size_t year_index, std::size_t age_index) const = 0;
+  virtual const Type& MeanLAA(std::size_t year_index,
+                              std::size_t age_index) const = 0;
 
   /**
    * @brief Read prepared spread of length-at-age.
@@ -87,7 +87,8 @@ class SizeDistributionProviderBase {
    * @param age_index Age index.
    * @return Read-only spread of length-at-age value.
    */
-  virtual const Type& SdLAA(std::size_t year_index, std::size_t age_index) const = 0;
+  virtual const Type& SdLAA(std::size_t year_index,
+                            std::size_t age_index) const = 0;
 
   /**
    * @brief Read prepared age-to-size probability on the population grid.
@@ -96,8 +97,7 @@ class SizeDistributionProviderBase {
    * @param size_bin_index Size-bin index.
    * @return Read-only age-to-size probability value.
    */
-  virtual const Type& ProbSize(std::size_t year_index,
-                               std::size_t age_index,
+  virtual const Type& ProbSize(std::size_t year_index, std::size_t age_index,
                                std::size_t size_bin_index) const = 0;
 };
 

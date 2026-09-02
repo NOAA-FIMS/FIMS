@@ -25,8 +25,8 @@ namespace fims_popdy {
 template <class Type>
 struct Fleet : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for fleet object*/
-  size_t n_years; /*!< the number of years in the model*/
-  size_t n_ages;  /*!< the number of ages in the model*/
+  size_t n_years;       /*!< the number of years in the model*/
+  size_t n_ages;        /*!< the number of ages in the model*/
   size_t n_lengths; /*!< the number of fleet observation bins for this fleet */
   fims::Vector<double>
       lengths; /*!< Fleet observation-bin centers for this fleet. */
@@ -40,9 +40,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
   // age-to-length conversion model
   std::shared_ptr<AgeToLengthConversionBase<Type>>
-      age_to_length_conversion_model; /*!< fleet-specific age-to-length conversion model */
+      age_to_length_conversion_model; /*!< fleet-specific age-to-length
+                                         conversion model */
   bool requires_age_length_mapping =
-      false; /*!< whether an active modeled path requires age-to-length conversion-based mapping */
+      false; /*!< whether an active modeled path requires age-to-length
+                conversion-based mapping */
 
   // catch data
   int fleet_observed_catch_data_id_m = -999; /*!< id of catch data */

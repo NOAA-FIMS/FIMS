@@ -1,8 +1,10 @@
 /**
  * @file age_to_length_conversion_fixed.hpp
- * @brief Declares the AgeToLengthConversionFixed class, which implements AgeToLengthConversionBase
- * using a fleet's fixed age-to-length conversion matrix.
- * @details Defines guards for the fixed-matrix age-to-length conversion functor.
+ * @brief Declares the AgeToLengthConversionFixed class, which implements
+ * AgeToLengthConversionBase using a fleet's fixed age-to-length conversion
+ * matrix.
+ * @details Defines guards for the fixed-matrix age-to-length conversion
+ * functor.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -49,7 +51,8 @@ struct AgeToLengthConversionFixed : public AgeToLengthConversionBase<Type> {
   virtual ~AgeToLengthConversionFixed() {}
 
   /**
-   * @brief Returns whether this fixed-matrix age-to-length conversion is active and usable.
+   * @brief Returns whether this fixed-matrix age-to-length conversion is active
+   * and usable.
    * @return True if the fleet has a valid fixed age-to-length matrix.
    */
   virtual bool IsActive() const override {
@@ -57,7 +60,8 @@ struct AgeToLengthConversionFixed : public AgeToLengthConversionBase<Type> {
     // access the fleet if it still exists.
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
 
-    // If the fleet no longer exists, this age-to-length conversion cannot be used.
+    // If the fleet no longer exists, this age-to-length conversion cannot be
+    // used.
     if (fleet_ptr == nullptr) {
       return false;
     }
@@ -66,19 +70,17 @@ struct AgeToLengthConversionFixed : public AgeToLengthConversionBase<Type> {
     // - the fleet has at least one age
     // - the fleet has at least one length bin
     // - the stored fixed matrix has the expected age x length size
-    return fleet_ptr->n_ages > 0 &&
-           fleet_ptr->n_lengths > 0 &&
+    return fleet_ptr->n_ages > 0 && fleet_ptr->n_lengths > 0 &&
            fleet_ptr->age_to_length_conversion.size() ==
                (fleet_ptr->n_ages * fleet_ptr->n_lengths);
   }
 
   /**
-   * @brief Prepare the fixed-matrix age-to-length conversion for the current model state.
+   * @brief Prepare the fixed-matrix age-to-length conversion for the current
+   * model state.
    * @return True if the fixed matrix is active and usable.
    */
-  virtual bool PrepareForCurrentState() override {
-    return this->IsActive();
-  }
+  virtual bool PrepareForCurrentState() override { return this->IsActive(); }
 
   /**
    * @brief Builds the fixed age-to-length conversion row for a given age.
@@ -87,11 +89,11 @@ struct AgeToLengthConversionFixed : public AgeToLengthConversionBase<Type> {
    * @param out_row Output age-to-length probability row.
    * @return True if the age-to-length conversion row was built successfully.
    */
-  virtual bool BuildAgeToLengthConversionRow(size_t year,
-                           size_t age,
-                           fims::Vector<Type>& out_row) const override {
+  virtual bool BuildAgeToLengthConversionRow(
+      size_t year, size_t age, fims::Vector<Type>& out_row) const override {
     // The current fixed matrix path does not vary by year, but year stays
-    // in the interface so all age-to-length conversion types share the same method signature.
+    // in the interface so all age-to-length conversion types share the same
+    // method signature.
     (void)year;
 
     // Safely access the linked fleet.
@@ -102,10 +104,8 @@ struct AgeToLengthConversionFixed : public AgeToLengthConversionBase<Type> {
     // - dimensions are invalid
     // - the requested age is out of range
     // - the fixed matrix does not have the expected size
-    if (fleet_ptr == nullptr ||
-        fleet_ptr->n_ages == 0 ||
-        fleet_ptr->n_lengths == 0 ||
-        age >= fleet_ptr->n_ages ||
+    if (fleet_ptr == nullptr || fleet_ptr->n_ages == 0 ||
+        fleet_ptr->n_lengths == 0 || age >= fleet_ptr->n_ages ||
         fleet_ptr->age_to_length_conversion.size() !=
             (fleet_ptr->n_ages * fleet_ptr->n_lengths)) {
       return false;

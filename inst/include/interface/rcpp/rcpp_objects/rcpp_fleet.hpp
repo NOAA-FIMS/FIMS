@@ -319,7 +319,8 @@ class FleetInterface : public FleetInterfaceBase {
 
   /**
    * @brief Set whether this fleet currently requires age-to-length mapping.
-   * @param requires_age_length_mapping True when a modeled path depends on age-to-length conversion.
+   * @param requires_age_length_mapping True when a modeled path depends on
+   * age-to-length conversion.
    */
   void SetRequiresAgeLengthMapping(bool requires_age_length_mapping) {
     interface_requires_age_length_mapping.set(requires_age_length_mapping);
@@ -533,10 +534,9 @@ class FleetInterface : public FleetInterfaceBase {
 
     if (this->n_lengths.get() > 0) {
       if (this->lengths.size() != static_cast<size_t>(this->n_lengths.get())) {
-        FIMS_ERROR_LOG(
-            "The size of `lengths` does not match `n_lengths`: " +
-            fims::to_string(this->lengths.size()) + " != " +
-            fims::to_string(this->n_lengths.get()));
+        FIMS_ERROR_LOG("The size of `lengths` does not match `n_lengths`: " +
+                       fims::to_string(this->lengths.size()) +
+                       " != " + fims::to_string(this->n_lengths.get()));
         throw std::invalid_argument(
             "Fleet lengths size mismatch. Fleet lengths is of size " +
             fims::to_string(this->lengths.size()) +
@@ -554,16 +554,20 @@ class FleetInterface : public FleetInterfaceBase {
 
       const size_t expected_age_to_length_conversion_size =
           static_cast<size_t>(this->n_ages.get() * this->n_lengths.get());
-      const size_t supplied_age_to_length_conversion_size = this->age_to_length_conversion.size();
+      const size_t supplied_age_to_length_conversion_size =
+          this->age_to_length_conversion.size();
 
-      if (supplied_age_to_length_conversion_size != 0 && supplied_age_to_length_conversion_size != expected_age_to_length_conversion_size) {
+      if (supplied_age_to_length_conversion_size != 0 &&
+          supplied_age_to_length_conversion_size !=
+              expected_age_to_length_conversion_size) {
         FIMS_ERROR_LOG(
             "age_to_length_conversion size mismatch, " +
-            fims::to_string(supplied_age_to_length_conversion_size) + " != " +
-            fims::to_string(expected_age_to_length_conversion_size));
+            fims::to_string(supplied_age_to_length_conversion_size) +
+            " != " + fims::to_string(expected_age_to_length_conversion_size));
         throw std::invalid_argument(
             "Fleet age_to_length_conversion size mismatch. Expected " +
-            fims::to_string(expected_age_to_length_conversion_size) + " values but received " +
+            fims::to_string(expected_age_to_length_conversion_size) +
+            " values but received " +
             fims::to_string(supplied_age_to_length_conversion_size) + ".");
       }
 

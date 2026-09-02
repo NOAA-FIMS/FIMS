@@ -1,9 +1,10 @@
 /**
  * @file age_to_length_conversion_derived.hpp
- * @brief Declares the AgeToLengthConversionDerived class, which implements AgeToLengthConversionBase
- * by mapping prepared population age-to-size distributions onto fleet
- * observation bins.
- * @details Defines guards for the growth-derived age-to-length conversion functor.
+ * @brief Declares the AgeToLengthConversionDerived class, which implements
+ * AgeToLengthConversionBase by mapping prepared population age-to-size
+ * distributions onto fleet observation bins.
+ * @details Defines guards for the growth-derived age-to-length conversion
+ * functor.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -26,8 +27,9 @@
 namespace fims_popdy {
 
 /**
- * @brief Growth-derived age-to-length conversion implementation that reads prepared population
- * age-to-size probabilities and maps them into fleet observation bins.
+ * @brief Growth-derived age-to-length conversion implementation that reads
+ * prepared population age-to-size probabilities and maps them into fleet
+ * observation bins.
  */
 template <typename Type>
 struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
@@ -39,7 +41,8 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
 
   /**
    * @brief Constructor.
-   * @param fleet_ Shared pointer to the fleet using this age-to-length conversion.
+   * @param fleet_ Shared pointer to the fleet using this age-to-length
+   * conversion.
    * @param growth_observation_ Shared pointer to the growth-derived
    * observation capability.
    * @param size_provider_ Shared pointer to the population size provider.
@@ -48,8 +51,7 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
       const std::shared_ptr<Fleet<Type>>& fleet_,
       const std::shared_ptr<GrowthDerivedObservationBase<Type>>&
           growth_observation_,
-      const std::shared_ptr<SizeDistributionProviderBase<Type>>&
-          size_provider_)
+      const std::shared_ptr<SizeDistributionProviderBase<Type>>& size_provider_)
       : AgeToLengthConversionBase<Type>(),
         fleet_(fleet_),
         size_provider_(size_provider_),
@@ -61,21 +63,21 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
   virtual ~AgeToLengthConversionDerived() {}
 
   /**
-   * @brief Returns whether this growth-derived age-to-length conversion is structurally active.
+   * @brief Returns whether this growth-derived age-to-length conversion is
+   * structurally active.
    * @return True if the linked fleet, population size provider, and growth
-   * observation are valid and the fleet has consistent observation-bin geometry.
+   * observation are valid and the fleet has consistent observation-bin
+   * geometry.
    */
   virtual bool IsActive() const override {
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
     std::shared_ptr<SizeDistributionProviderBase<Type>> size_provider_ptr =
         size_provider_.lock();
 
-    return fleet_ptr != nullptr &&
-           size_provider_ptr != nullptr &&
+    return fleet_ptr != nullptr && size_provider_ptr != nullptr &&
            growth_observation_ != nullptr &&
            growth_observation_->SupportsAgeToLengthConversionDerived() &&
-           fleet_ptr->n_ages > 0 &&
-           fleet_ptr->n_lengths > 0 &&
+           fleet_ptr->n_ages > 0 && fleet_ptr->n_lengths > 0 &&
            fleet_ptr->lengths.size() == fleet_ptr->n_lengths &&
            fleet_ptr->length_bin_edges.size() == fleet_ptr->n_lengths + 1 &&
            SizeBinMapping::HasStrictlyIncreasingEdges(
@@ -88,11 +90,13 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
    *
    * This helper reuses already prepared growth products when available and only
    * triggers preparation when products have not yet been prepared. It then
-   * prepares the linked population size provider so the age-to-length conversion can read
-   * population age-to-size rows for mapping into fleet observation bins.
+   * prepares the linked population size provider so the age-to-length
+   * conversion can read population age-to-size rows for mapping into fleet
+   * observation bins.
    *
-   * @return True if the required growth products are available for this age-to-length conversion
-   * path and the linked population size provider can be prepared.
+   * @return True if the required growth products are available for this
+   * age-to-length conversion path and the linked population size provider can
+   * be prepared.
    */
   virtual bool PrepareForCurrentState() override {
     if (!this->IsActive()) {
@@ -120,16 +124,16 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
   }
 
   /**
-   * @brief Builds the normalized age-to-length conversion row for a given year and age.
+   * @brief Builds the normalized age-to-length conversion row for a given year
+   * and age.
    * @param year Year index.
    * @param age Age index.
    * @param out_row Output age-to-length probability row.
-   * @return True if the age-to-length conversion row was built successfully using prepared growth
-   * products for the current model state.
+   * @return True if the age-to-length conversion row was built successfully
+   * using prepared growth products for the current model state.
    */
-  virtual bool BuildAgeToLengthConversionRow(size_t year,
-                           size_t age,
-                           fims::Vector<Type>& out_row) const override {
+  virtual bool BuildAgeToLengthConversionRow(
+      size_t year, size_t age, fims::Vector<Type>& out_row) const override {
     out_row = BuildMappedFleetAgeToLengthConversionRow(year, age);
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
     return fleet_ptr != nullptr && out_row.size() == fleet_ptr->n_lengths;
@@ -137,7 +141,8 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
 
  protected:
   /**
-   * @brief Read one prepared age-to-size row from the linked population size provider.
+   * @brief Read one prepared age-to-size row from the linked population size
+   * provider.
    * @param year_index Year index.
    * @param age_index Age index.
    * @return Population-grid probability row for the requested year and age.
@@ -161,11 +166,9 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
     fims::Vector<Type> prob_size_row(population_size_grid->n_bins);
 
     for (std::size_t size_bin_index = 0;
-         size_bin_index < population_size_grid->n_bins;
-         ++size_bin_index) {
+         size_bin_index < population_size_grid->n_bins; ++size_bin_index) {
       prob_size_row[size_bin_index] =
-          size_provider_ptr->ProbSize(
-              year_index, age_index, size_bin_index);
+          size_provider_ptr->ProbSize(year_index, age_index, size_bin_index);
     }
 
     return prob_size_row;
@@ -176,12 +179,12 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
    *
    * @param row Fleet probability row on observation bins.
    * @param expected_size Expected number of fleet bins.
-   * @param minimum_bin_prob Minimum probability added to each bin before normalization.
+   * @param minimum_bin_prob Minimum probability added to each bin before
+   * normalization.
    * @return True if the mapped fleet row has the expected size.
    */
   bool TryFinalizeMappedProbabilityRow(
-      fims::Vector<Type>& row,
-      std::size_t expected_size,
+      fims::Vector<Type>& row, std::size_t expected_size,
       const Type& minimum_bin_prob = static_cast<Type>(1e-12)) const {
     if (row.size() != expected_size) {
       return false;
@@ -201,14 +204,14 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
   }
 
   /**
-   * @brief Build one fleet age-to-length conversion row by mapping a population age-to-size row
-   * onto fleet observation bins.
+   * @brief Build one fleet age-to-length conversion row by mapping a population
+   * age-to-size row onto fleet observation bins.
    * @param year_index Year index.
    * @param age_index Age index.
    * @return Normalized fleet observation-bin probability row.
    */
-  fims::Vector<Type> BuildMappedFleetAgeToLengthConversionRow(std::size_t year_index,
-                                            std::size_t age_index) const {
+  fims::Vector<Type> BuildMappedFleetAgeToLengthConversionRow(
+      std::size_t year_index, std::size_t age_index) const {
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
     std::shared_ptr<SizeDistributionProviderBase<Type>> size_provider_ptr =
         TryGetSizeProvider();
@@ -224,14 +227,12 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
       return fims::Vector<Type>();
     }
 
-    if (fleet_ptr->n_years == 0 ||
-        fleet_ptr->n_lengths == 0 ||
+    if (fleet_ptr->n_years == 0 || fleet_ptr->n_lengths == 0 ||
         fleet_ptr->lengths.size() != fleet_ptr->n_lengths ||
         fleet_ptr->length_bin_edges.size() != fleet_ptr->n_lengths + 1 ||
         !SizeBinMapping::HasStrictlyIncreasingEdges(
             fleet_ptr->length_bin_edges) ||
-        year_index >= fleet_ptr->n_years ||
-        age_index >= fleet_ptr->n_ages) {
+        year_index >= fleet_ptr->n_years || age_index >= fleet_ptr->n_ages) {
       return fims::Vector<Type>();
     }
 
@@ -243,21 +244,19 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
 
     const fims::Vector<double> mapping_fleet_edges =
         SizeBinMapping::ExpandDestinationEdgesToCoverSourceRange(
-            population_size_grid->edges,
-            fleet_ptr->length_bin_edges);
+            population_size_grid->edges, fleet_ptr->length_bin_edges);
 
     const fims::Vector<fims::Vector<double>> rebin_weights =
-        SizeBinMapping::BuildRebinWeights(
-            population_size_grid->edges,
-            mapping_fleet_edges);
+        SizeBinMapping::BuildRebinWeights(population_size_grid->edges,
+                                          mapping_fleet_edges);
 
     fims::Vector<Type> fleet_row =
         SizeBinMapping::ApplyRebinWeights(rebin_weights, population_prob_size);
 
-    if (!TryFinalizeMappedProbabilityRow(
-            fleet_row, fleet_ptr->n_lengths)) {
+    if (!TryFinalizeMappedProbabilityRow(fleet_row, fleet_ptr->n_lengths)) {
       throw std::runtime_error(
-          "AgeToLengthConversionDerived produced an invalid mapped fleet probability row");
+          "AgeToLengthConversionDerived produced an invalid mapped fleet "
+          "probability row");
     }
 
     return fleet_row;
@@ -267,7 +266,8 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
    * @brief Try to get the linked population size provider.
    * @return Shared pointer to the size provider, or nullptr if unavailable.
    */
-  std::shared_ptr<SizeDistributionProviderBase<Type>> TryGetSizeProvider() const {
+  std::shared_ptr<SizeDistributionProviderBase<Type>> TryGetSizeProvider()
+      const {
     return size_provider_.lock();
   }
 
