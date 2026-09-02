@@ -60,7 +60,7 @@
 #'   with the following key columns:
 #'   * `label` - Type of estimate (e.g., "spawning_biomass", "recruitment")
 #'   * `timing` - Calendar year for the estimate
-#'   * `age_i` - Age index (if applicable)
+#'   * `age` - Age index (if applicable)
 #'   * `estimated` - Point estimate value
 #'   * `uncertainty` - Standard error of the estimate
 #'   * `lpdf` - Log probability density (negative log-likelihood component)

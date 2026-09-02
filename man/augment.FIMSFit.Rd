@@ -39,7 +39,8 @@ The returned tibble follows the conventions expected by every
    \code{module_id} \tab Unique module identifier \cr
    \code{distribution} \tab Likelihood distribution used for this data stream \cr
    \code{timing} \tab Calendar year (present when available in the estimates) \cr
-   \code{age_i} \tab Age index  (present when available in the estimates) \cr
+   \code{age} \tab Age index (present when available in the estimates) \cr
+   \code{length} \tab Length index (present when available in the estimates) \cr
 }
 }
 \examples{

@@ -327,6 +327,9 @@ test_that("`initialize_population()` works with correct inputs", {
   expect_type(result, "S4")
   #' @description Test that `initialize_population()` assigns one calendar year to every annual index.
   expect_equal(result$years[], get_years(data))
+  #' @description Test that `initialize_population()` assigns modeled age and length bins.
+  expect_equal(result$ages[], get_ages(data))
+  expect_equal(result$lengths[], get_lengths(data))
   #' @description Test that `initialize_population()` creates a module with expected methods in the class definition method table.
   expect_true(all(
     c(

@@ -26,6 +26,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g; /*!< reference id for population object*/
   size_t n_years;       /*!< total number of years in the fishery*/
   size_t n_ages;        /*!< total number of ages in the population*/
+  size_t n_lengths;     /*!< total number of modeled length bins*/
   size_t n_fleets;      /*!< total number of fleets in the fishery*/
 
   // parameters are estimated; after initialize in create_model, push_back to
@@ -47,6 +48,7 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
 annual fishing mortality multipliers to scale total mortality of all fleets*/
 
   fims::Vector<double> ages;  /*!< vector of the ages for referencing*/
+  fims::Vector<double> lengths; /*!< vector of lengths for referencing*/
   fims::Vector<double> years; /*!< vector of years for referencing*/
 
   /// recruitment

@@ -150,6 +150,11 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   RealVector ages;
   /**
+   * @brief Length bins that are modeled in the population. The length of this
+   * vector should equal \"n_lengths\".
+   */
+  RealVector lengths;
+  /**
    * @brief Calendar years that are modeled in the population. The length of
    * this vector should equal \"n_years\".
    */
@@ -267,6 +272,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_init_naa(other.log_init_naa),
         proportion_female(other.proportion_female),
         ages(other.ages),
+        lengths(other.lengths),
         years(other.years),
         name(other.name),
         total_catch_weight(other.total_catch_weight),
@@ -416,6 +422,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     // set relative info
     population->id = this->id;
     population->n_years = this->n_years.get();
+    population->n_lengths = this->n_lengths.get();
     population->n_fleets = this->n_fleets.get();
     // only define ages if n_ages greater than 0
     if (this->n_ages.get() > 0) {
@@ -437,6 +444,13 @@ class PopulationInterface : public PopulationInterfaceBase {
       for (size_t i = 0; i < this->years.size(); i++) {
         this->years[i] = static_cast<double>(i + 1);
       }
+    }
+    if (static_cast<size_t>(this->n_lengths.get()) == this->lengths.size()) {
+      population->lengths.resize(this->n_lengths.get());
+    } else {
+      throw std::invalid_argument(
+          "The size of the lengths vector for population " +
+          fims::to_string(this->id) + " is not equal to n_lengths.");
     }
     if (static_cast<size_t>(this->n_years.get()) == this->years.size()) {
       population->years.resize(this->n_years.get());
@@ -591,6 +605,9 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
+    }
+    for (size_t i = 0; i < lengths.size(); i++) {
+      population->lengths[i] = this->lengths[i];
     }
     for (size_t i = 0; i < years.size(); i++) {
       population->years[i] = this->years[i];

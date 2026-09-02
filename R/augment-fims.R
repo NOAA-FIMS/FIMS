@@ -18,7 +18,8 @@
 #' | `module_id`   | Unique module identifier                                  |
 #' | `distribution`| Likelihood distribution used for this data stream         |
 #' | `timing`      | Calendar year (present when available in the estimates)   |
-#' | `age_i`       | Age index  (present when available in the estimates)      |
+#' | `age`         | Age index (present when available in the estimates)       |
+#' | `length`      | Length index (present when available in the estimates)    |
 #'
 #' @param x A `FIMSFit` object returned from [fit_fims()].
 #' @param include_weights Logical (default `TRUE`).  When `TRUE` and
@@ -82,9 +83,12 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   }
 
   # Determine which optional index columns are present in the output
-  # (age_i, length_i, season_i, etc.). These and timing are carried through so
+  # (age, length, season_i, etc.). These and timing are carried through so
   # users can group metrics by, e.g., year.
-  index_cols <- names(fit_rows)[grepl("_i$", names(fit_rows))]
+  index_cols <- c(
+    intersect(c("age", "length"), names(fit_rows)),
+    names(fit_rows)[grepl("_i$", names(fit_rows))]
+  )
 
   # Core set of metadata columns to retain for grouping / filtering
   meta_cols <- intersect(

@@ -39,14 +39,18 @@ reshape_json_estimates <- function(model_output) {
     \(x) tidyr::unnest_wider(tibble::tibble(json = x), dplyr::all_of("json"))
   )
 
-  modeled_years <- if ("years" %in% names(read_list[["populations"]])) {
-    unlist(
-      read_list[["populations"]][["years"]][[1]],
-      use.names = FALSE
-    )
-  } else {
+  population_dimension_values <- function(dimension) {
+    if (dimension %in% names(read_list[["populations"]])) {
+      return(unlist(
+        read_list[["populations"]][[dimension]][[1]],
+        use.names = FALSE
+      ))
+    }
     numeric()
   }
+  modeled_years <- population_dimension_values("years")
+  modeled_ages <- population_dimension_values("ages")
+  modeled_lengths <- population_dimension_values("lengths")
 
 
   # Process the density components
@@ -155,7 +159,9 @@ reshape_json_estimates <- function(model_output) {
     ) |>
     # TODO: Think about these ids when we have more than one population
     dplyr::select(
-      -dplyr::any_of(c("delete_me", "population", "years")),
+      -dplyr::any_of(c(
+        "delete_me", "population", "years", "ages", "lengths"
+      )),
       -dplyr::ends_with("_id")
     ) |>
     dplyr::mutate(
@@ -175,13 +181,15 @@ reshape_json_estimates <- function(model_output) {
     population_information
   ) |>
     dplyr::mutate(
-      timing = year_index_to_timing(.data$year_i, modeled_years)
+      timing = year_index_to_timing(.data$year_i, modeled_years),
+      age = index_to_dimension_value(.data$age_i, modeled_ages),
+      length = index_to_dimension_value(.data$length_i, modeled_lengths)
     ) |>
     dplyr::select(
       dplyr::all_of(c("module_name", "module_id", "module_type")),
       "label" = dplyr::all_of("name"),
       dplyr::all_of(c("type", "type_id")), "parameter_id" = dplyr::all_of("id"),
-      dplyr::all_of("fleet"), dplyr::all_of("timing"),
+      dplyr::all_of("fleet"), dplyr::all_of(c("timing", "age", "length")),
       dplyr::ends_with("_i"),
       "input" = dplyr::all_of("value"),
       estimated = "estimated_value",
@@ -192,7 +200,21 @@ reshape_json_estimates <- function(model_output) {
       "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
     ) |>
-    dplyr::select(-dplyr::all_of("year_i"))
+    dplyr::select(-dplyr::all_of(c("year_i", "age_i", "length_i")))
+}
+
+#' Convert dimension indices to modeled values
+#'
+#' @param index Numeric indices from JSON dimensionality metadata.
+#' @param values Numeric modeled dimension values stored on the population.
+#' @return A numeric vector of modeled values, or the original indices for
+#'   legacy JSON without the corresponding metadata.
+#' @noRd
+index_to_dimension_value <- function(index, values) {
+  if (length(values) == 0) {
+    return(as.numeric(index))
+  }
+  unname(values[index])
 }
 
 #' Convert annual indices to model timing values

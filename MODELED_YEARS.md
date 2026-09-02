@@ -97,6 +97,8 @@ The finalized year vector is serialized as population-level metadata:
   "module_name": "Population",
   "population": "NA",
   "module_id": 1,
+  "ages": [1.0000000000, 2.0000000000, 3.0000000000],
+  "lengths": [10.0000000000, 20.0000000000, 30.0000000000],
   "years": [2001.0000000000, 2002.0000000000, 2003.0000000000],
   "recruitment_id": 1,
   "growth_id": 1,
@@ -108,6 +110,11 @@ Annual parameters and derived quantities continue to use dimensionality names
 such as `n_years`, `n_years-1`, and `n_years+1`. Consumers can use the
 population `years` metadata to translate internal year-dimension indices into
 the `timing` values returned by `get_estimates()`.
+
+The same mapping is applied to age and length dimensions. The public `age` and
+`length` columns contain the modeled bin values stored in population JSON, not
+their internal one-based indices. Legacy JSON without dimension-value metadata
+retains its numeric indices as a fallback.
 
 For example, given `years = c(2001, 2002, 2003)`:
 

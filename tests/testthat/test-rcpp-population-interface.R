@@ -28,6 +28,8 @@ test_that("rcpp population interface works with correct inputs", {
   population$n_fleets$set(2)
   population$n_years$set(n_years)
   population$years[] <- 2001:2010
+  population$n_lengths$set(3)
+  population$lengths[] <- c(10, 20, 40)
 
 
   #' @description Test that the population id is 1.
@@ -38,6 +40,9 @@ test_that("rcpp population interface works with correct inputs", {
 
   #' @description Test that population years retain calendar-year values.
   expect_equal(population$years[], 2001:2010)
+
+  #' @description Test that population length bins retain nonsequential values.
+  expect_equal(population$lengths[], c(10, 20, 40))
 
   for (i in 1:(n_years * n_ages)) {
     #' @description Test that the log_M values are all -1.

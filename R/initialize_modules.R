@@ -163,7 +163,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
   )
 
   real_vector_fields <- c(
-    "ages", "weights"
+    "ages", "lengths", "weights"
   )
 
   for (field in module_fields) {
@@ -184,6 +184,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
     } else if (field %in% real_vector_fields) {
       get_value_function <- switch(field,
         "ages" = get_ages,
+        "lengths" = get_lengths,
         "weights" = model_weight_at_age
       )
       module[[field]][] <- get_value_function(data)

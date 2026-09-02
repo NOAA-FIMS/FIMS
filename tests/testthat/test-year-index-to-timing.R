@@ -20,3 +20,35 @@ test_that("`year_index_to_timing()` maps annual indices to calendar years", {
     c(1, 2, NA)
   )
 })
+
+test_that("`index_to_dimension_value()` maps indices to modeled bins", {
+  #' @description Test that age indices map to nonsequential modeled ages.
+  expect_equal(
+    index_to_dimension_value(1:3, c(1, 3, 5)),
+    c(1, 3, 5)
+  )
+
+  #' @description Test that length indices map to modeled length-bin values.
+  expect_equal(
+    index_to_dimension_value(1:3, c(10, 20, 40)),
+    c(10, 20, 40)
+  )
+
+  #' @description Test that legacy JSON without bin metadata retains numeric indices.
+  expect_equal(
+    index_to_dimension_value(c(1, 2, NA), numeric()),
+    c(1, 2, NA)
+  )
+
+  #' @description Test that repeated and missing indices preserve row alignment.
+  expect_equal(
+    index_to_dimension_value(c(3, 1, 3, NA), c(2.5, 7.5, 12.5)),
+    c(12.5, 2.5, 12.5, NA)
+  )
+
+  #' @description Test that an index beyond the modeled bins maps to a missing value.
+  expect_equal(
+    index_to_dimension_value(c(1, 4), c(10, 20, 30)),
+    c(10, NA)
+  )
+})

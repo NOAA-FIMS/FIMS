@@ -62,7 +62,7 @@ with the following key columns:
 \itemize{
 \item \code{label} - Type of estimate (e.g., "spawning_biomass", "recruitment")
 \item \code{timing} - Calendar year for the estimate
-\item \code{age_i} - Age index (if applicable)
+\item \code{age} - Age index (if applicable)
 \item \code{estimated} - Point estimate value
 \item \code{uncertainty} - Standard error of the estimate
 \item \code{lpdf} - Log probability density (negative log-likelihood component)

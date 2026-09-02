@@ -18,7 +18,7 @@ if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
-  "parameter_id", "fleet", "timing", "age_i", "length_i",
+  "parameter_id", "fleet", "timing", "age", "length",
   "input", "estimated", "expected", "observed",
   "estimation_type", "uncertainty",
   "distribution", "input_type",
@@ -34,6 +34,8 @@ test_that("`get_estimates()` works with deterministic run", {
     object = deterministic_colnames,
     expected = expected_colnames
   )
+  #' @description Test that internal dimension-index columns are absent from estimates.
+  expect_false(any(c("year_i", "age_i", "length_i") %in% deterministic_colnames))
   modeled_years <- jsonlite::fromJSON(
     get_model_output(deterministic_results),
     simplifyVector = FALSE
@@ -46,6 +48,33 @@ test_that("`get_estimates()` works with deterministic run", {
         c(modeled_years, max(modeled_years) + 1)
     ))
   }
+  estimate_values <- get_estimates(deterministic_results)
+  model_json <- jsonlite::fromJSON(
+    get_model_output(deterministic_results),
+    simplifyVector = FALSE
+  )
+  modeled_ages <- unlist(
+    model_json[["populations"]][[1]][["ages"]],
+    use.names = FALSE
+  )
+  modeled_lengths <- unlist(
+    model_json[["populations"]][[1]][["lengths"]],
+    use.names = FALSE
+  )
+  #' @description Test that current model JSON contains dimension values used by estimates.
+  expect_gt(length(modeled_years), 0)
+  expect_gt(length(modeled_ages), 0)
+  expect_gt(length(modeled_lengths), 0)
+  if (length(modeled_ages) > 0) {
+    #' @description Test that estimate age values come from modeled age bins.
+    expect_true(all(stats::na.omit(estimate_values[["age"]]) %in% modeled_ages))
+  }
+  if (length(modeled_lengths) > 0) {
+    #' @description Test that estimate length values come from modeled length bins.
+    expect_true(all(
+      stats::na.omit(estimate_values[["length"]]) %in% modeled_lengths
+    ))
+  }
 
   #' @description Test that the result values from the model fit have not changed from the accepted version.
   expect_snapshot(
@@ -53,6 +82,7 @@ test_that("`get_estimates()` works with deterministic run", {
       # Normalize calendar years so snapshots remain independent of the model's
       # chosen start year.
       dplyr::mutate(timing = dplyr::dense_rank(.data$timing)) |>
+      dplyr::rename(year_i = timing, age_i = age, length_i = length) |>
       # Remove the estimate, uncertainty, and gradient columns, as they
       # may change between runs
       dplyr::select(
@@ -96,6 +126,7 @@ test_that("`get_estimates()` works with estimation run", {
       # Normalize calendar years so snapshots remain independent of the model's
       # chosen start year.
       dplyr::mutate(timing = dplyr::dense_rank(.data$timing)) |>
+      dplyr::rename(year_i = timing, age_i = age, length_i = length) |>
       # Remove the estimated, uncertainty, and gradient columns, as they
       # may change between runs
       dplyr::select(
