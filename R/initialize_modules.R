@@ -107,6 +107,7 @@ initialize_recruitment <- function(parameters, data) {
     data = data,
     module_name = "Recruitment"
   )
+  set_recruitment_n_years(module, get_n_years(data))
   return(module)
 }
 
@@ -252,6 +253,14 @@ initialize_fleet <- function(parameters, data, fleet, selectivity,
   set_fleet_constants(
     module, get_n_years(data), get_n_ages(data), get_n_lengths(data)
   )
+  if (!is.null(length_comp)) {
+    set_variable_vector(
+      module,
+      "age_to_length_conversion",
+      model_age_to_length_conversion(data),
+      "assumed_known"
+    )
+  }
   set_fleet_selectivity(module, selectivity)
 
   # A slot left NULL means the fleet has no data of that kind. Every slot is
@@ -774,7 +783,6 @@ initialize_fims <- function(parameters, data) {
   # Hard code to be a catch-at-age model
   fims_model <- create_fishery_model("CatchAtAge")
   set_model_populations(fims_model, list(population))
-browser()
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameter_list <- list(

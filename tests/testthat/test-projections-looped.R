@@ -122,7 +122,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # Set up fishery index data using the lognormal
   # lognormal observation error transformed on the log scale
   # Compute lognormal SD from OM coefficient of variation (CV)
-  fishing_fleet_catch_distribution <- create_distribution("Dlnorm")
+  fishing_fleet_catch_distribution <- create_distribution("dlnorm")
   set_variable_vector(
     fishing_fleet_catch_distribution, "log_sd",
     rep(log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1))), n_total_years),
@@ -139,10 +139,10 @@ run_FIMS_projection_scenario <- function(om_input,
   )
 
   # Set up fishery age composition data using the multinomial
-  fishing_fleet_agecomp_distribution <- create_distribution("Dmultinom")
+  fishing_fleet_agecomp_distribution <- create_distribution("dmultinom")
   set_distribution_observed_data(
     fishing_fleet_agecomp_distribution,
-    get_fleet_observed_data_ids(fishing_fleet)[["agecomp"]]
+    get_fleet_observed_data_ids(fishing_fleet)[["age_comp"]]
   )
   set_distribution_links(
     fishing_fleet_agecomp_distribution, "data",
@@ -150,10 +150,10 @@ run_FIMS_projection_scenario <- function(om_input,
   )
 
   # Set up fishery length composition data using the multinomial
-  fishing_fleet_lengthcomp_distribution <- create_distribution("Dmultinom")
+  fishing_fleet_lengthcomp_distribution <- create_distribution("dmultinom")
   set_distribution_observed_data(
     fishing_fleet_lengthcomp_distribution,
-    get_fleet_observed_data_ids(fishing_fleet)[["lengthcomp"]]
+    get_fleet_observed_data_ids(fishing_fleet)[["length_comp"]]
   )
   set_distribution_links(
     fishing_fleet_lengthcomp_distribution, "data",
@@ -236,7 +236,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # Set up survey index data using the lognormal
   # lognormal observation error transformed on the log scale
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-  survey_fleet_index_distribution <- create_distribution("Dlnorm")
+  survey_fleet_index_distribution <- create_distribution("dlnorm")
   set_variable_vector(
     survey_fleet_index_distribution, "log_sd",
     rep(
@@ -256,10 +256,10 @@ run_FIMS_projection_scenario <- function(om_input,
   )
 
   # Age composition distribution
-  survey_fleet_agecomp_distribution <- create_distribution("Dmultinom")
+  survey_fleet_agecomp_distribution <- create_distribution("dmultinom")
   set_distribution_observed_data(
     survey_fleet_agecomp_distribution,
-    get_fleet_observed_data_ids(survey_fleet)[["agecomp"]]
+    get_fleet_observed_data_ids(survey_fleet)[["age_comp"]]
   )
   set_distribution_links(
     survey_fleet_agecomp_distribution, "data",
@@ -267,10 +267,10 @@ run_FIMS_projection_scenario <- function(om_input,
   )
 
   # Length composition distribution
-  survey_fleet_lengthcomp_distribution <- create_distribution("Dmultinom")
+  survey_fleet_lengthcomp_distribution <- create_distribution("dmultinom")
   set_distribution_observed_data(
     survey_fleet_lengthcomp_distribution,
-    get_fleet_observed_data_ids(survey_fleet)[["lengthcomp"]]
+    get_fleet_observed_data_ids(survey_fleet)[["length_comp"]]
   )
   set_distribution_links(
     survey_fleet_lengthcomp_distribution, "data",
@@ -294,7 +294,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # create new module in the recruitment class (specifically Beverton-Holt,
   # when there are other options, this would be where the option would be chosen)
   recruitment <- create_recruitment("BevertonHolt")
-  recruitment_process <- create_recruitment("LogDevsProcess")
+  recruitment_process <- create_recruitment("log_devs")
   set_recruitment_process(recruitment, recruitment_process)
 
   # NOTE: the estimation status is given on every call, including where it is
@@ -336,7 +336,7 @@ run_FIMS_projection_scenario <- function(om_input,
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
   # taken before the likelihood calculation
-  recruitment_distribution <- create_distribution("Dnorm")
+  recruitment_distribution <- create_distribution("dnorm")
   set_variable_vector(
     recruitment_distribution, "log_sd",
     log(om_input[["logR_sd"]]), "fixed_effects"
@@ -418,7 +418,7 @@ run_FIMS_projection_scenario <- function(om_input,
     )
     if (n_projection_years > 0) {
 
-      F_mult_distribution <- create_distribution("Dnorm")
+      F_mult_distribution <- create_distribution("dnorm")
 
       # log_f_multiplier likelihood is setup with an expected mean target
       # to force the values to be close to equal. This setup is needed because
@@ -484,7 +484,7 @@ run_FIMS_projection_scenario <- function(om_input,
       ] <- -5
     }
 
-    SSB_ratio_prior <- create_distribution("Dnorm")
+    SSB_ratio_prior <- create_distribution("dnorm")
     set_variable_vector(
       SSB_ratio_prior, "observed_values",
       rep(ssb_ratio_target, n_ssb), "assumed_known"

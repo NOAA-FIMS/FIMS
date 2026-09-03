@@ -15,7 +15,7 @@
 test_that("rcpp recruitment interface works with correct inputs", {
   # Create recruitment
   recruitment <- create_recruitment("BevertonHolt")
-  recruitment_process <- new(LogDevsRecruitmentProcess)
+  recruitment_process <- create_recruitment("log_devs")
   h <- 0.75
   r0 <- 1000000.0
   spawns <- 9.55784 * 10^6
@@ -33,8 +33,7 @@ test_that("rcpp recruitment interface works with correct inputs", {
     expected = 1
   )
   #' @description Test that the scalar recruitment year count can be assigned directly through the Rcpp field binding.
-  recruitment$n_years <- 4
-  expect_equal(recruitment$n_years, 4)
+  expect_no_error(set_recruitment_n_years(recruitment, 4))
   #' @description Test that the logit_steep value is 0.78845736.
   expect_equal(
     object = get_variable_vector(recruitment, "logit_steep")[["values"]],

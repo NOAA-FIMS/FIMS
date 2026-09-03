@@ -155,7 +155,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set up fishery index data using the lognormal
   # lognormal observation error transformed on the log scale
   # Compute lognormal SD from OM coefficient of variation (CV)
-  fishing_fleet_catch_distribution <- create_distribution("Dlnorm")
+  fishing_fleet_catch_distribution <- create_distribution("dlnorm")
   set_variable_vector(
     fishing_fleet_catch_distribution, "log_sd",
     rep(
@@ -175,10 +175,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
 
   # Set up fishery age composition data using the multinomial
-  fishing_fleet_agecomp_distribution <- create_distribution("Dmultinom")
+  fishing_fleet_agecomp_distribution <- create_distribution("dmultinom")
   set_distribution_observed_data(
     fishing_fleet_agecomp_distribution,
-    get_fleet_observed_data_ids(fishing_fleet)[["agecomp"]]
+    get_fleet_observed_data_ids(fishing_fleet)[["age_comp"]]
   )
   set_distribution_links(
     fishing_fleet_agecomp_distribution, "data",
@@ -186,10 +186,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
 
   # Set up fishery length composition data using the multinomial
-  fishing_fleet_lengthcomp_distribution <- create_distribution("Dmultinom")
+  fishing_fleet_lengthcomp_distribution <- create_distribution("dmultinom")
   set_distribution_observed_data(
     fishing_fleet_lengthcomp_distribution,
-    get_fleet_observed_data_ids(fishing_fleet)[["lengthcomp"]]
+    get_fleet_observed_data_ids(fishing_fleet)[["length_comp"]]
   )
   set_distribution_links(
     fishing_fleet_lengthcomp_distribution, "data",
@@ -272,7 +272,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set up survey index data using the lognormal
   # lognormal observation error transformed on the log scale
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
-  survey_fleet_index_distribution <- create_distribution("Dlnorm")
+  survey_fleet_index_distribution <- create_distribution("dlnorm")
   set_variable_vector(
     survey_fleet_index_distribution, "log_sd",
     rep(
@@ -292,10 +292,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
 
   # Age composition distribution
-  survey_fleet_agecomp_distribution <- create_distribution("Dmultinom")
+  survey_fleet_agecomp_distribution <- create_distribution("dmultinom")
   set_distribution_observed_data(
     survey_fleet_agecomp_distribution,
-    get_fleet_observed_data_ids(survey_fleet)[["agecomp"]]
+    get_fleet_observed_data_ids(survey_fleet)[["age_comp"]]
   )
   set_distribution_links(
     survey_fleet_agecomp_distribution, "data",
@@ -303,10 +303,10 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
 
   # Length composition distribution
-  survey_fleet_lengthcomp_distribution <- create_distribution("Dmultinom")
+  survey_fleet_lengthcomp_distribution <- create_distribution("dmultinom")
   set_distribution_observed_data(
     survey_fleet_lengthcomp_distribution,
-    get_fleet_observed_data_ids(survey_fleet)[["lengthcomp"]]
+    get_fleet_observed_data_ids(survey_fleet)[["length_comp"]]
   )
   set_distribution_links(
     survey_fleet_lengthcomp_distribution, "data",
@@ -333,9 +333,9 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # when there are other options, this would be where the option would be chosen)
   recruitment <- create_recruitment("BevertonHolt")
   if (is.null(random_effects) || random_effects[["recruitment"]] == "log_devs") {
-    recruitment_process <- create_recruitment("LogDevsProcess")
+    recruitment_process <- create_recruitment("log_devs")
   } else {
-    recruitment_process <- create_recruitment("LogRProcess")
+    recruitment_process <- create_recruitment("log_r")
   }
   set_recruitment_process(recruitment, recruitment_process)
 
@@ -410,7 +410,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
   # taken before the likelihood calculation
-  recruitment_distribution <- create_distribution("Dnorm")
+  recruitment_distribution <- create_distribution("dnorm")
   set_variable_vector(
     recruitment_distribution, "log_sd",
     log(om_input[["logR_sd"]]), "assumed_known"

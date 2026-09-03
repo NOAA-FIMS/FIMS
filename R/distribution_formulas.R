@@ -28,7 +28,9 @@ check_distribution_validity <- function(args) {
   check_present <- purrr::map_vec(list("family" = family, "sd" = sd), is.null)
   
   # Only process distributions are currently validated here.
-  available_distributions <- c("lognormal", "dnorm", "Dnorm")
+  available_distributions <- c(
+    "gaussian", "lognormal", "dnorm", "dlnorm", "Dnorm", "Dlnorm"
+  )
   elements_of_sd <- c("value", "estimation_status")
 
   # Start a bulleted list of errors and add to it in each if statement
@@ -47,15 +49,20 @@ check_distribution_validity <- function(args) {
   }
 
   # Checks related to the family class
-  if (!inherits(family, "family")) {
+  if (inherits(family, "family")) {
+    family_name <- family[["family"]]
+  } else if (is.character(family) && length(family) == 1L && !is.na(family)) {
+    family_name <- family
+  } else {
     abort_bullets <- c(
       abort_bullets,
       "x" = "The class of {.var family} is incorrect.",
-      "i" = "{.var family} should be an object of class {.var family},
-             e.g., `family = gaussian()`, instead of {class(family)}."
+      "i" = "{.var family} should be a distribution name or an object of
+             class {.var family}, e.g., `family = 'dnorm'` or
+             `family = gaussian()`, instead of {class(family)}."
     )
-  } else {
-    family_name <- family[["family"]]
+  }
+  if (exists("family_name", inherits = FALSE)) {
     if (!(family_name %in% available_distributions)) {
       abort_bullets <- c(
         abort_bullets,
@@ -262,10 +269,7 @@ initialize_process_distribution <- function(
 ) {
   # validity check on user input
   args <- list(family = family, sd = sd)
-  # TODO: revise validity checks on process distributions after tibble is updated
-  # to follow the formula pattern for data
-  # after updating, the `check_distribution_validity` function above can be removed
-  #check_distribution_validity(args)
+  check_distribution_validity(args)
 
   if (!is.element(par, c("log_devs", "log_r"))) {
     return()
@@ -275,11 +279,19 @@ initialize_process_distribution <- function(
     "log_r" = "log_expected_recruitment"
   )
 
-  distribution_family <- family
-  # TODO: remove after making distribution name consistent in tibble or backend
-  if (family == "Dnorm") distribution_family <- "dnorm"
-  # TODO: remove after making distribution name consistent in tibble or backend
-  if (family == "Dlnorm") distribution_family <- "dlnorm"
+  distribution_family <- if (inherits(family, "family")) {
+    switch(family[["family"]],
+      gaussian = "dnorm",
+      lognormal = "dlnorm",
+      family[["family"]]
+    )
+  } else {
+    switch(family,
+      Dnorm = "dnorm",
+      Dlnorm = "dlnorm",
+      family
+    )
+  }
 
   # Set up distribution based on `family` argument`
   maker <- .fims_module_names[["Distribution"]]

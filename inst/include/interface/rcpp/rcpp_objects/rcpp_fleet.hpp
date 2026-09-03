@@ -448,10 +448,10 @@ class FleetInterface : public FleetInterfaceBase {
 
       if (this->age_to_length_conversion.size() !=
           static_cast<size_t>(this->n_ages * this->n_lengths)) {
-        FIMS_ERROR_LOG(
-            "age_to_length_conversion don't match, " +
-            fims::to_string(this->age_to_length_conversion.size()) + " != " +
-            fims::to_string((this->n_ages * this->n_lengths)));
+        throw std::invalid_argument(
+            "Fleet age_to_length_conversion size mismatch: expected " +
+            fims::to_string(this->n_ages * this->n_lengths) + ", got " +
+            fims::to_string(this->age_to_length_conversion.size()) + ".");
       }
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {

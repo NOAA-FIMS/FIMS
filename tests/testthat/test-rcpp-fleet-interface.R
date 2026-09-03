@@ -43,7 +43,7 @@ test_that("rcpp fleet works with correct inputs", {
   )
   #' @description Test that getting the observed data ids works within the fleet module.
   expect_equal(
-    get_fleet_observed_data_ids(fleet1)[["agecomp"]], get_module_id(age_comp)
+    get_fleet_observed_data_ids(fleet1)[["age_comp"]], get_module_id(age_comp)
   )
   expect_equal(
     get_fleet_observed_data_ids(fleet1)[["index"]], get_module_id(index)
@@ -74,6 +74,9 @@ test_that("rcpp fleet returns correct error messages", {
     "must be a .*Data"
   )
   #' @description Test that the fleet interface rejects an object that is not a module at all.
-  expect_error(set_fleet_selectivity(fleet1, "id"), "must be a FIMS module")
+  expect_error(
+    set_fleet_selectivity(fleet1, "id"),
+    "must be a FIMS module or a single numeric module ID"
+  )
   clear()
 })

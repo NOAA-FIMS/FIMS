@@ -18,14 +18,14 @@ test_that("rcpp population interface works with correct inputs", {
   n_years <- 10
   n_ages <- 10
   log_M_length <- n_years * n_ages
-  population$log_M[] <- rep(-1, log_M_length)
-
-  population$log_init_naa[] <- rep(0, n_ages)
-
-  population$n_ages$set(n_ages)
-  population$ages[] <- seq(1, n_ages)
-  population$n_fleets$set(2)
-  population$n_years$set(n_years)
+  set_variable_vector(
+    population, "log_M", rep(-1, log_M_length), "assumed_known"
+  )
+  set_variable_vector(
+    population, "log_init_naa", rep(0, n_ages), "fixed_effects"
+  )
+  set_population_constants(population, n_years, n_ages)
+  set_numeric_vector(population, "ages", seq_len(n_ages))
 
 
   #' @description Test that the population id is 1.
@@ -48,14 +48,21 @@ test_that("rcpp population interface works with correct inputs", {
   #' @description Test that the log_init_naa values are all 0.
   expect_equal(
     object = get_variable_vector(population, "log_init_naa")[["values"]],
-    expected = rep(0, n_years)
+    expected = rep(0, n_ages)
   )
   #' @description Test that the log_init_naa values are estimated.
   expect_equal(
     object = get_variable_vector(population, "log_init_naa")[["estimation_status"]],
-    expected = rep("fixed_effects", n_years)
+    expected = rep("fixed_effects", n_ages)
   )
 
+
+  set_variable_vector(
+    population, "log_M", rep(-1, log_M_length), "fixed_effects"
+  )
+  set_variable_vector(
+    population, "log_init_naa", rep(0, n_ages), "assumed_known"
+  )
 
   #' @description Test that the log_M values are all -1.
   expect_equal(
@@ -71,12 +78,12 @@ test_that("rcpp population interface works with correct inputs", {
   #' @description Test that the log_init_naa values are all 0.
   expect_equal(
     object = get_variable_vector(population, "log_init_naa")[["values"]],
-    expected = rep(0, n_years)
+    expected = rep(0, n_ages)
   )
   #' @description Test that the log_init_naa values are not estimated.
   expect_equal(
     object = get_variable_vector(population, "log_init_naa")[["estimation_status"]],
-    expected = rep("assumed_known", n_years)
+    expected = rep("assumed_known", n_ages)
   )
 
   clear()

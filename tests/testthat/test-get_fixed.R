@@ -28,7 +28,7 @@ test_that("`get_fixed()` works with correct inputs", {
   clear()
 
   selectivity <- create_selectivity("Logistic")
-  set_variable_vector(selectivity, "inflection_point", 10.0, "fixed_effects")
+  set_variable_vector(selectivity, "inflection_point", 10.0, "assumed_known")
   set_variable_vector(selectivity, "slope", 0.2, "fixed_effects")
   CreateTMBModel()
   #' @description Test that setting a selectivity parameter to FALSE in a previously defined module changes the number of parameters.
@@ -69,7 +69,7 @@ test_that("`get_fixed()` works with correct inputs", {
   )
   set_variable_vector(recruitment, "log_rzero", log(r0), "fixed_effects")
   # recruitment$n_years needs to be greater than 0 to avoid a CreateTMBModel() error
-  recruitment$n_years <- 1
+  set_recruitment_n_years(recruitment, 1)
   rec_parm <- c(-log(1.0 - h) + log(h - 0.2), log(r0))
 
   CreateTMBModel()
@@ -85,8 +85,8 @@ test_that("`get_fixed()` returns correct outputs for edge cases", {
   clear()
   #' @description Test that zero parameters are registered after using `clear()`.
   expect_equal(numeric(0), get_fixed())
-  CreateTMBModel()
-  #' @description Test that zero parameters are registered after using `clear()` even if `CreateTMBModel()` is called.
+  #' @description Test that model creation diagnoses an empty XPtr registry.
+  expect_error(CreateTMBModel(), "No model components have been registered")
   expect_equal(numeric(0), get_fixed())
   clear()
 })

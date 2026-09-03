@@ -48,6 +48,11 @@ module_id <- function(x, module_name = NULL, arg = "x") {
     check_module(x, module_name, arg)
     return(x[["id"]])
   }
+  if (!is.numeric(x) || length(x) != 1L || is.na(x)) {
+    cli::cli_abort(
+      "{.arg {arg}} must be a FIMS module or a single numeric module ID."
+    )
+  }
   as.integer(x)
 }
 

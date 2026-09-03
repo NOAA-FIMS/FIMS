@@ -353,6 +353,15 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     }
     info->variable_map[this->log_r.id_m] = &(recruitment)->log_r;
     
+    // Subtracting from zero and passing the result to resize() converts -1 to
+    // a huge size_t, which otherwise surfaces as the unhelpful
+    // vector::_M_default_append allocation error.
+    if (this->n_years <= 0) {
+      throw std::invalid_argument(
+          "BevertonHoltRecruitment requires n_years to be greater than zero "
+          "before CreateTMBModel().");
+    }
+
     // set log_expected_recruitment
     recruitment->log_expected_recruitment.resize(this->n_years - 1);
     for (size_t i = 0; i < static_cast<size_t>(this->n_years - 1); i++) {

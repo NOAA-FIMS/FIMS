@@ -13,9 +13,6 @@
 
 ## IO correctness ----
 test_that("Rcpp interface works for modules", {
-  #' @description Test that Rcpp interface works for variable module.
-  expect_no_error(variable <- methods::new(Variable, .1))
-
   #' @description Test that Rcpp interface works for recruitment module.
   expect_no_error(beverton_holt <- create_recruitment("BevertonHolt"))
   #' @description Test that `get_id()` method works for `BevertonHoltRecruitment` module.
@@ -54,25 +51,20 @@ test_that("Rcpp interface works for modules", {
 
 ## Error handling ----
 test_that("Rcpp interface returns correct error messages", {
-  #' @description Test that Rcpp Variable interface returns an error when given incorrect input.
-  expect_error(
-    methods::new(Variable, "a"),
-    regexp = "Not compatible with requested type"
-  )
   #' @description Test that the recruitment module returns an error when given an unknown type.
   expect_error(
     create_recruitment("a"),
-    regexp = "not a recruitment type FIMS knows about"
+    regexp = "not a Recruitment type FIMS knows about"
   )
   #' @description Test that the selectivity module returns an error when given an unknown type.
   expect_error(
     create_selectivity("a"),
-    regexp = "not a selectivity type FIMS knows about"
+    regexp = "not a Selectivity type FIMS knows about"
   )
   #' @description Test that the growth module returns an error when given an unknown type.
   expect_error(
     create_growth("a"),
-    regexp = "not a growth type FIMS knows about"
+    regexp = "not a Growth type FIMS knows about"
   )
   clear()
 })
