@@ -28,7 +28,7 @@ check_distribution_validity <- function(args) {
   check_present <- purrr::map_vec(list("family" = family, "sd" = sd), is.null)
   
   # Only process distributions are currently validated here.
-  available_distributions <- c("lognormal", "gaussian")
+  available_distributions <- c("lognormal", "dnorm", "Dnorm")
   elements_of_sd <- c("value", "estimation_status")
 
   # Start a bulleted list of errors and add to it in each if statement
@@ -111,39 +111,44 @@ check_distribution_validity <- function(args) {
   }
 }
 
-#' Set up a new distribution for a data type
+#' Set up a distribution for a fleet's data
 #'
-#' Use [methods::new()] to set up a distribution within an existing module with
-#' the necessary linkages between the two. For example, a fleet module will need
-#' a distributional assumption for parts of the data associated with it, which
-#' requires the use of `initialize_data_distribution()`.
-#' @param module An identifier to a C++ fleet module that is linked to the data
-#'   of interest.
-#' @param data_type A string specifying the type of data that the
-#'   distribution will be fit to. Allowable types include
+#' This helper creates a distribution module and wires it to the observed data
+#' carried by a fleet. 
+#'
+#' @param module A fleet [fims_module], created with [create_fleet()] and
+#'   linked to the data of interest.
+#' @param data_type A string specifying the observed data type the distribution
+#'   applies to. Allowable types include
 #'   `r glue::glue_collapse(sprintf('"%s"', eval(formals(initialize_data_distribution)[["data_type"]])), sep = ", ", last = ", and ")`
 #'   and the default is
 #'   `r eval(formals(initialize_data_distribution)[["data_type"]])[1]`.
-#' @param uncertainty A vector of strings specifying formulas for each data
-#'   point. See [FIMSFrame()] for more information on what the formula should
-#'   look like.
-#' @return
-#' A reference class. is returned. Use [methods::show()] to view the various
-#' Rcpp class fields, methods, and documentation.
+#' @param uncertainty A character vector of formulas describing the uncertainty
+#'   model for each observation. Each string is parsed by
+#'   `parse_data_distribution()` and checked for valid families before the
+#'   distribution is linked to the fleet's observed data. These formulas should
+#'   name the same quantities the model expects to read from the fleet or
+#'   associated modules.
+#' @return A [fims_module] distribution object. Internally it holds the C++
+#'   external pointer that FIMS uses to represent the distribution, and it is
+#'   registered with the model so it can be included when the model is built.
 #' @keywords distribution
 #' @export
 #' @seealso
+#' * [create_distribution()]
+#' * [set_distribution_links()]
 #' * [initialize_process_distribution()]
 #' @examples
 #' \dontrun{
-#' # Set up a new data distribution
-#' n_years <- 30
-#' # Create a new fleet module
-#' fleet <- methods::new(Fleet)
-#' # Create a distribution for the fleet module
-#' sd_log <- rep(sqrt(log(0.01^2 + 1)), n_years)
+#' # Create a fleet and the observed index data it carries.
+#' fleet <- create_fleet()
+#' index_data <- create_data("index", n_years = 30)
+#' set_fleet_observed_data(fleet, index = index_data)
+#'
+#' # Create a distribution for the fleet's index observations.
+#' sd_log <- rep(sqrt(log(0.01^2 + 1)), 30)
 #' fleet_distribution <- initialize_data_distribution(
-#'   module = fishing_fleet,
+#'   module = fleet,
 #'   uncertainty = glue::glue(
 #'     "~dlnorm(meanlog = log_index_expected, sdlog = {sd_log})"
 #'   ),
@@ -158,48 +163,47 @@ initialize_data_distribution <- function(
   data_type <- rlang::arg_match(data_type)
   uncertainty_split <- parse_data_distribution(uncertainty) |>
     validate_distribution_families()
-  family <- unique(stats::na.omit(uncertainty_split[["family"]]))
+  distribution_family <- unique(stats::na.omit(uncertainty_split[["family"]]))
 
   # Set up distribution based on `family` argument`
-  new_module <- methods::new(get(gsub(
-    "^d(.+)$", "D\\1Distribution",
-    family
-  )))
-  if ("log_sd" %in% names(new_module)) {
-    ancillary_parameter <- dplyr::filter(
-      FIMS::fims_distributions,
-      .data$family == .env$family
-    ) |>
-      dplyr::pull(.data$other_parameters) |>
-      unlist()
-    new_module$log_sd[] <- log(
-      unlist(uncertainty_split[[ancillary_parameter]], use.names = FALSE)
+  maker <- .fims_module_names[["Distribution"]]
+  if (is.null(maker)) {
+    cli::cli_abort(c(
+      "{.val {module_name}} is not a module FIMS knows how to create.",
+      "i" = "Add it to {.var .fims_module_names} in {.file R/fims_interface.R}."
+    ))
+  }
+  distribution_module <- maker[["create"]](
+    if (length(distribution_family) == 1) distribution_family else NA_character_
+  )
+
+  ancillary_parameter <- dplyr::filter(
+    FIMS::fims_distributions,
+    .data$family == .env$distribution_family
+  ) |>
+    dplyr::pull(.data$other_parameters) |>
+    unlist()
+
+  if (ancillary_parameter == "sdlog" | ancillary_parameter == "sd") {
+    set_variable_vector(distribution_module, "log_sd",
+      unlist(uncertainty_split[[ancillary_parameter]], use.names = FALSE) |> log(),
+      estimation_status = "assumed_known"
     )
-    new_module$log_sd$set_estimation_status("assumed_known")
   }
 
   # setup link to observed data
-  data_id_name <- glue::glue("GetObserved{snake_to_pascal(data_type)}DataID")
-  getter_function <- tryCatch(
-    do.call("$", list(module, data_id_name)),
-    error = function(e) NULL
-  )
-  if (is.null(getter_function)) {
-    cli::cli_abort(c(
-      x = "Could not find observed data name, {.code {data_id_name}} in the
-      module",
-      i = "Check {.var data_type} and the module class.",
-      i = "Options in the module are {grep('Get', names(module), value = TRUE)}"
-    ))
-  }
-  new_module$set_observed_data(getter_function())
-  # setup link to expected values
-  new_module$set_distribution_links(
-    "data",
-    module$field(unique(stats::na.omit(uncertainty_split[["link"]])))$get_id()
+  set_distribution_observed_data(
+    distribution_module,
+    get_fleet_observed_data_ids(module)[[data_type]]
   )
 
-  return(new_module)
+  # setup link to expected values
+  set_distribution_links( distribution_module, "data",
+    get_variable_vector_id(module,
+                           unique(stats::na.omit(uncertainty_split[["link"]])))
+  )
+  
+  return(distribution_module)
 }
 
 #' Set up a new distribution for a process
@@ -250,7 +254,7 @@ initialize_data_distribution <- function(
 initialize_process_distribution <- function(
   module,
   par,
-  family = NULL,
+  family = "dnorm",
   sd = tibble::tibble(
     value = 1,
     estimation_status = "fixed_effects"
@@ -258,44 +262,44 @@ initialize_process_distribution <- function(
 ) {
   # validity check on user input
   args <- list(family = family, sd = sd)
-  check_distribution_validity(args)
+  # TODO: revise validity checks on process distributions after tibble is updated
+  # to follow the formula pattern for data
+  # after updating, the `check_distribution_validity` function above can be removed
+  #check_distribution_validity(args)
 
   if (!is.element(par, c("log_devs", "log_r"))) {
     return()
   }
-  expected <- switch(paste0(par, "_", class(module)),
-    "log_devs_Rcpp_BevertonHoltRecruitment" = NULL,
-    "log_r_Rcpp_BevertonHoltRecruitment" = "log_expected_recruitment"
+  expected <- switch(paste0(par),
+    "log_devs" = NULL,
+    "log_r" = "log_expected_recruitment"
   )
 
+  distribution_family <- family
+  # TODO: remove after making distribution name consistent in tibble or backend
+  if (family == "Dnorm") distribution_family <- "dnorm"
+  # TODO: remove after making distribution name consistent in tibble or backend
+  if (family == "Dlnorm") distribution_family <- "dlnorm"
+
   # Set up distribution based on `family` argument`
-  if (family[["family"]] == "lognormal") {
-    # create new Rcpp module
-    new_module <- methods::new(DlnormDistribution)
-
-    # populate logged standard deviation parameter with log of input
-    new_module$log_sd[] <- log(sd[["value"]])
-
-    # setup whether or not sd parameter is estimated
-    et <- sd[["estimation_status"]]
-    et[is.na(et)] <- "assumed_known"
-    new_module$log_sd$set_estimation_status(et)
+  maker <- .fims_module_names[["Distribution"]]
+  if (is.null(maker)) {
+    cli::cli_abort(c(
+      "{.val {module_name}} is not a module FIMS knows how to create.",
+      "i" = "Add it to {.var .fims_module_names} in {.file R/fims_interface.R}."
+    ))
   }
+  distribution_module <- maker[["create"]](
+    if (length(distribution_family) == 1) distribution_family else NA_character_
+  )
 
-  if (family[["family"]] == "gaussian") {
-    # create new Rcpp module
-    new_module <- methods::new(DnormDistribution)
-
-    # populate logged standard deviation parameter with log of input
-    new_module$log_sd$resize(length(sd[["value"]]))
-    for (i in seq_along(sd[["value"]])) {
-      new_module$log_sd[i]$value <- log(sd[["value"]][i])
-    }
-
-    # setup whether or not sd parameter is estimated
-    et <- sd[["estimation_status"]]
-    et[is.na(et)] <- "assumed_known"
-    new_module$log_sd$set_estimation_status(et)
+  
+  if (distribution_family == "dnorm" | distribution_family == "dlnorm") {
+    set_variable_vector(distribution_module, "log_sd",
+      sd[["value"]] |> log(),
+      estimation_status = sd[["estimation_status"]]
+    )
+  }
 
     #   if (length(sd[["value"]]) > 1 && length(sd[["estimation_status"]]) == 1) {
     #     if (sd[["estimation_status"]] == "assumed_known") {
@@ -309,38 +313,30 @@ initialize_process_distribution <- function(
     #     }
     #   }
     # }
-  }
 
-  n_dim <- length(module$field(par))
+  n_dim <- length(get_variable_vector(module, par)[["values"]])
 
-  # create new Rcpp modules
-  new_module$observed_values$resize(n_dim)
-  new_module$expected_values$resize(n_dim)
-
-  # initialize values with 0
-  # these are overwritten in the code later by user input
-  for (i in 1:n_dim) {
-    new_module$observed_values[i]$value <- 0
-    new_module$expected_values[i]$value <- 0
-  }
+  # set distribution observed and expected values to 0
+  set_variable_vector(distribution_module, "observed_values", 
+                      rep(0, n_dim), "derived_quantity")
+  set_variable_vector(distribution_module, "expected_values", 
+                      rep(0, n_dim), "derived_quantity")
 
   # setup links to parameter
   if (is.null(expected)) {
-    new_module$set_distribution_links(
-      "random_effects",
-      module$field(par)$get_id()
+    set_distribution_links(distribution_module, 
+                           "random_effects",
+                           get_variable_vector_id(module, par)
     )
   } else {
-    new_module$set_distribution_links(
-      "random_effects",
-      c(
-        module$field(par)$get_id(),
-        module$field(expected)$get_id()
-      )
+    set_distribution_links(distribution_module, 
+                           "random_effects",
+                           c(get_variable_vector_id(module, par),
+                             get_variable_vector_id(module, expected))
     )
   }
 
-  return(new_module)
+  return(distribution_module)
 }
 
 #' @rdname initialize_process_distribution
@@ -350,14 +346,12 @@ initialize_process_structure <- function(module, par) {
   if (!is.element(par, c("log_devs", "log_r"))) {
     return()
   }
-  new_process_module <- switch(paste0(par, "_", class(module)),
-    "log_devs_Rcpp_BevertonHoltRecruitment" = new(LogDevsRecruitmentProcess),
-    "log_r_Rcpp_BevertonHoltRecruitment" = new(LogRRecruitmentProcess)
-  )
 
-  module$SetRecruitmentProcessID(new_process_module$get_id())
+  process_module <- create_recruitment(par)
 
-  return(new_process_module)
+  set_recruitment_process(module, get_module_id(process_module))
+
+  return(process_module)
 }
 
 #' Distributions not available in the stats package

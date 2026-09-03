@@ -91,13 +91,13 @@ enum class DistributionType : uint8_t {
  * @brief Convert a distribution name supplied from R to a DistributionType.
  */
 inline DistributionType DistributionTypeFromString(const std::string &name) {
-  if (name == "Dnorm") return DistributionType::kDnorm;
-  if (name == "Dlnorm") return DistributionType::kDlnorm;
-  if (name == "Dmultinom") return DistributionType::kDmultinom;
+  if (name == "dnorm") return DistributionType::kDnorm;
+  if (name == "dlnorm") return DistributionType::kDlnorm;
+  if (name == "dmultinom") return DistributionType::kDmultinom;
 
   throw std::invalid_argument(
       "Unsupported distribution '" + name +
-      "'. Valid options are: Dnorm, Dlnorm, Dmultinom.");
+      "'. Valid options are: dnorm, dlnorm, dmultinom.");
 }
 
 /**
@@ -106,13 +106,13 @@ inline DistributionType DistributionTypeFromString(const std::string &name) {
 inline std::string DistributionTypeToString(DistributionType type) {
   switch (type) {
     case DistributionType::kDnorm:
-      return "Dnorm";
+      return "dnorm";
     case DistributionType::kDlnorm:
-      return "Dlnorm";
+      return "dlnorm";
     case DistributionType::kDmultinom:
-      return "Dmultinom";
+      return "dmultinom";
   }
-  return "Dnorm";
+  return "dnorm";
 }
 
 }  // namespace fims_enum

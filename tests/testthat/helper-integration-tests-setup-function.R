@@ -510,7 +510,6 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Set up catch at age model
   caa <- create_fishery_model("CatchAtAge")
   set_model_populations(caa, list(population))
-browser()
   # Set-up TMB
   CreateTMBModel()
   # Create parameter list from Rcpp modules

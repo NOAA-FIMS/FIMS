@@ -11,39 +11,46 @@ initialize_data_distribution(
 )
 }
 \arguments{
-\item{module}{An identifier to a C++ fleet module that is linked to the data
-of interest.}
+\item{module}{A fleet \link[=fims_module]{fims_module}, created with \code{\link[=create_fleet]{create_fleet()}} and
+linked to the data of interest.}
 
-\item{data_type}{A string specifying the type of data that the
-distribution will be fit to. Allowable types include
+\item{data_type}{A string specifying the observed data type the distribution
+applies to. Allowable types include
 "catch", "index", "age_comp", and "length_comp"
 and the default is
 catch.}
 
-\item{uncertainty}{A vector of strings specifying formulas for each data
-point. See \code{\link[=FIMSFrame]{FIMSFrame()}} for more information on what the formula should
-look like.}
+\item{uncertainty}{A character vector of formulas describing the uncertainty
+model for each observation. Each string is parsed by
+\code{parse_data_distribution()} and checked for valid families before the
+distribution is linked to the fleet's observed data. These formulas should
+name the same quantities the model expects to read from the fleet or
+associated modules.}
 }
 \value{
-A reference class. is returned. Use \code{\link[methods:show]{methods::show()}} to view the various
-Rcpp class fields, methods, and documentation.
+A \link[=fims_module]{fims_module} distribution object. Internally it holds the C++
+external pointer that FIMS uses to represent the distribution, and it is
+registered with the model so it can be included when the model is built.
 }
 \description{
-Use \code{\link[methods:new]{methods::new()}} to set up a distribution within an existing module with
-the necessary linkages between the two. For example, a fleet module will need
-a distributional assumption for parts of the data associated with it, which
-requires the use of \code{initialize_data_distribution()}.
+This helper creates a distribution module and wires it to the observed data
+carried by a fleet. After the \code{Rcpp::XPtr} refactor, the relevant objects are
+\link[=fims_module]{fims_module} wrappers around C++ pointers, not raw Rcpp reference classes.
+The \code{module} argument should therefore be a fleet module created with
+\code{\link[=create_fleet]{create_fleet()}}, and the returned value is another \link[=fims_module]{fims_module}, this time
+for a distribution.
 }
 \examples{
 \dontrun{
-# Set up a new data distribution
-n_years <- 30
-# Create a new fleet module
-fleet <- methods::new(Fleet)
-# Create a distribution for the fleet module
-sd_log <- rep(sqrt(log(0.01^2 + 1)), n_years)
+# Create a fleet and the observed index data it carries.
+fleet <- create_fleet()
+index_data <- create_data("index", n_years = 30)
+set_fleet_observed_data(fleet, index = index_data)
+
+# Create a distribution for the fleet's index observations.
+sd_log <- rep(sqrt(log(0.01^2 + 1)), 30)
 fleet_distribution <- initialize_data_distribution(
-  module = fishing_fleet,
+  module = fleet,
   uncertainty = glue::glue(
     "~dlnorm(meanlog = log_index_expected, sdlog = {sd_log})"
   ),
@@ -53,6 +60,8 @@ fleet_distribution <- initialize_data_distribution(
 }
 \seealso{
 \itemize{
+\item \code{\link[=create_distribution]{create_distribution()}}
+\item \code{\link[=set_distribution_links]{set_distribution_links()}}
 \item \code{\link[=initialize_process_distribution]{initialize_process_distribution()}}
 }
 }

@@ -28,8 +28,8 @@
  */
 enum class RecruitmentType : uint8_t {
   beverton_holt = 0,
-  log_devs_process = 1,
-  log_r_process = 2
+  log_devs = 1,
+  log_r = 2
 };
 
 /**
@@ -37,12 +37,11 @@ enum class RecruitmentType : uint8_t {
  */
 inline RecruitmentType RecruitmentTypeFromString(const std::string &name) {
   if (name == "BevertonHolt") return RecruitmentType::beverton_holt;
-  if (name == "LogDevsProcess") return RecruitmentType::log_devs_process;
-  if (name == "LogRProcess") return RecruitmentType::log_r_process;
+  if (name == "log_devs") return RecruitmentType::log_devs;
+  if (name == "log_r") return RecruitmentType::log_r;
   throw std::invalid_argument(
       "Invalid type: '" + name +
-      "'. Valid options are: BevertonHolt, LogDevsProcess, "
-      "LogRProcess.");
+      "'. Valid options are: BevertonHolt, log_devs, log_r.");
 }
 
 /**

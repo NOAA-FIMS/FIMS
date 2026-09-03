@@ -204,8 +204,8 @@ print.fims_module <- function(x, ...) {
 .fims_module_types <- list(
   Data = c("age_comp", "length_comp", "index", "catch"),
   Selectivity = c("Logistic", "DoubleLogistic"),
-  Recruitment = c("BevertonHolt", "LogDevsProcess", "LogRProcess"),
-  Distribution = c("Dnorm", "Dlnorm", "Dmultinom"),
+  Recruitment = c("BevertonHolt", "log_devs", "log_r"),
+  Distribution = c("dnorm", "dlnorm", "dmultinom"),
   Growth = "EWAA",
   Maturity = "Logistic",
   Model = "CatchAtAge",
@@ -310,7 +310,7 @@ create_growth <- function(module_type) {
 #' its deviations, since both are recruitment modules on the C++ side.
 #'
 #' @param module_type `"BevertonHolt"` for the stock--recruit relationship,
-#'   or `"LogDevsProcess"` or `"LogRProcess"` for the deviation process.
+#'   or `"log_devs"` or `"log_r"` for the random effects parameterization.
 #' @return
 #' A [fims_module] of the requested recruitment type.
 #' @export
@@ -326,8 +326,8 @@ create_recruitment <- function(module_type) {
 #' model by being registered, and name the quantities they apply to with
 #' [set_distribution_links()].
 #'
-#' @param module_type The distribution: `"Dnorm"`, `"Dlnorm"`, or
-#'   `"Dmultinom"`.
+#' @param module_type The distribution: `"dnorm"`, `"dlnorm"`, or
+#'   `"dmultinom"`.
 #' @return
 #' A [fims_module] of the requested distribution type.
 #' @export

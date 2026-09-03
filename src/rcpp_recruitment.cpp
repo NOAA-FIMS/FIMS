@@ -30,7 +30,7 @@ using SharedRecruitment = std::shared_ptr<RecruitmentInterfaceBase>;
  * binds the XPtr to R's garbage collector: when the R variable is garbage 
  * collected, 'delete shared_ptr*' runs and the reference count is decremented.
  *
- * @param type One of "BevertonHolt", "LogDevsProcess", or "LogRProcess".
+ * @param type One of "BevertonHolt", "log_devs", or "log_r".
  *   The latter two are recruitment process modules, which carry no parameters
  *   of their own and are linked to a stock--recruit module by ID.
  */
@@ -41,10 +41,10 @@ Rcpp::XPtr<SharedRecruitment> create_recruitment_(std::string type) {
       recruitment_interface =
           std::make_shared<BevertonHoltRecruitmentInterface>();
       break;
-    case RecruitmentType::log_devs_process:
+    case RecruitmentType::log_devs:
       recruitment_interface = std::make_shared<LogDevsRecruitmentInterface>();
       break;
-    case RecruitmentType::log_r_process:
+    case RecruitmentType::log_r:
       recruitment_interface = std::make_shared<LogRRecruitmentInterface>();
       break;
   }

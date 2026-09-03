@@ -150,8 +150,8 @@ int get_fleet_selectivity_id_(Rcpp::XPtr<SharedFleet> xp) {
  */
 Rcpp::IntegerVector get_fleet_observed_data_ids_(Rcpp::XPtr<SharedFleet> xp) {
   return Rcpp::IntegerVector::create(
-      Rcpp::Named("agecomp") = (*xp)->GetObservedAgeCompDataID(),
-      Rcpp::Named("lengthcomp") = (*xp)->GetObservedLengthCompDataID(),
+      Rcpp::Named("age_comp") = (*xp)->GetObservedAgeCompDataID(),
+      Rcpp::Named("length_comp") = (*xp)->GetObservedLengthCompDataID(),
       Rcpp::Named("index") = (*xp)->GetObservedIndexDataID(),
       Rcpp::Named("catch") = (*xp)->GetObservedCatchDataID());
 }

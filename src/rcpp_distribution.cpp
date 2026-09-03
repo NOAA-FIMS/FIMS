@@ -29,7 +29,7 @@ using SharedDistribution = std::shared_ptr<DistributionsInterfaceBase>;
  * garbage collected, 'delete shared_ptr*' runs and the reference count is
  * decremented.
  *
- * @param type One of "Dnorm", "Dlnorm", or "Dmultinom".
+ * @param type One of "dnorm", "dlnorm", or "dmultinom".
  *
  * @return A pointer to the new distribution.
  */

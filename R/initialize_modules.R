@@ -717,7 +717,15 @@ initialize_fims <- function(parameters, data) {
         parameter tibble to {.var random_effects} or {.var fixed_effects}."
       ))
     }
-
+    
+    unique_family <- recruitment_process_input |> dplyr::pull(distribution) |> 
+      unique()
+    if (length(unique_family) > 1L) {
+    cli::cli_abort(c(
+      "!" = "Cannot accommodate more than one family per random effect right now.",
+      x = "You passed the following types: {unique_family}"
+    ))
+  }
 
     # Initialize_process_distribution
     sd_input <- recruitment_process_input |>
@@ -729,9 +737,7 @@ initialize_fims <- function(parameters, data) {
     recruitment_distribution <- initialize_process_distribution(
       module = recruitment,
       par = par,
-      # TODO: need to update family and match options from the distribution
-      # column from the parameters tibble
-      family = gaussian(),
+      family = unique_family,
       sd = sd_input
     )
 
@@ -768,7 +774,7 @@ initialize_fims <- function(parameters, data) {
   # Hard code to be a catch-at-age model
   fims_model <- create_fishery_model("CatchAtAge")
   set_model_populations(fims_model, list(population))
-
+browser()
   CreateTMBModel()
   # Create parameter list from Rcpp modules
   parameter_list <- list(
