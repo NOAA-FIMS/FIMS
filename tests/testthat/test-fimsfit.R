@@ -71,12 +71,21 @@ test_that("fit_fims() errors when optimization fails to converge", {
   skip_if_not(file.exists(testthat::test_path("fixtures", "integration_test_data.RData")))
 
   load(testthat::test_path("fixtures", "integration_test_data.RData"))
+  # Initial value scale for the parameters before validation, 
+  initial_value_scale <- readRDS(testthat::test_path("fixtures", "initial_value_scale.RDS"))
 
   # Set up the model with data
   data_age_comp <- FIMSFrame(data_big)
   parameters <- readRDS(
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
-  )
+  ) |>
+    dplyr::mutate(
+      value = dplyr::if_else(
+        estimation_type != "constant",
+        value / initial_value_scale,
+        value
+      )
+    )
 
   initialized_model <- parameters |>
     initialize_fims(data = data_age_comp)
