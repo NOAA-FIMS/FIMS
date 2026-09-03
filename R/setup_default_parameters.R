@@ -23,6 +23,10 @@
 #' You can modify the returned tibble before fitting a model (for example,
 #' updating maturity and selectivity parameter values).
 #'
+#' Growth defaults are chosen from the data. Models with empirical weight-at-age
+#' data default to `"EWAA"`. Models without empirical weight-at-age data but with
+#' length-composition data default to `"VonBertalanffySchnute"`.
+#'
 #' To create the default initial numbers at age, this function uses the defaults
 #' from `setup_default_Population()` and `setup_default_Recruitment()`, which
 #' are passed to `setup_default_init_naa()` to calculate initial numbers at age.
@@ -129,7 +133,12 @@ setup_default_parameters <- function(data) {
   maturity_defaults <- setup_default_Maturity(data = data)
 
   # Create growth parameters
-  growth_defaults <- setup_default_Growth()
+  growth_module_type <- choose_default_Growth_module_type(data = data)
+
+  growth_defaults <- setup_default_Growth(
+    data = data,
+    module_type = growth_module_type
+  )
 
   # Suppress the known informational alert about log_init_naa being NA here,
   # because this function computes and sets log_init_naa immediately below.
@@ -268,14 +277,65 @@ setup_default_parameters_template <- function(n_parameters = 1) {
     dplyr::slice(rep(1, each = n_parameters))
 }
 
+# Choose the default Growth module type from the user input data.
+# Empirical weight-at-age triggers EWAA. If empirical weight-at-age is absent,
+# length compositions trigger model-derived Growth.
+choose_default_Growth_module_type <- function(data) {
+  is.FIMSFrame(data)
+
+  has_weight_at_age <- any(data@data$type == "weight_at_age", na.rm = TRUE)
+  has_length_comp <- any(data@data$type == "length_comp", na.rm = TRUE)
+  has_fixed_age_length_conversion <- any(data@data$type == "age_to_length_conversion", na.rm = TRUE)
+
+  if (has_weight_at_age) {
+    cli::cli_inform(
+      "Empirical weight-at-age rows found. Growth defaults to {.val EWAA}."
+    )
+
+    return("EWAA")
+  }
+
+  if (has_length_comp && has_fixed_age_length_conversion) {
+    cli::cli_inform(c(
+      "Length compositions and fixed age-to-length conversion rows found, but empirical weight-at-age rows are absent.",
+      "i" = "Growth defaults to {.val VonBertalanffySchnute}; length compositions will use the Growth-derived age-to-length conversion, not the supplied fixed conversion.",
+      "i" = "Use {.fn setup_default_Growth} to choose a different Growth module explicitly."
+    ))
+
+    return("VonBertalanffySchnute")
+  }
+
+  if (has_length_comp) {
+    cli::cli_inform(c(
+      "Length compositions found and empirical weight-at-age rows are absent.",
+      "i" = "Growth defaults to {.val VonBertalanffySchnute}. Review Growth and length-weight parameter values before fitting.",
+      "i" = "Use {.fn setup_default_Growth} to choose a different Growth module explicitly."
+    ))
+
+    return("VonBertalanffySchnute")
+  }
+
+  cli::cli_abort(c(
+    "Empirical weight-at-age rows are absent and length compositions are absent.",
+    "x" = "FIMS cannot choose a default Growth module from the available data.",
+    "i" = paste(
+      "Use {.fn setup_default_Growth} to choose a Growth module explicitly,",
+      "or provide empirical weight-at-age data for the default {.val EWAA}",
+      "path or length-composition data for the default {.val VonBertalanffySchnute} path."
+    )
+  ))
+}
+
 #' Set up default growth parameters
 #'
 #' @description
 #' This function creates default growth parameters for a Fisheries Integrated
 #' Modeling System (FIMS) model. It generates a tibble with fields for
 #' module name, module type, label, value, and estimation type.
-#' @param module_type A character string specifying the type of growth module. The
-#' default is `"EWAA"`.
+#' @param data A `FIMSFrame` object returned from running [FIMSFrame()] on
+#'   your long input data. Required when `module_type = "VonBertalanffySchnute"`.
+#' @param module_type A character string specifying the type of growth module.
+#'   The default is `"EWAA"`.
 #' @return
 #' A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
@@ -289,18 +349,125 @@ setup_default_parameters_template <- function(n_parameters = 1) {
 #' default_growth_parameters <- setup_default_Growth()
 #' }
 setup_default_Growth <- function(
-  module_type = c("EWAA")
+  data = NULL,
+  module_type = c("EWAA", "VonBertalanffySchnute")
 ) {
   # Input check
-  module_type <- rlang::arg_match(module_type)
+  available_growth_module_types <- c("EWAA", "VonBertalanffySchnute")
 
-  default <- setup_default_parameters_template(
-    n_parameters = 1
-  ) |>
+  if (missing(module_type)) {
+    module_type <- available_growth_module_types[[1]]
+  }
+
+  if (
+    !rlang::is_string(module_type) ||
+      !module_type %in% available_growth_module_types
+  ) {
+    cli::cli_abort(c(
+      "Growth module type {.val {module_type}} is not supported.",
+      "i" = "Available Growth module types are: {.val EWAA} and {.val VonBertalanffySchnute}."
+    ))
+  }
+
+  if (identical(module_type, "EWAA")) {
+    if (!is.null(data)) {
+      is.FIMSFrame(data)
+
+      has_weight_at_age <- any(data@data$type == "weight_at_age", na.rm = TRUE)
+
+      if (!has_weight_at_age) {
+        cli::cli_abort(c(
+          "{.val EWAA} Growth requires empirical weight-at-age data.",
+          "i" = "Provide {.val weight_at_age} rows or use {.fn setup_default_Growth} with {.code module_type = \"VonBertalanffySchnute\"}."
+        ))
+      }
+    }
+
+    default <- setup_default_parameters_template(
+      n_parameters = 1
+    ) |>
+      dplyr::mutate(
+        module_name = "Growth",
+        module_type = .env$module_type
+      )
+
+    return(default)
+  }
+
+  if (is.null(data)) {
+    cli::cli_abort(c(
+      "{.fn setup_default_Growth} requires {.var data} when {.code module_type = \"VonBertalanffySchnute\"}.",
+      "i" = "VonBertalanffySchnute defaults use the model ages to choose reference ages."
+    ))
+  }
+
+  is.FIMSFrame(data)
+
+  ages <- get_ages(data)
+  if (length(ages) == 0 || all(is.na(ages))) {
+    reference_age_for_length_1 <- 0
+    n_ages <- get_n_ages(data)
+    reference_age_for_length_2 <- if (n_ages > 0) n_ages - 1 else 0
+  } else {
+    reference_age_for_length_1 <- min(ages, na.rm = TRUE)
+    reference_age_for_length_2 <- max(ages, na.rm = TRUE)
+  }
+
+  # Use interpolation SD anchors as the default VonB variability path.
+  # The delta-method wiring is retained in the backend, but it is not used
+  # in the default setup until it is re-derived for the traditional Von
+  # Bertalanffy parameterization.
+  default <- setup_default_parameters_template(n_parameters = 9) |>
     dplyr::mutate(
       module_name = "Growth",
-      module_type = .env$module_type
+      module_type = "VonBertalanffySchnute",
+      label = c(
+        "mean_length_young",
+        "mean_length_old",
+        "growth_coefficient",
+        "reference_age_for_length_1",
+        "reference_age_for_length_2",
+        "length_weight_a",
+        "length_weight_b",
+        "length_at_age_sd_at_ref_ages",
+        "length_at_age_sd_at_ref_ages"
+      ),
+      age = c(
+        NA_real_,
+        NA_real_,
+        NA_real_,
+        NA_real_,
+        NA_real_,
+        NA_real_,
+        NA_real_,
+        reference_age_for_length_1,
+        reference_age_for_length_2
+      ),
+      value = c(
+        275,
+        725,
+        0.18,
+        reference_age_for_length_1,
+        reference_age_for_length_2,
+        2.5e-11,
+        3,
+        28,
+        73
+      ),
+      estimation_type = c(
+        "fixed_effects",
+        "fixed_effects",
+        "fixed_effects",
+        "constant",
+        "constant",
+        "constant",
+        "constant",
+        "constant",
+        "constant"
+      )
     )
+
+  return(default)
 }
 
 #' Set up default population parameters

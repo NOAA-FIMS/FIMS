@@ -75,6 +75,10 @@ class FleetInterface : public FleetInterfaceBase {
    */
   SharedInt interface_observed_lengthcomp_data_id_m = -999;
   /**
+   * @brief Whether this fleet currently requires age-to-length mapping.
+   */
+  SharedBoolean interface_requires_age_length_mapping = false;
+  /**
    * @brief The ID of the observed index data object.
    */
   SharedInt interface_observed_index_data_id_m = -999;
@@ -100,6 +104,10 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief The number of length bins in the fleet data.
    */
   SharedInt n_lengths = 0;
+  /**
+   * @brief Fleet-specific observation-bin centers.
+   */
+  RealVector lengths;
   /**
    * @brief The number of years in the fleet data.
    */
@@ -234,6 +242,8 @@ class FleetInterface : public FleetInterfaceBase {
             other.interface_observed_agecomp_data_id_m),
         interface_observed_lengthcomp_data_id_m(
             other.interface_observed_lengthcomp_data_id_m),
+        interface_requires_age_length_mapping(
+            other.interface_requires_age_length_mapping),
         interface_observed_index_data_id_m(
             other.interface_observed_index_data_id_m),
         interface_observed_catch_data_id_m(
@@ -242,6 +252,7 @@ class FleetInterface : public FleetInterfaceBase {
         name(other.name),
         n_ages(other.n_ages),
         n_lengths(other.n_lengths),
+        lengths(other.lengths),
         n_years(other.n_years),
         observed_catch_units(other.observed_catch_units),
         observed_index_units(other.observed_index_units),
@@ -307,6 +318,15 @@ class FleetInterface : public FleetInterfaceBase {
   }
 
   /**
+   * @brief Set whether this fleet currently requires age-to-length mapping.
+   * @param requires_age_length_mapping True when a modeled path depends on
+   * age-to-length conversion.
+   */
+  void SetRequiresAgeLengthMapping(bool requires_age_length_mapping) {
+    interface_requires_age_length_mapping.set(requires_age_length_mapping);
+  }
+
+  /**
    * @brief Set the unique ID for the observed index data object.
    * @param observed_index_data_id Unique ID for the observed data object.
    */
@@ -349,6 +369,13 @@ class FleetInterface : public FleetInterfaceBase {
    */
   int GetObservedLengthCompDataID() {
     return interface_observed_lengthcomp_data_id_m.get();
+  }
+
+  /**
+   * @brief Return whether this fleet currently requires age-to-length mapping.
+   */
+  bool GetRequiresAgeLengthMapping() {
+    return interface_requires_age_length_mapping.get();
   }
 
   /**
@@ -446,6 +473,8 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->fleet_observed_lengthcomp_data_id_m =
         interface_observed_lengthcomp_data_id_m.get();
+    fleet->requires_age_length_mapping =
+        interface_requires_age_length_mapping.get();
 
     fleet->fleet_observed_index_data_id_m =
         interface_observed_index_data_id_m.get();
@@ -504,15 +533,42 @@ class FleetInterface : public FleetInterfaceBase {
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
     if (this->n_lengths.get() > 0) {
+      if (this->lengths.size() != static_cast<size_t>(this->n_lengths.get())) {
+        FIMS_ERROR_LOG("The size of `lengths` does not match `n_lengths`: " +
+                       fims::to_string(this->lengths.size()) +
+                       " != " + fims::to_string(this->n_lengths.get()));
+        throw std::invalid_argument(
+            "Fleet lengths size mismatch. Fleet lengths is of size " +
+            fims::to_string(this->lengths.size()) +
+            " and the number of lengths is " +
+            fims::to_string(this->n_lengths.get()));
+      }
+
+      fleet->lengths.resize(this->lengths.size());
+      for (size_t i = 0; i < fleet->lengths.size(); i++) {
+        fleet->lengths[i] = this->lengths[i];
+      }
+
       fleet->age_to_length_conversion.resize(
           this->age_to_length_conversion.size());
 
-      if (this->age_to_length_conversion.size() !=
-          static_cast<size_t>(this->n_ages.get() * this->n_lengths.get())) {
+      const size_t expected_age_to_length_conversion_size =
+          static_cast<size_t>(this->n_ages.get() * this->n_lengths.get());
+      const size_t supplied_age_to_length_conversion_size =
+          this->age_to_length_conversion.size();
+
+      if (supplied_age_to_length_conversion_size != 0 &&
+          supplied_age_to_length_conversion_size !=
+              expected_age_to_length_conversion_size) {
         FIMS_ERROR_LOG(
-            "age_to_length_conversion don't match, " +
-            fims::to_string(this->age_to_length_conversion.size()) + " != " +
-            fims::to_string((this->n_ages.get() * this->n_lengths.get())));
+            "age_to_length_conversion size mismatch, " +
+            fims::to_string(supplied_age_to_length_conversion_size) +
+            " != " + fims::to_string(expected_age_to_length_conversion_size));
+        throw std::invalid_argument(
+            "Fleet age_to_length_conversion size mismatch. Expected " +
+            fims::to_string(expected_age_to_length_conversion_size) +
+            " values but received " +
+            fims::to_string(supplied_age_to_length_conversion_size) + ".");
       }
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {

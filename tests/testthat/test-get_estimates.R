@@ -36,16 +36,20 @@ test_that("`get_estimates()` works with deterministic run", {
   )
 
   #' @description Test that the result values from the model fit have not changed from the accepted version.
-  expect_snapshot(
-    get_estimates(deterministic_results) |>
+  expect_snapshot({
+    estimates_snapshot <- get_estimates(deterministic_results) |>
       # Remove the estimate, uncertainty, and gradient columns, as they
       # may change between runs
       dplyr::select(
         -estimated, -expected, -uncertainty, -gradient,
-        -likelihood, -log_like_cv, -gradient
-      ) |>
-      print(n = 320, width = Inf)
-  )
+        -likelihood, -log_like_cv
+      )
+
+    estimates_snapshot_lines <- capture.output(
+      print(estimates_snapshot, n = 320, width = Inf)
+    )
+    cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
+  })
 })
 
 test_that("`get_estimates()` works with estimation run", {
@@ -74,18 +78,22 @@ test_that("`get_estimates()` works with estimation run", {
   result <- purrr::map(fit_files, check_estimates_colnames)
 
   #' @description Test that the result values from the model fit have not changed from the accepted version.
-  expect_snapshot(
+  expect_snapshot({
     # Read the first RDS file, get estimates, and print a snapshot
-    readRDS(fit_files[[1]]) |>
+    estimates_snapshot <- readRDS(fit_files[[1]]) |>
       get_estimates() |>
       # Remove the estimated, uncertainty, and gradient columns, as they
       # may change between runs
       dplyr::select(
         -estimated, -expected, -uncertainty, -gradient,
-        -likelihood, -log_like_cv, -gradient
-      ) |>
-      print(n = 320, width = Inf)
-  )
+        -likelihood, -log_like_cv
+      )
+
+    estimates_snapshot_lines <- capture.output(
+      print(estimates_snapshot, n = 320, width = Inf)
+    )
+    cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
+  })
 })
 
 ## Edge handling ----

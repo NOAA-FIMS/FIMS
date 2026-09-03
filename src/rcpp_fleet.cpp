@@ -26,6 +26,7 @@ void register_fleet(Rcpp::Module& m) {
       .field("n_ages", &FleetInterface::n_ages)
       .field("n_years", &FleetInterface::n_years)
       .field("n_lengths", &FleetInterface::n_lengths)
+      .field("lengths", &FleetInterface::lengths)
       .field("observed_catch_units",
              &FleetInterface::observed_catch_units)
       .field("observed_index_units", &FleetInterface::observed_index_units)
@@ -81,6 +82,10 @@ void register_fleet(Rcpp::Module& m) {
               &FleetInterface::SetObservedLengthCompDataID)
       .method("GetObservedLengthCompDataID",
               &FleetInterface::GetObservedLengthCompDataID)
+      .method("SetRequiresAgeLengthMapping",
+              &FleetInterface::SetRequiresAgeLengthMapping)
+      .method("GetRequiresAgeLengthMapping",
+              &FleetInterface::GetRequiresAgeLengthMapping)
       .method("SetObservedIndexDataID", &FleetInterface::SetObservedIndexDataID)
       .method("GetObservedIndexDataID", &FleetInterface::GetObservedIndexDataID)
       .method("SetObservedCatchDataID",

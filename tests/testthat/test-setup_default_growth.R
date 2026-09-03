@@ -24,6 +24,23 @@ test_that("`setup_default_Growth()` works with correct inputs", {
   clear()
 })
 
+test_that("`setup_default_Growth()` requires empirical weight-at-age data for EWAA when data are supplied", {
+  data_without_weight_at_age <- FIMS::FIMSFrame(
+    dplyr::filter(data_big, type != "weight_at_age")
+  )
+
+  #' @description Test that explicit EWAA setup errors when empirical weight-at-age data are absent.
+  expect_error(
+    setup_default_Growth(
+      data = data_without_weight_at_age,
+      module_type = "EWAA"
+    ),
+    regexp = "requires empirical weight-at-age data"
+  )
+
+  clear()
+})
+
 ## Edge handling ----
 # Please remove/comment out the test template below if no edge cases are being tested.
 # No edge cases to test.
@@ -33,7 +50,7 @@ test_that("`setup_default_Growth()` returns correct error messages", {
   #' @description Test that unsupported module_type returns expected error.
   expect_error(
     object = setup_default_Growth(module_type = "invalid"),
-    regexp = "must be one of"
+    regexp = "Growth module type"
   )
 
   clear()

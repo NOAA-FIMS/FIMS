@@ -3,6 +3,7 @@ fims_input_types <- c(
   "age_to_length_conversion",
   "index",
   "catch",
+  "length_bin",
   "length_comp",
   "weight_at_age"
 )

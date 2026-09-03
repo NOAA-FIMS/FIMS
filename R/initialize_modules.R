@@ -28,7 +28,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
     dplyr::mutate(
       temp_name = paste0(
         # Replace NAs with ""
-        dplyr::coalesce(.data$module_type, ""),
+        gsub("-", "", dplyr::coalesce(.data$module_type, "")),
         dplyr::coalesce(.data$module_name, "")
       )
     ) |>
@@ -118,24 +118,12 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       dplyr::pull(.data$type) |>
       unique()
 
-    if ("age_to_length_conversion" %in% get_data(data)[["type"]] &&
-      "length_comp" %in% fleet_types) {
-      age_to_length_conversion_value <- model_age_to_length_conversion(data)
-      # Assign each value to the corresponding position in the parameter vector
-      module[["age_to_length_conversion"]][] <- age_to_length_conversion_value
-      # Set the estimation information for the entire parameter vector
-      module[["age_to_length_conversion"]]$set_estimation_types(c("constant"))
-    } else {
-      module_fields <- setdiff(module_fields, c(
-        # Right now we can also remove n_lengths because the default is 0
-        "n_lengths"
-      ))
-    }
-
     module_fields <- setdiff(module_fields, c(
       "age_to_length_conversion",
       "lengthcomp_expected",
-      "lengthcomp_proportion"
+      "lengthcomp_proportion",
+      "n_lengths",
+      "lengths"
     ))
   }
 
@@ -192,6 +180,22 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       )
       module[[field]][] <- get_value_function(data)
     } else {
+      if (
+        module_class_name == "VonBertalanffySchnuteGrowth" &&
+          field %in% c(
+            "length_at_age_sd_at_ref_ages",
+            "log_sd_length_at_ref_age_1",
+            "log_sd_length_at_ref_age_2",
+            "log_sd_growth_coefficient",
+            "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+            "logit_corr_length_at_ref_age_1_growth_coefficient",
+            "logit_corr_length_at_ref_age_2_growth_coefficient"
+          ) &&
+          !(field %in% module_input$label)
+      ) {
+        next
+      }
+
       set_param_vector(
         field = field,
         module = module,
@@ -234,6 +238,106 @@ initialize_recruitment <- function(parameters, data) {
 #' The initialized growth module as an object.
 #' @noRd
 initialize_growth <- function(parameters, data) {
+  growth_input <- parameters |>
+    dplyr::filter(.data$module_name == "Growth")
+
+  growth_type <- growth_input |>
+    dplyr::pull(.data$module_type) |>
+    unique() |>
+    stats::na.omit()
+
+  if (length(growth_type) == 1 && identical(growth_type[[1]], "VonBertalanffySchnute")) {
+    vonb_delta_method_labels <- c(
+      "log_sd_length_at_ref_age_1",
+      "log_sd_length_at_ref_age_2",
+      "log_sd_growth_coefficient",
+      "logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+      "logit_corr_length_at_ref_age_1_growth_coefficient",
+      "logit_corr_length_at_ref_age_2_growth_coefficient"
+    )
+
+    sd_rows <- growth_input |>
+      dplyr::filter(.data$label == "length_at_age_sd_at_ref_ages")
+
+    if (nrow(sd_rows) > 1 && all(!is.na(sd_rows$age))) {
+      sd_rows <- sd_rows |>
+        dplyr::arrange(.data$age)
+
+      parameters <- parameters |>
+        dplyr::filter(!(
+          .data$module_name == "Growth" &
+            .data$label == "length_at_age_sd_at_ref_ages"
+        )) |>
+        dplyr::bind_rows(sd_rows)
+
+      growth_input <- parameters |>
+        dplyr::filter(.data$module_name == "Growth")
+
+      sd_rows <- growth_input |>
+        dplyr::filter(.data$label == "length_at_age_sd_at_ref_ages")
+    }
+
+    missing_reference_labels <- setdiff(
+      c("reference_age_for_length_1", "reference_age_for_length_2"),
+      growth_input$label
+    )
+
+    if (length(missing_reference_labels) > 0) {
+      cli::cli_abort(c(
+        "VonBertalanffySchnute growth requires reference-age inputs.",
+        "i" = "Missing labels: {toString(missing_reference_labels)}",
+        "i" = "Use {.fn setup_default_Growth} or supply both reference ages explicitly."
+      ))
+    }
+
+    has_interpolation_sd_inputs <-
+      "length_at_age_sd_at_ref_ages" %in% growth_input$label
+
+    present_vonb_delta_labels <- intersect(
+      vonb_delta_method_labels,
+      growth_input$label
+    )
+
+    missing_vonb_delta_labels <- setdiff(
+      vonb_delta_method_labels,
+      growth_input$label
+    )
+
+    if (length(present_vonb_delta_labels) > 0 &&
+      length(missing_vonb_delta_labels) > 0) {
+      cli::cli_abort(c(
+        "VonBertalanffy delta-method variability inputs must be supplied as a complete set.",
+        "i" = "Provide all of: {toString(vonb_delta_method_labels)}"
+      ))
+    }
+
+    if (has_interpolation_sd_inputs &&
+      length(present_vonb_delta_labels) == length(vonb_delta_method_labels)) {
+      cli::cli_abort(c(
+        "VonBertalanffy growth requires exactly one variability path.",
+        "i" = "The default setup uses interpolation via {.var length_at_age_sd_at_ref_ages}.",
+        "i" = "If you use the delta-method path, supply the full delta block and omit interpolation rows."
+      ))
+    }
+
+    if (!has_interpolation_sd_inputs &&
+      length(present_vonb_delta_labels) == 0) {
+      cli::cli_abort(c(
+        "VonBertalanffy growth requires exactly one variability path.",
+        "i" = "Supply either 2 {.var length_at_age_sd_at_ref_ages} rows or the full delta-method block."
+      ))
+    }
+
+    if (has_interpolation_sd_inputs &&
+      (nrow(sd_rows) != 2 || any(is.na(sd_rows$age)))) {
+      cli::cli_abort(c(
+        "VonBertalanffySchnute interpolation-based variability inputs are malformed.",
+        "i" = "Supply exactly 2 {.var length_at_age_sd_at_ref_ages} rows with non-missing ages.",
+        "i" = "These rows should correspond to the two reference ages."
+      ))
+    }
+  }
+
   module <- initialize_module(
     parameters = parameters,
     data = data,
@@ -353,14 +457,102 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     module_name = "Fleet"
   )
 
-  module$SetSelectivityID(linked_ids[["selectivity"]])
-
   fleet_types <- get_data(data) |>
     dplyr::filter(.data$fleet == .env$fleet) |>
     dplyr::pull(.data$type) |>
     unique()
 
-  # Link the observed catch data to the fleet module using its associated ID
+  has_growth_derived_support <- any(
+    parameters |>
+      dplyr::filter(.data$module_name == "Growth") |>
+      dplyr::pull(.data$module_type) %in% "VonBertalanffySchnute"
+  )
+
+  has_fixed_age_length_conversion_support <- any(
+    get_data(data)$type == "age_to_length_conversion"
+  )
+
+  has_length_comp_data <- "length_comp" %in% fleet_types
+  has_length_bin_data <- "length_bin" %in% fleet_types
+  has_length_bin_support <- has_length_comp_data || has_length_bin_data
+
+  use_age_to_length_conversion_fixed_path <-
+    !has_growth_derived_support &&
+      has_fixed_age_length_conversion_support &&
+      has_length_bin_support
+  use_growth_derived_path <-
+    has_growth_derived_support && has_length_bin_support
+  requires_age_length_mapping <-
+    has_length_comp_data ||
+      use_age_to_length_conversion_fixed_path ||
+      use_growth_derived_path
+
+  fleet_length_bins <- resolve_fleet_length_bins(
+    get_data(data),
+    allow_global_conversion_fallback = !use_growth_derived_path
+  )[[fleet]]
+
+  fleet_needs_length_bins <- requires_age_length_mapping
+
+  if (fleet_needs_length_bins &&
+    (is.null(fleet_length_bins) || length(fleet_length_bins) == 0)) {
+    if (use_growth_derived_path) {
+      cli::cli_abort(c(
+        "Fleet `{fleet}` requires a resolved fleet-specific length-bin layout for the growth-derived VonBertalanffySchnute path.",
+        "i" = "Provide explicit `length_bin` rows or fleet-specific `length_comp` bins.",
+        "i" = "Fixed `age_to_length_conversion` rows are not used to define fleet observation bins for the active Growth-derived age-to-length conversion path."
+      ))
+    }
+
+    cli::cli_abort(c(
+      "Fleet `{fleet}` requires a resolved fleet-specific length-bin layout.",
+      "i" = "Provide explicit `length_bin` rows, fleet-specific `length_comp` bins, or compatible fixed age-to-length support."
+    ))
+  }
+
+  if (is.null(fleet_length_bins)) {
+    fleet_length_bins <- numeric()
+  }
+
+  module$n_lengths$set(length(fleet_length_bins))
+  module$lengths[] <- fleet_length_bins
+  module$SetRequiresAgeLengthMapping(requires_age_length_mapping)
+
+  module$SetSelectivityID(linked_ids[["selectivity"]])
+
+  if (use_age_to_length_conversion_fixed_path) {
+    age_to_length_conversion_fixed_data <- get_data(data) |>
+      dplyr::filter(.data$type == "age_to_length_conversion") |>
+      dplyr::group_by(.data$age, .data$length) |>
+      dplyr::summarize(
+        value = mean(as.numeric(.data$observed), na.rm = TRUE),
+        .groups = "drop"
+      ) |>
+      dplyr::filter(.data$length %in% fleet_length_bins) |>
+      dplyr::mutate(
+        age_order = match(.data$age, get_ages(data)),
+        length_order = match(.data$length, fleet_length_bins)
+      ) |>
+      dplyr::arrange(.data$age_order, .data$length_order)
+
+    expected_age_to_length_conversion_rows <- get_n_ages(data) * length(fleet_length_bins)
+
+    if (nrow(age_to_length_conversion_fixed_data) != expected_age_to_length_conversion_rows) {
+      cli::cli_abort(c(
+        "Fleet `{fleet}` fixed age-to-length data do not match its resolved fleet bins.",
+        "i" = "Expected {expected_age_to_length_conversion_rows} age-length cells from {get_n_ages(data)} ages x {length(fleet_length_bins)} fleet bins.",
+        "i" = "Found {nrow(age_to_length_conversion_fixed_data)} matching fixed age-to-length cells after filtering to the fleet bins."
+      ))
+    }
+
+    module$age_to_length_conversion$resize(expected_age_to_length_conversion_rows)
+    module$age_to_length_conversion[] <- age_to_length_conversion_fixed_data$value
+    module$age_to_length_conversion$set_estimation_types(c("constant"))
+  } else {
+    module$age_to_length_conversion$resize(0)
+  }
+
+  # Link the observed catch data to the fleet module using its associated ID.
   if ("catch" %in% fleet_types) {
     module$SetObservedCatchDataID(linked_ids[["catch"]])
   }
@@ -470,46 +662,74 @@ initialize_index <- function(data, fleet) {
 #' @noRd
 initialize_comp <- function(data,
                             fleet,
+                            parameters = NULL,
                             type = c("AgeComp", "LengthComp")) {
-  # Edit this list if a new type is added
-  # Set up the specifics for the given type.
   comp_types <- list(
     "AgeComp" = list(
       "name" = "age_comp",
       "comp_data_field" = "age_comp_data",
-      "get_n_function" = get_n_ages,
       "comp_object" = AgeComp,
       "m_comp" = model_age_comp
     ),
     "LengthComp" = list(
       "name" = "length_comp",
       "comp_data_field" = "length_comp_data",
-      "get_n_function" = get_n_lengths,
       "comp_object" = LengthComp,
       "m_comp" = model_length_comp
     )
   )
 
-  # Ensures the user input matches the options provided,
-  #   if not, then match.arg() throws an error
   type <- match.arg(type)
-  # Select the row in comp_types that matches the user's type selection
   comp <- comp_types[[type]]
 
-  # Check if the specified fleet exists in the data
   fleet_exists <- fleet %in% get_fleets(data)
   if (!fleet_exists) {
     cli::cli_abort("Fleet {.var {fleet}} not found in the data object.")
   }
 
-  get_function <- comp[["get_n_function"]]
+  fleet_length_bins <- NULL
+  uses_growth_derived_path <- identical(type, "LengthComp") &&
+    !is.null(parameters) &&
+    any(
+      parameters |>
+        dplyr::filter(.data$module_name == "Growth") |>
+        dplyr::pull(.data$module_type) %in% "VonBertalanffySchnute"
+    )
+
+  if (identical(type, "LengthComp")) {
+    fleet_length_bins <- resolve_fleet_length_bins(
+      get_data(data),
+      allow_global_conversion_fallback = !uses_growth_derived_path
+    )[[fleet]]
+
+    if (is.null(fleet_length_bins) || length(fleet_length_bins) == 0) {
+      if (uses_growth_derived_path) {
+        cli::cli_abort(c(
+          "Fleet `{fleet}` requires a resolved fleet-specific length-bin layout for `length_comp` on the growth-derived VonBertalanffySchnute path.",
+          "i" = "Provide explicit `length_bin` rows or fleet-specific `length_comp` bins.",
+          "i" = "Fixed `age_to_length_conversion` rows are not used to define fleet observation bins for the active Growth-derived age-to-length conversion path."
+        ))
+      }
+
+      cli::cli_abort(c(
+        "Fleet `{fleet}` requires a resolved fleet-specific length-bin layout for `length_comp`.",
+        "i" = "Provide explicit `length_bin` rows, fleet-specific `length_comp` bins, or compatible fixed age-to-length support."
+      ))
+    }
+  }
+
+  expected_n <- if (identical(type, "LengthComp")) {
+    length(fleet_length_bins)
+  } else {
+    get_n_ages(data)
+  }
+
   module <- methods::new(
     comp[["comp_object"]],
     get_n_years(data),
-    get_function(data)
+    expected_n
   )
 
-  # Validate that the fleet's composition data is available
   comp_data <- comp[["m_comp"]](data, fleet)
   pretty_comp_name <- gsub("_comp", "-composition", comp[["name"]])
   if (is.null(comp_data) || length(comp_data) == 0) {
@@ -519,26 +739,94 @@ initialize_comp <- function(data,
     ))
   }
 
-  if (length(comp_data) != get_n_years(data) * get_function(data)) {
-    bad_data_years <- get_data(data) |>
+  model_uncertainty <- get_data(data) |>
+    dplyr::filter(
+      .data$fleet == .env$fleet,
+      .data$type == comp[["name"]]
+    )
+
+  if (identical(type, "LengthComp")) {
+    out_of_bin_length_rows <- get_data(data) |>
       dplyr::filter(
         .data$fleet == .env$fleet,
-        .data$type == comp[["name"]]
+        .data$type == "length_comp",
+        !is.na(.data$length),
+        !(.data$length %in% fleet_length_bins)
+      )
+
+    out_of_bin_non_missing <- out_of_bin_length_rows |>
+      dplyr::filter(!is.na(.data$observed), .data$observed != -999)
+
+    if (nrow(out_of_bin_non_missing) > 0) {
+      out_of_bin_lengths <- out_of_bin_non_missing |>
+        dplyr::pull(.data$length) |>
+        unique() |>
+        sort()
+
+      out_of_bin_timings <- out_of_bin_non_missing |>
+        dplyr::pull(.data$timing) |>
+        unique() |>
+        sort()
+
+      cli::cli_warn(c(
+        "Fleet `{fleet}` has `length_comp` rows outside its resolved length bins.",
+        "i" = "Ignoring {nrow(out_of_bin_non_missing)} non-missing out-of-bin rows.",
+        "i" = "Out-of-bin non-missing lengths: {toString(out_of_bin_lengths)}",
+        "i" = "Affected timings: {toString(out_of_bin_timings)}",
+        "i" = "Only rows matching the resolved fleet bins will be used."
+      ))
+    }
+
+    comp_data <- get_data(data) |>
+      dplyr::filter(
+        .data$fleet == .env$fleet,
+        .data$type == "length_comp",
+        .data$length %in% fleet_length_bins
       ) |>
+      dplyr::mutate(length_order = match(.data$length, fleet_length_bins)) |>
+      dplyr::arrange(.data$timing, .data$length_order) |>
+      dplyr::mutate(
+        sample_size = ifelse(
+          .data$observed == -999,
+          1,
+          unlist(
+            parse_data_distribution(.data$uncertainty)$size,
+            use.names = FALSE
+          )
+        ),
+        probabilities = ifelse(
+          .data$unit == "number",
+          .data$observed,
+          .data$observed * .data$sample_size
+        )
+      ) |>
+      dplyr::pull(.data$probabilities)
+
+    model_uncertainty <- model_uncertainty |>
+      dplyr::filter(.data$length %in% fleet_length_bins) |>
+      dplyr::mutate(length_order = match(.data$length, fleet_length_bins)) |>
+      dplyr::arrange(.data$timing, .data$length_order)
+  }
+
+  model_data <- comp_data
+
+  if (length(model_data) != get_n_years(data) * expected_n) {
+    bad_data_years <- model_uncertainty |>
       dplyr::count(.data$timing) |>
-      dplyr::filter(.data$n != get_function(data)) |>
+      dplyr::filter(.data$n != expected_n) |>
       dplyr::pull(.data$timing)
 
     cli::cli_abort(c(
       "The length of the `{comp[['name']]}`-composition data for fleet
       `{fleet}` does not match the expected dimensions.",
-      i = "Expected length: {get_n_years(data) * get_function(data)}",
-      i = "Actual length: {length(comp_data)}",
-      i = "Number of -999 values: {sum(comp_data == -999)}",
-      i = "Dates with invalid data: {bad_data_years}"
+      "i" = "Expected length: {get_n_years(data) * expected_n}",
+      "i" = "Actual length: {length(model_data)}",
+      "i" = "Number of -999 values: {sum(model_data == -999)}",
+      "i" = "Timings with invalid data: {toString(bad_data_years)}"
     ))
   }
-  module[[comp[["comp_data_field"]]]][] <- comp_data
+
+  module[[comp[["comp_data_field"]]]][] <- model_data
 
   return(module)
 }
@@ -691,6 +979,7 @@ initialize_fims <- function(parameters, data) {
       fleet_age_comp[[i]] <- initialize_comp(
         data = data,
         fleet = fleets[i],
+        parameters = parameters,
         type = "AgeComp"
       )
 
@@ -708,6 +997,7 @@ initialize_fims <- function(parameters, data) {
       fleet_length_comp[[i]] <- initialize_comp(
         data = data,
         fleet = fleets[i],
+        parameters = parameters,
         type = "LengthComp"
       )
 

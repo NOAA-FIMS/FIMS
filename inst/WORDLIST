@@ -139,6 +139,7 @@ nlls
 NMFS
 nmfspalette
 NOAA
+normalcdf
 nrecruits
 nsaw
 nsurveys
@@ -177,6 +178,8 @@ rcppchunk
 rdname
 rdrr
 Rdynload
+rebinned
+rebinning
 recr
 recruitments
 reportvector
@@ -233,6 +236,7 @@ usethis
 Venzon
 viridis
 vmit
+vonb
 Weverything
 Wextra
 widehat
@@ -240,8 +244,10 @@ withr
 Wmacro
 WORDLIST
 Wunused
+xout
 xlab
 yearf
 yearm
 yintercept
 ylab
+ylim
