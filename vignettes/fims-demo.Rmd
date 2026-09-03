@@ -106,7 +106,6 @@ You can use the base R function `plot(data_4_model)` to see the data types (e.g.
 plot(data_4_model)
 ```
 
-
 ## Parameters
 
 The parameters that are in the model will depend on which modules are used from the FIMS framework. This combination of modules rather than the use of a control file negates the need for complicated if{} else{} statements in the code.
@@ -137,22 +136,31 @@ The default parameters created above include a mix of constant (not estimated), 
 default_parameters |> dplyr::count(estimation_type)
 ```
 
-Tallying at the `label` column is a good way to understand what default parameters have been defined based on the FIMSFrame data. Note: in the count below, the one `NA` value in the label column is the row specifying that the model uses the `EWAA` growth module.
+Tallying at the `label` column is a good way to understand what default parameters have been defined based on the FIMSFrame data. *Note: In the count below, the one `NA` value in the label column is the row specifying that the model uses the `EWAA` growth module.*
 ```{r parameter-labels}
 default_parameters |> dplyr::count(label)
 ```
 
-The most important parameters to update will typically be those which are constant rather than estimated, because at this point the default values are generic and are better tailored to the species being modeled. In the future, species-specific defaults may be available thanks to the [FIMS fishprior project](https://github.com/NOAA-FIMS/fishprior).
+The most important parameters to update will typically be those which are constant rather than estimated, because at this point the default values are generic and are better tailored to the species being modeled. In the future, species-specific defaults may be available thanks to the [FIMS `{fishprior}` project](https://github.com/NOAA-FIMS/fishprior).
 
 Counting the constant parameters by `module_name`, `fleet`, `label`, and `value` helps identify which parameters to focus on first.
 ```{r parameter-values}
 default_parameters |>
   dplyr::filter(estimation_type == "constant") |>
   dplyr::count(module_name, fleet, label, value)
-```
-Here we can see that the defaults for the constant parameters include `log_M` values (by age and time step) which are all equal to `log(0.2) = -1.61`, maturity intercept and slope values with values of 2 and 1, respectively, and the stock-recruit parameter `logit_steepness = 0.788` (converted to and from a default steepness = 0.75 via the logit transformation `-log(1.0 - 0.75) + log(0.75 - 0.2) = 0.788` and the inverse-logit transformation `(exp(0.788) + 0.2)/(1 + exp(0.788)) = 0.75`). These are all parameters which would be good to update to species- or stock-specific values in a real-world application.
 
-Other constant parameters will likely be fine at the default values for most models, including in this case the `log_Fmort = -200` parameters for the `survey1` fleet which has no associated catch, where a tiny value is used to effectively set the fishing mortality to zero. Likewise the `log_q = 0` parameter for the `fleet1` fishing fleet which has no index of abundance is also fine as a default. And for many stocks, a default of `proportion_female = 0.5` will be fine.
+
+# Get number of years and ages from the data to make sense out of parameter counts
+n_years <- FIMS::get_n_years(data_4_model)
+n_years
+
+n_ages <- FIMS::get_ages(data_4_model)
+n_ages
+```
+
+Here we can see that the defaults for the constant parameters include `log_M` values (by age and time step, so for the 12 ages and 30 years we get in the model the n = 360) which are all equal to `log(0.2) = -1.61`, maturity intercept and slope values with values of 2 and 1, respectively, and the stock-recruit parameter `logit_steepness = 0.788` (converted to and from a default steepness = 0.75 via the logit transformation `-log(1.0 - 0.75) + log(0.75 - 0.2) = 0.788` and the inverse-logit transformation `(exp(0.788) + 0.2)/(1 + exp(0.788)) = 0.75`). These are all parameters which would be good to update to species- or stock-specific values in a real-world application.
+
+Other constant parameters will likely be fine at the default values for most models, including in this case the `log_Fmort = -200` parameters for the `survey1` fleet which has no associated catch for all of the 30 years in the model, where a tiny value is used to effectively set the fishing mortality to zero. Likewise the `log_q = 0` parameter for the `fleet1` fishing fleet which has no index of abundance is also fine as a default. And for many stocks, a default of `proportion_female = 0.5` will be fine.
 
 Users can modify any of the default parameters as needed, including the initial values and the choice of which parameters are constant or estimated. Functions (e.g., `rows_*()`) from `{dplyr}` can be used to make these updates.
 
@@ -165,7 +173,7 @@ parameters_4_model <- default_parameters |>
     tibble::tibble(
       fleet = "fleet1",
       label = "log_Fmort",
-      timing = seq(get_n_years(data_4_model)),
+      timing = seq(FIMS::get_n_years(data_4_model)),
       value = log(c(
         0.009459165, 0.027288858, 0.045063639,
         0.061017825, 0.048600752, 0.087420554,
@@ -194,7 +202,7 @@ parameters_4_model <- default_parameters |>
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      timing = 2:get_n_years(data_4_model),
+      timing = 2:FIMS::get_n_years(data_4_model),
       value = c(
         0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
         -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
@@ -228,7 +236,7 @@ parameters_4_model <- default_parameters |>
   dplyr::rows_update(
     tibble::tibble(
       label = "log_init_naa",
-      age = seq(get_n_ages(data_4_model)),
+      age = seq(FIMS::get_n_ages(data_4_model)),
       value = c(
         13.80944, 13.60690, 13.40217, 13.19525, 12.98692, 12.77791,
         12.56862, 12.35922, 12.14979, 11.94034, 11.73088, 13.18755
