@@ -65,7 +65,7 @@ for your distribution. And, use \code{?distributions} to get a list of
 distributions that have density functions in base R. To get information on
 available derived quantities to set the central tendency of the distribution
 to, you can create a fleet object and inspect the available names, e.g.,
-\code{names(methods::new(Fleet))}, or you can navigate to the Public Attributes
+the fields of a fleet module, or you can navigate to the Public Attributes
 section of the doxygen documentation for Fleet by running \code{?Fleet}.
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/distribution_formulas.R
 \name{initialize_data_distribution}
 \alias{initialize_data_distribution}
-\title{Set up a new distribution for a data type}
+\title{Set up a distribution for a fleet's data}
 \usage{
 initialize_data_distribution(
   module,
@@ -11,7 +11,7 @@ initialize_data_distribution(
 )
 }
 \arguments{
-\item{module}{A fleet \link[=fims_module]{fims_module}, created with \code{\link[=create_fleet]{create_fleet()}} and
+\item{module}{A fleet \link{fims_module}, created with \code{\link[=create_fleet]{create_fleet()}} and
 linked to the data of interest.}
 
 \item{data_type}{A string specifying the observed data type the distribution
@@ -28,17 +28,13 @@ name the same quantities the model expects to read from the fleet or
 associated modules.}
 }
 \value{
-A \link[=fims_module]{fims_module} distribution object. Internally it holds the C++
+A \link{fims_module} distribution object. Internally it holds the C++
 external pointer that FIMS uses to represent the distribution, and it is
 registered with the model so it can be included when the model is built.
 }
 \description{
 This helper creates a distribution module and wires it to the observed data
-carried by a fleet. After the \code{Rcpp::XPtr} refactor, the relevant objects are
-\link[=fims_module]{fims_module} wrappers around C++ pointers, not raw Rcpp reference classes.
-The \code{module} argument should therefore be a fleet module created with
-\code{\link[=create_fleet]{create_fleet()}}, and the returned value is another \link[=fims_module]{fims_module}, this time
-for a distribution.
+carried by a fleet.
 }
 \examples{
 \dontrun{

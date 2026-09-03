@@ -269,6 +269,10 @@ initialize_process_distribution <- function(
 ) {
   # validity check on user input
   args <- list(family = family, sd = sd)
+  # TODO: Distribution names between back-end and tibble need to be made consistent,
+  # and random effects interface needs to be updated with formula interface 
+  # like the data distribtuions. After which, validity checking needs to change
+  # to match the code in initialize_data_distribution.
   check_distribution_validity(args)
 
   if (!is.element(par, c("log_devs", "log_r"))) {
@@ -279,6 +283,8 @@ initialize_process_distribution <- function(
     "log_r" = "log_expected_recruitment"
   )
 
+  # TODO: remove after making distribution names between front end and 
+  # backend consistent
   distribution_family <- if (inherits(family, "family")) {
     switch(family[["family"]],
       gaussian = "dnorm",

@@ -54,6 +54,7 @@ export(get_n_fleets)
 export(get_n_lengths)
 export(get_n_years)
 export(get_number_of_parameters)
+export(get_numeric_vector)
 export(get_obj)
 export(get_opt)
 export(get_output)
@@ -67,9 +68,11 @@ export(get_report)
 export(get_run_time)
 export(get_sdreport)
 export(get_start_year)
+export(get_variable_vector)
 export(get_variable_vector_id)
 export(get_version)
 export(glance)
+export(has_variable_vector)
 export(initialize_data_distribution)
 export(initialize_fims)
 export(initialize_process_distribution)
@@ -133,12 +136,16 @@ exportMethods(plot)
 import(methods)
 import(stats)
 importFrom(TMB,MakeADFun)
-importFrom(generics,augment)
-importFrom(generics,glance)
-importFrom(generics,tidy)
+importFrom(generics,
+  augment,
+  glance,
+  tidy
+)
 importFrom(graphics,plot)
-importFrom(rlang,":=")
-importFrom(rlang,.data)
-importFrom(rlang,.env)
+importFrom(rlang,
+  ":=",
+  .data,
+  .env
+)
 importFrom(stockplotr,theme_noaa)
 useDynLib(FIMS, .registration = TRUE)

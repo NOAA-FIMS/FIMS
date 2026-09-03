@@ -8,7 +8,7 @@
 initialize_process_distribution(
   module,
   par,
-  family = NULL,
+  family = "dnorm",
   sd = tibble::tibble(value = 1, estimation_status = "fixed_effects")
 )
 

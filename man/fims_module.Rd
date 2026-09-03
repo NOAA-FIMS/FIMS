@@ -29,10 +29,12 @@ function named for a particular kind of module wants \code{pointer}, and a
 function that works on any module wants \code{base_pointer}:
 
 \if{html}{\out{<div class="sourceCode r">}}\preformatted{set_population_constants_(population$pointer, n_years = 30, ...)
-set_parameter_(population$base_pointer, "log_M", values, status)
+set_variable_vector_(population$base_pointer, "log_M", values, status)
 }\if{html}{\out{</div>}}
 
-\code{family} records which kind of module this is, for FIMS's own use.
+\code{module_name} and \code{module_type} say which kind of module this is, matching
+the \code{module_name} and \code{module_type} columns of the parameters tibble.
+\code{module_type} is \code{NA} for a fleet or a population, which have one kind each.
 }
 
 \section{After clear()}{
