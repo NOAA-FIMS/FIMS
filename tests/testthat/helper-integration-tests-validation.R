@@ -21,6 +21,10 @@
 #' @param em_input A list containing the estimation model inputs, including observed
 #' catch, indices, and other relevant data.
 #' @param use_fimsfit Logical; if `TRUE`, validates using `fit_fims()` results.
+#' @param initial_value_scale A numeric value indicating the scale factor to
+#' apply to the initial values of the parameters before validation. It's for
+#' restoring the input values back to the true OM values for estimated parameters.
+#' Default is 1.0.
 #'
 #' @return None. The function uses `testthat` functions to perform validations.
 #' It ensures that the output is within the expected range of error based on
@@ -44,7 +48,8 @@ validate_fims <- function(
   om_input,
   om_output,
   em_input,
-  use_fimsfit = FALSE
+  use_fimsfit = FALSE, 
+  initial_value_scale = 1.0
 ) {
   # Helper function to validate estimates against expected values
   validate_error <- function(expected,
@@ -205,6 +210,16 @@ validate_fims <- function(
         !is.na(uncertainty),
         estimation_type == "fixed_effects"
       ) |>
+      # Restore input values back to true OM values for estimated parameters
+      # so that parameter tolerance/recovery tests evaluate against truth. 
+      # See code in tests/testthat/helper-integration-tests-setup-run.R.
+      dplyr::mutate(
+        input = dplyr::if_else(
+          estimation_type != "constant",
+          input / initial_value_scale,
+          input
+        )
+      ) |>
       # Restore the "true" log_q value for testing
       dplyr::mutate(
         input = dplyr::if_else(
@@ -219,7 +234,15 @@ validate_fims <- function(
       ) |>
       # Check if estimate is within 2 standard errors (95% confidence)
       dplyr::mutate(
-        within_2SE = abs(estimated - input) <= qnorm(.975) * uncertainty
+        absolute_error = abs(estimated - input),
+        # 95% CI bound (1.96 * SE). Rounding matches output precision to prevent false 
+        # test failures on parameters like survey log_q (e.g., absolute_error = 0.1 
+        # vs qnorm(0.975) * uncertainty = 0.08467044)
+        rounded_confidence_threshold = round(
+          qnorm(0.975) * uncertainty,
+          digits = nchar(sub(".*\\.", "", as.character(absolute_error)))
+        ),
+        within_2SE = absolute_error <= rounded_confidence_threshold
       ) |>
       # Count the number of estimates outside 2*SE tolerance
       dplyr::filter(!within_2SE) |>

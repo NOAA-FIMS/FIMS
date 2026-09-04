@@ -279,11 +279,16 @@ prepare_test_data <- function() {
   # - Multiplying the parameter values by 1.01 moves the starting values 1%
   #   away from their original values while keeping them in the same general scale.
   #   The factor 1.01 is arbitrary.
+  initial_value_scale <- 1.02
+  saveRDS(
+    initial_value_scale,
+    file = testthat::test_path("fixtures", "initial_value_scale.RDS")
+  )
   modified_parameters <- modified_parameters |>
     dplyr::mutate(
       value = dplyr::if_else(
         estimation_type != "constant",
-        value * 1.01,
+        value * initial_value_scale,
         value
       )
     )

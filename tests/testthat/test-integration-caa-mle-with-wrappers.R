@@ -103,6 +103,8 @@ test_that("catch-at-age model (deterministic MLE with wrappers) recruitment devs
 
 # Estimation test ----
 ## Setup ----
+# Initial value scale for the parameters before validation, 
+initial_value_scale <- readRDS(testthat::test_path("fixtures", "initial_value_scale.RDS"))
 
 ## IO correctness ----
 test_that("catch-at-age model (estimation MLE with wrappers) works with age and length comp", {
@@ -116,7 +118,8 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with age and 
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
-    use_fimsfit = TRUE
+    use_fimsfit = TRUE,
+    initial_value_scale = initial_value_scale
   )
 })
 
@@ -147,7 +150,8 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with age comp
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
-    use_fimsfit = TRUE
+    use_fimsfit = TRUE,
+    initial_value_scale = initial_value_scale
   )
 
   # Load the test data from an RDS file containing the model fit
@@ -160,7 +164,8 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with age comp
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
-    use_fimsfit = TRUE
+    use_fimsfit = TRUE,
+    initial_value_scale = initial_value_scale
   )
 })
 
@@ -175,7 +180,8 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with length c
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
-    use_fimsfit = TRUE
+    use_fimsfit = TRUE,
+    initial_value_scale = initial_value_scale
   )
 
   # Load the test data from an RDS file containing the model fit
@@ -188,7 +194,8 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with length c
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
-    use_fimsfit = TRUE
+    use_fimsfit = TRUE,
+    initial_value_scale = initial_value_scale
   )
 })
 
@@ -203,7 +210,8 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with age and 
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
-    use_fimsfit = TRUE
+    use_fimsfit = TRUE,
+    initial_value_scale = initial_value_scale
   )
 })
 
@@ -213,7 +221,14 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with mixed es
 
   modified_parameters <- readRDS(
     testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
-  )
+  ) |>
+    dplyr::mutate(
+      value = dplyr::if_else(
+        estimation_type != "constant",
+        value / initial_value_scale,
+        value
+      )
+    )
 
   # Force fleet1's Fmort to be constant for the first 10 years.
   # From years 11-30, the Fmort estimation type is fixed_effects.
