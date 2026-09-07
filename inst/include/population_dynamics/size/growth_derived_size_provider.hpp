@@ -214,13 +214,13 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
 
     if (size_bin_index == 0) {
       const Type upper = static_cast<Type>(population_size_grid_->edges[1]);
-      return fims_math::normalcdf(upper, mean_laa, sd_laa);
+      return fims_math::pnorm(upper, mean_laa, sd_laa);
     }
 
     if (size_bin_index + 1 == population_size_grid_->n_bins) {
       const Type lower = static_cast<Type>(
           population_size_grid_->edges[population_size_grid_->n_bins - 1]);
-      return fims_math::normalcdf(static_cast<Type>(2.0) * mean_laa - lower,
+      return fims_math::pnorm(static_cast<Type>(2.0) * mean_laa - lower,
                                   mean_laa, sd_laa);
     }
 
@@ -229,8 +229,8 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     const Type upper =
         static_cast<Type>(population_size_grid_->edges[size_bin_index + 1]);
 
-    return fims_math::normalcdf(upper, mean_laa, sd_laa) -
-           fims_math::normalcdf(lower, mean_laa, sd_laa);
+    return fims_math::pnorm(upper, mean_laa, sd_laa) -
+           fims_math::pnorm(lower, mean_laa, sd_laa);
   }
 
   const GrowthProducts<Type>& PreparedGrowthProducts() const {

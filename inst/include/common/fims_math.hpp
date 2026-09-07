@@ -76,7 +76,7 @@ inline double Value(const double &x) { return x; }
  * and standard deviation is less than or equal to x.
  */
 template <class Type>
-inline const Type normalcdf(const Type &x, const Type &mean, const Type &sd) {
+inline const Type pnorm(const Type &x, const Type &mean, const Type &sd) {
   const double z = static_cast<double>(x - mean) /
                    (static_cast<double>(sd) * std::sqrt(2.0));
   return static_cast<Type>(0.5 * (1.0 + std::erf(z)));
@@ -210,17 +210,10 @@ inline const Type lgamma(const Type &x) {
 }
 
 /**
- * @brief The cumulative distribution function of the normal distribution for a
- * TMB model.
- *
- * @param x The value at which to evaluate the cumulative probability.
- * @param mean The mean of the normal distribution.
- * @param sd The standard deviation of the normal distribution.
- * @return The probability that a normal random variable with the given mean
- * and standard deviation is less than or equal to x.
+ * @copydoc normalcdf
  */
 template <class Type>
-inline const Type normalcdf(const Type &x, const Type &mean, const Type &sd) {
+inline const Type pnorm(const Type &x, const Type &mean, const Type &sd) {
   return pnorm(x, mean, sd);
 }
 
