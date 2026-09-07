@@ -54,7 +54,7 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
    *
    * @param other
    */
-  GrowthInterfaceBase(const GrowthInterfaceBase& other) : id(other.id) {}
+  GrowthInterfaceBase(const GrowthInterfaceBase &other) : id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -187,7 +187,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    *
    * @param other
    */
-  EWAAGrowthInterface(const EWAAGrowthInterface& other)
+  EWAAGrowthInterface(const EWAAGrowthInterface &other)
       : GrowthInterfaceBase(other),
         weights(other.weights),
         ages(other.ages),
