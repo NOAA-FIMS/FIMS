@@ -361,52 +361,63 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
 /**
  * @brief Rcpp-facing VonBertalanffySchnute growth module.
  * Inherits "derived observation" capability so this growth can support
- * growth-derived outputs used by downstream age-to-length conversion/WAA paths.
+ * growth-derived outputs used by downstream age-to-length conversion/weight-
+ * at-age paths.
  */
 class VonBertalanffySchnuteGrowthInterface
     : public GrowthDerivedObservationInterfaceBase {
  public:
-  VariableVector mean_length_young;  /**< expected length at reference age 1 */
-  VariableVector mean_length_old;    /**< expected length at reference age 2 */
-  VariableVector growth_coefficient; /**< growth coefficient */
-  VariableVector reference_age_for_length_1; /**< first reference age */
-  VariableVector reference_age_for_length_2; /**< second reference age */
-  VariableVector length_weight_a;            /**< coefficient in W = a * L^b */
-  VariableVector length_weight_b;            /**< exponent in W = a * L^b */
-  VariableVector length_at_age_sd_at_ref_ages; /**< natural-scale SD values at
-                                                  the two reference ages for the
-                                                  legacy interpolation path */
-  VariableVector
-      log_sd_length_at_ref_age_1; /**< working-scale VonB variability parameter
-                                     for sd(log(mean_length_young)) */
-  VariableVector
-      log_sd_length_at_ref_age_2; /**< working-scale VonB variability parameter
-                                     for sd(log(mean_length_old)) */
-  VariableVector
-      log_sd_growth_coefficient; /**< working-scale VonB variability parameter
-                                    for sd(log(growth_coefficient)) */
-  VariableVector
-      logit_corr_length_at_ref_age_1_length_at_ref_age_2; /**< working-scale
-                                                             VonB variability
-                                                             parameter for
-                                                             corr(log(mean_length_young),
-                                                             log(mean_length_old))
-                                                           */
-  VariableVector
-      logit_corr_length_at_ref_age_1_growth_coefficient; /**< working-scale VonB
-                                                            variability
-                                                            parameter for
-                                                            corr(log(mean_length_young),
-                                                            log(growth_coefficient))
-                                                          */
-  VariableVector
-      logit_corr_length_at_ref_age_2_growth_coefficient; /**< working-scale VonB
-                                                            variability
-                                                            parameter for
-                                                            corr(log(mean_length_old),
-                                                            log(growth_coefficient))
-                                                          */
-  SharedInt n_ages = 0; /**< modeled number of ages for validation */
+  /** @copydoc fims_popdy::VonBertalanffySchnuteGrowth::mean_length_young */
+  VariableVector mean_length_young;
+  /** @copydoc fims_popdy::VonBertalanffySchnuteGrowth::mean_length_old */
+  VariableVector mean_length_old;
+  /** @copydoc fims_popdy::VonBertalanffySchnuteGrowth::growth_coefficient */
+  VariableVector growth_coefficient;
+  /** @copydoc fims_popdy::VonBertalanffySchnuteGrowth::reference_age_for_length_1 */
+  VariableVector reference_age_for_length_1;
+  /** @copydoc fims_popdy::VonBertalanffySchnuteGrowth::reference_age_for_length_2 */
+  VariableVector reference_age_for_length_2;
+  /** @copydoc fims_popdy::VonBertalanffySchnuteGrowth::length_weight_a */
+  VariableVector length_weight_a;
+  /** @copydoc fims_popdy::VonBertalanffySchnuteGrowth::length_weight_b */
+  VariableVector length_weight_b;
+  /**
+   * @brief Natural-scale SD values at the two reference ages for the legacy
+   * interpolation path.
+   */
+  VariableVector length_at_age_sd_at_ref_ages;
+  /**
+   * @brief Working-scale VonB variability parameter for
+   * sd(log(mean_length_young)).
+   */
+  VariableVector log_sd_length_at_ref_age_1;
+  /**
+   * @brief Working-scale VonB variability parameter for
+   * sd(log(mean_length_old)).
+   */
+  VariableVector log_sd_length_at_ref_age_2;
+  /**
+   * @brief Working-scale VonB variability parameter for
+   * sd(log(growth_coefficient)).
+   */
+  VariableVector log_sd_growth_coefficient;
+  /**
+   * @brief Working-scale VonB variability parameter for
+   * corr(log(mean_length_young), log(mean_length_old)).
+   */
+  VariableVector logit_corr_length_at_ref_age_1_length_at_ref_age_2;
+  /**
+   * @brief Working-scale VonB variability parameter for
+   * corr(log(mean_length_young), log(growth_coefficient)).
+   */
+  VariableVector logit_corr_length_at_ref_age_1_growth_coefficient;
+  /**
+   * @brief Working-scale VonB variability parameter for
+   * corr(log(mean_length_old), log(growth_coefficient)).
+   */
+  VariableVector logit_corr_length_at_ref_age_2_growth_coefficient;
+  /** @brief Modeled number of ages used for validation. */
+  SharedInt n_ages = 0;
 
   /**
    * @brief Construct a new VonBertalanffySchnute growth interface.

@@ -30,14 +30,21 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
-  Type mean_length_young = Type(0.0); /**< expected length at reference age 1 */
-  Type mean_length_old = Type(0.0);   /**< expected length at reference age 2 */
-  Type growth_coefficient = Type(0.0);         /**< growth coefficient */
-  Type reference_age_for_length_1 = Type(0.0); /**< first reference age */
-  Type reference_age_for_length_2 = Type(0.0); /**< second reference age */
+  /** @brief Expected length at the first reference age. */
+  Type mean_length_young = Type(0.0);
+  /** @brief Expected length at the second reference age. */
+  Type mean_length_old = Type(0.0);
+  /** @brief Growth coefficient. */
+  Type growth_coefficient = Type(0.0);
+  /** @brief First reference age for the length parameterization. */
+  Type reference_age_for_length_1 = Type(0.0);
+  /** @brief Second reference age for the length parameterization. */
+  Type reference_age_for_length_2 = Type(0.0);
 
-  Type length_weight_a = Type(0.0); /**< coefficient in W = a * L^b */
-  Type length_weight_b = Type(3.0); /**< exponent in W = a * L^b */
+  /** @brief Coefficient in the length-weight relationship, W = a * L^b. */
+  Type length_weight_a = Type(0.0);
+  /** @brief Exponent in the length-weight relationship, W = a * L^b. */
+  Type length_weight_b = Type(3.0);
 
   VonBertalanffySchnuteGrowth() : GrowthBase<Type>() {}
   virtual ~VonBertalanffySchnuteGrowth() {}

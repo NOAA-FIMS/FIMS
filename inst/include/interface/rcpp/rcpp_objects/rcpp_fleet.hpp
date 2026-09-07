@@ -75,7 +75,17 @@ class FleetInterface : public FleetInterfaceBase {
    */
   SharedInt interface_observed_lengthcomp_data_id_m = -999;
   /**
-   * @brief Whether this fleet currently requires age-to-length mapping.
+   * @brief Whether this fleet requires age-to-length mapping.
+   *
+   * When true, the fleet has an active modeled path that converts quantities
+   * from age to length. Fleets with length-composition observations and fixed
+   * or growth-derived age-to-length conversion paths should have this flag
+   * turned on because the  model uses the flag to activate age-to-length
+   * conversion and to prepare the fleet's length-bin observation grid; the
+   * fleet must therefore provide resolved length bins through `n_lengths` and
+   * `lengths`. When false, age-to-length conversion and the associated
+   * length-bin processing are skipped. The default is false, and the value is
+   * copied to the underlying fleet when the interface is added to the model.
    */
   SharedBoolean interface_requires_age_length_mapping = false;
   /**
@@ -318,9 +328,16 @@ class FleetInterface : public FleetInterfaceBase {
   }
 
   /**
-   * @brief Set whether this fleet currently requires age-to-length mapping.
-   * @param requires_age_length_mapping True when a modeled path depends on
-   * age-to-length conversion.
+    * @brief Set whether this fleet requires age-to-length mapping.
+    *
+    * Set this to true when an active modeled path converts quantities from age
+    * to length. See the member documentation for the effects and required
+    * length-bin inputs.
+    *
+    * @param requires_age_length_mapping True when age-to-length mapping is
+    * required; false to skip age-to-length conversion and length-bin
+    * processing.
+    * @see FleetInterface::interface_requires_age_length_mapping
    */
   void SetRequiresAgeLengthMapping(bool requires_age_length_mapping) {
     interface_requires_age_length_mapping.set(requires_age_length_mapping);
@@ -372,7 +389,14 @@ class FleetInterface : public FleetInterfaceBase {
   }
 
   /**
-   * @brief Return whether this fleet currently requires age-to-length mapping.
+    * @brief Return whether this fleet requires age-to-length mapping.
+    *
+    * A true value indicates that the model will use an active age-to-length
+    * conversion path and the fleet's resolved length-bin observation grid.
+    * See the member documentation for details.
+    *
+    * @return True when age-to-length mapping is required; otherwise false.
+    * @see FleetInterface::interface_requires_age_length_mapping
    */
   bool GetRequiresAgeLengthMapping() {
     return interface_requires_age_length_mapping.get();
