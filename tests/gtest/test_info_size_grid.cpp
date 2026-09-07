@@ -33,8 +33,9 @@ std::shared_ptr<fims_popdy::Fleet<double>> MakeFleetWithCenters(
   return fleet;
 }
 
-TEST(InformationSizeGrid,
-     EnsurePopulationSizeGridWarnsWhenBuiltInDefaultCreatesMoreThan200RegularBins) {
+TEST(
+    InformationSizeGrid,
+    EnsurePopulationSizeGridWarnsWhenBuiltInDefaultCreatesMoreThan200RegularBins) {
   fims::FIMSLog::fims_log->clear();
 
   fims_info::Information<double> info;
@@ -60,9 +61,9 @@ TEST(InformationSizeGrid,
   EXPECT_TRUE(valid_model);
   EXPECT_TRUE(population->size_grid.IsConsistent());
   EXPECT_GT(fims::FIMSLog::fims_log->get_warning_count(), 0u);
-  EXPECT_NE(
-      fims::FIMSLog::fims_log->get_warnings().find("more than 200 regular bins"),
-      std::string::npos);
+  EXPECT_NE(fims::FIMSLog::fims_log->get_warnings().find(
+                "more than 200 regular bins"),
+            std::string::npos);
 
   fims::FIMSLog::fims_log->clear();
 }
@@ -83,10 +84,9 @@ TEST(InformationSizeGrid,
 
   EXPECT_FALSE(valid_model);
   EXPECT_GT(fims::FIMSLog::fims_log->get_error_count(), error_count_before);
-  EXPECT_NE(
-      fims::FIMSLog::fims_log->get_errors().find(
-          "No resolvable fleet observation-bin geometry was available"),
-      std::string::npos);
+  EXPECT_NE(fims::FIMSLog::fims_log->get_errors().find(
+                "No resolvable fleet observation-bin geometry was available"),
+            std::string::npos);
 
   fims::FIMSLog::fims_log->clear();
 }
@@ -110,10 +110,9 @@ TEST(InformationSizeGrid,
 
   EXPECT_FALSE(valid_model);
   EXPECT_GT(fims::FIMSLog::fims_log->get_error_count(), error_count_before);
-  EXPECT_NE(
-      fims::FIMSLog::fims_log->get_errors().find(
-          "coarser than an overlapping active fleet observation bin"),
-      std::string::npos);
+  EXPECT_NE(fims::FIMSLog::fims_log->get_errors().find(
+                "coarser than an overlapping active fleet observation bin"),
+            std::string::npos);
 
   fims::FIMSLog::fims_log->clear();
 }
@@ -141,10 +140,9 @@ TEST(InformationSizeGrid,
 
   EXPECT_FALSE(valid_model);
   EXPECT_GT(fims::FIMSLog::fims_log->get_error_count(), error_count_before);
-  EXPECT_NE(
-      fims::FIMSLog::fims_log->get_errors().find(
-          "coarser than an overlapping active fleet observation bin"),
-      std::string::npos);
+  EXPECT_NE(fims::FIMSLog::fims_log->get_errors().find(
+                "coarser than an overlapping active fleet observation bin"),
+            std::string::npos);
 
   fims::FIMSLog::fims_log->clear();
 }
@@ -163,8 +161,7 @@ TEST(InformationSizeGrid,
 
   population->size_grid.n_bins = 4;
   population->size_grid.edges = fims::Vector<double>{0.0, 1.0, 2.0, 3.0, 4.0};
-  population->size_grid.centers =
-      fims::Vector<double>{0.5, 1.5, 2.5, 3.5};
+  population->size_grid.centers = fims::Vector<double>{0.5, 1.5, 2.5, 3.5};
 
   ASSERT_NO_THROW(info.EnsurePopulationSizeGrid(valid_model, population));
 
@@ -198,10 +195,9 @@ TEST(InformationSizeGrid,
 
   EXPECT_FALSE(valid_model);
   EXPECT_GT(fims::FIMSLog::fims_log->get_error_count(), error_count_before);
-  EXPECT_NE(
-      fims::FIMSLog::fims_log->get_errors().find(
-          "has an invalid biological size grid"),
-      std::string::npos);
+  EXPECT_NE(fims::FIMSLog::fims_log->get_errors().find(
+                "has an invalid biological size grid"),
+            std::string::npos);
 
   fims::FIMSLog::fims_log->clear();
 }
@@ -230,16 +226,16 @@ TEST(InformationSizeGrid,
 
   EXPECT_FALSE(valid_model);
   EXPECT_GT(fims::FIMSLog::fims_log->get_error_count(), error_count_before);
-  EXPECT_NE(
-      fims::FIMSLog::fims_log->get_errors().find(
-          "Fleet length_bin centers are not consistent with n_lengths"),
-      std::string::npos);
+  EXPECT_NE(fims::FIMSLog::fims_log->get_errors().find(
+                "Fleet length_bin centers are not consistent with n_lengths"),
+            std::string::npos);
 
   fims::FIMSLog::fims_log->clear();
 }
 
-TEST(InformationSizeGrid,
-     SetFleetAgeToLengthConversionModelFailsWhenMappingRequiredWithoutLengthBins) {
+TEST(
+    InformationSizeGrid,
+    SetFleetAgeToLengthConversionModelFailsWhenMappingRequiredWithoutLengthBins) {
   fims::FIMSLog::fims_log->clear();
 
   fims_info::Information<double> info;
@@ -261,10 +257,10 @@ TEST(InformationSizeGrid,
 
   EXPECT_FALSE(valid_model);
   EXPECT_GT(fims::FIMSLog::fims_log->get_error_count(), error_count_before);
-  EXPECT_NE(
-      fims::FIMSLog::fims_log->get_errors().find(
-          "requires age-to-length conversion but has no fleet length observation bins"),
-      std::string::npos);
+  EXPECT_NE(fims::FIMSLog::fims_log->get_errors().find(
+                "requires age-to-length conversion but has no fleet length "
+                "observation bins"),
+            std::string::npos);
 
   fims::FIMSLog::fims_log->clear();
 }

@@ -405,15 +405,15 @@ setup_default_Growth <- function(
 
   ages <- get_ages(data)
   if (length(ages) == 0 || all(is.na(ages))) {
-    reference_age_for_length_1 <- 0
+    reference_age_for_length_young <- 0
     n_ages <- get_n_ages(data)
-    reference_age_for_length_2 <- if (n_ages > 0) n_ages - 1 else 0
+    reference_age_for_length_old <- if (n_ages > 0) n_ages - 1 else 0
   } else {
-    reference_age_for_length_1 <- min(ages, na.rm = TRUE)
-    reference_age_for_length_2 <- max(ages, na.rm = TRUE)
+    reference_age_for_length_young <- min(ages, na.rm = TRUE)
+    reference_age_for_length_old <- max(ages, na.rm = TRUE)
   }
 
-  # Use interpolation SD anchors as the default VonB variability path.
+  # Use interpolation SD anchors as the default von Bertalanffy--Schnute variability path.
   # The delta-method wiring is retained in the backend, but it is not used
   # in the default setup until it is re-derived for the traditional Von
   # Bertalanffy parameterization.
@@ -425,12 +425,12 @@ setup_default_Growth <- function(
         "mean_length_young",
         "mean_length_old",
         "growth_coefficient",
-        "reference_age_for_length_1",
-        "reference_age_for_length_2",
+        "reference_age_for_length_young",
+        "reference_age_for_length_old",
         "length_weight_a",
         "length_weight_b",
-        "length_at_age_sd_at_ref_ages",
-        "length_at_age_sd_at_ref_ages"
+        "length_at_age_sd_at_reference_ages",
+        "length_at_age_sd_at_reference_ages"
       ),
       age = c(
         NA_real_,
@@ -440,15 +440,15 @@ setup_default_Growth <- function(
         NA_real_,
         NA_real_,
         NA_real_,
-        reference_age_for_length_1,
-        reference_age_for_length_2
+        reference_age_for_length_young,
+        reference_age_for_length_old
       ),
       value = c(
         275,
         725,
         0.18,
-        reference_age_for_length_1,
-        reference_age_for_length_2,
+        reference_age_for_length_young,
+        reference_age_for_length_old,
         2.5e-11,
         3,
         28,

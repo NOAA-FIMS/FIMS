@@ -27,50 +27,30 @@ void register_fleet(Rcpp::Module& m) {
       .field("n_years", &FleetInterface::n_years)
       .field("n_lengths", &FleetInterface::n_lengths)
       .field("lengths", &FleetInterface::lengths)
-      .field("observed_catch_units",
-             &FleetInterface::observed_catch_units)
+      .field("observed_catch_units", &FleetInterface::observed_catch_units)
       .field("observed_index_units", &FleetInterface::observed_index_units)
       .field("log_index_expected", &FleetInterface::log_index_expected)
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
-      .field("catch_numbers_at_age",
-             &FleetInterface::
-                 catch_numbers_at_age)
-      .field("catch_weight_at_age",
-             &FleetInterface::
-                 catch_weight_at_age)
+      .field("catch_numbers_at_age", &FleetInterface::catch_numbers_at_age)
+      .field("catch_weight_at_age", &FleetInterface::catch_weight_at_age)
       .field("catch_numbers_at_length",
-             &FleetInterface::
-                 catch_numbers_at_length)
-      .field("catch_weight",
-             &FleetInterface::catch_weight)
-      .field("catch_numbers",
-             &FleetInterface::catch_numbers)
-      .field("catch_expected",
-             &FleetInterface::catch_expected)
-      .field("log_catch_expected",
-             &FleetInterface::log_catch_expected)
-      .field("agecomp_proportion",
-             &FleetInterface::agecomp_proportion)
-      .field("lengthcomp_proportion",
-             &FleetInterface::lengthcomp_proportion)
-      .field("index_numbers_at_age",
-             &FleetInterface::index_numbers_at_age)
-      .field("index_weight_at_age",
-             &FleetInterface::index_weight_at_age)
+             &FleetInterface::catch_numbers_at_length)
+      .field("catch_weight", &FleetInterface::catch_weight)
+      .field("catch_numbers", &FleetInterface::catch_numbers)
+      .field("catch_expected", &FleetInterface::catch_expected)
+      .field("log_catch_expected", &FleetInterface::log_catch_expected)
+      .field("agecomp_proportion", &FleetInterface::agecomp_proportion)
+      .field("lengthcomp_proportion", &FleetInterface::lengthcomp_proportion)
+      .field("index_numbers_at_age", &FleetInterface::index_numbers_at_age)
+      .field("index_weight_at_age", &FleetInterface::index_weight_at_age)
       .field("index_numbers_at_length",
-             &FleetInterface::
-                 index_numbers_at_length)
-      .field("index_weight",
-             &FleetInterface::index_weight)
-      .field("index_numbers",
-             &FleetInterface::index_numbers)
-      .field("index_expected",
-             &FleetInterface::index_expected)
-      .field("agecomp_expected",
-             &FleetInterface::agecomp_expected)
-      .field("lengthcomp_expected",
-             &FleetInterface::lengthcomp_expected)
+             &FleetInterface::index_numbers_at_length)
+      .field("index_weight", &FleetInterface::index_weight)
+      .field("index_numbers", &FleetInterface::index_numbers)
+      .field("index_expected", &FleetInterface::index_expected)
+      .field("agecomp_expected", &FleetInterface::agecomp_expected)
+      .field("lengthcomp_expected", &FleetInterface::lengthcomp_expected)
       .method("get_id", &FleetInterface::get_id)
       .method("SetName", &FleetInterface::SetName)
       .method("GetName", &FleetInterface::GetName)
@@ -88,9 +68,7 @@ void register_fleet(Rcpp::Module& m) {
               &FleetInterface::GetRequiresAgeLengthMapping)
       .method("SetObservedIndexDataID", &FleetInterface::SetObservedIndexDataID)
       .method("GetObservedIndexDataID", &FleetInterface::GetObservedIndexDataID)
-      .method("SetObservedCatchDataID",
-              &FleetInterface::SetObservedCatchDataID)
-      .method("GetObservedCatchDataID",
-              &FleetInterface::GetObservedCatchDataID)
+      .method("SetObservedCatchDataID", &FleetInterface::SetObservedCatchDataID)
+      .method("GetObservedCatchDataID", &FleetInterface::GetObservedCatchDataID)
       .method("SetSelectivityID", &FleetInterface::SetSelectivityID);
 }

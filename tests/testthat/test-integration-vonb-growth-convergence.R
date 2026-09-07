@@ -7,7 +7,7 @@
 #' one lines, that will be used in the bookdown report of the results from
 #' {testthat}. This line can be more than 80 characters.
 
-# VonB growth convergence ----
+# VonBertalanffySchnute growth convergence ----
 ## Setup ----
 make_vonb_parameters <- function(fims_frame) {
   default_parameters <- FIMS::setup_default_parameters(data = fims_frame)
@@ -308,12 +308,12 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     )) |>
     dplyr::pull(estimated)
 
-  #' @description Test that the VonB growth fit reaches a small maximum gradient under the current non-Newton optimization path.
+  #' @description Test that the von Bertalanffy--Schnute growth fit reaches a small maximum gradient under the current non-Newton optimization path.
   # Allow small cross-platform optimizer jitter while still requiring a low
   # gradient for the growth-estimation integration test.
   expect_lte(FIMS::get_max_gradient(fit), 2e-3)
 
-  #' @description Test that the estimable VonB growth parameters remain finite and positive.
+  #' @description Test that the estimable von Bertalanffy--Schnute growth parameters remain finite and positive.
   expect_true(all(is.finite(core_growth_estimates)))
   expect_true(all(core_growth_estimates > 0))
 
@@ -327,7 +327,7 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
       dplyr::pull(estimated)
   )
 
-  #' @description Test that reported SD at length-at-age remains positive for the fitted VonB path.
+  #' @description Test that reported SD at length-at-age remains positive for the fitted von Bertalanffy--Schnute path.
   expect_true(all(
     report[["growth_sd_LAA"]][[1]] > 0
   ))
@@ -342,7 +342,7 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   #' report a legacy fixed age_to_length_conversion matrix.
   expect_equal(length(report[["age_to_length_conversion"]][[1]]), 0)
 
-  #' @description Test that both biological and fleet-mapped mean WAA remain finite on the dynamic VonB path.
+  #' @description Test that both biological and fleet-mapped mean WAA remain finite on the dynamic von Bertalanffy--Schnute path.
   expect_true(all(is.finite(
     report[["growth_mean_WAA"]][[1]]
   )))
@@ -354,7 +354,7 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     length(report[["growth_derived_mean_WAA"]][[1]])
   )
 
-  #' @description Test that objective-side index weight_at_age uses the biological population mean WAA on the refactored VonB path.
+  #' @description Test that objective-side index weight_at_age uses the biological population mean WAA on the refactored von Bertalanffy--Schnute path.
   fleet_index_numbers_at_age <- report[["index_numbers_at_age"]][[1]]
   fleet_index_weight_at_age <- report[["index_weight_at_age"]][[1]]
   population_mean_waa <- report[["growth_mean_WAA"]][[1]]
@@ -367,7 +367,7 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     tolerance = 1e-8
   )
 
-  #' @description Test that objective-side catch weight_at_age uses the biological population mean WAA on the refactored VonB path.
+  #' @description Test that objective-side catch weight_at_age uses the biological population mean WAA on the refactored von Bertalanffy--Schnute path.
   fleet_catch_numbers_at_age <- report[["catch_numbers_at_age"]][[1]]
   fleet_catch_weight_at_age <- report[["catch_weight_at_age"]][[1]]
   positive_catch_cells <- abs(fleet_catch_numbers_at_age) > 0
@@ -412,7 +412,7 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
   K <- 0.18
   a0 <- -1.36
 
-  # Same VonB formula used in the model comparison OM data generator.
+  # Same von Bertalanffy--Schnute formula used in the model comparison OM data generator.
   AtoL <- function(a, Linf, K, a0) {
     Linf * (1 - exp(-K * (a - a0)))
   }
@@ -442,10 +442,10 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
     get_sd = FALSE
   )
 
-  #' @description Test that the VonB fit against Model Comparison OM values converges normally.
+  #' @description Test that the von Bertalanffy--Schnute fit against Model Comparison OM values converges normally.
   expect_equal(FIMS::get_opt(fit)$convergence, 0)
 
-  #' @description Test that the VonB fit against Model Comparison OM values reaches a small maximum gradient.
+  #' @description Test that the von Bertalanffy--Schnute fit against Model Comparison OM values reaches a small maximum gradient.
   expect_lte(FIMS::get_max_gradient(fit), 0.01)
 
   growth_estimates <- FIMS::get_estimates(fit) |>
@@ -456,7 +456,7 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
     dplyr::select(label, estimated) |>
     dplyr::left_join(expected_growth, by = "label")
 
-  #' @description Test that the fitted VonB output includes the three Model Comparison OM-truth growth parameters.
+  #' @description Test that the fitted von Bertalanffy--Schnute output includes the three Model Comparison OM-truth growth parameters.
   expect_setequal(growth_estimates$label, expected_growth$label)
 
   #' @description Test that fitted mean_length_young remains close to the model comparison OM value at age 1.
@@ -511,7 +511,7 @@ test_that("von bertalanffy report defaults to lightweight derived age-to-length 
 
   report <- FIMS::get_report(fit)
 
-  #' @description Test that the derived VonB path is still selected in reports by default.
+  #' @description Test that the derived von Bertalanffy--Schnute path is still selected in reports by default.
   expect_equal(report[["age_to_length_conversion_derived_used"]][[1]][1], 1)
 
   #' @description Test that default reporting keeps fleet growth-derived mean WAA available.
@@ -552,7 +552,7 @@ test_that("von bertalanffy uses fleet length-comp bins when fixed fleet age-to-l
     unique() |>
     sort()
 
-  #' @description Test that the growth-derived age-to-length conversion path is selected when VonB growth is used without fixed fleet age-to-length conversion rows.
+  #' @description Test that the growth-derived age-to-length conversion path is selected when von Bertalanffy--Schnute growth is used without fixed fleet age-to-length conversion rows.
   expect_equal(report[["age_to_length_conversion_derived_used"]][[1]][1], 1)
 
   #' @description Test that no fixed age_to_length_conversion matrix is reported when the fleet relies only on the growth-derived age-to-length conversion path.
@@ -831,7 +831,7 @@ test_that("von bertalanffy initialization rejects decreasing reference lengths",
       )
     )
 
-  #' @description Test that VonB initialization rejects a second reference length smaller than the first.
+  #' @description Test that von Bertalanffy--Schnute initialization rejects a second reference length smaller than the first.
   expect_error(
     bad_parameters |>
       FIMS::initialize_fims(data = ctx$data),

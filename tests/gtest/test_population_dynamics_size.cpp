@@ -23,8 +23,7 @@ struct FakeGrowthDerivedObservation
 
   void SetAgeOffset(double) override {}
 
-  void Initialize(std::size_t n_years,
-                  std::size_t n_ages,
+  void Initialize(std::size_t n_years, std::size_t n_ages,
                   std::size_t n_sexes = 1) override {
     products.Resize(n_years, n_ages, n_sexes);
     products_prepared = false;
@@ -53,8 +52,7 @@ struct FakeGrowthDerivedObservation
 };
 
 std::shared_ptr<FakeGrowthDerivedObservation> MakePreparedGrowth(
-    double mean_laa,
-    double sd_laa) {
+    double mean_laa, double sd_laa) {
   auto growth = std::make_shared<FakeGrowthDerivedObservation>();
   growth->Initialize(1, 1, 1);
   growth->products.MeanLAA(0, 0, 0) = mean_laa;
@@ -65,20 +63,16 @@ std::shared_ptr<FakeGrowthDerivedObservation> MakePreparedGrowth(
 
 void ConfigureAdapter(
     fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>& adapter,
-    double mean_length_young,
-    double mean_length_old,
-    double growth_coefficient,
-    double reference_age_for_length_1,
-    double reference_age_for_length_2,
-    double length_weight_a,
-    double length_weight_b,
-    double length_at_age_sd_at_reference_age_1,
-    double length_at_age_sd_at_reference_age_2) {
+    double mean_length_young, double mean_length_old, double growth_coefficient,
+    double reference_age_for_length_young, double reference_age_for_length_old,
+    double length_weight_a, double length_weight_b,
+    double length_at_age_sd_at_reference_age_young,
+    double length_at_age_sd_at_reference_age_old) {
   adapter.MeanLengthYoungVector().resize(1);
   adapter.MeanLengthOldVector().resize(1);
   adapter.GrowthCoefficientVector().resize(1);
-  adapter.ReferenceAgeForLength1Vector().resize(1);
-  adapter.ReferenceAgeForLength2Vector().resize(1);
+  adapter.ReferenceAgeForLengthYoungVector().resize(1);
+  adapter.ReferenceAgeForLengthOldVector().resize(1);
   adapter.LengthWeightAVector().resize(1);
   adapter.LengthWeightBVector().resize(1);
   adapter.LengthAtAgeSdAtRefAgesVector().resize(2);
@@ -86,14 +80,15 @@ void ConfigureAdapter(
   adapter.MeanLengthYoungVector()[0] = fims_math::log(mean_length_young);
   adapter.MeanLengthOldVector()[0] = fims_math::log(mean_length_old);
   adapter.GrowthCoefficientVector()[0] = fims_math::log(growth_coefficient);
-  adapter.ReferenceAgeForLength1Vector()[0] = reference_age_for_length_1;
-  adapter.ReferenceAgeForLength2Vector()[0] = reference_age_for_length_2;
+  adapter.ReferenceAgeForLengthYoungVector()[0] =
+      reference_age_for_length_young;
+  adapter.ReferenceAgeForLengthOldVector()[0] = reference_age_for_length_old;
   adapter.LengthWeightAVector()[0] = fims_math::log(length_weight_a);
   adapter.LengthWeightBVector()[0] = fims_math::log(length_weight_b);
   adapter.LengthAtAgeSdAtRefAgesVector()[0] =
-      fims_math::log(length_at_age_sd_at_reference_age_1);
+      fims_math::log(length_at_age_sd_at_reference_age_young);
   adapter.LengthAtAgeSdAtRefAgesVector()[1] =
-      fims_math::log(length_at_age_sd_at_reference_age_2);
+      fims_math::log(length_at_age_sd_at_reference_age_old);
 }
 
 TEST(SizeGridBuilder, BuildObservationEdgesFromCentersUsesAdjacentMidpoints) {
@@ -188,10 +183,9 @@ TEST(GrowthDerivedSizeProvider,
   ASSERT_NO_THROW(provider.PrepareSizeProducts());
 
   EXPECT_GT(fims::FIMSLog::fims_log->get_warning_count(), 0u);
-  EXPECT_NE(
-      fims::FIMSLog::fims_log->get_warnings().find(
-          "terminal biological plus-group bin"),
-      std::string::npos);
+  EXPECT_NE(fims::FIMSLog::fims_log->get_warnings().find(
+                "terminal biological plus-group bin"),
+            std::string::npos);
 
   const std::size_t warning_count_after_first_prepare =
       fims::FIMSLog::fims_log->get_warning_count();
@@ -206,19 +200,10 @@ TEST(GrowthDerivedSizeProvider,
 
 TEST(GrowthDerivedSizeProvider,
      PrepareSizeProductsHandlesDifferentGrowthVariability) {
-  auto growth =
-      std::make_shared<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
-  ConfigureAdapter(
-      *growth,
-      275.0,
-      725.0,
-      0.18,
-      1.0,
-      12.0,
-      2.5e-11,
-      3.0,
-      10.0,
-      120.0);
+  auto growth = std::make_shared<
+      fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
+  ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 10.0,
+                   120.0);
   growth->SetAgeOffset(1.0);
   growth->Initialize(1, 3, 1);
   ASSERT_NO_THROW(growth->PrepareGrowthProducts());
@@ -238,11 +223,9 @@ TEST(GrowthDerivedSizeProvider,
   for (std::size_t age_index = 0; age_index < 3; ++age_index) {
     double row_sum = 0.0;
 
-    for (std::size_t size_bin_index = 0;
-         size_bin_index < size_grid.n_bins;
+    for (std::size_t size_bin_index = 0; size_bin_index < size_grid.n_bins;
          ++size_bin_index) {
-      const double prob =
-          provider.ProbSize(0, age_index, size_bin_index);
+      const double prob = provider.ProbSize(0, age_index, size_bin_index);
       EXPECT_TRUE(std::isfinite(prob));
       EXPECT_GE(prob, 0.0);
       row_sum += prob;
@@ -256,9 +239,8 @@ TEST(GrowthDerivedSizeProvider,
      PrepareSizeProductsShiftMassWithDifferentMeanGrowth) {
   const auto lower_growth = MakePreparedGrowth(1.5, 0.4);
   const auto higher_growth = MakePreparedGrowth(3.5, 0.4);
-  const fims_popdy::SizeGrid grid =
-      fims_popdy::SizeGridBuilder::BuildFromEdges(
-          {0.0, 1.0, 2.0, 3.0, 4.0, 5.0});
+  const fims_popdy::SizeGrid grid = fims_popdy::SizeGridBuilder::BuildFromEdges(
+      {0.0, 1.0, 2.0, 3.0, 4.0, 5.0});
 
   fims_popdy::GrowthDerivedSizeProvider<double> lower_provider(lower_growth);
   lower_provider.SetPopulationSizeGrid(&grid);
@@ -277,10 +259,8 @@ TEST(GrowthDerivedSizeProvider,
 
   for (std::size_t size_bin_index = 0; size_bin_index < grid.n_bins;
        ++size_bin_index) {
-    const double lower_prob =
-        lower_provider.ProbSize(0, 0, size_bin_index);
-    const double higher_prob =
-        higher_provider.ProbSize(0, 0, size_bin_index);
+    const double lower_prob = lower_provider.ProbSize(0, 0, size_bin_index);
+    const double higher_prob = higher_provider.ProbSize(0, 0, size_bin_index);
 
     lower_expected_size += lower_prob * grid.centers[size_bin_index];
     higher_expected_size += higher_prob * grid.centers[size_bin_index];
@@ -297,43 +277,24 @@ TEST(GrowthDerivedSizeProvider,
 
 TEST(GrowthDerivedSizeProvider,
      PrepareSizeProductsShiftMassWithDifferentPreparedGrowthAdapters) {
-  auto lower_growth =
-      std::make_shared<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
-  ConfigureAdapter(
-      *lower_growth,
-      225.0,
-      575.0,
-      0.18,
-      1.0,
-      12.0,
-      2.5e-11,
-      3.0,
-      28.0,
-      73.0);
+  auto lower_growth = std::make_shared<
+      fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
+  ConfigureAdapter(*lower_growth, 225.0, 575.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0,
+                   28.0, 73.0);
   lower_growth->SetAgeOffset(1.0);
   lower_growth->Initialize(1, 1, 1);
   ASSERT_NO_THROW(lower_growth->PrepareGrowthProducts());
 
-  auto higher_growth =
-      std::make_shared<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
-  ConfigureAdapter(
-      *higher_growth,
-      325.0,
-      825.0,
-      0.18,
-      1.0,
-      12.0,
-      2.5e-11,
-      3.0,
-      28.0,
-      73.0);
+  auto higher_growth = std::make_shared<
+      fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
+  ConfigureAdapter(*higher_growth, 325.0, 825.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0,
+                   28.0, 73.0);
   higher_growth->SetAgeOffset(1.0);
   higher_growth->Initialize(1, 1, 1);
   ASSERT_NO_THROW(higher_growth->PrepareGrowthProducts());
 
-  const fims_popdy::SizeGrid grid =
-      fims_popdy::SizeGridBuilder::BuildFromEdges(
-          {0.0, 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0});
+  const fims_popdy::SizeGrid grid = fims_popdy::SizeGridBuilder::BuildFromEdges(
+      {0.0, 100.0, 200.0, 300.0, 400.0, 500.0, 600.0, 700.0, 800.0, 900.0});
 
   fims_popdy::GrowthDerivedSizeProvider<double> lower_provider(lower_growth);
   lower_provider.SetPopulationSizeGrid(&grid);
@@ -350,10 +311,8 @@ TEST(GrowthDerivedSizeProvider,
 
   for (std::size_t size_bin_index = 0; size_bin_index < grid.n_bins;
        ++size_bin_index) {
-    const double lower_prob =
-        lower_provider.ProbSize(0, 0, size_bin_index);
-    const double higher_prob =
-        higher_provider.ProbSize(0, 0, size_bin_index);
+    const double lower_prob = lower_provider.ProbSize(0, 0, size_bin_index);
+    const double higher_prob = higher_provider.ProbSize(0, 0, size_bin_index);
 
     lower_expected_size += lower_prob * grid.centers[size_bin_index];
     higher_expected_size += higher_prob * grid.centers[size_bin_index];

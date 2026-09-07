@@ -46,13 +46,13 @@ class GrowthModel : public GrowthModelBase<Type> {
   void SetVonBertalanffySchnuteParameters(Type mean_length_young,
                                           Type mean_length_old,
                                           Type growth_coefficient,
-                                          Type reference_age_for_length_1,
-                                          Type reference_age_for_length_2) {
+                                          Type reference_age_for_length_young,
+                                          Type reference_age_for_length_old) {
     vb_.mean_length_young = mean_length_young;
     vb_.mean_length_old = mean_length_old;
     vb_.growth_coefficient = growth_coefficient;
-    vb_.reference_age_for_length_1 = reference_age_for_length_1;
-    vb_.reference_age_for_length_2 = reference_age_for_length_2;
+    vb_.reference_age_for_length_young = reference_age_for_length_young;
+    vb_.reference_age_for_length_old = reference_age_for_length_old;
     needs_update_ = true;
   }
 
@@ -65,10 +65,12 @@ class GrowthModel : public GrowthModelBase<Type> {
 
   /// Set the reference-point SD values used by the interpolation
   /// variability path.
-  void SetLengthSdParams(Type length_at_age_sd_at_reference_age_1,
-                         Type length_at_age_sd_at_reference_age_2) {
-    length_at_age_sd_at_reference_age_1_ = length_at_age_sd_at_reference_age_1;
-    length_at_age_sd_at_reference_age_2_ = length_at_age_sd_at_reference_age_2;
+  void SetLengthSdParams(Type length_at_age_sd_at_reference_age_young,
+                         Type length_at_age_sd_at_reference_age_old) {
+    length_at_age_sd_at_reference_age_young_ =
+        length_at_age_sd_at_reference_age_young;
+    length_at_age_sd_at_reference_age_old_ =
+        length_at_age_sd_at_reference_age_old;
     needs_update_ = true;
   }
 
@@ -81,22 +83,27 @@ class GrowthModel : public GrowthModelBase<Type> {
   /// 2. log(mean_length_old)
   /// 3. log(growth_coefficient)
   void SetGrowthParameterCovariance(
-      Type length_at_ref_age_1_variance,
-      Type length_at_ref_age_1_length_at_ref_age_2_covariance,
-      Type length_at_ref_age_1_k_covariance, Type length_at_ref_age_2_variance,
-      Type length_at_ref_age_2_k_covariance, Type growth_coefficient_variance) {
+      Type mean_length_young_variance,
+      Type mean_length_young_mean_length_old_covariance,
+      Type mean_length_young_growth_coefficient_covariance,
+      Type mean_length_old_variance,
+      Type mean_length_old_growth_coefficient_covariance,
+      Type growth_coefficient_variance) {
     ValidateGrowthParameterCovariance(
-        length_at_ref_age_1_variance,
-        length_at_ref_age_1_length_at_ref_age_2_covariance,
-        length_at_ref_age_1_k_covariance, length_at_ref_age_2_variance,
-        length_at_ref_age_2_k_covariance, growth_coefficient_variance);
+        mean_length_young_variance,
+        mean_length_young_mean_length_old_covariance,
+        mean_length_young_growth_coefficient_covariance,
+        mean_length_old_variance, mean_length_old_growth_coefficient_covariance,
+        growth_coefficient_variance);
 
-    length_at_ref_age_1_variance_ = length_at_ref_age_1_variance;
-    length_at_ref_age_1_length_at_ref_age_2_covariance_ =
-        length_at_ref_age_1_length_at_ref_age_2_covariance;
-    length_at_ref_age_1_k_covariance_ = length_at_ref_age_1_k_covariance;
-    length_at_ref_age_2_variance_ = length_at_ref_age_2_variance;
-    length_at_ref_age_2_k_covariance_ = length_at_ref_age_2_k_covariance;
+    mean_length_young_variance_ = mean_length_young_variance;
+    mean_length_young_mean_length_old_covariance_ =
+        mean_length_young_mean_length_old_covariance;
+    mean_length_young_growth_coefficient_covariance_ =
+        mean_length_young_growth_coefficient_covariance;
+    mean_length_old_variance_ = mean_length_old_variance;
+    mean_length_old_growth_coefficient_covariance_ =
+        mean_length_old_growth_coefficient_covariance;
     growth_coefficient_variance_ = growth_coefficient_variance;
     use_delta_method_variability_ = true;
     needs_update_ = true;
@@ -105,12 +112,11 @@ class GrowthModel : public GrowthModelBase<Type> {
   /// Disable the delta-method growth variability path and return to the
   /// reference-point interpolation path.
   void ClearGrowthParameterCovariance() {
-    length_at_ref_age_1_variance_ = static_cast<Type>(0.0);
-    length_at_ref_age_1_length_at_ref_age_2_covariance_ =
-        static_cast<Type>(0.0);
-    length_at_ref_age_1_k_covariance_ = static_cast<Type>(0.0);
-    length_at_ref_age_2_variance_ = static_cast<Type>(0.0);
-    length_at_ref_age_2_k_covariance_ = static_cast<Type>(0.0);
+    mean_length_young_variance_ = static_cast<Type>(0.0);
+    mean_length_young_mean_length_old_covariance_ = static_cast<Type>(0.0);
+    mean_length_young_growth_coefficient_covariance_ = static_cast<Type>(0.0);
+    mean_length_old_variance_ = static_cast<Type>(0.0);
+    mean_length_old_growth_coefficient_covariance_ = static_cast<Type>(0.0);
     growth_coefficient_variance_ = static_cast<Type>(0.0);
     use_delta_method_variability_ = false;
     needs_update_ = true;
@@ -124,22 +130,23 @@ class GrowthModel : public GrowthModelBase<Type> {
       throw std::runtime_error(
           "VonBertalanffySchnuteGrowth requires n_ages > 0");
     }
-    if (vb_.reference_age_for_length_2 <= vb_.reference_age_for_length_1) {
+    if (vb_.reference_age_for_length_old <=
+        vb_.reference_age_for_length_young) {
       throw std::runtime_error(
-          "VonBertalanffySchnuteGrowth reference_age_for_length_2 must be > "
-          "reference_age_for_length_1");
+          "VonBertalanffySchnuteGrowth reference_age_for_length_old must be > "
+          "reference_age_for_length_young");
     }
 
     Type laa_min = Type(0.0);
     Type slope = Type(0.0);
 
     if (!use_delta_method_variability_) {
-      laa_min = vb_.length_at_age(vb_.reference_age_for_length_1);
-      const Type laa_max = vb_.length_at_age(vb_.reference_age_for_length_2);
+      laa_min = vb_.length_at_age(vb_.reference_age_for_length_young);
+      const Type laa_max = vb_.length_at_age(vb_.reference_age_for_length_old);
       const Type laa_delta_safe = fims_math::ad_max(
           fims_math::ad_fabs(laa_max - laa_min), static_cast<Type>(1e-8));
-      slope = (n_ages_ > 1) ? (length_at_age_sd_at_reference_age_2_ -
-                               length_at_age_sd_at_reference_age_1_) /
+      slope = (n_ages_ > 1) ? (length_at_age_sd_at_reference_age_old_ -
+                               length_at_age_sd_at_reference_age_young_) /
                                   laa_delta_safe
                             : Type(0.0);
     }
@@ -172,53 +179,57 @@ class GrowthModel : public GrowthModelBase<Type> {
   /// log-scale FIMS estimation parameterization is usable for the
   /// delta-method growth variability path.
   void ValidateGrowthParameterCovariance(
-      Type length_at_ref_age_1_variance,
-      Type length_at_ref_age_1_length_at_ref_age_2_covariance,
-      Type length_at_ref_age_1_k_covariance, Type length_at_ref_age_2_variance,
-      Type length_at_ref_age_2_k_covariance,
+      Type mean_length_young_variance,
+      Type mean_length_young_mean_length_old_covariance,
+      Type mean_length_young_growth_coefficient_covariance,
+      Type mean_length_old_variance,
+      Type mean_length_old_growth_coefficient_covariance,
       Type growth_coefficient_variance) const {
-    if (length_at_ref_age_1_variance < Type(0.0) ||
-        length_at_ref_age_2_variance < Type(0.0) ||
+    if (mean_length_young_variance < Type(0.0) ||
+        mean_length_old_variance < Type(0.0) ||
         growth_coefficient_variance < Type(0.0)) {
       throw std::runtime_error("Growth parameter variances must be >= 0");
     }
 
-    if (length_at_ref_age_1_length_at_ref_age_2_covariance *
-            length_at_ref_age_1_length_at_ref_age_2_covariance >
-        length_at_ref_age_1_variance * length_at_ref_age_2_variance) {
+    if (mean_length_young_mean_length_old_covariance *
+            mean_length_young_mean_length_old_covariance >
+        mean_length_young_variance * mean_length_old_variance) {
       throw std::runtime_error(
           "Growth covariance between mean_length_young and "
           "mean_length_old is inconsistent with the supplied variances");
     }
 
-    if (length_at_ref_age_1_k_covariance * length_at_ref_age_1_k_covariance >
-        length_at_ref_age_1_variance * growth_coefficient_variance) {
+    if (mean_length_young_growth_coefficient_covariance *
+            mean_length_young_growth_coefficient_covariance >
+        mean_length_young_variance * growth_coefficient_variance) {
       throw std::runtime_error(
           "Growth covariance between mean_length_young and "
           "growth_coefficient is inconsistent with the supplied variances");
     }
 
-    if (length_at_ref_age_2_k_covariance * length_at_ref_age_2_k_covariance >
-        length_at_ref_age_2_variance * growth_coefficient_variance) {
+    if (mean_length_old_growth_coefficient_covariance *
+            mean_length_old_growth_coefficient_covariance >
+        mean_length_old_variance * growth_coefficient_variance) {
       throw std::runtime_error(
           "Growth covariance between mean_length_old and "
           "growth_coefficient is inconsistent with the supplied variances");
     }
 
     const Type determinant =
-        length_at_ref_age_1_variance *
-            (length_at_ref_age_2_variance * growth_coefficient_variance -
-             length_at_ref_age_2_k_covariance *
-                 length_at_ref_age_2_k_covariance) -
-        length_at_ref_age_1_length_at_ref_age_2_covariance *
-            (length_at_ref_age_1_length_at_ref_age_2_covariance *
+        mean_length_young_variance *
+            (mean_length_old_variance * growth_coefficient_variance -
+             mean_length_old_growth_coefficient_covariance *
+                 mean_length_old_growth_coefficient_covariance) -
+        mean_length_young_mean_length_old_covariance *
+            (mean_length_young_mean_length_old_covariance *
                  growth_coefficient_variance -
-             length_at_ref_age_1_k_covariance *
-                 length_at_ref_age_2_k_covariance) +
-        length_at_ref_age_1_k_covariance *
-            (length_at_ref_age_1_length_at_ref_age_2_covariance *
-                 length_at_ref_age_2_k_covariance -
-             length_at_ref_age_1_k_covariance * length_at_ref_age_2_variance);
+             mean_length_young_growth_coefficient_covariance *
+                 mean_length_old_growth_coefficient_covariance) +
+        mean_length_young_growth_coefficient_covariance *
+            (mean_length_young_mean_length_old_covariance *
+                 mean_length_old_growth_coefficient_covariance -
+             mean_length_young_growth_coefficient_covariance *
+                 mean_length_old_variance);
 
     if (determinant < Type(0.0)) {
       throw std::runtime_error(
@@ -239,9 +250,10 @@ class GrowthModel : public GrowthModelBase<Type> {
       return fims_math::ad_max(sd_laa, static_cast<Type>(1e-8));
     }
 
-    const Type sd_laa = (n_ages_ > 1) ? length_at_age_sd_at_reference_age_1_ +
-                                            slope * (laa - laa_min)
-                                      : length_at_age_sd_at_reference_age_1_;
+    const Type sd_laa =
+        (n_ages_ > 1)
+            ? length_at_age_sd_at_reference_age_young_ + slope * (laa - laa_min)
+            : length_at_age_sd_at_reference_age_young_;
 
     return fims_math::ad_max(sd_laa, static_cast<Type>(1e-8));
   }
@@ -249,23 +261,25 @@ class GrowthModel : public GrowthModelBase<Type> {
   /// Compute delta-method variance of log length at age using the current
   /// 3-parameter covariance matrix.
   Type ComputeLogLengthVarianceAtAge(const Type& age) const {
-    Type d_log_laa_d_log_l1 = Type(0.0);
-    Type d_log_laa_d_log_l2 = Type(0.0);
+    Type d_log_laa_d_log_length_young = Type(0.0);
+    Type d_log_laa_d_log_length_old = Type(0.0);
     Type d_log_laa_d_log_k = Type(0.0);
 
-    vb_.log_length_at_age_logscale_gradient(
-        age, d_log_laa_d_log_l1, d_log_laa_d_log_l2, d_log_laa_d_log_k);
+    vb_.log_length_at_age_logscale_gradient(age, d_log_laa_d_log_length_young,
+                                            d_log_laa_d_log_length_old,
+                                            d_log_laa_d_log_k);
 
-    return d_log_laa_d_log_l1 * d_log_laa_d_log_l1 *
-               length_at_ref_age_1_variance_ +
-           Type(2.0) * d_log_laa_d_log_l1 * d_log_laa_d_log_l2 *
-               length_at_ref_age_1_length_at_ref_age_2_covariance_ +
-           Type(2.0) * d_log_laa_d_log_l1 * d_log_laa_d_log_k *
-               length_at_ref_age_1_k_covariance_ +
-           d_log_laa_d_log_l2 * d_log_laa_d_log_l2 *
-               length_at_ref_age_2_variance_ +
-           Type(2.0) * d_log_laa_d_log_l2 * d_log_laa_d_log_k *
-               length_at_ref_age_2_k_covariance_ +
+    return d_log_laa_d_log_length_young * d_log_laa_d_log_length_young *
+               mean_length_young_variance_ +
+           Type(2.0) * d_log_laa_d_log_length_young *
+               d_log_laa_d_log_length_old *
+               mean_length_young_mean_length_old_covariance_ +
+           Type(2.0) * d_log_laa_d_log_length_young * d_log_laa_d_log_k *
+               mean_length_young_growth_coefficient_covariance_ +
+           d_log_laa_d_log_length_old * d_log_laa_d_log_length_old *
+               mean_length_old_variance_ +
+           Type(2.0) * d_log_laa_d_log_length_old * d_log_laa_d_log_k *
+               mean_length_old_growth_coefficient_covariance_ +
            d_log_laa_d_log_k * d_log_laa_d_log_k * growth_coefficient_variance_;
   }
 
@@ -280,15 +294,15 @@ class GrowthModel : public GrowthModelBase<Type> {
 
   // Caching state
   bool needs_update_ = true;
-  Type length_at_age_sd_at_reference_age_1_ = static_cast<Type>(3.0);
-  Type length_at_age_sd_at_reference_age_2_ = static_cast<Type>(7.0);
+  Type length_at_age_sd_at_reference_age_young_ = static_cast<Type>(3.0);
+  Type length_at_age_sd_at_reference_age_old_ = static_cast<Type>(7.0);
   bool use_delta_method_variability_ = false;
-  Type length_at_ref_age_1_variance_ = static_cast<Type>(0.0);
-  Type length_at_ref_age_1_length_at_ref_age_2_covariance_ =
+  Type mean_length_young_variance_ = static_cast<Type>(0.0);
+  Type mean_length_young_mean_length_old_covariance_ = static_cast<Type>(0.0);
+  Type mean_length_young_growth_coefficient_covariance_ =
       static_cast<Type>(0.0);
-  Type length_at_ref_age_1_k_covariance_ = static_cast<Type>(0.0);
-  Type length_at_ref_age_2_variance_ = static_cast<Type>(0.0);
-  Type length_at_ref_age_2_k_covariance_ = static_cast<Type>(0.0);
+  Type mean_length_old_variance_ = static_cast<Type>(0.0);
+  Type mean_length_old_growth_coefficient_covariance_ = static_cast<Type>(0.0);
   Type growth_coefficient_variance_ = static_cast<Type>(0.0);
   Type age_offset_ = static_cast<Type>(0.0);
 

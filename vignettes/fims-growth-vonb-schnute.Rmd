@@ -44,7 +44,7 @@ The `VonBertalanffySchnute` module uses a two-reference-age growth form. The gro
 
 FIMS uses the fitted growth curve and supplied variability in length-at-age to prepare mean length-at-age, standard deviation of length-at-age, mean weight-at-age, and the growth-derived age-to-length conversion used by length-based fleet calculations.
 
-This vignette uses the interpolation-based variability pathway, which supplies standard deviation at the two reference ages through `length_at_age_sd_at_ref_ages`.
+This vignette uses the interpolation-based variability pathway, which supplies standard deviation at the two reference ages through `length_at_age_sd_at_reference_ages`.
 
 > Note:  The delta-method path is wired into FIMS, but it is not used here because it depends on a different growth parameterization.
 
@@ -81,13 +81,13 @@ vonb_two_reference_age <- function(
   mean_length_young,
   mean_length_old,
   growth_coefficient,
-  reference_age_for_length_1,
-  reference_age_for_length_2
+  reference_age_for_length_young,
+  reference_age_for_length_old
 ) {
   # Normalizes the curve so it is anchored to both reference-age lengths.
   denominator <- 1 - exp(
     -growth_coefficient *
-      (reference_age_for_length_2 - reference_age_for_length_1)
+      (reference_age_for_length_old - reference_age_for_length_young)
   )
 
   # Predict mean length at age using the same curve shape FIMS estimates.
@@ -96,7 +96,7 @@ vonb_two_reference_age <- function(
       (
         1 - exp(
           -growth_coefficient *
-            (age - reference_age_for_length_1)
+            (age - reference_age_for_length_young)
         )
       ) / denominator
 }
@@ -106,15 +106,15 @@ vonb_implied_linf <- function(
   mean_length_young,
   mean_length_old,
   growth_coefficient,
-  reference_age_for_length_1,
-  reference_age_for_length_2
+  reference_age_for_length_young,
+  reference_age_for_length_old
 ) {
   mean_length_young +
     (mean_length_old - mean_length_young) /
       (
         1 - exp(
           -growth_coefficient *
-            (reference_age_for_length_2 - reference_age_for_length_1)
+            (reference_age_for_length_old - reference_age_for_length_young)
         )
       )
 }
@@ -130,11 +130,11 @@ make_vonb_demo_data <- function(
   mean_length_young = 180,
   mean_length_old = 850,
   growth_coefficient = 0.18,
-  reference_age_for_length_1 = 1,
-  reference_age_for_length_2 = 12,
+  reference_age_for_length_young = 1,
+  reference_age_for_length_old = 12,
   length_weight_a = 2.5e-11,
   length_weight_b = 3,
-  sd_at_ref_ages = c(30, 73)
+  sd_at_reference_ages = c(30, 73)
 ) {
   # Calculate the "true" growth products used to generate the example.
   true_curve <- tibble::tibble(
@@ -144,15 +144,15 @@ make_vonb_demo_data <- function(
       mean_length_young = mean_length_young,
       mean_length_old = mean_length_old,
       growth_coefficient = growth_coefficient,
-      reference_age_for_length_1 = reference_age_for_length_1,
-      reference_age_for_length_2 = reference_age_for_length_2
+      reference_age_for_length_young = reference_age_for_length_young,
+      reference_age_for_length_old = reference_age_for_length_old
     ),
     true_sd_length = stats::approx(
       x = c(
-        reference_age_for_length_1,
-        reference_age_for_length_2
+        reference_age_for_length_young,
+        reference_age_for_length_old
       ),
-      y = sd_at_ref_ages,
+      y = sd_at_reference_ages,
       xout = ages,
       rule = 2
     )$y
@@ -168,8 +168,8 @@ make_vonb_demo_data <- function(
     mean_length_young = mean_length_young,
     mean_length_old = mean_length_old,
     growth_coefficient = growth_coefficient,
-    reference_age_for_length_1 = reference_age_for_length_1,
-    reference_age_for_length_2 = reference_age_for_length_2
+    reference_age_for_length_young = reference_age_for_length_young,
+    reference_age_for_length_old = reference_age_for_length_old
   )
 
   # Use a declining age distribution for the generated population.
@@ -338,15 +338,15 @@ make_vonb_demo_data <- function(
         "mean_length_young",
         "mean_length_old",
         "growth_coefficient",
-        "reference_age_for_length_1",
-        "reference_age_for_length_2"
+        "reference_age_for_length_young",
+        "reference_age_for_length_old"
       ),
       true_value = c(
         mean_length_young,
         mean_length_old,
         growth_coefficient,
-        reference_age_for_length_1,
-        reference_age_for_length_2
+        reference_age_for_length_young,
+        reference_age_for_length_old
       )
     )
   )
@@ -405,7 +405,7 @@ The three core curve parameters are already `"fixed_effects"`. The example chang
 growth_sd_rows <- parameters |>
   dplyr::filter(
     module_name == "Growth",
-    label == "length_at_age_sd_at_ref_ages"
+    label == "length_at_age_sd_at_reference_ages"
   ) |>
   dplyr::mutate(
     # Move the interpolation ages to the demo reference ages.
@@ -418,7 +418,7 @@ growth_sd_rows <- parameters |>
 parameters <- parameters |>
   dplyr::filter(
     !(module_name == "Growth" &
-      label == "length_at_age_sd_at_ref_ages")
+      label == "length_at_age_sd_at_reference_ages")
   ) |>
   dplyr::bind_rows(growth_sd_rows) |>
   dplyr::rows_update(
@@ -428,8 +428,8 @@ parameters <- parameters |>
         "mean_length_young",
         "mean_length_old",
         "growth_coefficient",
-        "reference_age_for_length_1",
-        "reference_age_for_length_2"
+        "reference_age_for_length_young",
+        "reference_age_for_length_old"
       ),
       value = c(150, 800, 0.22, 1, 12)
     ),
@@ -539,8 +539,8 @@ growth_reference_ages <- parameters |>
   dplyr::filter(
     module_name == "Growth",
     label %in% c(
-      "reference_age_for_length_1",
-      "reference_age_for_length_2"
+      "reference_age_for_length_young",
+      "reference_age_for_length_old"
     )
   ) |>
   dplyr::select(label, value) |>
@@ -563,10 +563,10 @@ true_plot_curve <- tibble::tibble(
     mean_length_young = true_growth_values$mean_length_young,
     mean_length_old = true_growth_values$mean_length_old,
     growth_coefficient = true_growth_values$growth_coefficient,
-    reference_age_for_length_1 =
-      true_growth_values$reference_age_for_length_1,
-    reference_age_for_length_2 =
-      true_growth_values$reference_age_for_length_2
+    reference_age_for_length_young =
+      true_growth_values$reference_age_for_length_young,
+    reference_age_for_length_old =
+      true_growth_values$reference_age_for_length_old
   ),
   curve = "True curve",
   series = "True curve"
@@ -579,10 +579,10 @@ estimated_plot_curve <- tibble::tibble(
     mean_length_young = estimated_growth_values$mean_length_young,
     mean_length_old = estimated_growth_values$mean_length_old,
     growth_coefficient = estimated_growth_values$growth_coefficient,
-    reference_age_for_length_1 =
-      growth_reference_ages$reference_age_for_length_1,
-    reference_age_for_length_2 =
-      growth_reference_ages$reference_age_for_length_2
+    reference_age_for_length_young =
+      growth_reference_ages$reference_age_for_length_young,
+    reference_age_for_length_old =
+      growth_reference_ages$reference_age_for_length_old
   ),
   curve = "Estimated curve",
   series = "Estimated curve"
@@ -601,10 +601,10 @@ predicted_curve <- tibble::tibble(
     mean_length_young = estimated_growth_values$mean_length_young,
     mean_length_old = estimated_growth_values$mean_length_old,
     growth_coefficient = estimated_growth_values$growth_coefficient,
-    reference_age_for_length_1 =
-      growth_reference_ages$reference_age_for_length_1,
-    reference_age_for_length_2 =
-      growth_reference_ages$reference_age_for_length_2
+    reference_age_for_length_young =
+      growth_reference_ages$reference_age_for_length_young,
+    reference_age_for_length_old =
+      growth_reference_ages$reference_age_for_length_old
   )
 )
 

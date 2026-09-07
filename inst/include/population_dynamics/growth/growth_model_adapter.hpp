@@ -71,7 +71,7 @@ class GrowthDerivedObservationBase : public GrowthBase<Type> {
 };
 
 /**
- * @brief VonB growth model adapter implementing the generic growth-derived
+ * @brief von Bertalanffy--Schnute growth model adapter implementing the generic growth-derived
  * observation capability for catch-at-age.
  */
 template <typename Type>
@@ -86,8 +86,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
    */
   enum class LengthReferenceParameterization {
     kEstimatedReferenceLengths = 0,
-    kConstantL1EstimatedL2,
-    kEstimatedL1BelowConstantL2,
+    kConstantLengthYoungEstimatedLengthOld,
+    kEstimatedLengthYoungBelowConstantLengthOld,
     kBothConstant
   };
 
@@ -109,7 +109,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
   void UseConstantMeanLengthYoungWithEstimatedMeanLengthOld(
       Type constant_mean_length_young) {
     length_reference_parameterization_ =
-        LengthReferenceParameterization::kConstantL1EstimatedL2;
+        LengthReferenceParameterization::kConstantLengthYoungEstimatedLengthOld;
     constant_mean_length_young_ = constant_mean_length_young;
     growth_products_prepared_ = false;
   }
@@ -122,8 +122,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
    */
   void UseEstimatedMeanLengthYoungBelowConstantMeanLengthOld(
       Type constant_mean_length_old) {
-    length_reference_parameterization_ =
-        LengthReferenceParameterization::kEstimatedL1BelowConstantL2;
+    length_reference_parameterization_ = LengthReferenceParameterization::
+        kEstimatedLengthYoungBelowConstantLengthOld;
     constant_mean_length_old_ = constant_mean_length_old;
     growth_products_prepared_ = false;
   }
@@ -184,22 +184,22 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @brief Access the first reference-age vector.
    * @return Mutable parameter vector.
    */
-  fims::Vector<Type>& ReferenceAgeForLength1Vector() {
+  fims::Vector<Type>& ReferenceAgeForLengthYoungVector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
     growth_products_prepared_ = false;
-    return reference_age_for_length_1_vector_;
+    return reference_age_for_length_young_vector_;
   }
 
   /**
    * @brief Access the second reference-age vector.
    * @return Mutable parameter vector.
    */
-  fims::Vector<Type>& ReferenceAgeForLength2Vector() {
+  fims::Vector<Type>& ReferenceAgeForLengthOldVector() {
     use_param_vectors_ = true;
     vb_params_set_ = true;
     growth_products_prepared_ = false;
-    return reference_age_for_length_2_vector_;
+    return reference_age_for_length_old_vector_;
   }
 
   /**
@@ -232,27 +232,27 @@ class VonBertalanffySchnuteGrowthModelAdapter
   fims::Vector<Type>& LengthAtAgeSdAtRefAgesVector() {
     use_param_vectors_ = true;
     growth_products_prepared_ = false;
-    return length_at_age_sd_at_ref_ages_vector_;
+    return length_at_age_sd_at_reference_ages_vector_;
   }
 
   /**
-   * @brief Access the log-SD vector for length_at_ref_age_1.
+   * @brief Access the log-SD vector for mean_length_young.
    * @return Mutable parameter vector.
    */
-  fims::Vector<Type>& LogSdLengthAtRefAge1Vector() {
+  fims::Vector<Type>& LogSdLengthAtRefAgeYoungVector() {
     use_param_vectors_ = true;
     growth_products_prepared_ = false;
-    return log_sd_length_at_ref_age_1_vector_;
+    return log_sd_mean_length_young_vector_;
   }
 
   /**
-   * @brief Access the log-SD vector for length_at_ref_age_2.
+   * @brief Access the log-SD vector for mean_length_old.
    * @return Mutable parameter vector.
    */
-  fims::Vector<Type>& LogSdLengthAtRefAge2Vector() {
+  fims::Vector<Type>& LogSdLengthAtRefAgeOldVector() {
     use_param_vectors_ = true;
     growth_products_prepared_ = false;
-    return log_sd_length_at_ref_age_2_vector_;
+    return log_sd_mean_length_old_vector_;
   }
 
   /**
@@ -267,35 +267,35 @@ class VonBertalanffySchnuteGrowthModelAdapter
 
   /**
    * @brief Access the transformed correlation vector for
-   * length_at_ref_age_1 and length_at_ref_age_2.
+   * mean_length_young and mean_length_old.
    * @return Mutable parameter vector.
    */
-  fims::Vector<Type>& LogitCorrLengthAtRefAge1LengthAtRefAge2Vector() {
+  fims::Vector<Type>& LogitCorrLengthAtRefAgeYoungLengthAtRefAgeOldVector() {
     use_param_vectors_ = true;
     growth_products_prepared_ = false;
-    return logit_corr_length_at_ref_age_1_length_at_ref_age_2_vector_;
+    return mean_length_young_mean_length_old_logit_corr_vector_;
   }
 
   /**
    * @brief Access the transformed correlation vector for
-   * length_at_ref_age_1 and growth_coefficient.
+   * mean_length_young and growth_coefficient.
    * @return Mutable parameter vector.
    */
-  fims::Vector<Type>& LogitCorrLengthAtRefAge1KVector() {
+  fims::Vector<Type>& LogitCorrLengthAtRefAgeYoungKVector() {
     use_param_vectors_ = true;
     growth_products_prepared_ = false;
-    return logit_corr_length_at_ref_age_1_growth_coefficient_vector_;
+    return mean_length_young_growth_coefficient_logit_corr_vector_;
   }
 
   /**
    * @brief Access the transformed correlation vector for
-   * length_at_ref_age_2 and growth_coefficient.
+   * mean_length_old and growth_coefficient.
    * @return Mutable parameter vector.
    */
-  fims::Vector<Type>& LogitCorrLengthAtRefAge2KVector() {
+  fims::Vector<Type>& LogitCorrLengthAtRefAgeOldKVector() {
     use_param_vectors_ = true;
     growth_products_prepared_ = false;
-    return logit_corr_length_at_ref_age_2_growth_coefficient_vector_;
+    return mean_length_old_growth_coefficient_logit_corr_vector_;
   }
 
   /**
@@ -353,12 +353,12 @@ class VonBertalanffySchnuteGrowthModelAdapter
       throw std::runtime_error("Non-integer age not supported yet");
     }
     EnsureParamsSet();
-    const Type ref_age_1 = CurrentReferenceAgeForLength1();
-    const Type ref_age_2 = CurrentReferenceAgeForLength2();
-    if (ref_age_2 <= ref_age_1) {
+    const Type ref_age_young = CurrentReferenceAgeForLengthYoung();
+    const Type ref_age_old = CurrentReferenceAgeForLengthOld();
+    if (ref_age_old <= ref_age_young) {
       throw std::runtime_error(
-          "VonBertalanffySchnuteGrowth reference_age_for_length_2 must be > "
-          "reference_age_for_length_1");
+          "VonBertalanffySchnuteGrowth reference_age_for_length_old must be > "
+          "reference_age_for_length_young");
     }
 
     if (!model_) {
@@ -439,17 +439,17 @@ class VonBertalanffySchnuteGrowthModelAdapter
   fims::Vector<Type> mean_length_young_vector_;
   fims::Vector<Type> mean_length_old_vector_;
   fims::Vector<Type> growth_coefficient_vector_;
-  fims::Vector<Type> reference_age_for_length_1_vector_;
-  fims::Vector<Type> reference_age_for_length_2_vector_;
+  fims::Vector<Type> reference_age_for_length_young_vector_;
+  fims::Vector<Type> reference_age_for_length_old_vector_;
   fims::Vector<Type> length_weight_a_vector_;
   fims::Vector<Type> length_weight_b_vector_;
-  fims::Vector<Type> length_at_age_sd_at_ref_ages_vector_;
-  fims::Vector<Type> log_sd_length_at_ref_age_1_vector_;
-  fims::Vector<Type> log_sd_length_at_ref_age_2_vector_;
+  fims::Vector<Type> length_at_age_sd_at_reference_ages_vector_;
+  fims::Vector<Type> log_sd_mean_length_young_vector_;
+  fims::Vector<Type> log_sd_mean_length_old_vector_;
   fims::Vector<Type> log_sd_growth_coefficient_vector_;
-  fims::Vector<Type> logit_corr_length_at_ref_age_1_length_at_ref_age_2_vector_;
-  fims::Vector<Type> logit_corr_length_at_ref_age_1_growth_coefficient_vector_;
-  fims::Vector<Type> logit_corr_length_at_ref_age_2_growth_coefficient_vector_;
+  fims::Vector<Type> mean_length_young_mean_length_old_logit_corr_vector_;
+  fims::Vector<Type> mean_length_young_growth_coefficient_logit_corr_vector_;
+  fims::Vector<Type> mean_length_old_growth_coefficient_logit_corr_vector_;
   bool use_param_vectors_ = false;
   LengthReferenceParameterization length_reference_parameterization_ =
       LengthReferenceParameterization::kEstimatedReferenceLengths;
@@ -472,8 +472,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
     vb.mean_length_young = CurrentMeanLengthYoung();
     vb.mean_length_old = CurrentMeanLengthOld();
     vb.growth_coefficient = CurrentGrowthCoefficient();
-    vb.reference_age_for_length_1 = CurrentReferenceAgeForLength1();
-    vb.reference_age_for_length_2 = CurrentReferenceAgeForLength2();
+    vb.reference_age_for_length_young = CurrentReferenceAgeForLengthYoung();
+    vb.reference_age_for_length_old = CurrentReferenceAgeForLengthOld();
     vb.length_weight_a = CurrentLengthWeightA();
     vb.length_weight_b = CurrentLengthWeightB();
     return vb.evaluate(year, a);
@@ -485,8 +485,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
 
     model_->SetVonBertalanffySchnuteParameters(
         CurrentMeanLengthYoung(), CurrentMeanLengthOld(),
-        CurrentGrowthCoefficient(), CurrentReferenceAgeForLength1(),
-        CurrentReferenceAgeForLength2());
+        CurrentGrowthCoefficient(), CurrentReferenceAgeForLengthYoung(),
+        CurrentReferenceAgeForLengthOld());
     model_->SetLengthWeightParameters(CurrentLengthWeightA(),
                                       CurrentLengthWeightB());
 
@@ -498,7 +498,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
     if (HasStructuredDeltaMethodInputs()) {
       model_->SetGrowthParameterCovariance(
           CurrentMeanLengthYoungVariance(),
-          CurrentMeanLengthYoungLengthAtRefAge2Covariance(),
+          CurrentMeanLengthYoungLengthAtRefAgeOldCovariance(),
           CurrentMeanLengthYoungKCovariance(), CurrentMeanLengthOldVariance(),
           CurrentMeanLengthOldKCovariance(),
           CurrentGrowthCoefficientVariance());
@@ -520,10 +520,12 @@ class VonBertalanffySchnuteGrowthModelAdapter
       case LengthReferenceParameterization::kEstimatedReferenceLengths:
         return CurrentMeanLengthYoungStorage();
 
-      case LengthReferenceParameterization::kConstantL1EstimatedL2:
+      case LengthReferenceParameterization::
+          kConstantLengthYoungEstimatedLengthOld:
         return constant_mean_length_young_;
 
-      case LengthReferenceParameterization::kEstimatedL1BelowConstantL2:
+      case LengthReferenceParameterization::
+          kEstimatedLengthYoungBelowConstantLengthOld:
         return fims_math::inv_logit(static_cast<Type>(0.0),
                                     constant_mean_length_old_,
                                     mean_length_young_vector_[0]);
@@ -538,10 +540,12 @@ class VonBertalanffySchnuteGrowthModelAdapter
   Type CurrentMeanLengthOld() const {
     switch (length_reference_parameterization_) {
       case LengthReferenceParameterization::kEstimatedReferenceLengths:
-      case LengthReferenceParameterization::kConstantL1EstimatedL2:
+      case LengthReferenceParameterization::
+          kConstantLengthYoungEstimatedLengthOld:
         return CurrentMeanLengthOldStorage();
 
-      case LengthReferenceParameterization::kEstimatedL1BelowConstantL2:
+      case LengthReferenceParameterization::
+          kEstimatedLengthYoungBelowConstantLengthOld:
         return constant_mean_length_old_;
 
       case LengthReferenceParameterization::kBothConstant:
@@ -554,11 +558,11 @@ class VonBertalanffySchnuteGrowthModelAdapter
   Type CurrentGrowthCoefficient() const {
     return fims_math::exp(growth_coefficient_vector_[0]);
   }
-  Type CurrentReferenceAgeForLength1() const {
-    return reference_age_for_length_1_vector_[0];
+  Type CurrentReferenceAgeForLengthYoung() const {
+    return reference_age_for_length_young_vector_[0];
   }
-  Type CurrentReferenceAgeForLength2() const {
-    return reference_age_for_length_2_vector_[0];
+  Type CurrentReferenceAgeForLengthOld() const {
+    return reference_age_for_length_old_vector_[0];
   }
   Type CurrentLengthWeightA() const {
     return fims_math::exp(length_weight_a_vector_[0]);
@@ -567,48 +571,48 @@ class VonBertalanffySchnuteGrowthModelAdapter
     return fims_math::exp(length_weight_b_vector_[0]);
   }
   Type CurrentLengthAtAgeSdAtReferenceAge1() const {
-    return fims_math::exp(length_at_age_sd_at_ref_ages_vector_[0]);
+    return fims_math::exp(length_at_age_sd_at_reference_ages_vector_[0]);
   }
   Type CurrentLengthAtAgeSdAtReferenceAge2() const {
-    return fims_math::exp(length_at_age_sd_at_ref_ages_vector_[1]);
+    return fims_math::exp(length_at_age_sd_at_reference_ages_vector_[1]);
   }
-  Type CurrentSdLengthAtRefAge1() const {
-    return fims_math::exp(log_sd_length_at_ref_age_1_vector_[0]);
+  Type CurrentSdLengthAtRefAgeYoung() const {
+    return fims_math::exp(log_sd_mean_length_young_vector_[0]);
   }
 
-  Type CurrentSdLengthAtRefAge2() const {
-    return fims_math::exp(log_sd_length_at_ref_age_2_vector_[0]);
+  Type CurrentSdLengthAtRefAgeOld() const {
+    return fims_math::exp(log_sd_mean_length_old_vector_[0]);
   }
 
   Type CurrentSdGrowthCoefficient() const {
     return fims_math::exp(log_sd_growth_coefficient_vector_[0]);
   }
 
-  Type CurrentCorrLengthAtRefAge1LengthAtRefAge2() const {
+  Type CurrentCorrLengthAtRefAgeYoungLengthAtRefAgeOld() const {
     return fims_math::inv_logit(
         static_cast<Type>(-1.0), static_cast<Type>(1.0),
-        logit_corr_length_at_ref_age_1_length_at_ref_age_2_vector_[0]);
+        mean_length_young_mean_length_old_logit_corr_vector_[0]);
   }
 
-  Type CurrentCorrLengthAtRefAge1K() const {
+  Type CurrentCorrLengthAtRefAgeYoungK() const {
     return fims_math::inv_logit(
         static_cast<Type>(-1.0), static_cast<Type>(1.0),
-        logit_corr_length_at_ref_age_1_growth_coefficient_vector_[0]);
+        mean_length_young_growth_coefficient_logit_corr_vector_[0]);
   }
 
-  Type CurrentCorrLengthAtRefAge2K() const {
+  Type CurrentCorrLengthAtRefAgeOldK() const {
     return fims_math::inv_logit(
         static_cast<Type>(-1.0), static_cast<Type>(1.0),
-        logit_corr_length_at_ref_age_2_growth_coefficient_vector_[0]);
+        mean_length_old_growth_coefficient_logit_corr_vector_[0]);
   }
 
   Type CurrentMeanLengthYoungVariance() const {
-    const Type sd = CurrentSdLengthAtRefAge1();
+    const Type sd = CurrentSdLengthAtRefAgeYoung();
     return sd * sd;
   }
 
   Type CurrentMeanLengthOldVariance() const {
-    const Type sd = CurrentSdLengthAtRefAge2();
+    const Type sd = CurrentSdLengthAtRefAgeOld();
     return sd * sd;
   }
 
@@ -617,53 +621,49 @@ class VonBertalanffySchnuteGrowthModelAdapter
     return sd * sd;
   }
 
-  Type CurrentMeanLengthYoungLengthAtRefAge2Covariance() const {
-    return CurrentCorrLengthAtRefAge1LengthAtRefAge2() *
-           CurrentSdLengthAtRefAge1() * CurrentSdLengthAtRefAge2();
+  Type CurrentMeanLengthYoungLengthAtRefAgeOldCovariance() const {
+    return CurrentCorrLengthAtRefAgeYoungLengthAtRefAgeOld() *
+           CurrentSdLengthAtRefAgeYoung() * CurrentSdLengthAtRefAgeOld();
   }
 
   Type CurrentMeanLengthYoungKCovariance() const {
-    return CurrentCorrLengthAtRefAge1K() * CurrentSdLengthAtRefAge1() *
+    return CurrentCorrLengthAtRefAgeYoungK() * CurrentSdLengthAtRefAgeYoung() *
            CurrentSdGrowthCoefficient();
   }
 
   Type CurrentMeanLengthOldKCovariance() const {
-    return CurrentCorrLengthAtRefAge2K() * CurrentSdLengthAtRefAge2() *
+    return CurrentCorrLengthAtRefAgeOldK() * CurrentSdLengthAtRefAgeOld() *
            CurrentSdGrowthCoefficient();
   }
 
   bool HasInterpolationSdInputs() const {
-    return length_at_age_sd_at_ref_ages_vector_.size() > 0;
+    return length_at_age_sd_at_reference_ages_vector_.size() > 0;
   }
 
   bool HasAnyStructuredDeltaMethodInput() const {
-    return log_sd_length_at_ref_age_1_vector_.size() > 0 ||
-           log_sd_length_at_ref_age_2_vector_.size() > 0 ||
+    return log_sd_mean_length_young_vector_.size() > 0 ||
+           log_sd_mean_length_old_vector_.size() > 0 ||
            log_sd_growth_coefficient_vector_.size() > 0 ||
-           logit_corr_length_at_ref_age_1_length_at_ref_age_2_vector_.size() >
-               0 ||
-           logit_corr_length_at_ref_age_1_growth_coefficient_vector_.size() >
-               0 ||
-           logit_corr_length_at_ref_age_2_growth_coefficient_vector_.size() > 0;
+           mean_length_young_mean_length_old_logit_corr_vector_.size() > 0 ||
+           mean_length_young_growth_coefficient_logit_corr_vector_.size() > 0 ||
+           mean_length_old_growth_coefficient_logit_corr_vector_.size() > 0;
   }
 
   bool HasStructuredDeltaMethodInputs() const {
-    return log_sd_length_at_ref_age_1_vector_.size() > 0 &&
-           log_sd_length_at_ref_age_2_vector_.size() > 0 &&
+    return log_sd_mean_length_young_vector_.size() > 0 &&
+           log_sd_mean_length_old_vector_.size() > 0 &&
            log_sd_growth_coefficient_vector_.size() > 0 &&
-           logit_corr_length_at_ref_age_1_length_at_ref_age_2_vector_.size() >
-               0 &&
-           logit_corr_length_at_ref_age_1_growth_coefficient_vector_.size() >
-               0 &&
-           logit_corr_length_at_ref_age_2_growth_coefficient_vector_.size() > 0;
+           mean_length_young_mean_length_old_logit_corr_vector_.size() > 0 &&
+           mean_length_young_growth_coefficient_logit_corr_vector_.size() > 0 &&
+           mean_length_old_growth_coefficient_logit_corr_vector_.size() > 0;
   }
 
   void EnsureParamsSet() const {
     if (!use_param_vectors_ || mean_length_young_vector_.size() < 1 ||
         mean_length_old_vector_.size() < 1 ||
         growth_coefficient_vector_.size() < 1 ||
-        reference_age_for_length_1_vector_.size() < 1 ||
-        reference_age_for_length_2_vector_.size() < 1 ||
+        reference_age_for_length_young_vector_.size() < 1 ||
+        reference_age_for_length_old_vector_.size() < 1 ||
         length_weight_a_vector_.size() < 1 ||
         length_weight_b_vector_.size() < 1) {
       throw std::runtime_error(
@@ -673,13 +673,13 @@ class VonBertalanffySchnuteGrowthModelAdapter
     if (mean_length_young_vector_.size() != 1 ||
         mean_length_old_vector_.size() != 1 ||
         growth_coefficient_vector_.size() != 1 ||
-        reference_age_for_length_1_vector_.size() != 1 ||
-        reference_age_for_length_2_vector_.size() != 1 ||
+        reference_age_for_length_young_vector_.size() != 1 ||
+        reference_age_for_length_old_vector_.size() != 1 ||
         length_weight_a_vector_.size() != 1 ||
         length_weight_b_vector_.size() != 1) {
       throw std::runtime_error(
           "VonBertalanffySchnuteGrowthModelAdapter currently supports a single "
-          "growth pattern; expected size 1 for VonB and length-weight "
+          "growth pattern; expected size 1 for von Bertalanffy--Schnute and length-weight "
           "parameter vectors");
     }
 
@@ -690,7 +690,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
     if (!has_sd && !has_any_structured_delta) {
       throw std::runtime_error(
           "VonBertalanffySchnuteGrowthModelAdapter requires either "
-          "length_at_age_sd_at_ref_ages or the structured delta-method "
+          "length_at_age_sd_at_reference_ages or the structured delta-method "
           "growth variability inputs");
     }
 
@@ -702,28 +702,25 @@ class VonBertalanffySchnuteGrowthModelAdapter
 
     if (has_sd && has_structured_delta) {
       throw std::runtime_error(
-          "VonB growth adapter requires variability inputs for "
+          "von Bertalanffy--Schnute growth adapter requires variability inputs for "
           "exactly one supported path. Supply either the interpolation "
-          "inputs length_at_age_sd_at_ref_ages or the full delta-method "
+          "inputs length_at_age_sd_at_reference_ages or the full delta-method "
           "variability inputs, but not both");
     }
 
-    if (has_sd && length_at_age_sd_at_ref_ages_vector_.size() != 2) {
+    if (has_sd && length_at_age_sd_at_reference_ages_vector_.size() != 2) {
       throw std::runtime_error(
           "VonBertalanffySchnuteGrowthModelAdapter expected exactly 2 "
-          "length_at_age_sd_at_ref_ages values");
+          "length_at_age_sd_at_reference_ages values");
     }
 
     if (has_structured_delta &&
-        (log_sd_length_at_ref_age_1_vector_.size() != 1 ||
-         log_sd_length_at_ref_age_2_vector_.size() != 1 ||
+        (log_sd_mean_length_young_vector_.size() != 1 ||
+         log_sd_mean_length_old_vector_.size() != 1 ||
          log_sd_growth_coefficient_vector_.size() != 1 ||
-         logit_corr_length_at_ref_age_1_length_at_ref_age_2_vector_.size() !=
-             1 ||
-         logit_corr_length_at_ref_age_1_growth_coefficient_vector_.size() !=
-             1 ||
-         logit_corr_length_at_ref_age_2_growth_coefficient_vector_.size() !=
-             1)) {
+         mean_length_young_mean_length_old_logit_corr_vector_.size() != 1 ||
+         mean_length_young_growth_coefficient_logit_corr_vector_.size() != 1 ||
+         mean_length_old_growth_coefficient_logit_corr_vector_.size() != 1)) {
       throw std::runtime_error(
           "VonBertalanffySchnuteGrowthModelAdapter currently supports a single "
           "structured delta-method variability parameter set; expected "

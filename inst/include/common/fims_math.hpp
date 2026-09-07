@@ -210,7 +210,7 @@ inline const Type lgamma(const Type &x) {
 }
 
 /**
- * @copydoc normalcdf
+ * @copydoc pnorm
  */
 template <class Type>
 inline const Type pnorm(const Type &x, const Type &mean, const Type &sd) {

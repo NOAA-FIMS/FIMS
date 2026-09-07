@@ -221,7 +221,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
       const Type lower = static_cast<Type>(
           population_size_grid_->edges[population_size_grid_->n_bins - 1]);
       return fims_math::pnorm(static_cast<Type>(2.0) * mean_laa - lower,
-                                  mean_laa, sd_laa);
+                              mean_laa, sd_laa);
     }
 
     const Type lower =

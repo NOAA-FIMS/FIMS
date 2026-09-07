@@ -29,7 +29,8 @@ void register_growth(Rcpp::Module& m) {
       .method("get_id", &EWAAGrowthInterface::get_id)
       .method("evaluate", &EWAAGrowthInterface::evaluate);
 
-  Rcpp::class_<VonBertalanffySchnuteGrowthInterface>("VonBertalanffySchnuteGrowth")
+  Rcpp::class_<VonBertalanffySchnuteGrowthInterface>(
+      "VonBertalanffySchnuteGrowth")
       .constructor()
       .field("mean_length_young",
              &VonBertalanffySchnuteGrowthInterface::mean_length_young)
@@ -37,29 +38,34 @@ void register_growth(Rcpp::Module& m) {
              &VonBertalanffySchnuteGrowthInterface::mean_length_old)
       .field("growth_coefficient",
              &VonBertalanffySchnuteGrowthInterface::growth_coefficient)
-      .field("reference_age_for_length_1",
-             &VonBertalanffySchnuteGrowthInterface::reference_age_for_length_1)
-      .field("reference_age_for_length_2",
-             &VonBertalanffySchnuteGrowthInterface::reference_age_for_length_2)
+      .field(
+          "reference_age_for_length_young",
+          &VonBertalanffySchnuteGrowthInterface::reference_age_for_length_young)
+      .field(
+          "reference_age_for_length_old",
+          &VonBertalanffySchnuteGrowthInterface::reference_age_for_length_old)
       .field("length_weight_a",
              &VonBertalanffySchnuteGrowthInterface::length_weight_a)
       .field("length_weight_b",
              &VonBertalanffySchnuteGrowthInterface::length_weight_b)
-      .field("length_at_age_sd_at_ref_ages",
-             &VonBertalanffySchnuteGrowthInterface::length_at_age_sd_at_ref_ages)
-      .field("log_sd_length_at_ref_age_1",
-             &VonBertalanffySchnuteGrowthInterface::log_sd_length_at_ref_age_1)
-      .field("log_sd_length_at_ref_age_2",
-             &VonBertalanffySchnuteGrowthInterface::log_sd_length_at_ref_age_2)
+      .field("length_at_age_sd_at_reference_ages",
+             &VonBertalanffySchnuteGrowthInterface::
+                 length_at_age_sd_at_reference_ages)
+      .field("log_sd_mean_length_young",
+             &VonBertalanffySchnuteGrowthInterface::log_sd_mean_length_young)
+      .field("log_sd_mean_length_old",
+             &VonBertalanffySchnuteGrowthInterface::log_sd_mean_length_old)
       .field("log_sd_growth_coefficient",
              &VonBertalanffySchnuteGrowthInterface::log_sd_growth_coefficient)
-      .field("logit_corr_length_at_ref_age_1_length_at_ref_age_2",
+      .field("mean_length_young_mean_length_old_logit_corr",
              &VonBertalanffySchnuteGrowthInterface::
-                 logit_corr_length_at_ref_age_1_length_at_ref_age_2)
-      .field("logit_corr_length_at_ref_age_1_growth_coefficient",
-             &VonBertalanffySchnuteGrowthInterface::logit_corr_length_at_ref_age_1_growth_coefficient)
-      .field("logit_corr_length_at_ref_age_2_growth_coefficient",
-             &VonBertalanffySchnuteGrowthInterface::logit_corr_length_at_ref_age_2_growth_coefficient)
+                 mean_length_young_mean_length_old_logit_corr)
+      .field("mean_length_young_growth_coefficient_logit_corr",
+             &VonBertalanffySchnuteGrowthInterface::
+                 mean_length_young_growth_coefficient_logit_corr)
+      .field("mean_length_old_growth_coefficient_logit_corr",
+             &VonBertalanffySchnuteGrowthInterface::
+                 mean_length_old_growth_coefficient_logit_corr)
       .field("n_ages", &VonBertalanffySchnuteGrowthInterface::n_ages)
       .method("get_id", &VonBertalanffySchnuteGrowthInterface::get_id)
       .method("evaluate", &VonBertalanffySchnuteGrowthInterface::evaluate)
