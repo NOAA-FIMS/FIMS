@@ -356,57 +356,8 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   )
   set_recruitment_n_years(recruitment, om_input[["nyr"]])
 
-  # turn on estimation of deviations
-  # recruit deviations should enter the model in normal space.
-  # The log is taken in the likelihood calculations
-  if (is.null(random_effects) || random_effects[["recruitment"]] == "log_devs") {
-    # The status is applied in the same call that sets the values, so it is
-    # resolved here rather than in a second pass. When random_effects is NULL
-    # the deviations keep the default status, matching the previous behavior.
-    log_devs_status <- if (
-      "recruitment" %in% names(random_effects) &&
-        random_effects[["recruitment"]] == "log_devs"
-    ) {
-      "random_effects"
-    } else {
-      "assumed_known"
-    }
-    set_variable_vector(
-    recruitment, "log_devs",
-      om_input[["logR.resid"]][2:om_input[["nyr"]]], log_devs_status
-    )
-  }
-
-  if ("recruitment" %in% names(random_effects)) {
-    if (random_effects[["recruitment"]] == "log_r") {
-      recruits_true <- matrix(c(t(om_output[["N.age"]])),
-        om_input[["nyr"]], om_input[["nages"]],
-        byrow = TRUE
-      )[, 1]
-      log_r_values <- if (!estimation_mode) {
-        recruits_true[2:om_input[["nyr"]]]
-      } else {
-        rep(0, om_input[["nyr"]] - 1)
-      }
-      set_variable_vector(
-    recruitment, "log_r",
-        log_r_values, "random_effects"
-      )
-    }
-  }
-
-  if ("selectivity" %in% names(random_effects)) {
-    # The previous version branched on random_effects[["selectivity"]] and set
-    # fields named log_devs, log_sel, and inflection_point$slope on the
-    # selectivity modules. None of those exist on LogisticSelectivityInterface,
-    # which carries only inflection_point and slope, so those branches could
-    # never have run. No test passes a "selectivity" entry. Rather than
-    # translate code that cannot work, this reports the gap.
-    cli::cli_abort(
-      "Random effects on selectivity are not implemented in the interface."
-    )
-  }
-
+  # Set-up recruitment distribution
+  
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
   # taken before the likelihood calculation
@@ -424,37 +375,85 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     rep(0, om_input[["nyr"]] - 1), "assumed_known"
   )
 
-  if ("recruitment" %in% names(random_effects)) {
-    if (random_effects[["recruitment"]] == "log_devs") {
-      set_variable_vector(
-    recruitment_distribution, "log_sd",
-        log(om_input[["logR_sd"]]), "fixed_effects"
-      )
-      set_distribution_links(
-    recruitment_distribution, "random_effects",
-        get_variable_vector_id(recruitment, "log_devs")
-      )
-    }
-    if (random_effects[["recruitment"]] == "log_r") {
-      set_variable_vector(
-    recruitment_distribution, "log_sd",
-        log(1), "fixed_effects"
-      )
-      set_distribution_links(
-    recruitment_distribution, "random_effects",
-        c(
-          get_variable_vector_id(recruitment, "log_r"),
-          get_variable_vector_id(recruitment, "log_expected_recruitment"
-          )
-        )
-      )
-    }
+  # Three scenarios: 1. log_devs and penalized likelihood
+  #                    - recruitment parameterized as log deviations
+  #                    - log_sdr estimation_status: assumed_known
+  #                  2. log_devs and laplace approximation
+  #                    - recruitment parameterized as log deviations
+  #                    - log_sdr estimation_status: fixed_effects
+  #                  3. log_r and laplace approximation
+  #                    - recruitment parameterized as log r
+  #                    - log_sdr estimation_status: fixed_effects
+
+  if (is.null(random_effects)) { # scenario #1
+    set_variable_vector(
+      recruitment, "log_devs",
+      om_input[["logR.resid"]][2:om_input[["nyr"]]], "fixed_effects"
+    )
+    set_variable_vector(
+      recruitment_distribution, "log_sd",
+      log(om_input[["logR_sd"]]), "assumed_known"
+    )
+    set_distribution_links(
+      recruitment_distribution, "random_effects",
+      get_variable_vector_id(recruitment, "log_devs")
+    )
   }
 
-  if (is.null(random_effects)) {
+  if ("recruitment" %in% names(random_effects) & 
+      random_effects[["recruitment"]] == "log_devs") { # scenario #2
+    set_variable_vector(
+      recruitment, "log_devs",
+      om_input[["logR.resid"]][2:om_input[["nyr"]]], "random_effects"
+    )
+    set_variable_vector(
+      recruitment_distribution, "log_sd",
+      log(om_input[["logR_sd"]]), "fixed_effects"
+    )
     set_distribution_links(
-    recruitment_distribution, "random_effects",
+      recruitment_distribution, "random_effects",
       get_variable_vector_id(recruitment, "log_devs")
+    )
+  }
+
+  if ("recruitment"%in% names(random_effects) & 
+        random_effects[["recruitment"]] == "log_r") { # scenario #3
+    recruits_true <- matrix(c(t(om_output[["N.age"]])),
+        om_input[["nyr"]], om_input[["nages"]],
+        byrow = TRUE
+      )[, 1]
+    set_variable_vector(
+      recruitment, "log_r",
+      log(recruits_true), "random_effects"
+    )
+    set_variable_vector(
+      recruitment_distribution, "log_sd",
+      log(om_input[["logR_sd"]]), "fixed_effects"
+    )
+    set_distribution_links(
+      recruitment_distribution, "random_effects",
+      c(
+        get_variable_vector_id(recruitment, "log_r"),
+        get_variable_vector_id(recruitment, "log_expected_recruitment")
+      )
+    )
+  }
+
+  if (!any(c("log_r", "log_devs") %in% random_effects[["recruitment"]])) {
+    cli::cli_abort(
+      "random_effects = c(recruitment = 'log_devs') or random_effects = c(recruitment = 'log_r')."
+    )
+  }
+
+  if ("selectivity" %in% names(random_effects)) {
+    # The previous version branched on random_effects[["selectivity"]] and set
+    # fields named log_devs, log_sel, and inflection_point$slope on the
+    # selectivity modules. None of those exist on LogisticSelectivityInterface,
+    # which carries only inflection_point and slope, so those branches could
+    # never have run. No test passes a "selectivity" entry. Rather than
+    # translate code that cannot work, this reports the gap.
+    cli::cli_abort(
+      "Random effects on selectivity are not implemented in the interface."
     )
   }
 
