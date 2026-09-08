@@ -353,21 +353,7 @@ setup_default_Growth <- function(
   module_type = c("EWAA", "VonBertalanffySchnute")
 ) {
   # Input check
-  available_growth_module_types <- c("EWAA", "VonBertalanffySchnute")
-
-  if (missing(module_type)) {
-    module_type <- available_growth_module_types[[1]]
-  }
-
-  if (
-    !rlang::is_string(module_type) ||
-      !module_type %in% available_growth_module_types
-  ) {
-    cli::cli_abort(c(
-      "Growth module type {.val {module_type}} is not supported.",
-      "i" = "Available Growth module types are: {.val EWAA} and {.val VonBertalanffySchnute}."
-    ))
-  }
+  module_type <- rlang::arg_match(module_type)
 
   if (identical(module_type, "EWAA")) {
     if (!is.null(data)) {

@@ -61,16 +61,19 @@ struct SizeBinMapping {
   }
 
   /**
-   * @brief Build overlap-based rebinning weights from source bins to
+   * @brief Build overlap-based rebin weights from source bins to
    * destination bins.
    * @param source_edges Population biological size-grid edges.
    * @param destination_edges Fleet observation-bin edges.
    * @return Matrix of weights stored as [destination_bin][source_bin].
    *
-   * This helper performs geometric rebinning only. It requires destination
-   * support to cover source support and does not apply higher-level tail
-   * handling such as biological plus-group interpretation or observation-side
-   * compression rules.
+   * Convert a probability distribution from FIMS's internal biological size
+   * grid into the same bins as observed by a fleet using geometric mass
+   * conservation when translating the growth-derived biological size
+   * distribution into the bins actually observed by a fleet. It requires
+   * destination support to cover source support and does not apply
+   * higher-level tail handling such as biological plus-group interpretation or
+   * observation-side compression rules.
    */
   static fims::Vector<fims::Vector<double>> BuildRebinWeights(
       const fims::Vector<double>& source_edges,
@@ -174,10 +177,35 @@ struct SizeBinMapping {
   }
 
   /**
-   * @brief Apply rebinning weights to a source mass vector.
-   * @param weights Overlap weights stored as [destination_bin][source_bin].
-   * @param source_mass Mass on the population biological size bins.
-   * @return Rebinned mass on the fleet observation bins.
+   * @brief Apply a source-to-destination bin mapping to a size-mass vector.
+   *
+   * The source vector contains probability mass or another size-indexed
+   * quantity on the population biological size grid. The weight matrix must
+   * have been created by `BuildRebinWeights()`, so each row corresponds to one
+   * destination bin and each column corresponds to one source bin. For each
+   * destination bin, this function multiplies the source mass in every source
+   * bin by its overlap fraction and sums the results. In matrix notation, the
+   * returned vector is `destination_mass = weights * source_mass`.
+   *
+   * In the growth-derived age-to-length path, the source vector is the
+   * population-level age-to-size probability row and the destination vector is
+   * the fleet-specific age-to-length probability row. The caller may first
+   * use `ExpandDestinationEdgesToCoverSourceRange()` to extend the outer
+   * destination edges, then use `BuildRebinWeights()` to construct the
+   * geometric mapping. This function performs only the weighted aggregation;
+   * it does not validate or normalize the resulting row.
+   *
+   * @param weights Overlap weights stored as
+   *   `[destination_bin][source_bin]`, typically returned by
+   *   `BuildRebinWeights()`.
+   * @param source_mass Mass or probability values indexed by source bin.
+   * @return Values aggregated onto the destination bins, in destination-bin
+   *   order.
+   * @throws std::runtime_error If a weight row has a different number of
+   *   columns than `source_mass`.
+   * @see BuildRebinWeights()
+   * @see ExpandDestinationEdgesToCoverSourceRange()
+   * @see AgeToLengthConversionDerived::BuildMappedFleetAgeToLengthConversionRow()
    */
   template <typename Type>
   static fims::Vector<Type> ApplyRebinWeights(

@@ -50,7 +50,7 @@ test_that("`setup_default_Growth()` returns correct error messages", {
   #' @description Test that unsupported module_type returns expected error.
   expect_error(
     object = setup_default_Growth(module_type = "invalid"),
-    regexp = "Growth module type"
+    regexp = "not \"invalid\""
   )
 
   clear()
