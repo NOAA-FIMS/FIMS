@@ -71,7 +71,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
   skip_if_not(file.exists(testthat::test_path("fixtures", "integration_test_data.RData")))
 
   load(testthat::test_path("fixtures", "integration_test_data.RData"))
-  # Initial value scale for the parameters before validation, 
+  # Initial value scale for the parameters before validation,
   initial_value_scale <- readRDS(testthat::test_path("fixtures", "initial_value_scale.RDS"))
 
   # Set up the model with data

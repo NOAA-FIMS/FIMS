@@ -103,7 +103,7 @@ test_that("catch-at-age model (deterministic MLE with wrappers) recruitment devs
 
 # Estimation test ----
 ## Setup ----
-# Initial value scale for the parameters before validation, 
+# Initial value scale for the parameters before validation,
 initial_value_scale <- readRDS(testthat::test_path("fixtures", "initial_value_scale.RDS"))
 
 ## IO correctness ----

@@ -48,7 +48,7 @@ validate_fims <- function(
   om_input,
   om_output,
   em_input,
-  use_fimsfit = FALSE, 
+  use_fimsfit = FALSE,
   initial_value_scale = 1.0
 ) {
   # Helper function to validate estimates against expected values
@@ -211,7 +211,7 @@ validate_fims <- function(
         estimation_type == "fixed_effects"
       ) |>
       # Restore input values back to true OM values for estimated parameters
-      # so that parameter tolerance/recovery tests evaluate against truth. 
+      # so that parameter tolerance/recovery tests evaluate against truth.
       # See code in tests/testthat/helper-integration-tests-setup-run.R.
       dplyr::mutate(
         input = dplyr::if_else(
@@ -235,8 +235,8 @@ validate_fims <- function(
       # Check if estimate is within 2 standard errors (95% confidence)
       dplyr::mutate(
         absolute_error = abs(estimated - input),
-        # 95% CI bound (1.96 * SE). Rounding matches output precision to prevent false 
-        # test failures on parameters like survey log_q (e.g., absolute_error = 0.1 
+        # 95% CI bound (1.96 * SE). Rounding matches output precision to prevent false
+        # test failures on parameters like survey log_q (e.g., absolute_error = 0.1
         # vs qnorm(0.975) * uncertainty = 0.08467044)
         rounded_confidence_threshold = round(
           qnorm(0.975) * uncertainty,

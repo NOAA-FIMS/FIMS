@@ -296,7 +296,7 @@ prepare_test_data <- function() {
     file = testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"),
     compress = FALSE
   )
-    
+
   # Run FIMS using the setup_and_run_FIMS_with_wrappers function
   fit_age_length_comp <- setup_and_run_FIMS_with_wrappers(
     iter_id = iter_id,
