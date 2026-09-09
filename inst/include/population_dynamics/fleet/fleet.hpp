@@ -9,12 +9,12 @@
 #ifndef FIMS_POPULATION_DYNAMICS_FLEET_HPP
 #define FIMS_POPULATION_DYNAMICS_FLEET_HPP
 
-#include "../../common/data_object.hpp"
-#include "../../common/fims_vector.hpp"
-#include "../../common/model_object.hpp"
-#include "../../distributions/distributions.hpp"
-#include "../selectivity/selectivity.hpp"
-#include "../age_to_length_conversion/functors/age_to_length_conversion_base.hpp"
+#include "common/data_object.hpp"
+#include "common/fims_vector.hpp"
+#include "common/model_object.hpp"
+#include "distributions/distributions.hpp"
+#include "population_dynamics/selectivity/selectivity.hpp"
+#include "population_dynamics/age_to_length_conversion/functors/base.hpp"
 
 namespace fims_popdy {
 

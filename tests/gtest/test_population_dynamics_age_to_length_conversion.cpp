@@ -8,9 +8,9 @@
 
 #include "common/fims_math.hpp"
 #include "common/fims_vector.hpp"
-#include "population_dynamics/age_to_length_conversion/functors/age_to_length_conversion_fixed.hpp"
-#include "population_dynamics/age_to_length_conversion/functors/age_to_length_conversion_derived.hpp"
-#include "population_dynamics/age_to_length_conversion/functors/age_to_length_conversion_runtime.hpp"
+#include "population_dynamics/age_to_length_conversion/functors/fixed.hpp"
+#include "population_dynamics/age_to_length_conversion/functors/derived.hpp"
+#include "population_dynamics/age_to_length_conversion/functors/runtime.hpp"
 #include "population_dynamics/fleet/fleet.hpp"
 #include "population_dynamics/growth/growth_model_adapter.hpp"
 #include "population_dynamics/growth/growth_products.hpp"

@@ -12,9 +12,9 @@
 #include <algorithm>
 #include <cmath>
 
-#include "../../../common/fims_math.hpp"
-#include "../../../common/fims_vector.hpp"
-#include "../../../population_dynamics/growth/growth.hpp"
+#include "common/fims_math.hpp"
+#include "common/fims_vector.hpp"
+#include "population_dynamics/growth/growth.hpp"
 #include "rcpp_interface_base.hpp"
 
 /**

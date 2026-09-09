@@ -15,7 +15,7 @@
 #include <stdexcept>
 
 #include "fishery_model_base.hpp"
-#include "../../population_dynamics/age_to_length_conversion/functors/age_to_length_conversion_runtime.hpp"
+#include "population_dynamics/age_to_length_conversion/functors/runtime.hpp"
 
 /* Dictionary block for shared parameter snippet documentations.
  * Referenced in function docs via @snippet{doc} this snippet_id.

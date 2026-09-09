@@ -4,7 +4,7 @@
 
 #include "../../inst/include/models/functors/catch_at_age.hpp"
 #include "population/population.hpp"
-#include "population_dynamics/age_to_length_conversion/functors/age_to_length_conversion_fixed.hpp"
+#include "population_dynamics/age_to_length_conversion/functors/fixed.hpp"
 #include "test_stubs.hpp"
 
 namespace {

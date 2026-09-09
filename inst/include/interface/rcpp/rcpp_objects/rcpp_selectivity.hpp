@@ -9,7 +9,7 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_SELECTIVITY_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_SELECTIVITY_HPP
 
-#include "../../../population_dynamics/selectivity/selectivity.hpp"
+#include "population_dynamics/selectivity/selectivity.hpp"
 #include "rcpp_interface_base.hpp"
 
 /**

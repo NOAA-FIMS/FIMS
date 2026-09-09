@@ -1,5 +1,5 @@
 /**
- * @file age_to_length_conversion_base.hpp
+ * @file base.hpp
  * @brief Declares the AgeToLengthConversionBase class which is the base class
  * for all age-length key functors.
  * @details Defines guards for the age-to-length conversion module outline to
@@ -13,8 +13,8 @@
 
 #include <cstddef>
 
-#include "../../../common/fims_vector.hpp"
-#include "../../../common/model_object.hpp"
+#include "common/fims_vector.hpp"
+#include "common/model_object.hpp"
 
 namespace fims_popdy {
 
