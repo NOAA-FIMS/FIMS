@@ -71,8 +71,8 @@ class GrowthDerivedObservationBase : public GrowthBase<Type> {
 };
 
 /**
- * @brief von Bertalanffy--Schnute growth model adapter implementing the generic growth-derived
- * observation capability for catch-at-age.
+ * @brief von Bertalanffy--Schnute growth model adapter implementing the generic
+ * growth-derived observation capability for catch-at-age.
  */
 template <typename Type>
 class VonBertalanffySchnuteGrowthModelAdapter
@@ -679,7 +679,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
         length_weight_b_vector_.size() != 1) {
       throw std::runtime_error(
           "VonBertalanffySchnuteGrowthModelAdapter currently supports a single "
-          "growth pattern; expected size 1 for von Bertalanffy--Schnute and length-weight "
+          "growth pattern; expected size 1 for von Bertalanffy--Schnute and "
+          "length-weight "
           "parameter vectors");
     }
 
@@ -702,7 +703,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
 
     if (has_sd && has_structured_delta) {
       throw std::runtime_error(
-          "von Bertalanffy--Schnute growth adapter requires variability inputs for "
+          "von Bertalanffy--Schnute growth adapter requires variability inputs "
+          "for "
           "exactly one supported path. Supply either the interpolation "
           "inputs length_at_age_sd_at_reference_ages or the full delta-method "
           "variability inputs, but not both");

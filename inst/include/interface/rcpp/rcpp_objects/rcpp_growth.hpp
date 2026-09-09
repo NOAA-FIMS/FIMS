@@ -734,13 +734,15 @@ class VonBertalanffySchnuteGrowthInterface
 
     if (has_any_structured_delta && !has_structured_delta) {
       Rcpp::stop(
-          "von Bertalanffy--Schnute growth requires all six structured delta-method "
+          "von Bertalanffy--Schnute growth requires all six structured "
+          "delta-method "
           "variability inputs when using that path");
     }
 
     if (has_sd && has_structured_delta) {
       Rcpp::stop(
-          "von Bertalanffy--Schnute growth requires variability inputs for exactly one "
+          "von Bertalanffy--Schnute growth requires variability inputs for "
+          "exactly one "
           "supported path. Supply either the interpolation inputs "
           "length_at_age_sd_at_reference_ages or the full delta-method "
           "variability inputs, but not both");
