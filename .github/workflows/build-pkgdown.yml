@@ -59,7 +59,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
+          extra-packages: any::pkgdown, local::., any::fs, any::jsonlite, any::yaml, any::purrr, any::stringr
           needs: website
 
       - name: build pkgdown
@@ -88,6 +88,9 @@ jobs:
         run: |
           mkdir -p docs/doxygen
           cp -a doxygen/html/. docs/doxygen/
+
+      - name: Build vignette JSON
+        run: Rscript .github/build_vignette_index.R
 
       - name: Check local site links
         id: local-links

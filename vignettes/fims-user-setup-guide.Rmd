@@ -5,6 +5,8 @@ vignette: >
   %\VignetteIndexEntry{FIMS User Setup Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+level: "intermediate-user"
+summary: "Set up a standardized FIMS environment using Google Workstations, Codespaces, WSL, or on your local machine"
 ---
 
 <div id="expand-collapse-buttons" style="margin-bottom: 20px;">

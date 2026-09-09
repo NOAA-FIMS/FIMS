@@ -5,6 +5,8 @@ vignette: >
   %\VignetteIndexEntry{Intro to Rcpp}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+level: "power-user"
+summary: "Intro training to Rcpp for FIMS development"
 ---
 
 ```{r setup, include=FALSE}
