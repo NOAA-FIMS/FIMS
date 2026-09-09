@@ -1,18 +1,4 @@
 ## usethis namespace: start
-#' @export AgeComp
-#' @export AgeSpecificSelectivity
-#' @export BevertonHoltRecruitment
-#' @export LogDevsRecruitmentProcess
-#' @export LogRRecruitmentProcess
-#' @export CatchAtAge
-#' @export clear
-#' @export CreateTMBModel
-#' @export DlnormDistribution
-#' @export DmultinomDistribution
-#' @export DnormDistribution
-#' @export DoubleLogisticSelectivity
-#' @export EWAAGrowth
-#' @export Fleet
 #' @export set_fixed
 #' @export get_fixed
 #' @export set_random
@@ -25,22 +11,12 @@
 #' @export get_random
 #' @export inv_logit
 #' @export logit
-#' @export Catch
-#' @export Index
-#' @export LengthComp
 #' @export log_error
 #' @export log_info
 #' @export log_warning
-#' @export LogisticMaturity
-#' @export LogisticSelectivity
 #' @export Variable
 #' @export VariableVector
-#' @export Population
-#' @export RealVector
 #' @export set_log_throw_on_error
-#' @export SharedInt
-#' @export SharedReal
-#' @export SharedString
 #' @import methods
 #' @import stats
 #' @importFrom rlang .data

@@ -13,6 +13,37 @@
 #include "rcpp_interface_base.hpp"
 
 /**
+ * @brief The selectivity forms FIMS can build.
+ *
+ * @details The create_selectivity_() function takes one of these names from R
+ * and builds the matching class: "Logistic" builds a
+ * LogisticSelectivityInterface, "DoubleLogistic" builds a
+ * DoubleLogisticSelectivityInterface. SelectivityInterfaceBase is never built
+ * on its own; it only holds what all selectivity forms have in common.
+ *
+ * These are an enum rather than plain strings so that every place in the C++
+ * code that acts on a selectivity form has to name one of these values, which
+ * makes it harder to add a form and forget to handle it somewhere.
+ */
+enum class SelectivityType : uint8_t {
+  logistic = 0,
+  double_logistic = 1,
+  age_specific = 2
+};
+
+/**
+ * @brief Convert a type name supplied from R to a SelectivityType.
+ */
+inline SelectivityType SelectivityTypeFromString(const std::string &name) {
+  if (name == "Logistic") return SelectivityType::logistic;
+  if (name == "DoubleLogistic") return SelectivityType::double_logistic;
+  if (name == "AgeSpecific") return SelectivityType::age_specific;
+  throw std::invalid_argument(
+      "Invalid type: '" + name +
+      "'. Valid options are: Logistic, DoubleLogistic, AgeSpecific.");
+}
+
+/**
  * @brief Rcpp interface that serves as the parent class for Rcpp selectivity
  * interfaces. This type should be inherited and not called from R directly.
  */
@@ -26,42 +57,24 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The local id of the SelectivityInterfaceBase object.
    */
   uint32_t id;
-  /**
-   * @brief The map associating the IDs of SelectivityInterfaceBase to the
-   * objects. This is a live object, which is an object that has been created
-   * and lives in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
-      live_objects;
 
   /**
    * @brief The constructor.
    */
-  SelectivityInterfaceBase() {
-    this->id = SelectivityInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    SelectivityInterfaceBase */
-    // SelectivityInterfaceBase::live_objects[this->id] = this;
-  }
+  SelectivityInterfaceBase() { this->id = SelectivityInterfaceBase::id_g++; }
 
   /**
-   * @brief Construct a new Selectivity Interface Base object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  SelectivityInterfaceBase(const SelectivityInterfaceBase &other)
-      : id(other.id) {}
+  SelectivityInterfaceBase(const SelectivityInterfaceBase &) = delete;
+  SelectivityInterfaceBase &operator=(const SelectivityInterfaceBase &) = delete;
 
   /**
    * @brief The destructor.
    */
   virtual ~SelectivityInterfaceBase() {}
 
-  /**
-   * @brief Get the ID for the child selectivity interface objects to inherit.
-   */
-  virtual uint32_t get_id() = 0;
-
+    
   /**
    * @brief A method for each child selectivity interface object to inherit so
    * each selectivity option can have an evaluate() function.
@@ -88,22 +101,13 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LogisticSelectivityInterface() : SelectivityInterfaceBase() {
-    SelectivityInterfaceBase::live_objects[this->id] =
-        std::make_shared<LogisticSelectivityInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        SelectivityInterfaceBase::live_objects[this->id]);
-  }
+  LogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
   /**
-   * @brief Construct a new Logistic Selectivity Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  LogisticSelectivityInterface(const LogisticSelectivityInterface &other)
-      : SelectivityInterfaceBase(other),
-        inflection_point(other.inflection_point),
-        slope(other.slope) {}
+  LogisticSelectivityInterface(const LogisticSelectivityInterface &) = delete;
+  LogisticSelectivityInterface &operator=(const LogisticSelectivityInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -115,6 +119,15 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
+   */
+  virtual VariableVector *get_variable_vector(const std::string &name) {
+    if (name == "inflection_point") return &this->inflection_point;
+    if (name == "slope") return &this->slope;
+    return nullptr;
+  }
 
   /**
    * @brief Evaluate selectivity using the logistic function.
@@ -161,20 +174,12 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
-        if (this->inflection_point[i].estimation_type_m.get() == "constant") {
-          this->inflection_point[i].final_value_m =
-              this->inflection_point[i].initial_value_m;
-        } else {
-          this->inflection_point[i].final_value_m = sel->inflection_point[i];
-        }
+        set_final_value_by_estimation_status(this->inflection_point[i],
+                                             sel->inflection_point[i]);
       }
 
       for (size_t i = 0; i < slope.size(); i++) {
-        if (this->slope[i].estimation_type_m.get() == "constant") {
-          this->slope[i].final_value_m = this->slope[i].initial_value_m;
-        } else {
-          this->slope[i].final_value_m = sel->slope[i];
-        }
+        set_final_value_by_estimation_status(this->slope[i], sel->slope[i]);
       }
     }
   }
@@ -232,22 +237,12 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     for (size_t i = 0; i < this->inflection_point.size(); i++) {
       selectivity->inflection_point[i] =
           this->inflection_point[i].initial_value_m;
-      if (this->inflection_point[i].estimation_type_m.get() ==
-          "fixed_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".inflection_point."
-           << this->inflection_point[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(selectivity->inflection_point[i]);
-      }
-      if (this->inflection_point[i].estimation_type_m.get() ==
-          "random_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".inflection_point."
-           << this->inflection_point[i].id_m;
-        info->RegisterRandomEffect(selectivity->inflection_point[i]);
-        info->RegisterRandomEffectName(ss.str());
-      }
+      ss.str("");
+      ss << "Selectivity." << this->id << ".inflection_point."
+         << this->inflection_point[i].id_m;
+      register_parameter_if_estimable(
+          selectivity->inflection_point[i],
+          this->inflection_point[i].estimation_status_m, ss.str());
     }
     info->variable_map[this->inflection_point.id_m] =
         &(selectivity)->inflection_point;
@@ -255,18 +250,10 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     selectivity->slope.resize(this->slope.size());
     for (size_t i = 0; i < this->slope.size(); i++) {
       selectivity->slope[i] = this->slope[i].initial_value_m;
-      if (this->slope[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".slope." << this->slope[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(selectivity->slope[i]);
-      }
-      if (this->slope[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".slope." << this->slope[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(selectivity->slope[i]);
-      }
+      ss.str("");
+      ss << "Selectivity." << this->id << ".slope." << this->slope[i].id_m;
+      register_parameter_if_estimable(
+          selectivity->slope[i], this->slope[i].estimation_status_m, ss.str());
     }
     info->variable_map[this->slope.id_m] = &(selectivity)->slope;
 
@@ -306,30 +293,29 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   VariableVector
       slope_desc; /**< the width of the curve at the inflection_point */
 
-  DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {
-    SelectivityInterfaceBase::live_objects[this->id] =
-        std::make_shared<DoubleLogisticSelectivityInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        SelectivityInterfaceBase::live_objects[this->id]);
-  }
+  DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {}
 
   /**
-   * @brief Construct a new Double Logistic Selectivity Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  DoubleLogisticSelectivityInterface(
-      const DoubleLogisticSelectivityInterface &other)
-      : SelectivityInterfaceBase(other),
-        inflection_point_asc(other.inflection_point_asc),
-        slope_asc(other.slope_asc),
-        inflection_point_desc(other.inflection_point_desc),
-        slope_desc(other.slope_desc) {}
+  DoubleLogisticSelectivityInterface(const DoubleLogisticSelectivityInterface &) = delete;
+  DoubleLogisticSelectivityInterface &operator=(const DoubleLogisticSelectivityInterface &) = delete;
 
   virtual ~DoubleLogisticSelectivityInterface() {}
 
   /** @brief returns the id for the double logistic selectivity interface */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
+   */
+  virtual VariableVector *get_variable_vector(const std::string &name) {
+    if (name == "inflection_point_asc") return &this->inflection_point_asc;
+    if (name == "slope_asc") return &this->slope_asc;
+    if (name == "inflection_point_desc") return &this->inflection_point_desc;
+    if (name == "slope_desc") return &this->slope_desc;
+    return nullptr;
+  }
 
   /** @brief evaluate the double logistic selectivity function
    *   @param x  The independent variable in the logistic function (e.g., age or
@@ -382,42 +368,23 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
               fims_popdy::DoubleLogisticSelectivity<double>>(it->second);
 
       for (size_t i = 0; i < inflection_point_asc.size(); i++) {
-        if (this->inflection_point_asc[i].estimation_type_m.get() ==
-            "constant") {
-          this->inflection_point_asc[i].final_value_m =
-              this->inflection_point_asc[i].initial_value_m;
-        } else {
-          this->inflection_point_asc[i].final_value_m =
-              sel->inflection_point_asc[i];
-        }
+        set_final_value_by_estimation_status(this->inflection_point_asc[i],
+                                             sel->inflection_point_asc[i]);
       }
 
       for (size_t i = 0; i < slope_asc.size(); i++) {
-        if (this->slope_asc[i].estimation_type_m.get() == "constant") {
-          this->slope_asc[i].final_value_m = this->slope_asc[i].initial_value_m;
-        } else {
-          this->slope_asc[i].final_value_m = sel->slope_asc[i];
-        }
+        set_final_value_by_estimation_status(this->slope_asc[i],
+                                             sel->slope_asc[i]);
       }
 
       for (size_t i = 0; i < inflection_point_desc.size(); i++) {
-        if (this->inflection_point_desc[i].estimation_type_m.get() ==
-            "constant") {
-          this->inflection_point_desc[i].final_value_m =
-              this->inflection_point_desc[i].initial_value_m;
-        } else {
-          this->inflection_point_desc[i].final_value_m =
-              sel->inflection_point_desc[i];
-        }
+        set_final_value_by_estimation_status(this->inflection_point_desc[i],
+                                             sel->inflection_point_desc[i]);
       }
 
       for (size_t i = 0; i < slope_desc.size(); i++) {
-        if (this->slope_desc[i].estimation_type_m.get() == "constant") {
-          this->slope_desc[i].final_value_m =
-              this->slope_desc[i].initial_value_m;
-        } else {
-          this->slope_desc[i].final_value_m = sel->slope_desc[i];
-        }
+        set_final_value_by_estimation_status(this->slope_desc[i],
+                                             sel->slope_desc[i]);
       }
     }
   }
@@ -491,22 +458,13 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     for (size_t i = 0; i < this->inflection_point_asc.size(); i++) {
       selectivity->inflection_point_asc[i] =
           this->inflection_point_asc[i].initial_value_m;
-      if (this->inflection_point_asc[i].estimation_type_m.get() ==
-          "fixed_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".inflection_point_asc."
-           << this->inflection_point_asc[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(selectivity->inflection_point_asc[i]);
-      }
-      if (this->inflection_point_asc[i].estimation_type_m.get() ==
-          "random_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".inflection_point_asc."
-           << this->inflection_point_asc[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(selectivity->inflection_point_asc[i]);
-      }
+      ss.str("");
+      ss << "Selectivity." << this->id << ".inflection_point_asc."
+         << this->inflection_point_asc[i].id_m;
+      register_parameter_if_estimable(
+          selectivity->inflection_point_asc[i],
+          this->inflection_point_asc[i].estimation_status_m,
+          ss.str());
     }
     info->variable_map[this->inflection_point_asc.id_m] =
         &(selectivity)->inflection_point_asc;
@@ -514,21 +472,12 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     selectivity->slope_asc.resize(this->slope_asc.size());
     for (size_t i = 0; i < this->slope_asc.size(); i++) {
       selectivity->slope_asc[i] = this->slope_asc[i].initial_value_m;
-
-      if (this->slope_asc[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".slope_asc."
-           << this->slope_asc[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(selectivity->slope_asc[i]);
-      }
-      if (this->slope_asc[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".slope_asc."
-           << this->slope_asc[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(selectivity->slope_asc[i]);
-      }
+      ss.str("");
+      ss << "Selectivity." << this->id << ".slope_asc."
+         << this->slope_asc[i].id_m;
+      register_parameter_if_estimable(
+          selectivity->slope_asc[i], this->slope_asc[i].estimation_status_m,
+          ss.str());
     }
     info->variable_map[this->slope_asc.id_m] = &(selectivity)->slope_asc;
 
@@ -537,23 +486,13 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     for (size_t i = 0; i < this->inflection_point_desc.size(); i++) {
       selectivity->inflection_point_desc[i] =
           this->inflection_point_desc[i].initial_value_m;
-
-      if (this->inflection_point_desc[i].estimation_type_m.get() ==
-          "fixed_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".inflection_point_desc."
-           << this->inflection_point_desc[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(selectivity->inflection_point_desc[i]);
-      }
-      if (this->inflection_point_desc[i].estimation_type_m.get() ==
-          "random_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".inflection_point_desc."
-           << this->inflection_point_desc[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(selectivity->inflection_point_desc[i]);
-      }
+      ss.str("");
+      ss << "Selectivity." << this->id << ".inflection_point_desc."
+         << this->inflection_point_desc[i].id_m;
+      register_parameter_if_estimable(
+          selectivity->inflection_point_desc[i],
+          this->inflection_point_desc[i].estimation_status_m,
+          ss.str());
     }
     info->variable_map[this->inflection_point_desc.id_m] =
         &(selectivity)->inflection_point_desc;
@@ -561,23 +500,13 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     selectivity->slope_desc.resize(this->slope_desc.size());
     for (size_t i = 0; i < this->slope_desc.size(); i++) {
       selectivity->slope_desc[i] = this->slope_desc[i].initial_value_m;
-
-      if (this->slope_desc[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".slope_desc."
-           << this->slope_desc[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(selectivity->slope_desc[i]);
-      }
-      if (this->slope_desc[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".slope_desc."
-           << this->slope_desc[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(selectivity->slope_desc[i]);
-      }
+      ss.str("");
+      ss << "Selectivity." << this->id << ".slope_desc."
+         << this->slope_desc[i].id_m;
+      register_parameter_if_estimable(
+          selectivity->slope_desc[i], this->slope_desc[i].estimation_status_m,
+          ss.str());
     }
-
     info->variable_map[this->slope_desc.id_m] = &(selectivity)->slope_desc;
 
     // add to Information
@@ -610,15 +539,15 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
   /**
    * @brief The number of age bins.
    */
-  SharedInt n_ages = 1;
+  int n_ages = 1;
   /**
    * @brief Vector of ages.
    */
-  RealVector ages;
+  fims::Vector<double> ages;
   /**
    * @brief Minimum observed age
    */
-  SharedInt min_age = 1;
+  int min_age = 1;
   /**
    * @brief Age-specific selectivity parameter values.
    */
@@ -627,24 +556,14 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
   /**
    * @brief The constructor.
    */
-  AgeSpecificSelectivityInterface() : SelectivityInterfaceBase() {
-    SelectivityInterfaceBase::live_objects[this->id] =
-        std::make_shared<AgeSpecificSelectivityInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        SelectivityInterfaceBase::live_objects[this->id]);
-  }
+  AgeSpecificSelectivityInterface() : SelectivityInterfaceBase() {}
+  AgeSpecificSelectivityInterface(const AgeSpecificSelectivityInterface &) = delete;
+  AgeSpecificSelectivityInterface &operator=(const AgeSpecificSelectivityInterface &) = delete;
 
-  /**
-   * @brief Construct a new Selectivity-at-age Interface object
-   *
-   * @param other
-   */
-  AgeSpecificSelectivityInterface(const AgeSpecificSelectivityInterface &other)
-      : SelectivityInterfaceBase(other),
-        n_ages(other.n_ages),
-        ages(other.ages),
-        min_age(other.min_age),
-        logit_sel_at_age(other.logit_sel_at_age) {}
+  /** @copydoc FIMSRcppInterfaceBase::get_variable_vector */
+  VariableVector *get_variable_vector(const std::string &name) override {
+    return name == "logit_sel_at_age" ? &logit_sel_at_age : nullptr;
+  }
 
   /**
    * @brief The destructor.
@@ -664,12 +583,12 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
    */
   virtual double evaluate(double x) {
     fims_popdy::AgeSpecificSelectivity<double> AgeSpecificSel;
-    AgeSpecificSel.n_ages = this->n_ages.get();
+    AgeSpecificSel.n_ages = this->n_ages;
     if (this->ages.size() > 0) {
       AgeSpecificSel.min_age = static_cast<size_t>(*std::min_element(
-          this->ages.storage_m->begin(), this->ages.storage_m->end()));
+          this->ages.begin(), this->ages.end()));
     } else {
-      AgeSpecificSel.min_age = static_cast<size_t>(this->min_age.get());
+      AgeSpecificSel.min_age = static_cast<size_t>(this->min_age);
     }
     AgeSpecificSel.logit_sel_at_age.resize(this->logit_sel_at_age.size());
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
@@ -709,7 +628,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
           std::dynamic_pointer_cast<fims_popdy::AgeSpecificSelectivity<double>>(
               it->second);
       for (size_t i = 0; i < logit_sel_at_age.size(); i++) {
-        if (this->logit_sel_at_age[i].estimation_type_m.get() == "constant") {
+        if (this->logit_sel_at_age[i].estimation_status_m == fims_enum::EstimationStatus::kAssumedKnown) {
           this->logit_sel_at_age[i].final_value_m =
               this->logit_sel_at_age[i].initial_value_m;
         } else {
@@ -739,7 +658,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [\"n_ages\"],\n";
-    ss << "  \"dimensions\": [" << this->n_ages.get() << "]\n},\n";
+    ss << "  \"dimensions\": [" << this->n_ages << "]\n},\n";
     ss << "   \"values\":" << this->logit_sel_at_age << "}]\n";
 
     ss << "}";
@@ -759,23 +678,23 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     std::stringstream ss;
     // set relative info
     selectivity->id = this->id;
-    selectivity->n_ages = this->n_ages.get();
-    selectivity->min_age = *std::min_element(this->ages.storage_m->begin(),
-                                             this->ages.storage_m->end());
+    selectivity->n_ages = this->n_ages;
+    selectivity->min_age = this->ages.size() ? *std::min_element(this->ages.begin(),
+                                             this->ages.end()) : this->min_age;
     selectivity->logit_sel_at_age.resize(this->logit_sel_at_age.size());
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
       selectivity->logit_sel_at_age[i] =
           this->logit_sel_at_age[i].initial_value_m;
-      if (this->logit_sel_at_age[i].estimation_type_m.get() ==
-          "fixed_effects") {
+      if (this->logit_sel_at_age[i].estimation_status_m ==
+          fims_enum::EstimationStatus::kFixedEffects) {
         ss.str("");
         ss << "Selectivity." << this->id << ".logit_sel_at_age."
            << this->logit_sel_at_age[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->logit_sel_at_age[i]);
       }
-      if (this->logit_sel_at_age[i].estimation_type_m.get() ==
-          "random_effects") {
+      if (this->logit_sel_at_age[i].estimation_status_m ==
+          fims_enum::EstimationStatus::kRandomEffects) {
         ss.str("");
         ss << "Selectivity." << this->id << ".logit_sel_at_age."
            << this->logit_sel_at_age[i].id_m;

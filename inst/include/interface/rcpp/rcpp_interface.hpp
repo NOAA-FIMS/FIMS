@@ -48,8 +48,8 @@ void init_logging() {
  *   settings are cleared and ready for a new model run. This step is essential
  *   for both initializing the model structure and avoiding conflicts from
  *   previous runs.
- * - It iterates over all registered FIMS interface objects and adds them to
- *   the TMB model context.
+ * - It iterates over the list of module interface pointers passed in from R 
+ *   and call's each interfaces' `add_to_fims_tmb()` function. 
  * - After all of the objects are registered, it calls
  *   fims_info::Information::CreateModel() and
  *   fims_info::Information::CheckModel() on the base fims_info::Information
@@ -69,10 +69,23 @@ void init_logging() {
  * @see <a href =
  * "https://noaa-fims.github.io/FIMS/reference/initialize_fims.html"
  * target="_blank">`initialize_fims()`</a>
- * @return A boolean is returned, where true indicates that the model was
- * successfully created.
+ *
+ * @param xptr_list List of Rcpp::XPtrs that point to the modules being used
+ * in a particular model run, each an Rcpp::XPtr<SharedBase> as produced by the 
+ * `*_to_fims_xptr_()` functions. The R wrapper `CreateTMBModel()` passes the 
+ * package registry here, so users do not assemble this list by hand.
+ * @return A handle identifying this build of the model. It is a plain number
+ * that increases with every successful call, so two handles are equal only if
+ * they came from the same build. Failure is reported by throwing, not by the
+ * return value, so a returned handle always means the model was created.
  */
-bool CreateTMBModel() {
+uint32_t CreateTMBModel(Rcpp::List xptr_list) {
+  // Identifies this build of the model. Incremented on every successful call
+  // and never rewound, so a handle taken from one build never matches a later
+  // one -- which is what lets R tell that a TMB objective function belongs to
+  // a model that has since been rebuilt. 
+  static uint32_t model_handle = 0;
+
   init_logging();
 
   // clear first
@@ -85,9 +98,28 @@ bool CreateTMBModel() {
       fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
   info->Clear();
 
-  for (size_t i = 0; i < FIMSRcppInterfaceBase::fims_interface_objects.size();
-       i++) {
-    FIMSRcppInterfaceBase::fims_interface_objects[i]->add_to_fims_tmb();
+  // Every entry is an XPtr<SharedBase>, so add_to_fims_tmb() reaches the right
+  // derived implementation without this loop knowing which module family it is
+  // holding. The list comes from the R-side registry, which collects each
+  // module's base pointer as it is created.
+  for (int i = 0; i < xptr_list.size(); i++) {
+    SEXP element = xptr_list[i];
+    if (Rf_isNull(element) || TYPEOF(element) != EXTPTRSXP) {
+      Rcpp::stop("Model component " + std::to_string(i + 1) +
+                 " is not a module pointer.");
+    }
+    Rcpp::XPtr<SharedBase> xp(element);
+    if (!xp || !(*xp)) {
+      Rcpp::stop("Model component " + std::to_string(i + 1) +
+                 " is an empty pointer. This usually means clear() was called "
+                 "while the module was still held in R.");
+    }
+    try {
+      (*xp)->add_to_fims_tmb();
+    } catch (const std::exception& error) {
+      Rcpp::stop("Failed to register model component " +
+                 std::to_string(i + 1) + ": " + error.what());
+    }
   }
 
   // base model
@@ -100,7 +132,7 @@ bool CreateTMBModel() {
   std::shared_ptr<fims_model::Model<TMB_FIMS_REAL_TYPE>> m0 =
       fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-  return true;
+  return ++model_handle;
 }
 
 /* Dictionary block for shared documentation.
@@ -240,97 +272,41 @@ void clear_internal() {
 }
 
 /**
- * @brief Clears all FIMS pointers and resets model state.
+ * @brief Reset the model so the next model starts from a cleared memory state.
+ *
+ * @details Rewind ID counters to one and reset the TMB information singletons
+ * so the next model is not built on top of the previous one. This function is
+ * called by the R facing clean() wrapper, which is also responsible for clearing
+ * the interface modules. 
+ *  
  * @param get_error_msg If true, retains a lingering pointer to trigger
  * dangling pointer diagnostics. Should only be set to true via
  * test_clear_with_leak_check().
  */
 void clear_impl(bool get_error_msg) {
-  // rcpp_interface_base.hpp
-  FIMSRcppInterfaceBase::fims_interface_objects.clear();
 
-  // Variable and VariableVector
-  Variable::id_g = 1;
-  VariableVector::id_g = 1;
-  // rcpp_data.hpp
-  DataInterfaceBase::id_g = 1;
-  DataInterfaceBase::live_objects.clear();
+  // Check that the R wrapper released every interface module, which it does
+  // before calling here, so this count should be zero. A count above zero
+  // means something bypassed the wrapper: clear_() called directly, or a
+  // module that never reached the registry. That module keeps its ID, the
+  // reset below hands the same ID out again, and two modules end up sharing
+  // it -- which the model reads as one module, silently.
+  if (FIMSRcppInterfaceBase::live_module_count > 0) {
+    std::ostringstream msg;
+    msg << "\nclear() was called while "
+        << FIMSRcppInterfaceBase::live_module_count
+        << " module(s) are still in use.\n"
+        << "Those modules hold IDs that will be issued again to modules "
+           "created after this\ncall, which would silently produce a wrong "
+           "model. Release them before calling\nclear().\n";
+    Rcpp::warning(msg.str());
+  }
 
-  AgeCompDataInterface::id_g = 1;
-  AgeCompDataInterface::live_objects.clear();
-
-  LengthCompDataInterface::id_g = 1;
-  LengthCompDataInterface::live_objects.clear();
-
-  CatchDataInterface::id_g = 1;
-  CatchDataInterface::live_objects.clear();
-
-  IndexDataInterface::id_g = 1;
-  IndexDataInterface::live_objects.clear();
-
-  // rcpp_fleets.hpp
-  FleetInterfaceBase::id_g = 1;
-  FleetInterfaceBase::live_objects.clear();
-
-  FleetInterface::id_g = 1;
-  FleetInterface::live_objects.clear();
-
-  // rcpp_growth.hpp
-  GrowthInterfaceBase::id_g = 1;
-  GrowthInterfaceBase::live_objects.clear();
-
-  EWAAGrowthInterface::id_g = 1;
-  EWAAGrowthInterface::live_objects.clear();
-
-  // rcpp_maturity.hpp
-  MaturityInterfaceBase::id_g = 1;
-  MaturityInterfaceBase::live_objects.clear();
-
-  LogisticMaturityInterface::id_g = 1;
-  LogisticMaturityInterface::live_objects.clear();
-
-  // rcpp_population.hpp
-  PopulationInterfaceBase::id_g = 1;
-  PopulationInterfaceBase::live_objects.clear();
-
-  PopulationInterface::id_g = 1;
-  PopulationInterface::live_objects.clear();
-
-  // rcpp_recruitment.hpp
-  RecruitmentInterfaceBase::id_g = 1;
-  RecruitmentInterfaceBase::live_objects.clear();
-
-  BevertonHoltRecruitmentInterface::id_g = 1;
-  BevertonHoltRecruitmentInterface::live_objects.clear();
-
-  // rcpp_selectivity.hpp
-  SelectivityInterfaceBase::id_g = 1;
-  SelectivityInterfaceBase::live_objects.clear();
-
-  LogisticSelectivityInterface::id_g = 1;
-  LogisticSelectivityInterface::live_objects.clear();
-
-  DoubleLogisticSelectivityInterface::id_g = 1;
-  DoubleLogisticSelectivityInterface::live_objects.clear();
-
-  AgeSpecificSelectivityInterface::id_g = 1;
-  AgeSpecificSelectivityInterface::live_objects.clear();
-
-  // rcpp_distribution.hpp
-  DistributionsInterfaceBase::id_g = 1;
-  DistributionsInterfaceBase::live_objects.clear();
-
-  DnormDistributionsInterface::id_g = 1;
-  DnormDistributionsInterface::live_objects.clear();
-
-  DlnormDistributionsInterface::id_g = 1;
-  DlnormDistributionsInterface::live_objects.clear();
-
-  DmultinomDistributionsInterface::id_g = 1;
-  DmultinomDistributionsInterface::live_objects.clear();
-
-  FisheryModelInterfaceBase::id_g = 1;
-  FisheryModelInterfaceBase::live_objects.clear();
+  // Each family adds its id_g to this list where the counter is defined, in
+  // the matching src/rcpp_*.cpp, so a new family cannot be left out here.
+  for (uint32_t *counter : FIMSRcppInterfaceBase::id_counters()) {
+    *counter = 1;
+  }
 
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMBAD_FIMS_TYPE>();
@@ -359,12 +335,15 @@ void clear_impl(bool get_error_msg) {
 }
 
 /**
- * @brief Clears all FIMS pointers and resets model state.
+ * @brief Calls the default `clear_impl` function.
+ *
+ * @details Registered by Rcpp as `clear_()`. The R wrapper `clear()` releases
+ * the interface modules and empties the R-side registry before calling this.
  */
 void clear() { clear_impl(false); }
 
 /**
- * @brief Test-only variant of clear() that retains a lingering pointer
+ * @brief Test-only variant of `clear_impl()` that retains a lingering pointer
  * to validate dangling pointer diagnostics.
  * @note Not exposed to users. Use only in tests.
  */

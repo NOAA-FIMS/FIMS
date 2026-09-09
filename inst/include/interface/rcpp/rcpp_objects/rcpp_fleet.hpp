@@ -26,39 +26,23 @@ class FleetInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The local id of the FleetInterfaceBase object.
    */
   uint32_t id;
-  /**
-   * @brief The map associating the IDs of FleetInterfaceBase to the objects.
-   * This is a live object, which is an object that has been created and lives
-   * in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<FleetInterfaceBase>> live_objects;
 
   /**
    * @brief The constructor.
    */
-  FleetInterfaceBase() {
-    this->id = FleetInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    FleetInterfaceBase */
-    // FleetInterfaceBase::live_objects[this->id] = this;
-  }
+  FleetInterfaceBase() { this->id = FleetInterfaceBase::id_g++; }
 
   /**
-   * @brief Construct a new Fleet Interface Base object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  FleetInterfaceBase(const FleetInterfaceBase &other) : id(other.id) {}
+  FleetInterfaceBase(const FleetInterfaceBase &) = delete;
+  FleetInterfaceBase &operator=(const FleetInterfaceBase &) = delete;
 
   /**
    * @brief The destructor.
    */
   virtual ~FleetInterfaceBase() {}
 
-  /**
-   * @brief Get the ID for the child fleet interface objects to inherit.
-   */
-  virtual uint32_t get_id() = 0;
 };
 
 /**
@@ -69,51 +53,51 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief The ID of the observed age-composition data object.
    */
-  SharedInt interface_observed_agecomp_data_id_m = -999;
+  int interface_observed_agecomp_data_id_m = -999;
   /**
    * @brief The ID of the observed length-composition data object.
    */
-  SharedInt interface_observed_lengthcomp_data_id_m = -999;
+  int interface_observed_lengthcomp_data_id_m = -999;
   /**
    * @brief The ID of the observed index data object.
    */
-  SharedInt interface_observed_index_data_id_m = -999;
+  int interface_observed_index_data_id_m = -999;
   /**
    * @brief The ID of the observed catch data object.
    */
-  SharedInt interface_observed_catch_data_id_m = -999;
+  int interface_observed_catch_data_id_m = -999;
   /**
    * @brief The ID of the selectivity object.
    */
-  SharedInt interface_selectivity_id_m = -999;
+  int interface_selectivity_id_m = -999;
 
  public:
   /**
    * @brief The name of the fleet.
    */
-  SharedString name = fims::to_string("NA");
+  std::string name = "NA";
   /**
    * @brief The number of age bins in the fleet data.
    */
-  SharedInt n_ages = 0;
+  int n_ages = 0;
   /**
    * @brief The number of length bins in the fleet data.
    */
-  SharedInt n_lengths = 0;
+  int n_lengths = 0;
   /**
    * @brief The number of years in the fleet data.
    */
-  SharedInt n_years = 0;
+  int n_years = 0;
   /**
    * @brief What units are the observed catch for this fleet measured in.
    * Options are weight or numbers, default is weight.
    */
-  SharedString observed_catch_units = fims::to_string("weight");
+  std::string observed_catch_units = "weight";
   /**
    * @brief What units is the observed index of abundance for this fleet
    * measured in. Options are weight or numbers, default is weight.
    */
-  SharedString observed_index_units = fims::to_string("weight");
+  std::string observed_index_units = "weight";
   /**
    * @brief The natural log of the index of abundance scaling parameter
    * for this fleet.
@@ -214,58 +198,13 @@ class FleetInterface : public FleetInterfaceBase {
   /**
    * @brief The constructor.
    */
-  FleetInterface() : FleetInterfaceBase() {
-    std::shared_ptr<FleetInterface> fleet =
-        std::make_shared<FleetInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(fleet);
-    /* Create instance of map: key is id and value is pointer to
-     FleetInterfaceBase */
-    FleetInterfaceBase::live_objects[this->id] = fleet;
-  }
+  FleetInterface() : FleetInterfaceBase() {}
 
   /**
-   * @brief Construct a new Fleet Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  FleetInterface(const FleetInterface &other)
-      : FleetInterfaceBase(other),
-        interface_observed_agecomp_data_id_m(
-            other.interface_observed_agecomp_data_id_m),
-        interface_observed_lengthcomp_data_id_m(
-            other.interface_observed_lengthcomp_data_id_m),
-        interface_observed_index_data_id_m(
-            other.interface_observed_index_data_id_m),
-        interface_observed_catch_data_id_m(
-            other.interface_observed_catch_data_id_m),
-        interface_selectivity_id_m(other.interface_selectivity_id_m),
-        name(other.name),
-        n_ages(other.n_ages),
-        n_lengths(other.n_lengths),
-        n_years(other.n_years),
-        observed_catch_units(other.observed_catch_units),
-        observed_index_units(other.observed_index_units),
-        log_q(other.log_q),
-        log_Fmort(other.log_Fmort),
-        age_to_length_conversion(other.age_to_length_conversion),
-        catch_numbers_at_age(other.catch_numbers_at_age),
-        catch_weight_at_age(other.catch_weight_at_age),
-        catch_numbers_at_length(other.catch_numbers_at_length),
-        catch_weight(other.catch_weight),
-        catch_numbers(other.catch_numbers),
-        catch_expected(other.catch_expected),
-        log_catch_expected(other.log_catch_expected),
-        agecomp_proportion(other.agecomp_proportion),
-        lengthcomp_proportion(other.lengthcomp_proportion),
-        index_numbers_at_age(other.index_numbers_at_age),
-        index_weight_at_age(other.index_weight_at_age),
-        index_numbers_at_length(other.index_numbers_at_length),
-        index_weight(other.index_weight),
-        index_numbers(other.index_numbers),
-        index_expected(other.index_expected),
-        log_index_expected(other.log_index_expected),
-        agecomp_expected(other.agecomp_expected),
-        lengthcomp_expected(other.lengthcomp_expected) {}
+  FleetInterface(const FleetInterface &) = delete;
+  FleetInterface &operator=(const FleetInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -279,23 +218,54 @@ class FleetInterface : public FleetInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
+   */
+  virtual VariableVector *get_variable_vector(const std::string &name) {
+    if (name == "log_q") return &this->log_q;
+    if (name == "log_Fmort") return &this->log_Fmort;
+    if (name == "age_to_length_conversion")
+      return &this->age_to_length_conversion;
+    if (name == "catch_numbers_at_age") return &this->catch_numbers_at_age;
+    if (name == "catch_weight_at_age") return &this->catch_weight_at_age;
+    if (name == "catch_numbers_at_length")
+      return &this->catch_numbers_at_length;
+    if (name == "catch_weight") return &this->catch_weight;
+    if (name == "catch_numbers") return &this->catch_numbers;
+    if (name == "catch_expected") return &this->catch_expected;
+    if (name == "log_catch_expected") return &this->log_catch_expected;
+    if (name == "agecomp_proportion") return &this->agecomp_proportion;
+    if (name == "lengthcomp_proportion") return &this->lengthcomp_proportion;
+    if (name == "index_numbers_at_age") return &this->index_numbers_at_age;
+    if (name == "index_weight_at_age") return &this->index_weight_at_age;
+    if (name == "index_numbers_at_length")
+      return &this->index_numbers_at_length;
+    if (name == "index_weight") return &this->index_weight;
+    if (name == "index_numbers") return &this->index_numbers;
+    if (name == "index_expected") return &this->index_expected;
+    if (name == "log_index_expected") return &this->log_index_expected;
+    if (name == "agecomp_expected") return &this->agecomp_expected;
+    if (name == "lengthcomp_expected") return &this->lengthcomp_expected;
+    return nullptr;
+  }
+
+  /**
    * @brief Sets the name of the fleet.
    * @param name The name to set.
    */
-  void SetName(const std::string &name) { this->name.set(name); }
+  void SetName(const std::string &name) { this->name = name; }
 
   /**
    * @brief Gets the name of the fleet.
    * @return The name.
    */
-  std::string GetName() const { return this->name.get(); }
+  std::string GetName() const { return this->name; }
 
   /**
    * @brief Set the unique ID for the observed age-composition data object.
    * @param observed_agecomp_data_id Unique ID for the observed data object.
    */
   void SetObservedAgeCompDataID(int observed_agecomp_data_id) {
-    interface_observed_agecomp_data_id_m.set(observed_agecomp_data_id);
+    interface_observed_agecomp_data_id_m = observed_agecomp_data_id;
   }
 
   /**
@@ -303,7 +273,7 @@ class FleetInterface : public FleetInterfaceBase {
    * @param observed_lengthcomp_data_id Unique ID for the observed data object.
    */
   void SetObservedLengthCompDataID(int observed_lengthcomp_data_id) {
-    interface_observed_lengthcomp_data_id_m.set(observed_lengthcomp_data_id);
+    interface_observed_lengthcomp_data_id_m = observed_lengthcomp_data_id;
   }
 
   /**
@@ -311,7 +281,7 @@ class FleetInterface : public FleetInterfaceBase {
    * @param observed_index_data_id Unique ID for the observed data object.
    */
   void SetObservedIndexDataID(int observed_index_data_id) {
-    interface_observed_index_data_id_m.set(observed_index_data_id);
+    interface_observed_index_data_id_m = observed_index_data_id;
   }
 
   /**
@@ -319,14 +289,14 @@ class FleetInterface : public FleetInterfaceBase {
    * @param observed_catch_data_id Unique ID for the observed data object.
    */
   void SetObservedCatchDataID(int observed_catch_data_id) {
-    interface_observed_catch_data_id_m.set(observed_catch_data_id);
+    interface_observed_catch_data_id_m = observed_catch_data_id;
   }
   /**
    * @brief Set the unique ID for the selectivity object.
    * @param selectivity_id Unique ID for the observed object.
    */
   void SetSelectivityID(int selectivity_id) {
-    interface_selectivity_id_m.set(selectivity_id);
+    interface_selectivity_id_m = selectivity_id;
   }
 
   /**
@@ -334,13 +304,13 @@ class FleetInterface : public FleetInterfaceBase {
    *
    * @return uint32_t
    */
-  uint32_t GetSelectivityID() { return interface_selectivity_id_m.get(); }
+  int GetSelectivityID() { return interface_selectivity_id_m; }
 
   /**
    * @brief Get the unique ID for the observed age-composition data object.
    */
   int GetObservedAgeCompDataID() {
-    return interface_observed_agecomp_data_id_m.get();
+    return interface_observed_agecomp_data_id_m;
   }
 
   /**
@@ -348,21 +318,21 @@ class FleetInterface : public FleetInterfaceBase {
    * object.
    */
   int GetObservedLengthCompDataID() {
-    return interface_observed_lengthcomp_data_id_m.get();
+    return interface_observed_lengthcomp_data_id_m;
   }
 
   /**
    * @brief Get the unique id for the observed index data object.
    */
   int GetObservedIndexDataID() {
-    return interface_observed_index_data_id_m.get();
+    return interface_observed_index_data_id_m;
   }
 
   /**
    * @brief Get the unique id for the observed catch data object.
    */
   int GetObservedCatchDataID() {
-    return interface_observed_catch_data_id_m.get();
+    return interface_observed_catch_data_id_m;
   }
   /**
    * @brief Extracts the derived quantities from `Information` to the Rcpp
@@ -393,30 +363,17 @@ class FleetInterface : public FleetInterfaceBase {
           std::dynamic_pointer_cast<fims_popdy::Fleet<double>>(it->second);
 
       for (size_t i = 0; i < this->log_Fmort.size(); i++) {
-        if (this->log_Fmort[i].estimation_type_m.get() == "constant") {
-          this->log_Fmort[i].final_value_m = this->log_Fmort[i].initial_value_m;
-        } else {
-          this->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
-        }
+        set_final_value_by_estimation_status(this->log_Fmort[i],
+                                             fleet->log_Fmort[i]);
       }
 
       for (size_t i = 0; i < this->log_q.size(); i++) {
-        if (this->log_q[i].estimation_type_m.get() == "constant") {
-          this->log_q[i].final_value_m = this->log_q[i].initial_value_m;
-        } else {
-          this->log_q[i].final_value_m = fleet->log_q[i];
-        }
+        set_final_value_by_estimation_status(this->log_q[i], fleet->log_q[i]);
       }
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
-        if (this->age_to_length_conversion[i].estimation_type_m.get() ==
-            "constant") {
-          this->age_to_length_conversion[i].final_value_m =
-              this->age_to_length_conversion[i].initial_value_m;
-        } else {
-          this->age_to_length_conversion[i].final_value_m =
-              fleet->age_to_length_conversion[i];
-        }
+        set_final_value_by_estimation_status(this->age_to_length_conversion[i],
+                                             fleet->age_to_length_conversion[i]);
       }
     }
   }
@@ -435,105 +392,80 @@ class FleetInterface : public FleetInterfaceBase {
 
     // set relative info
     fleet->id = this->id;
-    fleet->n_ages = this->n_ages.get();
-    fleet->n_lengths = this->n_lengths.get();
-    fleet->n_years = this->n_years.get();
+    fleet->n_ages = this->n_ages;
+    fleet->n_lengths = this->n_lengths;
+    fleet->n_years = this->n_years;
     fleet->observed_catch_units = this->observed_catch_units;
     fleet->observed_index_units = this->observed_index_units;
 
     fleet->fleet_observed_agecomp_data_id_m =
-        interface_observed_agecomp_data_id_m.get();
+        interface_observed_agecomp_data_id_m;
 
     fleet->fleet_observed_lengthcomp_data_id_m =
-        interface_observed_lengthcomp_data_id_m.get();
+        interface_observed_lengthcomp_data_id_m;
 
     fleet->fleet_observed_index_data_id_m =
-        interface_observed_index_data_id_m.get();
+        interface_observed_index_data_id_m;
     fleet->fleet_observed_catch_data_id_m =
-        interface_observed_catch_data_id_m.get();
+        interface_observed_catch_data_id_m;
 
-    fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
+    fleet->fleet_selectivity_id_m = interface_selectivity_id_m;
 
     fleet->log_q.resize(this->log_q.size());
     for (size_t i = 0; i < this->log_q.size(); i++) {
       fleet->log_q[i] = this->log_q[i].initial_value_m;
-
-      if (this->log_q[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(fleet->log_q[i]);
-      }
-      if (this->log_q[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(fleet->log_q[i]);
-      }
+      ss.str("");
+      ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
+      register_parameter_if_estimable(
+          fleet->log_q[i], this->log_q[i].estimation_status_m, ss.str());
     }
+    info->variable_map[this->log_q.id_m] = &(fleet)->log_q;
 
-    if (this->log_Fmort.size() != static_cast<size_t>(this->n_years.get())) {
+    if (this->log_Fmort.size() != static_cast<size_t>(this->n_years)) {
       FIMS_ERROR_LOG("The size of `log_Fmort` does not match `n_years`: " +
                      fims::to_string(this->log_Fmort.size()) +
-                     " != " + fims::to_string(this->n_years.get()));
+                     " != " + fims::to_string(this->n_years));
       throw std::invalid_argument(
           "Fleet log_Fmort size mismatch."
           "Fleet log_Fmort is of size " +
           fims::to_string(this->log_Fmort.size()) +
           " and the number of years is " +
-          fims::to_string(this->n_years.get()));
+          fims::to_string(this->n_years));
     }
     fleet->log_Fmort.resize(static_cast<size_t>(this->log_Fmort.size()));
     for (size_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
-
-      if (this->log_Fmort[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(fleet->log_Fmort[i]);
-      }
-      if (this->log_Fmort[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(fleet->log_Fmort[i]);
-      }
+      ss.str("");
+      ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
+      register_parameter_if_estimable(
+          fleet->log_Fmort[i], this->log_Fmort[i].estimation_status_m, ss.str());
     }
-    // add to variable_map
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
-    if (this->n_lengths.get() > 0) {
+    if (this->n_lengths > 0) {
       fleet->age_to_length_conversion.resize(
           this->age_to_length_conversion.size());
 
       if (this->age_to_length_conversion.size() !=
-          static_cast<size_t>(this->n_ages.get() * this->n_lengths.get())) {
-        FIMS_ERROR_LOG(
-            "age_to_length_conversion don't match, " +
-            fims::to_string(this->age_to_length_conversion.size()) + " != " +
-            fims::to_string((this->n_ages.get() * this->n_lengths.get())));
+          static_cast<size_t>(this->n_ages * this->n_lengths)) {
+        throw std::invalid_argument(
+            "Fleet age_to_length_conversion size mismatch: expected " +
+            fims::to_string(this->n_ages * this->n_lengths) + ", got " +
+            fims::to_string(this->age_to_length_conversion.size()) + ".");
       }
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
         fleet->age_to_length_conversion[i] =
             this->age_to_length_conversion[i].initial_value_m;
 
-        if (this->age_to_length_conversion[i].estimation_type_m.get() ==
-            "fixed_effects") {
-          ss.str("");
-          ss << "Fleet." << this->id << ".age_to_length_conversion."
-             << this->age_to_length_conversion[i].id_m;
-          info->RegisterParameterName(ss.str());
-          info->RegisterParameter(fleet->age_to_length_conversion[i]);
-        }
-        if (this->age_to_length_conversion[i].estimation_type_m.get() ==
-            "random_effects") {
-          FIMS_ERROR_LOG(
-              "age_to_length_conversion cannot be set to random effects");
-        }
+        ss.str("");
+        ss << "Fleet." << this->id << ".age_to_length_conversion."
+           << this->age_to_length_conversion[i].id_m;
+        register_parameter_if_estimable(
+            fleet->age_to_length_conversion[i],
+            this->age_to_length_conversion[i].estimation_status_m,
+            ss.str(), false);
       }
-
       info->variable_map[this->age_to_length_conversion.id_m] =
           &(fleet)->age_to_length_conversion;
     }

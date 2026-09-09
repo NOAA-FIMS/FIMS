@@ -13,6 +13,32 @@
 #include "rcpp_interface_base.hpp"
 
 /**
+ * @brief The maturity forms FIMS can build.
+ *
+ * @details The create_maturity_() function takes one of these names from R and
+ * builds the matching class: "Logistic" builds a LogisticMaturityInterface.
+ * MaturityInterfaceBase is never built on its own; it only holds what all
+ * maturity forms have in common.
+ *
+ * These are an enum rather than plain strings so that every place in the C++
+ * code that acts on a maturity form has to name one of these values, which
+ * makes it harder to add a form and forget to handle it somewhere.
+ */
+enum class MaturityType : uint8_t {
+  logistic = 0
+};
+
+/**
+ * @brief Convert a type name supplied from R to a MaturityType.
+ */
+inline MaturityType MaturityTypeFromString(const std::string &name) {
+  if (name == "Logistic") return MaturityType::logistic;
+  throw std::invalid_argument(
+      "Invalid type: '" + name +
+      "'. Valid options are: Logistic.");
+}
+
+/**
  * @brief Rcpp interface that serves as the parent class for Rcpp maturity
  * interfaces. This type should be inherited and not called from R directly.
  */
@@ -26,41 +52,24 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The local id of the MaturityInterfaceBase object.
    */
   uint32_t id;
-  /**
-   * @brief The map associating the IDs of MaturityInterfaceBase to the objects.
-   * This is a live object, which is an object that has been created and lives
-   * in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
-      live_objects;
 
   /**
    * @brief The constructor.
    */
-  MaturityInterfaceBase() {
-    this->id = MaturityInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    MaturityInterfaceBase */
-    // MaturityInterfaceBase::live_objects[this->id] = this;
-  }
+  MaturityInterfaceBase() { this->id = MaturityInterfaceBase::id_g++; }
 
   /**
-   * @brief Construct a new Maturity Interface Base object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  MaturityInterfaceBase(const MaturityInterfaceBase& other) : id(other.id) {}
+  MaturityInterfaceBase(const MaturityInterfaceBase &) = delete;
+  MaturityInterfaceBase &operator=(const MaturityInterfaceBase &) = delete;
 
   /**
    * @brief The destructor.
    */
   virtual ~MaturityInterfaceBase() {}
 
-  /**
-   * @brief Get the ID for the child maturity interface objects to inherit.
-   */
-  virtual uint32_t get_id() = 0;
-
+    
   /**
    * @brief A method for each child maturity interface object to inherit so
    * each maturity option can have an evaluate() function.
@@ -86,22 +95,13 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LogisticMaturityInterface() : MaturityInterfaceBase() {
-    MaturityInterfaceBase::live_objects[this->id] =
-        std::make_shared<LogisticMaturityInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        MaturityInterfaceBase::live_objects[this->id]);
-  }
+  LogisticMaturityInterface() : MaturityInterfaceBase() {}
 
   /**
-   * @brief Construct a new Logistic Maturity Interface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  LogisticMaturityInterface(const LogisticMaturityInterface& other)
-      : MaturityInterfaceBase(other),
-        inflection_point(other.inflection_point),
-        slope(other.slope) {}
+  LogisticMaturityInterface(const LogisticMaturityInterface &) = delete;
+  LogisticMaturityInterface &operator=(const LogisticMaturityInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -113,6 +113,15 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
+   */
+  virtual VariableVector *get_variable_vector(const std::string &name) {
+    if (name == "inflection_point") return &this->inflection_point;
+    if (name == "slope") return &this->slope;
+    return nullptr;
+  }
 
   /**
    * @brief Evaluate maturity using the logistic function.
@@ -159,20 +168,12 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
-        if (this->inflection_point[i].estimation_type_m.get() == "constant") {
-          this->inflection_point[i].final_value_m =
-              this->inflection_point[i].initial_value_m;
-        } else {
-          this->inflection_point[i].final_value_m = mat->inflection_point[i];
-        }
+        set_final_value_by_estimation_status(this->inflection_point[i],
+                                             mat->inflection_point[i]);
       }
 
       for (size_t i = 0; i < slope.size(); i++) {
-        if (this->slope[i].estimation_type_m.get() == "constant") {
-          this->slope[i].final_value_m = this->slope[i].initial_value_m;
-        } else {
-          this->slope[i].final_value_m = mat->slope[i];
-        }
+        set_final_value_by_estimation_status(this->slope[i], mat->slope[i]);
       }
     }
   }
@@ -229,40 +230,25 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     maturity->inflection_point.resize(this->inflection_point.size());
     for (size_t i = 0; i < this->inflection_point.size(); i++) {
       maturity->inflection_point[i] = this->inflection_point[i].initial_value_m;
-      if (this->inflection_point[i].estimation_type_m.get() ==
-          "fixed_effects") {
-        ss.str("");
-        ss << "Maturity." << this->id << ".inflection_point."
-           << this->inflection_point[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(maturity->inflection_point[i]);
-      }
-      if (this->inflection_point[i].estimation_type_m.get() ==
-          "random_effects") {
-        ss.str("");
-        ss << "Maturity." << this->id << ".inflection_point."
-           << this->inflection_point[i].id_m;
-        info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(maturity->inflection_point[i]);
-      }
+      ss.str("");
+      ss << "Maturity." << this->id << ".inflection_point."
+         << this->inflection_point[i].id_m;
+      register_parameter_if_estimable(
+          maturity->inflection_point[i],
+          this->inflection_point[i].estimation_status_m, ss.str());
     }
+    info->variable_map[this->inflection_point.id_m] =
+        &(maturity)->inflection_point;
 
     maturity->slope.resize(this->slope.size());
     for (size_t i = 0; i < this->slope.size(); i++) {
       maturity->slope[i] = this->slope[i].initial_value_m;
-      if (this->slope[i].estimation_type_m.get() == "fixed_effects") {
-        ss.str("");
-        ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(maturity->slope[i]);
-      }
-      if (this->slope[i].estimation_type_m.get() == "random_effects") {
-        ss.str("");
-        ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
-        info->RegisterRandomEffect(maturity->slope[i]);
-        info->RegisterRandomEffectName(ss.str());
-      }
+      ss.str("");
+      ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
+      register_parameter_if_estimable(
+          maturity->slope[i], this->slope[i].estimation_status_m, ss.str());
     }
+    info->variable_map[this->slope.id_m] = &(maturity)->slope;
 
     // add to Information
     info->maturity_models[maturity->id] = maturity;

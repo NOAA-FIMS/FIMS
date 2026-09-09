@@ -13,6 +13,32 @@
 #include "rcpp_interface_base.hpp"
 
 /**
+ * @brief The growth forms FIMS can build.
+ *
+ * @details The create_growth_() function takes one of these names from R and
+ * builds the matching class: "EWAA" builds an EWAAGrowthInterface.
+ * GrowthInterfaceBase is never built on its own; it only holds what all growth
+ * forms have in common.
+ *
+ * These are an enum rather than plain strings so that every place in the C++
+ * code that acts on a growth form has to name one of these values, which makes
+ * it harder to add a form and forget to handle it somewhere.
+ */
+enum class GrowthType : uint8_t {
+  ewaa = 0
+};
+
+/**
+ * @brief Convert a type name supplied from R to a GrowthType.
+ */
+inline GrowthType GrowthTypeFromString(const std::string &name) {
+  if (name == "EWAA") return GrowthType::ewaa;
+  throw std::invalid_argument(
+      "Invalid type: '" + name +
+      "'. Valid options are: EWAA.");
+}
+
+/**
  * @brief Rcpp interface that serves as the parent class for Rcpp growth
  * interfaces. This type should be inherited and not called from R directly.
  */
@@ -26,40 +52,32 @@ class GrowthInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The local id of the GrowthInterfaceBase object.
    */
   uint32_t id;
-  /**
-   * @brief The map associating the IDs of GrowthInterfaceBase to the objects.
-   * This is a live object, which is an object that has been created and lives
-   * in memory.
-   */
-  static std::map<uint32_t, std::shared_ptr<GrowthInterfaceBase>> live_objects;
 
   /**
    * @brief The constructor.
    */
-  GrowthInterfaceBase() {
-    this->id = GrowthInterfaceBase::id_g++;
-    /* Create instance of map: key is id and value is pointer to
-    GrowthInterfaceBase */
-    // GrowthInterfaceBase::live_objects[this->id] =
-    // std::make_shared<GrowthInterfaceBase>(*this);
-  }
+  GrowthInterfaceBase() { this->id = GrowthInterfaceBase::id_g++; }
 
   /**
-   * @brief Construct a new Growth Interface Base object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  GrowthInterfaceBase(const GrowthInterfaceBase &other) : id(other.id) {}
+  GrowthInterfaceBase(const GrowthInterfaceBase &) = delete;
+  GrowthInterfaceBase &operator=(const GrowthInterfaceBase &) = delete;
 
   /**
    * @brief The destructor.
    */
   virtual ~GrowthInterfaceBase() {}
 
-  /**
-   * @brief Get the ID for the child growth interface objects to inherit.
+    /**
+   * @brief Set the number of years this growth module spans.
+   *
+   * @details Defaults to reporting that the type does not use it, so a growth
+   * type without a time dimension needs no override.
    */
-  virtual uint32_t get_id() = 0;
+  virtual void set_n_years(int n_years) {
+    Rcpp::stop("This growth module does not use `n_years`.");
+  }
 
   /**
    * @brief A method for each child growth interface object to inherit so
@@ -78,16 +96,16 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   /**
    * @brief Weights (mt) for each age class.
    */
-  RealVector weights;
+  fims::Vector<double> weights;
   /**
    * @brief Ages (years) for each age class.
    */
-  RealVector ages;
+  fims::Vector<double> ages;
   /**
    * @brief An integer specifying the number of years.
    *
    */
-  SharedInt n_years;
+  int n_years = 0;
   /**
    * @brief A map of empirical weight-at-age values allowing multiple modules to
    * access and modify the weights without copying values between modules.
@@ -103,24 +121,13 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
    */
   EWAAGrowthInterface() : GrowthInterfaceBase() {
     this->ewaa = std::make_shared<std::map<int, std::map<double, double>>>();
-    GrowthInterfaceBase::live_objects[this->id] =
-        std::make_shared<EWAAGrowthInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        std::make_shared<EWAAGrowthInterface>(*this));
   }
 
   /**
-   * @brief Construct a new EWAAGrowthInterface object
-   *
-   * @param other
+   * @brief Interface objects are not copyable.
    */
-  EWAAGrowthInterface(const EWAAGrowthInterface &other)
-      : GrowthInterfaceBase(other),
-        weights(other.weights),
-        ages(other.ages),
-        n_years(other.n_years),
-        ewaa(other.ewaa),
-        initialized(other.initialized) {}
+  EWAAGrowthInterface(const EWAAGrowthInterface &) = delete;
+  EWAAGrowthInterface &operator=(const EWAAGrowthInterface &) = delete;
 
   /**
    * @brief The destructor.
@@ -134,21 +141,35 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
+   * @copydoc FIMSRcppInterfaceBase::get_numeric_vector
+   */
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
+    if (name == "weights") return &this->weights;
+    if (name == "ages") return &this->ages;
+    return nullptr;
+  }
+
+  /**
+   * @copydoc GrowthInterfaceBase::set_n_years
+   */
+  virtual void set_n_years(int n_years) { this->n_years = n_years; }
+
+  /**
    * @brief Create a map of input numeric vectors.
    * @param weights Type vector of weights.
    * @param ages Type vector of ages.
    * @param n_years An integer specifying the number of years.
    * @return std::map<T, T>.
    */
-  inline std::map<int, std::map<double, double>> make_map(RealVector ages,
-                                                          RealVector weights,
-                                                          SharedInt n_years) {
+  inline std::map<int, std::map<double, double>> make_map(
+      const fims::Vector<double> &ages, const fims::Vector<double> &weights,
+                                                          int n_years) {
     std::map<int, std::map<double, double>> mymap;
-    const size_t n_years_plus_one = static_cast<size_t>(n_years.get() + 1);
+    const size_t n_years_plus_one = static_cast<size_t>(n_years + 1);
 
     // Reject invalid year counts because map keys are expected to include
     // at least one model year.
-    if (n_years.get() < 1) {
+    if (n_years < 1) {
       Rcpp::stop("EWAA Error:: n_years must be at least 1");
     }
 
@@ -169,7 +190,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
           "calculations. weights size: " +
           std::to_string(weights.size()) +
           " ages size: " + std::to_string(ages.size()) +
-          " n_years: " + std::to_string(n_years.get()));
+          " n_years: " + std::to_string(n_years));
     } else if (weights.size() == ages.size()) {
       // One age-specific vector was provided, so replicate the same
       // weight-at-age values for every year key (0 through n_years).
@@ -229,7 +250,7 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     ss << " \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [\"n_years+1\",\"n_ages\"],\n";
-    ss << "  \"dimensions\": [" << this->n_years.get() + 1 << ","
+    ss << "  \"dimensions\": [" << this->n_years + 1 << ","
        << this->ages.size() << "]\n},\n";
 
     ss << " \"values\": [\n";
@@ -238,14 +259,14 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
       ss << "\"id\": null,\n";
       ss << "\"value\": " << weights[i] << ",\n";
       ss << "\"estimated_value\": " << weights[i] << ",\n";
-      ss << "\"estimation_type\": \"constant\"\n";
+      ss << "\"estimation_status\": \"assumed_known\"\n";
       ss << "},\n";
     }
     ss << "{\n";
     ss << "\"id\": null,\n";
     ss << "\"value\": " << weights[weights.size() - 1] << ",\n";
     ss << "\"estimated_value\": " << weights[weights.size() - 1] << ",\n";
-    ss << "\"estimation_type\": \"constant\"\n";
+    ss << "\"estimation_status\": \"assumed_known\"\n";
     ss << "}\n]\n";
     ss << "}\n]\n}\n";
     return ss.str();

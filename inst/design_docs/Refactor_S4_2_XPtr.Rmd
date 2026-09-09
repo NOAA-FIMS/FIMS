@@ -1,0 +1,1391 @@
+---
+title: "Design Document: FIMS Rcpp Interface Refactor to Rcpp::XPtr"
+author: "FIMS Development Team"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Motivation
+
+The current FIMS architecture relies on S4 Rcpp::Module classes to expose C++ interface
+objects (such as `AgeCompDataInterface` or `PopulationInterface`) directly to R. This
+design introduces two structural problems that compound each other.
+
+### 1.1 The Copy Problem
+
+When `methods::new(Population)` is called in R, Rcpp owns the C++ object's memory through
+its own internal mechanism. A `std::shared_ptr` cannot safely be created pointing at a
+Rcpp-managed object, because Rcpp controls its lifetime. However, `CreateTMBModel()` needs
+to iterate over all interface objects to call `add_to_fims_tmb()` via a registry it owns.
+The solution in the current design is to make a heap copy of every interface object in the
+constructor:
+
+```cpp
+// PopulationInterface constructor — current approach
+PopulationInterface() : PopulationInterfaceBase() {
+    // ...
+    std::shared_ptr<PopulationInterface> population =
+        std::make_shared<PopulationInterface>(*this);  // heap copy
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(population);
+    PopulationInterfaceBase::live_objects[this->id] = population;
+}
+```
+
+Because these global static collections (variables that are shared across the program and
+persist for the lifetime of the program) maintain strong `std::shared_ptr` references to
+every object created, their reference counts never drop to zero. Even when an R variable is
+overwritten (e.g., `my_fleet <- NULL`), the underlying C++ memory is never deallocated until
+an explicit manual call to `clear()`. This prevents clean iterative modeling workflows
+(bootstrapping, sensitivity runs, profile likelihood) within a single R session.
+
+### 1.2 The SharedPrimitive Overhead Problem
+
+When users initialize a module (e.g. pop <- methods::new(Population)), a copy gets stored in
+the registry. When the user later sets `pop$n_years <- 30` on the R-side S4 object, this
+modifies the original Rcpp-managed object but not the registry copy. `CreateTMBModel()`
+would see stale initial values.
+
+The `SharedInt`, `SharedBoolean`, `SharedReal`, and `SharedString` wrapper classes were
+introduced to solve this synchronization problem: by wrapping scalar fields in `shared_ptr`,
+both the original and the registry copy share the same underlying value. Modifying the
+original is automatically seen by the copy.
+
+However, this comes at a significant memory cost. Each `SharedPrimitive` field requires one
+heap allocation for a single scalar. On a 64-bit system, `make_shared<int>(0)` allocates
+approximately 28 bytes (16-byte control block + 4-byte int + alignment padding) for 4 bytes
+of actual data — a 7:1 overhead ratio. `PopulationInterface` alone has 8 `SharedInt`, 2
+`SharedBoolean`, and 1 `SharedString` configuration fields: roughly 11 heap allocations
+before any model data is set. Additionally, every `Variable` element in every
+`VariableVector` carries a `SharedString estimation_type_m`, adding one heap allocation per
+parameter element across the entire model.
+
+The SharedPrimitive types and the constructor copies are symptoms of the same root cause:
+the S4 module system forces a two-object design (Rcpp-owned original + heap registry copy)
+that requires shared ownership of individual fields to stay synchronized.
+
+### 1.3 The Rcpp::XPtr Solution
+
+By transitioning the R-to-C++ boundary to `Rcpp::XPtr<std::shared_ptr<T>>`, both problems
+are eliminated together.
+
+**One object, no copies.** The creator function allocates the C++ object on the heap
+directly and hands ownership to a `shared_ptr`. The XPtr wraps that `shared_ptr`. There is
+no Rcpp-managed original and no registry copy — there is one object. User modifications via
+standalone setter functions go directly to that object.
+
+**SharedPrimitives become unnecessary.** Without a copy to keep synchronized with the
+original, scalar fields can revert to plain C++ types (`int`, `bool`, `double`,
+`std::string`). The `Variable::estimation_type_m` field can become an enum.
+
+**Automated lifecycle management.** When an R variable holding an XPtr is overwritten or
+goes out of scope, R's garbage collector deletes the external pointer wrapper, decrementing
+the `shared_ptr` reference count. Memory is freed without requiring an explicit `clear()`
+call.
+
+---
+
+## 2. Refactoring Steps
+
+### Step 1: Replace `SharedPrimitive` scalar fields with plain C++ types
+
+In every interface class, replace `SharedInt`, `SharedBoolean`, `SharedReal`, and
+`SharedString` fields that hold scalar configuration values with their plain C++
+equivalents. This is only safe under XPtr because there is no registry copy that needs to
+remain synchronized with user modifications.
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_population.hpp
+
+// BEFORE — SharedPrimitive fields (one heap allocation each)
+SharedInt n_ages = 0;
+SharedInt n_fleets;
+SharedInt n_years;
+SharedInt n_lengths;
+SharedInt maturity_id;
+SharedInt growth_id;
+SharedInt recruitment_id;
+SharedInt recruitment_err_id;
+SharedString name = fims::to_string("NA");
+
+// AFTER — plain C++ types (no heap allocation per scalar)
+int n_ages = 0;
+int n_fleets = 0;
+int n_years = 0;
+int n_lengths = 0;
+int maturity_id = -1;
+int growth_id = -1;
+int recruitment_id = -1;
+int recruitment_err_id = -1;
+// n_lengths was converted with the rest and later removed: nothing ever read
+// it. Populations are age-structured, and length belongs to the fleets.
+std::string name = "NA";
+```
+
+`VariableVector` retains its `shared_ptr<vector<Variable>>` internal storage because R-side
+access to individual elements relies on shared ownership within the vector. Only standalone
+scalar configuration fields change.
+
+`SharedBoolean` fields in base classes (`initialize_catch_at_age`,
+`initialize_surplus_production`) follow the same pattern — replace with plain `bool`.
+
+### Step 2: Replace `Variable::estimation_type_m` with an enum
+
+Every `Variable` element in every `VariableVector` currently carries a
+`SharedString estimation_type_m`, which heap-allocates one `std::string` per element.
+Replace it with an enum stored as a single byte. The field is also renamed to
+`estimation_status_m`: what it records is a parameter's status in the estimation
+machinery, not a category of estimation.
+
+The enum does not live beside `Variable`. It governs parameter registration throughout
+the model core, which must compile without Rcpp, so it belongs in a shared header that
+carries no Rcpp dependency:
+
+```cpp
+// inst/include/common/enumerations.hpp
+
+namespace fims_enum {
+
+enum class EstimationStatus : uint8_t {
+  kAssumedKnown    = 0,
+  kFixedEffects    = 1,
+  kRandomEffects   = 2,
+  kDerivedQuantity = 3
+};
+
+// Reports failure with std::invalid_argument rather than Rcpp::stop, so the
+// header stays usable from the model core. Rcpp catches it at the R boundary
+// and surfaces it as an ordinary R error.
+inline EstimationStatus EstimationStatusFromString(const std::string &status);
+inline std::string EstimationStatusToString(EstimationStatus status);
+
+}  // namespace fims_enum
+```
+
+`kDerivedQuantity` is a fourth status the string field never distinguished: a quantity
+computed from other parameters, which is reported but never handed to the optimizer.
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp
+
+// BEFORE — one heap allocation per Variable element
+class Variable {
+ public:
+  SharedString estimation_type_m = SharedString("constant");
+  // ...
+};
+
+// AFTER — zero heap allocations, 1 byte per Variable element
+class Variable {
+ public:
+  fims_enum::EstimationStatus estimation_status_m =
+      fims_enum::EstimationStatus::kAssumedKnown;
+  // ...
+};
+```
+
+Update all callers that previously compared strings (e.g.,
+`estimation_type_m.get() == "fixed_effects"`) to use the enum values:
+
+```cpp
+// BEFORE
+if (this->log_M[i].estimation_type_m.get() == "fixed_effects") { ... }
+
+// AFTER
+if (this->log_M[i].estimation_status_m ==
+    fims_enum::EstimationStatus::kFixedEffects) { ... }
+```
+
+Update `VariableVector::set_estimation_status()` to accept an
+`Rcpp::CharacterVector` and convert string input to enum internally, preserving the
+existing R-side API. `Variable::get_estimation_status()` converts back, so R continues
+to see and set the status by name and never handles the integer.
+
+### Step 3: Remove constructor copies and implement standalone lifecycle functions
+
+Strip `live_objects` map insertions and `fims_interface_objects` push_back calls from all
+interface class constructors. The constructor should perform only pure initialization:
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp
+
+// BEFORE — constructor registers in two global registries
+AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfaceBase() {
+    this->amax = amax;
+    this->ymax = ymax;
+    this->age_comp_data.resize(amax * ymax);
+    this->uncertainty.resize(amax * ymax);
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<AgeCompDataInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DataInterfaceBase::live_objects[this->id]);
+}
+
+// AFTER — pure initialization only
+AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfaceBase() {
+    this->amax = amax;
+    this->ymax = ymax;
+    this->age_comp_data.resize(amax * ymax);
+    this->uncertainty.resize(amax * ymax);
+}
+```
+
+Delete the copy constructor of every migrated class as well, and delete copy assignment
+alongside it. Removing the copy constructor is not sufficient: C++ then synthesizes an
+implicit one, so the class stays copyable and a copy would produce a second object holding
+a duplicate `id`. `= delete` makes any copy a compile error instead:
+
+```cpp
+AgeCompDataInterface(const AgeCompDataInterface &) = delete;
+AgeCompDataInterface &operator=(const AgeCompDataInterface &) = delete;
+```
+
+Implement standalone creator functions in the corresponding `.cpp` source file. Wrap the
+`shared_ptr` (not a raw pointer) inside the XPtr so that the reference count is safely
+decremented by R's garbage collector when the XPtr is collected.
+
+Write one creator per *family* rather than per concrete class. The XPtr is typed to the
+family's base class, and a type name selects which derived class to allocate. Convert that
+name to an enum first — `switch` requires an integral or enum operand, and the enum gives
+the compiler a chance to flag a missing case when a new type is added later.
+
+A family's type enum lives beside the classes it names, so adding a functional form
+touches one file. Only enums with users in more than one part of FIMS — `EstimationStatus`,
+`DistributionType` — go in `common/enumerations.hpp`. Converters throw
+`std::invalid_argument` rather than calling `Rcpp::stop`, which keeps them usable from the
+model core; Rcpp catches the exception at the boundary and surfaces it as an R error.
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp
+
+enum class DataType : uint8_t {
+  age_comp = 0, length_comp = 1, index = 2, catch_data = 3
+};
+
+inline DataType DataTypeFromString(const std::string &type) {
+  if (type == "age_comp") return DataType::age_comp;
+  // ... remaining types ...
+  throw std::invalid_argument(
+      "Invalid data type: '" + type +
+      "'. Valid options are: age_comp, length_comp, index, catch.");
+}
+```
+
+```cpp
+// src/rcpp_data.cpp
+
+using SharedData = std::shared_ptr<DataInterfaceBase>;
+
+Rcpp::XPtr<SharedData> create_data_interface_(std::string data_type,
+                                              int n_years, int n_bins = 0) {
+    DataType data_type_ = DataTypeFromString(data_type);
+
+    // Reject a bin count on a one-dimensional type rather than ignoring it,
+    // so a mistake in the call surfaces here instead of as a wrong-shaped
+    // model later.
+    if (n_bins != 0 && (data_type_ == DataType::index ||
+                        data_type_ == DataType::catch_data)) {
+      Rcpp::stop("Data type '" + data_type +
+                 "' is one-dimensional; `n_bins` must be 0, got " +
+                 std::to_string(n_bins) + ".");
+    }
+
+    SharedData data_interface;
+    switch (data_type_) {
+      case DataType::age_comp:
+        data_interface =
+            std::make_shared<AgeCompDataInterface>(n_years, n_bins);  break;
+      case DataType::length_comp:
+        data_interface =
+            std::make_shared<LengthCompDataInterface>(n_years, n_bins); break;
+      case DataType::index:
+        data_interface = std::make_shared<IndexDataInterface>(n_years); break;
+      case DataType::catch_data:
+        data_interface = std::make_shared<CatchDataInterface>(n_years); break;
+    }
+    // Heap-allocate the shared_ptr itself and hand it to the XPtr.
+    // 'true' binds the XPtr to R's garbage collector: when the R variable
+    // is collected, 'delete shared_ptr*' is called, decrementing the ref count.
+    return Rcpp::XPtr<SharedData>(new SharedData(data_interface), true);
+}
+```
+
+Only the creator branches on type, because it is the one place where the concrete class
+does not yet exist. Everything after it reaches the right object through a virtual
+function on the base, or does not need to know the type at all.
+
+That principle applies to the setters too, and it collapses them much further than one
+per family. A setter's only type-specific act is picking *which member* to write, and a
+member can be identified by name. So instead of a function per field, the base class
+answers three questions by name, and every derived class overrides them with a short
+list of the names it recognizes:
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp
+
+class FIMSRcppInterfaceBase {
+ public:
+  virtual uint32_t get_id() = 0;
+  virtual VariableVector *get_variable_vector(const std::string &name) {
+    return nullptr;
+  }
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
+    return nullptr;
+  }
+  // ...
+};
+```
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_data.hpp — AgeCompDataInterface
+
+virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
+  if (name == "values")      return &this->age_comp_data;
+  if (name == "uncertainty") return &this->uncertainty;
+  return nullptr;
+}
+```
+
+`IndexDataInterface` answers `"values"` with `index_data`, and so on. A name a class does
+not recognize returns `nullptr`, which the caller turns into an R error naming the module
+and the field, rather than a silent no-op.
+
+Four functions then cover every module in FIMS, registered once in
+`src/rcpp_interface_base.cpp` and taking the *base* XPtr, so they do not care which family
+they were handed:
+
+```cpp
+// src/rcpp_interface_base.cpp
+
+void set_variable_vector_(Rcpp::XPtr<SharedBase> xp, std::string name,
+                    Rcpp::NumericVector values,
+                    Rcpp::CharacterVector estimation_status);
+void set_numeric_vector_(Rcpp::XPtr<SharedBase> xp, std::string name,
+                 Rcpp::NumericVector values);
+uint32_t get_module_id_(Rcpp::XPtr<SharedBase> xp);
+uint32_t get_variable_vector_id_(Rcpp::XPtr<SharedBase> xp, std::string name);
+```
+
+`set_variable_vector_` writes estimable quantities (a `VariableVector`, carrying an
+estimation status per element); `set_numeric_vector_` writes fixed numeric input such as
+observations and uncertainties. `get_variable_vector_id_` returns a parameter's
+`VariableVector` ID, which is what links a distribution to the quantity it applies to — see
+Section 4c.
+
+Fields that are neither, because they are plain scalars rather than vectors, still get a
+small family-specific setter:
+
+```cpp
+// src/rcpp_population.cpp
+
+void set_population_constants_(Rcpp::XPtr<SharedPopulation> xp,
+                               int n_years, int n_ages) {
+    (*xp)->n_years   = n_years;
+    (*xp)->n_ages    = n_ages;
+}
+```
+
+Register these functions inside the existing module registration blocks. Do **not** use
+`// [[Rcpp::exports]]`, as this causes essential TMB callables to be overwritten by
+`Rcpp::compileAttributes()`. Add a trailing underscore to every registered name to prevent
+name collisions with the R wrapper functions defined in Section 4b. Remove the
+`Rcpp::class_<T>` registration for any interface class that has been fully migrated to XPtr:
+
+```cpp
+// src/rcpp_data.cpp
+
+void register_data(Rcpp::Module& m) {
+    // Rcpp::class_<> registrations removed — users no longer call methods::new().
+    Rcpp::function("create_data_interface_", &create_data_interface_);
+    Rcpp::function("data_to_fims_xptr_",     &data_to_fims_xptr_);
+}
+```
+
+Two registered functions cover all four data types, because setting values, setting
+uncertainty, and reading the ID are all handled by the shared functions above. A
+per-class design would need roughly twenty. Across the ten module source files the
+migration leaves 52 registered functions where the `Rcpp::class_<T>` design had about 130.
+
+#### Reporting after the registries are gone
+
+Deleting `live_objects` removes something the model relied on. When
+`CatchAtAgeInterface` writes its JSON output it has to describe modules it does not own:
+a fleet names its selectivity, a population names its growth and maturity, but the
+interface holds only their integer IDs. It previously turned an ID back into an object by
+looking it up in the family's `live_objects` map. With the maps gone there is nothing to
+look up.
+
+The modules are already reachable from R, so R hands them in. `to_json()` takes the same
+list of base XPtrs that the registry builds for `CreateTMBModel()`:
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp
+virtual std::string to_json(const std::vector<SharedBase> &report_modules);
+```
+
+The list is untyped — every entry is a `FIMSRcppInterfaceBase` pointer — so `to_json()`
+sorts it into one map per family on the way in. A single helper does the sorting by
+attempting the downcast and reporting whether it succeeded:
+
+```cpp
+template <typename T>
+static bool try_store_module(const SharedBase &module,
+                             std::map<uint32_t, std::shared_ptr<T>> &modules) {
+  if (std::shared_ptr<T> typed_module = std::dynamic_pointer_cast<T>(module)) {
+    modules[typed_module->get_id()] = typed_module;
+    return true;
+  }
+  return false;
+}
+```
+
+Each module is offered to each map until one accepts it; anything no map claims is
+ignored rather than treated as an error, because the registry legitimately contains
+modules that are not reportable. The resulting maps are keyed by ID, so the rest of the
+reporting code performs the same ID lookup it always did — the maps are built per call
+from what R supplied, instead of persisting for the life of the session.
+
+This is why reporting-only modules do not need a `shared_ptr` link from the model.
+Structural links exist where one module *computes* with another; a module that is merely
+described in the output is passed in at reporting time. In particular, distributions are
+not linked to `CatchAtAgeInterface`.
+
+### Step 4: Implement dispatch through a shared base class for `CreateTMBModel()`
+
+`CreateTMBModel()` currently iterates `FIMSRcppInterfaceBase::fims_interface_objects` to
+call `add_to_fims_tmb()` on every registered object. Under XPtr, the C++ global registry
+is removed. This step replaces it with two pieces: a C++ mechanism for calling
+`add_to_fims_tmb()` through a common base class pointer, and an R-side registry that
+automatically tracks objects as they are created so the user does not need to build the list
+by hand.
+
+#### 4a. Why two XPtr types are needed
+
+Each concrete creator function (e.g., `create_data()`, `create_population()`) returns
+an XPtr typed to its specific class — `XPtr<SharedAgeComp>`, `XPtr<SharedPopulation>`, etc.
+These types are all different, so they cannot be stored together in a single list and passed
+to `CreateTMBModel()`.
+
+The solution is a second, less specific XPtr typed to the common base class
+`FIMSRcppInterfaceBase`, which all interface classes inherit from. Because
+`add_to_fims_tmb()` is declared as a `virtual` method on that base class, calling it through
+a base class pointer is sufficient — C++ automatically invokes the correct derived-class
+implementation at runtime. This is what "dispatch through a shared base class" means:
+`CreateTMBModel()` does not need to know whether it is looking at an `AgeCompDataInterface`
+or a `PopulationInterface`; it just calls `add_to_fims_tmb()` and C++ figures out the rest.
+
+The two XPtr types point to the same underlying C++ object in memory. The concrete XPtr is
+what the user works with (setting values, reading results). The base XPtr is only needed
+by `CreateTMBModel()` to make that call. Both XPtrs share ownership of the object via
+`shared_ptr`, so the object stays alive as long as either pointer exists.
+
+**Define the base alias** in `rcpp_interface_base.hpp`:
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp
+using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
+```
+
+**Provide a conversion function for each concrete type.** This function takes the
+concrete XPtr the user already has and returns a second XPtr pointing to the same object
+but typed as the base class. C++ allows this conversion implicitly because
+`AgeCompDataInterface` inherits from `FIMSRcppInterfaceBase` — no special cast syntax
+is needed:
+
+```cpp
+// src/rcpp_data.cpp
+
+// create_data_interface_ — allocates a NEW data interface object
+// data_to_fims_xptr_     — does NOT create a new object; returns a second pointer
+//                          to the SAME object typed as the interface base class
+Rcpp::XPtr<SharedBase> data_to_fims_xptr_(Rcpp::XPtr<SharedData> xp) {
+    SharedBase base = *xp;  // implicit conversion: shared_ptr<Derived> -> shared_ptr<Base>
+    return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
+```
+
+One conversion function per family is enough, for the same reason as the creator: the
+argument is already typed to the family's base class. A single conversion function across
+*all* families is not possible, because `Rcpp::function` registers one concrete signature
+and `XPtr<SharedData>`, `XPtr<SharedFleet>`, and `XPtr<SharedPopulation>` are distinct C++
+types.
+
+Register it inside the existing module registration block, again with a trailing underscore
+so the clean names remain available for the R wrappers in Section 4b:
+
+```cpp
+void register_data(Rcpp::Module& m) {
+    Rcpp::function("create_data_interface_", &create_data_interface_);
+    Rcpp::function("data_to_fims_xptr_",     &data_to_fims_xptr_);
+}
+```
+
+Register `CreateTMBModel` and `clear` the same way in their respective registration blocks:
+
+```cpp
+Rcpp::function("CreateTMBModel_", &CreateTMBModel);
+Rcpp::function("clear_",          &clear_impl);
+```
+
+**Update `CreateTMBModel()` in C++ to accept a list of base XPtrs** and call
+`add_to_fims_tmb()` on each:
+
+```cpp
+// inst/include/interface/rcpp/rcpp_interface.hpp
+
+uint32_t CreateTMBModel(Rcpp::List xptr_list) {
+    init_logging();
+
+    std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0 =
+        fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
+    info0->Clear();
+
+    std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>> info =
+        fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
+    info->Clear();
+
+    for (int i = 0; i < xptr_list.size(); i++) {
+        Rcpp::XPtr<SharedBase> xp =
+            Rcpp::as<Rcpp::XPtr<SharedBase>>(xptr_list[i]);
+        (*xp)->add_to_fims_tmb();  // C++ calls the correct derived-class method
+    }
+
+    info0->CreateModel();
+    info0->CheckModel();
+    info->CreateModel();
+
+    std::shared_ptr<fims_model::Model<TMB_FIMS_REAL_TYPE>> m0 =
+        fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
+
+    return true;
+}
+```
+
+#### 4b. R-side automatic registry (intermediate step before R6)
+
+Rather than requiring the user to manually build the list passed to `CreateTMBModel()` —
+which risks silently omitting a component — an R-side package-level registry can be
+maintained automatically. The registry is a simple list stored inside a private package
+environment (not visible to the user). Thin R wrapper functions around each C++ creator
+call both `create_<type>()` and `<type>_to_fims_xptr()` and add the result to the registry.
+The user-facing `CreateTMBModel()` and `clear()` functions are also R wrappers that operate
+on this registry.
+
+This approach is more reliable than scanning the R environment for XPtr objects, because
+registration happens at the moment of creation — it is not affected by variable names,
+scoping, or objects stored inside lists.
+
+**A wrapper must return both pointers, not just the concrete one.** The obvious design
+is for `create_data()` to return the concrete XPtr and keep the base XPtr private in
+the registry. That does not work. The shared functions from Step 3 —
+`set_variable_vector_()`, `set_numeric_vector_()`, `get_variable_vector_id_()`,
+`get_module_id_()` — all take the **base** XPtr, and a concrete XPtr cannot be converted to
+one without knowing its family, because the `*_to_fims_xptr_()` functions are per family. A
+concrete XPtr on its own cannot even report its own ID. So a user handed only the concrete
+pointer could call the family-specific setters and nothing else.
+
+The wrapper therefore returns a small S3 object carrying both pointers, the module type,
+and the ID. This is the same pair the R6 wrappers in Section 3.2 hold in `.xp` and
+`.base_xp`, so it is a step toward that design rather than away from it.
+
+```r
+# R/fims_interface.R
+
+# Private package-level registry — not exported, not user-visible
+.fims_registry <- new.env(parent = emptyenv())
+.fims_registry$objects  <- list()
+.fims_registry$metadata <- list()
+
+# The two C++ functions that differ per family: one produces a module's base
+# pointer, the other invalidates its family-typed pointer. Both are wrapped in
+# closures, because the Rcpp module is not loaded until .onLoad() runs, well
+# after this file is sourced — naming the functions directly would fail at
+# package load. A family name in place of a nine-branch switch keeps the
+# create_*() wrappers to two lines each.
+.fims_module_family <- list(
+  data = list(
+    to_base = function(pointer) data_to_fims_xptr_(pointer),
+    release = function(pointer) release_data_(pointer)
+  ),
+  population = list(
+    to_base = function(pointer) population_to_fims_xptr_(pointer),
+    release = function(pointer) release_population_(pointer)
+  )
+  # ... one entry per family: fleet, growth, maturity, recruitment,
+  # selectivity, distribution, model
+)
+
+# Records the module in the registry and returns it to the user. Every
+# create_*() wrapper ends with this call, so registration cannot be forgotten.
+# The whole module goes into the registry, not just its base pointer, so that
+# clear() can reach both pointers to invalidate them.
+register_module <- function(pointer, family, type, ...) {
+  base_pointer <- .fims_module_family[[family]]$to_base(pointer)
+  id <- as.integer(get_module_id_(base_pointer))
+  module <- structure(
+    list(pointer = pointer, base_pointer = base_pointer,
+         family = family, type = type, id = id),
+    class = "fims_module")
+  .fims_registry$objects  <- c(.fims_registry$objects, list(module))
+  .fims_registry$metadata <- c(.fims_registry$metadata,
+                               list(c(list(type = type, id = id), list(...))))
+  module
+}
+
+# One creator per family on the R side too, mirroring C++. An earlier draft
+# gave each type its own R function so the type string never appeared in user
+# code, but that meant seventeen R functions over nine C++ ones, and adding a
+# type meant an addition in both places. Passing the type through keeps the two
+# layers in step. The type is checked against a table first, so a bad one is
+# reported with the valid options rather than reaching C++.
+create_data <- function(type, n_years, n_bins = 0) {
+  label <- module_type_label("data", type)
+  # Rcpp modules do not carry C++ default arguments across to R, so n_bins is
+  # passed explicitly even though the C++ signature defaults it to 0.
+  pointer <- create_data_interface_(type, as.integer(n_years),
+                                    as.integer(n_bins))
+  # The bin count is named for what it counts, so describe_model() reads well.
+  extras <- list(n_years = n_years)
+  if (type == "age_comp") extras[["n_ages"]] <- n_bins
+  if (type == "length_comp") extras[["n_lengths"]] <- n_bins
+  do.call(register_module,
+          c(list(pointer = pointer, family = "data", type = label), extras))
+}
+
+create_selectivity <- function(type) {
+  register_module(create_selectivity_(type), "selectivity",
+                  module_type_label("selectivity", type))
+}
+
+# Repeat for every family: create_maturity(), create_growth(),
+# create_recruitment(), create_distribution(), create_fishery_model(), and
+# create_fleet() and create_population(), which take no type.
+
+# R wrapper around C++ CreateTMBModel_ — uses the registry automatically.
+# The registry holds whole modules, so the base pointers are pulled out here.
+CreateTMBModel <- function() {
+  CreateTMBModel_(lapply(.fims_registry$objects, `[[`, "base_pointer"))
+}
+
+# clear() invalidates every registered module, then resets the C++ TMB
+# singletons and empties the registry. Releasing both of a module's pointers
+# leaves nothing owning it, so a module cannot survive to collide with a later
+# one and its memory is returned immediately. See Section 4e.
+clear <- function() {
+  for (module in .fims_registry$objects) {
+    .fims_module_family[[module$family]]$release(module$pointer)
+    release_base_(module$base_pointer)
+  }
+  clear_()
+  .fims_registry$objects  <- list()
+  .fims_registry$metadata <- list()
+}
+```
+
+With this in place, the user workflow is identical to the current S4 workflow — create
+objects, set values, call `CreateTMBModel()` — with no manual list management required.
+The `clear()` function simplifies on the C++ side to resetting the TMB `Information`
+singletons and `id_g` counters. The bookkeeping that `live_objects` and
+`fims_interface_objects` previously provided moves to the R wrapper, which invalidates
+every registered module and then empties the registry before calling the C++ side, so by
+the time `clear_impl()` runs there are no interface objects left to account for.
+
+**Migrating `initialize_population()`.** Linking fleets to a population gets simpler, not
+harder. The S4 method took one fleet at a time, so `initialize_population()` loops over
+the fleet entries of `linked_ids`:
+
+```{r eval=FALSE}
+# R/initialize_modules.R — current
+for (i in seq_along(linked_ids)) {
+  module$AddFleet(linked_ids[[i]])
+}
+```
+
+The XPtr setter replaces the whole set in one call, and takes the fleet objects rather
+than their IDs, so the loop collapses:
+
+```{r eval=FALSE}
+set_population_fleets_(population, fleets)
+```
+
+`initialize_population()` already receives the full set of fleets, so nothing new has to
+be threaded through — but it currently receives their *IDs*, in `linked_ids`, and the
+setter needs the XPtrs. Whichever function assembles `linked_ids` should carry the
+objects alongside the IDs, or return them, so the population can be given both its
+`growth_id`/`maturity_id`/`recruitment_id` numbers and its fleet objects.
+
+Replacing rather than appending is deliberate. It is the only form that can *reduce* the
+fleet set, which is what lets a population built by copying another one be given
+different fleets. It also keeps `fleet_ids` and `fleets_m` in step by construction: both
+are cleared and rebuilt in the same loop, so they cannot drift apart the way two
+separately-maintained lists could. `FisheryModelInterfaceBase::SetPopulations()` and its
+`set_model_populations_()` wrapper follow the same pattern for the same reasons.
+
+**Migrating `set_param_vector()`.** Parameter assignment gets shorter in the same way, and
+in the function that already exists for it. `set_param_vector()` filters the parameters
+tibble down to one label and pulls its `value` and `estimation_status` columns; only its
+last few lines touch the module, and those are a per-element loop through the S4 field:
+
+```{r eval=FALSE}
+# R/initialize_modules.R — current
+module[[field]]$resize(length(field_value))
+for (i in seq_along(field_value)) {
+  module[[field]][i][["value"]] <- field_value[i]
+  module[[field]][i][["estimation_status"]]$set(field_estimation_status[i])
+}
+```
+
+The whole block becomes one call. `fill_variable_vector()` resizes to match the values it is
+given, so the explicit resize goes too:
+
+```{r eval=FALSE}
+set_variable_vector_(module_base, field, field_value, field_estimation_status)
+```
+
+Everything above that in the function — the filtering, the grouping by label, the missing
+value check — stays in R and stays unchanged.
+
+**Migrating `initialize_module()`: invert the loop.** The generic populator worked by
+reflection. It derived the S4 class name from the tibble's `module_type` and `module_name`
+columns, read `names(module_class@fields)` to enumerate every field, subtracted the ones
+that should not be set, and called `set_param_vector()` for each survivor.
+
+Reflection is not available under XPtr — there is no class object to enumerate — and the
+subtraction was already the weak point: **38 distinct field names** hardcoded across
+`Population`, `Fleet`, and `BevertonHoltRecruitment`, existing only to strip derived
+quantities back out of the reflected list. Exposing the derived quantities in
+`get_variable_vector()` makes that list longer, not shorter.
+
+The tibble already knows the answer. `set_param_vector()` aborted if a reflected field was
+absent from the tibble, so every field it set was in the tibble to begin with; the
+reflection and the exclusion list existed only to derive a set the tibble already held.
+Iterating the tibble's labels instead removes both, and adding a parameter to a module then
+needs a tibble row and no R change.
+
+One predicate makes that work: `has_variable_vector()`, which asks a module whether it has
+a field by a given name. The tibble mixes rows for a module with rows for the distribution
+attached to it — a recruitment module carries a `log_sd` row belonging to its process
+distribution — and `distribution_type` does not separate them, because `log_devs` carries
+`"process"` too and *is* a recruitment field. So the module is asked rather than a list
+being kept.
+
+A label the module does not have is an error unless the row has a distribution attached,
+which is what separates the two cases: in the default parameters tibble every label without
+a distribution is a module field, and the only non-field label, `log_sd`, carries one. A
+typo therefore fails loudly rather than being silently ignored. The remaining hole is a typo
+on a label that also carries a distribution, which stays silent; closing it would need the
+distribution setup to declare which labels it consumes so that anything unconsumed is a
+mistake.
+
+**Which module to create is derived, not tabled.** The obvious approach is a lookup from
+`module_name` to a creator function, but that is one more place to edit when a functional
+form is added — a Ricker recruitment would mean touching the C++ enum, the C++ creator, and
+that table. It is unnecessary: `paste0(module_type, module_name)` spells exactly the display
+labels `.fims_module_types` already holds for `describe_model()`, so the family and type can
+be recovered from the label. `.fims_module_family` gained a `create` entry per family to
+complete the path.
+
+The two tables divide along the axis that matters. `.fims_module_types` is keyed by type and
+grows when a functional form is added; `.fims_module_family` is keyed by family and does
+not. Adding Ricker touches the C++ enum, the C++ creator, and one line of
+`.fims_module_types`.
+
+This does couple the R side to a naming convention: the label is built by concatenation, so
+it works only while a module's C++ class name equals its type followed by its name. A module
+breaking that convention fails the lookup with an error naming `.fims_module_types`, which
+is the right failure, but the coupling is worth knowing about.
+
+**Bulk assignment belongs in R, not C++.** It is tempting to hand the parameters tibble
+across the boundary and let C++ set every field of a module at once. That would be the wrong
+place for it. The tibble's `module_name`, `module_type`, and `fleet` columns decide *which*
+module receives *which* rows, so a C++ bulk setter would have to reimplement the filtering
+and grouping that `dplyr` already does, and would pull module dispatch into C++ as well.
+Crossing the boundary is not the cost to optimize: a population has roughly five settable
+parameters, and even a large model is a few dozen calls made once during setup. R also
+produces far better diagnostics, because it knows which row of the tibble a bad label came
+from, and C++ sees only the name.
+
+**What C++ does still owe: enumerating parameter names.** `get_variable_vector()` answers
+*"do you have a parameter called this?"*, but nothing can ask a module *"what parameters do
+you have?"* That gap has three consequences: R cannot validate a label against the module
+before sending it, `describe_model()` (Section 4c) cannot list a module's parameters, and
+the module manifest in Step E of `Parameter_Registry.Rmd` has nothing to build from.
+
+Enumeration should not be added to the current hand-written `get_variable_vector()`
+overrides, which are `if` chains and hold no list to return. It arrives for free with Step A
+of `Parameter_Registry.Rmd`, where `declare_parameter()` in each constructor populates a
+`parameters_m` vector that already holds every name.
+
+Nor should the names become an enum in the sense that `SelectivityType` is one. Parameter
+names are per module type and there are many of them across the families, so a shared enum
+would be a large flat list in one file that every contributor adding a parameter has to
+edit — the churn that keeping the family type tags local was meant to avoid. The R side also
+drives assignment from the string `label` column of the parameters tibble, so an enum would
+add a string-to-enum conversion in front of a lookup that already takes a string. The name
+is data, and it should stay data.
+
+**Migrating `distribution_formulas.R`.** This file needs more attention than the other R
+migrations, because both of the things it does — reaching a module's data ID, and reaching a
+parameter's ID — worked through S4 mechanics that no longer exist.
+
+It reaches the observed data ID by building a method name as a string and looking it up:
+
+```{r eval=FALSE}
+# R/distribution_formulas.R — current
+data_id_name <- glue::glue("GetObserved{snake_to_pascal(data_type)}DataID")
+getter_function <- tryCatch(do.call("$", list(module, data_id_name)),
+                            error = function(e) NULL)
+if (is.null(getter_function)) {
+  cli::cli_abort(c(x = "Could not find observed data name, {.code {data_id_name}} ..."))
+}
+new_module$set_observed_data(getter_function())
+```
+
+`get_fleet_observed_data_ids_()` returns all four IDs at once as a named integer vector,
+using the same names as the `data_ids` entries in the JSON output, so the string-building,
+the `tryCatch`, and the error branch all collapse to a lookup:
+
+```{r eval=FALSE}
+new_module <- set_distribution_observed_data_(
+  new_module, get_fleet_observed_data_ids_(fleet)[[data_type]]
+)
+```
+
+This assumes `data_type` already uses `"agecomp"`, `"lengthcomp"`, `"index"`, and
+`"catch"`. If it does not, converting it once is a better place for the mapping than
+`snake_to_pascal()` reconstructing a C++ method name — a name the R side should not have to
+know.
+
+The parameter links are the harder half. Both call sites read a `VariableVector` ID through
+the S4 field:
+
+```{r eval=FALSE}
+new_module$set_distribution_links("data", module$field(link_name)$get_id())
+new_module$set_distribution_links("random_effects", module$field(par)$get_id())
+```
+
+`$field()` and `VariableVector$get_id()` were both `Rcpp::class_<>` mechanics, so with those
+registrations removed there is no path from R to a parameter's ID. That is why
+`get_variable_vector_id_(module_base, name)` exists; it is the replacement for this exact
+call:
+
+```{r eval=FALSE}
+set_distribution_links_(new_module, "random_effects",
+                        get_variable_vector_id_(module_base, par))
+```
+
+Two details worth carrying into the rewrite. `get_variable_vector_id_()` takes the **base**
+XPtr, so the wrapper needs the module's base pointer here, not only its family-typed one.
+And `par` and `link` come from the parameters tibble as strings, which is exactly what
+`get_variable_vector_id_()` wants — the names line up without translation, unlike the
+data-ID path above.
+
+#### 4c. Model description from the registry
+
+Because the R wrapper functions know the type and configuration of each object at the
+moment of creation, a parallel metadata list can be stored alongside the base XPtrs at no
+additional C++ cost. This metadata enables a `describe_model()` function that prints a
+human-readable summary of the model the user has assembled — useful for verifying that all
+components are present and correctly configured before calling `CreateTMBModel()`.
+
+Extend the registry environment with a `metadata` list, and populate it inside each R
+wrapper function:
+
+The `metadata` list is populated by the same `register_module()` call shown in Section
+4b, so a wrapper adds a metadata field simply by naming it in `...`:
+
+```r
+create_data <- function(type, n_years, n_bins = 0) {
+  # ... resolve the label and create the pointer, then:
+  register_module(pointer, "data", label,
+                  n_years = n_years, n_ages = n_bins)   # extra metadata
+}
+
+create_population <- function() {
+  register_module(create_population_(), "population", "Population")
+}
+```
+
+The ID recorded here comes from `get_module_id_()`, which takes the base XPtr — there is
+no way to read an ID from a concrete XPtr, which is part of why the wrapper keeps both.
+
+`describe_model()` iterates the metadata list and prints a summary. Because this function
+operates entirely on the R-side metadata, it requires no C++ changes:
+
+```r
+describe_model <- function() {
+  if (length(.fims_registry$metadata) == 0) {
+    message("No model components have been registered.")
+    return(invisible(NULL))
+  }
+  cat("Model components registered:\n")
+  cat(strrep("-", 40), "\n")
+  for (m in .fims_registry$metadata) {
+    # Build a string of any extra fields beyond type and id
+    extras <- m[!names(m) %in% c("type", "id")]
+    extra_str <- if (length(extras) > 0) {
+      paste(names(extras), unlist(extras), sep = " = ", collapse = ", ")
+    } else ""
+    cat(sprintf("  %-20s id: %d  %s\n", m$type, m$id, extra_str))
+  }
+  cat(strrep("-", 40), "\n")
+  cat(sprintf("Total: %d component(s)\n", length(.fims_registry$metadata)))
+  invisible(.fims_registry$metadata)
+}
+```
+
+Example output after setting up a simple model:
+
+```
+Model components registered:
+----------------------------------------
+  AgeComp              id: 1  n_years = 10, n_ages = 5
+  Index                id: 2  n_years = 10
+  BevertonHoltRecruit  id: 3
+  LogisticSelectivity  id: 4
+  Fleet                id: 5
+  Population           id: 6
+----------------------------------------
+Total: 6 component(s)
+```
+
+`describe_model()` is intended to be called interactively before `CreateTMBModel()` as a
+sanity check. Additional metadata fields — such as linked component IDs (e.g.,
+`recruitment_id`, `selectivity_id`) or parameter dimensions — can be added to each wrapper
+function without modifying any C++ code.
+
+Parameter names, values, and estimation statuses are the exception: they cannot be added
+this way, because nothing can ask a module what parameters it has, and there is no getter
+for a parameter's values or status either — only `set_variable_vector_()` and
+`get_variable_vector_id_()` are exported. Adding enumeration to the hand-written
+`get_variable_vector()` overrides would mean maintaining a second list beside the `if`
+chain, so it waits for Step A of `Parameter_Registry.Rmd`, where `declare_parameter()`
+produces the list as a side effect of declaring the fields. See the discussion at the end of
+Section 4b.
+
+When it does land, one distinction belongs in `describe_model()`'s own documentation: an
+interface module holds a parameter's *starting* value. After a fit the estimates live in
+the model, not in the module, so `describe_model()` will report what was set rather than
+what was estimated unless it is deliberately given a path to the fitted values. The name
+invites the other reading, so it should say which one it means.
+
+#### 4d. Changing a module after the model is built
+
+The registry supports adding a module and emptying everything. It does not support
+removing one, and that gap has a silent failure behind it.
+
+Consider swapping a fleet's logistic selectivity for a double-logistic one --- the natural
+way to run a selectivity sensitivity. The obvious sequence looks right and is wrong:
+
+```{r eval=FALSE}
+new_selectivity <- create_double_logistic_selectivity()
+set_variable_vector_(new_selectivity$base_pointer, "inflection_point_asc", ...)
+set_fleet_selectivity_id_(fleet$pointer, new_selectivity$id)
+CreateTMBModel()
+```
+
+The fleet is repointed correctly, but the old selectivity is still in the registry, so
+`CreateTMBModel()` still hands it to the model and its `add_to_fims_tmb()` still registers
+`inflection_point` and `slope` as estimable. The result is two parameters that no fleet
+uses: present in the parameter vector, zero gradient, and nothing reports a problem. The
+only related check in `Information` fires when a fleet is *missing* a selectivity, not when
+a selectivity is unreferenced. Until a removal path exists, the only correct workflow is
+`clear()` followed by rebuilding the whole model.
+
+**The shape to build.** A `remove_module()` that drops a module from `objects` and
+`metadata` and releases its pointers, and above it a small family of `update_*` functions
+that repoint a link and retire whatever the link used to reach:
+
+```{r eval=FALSE}
+new_selectivity <- create_double_logistic_selectivity()
+set_variable_vector_(new_selectivity$base_pointer, "inflection_point_asc", ...)
+update_fleet_selectivity(fleet, new_selectivity)
+CreateTMBModel()
+```
+
+Two decisions about that signature are worth recording, because the obvious alternatives
+are worse.
+
+*The function should not create the module.* Creation arguments differ by type --- a
+double-logistic selectivity takes different parameters than a logistic one --- so a
+function that created as well as linked would have to accept a type string plus arbitrary
+parameters. It is also normal to set the new module's parameters before wiring it in,
+which requires having it first.
+
+*The function should not take the old module.* The holder already knows which module it
+points at, so passing the old one separately creates a way for the two to disagree. Look
+it up instead. This is what `get_population_process_ids_()` and
+`get_recruitment_process_id_()` were added for: every single-ID link now has a getter, so
+a link can be changed without the caller having to remember what it was. Note that an
+unset link reads back as `-999`, so R code must treat that as the sentinel rather than
+assuming a missing link is falsy.
+
+**Retire only if unreferenced.** Nothing stops two fleets sharing one selectivity --- the
+link is an integer ID, not an exclusive relationship. So `update_*` must confirm nothing
+else still points at the old module before removing it, or it silently breaks the other
+fleet. The registry holds every module, so the check is a scan over the plausible holders;
+it only has to exist.
+
+**Links come in three shapes, and only the first takes an `update_*` verb.**
+
+- *Single ID.* `fleet -> selectivity`, `population -> maturity / growth / recruitment /
+  recruitment_err`, and `recruitment -> process`. One holder, one slot, so a swap is
+  unambiguous. One internal helper does read-current-ID, set-new-ID, retire-if-unreferenced,
+  and the public functions are thin wrappers over it.
+- *Many, by pointer.* `population -> fleets` and `model -> populations` already have
+  replace-all setters, and replacing the whole set can shrink it, which is what makes a
+  swap work there. No new verb is needed; what is missing is retiring whatever the
+  replacement dropped, using the same unreferenced check.
+- *No holder.* Nothing points at a distribution --- it reaches the model through the
+  registry --- so changing `dnorm` to `dlnorm` is `remove_module()` plus a fresh
+  `create_*()`, with the new module's own links set. An `update_*` verb has nothing to act
+  on.
+
+This is new API surface rather than part of the migration, and none of it can be exercised
+until the R side builds a model again, so it belongs after `initialize_modules.R` rather
+than alongside it.
+
+#### 4e. Forward compatibility with per-model contexts
+
+FIMS currently holds exactly one model per R process, because `fims_info::Information<Type>`
+and `fims_model::Model<Type>` are singletons reached through `GetInstance()`. Removing that
+restriction is a separate piece of work — see `Singleton_Removal.Rmd` — but four decisions
+made while writing Step 4 determine whether that work is a small change or a second pass
+over the whole interface layer. All four are close to free now and expensive to retrofit.
+
+**Pass a context to `add_to_fims_tmb()`.** Of the 51 `GetInstance()` call sites in the
+codebase, 46 are in the interface layer that Step 4 rewrites. If `add_to_fims_tmb()` takes
+its `Information` objects as a parameter rather than reaching for the singleton, those 46
+sites are converted once, as part of work already being done, instead of twice.
+
+No new type is required. `fims_model::Model<Type>` already owns `fims_information`, so the
+context is a `Model<Type>` that is simply no longer a singleton. Because
+`add_to_fims_tmb()` dispatches to both type instantiations, a small struct holding the pair
+is enough:
+
+```cpp
+// inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp
+
+struct FIMSModelContext {
+  std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE>> info0;
+  std::shared_ptr<fims_info::Information<TMBAD_FIMS_TYPE>>    info;
+};
+
+class FIMSRcppInterfaceBase {
+ public:
+  virtual bool add_to_fims_tmb(FIMSModelContext &ctx) { ... }
+};
+```
+
+In the interim `CreateTMBModel()` fills the struct from `GetInstance()`, so behavior is
+unchanged. What changes is that every interface object now reads its `Information` from an
+argument instead of a global, and switching to a per-model registry later becomes a change
+to one function rather than to forty-six.
+
+**Return a model handle from `CreateTMBModel()`.** Done. It returned `bool` and always
+returned `true`, so the return value carried nothing. It now returns a `uint32_t` that
+increments on every successful build and is never rewound, so two handles are equal only
+if they came from the same build, and the R wrapper keeps the latest in the registry.
+
+Failure is still reported by throwing rather than by the return value, so a returned
+handle always means the model was built.
+
+The handle is useful now, not only later: with `CreateTMBModel()` callable repeatedly to
+rebuild from the same modules, a fitted `obj` can outlive the model it was built from, and
+comparing handles is how R can tell. It is also what a per-model registry would look up,
+and what the R wrapper should attach to `obj` as an attribute so the garbage collector
+keeps the two alive together — that attachment is still to do.
+
+**Keep the `id_g` resets; give each model its own ID namespace instead.** An earlier
+draft of this section argued the opposite --- that `clear()` should stop rewinding the
+counters, so IDs would be globally unique and two models could share
+`Information::variable_map`, which is keyed by ID. That recommendation is withdrawn, for
+two reasons.
+
+The first is that IDs are user-facing. `module_id` is a documented column of the tibble
+`tidy()` returns, and `parameter_id` reaches the same output through
+`reshape_output.R`. Monotonic counters advance by roughly thirty per model build, so a
+session spent rebuilding a model while debugging would put four-digit IDs in front of a
+user who has only ever built one model. That is a poor trade for a property no user asked
+for.
+
+The second is that global uniqueness is a workaround for a single shared map, and the
+per-model context in the first item of this section removes the need for it. A model that
+owns its own `Information` can own its own counters: IDs start at 1 in every model, stay
+small, and cannot collide, because they are only ever compared within one model. Making
+one namespace enormous is the wrong way to get uniqueness when the real fix is to have
+more than one namespace.
+
+What was correct in the original argument is the aliasing hazard. Calling `clear()` while
+still holding a module in R rewinds the counters underneath that module: the next module
+created takes an ID the old one is still using, and the ID is what the model looks
+parameters up by. Nothing in C++ catches this --- the dangling-pointer warning in
+`clear_impl()` counts model-core objects, because `FIMSMemoryTracker` is inherited by
+`FIMSObject<Type>` and not by the interface classes.
+
+The R `clear()` wrapper closes it instead, by invalidating every module in the registry
+before it empties: both of a module's pointers are released, so a module cannot survive a
+`clear()` to collide with a later one. Using a released module reports `external pointer
+is not valid` rather than producing a wrong model, and because nothing owns the module
+afterwards its memory is returned when `clear()` returns rather than at the next garbage
+collection. This is why no user has to remember to set variables to `NULL`.
+
+The one thing the guard does not cover is a module held by something the registry never
+saw, which under the current design cannot happen: every `create_*()` wrapper registers.
+
+Two related defects surfaced while working through this, both independent of which way
+the counters go:
+
+- `Information::variable_map` was never cleared --- not by `Clear()`, not anywhere. Its
+  entries are *raw* pointers into objects `Clear()` has already destroyed, so every entry
+  dangles the moment `Clear()` runs. The ID resets were bounding the map by accident, since
+  a rerun overwrites the same keys; a run with fewer modules than its predecessor still
+  left the surplus keys behind. `Clear()` now calls `variable_map.clear()`, which both
+  removes the dangling entries and makes the map's size independent of how IDs are
+  numbered.
+- The four `variable_map.find()` lookups in `SetupPriors()`, `SetupRandomEffects()`, and
+  `SetupData()` dereference the returned iterator without comparing it to `end()`. A
+  distribution linked to an unregistered parameter ID is therefore undefined behavior
+  rather than an error message.
+
+The existing inconsistency where `Variable::id_g` and `VariableVector::id_g` are defined
+as `0` but reset to `1` should still be resolved, so that the first ID does not depend on
+whether `clear()` has run.
+
+**Let the XPtr own the context and anything global hold a weak reference.** A TMB objective
+function holds no C++ reference back to the model it evaluates. If R releases the handle
+while `obj` is still alive, the next `obj$fn()` call has nothing to dereference. The
+registry should therefore hold `std::weak_ptr`, the XPtr should hold the strong reference,
+and the R wrapper that calls `TMB::MakeADFun()` should attach the model handle to `obj` as
+an attribute so R's garbage collector keeps the two alive together. Establishing this
+direction in the Section 4b registry costs nothing; reversing ownership semantics after the
+API ships does not.
+
+---
+
+## 3. Usage Example
+
+### 3.1 R Workflow with Automatic Registry
+
+With the R-side registry in place (Step 4b), the user workflow closely mirrors the current
+S4 workflow. `CreateTMBModel()` is called with no arguments — the registry built up during
+object creation is used automatically. Note that `$method()` syntax does not work directly
+on raw XPtr objects; all field access goes through standalone setter functions. See
+Section 3.2 for R6 wrappers that restore familiar `$` ergonomics.
+
+```{r eval=FALSE}
+library(FIMS)
+
+# ==================== SETUP ====================
+
+# 1. Create model components.
+#    Each R wrapper calls the C++ creator AND registers the object automatically.
+#    The concrete XPtr is returned for use in setter calls below.
+age_comp <- create_data("age_comp", n_years = 10, n_bins = 5)
+index    <- create_data("index", n_years = 10)
+pop      <- create_population()
+growth   <- create_empirical_growth()
+
+# 2. Set values via the shared setter functions.
+#    set_numeric_vector_() and set_variable_vector_() cover every module in FIMS: the field is
+#    named rather than typed, so no module type appears in the call. They take
+#    the base XPtr, which the R wrappers hold alongside the concrete one.
+set_vector(age_comp, "values", my_age_comp_data)
+set_vector(age_comp, "uncertainty", my_age_comp_cv)
+set_vector(index, "values", my_index_data)
+set_population_constants(pop, n_years = 10L, n_ages = 5L)
+set_population_process_ids(pop, growth_id = get_module_id(growth))
+
+# 3. Build the TMB model — registry is passed automatically, no list needed
+CreateTMBModel()
+
+# fit model...
+
+
+# ==================== ITERATIVE WORKFLOW ====================
+
+# 4. For a second scenario (e.g., a sensitivity run with different data),
+#    update values directly on the existing concrete XPtrs.
+#    The registry already holds base XPtrs pointing to the same underlying C++ objects,
+#    so any change made here is automatically visible when CreateTMBModel() runs again —
+#    no re-registration or clear() needed between scenarios.
+set_vector(age_comp, "values", new_age_comp_data)   # update age composition data
+set_vector(index, "values", new_index_data)         # update index data
+set_parameter(pop, "log_M",                         # update starting values
+              values = new_log_M,
+              estimation_status = "assumed_known")
+set_parameter(pop, "log_init_naa",
+              values = new_log_init_naa,
+              estimation_status = "fixed_effects")
+
+# 5. Rebuild — CreateTMBModel() internally calls fims::Information::Clear() on both
+#    TMB singletons (double and TMBAD types) before re-populating from the registry,
+#    so the previous model run's state is fully reset. The R registry itself is NOT
+#    cleared, which is what allows the same objects to be reused across scenarios.
+CreateTMBModel()
+
+# fit model...
+
+
+# ==================== CLEANUP ====================
+
+# 6. clear() resets the TMB singletons AND the R registry.
+#    Setting R variables to NULL releases the concrete XPtrs;
+#    shared_ptr ref counts drop to 0 on next GC and memory is freed.
+clear()
+age_comp_xp <- NULL
+index_xp    <- NULL
+pop_xp      <- NULL
+gc()
+```
+
+### 3.2 R6 Wrapper Workflow - Future Development, will not be implemented in this issue
+
+R6 classes restore `$` ergonomics by wrapping both the concrete XPtr (for typed field
+access) and the base XPtr (for `CreateTMBModel()` dispatch) inside a single user-facing
+object:
+
+```{r eval=FALSE}
+AgeComp <- R6::R6Class("AgeComp",
+  private = list(
+    .xp      = NULL,
+    .base_xp = NULL
+  ),
+  public = list(
+    initialize = function(n_years, n_ages) {
+      private$.xp      <- create_data_interface_("age_comp", n_years, n_ages)
+      private$.base_xp <- data_to_fims_xptr_(private$.xp)
+    },
+    set_values = function(values) {
+      set_numeric_vector_(private$.base_xp, "values", values)
+    },
+    fims_xptr = function() private$.base_xp
+  )
+)
+
+Population <- R6::R6Class("Population",
+  private = list(
+    .xp      = NULL,
+    .base_xp = NULL
+  ),
+  public = list(
+    initialize = function() {
+      private$.xp      <- create_population_()
+      private$.base_xp <- population_to_fims_xptr_(private$.xp)
+    },
+    set_n_years = function(n) set_population_n_years_(private$.xp, n),
+    set_n_ages  = function(n) set_population_n_ages_(private$.xp, n),
+    fims_xptr   = function() private$.base_xp
+  )
+)
+
+# User workflow
+age_comp <- AgeComp$new(n_years = 10, n_ages = 5)
+age_comp$set_values(my_age_comp_data)
+
+pop <- Population$new()
+pop$set_n_years(10L)
+pop$set_n_ages(5L)
+
+# Under R6, CreateTMBModel() can receive explicit base XPtrs from each object,
+# or the R-side registry (Section 4b/4c) can be used here too — both patterns work.
+CreateTMBModel(list(age_comp$fims_xptr(), pop$fims_xptr()))
+```
+
+---
+
+## 4. Memory Impact
+
+The following table summarizes heap allocations eliminated per `PopulationInterface`
+instance by the full refactor. The XPtr approach only realizes these savings when all four
+steps are applied together; a partial migration that retains SharedPrimitives or constructor
+copies will not produce a meaningful reduction.
+
+| Source | Before | After |
+|---|---|---|
+| `SharedInt` configuration fields (8) | 8 heap allocs | 0 |
+| `SharedBoolean` fields (2 in base) | 2 heap allocs | 0 |
+| `SharedString` field (1) | 1 heap alloc | 0 |
+| Constructor registry copy | 1 `make_shared<PopulationInterface>` | 0 |
+| `Variable::estimation_type_m` per element | 1 heap alloc per `Variable` | 0 (`EstimationStatus` enum) |
+| `live_objects` map per class | 1 `std::map` + N entries | removed |
+| `fims_interface_objects` global vector | 1 entry per object | removed |
+| `RealVector` shared storage per instance | 1 `make_shared<std::vector>` | removed (class deleted) |
+
+The `clear()` function simplifies substantially: instead of manually resetting every
+class's `live_objects` map and `id_g` counter, it only needs to reset the TMB `Information`
+singletons and the `id_g` counters — no per-class map iteration required.
+
+
+## 5. Notes
+
+**Copy operations are deleted, not removed.** During Step 3, the copy constructor and
+copy assignment operator of every interface class were set to `= delete`. Copies existed
+to populate the `live_objects` and `fims_interface_objects` registries. With those
+registries gone, a copy would only create a second object carrying a duplicate `id`,
+which would then diverge from the object the `Rcpp::XPtr` points at. Merely removing the
+copy constructor is not enough — C++ synthesizes an implicit one and the class stays
+copyable. `= delete` makes a copy a compile error instead of a silent bug.
+
+**`RealVector` was removed.** It wrapped a `std::vector<double>` in a `shared_ptr` so that
+the registry copies of an interface would share one buffer with the original. With the
+copies gone the sharing had no purpose, and unlike `VariableVector` its `id_m` was never
+used as a `variable_map` key. Data vectors are now plain `fims::Vector<double>` with value
+semantics. `Rcpp::NumericVector` was considered as the replacement and rejected: holding a
+`SEXP` as a long-lived member pins R memory through `R_PreserveObject` and confines access
+to the main R thread.
+
+**Still to do.**
+
+- `deep_copy()` for interface modules. Now that copying is a compile error, a user who
+  wants a second scenario built from an existing module needs an explicit function. The
+  design is settled but unimplemented: copy the input field values, share rather than
+  duplicate the structural links, assign fresh IDs, and copy input fields only — never
+  derived quantities, which belong to a model run rather than to the module.
+- The R side is unmigrated. `initialize_modules.R`, `distribution_formulas.R`, and
+  `fimsfit.R` still build modules with `methods::new()`. The migration notes in Section 4
+  cover `initialize_population()`, `set_param_vector()`, and `distribution_formulas.R`.
+- The vignettes still document `live_objects` and `methods::new()` as the current API and
+  need rewriting once the R side lands.
+- `initialize_recruitment()` lost a validation warning in the migration. The reflective
+  `initialize_module()` warned when the parameters tibble specified both `log_devs` and
+  `log_r` for recruitment, since a model can use only one, and advised `log_r` when fitting
+  an AR1 to recruitment. The check lived in the reflection path that inverting the loop
+  removed, and belongs in `initialize_recruitment()` rather than in the generic. The
+  validations that remain at the recruitment-process distribution are a different check and
+  do not cover this case.
+- `initialize_selectivity()`, and its neighbours, say in their documentation that they
+  "handle specific requirements for population initialization" --- a copy-paste from
+  `initialize_population()` that predates this refactor.
+- The doxygen examples in the interface headers still tell users to call
+  `methods::new()` --- `acomp <- methods::new(AgeComp)` and the like, about two dozen of
+  them across the nine `rcpp_objects/*.hpp` files, plus several file-level headers saying
+  "Allows for the use of methods::new() in R." These are not stale history; they are
+  instructions that now fail, because those class registrations are gone. They become
+  `create_data()` and its siblings.
+- `tests/testthat/test-clear.R` needs work that has to wait for the R migration, because
+  its setup calls `initialize_fims()` and so cannot run until `initialize_modules.R` is
+  converted. Deferred deliberately rather than carried as failing tests:
+    - Two assertions worth adding for behavior introduced in Step 4 and currently
+      untested: that `clear_()` warns when modules are still in use --- reachable only by
+      calling the C++ function directly, since the R `clear()` wrapper releases modules
+      first and so can never trip it --- and that a module is unusable after `clear()`,
+      which is the invalidation promise the `fims_module` documentation makes to users.
+    - A check that `clear()` is safe to call twice, which is cheap and would catch a bug
+      in the release loop that would otherwise surface as a crash.
+    - `expect_warning(test_clear_with_leak_check())` appears twice, under both "IO
+      correctness" and "Error handling"; only the second is in the right section.
+    - Both of those calls pass a bare `expect_warning()` with no pattern. That was
+      sufficient when `clear_impl()` could emit only one warning. It now emits two --- the
+      dangling-pointer diagnostic and the live-module check --- so the test would pass
+      even if the dangling-pointer check stopped working, as long as something warned.
+      Matching on the message text fixes it.
+    - `model_run` is assigned in the setup block and never referenced. The call is there
+      for its side effect of building a model; the assignment should say so or go.

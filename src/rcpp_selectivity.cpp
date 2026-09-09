@@ -6,56 +6,130 @@
 
 // static id of the SelectivityInterfaceBase object
 uint32_t SelectivityInterfaceBase::id_g = 1;
-// local id of the SelectivityInterfaceBase object map relating the ID of the
-// SelectivityInterfaceBase to the SelectivityInterfaceBase objects
-std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
-    SelectivityInterfaceBase::live_objects;
+namespace {
+// Adds this counter to the list clear() rewinds.
+IdCounterRegistration selectivity_id_g_registration(
+    &SelectivityInterfaceBase::id_g);
+}  // namespace
+
 #include <Rcpp.h>
+
+// ── Short name for the pointer type ─────────────────────────────────────────
+// SharedSelectivity is a short name for the pointer type used throughout this
+// file. create_selectivity_() hands back a pointer typed to
+// SelectivityInterfaceBase whichever form it built. The forms carry different
+// parameters, so the setter asks for one by name instead of naming a member.
+using SharedSelectivity = std::shared_ptr<SelectivityInterfaceBase>;
+
+// ── Building a module ──────────────────────────────────────────────────────
+/**
+ * @brief Create a selectivity module of the requested type.
+ *
+ * @details Allocates the selectivity interface object to heap memory, hands ownership 
+ * to a shared_ptr, and wraps that shared_ptr in the XPtr. The 'true' argument 
+ * binds the XPtr to R's garbage collector: when the R variable is garbage 
+ * collected, 'delete shared_ptr*' runs and the reference count is decremented.
+ *
+ * @param type Either "Logistic" or "DoubleLogistic".
+ *
+ * @return A pointer to the new selectivity module.
+ */
+Rcpp::XPtr<SharedSelectivity> create_selectivity_(std::string type) {
+  SharedSelectivity selectivity_interface;
+  switch (SelectivityTypeFromString(type)) {
+    case SelectivityType::age_specific:
+      selectivity_interface = std::make_shared<AgeSpecificSelectivityInterface>();
+      break;
+    case SelectivityType::logistic:
+      selectivity_interface = std::make_shared<LogisticSelectivityInterface>();
+      break;
+    case SelectivityType::double_logistic:
+      selectivity_interface =
+          std::make_shared<DoubleLogisticSelectivityInterface>();
+      break;
+  }
+  return Rcpp::XPtr<SharedSelectivity>(
+      new SharedSelectivity(selectivity_interface), true);
+}
+
+/**
+ * @brief Evaluate selectivity at one point.
+ *
+ * @details Evaluates the interface object directly, so it can be called before
+ *   CreateTMBModel() to check a selectivity curve.
+ *
+ * @param xp The selectivity module.
+ * @param x The independent variable, usually age or length.
+ * @return Selectivity at that point.
+ */
+double evaluate_selectivity_(Rcpp::XPtr<SharedSelectivity> xp, double x) {
+  return (*xp)->evaluate(x);
+}
+
+/** @brief Set the age bins for age-specific selectivity. */
+void set_selectivity_ages_(Rcpp::XPtr<SharedSelectivity> xp, std::vector<double> ages) {
+  auto sel = std::dynamic_pointer_cast<AgeSpecificSelectivityInterface>(*xp);
+  if (!sel) Rcpp::stop("This selectivity does not use age bins.");
+  if (ages.empty()) Rcpp::stop("Age bins must not be empty.");
+  sel->ages.resize(ages.size());
+  std::copy(ages.begin(), ages.end(), sel->ages.begin());
+  sel->n_ages = ages.size();
+  sel->min_age = *std::min_element(ages.begin(), ages.end());
+}
+
+// ── Base-class conversion for CreateTMBModel() ───────────────────────────────
+/**
+ * @brief Return a second pointer to the same object, typed to the common
+ *   interface base class.
+ *
+ * @details This does not create a new object. CreateTMBModel() holds a mixed
+ *   list of modules and calls add_to_fims_tmb() on each, which it can only do
+ *   through a pointer typed to the class they all share.
+ *
+ * @param xp The selectivity module.
+ * @return A base-class pointer to the same module.
+ */
+Rcpp::XPtr<SharedBase> selectivity_to_fims_xptr_(
+    Rcpp::XPtr<SharedSelectivity> xp) {
+  // Every interface class inherits from FIMSRcppInterfaceBase, so this
+  // conversion needs no cast: same object, more general pointer type.
+  SharedBase base = *xp;
+  return Rcpp::XPtr<SharedBase>(new SharedBase(base), true);
+}
+
+// ── Invalidation for clear() ─────────────────────────────────────────────────
+/**
+ * @brief Invalidate a pointer to a selectivity module, releasing this
+ * pointer's share of the module.
+ *
+ * @details Called by the R `clear()` wrapper for every module in the registry.
+ * The external pointer is set to NULL in place, so the R variable still holding
+ * it reports "external pointer is not valid" on the next use instead of quietly
+ * operating on a module that is no longer part of any model. Once both this
+ * pointer and the module's base pointer are released, nothing owns the module
+ * and its memory is returned immediately rather than at the next garbage
+ * collection.
+ *
+ * Releasing an already-released pointer does nothing, so this is safe to call
+ * twice.
+ *
+ * @param xp The module to invalidate.
+ */
+void release_selectivity_(Rcpp::XPtr<SharedSelectivity> xp) { xp.release(); }
 
 /**
  * Function to register selectivity classes with the Rcpp module system.
  *
  */
+/**
+ * @brief Register the selectivity functions with the Rcpp module system.
+ *
+ * @param m The Rcpp module to register into.
+ */
 void register_selectivity(Rcpp::Module& m) {
-  Rcpp::class_<LogisticSelectivityInterface>(
-      "LogisticSelectivity",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classLogisticSelectivityInterface.html.")
-      .constructor()
-      .field("inflection_point",
-             &LogisticSelectivityInterface::inflection_point)
-      .field("slope", &LogisticSelectivityInterface::slope)
-      .method("get_id", &LogisticSelectivityInterface::get_id)
-      .method("evaluate", &LogisticSelectivityInterface::evaluate);
-
-  Rcpp::class_<DoubleLogisticSelectivityInterface>(
-      "DoubleLogisticSelectivity",
-      "See "
-      "https://noaa-fims.github.io/FIMS/doxygen/"
-      "classDoubleLogisticSelectivityInterface.html.")
-      .constructor()
-      .field("inflection_point_asc",
-             &DoubleLogisticSelectivityInterface::inflection_point_asc)
-      .field("slope_asc", &DoubleLogisticSelectivityInterface::slope_asc)
-      .field("inflection_point_desc",
-             &DoubleLogisticSelectivityInterface::inflection_point_desc)
-      .field("slope_desc", &DoubleLogisticSelectivityInterface::slope_desc)
-      .method("get_id", &DoubleLogisticSelectivityInterface::get_id)
-      .method("evaluate", &DoubleLogisticSelectivityInterface::evaluate);
-
-  Rcpp::class_<AgeSpecificSelectivityInterface>(
-      "AgeSpecificSelectivity",
-      "See "
-      "https://noaa-fims.github.io/doxygen/"
-      "classAgeSpecificSelectivityInterfaceInterface.html.")
-      .constructor()
-      .field("n_ages", &AgeSpecificSelectivityInterface::n_ages)
-      .field("ages", &AgeSpecificSelectivityInterface::ages, 
-             "Ages for each age class.")
-      .field("min_age", &AgeSpecificSelectivityInterface::min_age, 
-             "Minimum observed age")
-      .field("logit_sel_at_age", &AgeSpecificSelectivityInterface::logit_sel_at_age)
-      .method("get_id", &AgeSpecificSelectivityInterface::get_id)
-      .method("evaluate", &AgeSpecificSelectivityInterface::evaluate);
+  Rcpp::function("set_selectivity_ages_", &set_selectivity_ages_);
+  Rcpp::function("create_selectivity_", &create_selectivity_);
+  Rcpp::function("evaluate_selectivity_", &evaluate_selectivity_);
+  Rcpp::function("selectivity_to_fims_xptr_", &selectivity_to_fims_xptr_);
+  Rcpp::function("release_selectivity_", &release_selectivity_);
 }

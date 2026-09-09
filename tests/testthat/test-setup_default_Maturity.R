@@ -15,11 +15,11 @@ data <- FIMS::FIMSFrame(data_big)
 test_that("`setup_default_Maturity()` works with correct inputs", {
   result <- setup_default_Maturity(data = data)
 
-  #' @description Test that maturity defaults use logistic form and constant estimation.
+  #' @description Test that maturity defaults use logistic form and "assumed_known" estimation.
   expect_s3_class(result, "tbl_df")
   expect_true(all(result[["module_name"]] == "Maturity"))
   expect_true(all(result[["module_type"]] == "Logistic"))
-  expect_true(all(result[["estimation_type"]] == "constant"))
+  expect_true(all(result[["estimation_status"]] == "assumed_known"))
 
   clear()
 })

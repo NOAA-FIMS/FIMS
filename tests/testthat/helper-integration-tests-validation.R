@@ -203,7 +203,7 @@ validate_fims <- function(
         !is.na(input),
         !is.na(estimated),
         !is.na(uncertainty),
-        estimation_type == "fixed_effects"
+        estimation_status == "fixed_effects"
       ) |>
       # Restore the "true" log_q value for testing
       dplyr::mutate(
@@ -450,14 +450,27 @@ verify_fims_deterministic <- function(
 verify_fims_nll <- function(report,
                             om_input,
                             om_output,
-                            em_input) {
+                            em_input,
+                            log_devs = TRUE) {
   # recruitment likelihood
-  # log_devs is of length nyr-1
-  rec_nll <- -sum(dnorm(
-    om_input[["logR.resid"]][-1], rep(0, om_input[["nyr"]] - 1),
-    om_input[["logR_sd"]], TRUE
-  ))
-
+  if (log_devs) {
+    # log_devs is of length nyr-1
+    rec_nll <- -sum(dnorm(
+      om_input[["logR.resid"]][-1], rep(0, om_input[["nyr"]] - 1),
+      om_input[["logR_sd"]], TRUE
+    ))
+  } else {
+    log_recruits_true <- matrix(c(t(om_output[["N.age"]])),
+        om_input[["nyr"]], om_input[["nages"]],
+        byrow = TRUE
+      )[, 1] |> log()
+    log_recruits_expected <- log_recruits_true -  om_input[["logR.resid"]]
+    rec_nll <- -sum(dnorm(
+      log_recruits_true,
+      log_recruits_expected,
+      om_input[["logR_sd"]], TRUE
+    ))
+  }
   # fishery catch expected likelihood
   catch_nll <- catch_nll_fleet <- -sum(dlnorm(
     em_input[["L.obs"]][["fleet1"]],

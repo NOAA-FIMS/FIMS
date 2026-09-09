@@ -20,7 +20,7 @@ expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
   "parameter_id", "fleet", "year_i", "age_i", "length_i",
   "input", "estimated", "expected", "observed",
-  "estimation_type", "uncertainty",
+  "estimation_status", "uncertainty",
   "distribution", "input_type",
   "lpdf", "likelihood", "log_sd", "log_like_cv", "gradient"
 )

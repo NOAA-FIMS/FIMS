@@ -28,13 +28,13 @@ test_that("`setup_default_BevertonHoltRecruitment()` works with correct inputs",
 test_that("`setup_default_BevertonHoltRecruitment()` works with edge cases", {
   result <- FIMS:::setup_default_BevertonHoltRecruitment(data = data, distribution = NA_character_)
 
-  #' @description Test that `log_devs` become constant when no process distribution is provided.
+  #' @description Test that `log_devs` become "assumed_known" when no process distribution is provided.
   expect_equal(
     result |>
       dplyr::filter(.data[["label"]] == "log_devs") |>
-      dplyr::pull(.data[["estimation_type"]]) |>
+      dplyr::pull(.data[["estimation_status"]]) |>
       unique(),
-    "constant"
+    "assumed_known"
   )
 
   clear()

@@ -17,7 +17,7 @@ for full column descriptions.
 \description{
 This function creates default growth parameters for a Fisheries Integrated
 Modeling System (FIMS) model. It generates a tibble with fields for
-module name, module type, label, value, and estimation type.
+module name, module type, label, value, and estimation status.
 }
 \examples{
 \dontrun{

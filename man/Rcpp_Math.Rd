@@ -6,7 +6,6 @@
 \alias{Ops,numeric,Rcpp_Variable-method}
 \alias{Ops,Rcpp_VariableVector,Rcpp_VariableVector-method}
 \alias{Ops,Rcpp_VariableVector,numeric-method}
-\alias{Ops,Rcpp_RealVector,numeric-method}
 \alias{Ops,numeric,Rcpp_VariableVector-method}
 \alias{Math,Rcpp_VariableVector-method}
 \title{Sets methods for operators under the S4 Generic Group, Ops}
@@ -20,8 +19,6 @@
 \S4method{Ops}{Rcpp_VariableVector,Rcpp_VariableVector}(e1, e2)
 
 \S4method{Ops}{Rcpp_VariableVector,numeric}(e1, e2)
-
-\S4method{Ops}{Rcpp_RealVector,numeric}(e1, e2)
 
 \S4method{Ops}{numeric,Rcpp_VariableVector}(e1, e2)
 

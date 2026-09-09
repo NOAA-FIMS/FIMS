@@ -15,12 +15,22 @@
 #include <RcppCommon.h>
 #include <Rcpp.h>
 #include <map>
+#include <memory>
+#include <string>
+#include <stdexcept>
 #include <vector>
 
+#include "common/enumerations.hpp"
 #include "common/information.hpp"
 #include "../../interface.hpp"
-#include "rcpp_shared_primitive.hpp"
 #include <limits>
+
+
+// EstimationStatusFromString() and EstimationStatusToString() now live in
+// common/enumerations.hpp, next to the enum they convert. Pulled into this
+// scope so the call sites below stay unqualified.
+using fims_enum::EstimationStatusFromString;
+using fims_enum::EstimationStatusToString;
 
 /**
  * @brief An Rcpp interface that defines the Variable class.
@@ -47,18 +57,17 @@ class Variable {
    */
   double final_value_m = 0.0;
   /**
-   * @brief A string indicating the estimation type. Options are: constant,
-   * fixed_effects, or random_effects, where the default is constant.
+   * @brief An enum indicating estimation status.
    */
-  SharedString estimation_type_m = SharedString("constant");
+  fims_enum::EstimationStatus estimation_status_m = fims_enum::EstimationStatus::kAssumedKnown;
 
   /**
    * @brief The constructor for initializing a variable.
    */
-  Variable(double value, std::string estimation_type)
+  Variable(double value, std::string estimation_status)
       : id_m(Variable::id_g++),
         initial_value_m(value),
-        estimation_type_m(estimation_type) {}
+        estimation_status_m(EstimationStatusFromString(estimation_status)) {}
 
   /**
    * @brief The constructor for initializing a variable.
@@ -67,7 +76,7 @@ class Variable {
       : id_m(other.id_m),
         initial_value_m(other.initial_value_m),
         final_value_m(other.final_value_m),
-        estimation_type_m(other.estimation_type_m) {}
+        estimation_status_m(other.estimation_status_m) {}
 
   /**
    * @brief The constructor for initializing a variable.
@@ -78,7 +87,7 @@ class Variable {
       return *this;      // Yes, so skip assignment, and just return *this.
     this->id_m = right.id_m;
     this->initial_value_m = right.initial_value_m;
-    this->estimation_type_m = right.estimation_type_m;
+    this->estimation_status_m = right.estimation_status_m;
     return *this;
   }
 
@@ -97,6 +106,20 @@ class Variable {
   Variable() {
     initial_value_m = 0;
     id_m = Variable::id_g++;
+  }
+
+  /**
+   * @brief Get estimation status as a string.
+   */
+  std::string get_estimation_status() const {
+    return EstimationStatusToString(this->estimation_status_m);
+  }
+
+  /**
+   * @brief Set estimation status from a string.
+   */
+  void set_estimation_status(const std::string& status) {
+    this->estimation_status_m = EstimationStatusFromString(status);
   }
 };
 
@@ -128,7 +151,8 @@ inline std::ostream& operator<<(std::ostream& out, const Variable& p) {
   out << "{\"id\": " << p.id_m
       << ",\n\"value\": " << sanitize_val(p.initial_value_m)
       << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m);
-  out << ",\n\"estimation_type\": \"" << p.estimation_type_m << "\"\n}";
+  out << ",\n\"estimation_status\": \""
+      << EstimationStatusToString(p.estimation_status_m) << "\"\n}";
 
   return out;
 }
@@ -316,16 +340,16 @@ class VariableVector {
   }
 
   /**
-   * @brief Sets the estimation type for all Variables within a
+   * @brief Sets the estimation status for all Variables within a
    * VariableVector.
    */
-  void set_estimation_types(Rcpp::CharacterVector estimation_types) {
+  void set_estimation_status(Rcpp::CharacterVector estimation_status) {
     const size_t vector_size = this->storage_m->size();
-    const size_t input_size = estimation_types.size();
+    const size_t input_size = estimation_status.size();
 
     if (input_size != 1 && input_size != vector_size) {
       throw std::invalid_argument(
-          "VariableVector::set_estimation_types(): `estimation_types` length "
+          "VariableVector::set_estimation_status(): `estimation_status` length "
           "(" +
           std::to_string(input_size) +
           ") must be 1 (broadcast) or equal to the VariableVector size (" +
@@ -334,25 +358,16 @@ class VariableVector {
           "Received length: " +
           std::to_string(input_size) +
           ". "
-          "Pass a single estimation type to apply to all elements, or a "
+          "Pass a single estimation status to apply to all elements, or a "
           "vector of length " +
           std::to_string(vector_size) + ".");
     }
 
-    auto validate_estimation_type = [&](const std::string& est_type) {
-      if (est_type != "constant" && est_type != "fixed_effects" &&
-          est_type != "random_effects") {
-        throw std::invalid_argument(
-            "Invalid estimation_type: " + est_type +
-            ". Valid options are: constant, fixed_effects, or random_effects.");
-      }
-    };
-
     for (size_t i = 0; i < vector_size; i++) {
-      std::string est_type =
-          Rcpp::as<std::string>(estimation_types[input_size == 1 ? 0 : i]);
-      validate_estimation_type(est_type);
-      this->storage_m->at(i).estimation_type_m.set(est_type);
+      std::string est_status =
+          Rcpp::as<std::string>(estimation_status[input_size == 1 ? 0 : i]);
+      this->storage_m->at(i).estimation_status_m =
+          EstimationStatusFromString(est_status);
     }
   }
 
@@ -393,13 +408,74 @@ class VariableVector {
       const Variable& variable = this->storage_m->at(i);
       variable_copy.initial_value_m = variable.initial_value_m;
       variable_copy.final_value_m = variable.final_value_m;
-      variable_copy.estimation_type_m =
-          SharedString(variable.estimation_type_m.get());
+      variable_copy.estimation_status_m =
+          variable.estimation_status_m;
       copy.storage_m->push_back(variable_copy);
     }
     return copy;
   }
 };
+
+/**
+ * @brief Register a parameter by estimation status.
+ */
+template <typename Type>
+inline void register_parameter_if_estimable(
+    Type& parameter, fims_enum::EstimationStatus estimation_status,
+    const std::string& parameter_name, bool random_effects_allowed = true) {
+  std::shared_ptr<fims_info::Information<Type>> info =
+      fims_info::Information<Type>::GetInstance();
+
+  if (!random_effects_allowed &&
+      estimation_status == fims_enum::EstimationStatus::kRandomEffects) {
+    Rf_error("%s cannot be set to random effects.", parameter_name.c_str());
+  }
+
+  switch (estimation_status) {
+    case fims_enum::EstimationStatus::kAssumedKnown:
+    case fims_enum::EstimationStatus::kDerivedQuantity:
+      break;
+    case fims_enum::EstimationStatus::kFixedEffects:
+      info->RegisterParameterName(parameter_name);
+      info->RegisterParameter(parameter);
+      break;
+    case fims_enum::EstimationStatus::kRandomEffects:
+      info->RegisterRandomEffectName(parameter_name);
+      info->RegisterRandomEffect(parameter);
+      break;
+    default:
+      Rf_error(
+          "Unknown estimation_status code %d. Supported codes are "
+          "0 (assumed_known), 1 (fixed_effects), 2 (random_effects), and "
+          "3 (derived_quantity).",
+          static_cast<int>(estimation_status));
+  }
+}
+
+
+/**
+ * @brief Set final value from estimated value based on estimation status.
+ */
+template <typename Type>
+inline void set_final_value_by_estimation_status(Variable& variable,
+                                                 const Type& estimated_value) {
+  switch (variable.estimation_status_m) {
+    case fims_enum::EstimationStatus::kAssumedKnown:
+    case fims_enum::EstimationStatus::kDerivedQuantity:
+      variable.final_value_m = variable.initial_value_m;
+      return;
+    case fims_enum::EstimationStatus::kFixedEffects:
+    case fims_enum::EstimationStatus::kRandomEffects:
+      variable.final_value_m = estimated_value;
+      return;
+    default:
+      Rf_error(
+          "Unknown estimation_status code %d. Supported codes are "
+          "0 (assumed_known), 1 (fixed_effects), 2 (random_effects), and "
+          "3 (derived_quantity).",
+          static_cast<int>(variable.estimation_status_m));
+  }
+}
 
 #ifdef FIMS_HEADER_ONLY
 uint32_t VariableVector::id_g = 0;
@@ -422,233 +498,51 @@ inline std::ostream& operator<<(std::ostream& out, VariableVector& v) {
   return out;
 }
 
-/**
- * @brief An Rcpp interface class that defines the RealVector class.
- *
- * @details An Rcpp interface class that defines the interface between R and
- * C++ for a real vector type. Underlying values are held in a shared pointer
- * and are carried over to any copies of this vector.
- */
-class RealVector {
- public:
-  /**
-   * @brief The static ID of the RealVector object.
-   */
-  static uint32_t id_g;
-  /**
-   * @brief real storage.
-   */
-  std::shared_ptr<std::vector<double>> storage_m;
-  /**
-   * @brief The local ID of the RealVector object.
-   */
-  uint32_t id_m;
-
-  /**
-   * @brief The constructor.
-   */
-  RealVector() {
-    this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double>>();
-    this->storage_m->resize(1);
-  }
-
-  /**
-   * @brief The constructor.
-   */
-  RealVector(const RealVector& other)
-      : storage_m(other.storage_m), id_m(other.id_m) {}
-
-  /**
-   * @brief The constructor.
-   */
-  RealVector(size_t size) {
-    this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double>>();
-    this->storage_m->resize(size);
-  }
-
-  /**
-   * @brief The constructor for initializing a real vector.
-   * @param x A numeric vector.
-   * @param size The number of elements to copy over.
-   */
-  RealVector(Rcpp::NumericVector x, size_t size) {
-    this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double>>();
-    const size_t input_size = static_cast<size_t>(x.size());
-    if (input_size != size) {
-      throw std::invalid_argument(
-          "RealVector::RealVector(Rcpp::NumericVector, size_t): `x` length (" +
-          std::to_string(input_size) +
-          ") must equal the requested "
-          "size (" +
-          std::to_string(size) +
-          "). Received length: " + std::to_string(input_size) + ".");
-    }
-    this->storage_m->assign(x.begin(), x.end());
-  }
-
-  /**
-   * @brief The constructor for initializing a real vector.
-   * @param v A vector of doubles.
-   */
-  RealVector(const fims::Vector<double>& v) {
-    this->id_m = RealVector::id_g++;
-    this->storage_m = std::make_shared<std::vector<double>>();
-    this->storage_m->resize(v.size());
-    for (size_t i = 0; i < v.size(); i++) {
-      storage_m->at(i) = v[i];
-    }
-  }
-
-  /**
-   * @brief Destroy the real Vector object.
-   *
-   */
-  virtual ~RealVector() {}
-
-  /**
-   * @brief
-   *
-   * @param v
-   * @return RealVector&
-   */
-  RealVector& operator=(const Rcpp::NumericVector& v) {
-    this->storage_m->assign(v.begin(), v.end());
-    return *this;
-  }
-
-  /**
-   * @brief Gets the ID of the RealVector object.
-   */
-  virtual uint32_t get_id() { return this->id_m; }
-
-  /**
-   * @brief
-   *
-   * @param orig
-   */
-  void set_values(const Rcpp::NumericVector& orig) {
-    this->storage_m->resize(orig.size());
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      this->storage_m->at(i) = orig[i];
-    }
-  }
-
-  /**
-   * @brief
-   *
-   * @return Rcpp::NumericVector
-   */
-  Rcpp::NumericVector get_values() {
-    Rcpp::NumericVector ret(this->storage_m->size());
-    for (size_t i = 0; i < this->size(); i++) {
-      ret[i] = this->storage_m->at(i);
-    }
-
-    return ret;
-  }
-
-  /**
-   * @brief The accessor where the first index starts is zero.
-   * @param pos The position of the RealVector that you want returned.
-   */
-  inline double& operator[](size_t pos) { return this->storage_m->at(pos); }
-
-  /**
-   * @brief The accessor where the first index starts at one. This function is
-   * for calling accessing from R.
-   * @param pos The position of the VariableVector that you want returned.
-   */
-  SEXP at(R_xlen_t pos) {
-    if (static_cast<size_t>(pos) == 0 ||
-        static_cast<size_t>(pos) > this->storage_m->size()) {
-      throw std::invalid_argument("RealVector: Index out of range");
-      FIMS_ERROR_LOG(fims::to_string(pos) + "!<" +
-                     fims::to_string(this->size()));
-      return NULL;
-    }
-    return Rcpp::wrap(this->storage_m->at(pos - 1));
-  }
-
-  /**
-   * @brief An internal accessor for calling a position of a RealVector
-   * from R.
-   * @param pos An integer specifying the position of the RealVector
-   * you want returned. The first position is one and the last position is
-   * the same as the size of the RealVector.
-   */
-  double& get(size_t pos) {
-    if (pos >= this->storage_m->size()) {
-      throw std::invalid_argument("RealVector: Index out of range");
-    }
-    return (this->storage_m->at(pos));
-  }
-
-  /**
-   * @brief An internal setter for setting a position of a RealVector
-   * from R.
-   * @param pos An integer specifying the position of the RealVector
-   * you want to set. The first position is one and the last position is the
-   * same as the size of the RealVector.
-   * @param p A numeric value specifying the value to set position `pos` to
-   * in the RealVector.
-   */
-  void set(size_t pos, const double& p) { this->storage_m->at(pos) = p; }
-
-  /**
-   * @brief Returns the size of a RealVector.
-   */
-  size_t size() { return this->storage_m->size(); }
-
-  /**
-   * @brief Resizes a RealVector to the desired length.
-   * @param size An integer specifying the desired length for the
-   * RealVector to be resized to.
-   */
-  void resize(size_t size) { this->storage_m->resize(size); }
-
-  /**
-   * @brief Sets the value of all elements in the RealVector to the
-   * provided value.
-   *
-   * @param value A double specifying the value to set all elements to
-   * within the RealVector.
-   */
-  void fill(double value) {
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      storage_m->at(i) = value;
-    }
-  }
-
-  /**
-   * @brief The printing methods for a RealVector.
-   *
-   */
-  void show() {
-    Rcpp::Rcout << this->storage_m->data() << "\n";
-
-    for (size_t i = 0; i < this->storage_m->size(); i++) {
-      Rcpp::Rcout << storage_m->at(i) << "  ";
-    }
-  }
-
-  /**
-   * @brief Create a deep copy with a new RealVector ID.
-   */
-  RealVector deep_copy() const {
-    RealVector copy;
-    copy.storage_m = std::make_shared<std::vector<double>>(*this->storage_m);
-    return copy;
-  }
-};
-#ifdef FIMS_HEADER_ONLY
-uint32_t RealVector::id_g = 0;
-#endif
-
 RCPP_EXPOSED_CLASS(VariableVector)
-RCPP_EXPOSED_CLASS(RealVector)
+
+/**
+ * @brief Fill a VariableVector from R, setting values and estimation statuses.
+ *
+ * @details Shared by the standalone XPtr setter functions in the src/*.cpp
+ * files. The vector is resized to match `values`. An `estimation_status` of
+ * length 1 is recycled across every element; otherwise it must be the same
+ * length as `values`.
+ *
+ * @param target The VariableVector to fill.
+ * @param values The initial values.
+ * @param estimation_status One status name, or one per element.
+ */
+inline void fill_variable_vector(VariableVector &target,
+                                Rcpp::NumericVector values,
+                                Rcpp::CharacterVector estimation_status) {
+  if (estimation_status.size() != 1 &&
+      estimation_status.size() != values.size()) {
+    Rcpp::stop(
+        "fill_variable_vector(): `estimation_status` must be length 1 or the "
+        "same length as `values`.");
+  }
+  target.resize(values.size());
+  for (int i = 0; i < values.size(); i++) {
+    Variable &v = target.storage_m->at(i);
+    v.initial_value_m = values[i];
+    v.estimation_status_m = EstimationStatusFromString(Rcpp::as<std::string>(
+        estimation_status[estimation_status.size() == 1 ? 0 : i]));
+  }
+}
+
+/**
+ * @brief Fill a numeric vector from R, resizing to match.
+ *
+ * @param target The vector to fill.
+ * @param values The values to copy in.
+ */
+inline void fill_numeric_vector(fims::Vector<double> &target,
+                            Rcpp::NumericVector values) {
+  target.resize(values.size());
+  for (int i = 0; i < values.size(); i++) {
+    target[i] = values[i];
+  }
+}
 
 /**
  *@brief Base class for all interface objects.
@@ -656,14 +550,110 @@ RCPP_EXPOSED_CLASS(RealVector)
 class FIMSRcppInterfaceBase {
  public:
   /**
+   * @brief How many interface modules are alive right now.
+   *
+   * @details Every module -- population, fleet, selectivity, and the rest --
+   * adds one here when it is constructed and takes one away when it is
+   * destroyed.
+   *
+   * clear() reads it to check that R released every module before the ID
+   * counters are rewound. The R clear() wrapper releases them all, so this is
+   * normally zero by then, and a count above zero means something bypassed the
+   * wrapper. That matters because a surviving module keeps an ID that will be
+   * handed out again after the rewind, and IDs are how the model finds
+   * parameters.
+   */
+  static inline int live_module_count = 0;
+
+  /**
+   * @brief A vector of every ID counter that clear() has to rewind.
+   *
+   * @details Each family's id_g adds itself here where it is defined, in the
+   * corresponding src/rcpp_*.cpp, so clear() can loop over the counters rather
+   * than naming them one by one. Adding a module family therefore cannot leave
+   * a counter behind.
+   *
+   * A function-local static rather than a plain static member, so the vector
+   * is guaranteed to exist before the first registration runs, whatever order
+   * the translation units initialize in.
+   *
+   * @return The registered counters.
+   */
+  static std::vector<uint32_t *> &id_counters() {
+    static std::vector<uint32_t *> counters;
+    return counters;
+  }
+
+  /** @brief Count this module as alive. */
+  FIMSRcppInterfaceBase() { live_module_count++; }
+
+  /** @brief Stop counting this module as alive. */
+  virtual ~FIMSRcppInterfaceBase() { live_module_count--; }
+
+  /**
    * @brief Is the object already finalized? The default is false.
    */
   bool finalized = false;
   /**
-   * @brief FIMS interface object vectors.
+   * @brief This module's unique ID.
+   *
+   * @details Every module carries one, and IDs are how modules refer to each
+   * other: a fleet records its selectivity's ID, a population records its
+   * growth module's, and fims_info::Information is keyed by them. Declared on
+   * the root so one exported getter serves every module.
+   *
+   * @return The ID.
    */
-  static std::vector<std::shared_ptr<FIMSRcppInterfaceBase>>
-      fims_interface_objects;
+  virtual uint32_t get_id() = 0;
+
+  /**
+   * @brief Look up one of this module's VariableVector fields by name.
+   *
+   * @details A VariableVector carries an estimation status per element and is
+   * registered in fims_info::Information::variable_map under an id. Those two
+   * properties are what this accessor selects on, and they are what the id is
+   * for: naming a quantity so a distribution can say which one it applies to.
+   *
+   * Declared on the root so that one exported setter and one id getter serve
+   * every module, reached through an XPtr typed to this class. Modules with no
+   * VariableVector fields -- the data modules and the fishery models -- inherit
+   * this default and report that the name is unknown.
+   *
+   * Section 2.1 of Parameter_Registry.Rmd replaces these hand-written overrides
+   * with one declaration per field in each constructor, which also gives the
+   * enumeration this design currently lacks: there is no way to ask a module
+   * what fields it has, only whether it has a given one.
+   *
+   * @param name The field name as used in R.
+   * @return A pointer to the vector, or nullptr if this module has no
+   * VariableVector by that name.
+   */
+  virtual VariableVector *get_variable_vector(const std::string &name) {
+    return nullptr;
+  }
+
+  /**
+   * @brief Look up one of this module's plain numeric vectors by name.
+   *
+   * @details The counterpart to get_variable_vector(), for fields that are
+   * fims::Vector<double> rather than VariableVector: observations,
+   * uncertainties, ages, empirical weights. These carry no estimation status
+   * and no variable_map id, so nothing can be estimated from them and no
+   * distribution can name them; one setter writes them with values alone.
+   *
+   * The split between the two accessors is by type, not by role. A module
+   * author picks by asking which type the field is declared as, and that
+   * choice was already made when the field was declared: a quantity that could
+   * ever be estimated, or that a distribution might need to name, has to be a
+   * VariableVector.
+   *
+   * @param name The field name as used in R.
+   * @return A pointer to the vector, or nullptr if this module has no numeric
+   * vector by that name.
+   */
+  virtual fims::Vector<double> *get_numeric_vector(const std::string &name) {
+    return nullptr;
+  }
 
   /**
    * @brief A virtual method to inherit to add objects to the TMB model.
@@ -725,6 +715,34 @@ class FIMSRcppInterfaceBase {
       }
     }
     return ss.str();
+  }
+};
+
+/**
+ * @brief A shared pointer that can hold any FIMS interface object.
+ *
+ * @details Every interface class -- data, fleet, population, and the rest --
+ * inherits from FIMSRcppInterfaceBase, so a SharedBase can point at any of
+ * them. CreateTMBModel() uses this to hold a mixed list of modules and call
+ * add_to_fims_tmb() on each one without needing to know what each module is:
+ * C++ runs the right version based on what the object actually is.
+ */
+using SharedBase = std::shared_ptr<FIMSRcppInterfaceBase>;
+
+/**
+ * @brief Registers one ID counter with FIMSRcppInterfaceBase::id_counters().
+ *
+ * @details Declare one of these next to each `id_g` definition in
+ * src/rcpp_*.cpp. Its constructor runs at startup and adds the counter to the
+ * list clear() rewinds, so the counter cannot be forgotten there.
+ */
+struct IdCounterRegistration {
+  /**
+   * @brief Adds the counter to the list.
+   * @param counter The id_g to register.
+   */
+  explicit IdCounterRegistration(uint32_t *counter) {
+    FIMSRcppInterfaceBase::id_counters().push_back(counter);
   }
 };
 

@@ -167,13 +167,13 @@ test_that("Run FIMS in parallel using {snowfall}", {
   parameters_parallel <- purrr::map(
     results_parallel,
     \(x) get_estimates(x) |>
-      dplyr::filter(estimation_type == "fixed_effects") |>
+      dplyr::filter(estimation_status == "fixed_effects") |>
       dplyr::pull(estimated)
   )
   parameters_serial <- purrr::map(
     estimation_results_serial,
     \(x) get_estimates(x) |>
-      dplyr::filter(estimation_type == "fixed_effects") |>
+      dplyr::filter(estimation_status == "fixed_effects") |>
       dplyr::pull(estimated)
   )
   #' @description Test that parameter estimates from parallel runs equal those from serial runs. We apply a tolerance of 1e-5 to floating-point comparison.
