@@ -24,3 +24,34 @@ test_that("Quadra sdreport summaries match the TMB summary contract", {
 test_that("the native Quadra evaluator is exported", {
   expect_true("native_quadra_evaluate" %in% getNamespaceExports("FIMS"))
 })
+
+
+test_that("native split callbacks agree with combined evaluations and derivatives", {
+  on.exit(clear())
+  data <- FIMSFrame(data_big)
+  parameters <- setup_default_parameters(data)
+  initialize_fims(parameters, data)
+  fixed <- get_fixed(); random <- get_random()
+  for (shift in c(0, 0, 1e-8, 0.001, -0.001, 0)) {
+    p <- fixed + shift; re <- random + shift
+    objective <- native_quadra_objective(p, re)
+    gradient <- native_quadra_gradient(p, re)
+    combined <- native_quadra_evaluate(p, re)
+    expect_identical(objective, combined$objective)
+    expect_identical(gradient, combined$gradient)
+    expect_identical(native_quadra_gradient(p, re), gradient)
+  }
+  values <- c(fixed, random)
+  gradient <- native_quadra_gradient(fixed, random)
+  for (i in unique(c(1L, length(fixed), length(values)))) {
+    delta <- numeric(length(values)); delta[i] <- 1e-5
+    fn <- function(x) native_quadra_objective(x[seq_along(fixed)], x[length(fixed) + seq_along(random)])
+    expect_equal((fn(values + delta) - fn(values - delta)) / 2e-5,
+      gradient[i], tolerance = 1e-5)
+  }
+  expect_error(native_quadra_objective(numeric(), numeric()), "parameter count")
+  # Rebuilding with identical parameter values must preserve the objective.
+  expected <- native_quadra_objective(fixed, random)
+  initialize_fims(parameters, data)
+  expect_identical(native_quadra_objective(fixed, random), expected)
+})

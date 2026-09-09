@@ -311,3 +311,26 @@ get_random_names <- function(pars = NULL) {
   names(pars) <- paste0("random_effect_", seq_along(pars))
   pars
 }
+
+#' Evaluate the native joint objective with forward-only Quadra replay
+#'
+#' @param fixed,random Numeric fixed- and random-effect parameter vectors.
+#' @return The scalar joint objective.
+#' @details Replays the compact tape without a reverse sweep. Exact repeated
+#'   parameters reuse cached forward and reverse passes. Rebuilding or clearing
+#'   the model discards the cache.
+#' @export
+native_quadra_objective <- function(fixed, random = numeric()) {
+  .Call("fims_call_quadra_objective", as.numeric(fixed), as.numeric(random),
+    PACKAGE = "FIMS")
+}
+
+#' Evaluate the native joint gradient with Quadra
+#'
+#' @inheritParams native_quadra_objective
+#' @return A numeric gradient, fixed effects followed by random effects.
+#' @details Reuses a preceding forward pass at exactly identical parameters.
+#' @export
+native_quadra_gradient <- function(fixed, random = numeric()) {
+  native_quadra_evaluate(fixed, random)$gradient
+}
