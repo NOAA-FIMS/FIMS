@@ -44,12 +44,14 @@ SEXP _rcpp_module_boot_fims();
 #ifdef QUADRA_MODEL
 SEXP fims_call_quadra_fit(SEXP, SEXP, SEXP, SEXP, SEXP);
 SEXP fims_call_quadra_evaluate(SEXP, SEXP);
+SEXP fims_call_quadra_objective(SEXP, SEXP);
 SEXP fims_call_quadra_sdreport(SEXP, SEXP);
 #endif
 
 static const R_CallMethodDef CallEntries[] = {
 #ifdef QUADRA_MODEL
     {"fims_call_quadra_fit", (DL_FUNC)&fims_call_quadra_fit, 5},
+    {"fims_call_quadra_objective", (DL_FUNC)&fims_call_quadra_objective, 2},
     {"fims_call_quadra_evaluate", (DL_FUNC)&fims_call_quadra_evaluate, 2},
     {"fims_call_quadra_sdreport", (DL_FUNC)&fims_call_quadra_sdreport, 2},
 #endif

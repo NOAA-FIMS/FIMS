@@ -172,3 +172,28 @@ fit_fims_quadra <- function(input, get_sd, save_sd, optimize, control,
   fit@max_gradient <- if (length(result$gradient)) max(abs(result$gradient)) else 0
   fit
 }
+
+#' Evaluate the joint objective without automatic differentiation
+#'
+#' @inheritParams quadra_evaluate
+#' @return The scalar joint negative log likelihood.
+#' @details Uses the model templated on double, without a derivative tape.
+#'   Call [CreateTMBModel()] after assembling or changing modules.
+#' @export
+quadra_objective <- function(fixed = get_fixed(), random = get_random()) {
+  check_quadra_parameters(fixed, random)
+  .Call("fims_call_quadra_objective", as.numeric(fixed), as.numeric(random),
+    PACKAGE = "FIMS"
+  )
+}
+
+#' Evaluate the joint gradient with Quadra
+#'
+#' @inheritParams quadra_evaluate
+#' @return A numeric gradient, fixed effects followed by random effects.
+#' @details Uses the Quadra first-order tape. The forward value required for
+#'   differentiation is computed internally; only the gradient is returned.
+#' @export
+quadra_gradient <- function(fixed = get_fixed(), random = get_random()) {
+  quadra_evaluate(fixed, random)$gradient
+}

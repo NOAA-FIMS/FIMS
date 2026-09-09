@@ -63,7 +63,7 @@ class Model {  // may need singleton
   /**
    * @brief Evaluate. Calculates the joint negative log-likelihood function.
    */
-  const Type Evaluate() {
+  const Type Evaluate(bool report = true) {
     // jnll = negative-log-likelihood (the objective function)
     Type jnll = static_cast<Type>(0.0);
     typename fims_info::Information<Type>::model_map_iterator m_it;
@@ -169,6 +169,9 @@ class Model {  // may need singleton
         "evaluating priors, random effects, and " +
         fims::to_string(n_data) +
         " data likelihoods is: " + fims::to_string(jnll));
+
+    // Primitive objective-only callers do not have a TMB report context.
+    if (!report) return jnll;
 
     // report out nll components
 

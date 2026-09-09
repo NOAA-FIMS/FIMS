@@ -95,9 +95,13 @@ test_that("catch-at-age models agree across backends and return FIMSFit", {
   parameters$distribution[rec] <- NA_character_
   parameters$distribution_type[rec] <- NA_character_
   input <- initialize_fims(data = data, parameters = parameters)
+  primitive <- quadra_objective()  # No TMB objective/report context exists yet.
   obj <- TMB::MakeADFun(list(), input$parameters, DLL = "FIMS", silent = TRUE)
   result <- quadra_evaluate()
   expect_true(is.finite(result$objective))
+  expect_equal(primitive, result$objective, tolerance = 1e-8)
+  expect_equal(quadra_objective(), result$objective, tolerance = 1e-8)
+  expect_equal(quadra_gradient(), result$gradient, tolerance = 1e-8)
   expect_equal(result$objective, obj$fn(obj$par), tolerance = 1e-8)
   expect_equal(result$gradient, as.numeric(obj$gr(obj$par)), tolerance = 1e-7)
   fit <- fit_fims(input, backend = "quadra", control = list(iter.max = 100L))
@@ -116,4 +120,30 @@ test_that("catch-at-age models agree across backends and return FIMSFit", {
   ), "parameter maps")
   CreateTMBModel()
   expect_error(fit_fims(input, backend = "quadra"), "rebuilt")
+})
+
+
+test_that("split callbacks agree with joint values and finite differences", {
+  on.exit(clear())
+  for (random in c(FALSE, TRUE)) {
+    pars <- quadra_gaussian_fixture(random)
+    for (shift in c(0.25, -0.5, 0)) {
+      fixed <- pars$p + shift
+      re <- pars$re + shift
+      combined <- quadra_evaluate(fixed, re)
+      expect_equal(quadra_objective(fixed, re), combined$objective, tolerance = 1e-10)
+      expect_equal(quadra_gradient(fixed, re), combined$gradient, tolerance = 1e-10)
+      values <- c(fixed, re)
+      fn <- function(x) quadra_objective(x[seq_along(fixed)], x[length(fixed) + seq_along(re)])
+      fd <- vapply(seq_along(values), function(i) {
+        delta <- numeric(length(values)); delta[i] <- 1e-5
+        (fn(values + delta) - fn(values - delta)) / 2e-5
+      }, numeric(1))
+      expect_equal(quadra_gradient(fixed, re), fd, tolerance = 1e-7)
+    }
+  }
+  expect_error(quadra_objective(NA_real_), "finite numeric")
+  expect_error(quadra_objective(numeric(), numeric()), "parameter count")
+  clear()
+  expect_error(quadra_objective(), "Build the model")
 })
