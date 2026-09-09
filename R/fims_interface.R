@@ -272,7 +272,8 @@ create_data <- function(module_type, n_years, n_bins = 0) {
 
 #' Create a selectivity module
 #'
-#' @param module_type The functional form: `"Logistic"` or `"DoubleLogistic"`.
+#' @param module_type The functional form: `"Logistic"`, `"DoubleLogistic"`,
+#'   or `"AgeSpecific"`.
 #' @return
 #' A [fims_module] of the requested selectivity type.
 #' @export

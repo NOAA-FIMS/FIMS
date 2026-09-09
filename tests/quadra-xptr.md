@@ -38,3 +38,35 @@ not imported. XPtr registration supplies the backend model instead.
 Validation includes analytic Gaussian objectives, gradients, Hessians and
 fits; comparison against TMB; random effects; repeated evaluations; model
 rebuilding and clearing; and evaluation after Laplace fitting.
+
+## Local validation
+
+On macOS arm64 with R 4.4 and Apple clang 16:
+
+- The focused XPtr/Quadra suite passes, including catch-at-age objective,
+  gradient, fitted-parameter and covariance comparisons against TMB.
+- All 70 C++ tests pass; Doxygen builds successfully.
+- The optimized source package builds, installs, loads and unloads successfully.
+- `R CMD check --no-manual --no-vignettes --no-tests` completes with no errors,
+  three warnings and six notes. Warnings concern existing compiler flags and
+  omitted vignette output. Notes include long vendored Eigen paths, installed
+  size, existing R documentation/global bindings, GNU make, and Quadra stdout.
+  The R regression suite is run separately against the optimized package.
+
+The system's default Homebrew compiler could not locate the macOS System
+library. Validation used `/usr/bin` ahead of Homebrew on `PATH` and
+`SDKROOT=$(xcrun --show-sdk-path)`, without changing the user's compiler settings.
+
+The full R regression suite completes with one pre-existing failure:
+`test-integration-fims-estimation-random-effects-without-wrappers.R`, recruitment
+`log_r` estimation, raises `NA/NaN gradient evaluation` in `stats::nlminb()` before
+reaching its existing skip statement. Running that file against the pre-Quadra
+XPtr checkpoint `bb2d5945` reproduces the same warning and error. All other tests
+in the full run pass or take their existing skips; three additional warnings
+come from the proportion-female test's many-to-many joins. No test expectations
+or skip placement were changed to conceal this baseline failure.
+
+Formatting used the available clang-format 21 and styler. CSpell could not run
+because neither CSpell nor npm is installed locally; vendored Quadra files are
+excluded from the repository spelling scan, and backend names were added to
+the project dictionary.

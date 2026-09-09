@@ -7,7 +7,8 @@
 create_selectivity(module_type)
 }
 \arguments{
-\item{module_type}{The functional form: \code{"Logistic"} or \code{"DoubleLogistic"}.}
+\item{module_type}{The functional form: \code{"Logistic"}, \code{"DoubleLogistic"},
+or \code{"AgeSpecific"}.}
 }
 \value{
 A \link{fims_module} of the requested selectivity type.

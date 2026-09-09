@@ -19,7 +19,8 @@
     "*.Rproj",
     ".github/workflows/**",
     "build/**",
-    "man/**"
+    "man/**",
+    "inst/include/interface/Quadra/**"
   ],
   "ignoreRegExpList": [
     "/[a-z0-9]{32,}/g"
