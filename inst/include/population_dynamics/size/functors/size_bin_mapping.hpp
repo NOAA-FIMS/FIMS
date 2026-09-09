@@ -205,7 +205,8 @@ struct SizeBinMapping {
    *   columns than `source_mass`.
    * @see BuildRebinWeights()
    * @see ExpandDestinationEdgesToCoverSourceRange()
-   * @see AgeToLengthConversionDerived::BuildMappedFleetAgeToLengthConversionRow()
+   * @see
+   * AgeToLengthConversionDerived::BuildMappedFleetAgeToLengthConversionRow()
    */
   template <typename Type>
   static fims::Vector<Type> ApplyRebinWeights(

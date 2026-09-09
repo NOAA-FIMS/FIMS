@@ -215,7 +215,8 @@ inline const Type lgamma(const Type &x) {
 template <class Type>
 inline const Type pnorm(const Type &x, const Type &mean, const Type &sd) {
   // Use :: to call TMB's global pnorm; an unqualified call recurses into this
-  // wrapper and can hang CreateTMBModel() when growth uses normal probabilities.
+  // wrapper and can hang CreateTMBModel() when growth uses normal
+  // probabilities.
   return ::pnorm(x, mean, sd);
 }
 
