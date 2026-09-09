@@ -22,6 +22,8 @@ detailed usage, see the C++ docs.
 
 - [EWAAGrowth](https://noaa-fims.github.io/FIMS/doxygen/classEWAAGrowthInterface.html)
 
+- [VonBertalanffySchnuteGrowth](https://noaa-fims.github.io/FIMS/doxygen/classVonBertalanffySchnuteGrowthInterface.html)
+
 - [Fleet](https://noaa-fims.github.io/FIMS/doxygen/classFleetInterface.html)
 
 - [Index](https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html)

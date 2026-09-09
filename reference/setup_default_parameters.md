@@ -95,6 +95,11 @@ population components, then combines those defaults into one tibble. You
 can modify the returned tibble before fitting a model (for example,
 updating maturity and selectivity parameter values).
 
+Growth defaults are chosen from the data. Models with empirical
+weight-at-age data default to `"EWAA"`. Models without empirical
+weight-at-age data but with length-composition data default to
+`"VonBertalanffySchnute"`.
+
 To create the default initial numbers at age, this function uses the
 defaults from
 [`setup_default_Population()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_Population.md)

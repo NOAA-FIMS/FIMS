@@ -10,12 +10,20 @@ var hierarchy =
           [ "fims_distributions::MultinomialLPMF< Type >", "structfims__distributions_1_1MultinomialLPMF.html", null ],
           [ "fims_distributions::NormalLPDF< Type >", "structfims__distributions_1_1NormalLPDF.html", null ]
         ] ],
+        [ "fims_popdy::AgeToLengthConversionBase< Type >", "structfims__popdy_1_1AgeToLengthConversionBase.html", [
+          [ "fims_popdy::AgeToLengthConversionDerived< Type >", "structfims__popdy_1_1AgeToLengthConversionDerived.html", null ],
+          [ "fims_popdy::AgeToLengthConversionFixed< Type >", "structfims__popdy_1_1AgeToLengthConversionFixed.html", null ]
+        ] ],
         [ "fims_popdy::FisheryModelBase< Type >", "classfims__popdy_1_1FisheryModelBase.html", [
           [ "fims_popdy::CatchAtAge< Type >", "classfims__popdy_1_1CatchAtAge.html", null ]
         ] ],
         [ "fims_popdy::Fleet< Type >", "structfims__popdy_1_1Fleet.html", null ],
         [ "fims_popdy::GrowthBase< Type >", "structfims__popdy_1_1GrowthBase.html", [
-          [ "fims_popdy::EWAAGrowth< Type >", "structfims__popdy_1_1EWAAGrowth.html", null ]
+          [ "fims_popdy::EWAAGrowth< Type >", "structfims__popdy_1_1EWAAGrowth.html", null ],
+          [ "fims_popdy::GrowthDerivedObservationBase< Type >", "classfims__popdy_1_1GrowthDerivedObservationBase.html", [
+            [ "fims_popdy::VonBertalanffySchnuteGrowthModelAdapter< Type >", "classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html", null ]
+          ] ],
+          [ "fims_popdy::VonBertalanffySchnuteGrowth< Type >", "structfims__popdy_1_1VonBertalanffySchnuteGrowth.html", null ]
         ] ],
         [ "fims_popdy::MaturityBase< Type >", "structfims__popdy_1_1MaturityBase.html", [
           [ "fims_popdy::LogisticMaturity< Type >", "structfims__popdy_1_1LogisticMaturity.html", null ]
@@ -52,7 +60,10 @@ var hierarchy =
         [ "FleetInterface", "classFleetInterface.html", null ]
       ] ],
       [ "GrowthInterfaceBase", "classGrowthInterfaceBase.html", [
-        [ "EWAAGrowthInterface", "classEWAAGrowthInterface.html", null ]
+        [ "EWAAGrowthInterface", "classEWAAGrowthInterface.html", null ],
+        [ "GrowthDerivedObservationInterfaceBase", "classGrowthDerivedObservationInterfaceBase.html", [
+          [ "VonBertalanffySchnuteGrowthInterface", "classVonBertalanffySchnuteGrowthInterface.html", null ]
+        ] ]
       ] ],
       [ "MaturityInterfaceBase", "classMaturityInterfaceBase.html", [
         [ "LogisticMaturityInterface", "classLogisticMaturityInterface.html", null ]
@@ -71,6 +82,10 @@ var hierarchy =
         [ "LogisticSelectivityInterface", "classLogisticSelectivityInterface.html", null ]
       ] ]
     ] ],
+    [ "fims_popdy::GrowthModelBase< Type >", "classfims__popdy_1_1GrowthModelBase.html", [
+      [ "fims_popdy::GrowthModel< Type >", "classfims__popdy_1_1GrowthModel.html", null ]
+    ] ],
+    [ "fims_popdy::GrowthProducts< Type >", "structfims__popdy_1_1GrowthProducts.html", null ],
     [ "fims_info::Information< Type >", "classfims__info_1_1Information.html", null ],
     [ "fims::JsonParser", "classfims_1_1JsonParser.html", null ],
     [ "fims::JsonValue", "classfims_1_1JsonValue.html", null ],
@@ -81,6 +96,13 @@ var hierarchy =
     [ "SharedInt", "classSharedInt.html", null ],
     [ "SharedReal", "classSharedReal.html", null ],
     [ "SharedString", "classSharedString.html", null ],
+    [ "fims_popdy::SizeBinMapping", "structfims__popdy_1_1SizeBinMapping.html", null ],
+    [ "fims_popdy::SizeDistributionProviderBase< Type >", "classfims__popdy_1_1SizeDistributionProviderBase.html", [
+      [ "fims_popdy::GrowthDerivedSizeProvider< Type >", "classfims__popdy_1_1GrowthDerivedSizeProvider.html", null ]
+    ] ],
+    [ "fims_popdy::SizeGrid", "structfims__popdy_1_1SizeGrid.html", null ],
+    [ "fims_popdy::SizeGridBuilder", "structfims__popdy_1_1SizeGridBuilder.html", null ],
+    [ "fims_popdy::SizeProducts< Type >", "structfims__popdy_1_1SizeProducts.html", null ],
     [ "fims_popdy::Subpopulation< Type >", "classfims__popdy_1_1Subpopulation.html", null ],
     [ "Variable", "classVariable.html", null ],
     [ "VariableVector", "classVariableVector.html", null ],

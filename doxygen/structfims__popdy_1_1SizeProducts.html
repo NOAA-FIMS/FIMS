@@ -1,0 +1,981 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
+    <link href="bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.10.0</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-input-data.html">introducing FIMS input data</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-logging.html">introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-diagnostics.html">Running diagnostics on a FIMS model</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/adding-new-module.html">adding a new c++ module</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('structfims__popdy_1_1SizeProducts.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="structfims__popdy_1_1SizeProducts-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">fims_popdy::SizeProducts&lt; Type &gt; Struct Template Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Cached population-level size outputs on a biological size grid.  
+ <a href="structfims__popdy_1_1SizeProducts.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="size__products_8hpp_source.html">size_products.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:ab6e0e6bb8b397bacb4046170aa1820dd" id="r_ab6e0e6bb8b397bacb4046170aa1820dd"><td class="memItemLeft" align="right" valign="top"><a id="ab6e0e6bb8b397bacb4046170aa1820dd" name="ab6e0e6bb8b397bacb4046170aa1820dd"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>SizeProducts</b> ()</td></tr>
+<tr class="memdesc:ab6e0e6bb8b397bacb4046170aa1820dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
+<tr class="separator:ab6e0e6bb8b397bacb4046170aa1820dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98962d468d1c13089766dc25d12e8502" id="r_a98962d468d1c13089766dc25d12e8502"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#a98962d468d1c13089766dc25d12e8502">SizeProducts</a> (std::size_t years, std::size_t ages, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_bins</a>)</td></tr>
+<tr class="memdesc:a98962d468d1c13089766dc25d12e8502"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct and size the size-product container.  <br /></td></tr>
+<tr class="separator:a98962d468d1c13089766dc25d12e8502"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a633a0071eed9b27ac5a23a6fa6d9efb0" id="r_a633a0071eed9b27ac5a23a6fa6d9efb0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#a633a0071eed9b27ac5a23a6fa6d9efb0">Resize</a> (std::size_t years, std::size_t ages, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_bins</a>)</td></tr>
+<tr class="memdesc:a633a0071eed9b27ac5a23a6fa6d9efb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resize all cached product arrays.  <br /></td></tr>
+<tr class="separator:a633a0071eed9b27ac5a23a6fa6d9efb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a953da2b535ca8cffb1fb8a1e85d648c9" id="r_a953da2b535ca8cffb1fb8a1e85d648c9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#a953da2b535ca8cffb1fb8a1e85d648c9">ResizeProbSizeOnly</a> (std::size_t years, std::size_t ages, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_bins</a>)</td></tr>
+<tr class="memdesc:a953da2b535ca8cffb1fb8a1e85d648c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resize only the cached age-to-size probability array.  <br /></td></tr>
+<tr class="separator:a953da2b535ca8cffb1fb8a1e85d648c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d6d26671d7b9a76d97e0e18d8437b33" id="r_a3d6d26671d7b9a76d97e0e18d8437b33"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#a3d6d26671d7b9a76d97e0e18d8437b33">AgeYearIndex</a> (std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">year_index</a>, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age_index</a>) <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a></td></tr>
+<tr class="memdesc:a3d6d26671d7b9a76d97e0e18d8437b33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the flattened index for year-age products.  <br /></td></tr>
+<tr class="separator:a3d6d26671d7b9a76d97e0e18d8437b33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d17cc6ba68fc126e96790e06db33b69" id="r_a5d17cc6ba68fc126e96790e06db33b69"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#a5d17cc6ba68fc126e96790e06db33b69">AgeYearSizeIndex</a> (std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">year_index</a>, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age_index</a>, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_bin_index</a>) <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a></td></tr>
+<tr class="memdesc:a5d17cc6ba68fc126e96790e06db33b69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the flattened index for year-age-size-bin probabilities.  <br /></td></tr>
+<tr class="separator:a5d17cc6ba68fc126e96790e06db33b69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38e39948f27c08ce7236a582cfaa5d74" id="r_a38e39948f27c08ce7236a582cfaa5d74"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#a38e39948f27c08ce7236a582cfaa5d74">MeanLAA</a> (std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">year_index</a>, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age_index</a>)</td></tr>
+<tr class="memdesc:a38e39948f27c08ce7236a582cfaa5d74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access mean length-at-age.  <br /></td></tr>
+<tr class="separator:a38e39948f27c08ce7236a582cfaa5d74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac298b398f9fdcaa034b930a4613dd90d" id="r_ac298b398f9fdcaa034b930a4613dd90d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#ac298b398f9fdcaa034b930a4613dd90d">SdLAA</a> (std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">year_index</a>, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age_index</a>)</td></tr>
+<tr class="memdesc:ac298b398f9fdcaa034b930a4613dd90d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access spread of length-at-age.  <br /></td></tr>
+<tr class="separator:ac298b398f9fdcaa034b930a4613dd90d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9ee9cd19d95bab70b0c99d8f7468c61" id="r_ab9ee9cd19d95bab70b0c99d8f7468c61"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#ab9ee9cd19d95bab70b0c99d8f7468c61">ProbSize</a> (std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">year_index</a>, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age_index</a>, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_bin_index</a>)</td></tr>
+<tr class="memdesc:ab9ee9cd19d95bab70b0c99d8f7468c61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access age-to-size probability.  <br /></td></tr>
+<tr class="separator:ab9ee9cd19d95bab70b0c99d8f7468c61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cea645bd47ee9371fa966541b89b63c" id="r_a0cea645bd47ee9371fa966541b89b63c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#a0cea645bd47ee9371fa966541b89b63c">MeanLAA</a> (std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">year_index</a>, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age_index</a>) <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a></td></tr>
+<tr class="memdesc:a0cea645bd47ee9371fa966541b89b63c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read mean length-at-age.  <br /></td></tr>
+<tr class="separator:a0cea645bd47ee9371fa966541b89b63c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae72d4d94c6b7320f6b26d0d1eb18fe1c" id="r_ae72d4d94c6b7320f6b26d0d1eb18fe1c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#ae72d4d94c6b7320f6b26d0d1eb18fe1c">SdLAA</a> (std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">year_index</a>, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age_index</a>) <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a></td></tr>
+<tr class="memdesc:ae72d4d94c6b7320f6b26d0d1eb18fe1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read spread of length-at-age.  <br /></td></tr>
+<tr class="separator:ae72d4d94c6b7320f6b26d0d1eb18fe1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e16f39cb41d4d1c69b4e9937eab94ae" id="r_a8e16f39cb41d4d1c69b4e9937eab94ae"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#a8e16f39cb41d4d1c69b4e9937eab94ae">ProbSize</a> (std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">year_index</a>, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age_index</a>, std::size_t <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_bin_index</a>) <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a></td></tr>
+<tr class="memdesc:a8e16f39cb41d4d1c69b4e9937eab94ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read age-to-size probability.  <br /></td></tr>
+<tr class="separator:a8e16f39cb41d4d1c69b4e9937eab94ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a9b43c3757dd30157080e934e2ea0915f" id="r_a9b43c3757dd30157080e934e2ea0915f"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#a9b43c3757dd30157080e934e2ea0915f">n_years</a> = 0</td></tr>
+<tr class="separator:a9b43c3757dd30157080e934e2ea0915f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a395a81e287d8900094422279e413df" id="r_a5a395a81e287d8900094422279e413df"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#a5a395a81e287d8900094422279e413df">n_ages</a> = 0</td></tr>
+<tr class="separator:a5a395a81e287d8900094422279e413df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1c4d686db834e1a9b4de88f2430737f" id="r_aa1c4d686db834e1a9b4de88f2430737f"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#aa1c4d686db834e1a9b4de88f2430737f">n_size_bins</a></td></tr>
+<tr class="separator:aa1c4d686db834e1a9b4de88f2430737f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a489bac63b1d7281faf4e7ff59f9e34ec" id="r_a489bac63b1d7281faf4e7ff59f9e34ec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#a489bac63b1d7281faf4e7ff59f9e34ec">mean_LAA</a></td></tr>
+<tr class="separator:a489bac63b1d7281faf4e7ff59f9e34ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab331c1f98cb42fa2029918ae85a2d684" id="r_ab331c1f98cb42fa2029918ae85a2d684"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#ab331c1f98cb42fa2029918ae85a2d684">sd_LAA</a></td></tr>
+<tr class="separator:ab331c1f98cb42fa2029918ae85a2d684"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf26dbf1335e8d6d4e96f2578fc765e6" id="r_acf26dbf1335e8d6d4e96f2578fc765e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html#acf26dbf1335e8d6d4e96f2578fc765e6">prob_size</a></td></tr>
+<tr class="separator:acf26dbf1335e8d6d4e96f2578fc765e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt;<br />
+struct fims_popdy::SizeProducts&lt; Type &gt;</div><p>Cached population-level size outputs on a biological size grid. </p>
+<p>This container can be used by a size provider to store prepared size-related outputs for a pooled population, including mean length-at-age, spread-at-age, and age-to-size probabilities on the internal biological size grid.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Type</td><td>Numeric type used for cached values. </td></tr>
+  </table>
+  </dd>
+</dl>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a98962d468d1c13089766dc25d12e8502" name="a98962d468d1c13089766dc25d12e8502"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98962d468d1c13089766dc25d12e8502">&#9670;&#160;</a></span>SizeProducts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::SizeProducts </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>years</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>ages</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>size_bins</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Construct and size the size-product container. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">years</td><td>Number of modeled years. </td></tr>
+    <tr><td class="paramname">ages</td><td>Number of modeled ages. </td></tr>
+    <tr><td class="paramname">size_bins</td><td>Number of biological size bins. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a3d6d26671d7b9a76d97e0e18d8437b33" name="a3d6d26671d7b9a76d97e0e18d8437b33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d6d26671d7b9a76d97e0e18d8437b33">&#9670;&#160;</a></span>AgeYearIndex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::AgeYearIndex </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>year_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>age_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the flattened index for year-age products. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year_index</td><td>Year index. </td></tr>
+    <tr><td class="paramname">age_index</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Flattened year-age index. </dd></dl>
+
+</div>
+</div>
+<a id="a5d17cc6ba68fc126e96790e06db33b69" name="a5d17cc6ba68fc126e96790e06db33b69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d17cc6ba68fc126e96790e06db33b69">&#9670;&#160;</a></span>AgeYearSizeIndex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::AgeYearSizeIndex </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>year_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>age_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>size_bin_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the flattened index for year-age-size-bin probabilities. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year_index</td><td>Year index. </td></tr>
+    <tr><td class="paramname">age_index</td><td>Age index. </td></tr>
+    <tr><td class="paramname">size_bin_index</td><td>Size-bin index. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Flattened year-age-size-bin index. </dd></dl>
+
+</div>
+</div>
+<a id="a38e39948f27c08ce7236a582cfaa5d74" name="a38e39948f27c08ce7236a582cfaa5d74"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38e39948f27c08ce7236a582cfaa5d74">&#9670;&#160;</a></span>MeanLAA() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp; <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::MeanLAA </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>year_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>age_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Access mean length-at-age. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year_index</td><td>Year index. </td></tr>
+    <tr><td class="paramname">age_index</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Reference to mean length-at-age. </dd></dl>
+
+</div>
+</div>
+<a id="a0cea645bd47ee9371fa966541b89b63c" name="a0cea645bd47ee9371fa966541b89b63c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cea645bd47ee9371fa966541b89b63c">&#9670;&#160;</a></span>MeanLAA() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp; <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::MeanLAA </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>year_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>age_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read mean length-at-age. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year_index</td><td>Year index. </td></tr>
+    <tr><td class="paramname">age_index</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Const reference to mean length-at-age. </dd></dl>
+
+</div>
+</div>
+<a id="ab9ee9cd19d95bab70b0c99d8f7468c61" name="ab9ee9cd19d95bab70b0c99d8f7468c61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9ee9cd19d95bab70b0c99d8f7468c61">&#9670;&#160;</a></span>ProbSize() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp; <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::ProbSize </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>year_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>age_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>size_bin_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Access age-to-size probability. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year_index</td><td>Year index. </td></tr>
+    <tr><td class="paramname">age_index</td><td>Age index. </td></tr>
+    <tr><td class="paramname">size_bin_index</td><td>Size-bin index. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Reference to age-to-size probability. </dd></dl>
+
+</div>
+</div>
+<a id="a8e16f39cb41d4d1c69b4e9937eab94ae" name="a8e16f39cb41d4d1c69b4e9937eab94ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e16f39cb41d4d1c69b4e9937eab94ae">&#9670;&#160;</a></span>ProbSize() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp; <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::ProbSize </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>year_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>age_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>size_bin_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read age-to-size probability. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year_index</td><td>Year index. </td></tr>
+    <tr><td class="paramname">age_index</td><td>Age index. </td></tr>
+    <tr><td class="paramname">size_bin_index</td><td>Size-bin index. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Const reference to age-to-size probability. </dd></dl>
+
+</div>
+</div>
+<a id="a633a0071eed9b27ac5a23a6fa6d9efb0" name="a633a0071eed9b27ac5a23a6fa6d9efb0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a633a0071eed9b27ac5a23a6fa6d9efb0">&#9670;&#160;</a></span>Resize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a> <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::Resize </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>years</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>ages</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>size_bins</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Resize all cached product arrays. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">years</td><td>Number of modeled years. </td></tr>
+    <tr><td class="paramname">ages</td><td>Number of modeled ages. </td></tr>
+    <tr><td class="paramname">size_bins</td><td>Number of biological size bins. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a953da2b535ca8cffb1fb8a1e85d648c9" name="a953da2b535ca8cffb1fb8a1e85d648c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a953da2b535ca8cffb1fb8a1e85d648c9">&#9670;&#160;</a></span>ResizeProbSizeOnly()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a> <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::ResizeProbSizeOnly </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>years</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>ages</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>size_bins</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Resize only the cached age-to-size probability array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">years</td><td>Number of modeled years. </td></tr>
+    <tr><td class="paramname">ages</td><td>Number of modeled ages. </td></tr>
+    <tr><td class="paramname">size_bins</td><td>Number of biological size bins.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This is used by providers that read MeanLAA and SdLAA from upstream growth products and only own ProbSize locally. </p>
+
+</div>
+</div>
+<a id="ac298b398f9fdcaa034b930a4613dd90d" name="ac298b398f9fdcaa034b930a4613dd90d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac298b398f9fdcaa034b930a4613dd90d">&#9670;&#160;</a></span>SdLAA() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp; <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::SdLAA </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>year_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>age_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Access spread of length-at-age. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year_index</td><td>Year index. </td></tr>
+    <tr><td class="paramname">age_index</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Reference to spread of length-at-age. </dd></dl>
+
+</div>
+</div>
+<a id="ae72d4d94c6b7320f6b26d0d1eb18fe1c" name="ae72d4d94c6b7320f6b26d0d1eb18fe1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae72d4d94c6b7320f6b26d0d1eb18fe1c">&#9670;&#160;</a></span>SdLAA() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp; <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::SdLAA </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>year_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>age_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read spread of length-at-age. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year_index</td><td>Year index. </td></tr>
+    <tr><td class="paramname">age_index</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Const reference to spread of length-at-age. </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a489bac63b1d7281faf4e7ff59f9e34ec" name="a489bac63b1d7281faf4e7ff59f9e34ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a489bac63b1d7281faf4e7ff59f9e34ec">&#9670;&#160;</a></span>mean_LAA</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::mean_LAA</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>mean length-at-age on the natural scale </p>
+
+</div>
+</div>
+<a id="a5a395a81e287d8900094422279e413df" name="a5a395a81e287d8900094422279e413df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a395a81e287d8900094422279e413df">&#9670;&#160;</a></span>n_ages</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::n_ages = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>number of modeled ages represented </p>
+
+</div>
+</div>
+<a id="aa1c4d686db834e1a9b4de88f2430737f" name="aa1c4d686db834e1a9b4de88f2430737f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1c4d686db834e1a9b4de88f2430737f">&#9670;&#160;</a></span>n_size_bins</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::n_size_bins</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">      0</div>
+</div><!-- fragment --><p>number of biological size bins represented </p>
+
+</div>
+</div>
+<a id="a9b43c3757dd30157080e934e2ea0915f" name="a9b43c3757dd30157080e934e2ea0915f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b43c3757dd30157080e934e2ea0915f">&#9670;&#160;</a></span>n_years</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::n_years = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>number of modeled years represented </p>
+
+</div>
+</div>
+<a id="acf26dbf1335e8d6d4e96f2578fc765e6" name="acf26dbf1335e8d6d4e96f2578fc765e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf26dbf1335e8d6d4e96f2578fc765e6">&#9670;&#160;</a></span>prob_size</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::prob_size</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>age-to-size probabilities on the biological size grid </p>
+
+</div>
+</div>
+<a id="ab331c1f98cb42fa2029918ae85a2d684" name="ab331c1f98cb42fa2029918ae85a2d684"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab331c1f98cb42fa2029918ae85a2d684">&#9670;&#160;</a></span>sd_LAA</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; <a class="el" href="structfims__popdy_1_1SizeProducts.html">fims_popdy::SizeProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::sd_LAA</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>spread of length-at-age on the natural scale </p>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
+<li>inst/include/population_dynamics/size/<a class="el" href="size__products_8hpp_source.html">size_products.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacefims__popdy.html">fims_popdy</a></li><li class="navelem"><a class="el" href="structfims__popdy_1_1SizeProducts.html">SizeProducts</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -243,90 +243,98 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a1aaf947b159a58a5d23d78e55c34a4fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
 <tr class="separator:a1aaf947b159a58a5d23d78e55c34a4fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8daf372e70483efaeba014d5ebf7500b" id="r_a8daf372e70483efaeba014d5ebf7500b"><td class="memItemLeft" align="right" valign="top"><a id="a8daf372e70483efaeba014d5ebf7500b" name="a8daf372e70483efaeba014d5ebf7500b"></a>
-<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~Fleet</b> ()</td></tr>
+<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a>&#160;</td><td class="memItemRight" valign="bottom"><b>~Fleet</b> ()</td></tr>
 <tr class="memdesc:a8daf372e70483efaeba014d5ebf7500b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
 <tr class="separator:a8daf372e70483efaeba014d5ebf7500b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a889b7e1e0b2aa9f4a3114d3d6f8ad577" id="r_a889b7e1e0b2aa9f4a3114d3d6f8ad577"><td class="memItemLeft" align="right" valign="top"><a id="a889b7e1e0b2aa9f4a3114d3d6f8ad577" name="a889b7e1e0b2aa9f4a3114d3d6f8ad577"></a>
-<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Prepare</b> ()</td></tr>
+<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Prepare</b> ()</td></tr>
 <tr class="memdesc:a889b7e1e0b2aa9f4a3114d3d6f8ad577"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare to run the fleet module. Called at each model iteration, and used to exponentiate the natural log of q and Fmort parameters prior to evaluation. <br /></td></tr>
 <tr class="separator:a889b7e1e0b2aa9f4a3114d3d6f8ad577"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structfims__model__object_1_1FIMSObject"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structfims__model__object_1_1FIMSObject')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject&lt; Type &gt;</a></td></tr>
 <tr class="memitem:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a7f1a6d1474f8ad7d8b460ce889ee6ebd"><td class="memItemLeft" align="right" valign="top">
-<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetId</b> () <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a></td></tr>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>GetId</b> () const</td></tr>
 <tr class="memdesc:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="mdescLeft">&#160;</td><td class="mdescRight">Getter that returns the unique id for parameters in the model. <br /></td></tr>
 <tr class="separator:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a81239daf538745bbb96c56f627edc781"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a81239daf538745bbb96c56f627edc781">CheckDimensions</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">actual</a>, <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">expected</a>)</td></tr>
+<tr class="memitem:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a81239daf538745bbb96c56f627edc781"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a81239daf538745bbb96c56f627edc781">CheckDimensions</a> (size_t actual, size_t expected)</td></tr>
 <tr class="memdesc:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the dimensions of an object.  <br /></td></tr>
 <tr class="separator:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structfims__model__object_1_1FIMSMemoryTracker"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structfims__model__object_1_1FIMSMemoryTracker')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfims__model__object_1_1FIMSMemoryTracker.html">fims_model_object::FIMSMemoryTracker</a></td></tr>
-<tr class="memitem:aa714fd275e924fae47d51824b0e705cc inherit pub_methods_structfims__model__object_1_1FIMSMemoryTracker" id="r_aa714fd275e924fae47d51824b0e705cc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSMemoryTracker.html#aa714fd275e924fae47d51824b0e705cc">register_self</a> (<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">const</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> id)</td></tr>
+<tr class="memitem:aa714fd275e924fae47d51824b0e705cc inherit pub_methods_structfims__model__object_1_1FIMSMemoryTracker" id="r_aa714fd275e924fae47d51824b0e705cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSMemoryTracker.html#aa714fd275e924fae47d51824b0e705cc">register_self</a> (const uint32_t id)</td></tr>
 <tr class="memdesc:aa714fd275e924fae47d51824b0e705cc inherit pub_methods_structfims__model__object_1_1FIMSMemoryTracker"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a <a class="el" href="structfims__model__object_1_1FIMSObject.html" title="FIMSObject struct that defines member types and returns the unique id.">FIMSObject</a> instance with the memory tracker.  <br /></td></tr>
 <tr class="separator:aa714fd275e924fae47d51824b0e705cc inherit pub_methods_structfims__model__object_1_1FIMSMemoryTracker"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a6391035016ec648ac6c3d2891dc6fb25" id="r_a6391035016ec648ac6c3d2891dc6fb25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a6391035016ec648ac6c3d2891dc6fb25">n_years</a></td></tr>
+<tr class="memitem:a6391035016ec648ac6c3d2891dc6fb25" id="r_a6391035016ec648ac6c3d2891dc6fb25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a6391035016ec648ac6c3d2891dc6fb25">n_years</a></td></tr>
 <tr class="separator:a6391035016ec648ac6c3d2891dc6fb25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d3723853194985d3cc6645bb8fa206d" id="r_a8d3723853194985d3cc6645bb8fa206d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a8d3723853194985d3cc6645bb8fa206d">n_ages</a></td></tr>
+<tr class="memitem:a8d3723853194985d3cc6645bb8fa206d" id="r_a8d3723853194985d3cc6645bb8fa206d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a8d3723853194985d3cc6645bb8fa206d">n_ages</a></td></tr>
 <tr class="separator:a8d3723853194985d3cc6645bb8fa206d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af145559ff2e9e95609c6520f912163f6" id="r_af145559ff2e9e95609c6520f912163f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#af145559ff2e9e95609c6520f912163f6">n_lengths</a></td></tr>
+<tr class="memitem:af145559ff2e9e95609c6520f912163f6" id="r_af145559ff2e9e95609c6520f912163f6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#af145559ff2e9e95609c6520f912163f6">n_lengths</a></td></tr>
 <tr class="separator:af145559ff2e9e95609c6520f912163f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3bfbbc0bf021aa8f6f2730d42027d17d" id="r_a3bfbbc0bf021aa8f6f2730d42027d17d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a3bfbbc0bf021aa8f6f2730d42027d17d">fleet_selectivity_id_m</a> = -999</td></tr>
+<tr class="memitem:aeb388ecfda4ab33b111c343d296293c9" id="r_aeb388ecfda4ab33b111c343d296293c9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#aeb388ecfda4ab33b111c343d296293c9">lengths</a></td></tr>
+<tr class="separator:aeb388ecfda4ab33b111c343d296293c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea2e3421162300dca8268bac6f0f01af" id="r_aea2e3421162300dca8268bac6f0f01af"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#aea2e3421162300dca8268bac6f0f01af">length_bin_edges</a></td></tr>
+<tr class="separator:aea2e3421162300dca8268bac6f0f01af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bfbbc0bf021aa8f6f2730d42027d17d" id="r_a3bfbbc0bf021aa8f6f2730d42027d17d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a3bfbbc0bf021aa8f6f2730d42027d17d">fleet_selectivity_id_m</a> = -999</td></tr>
 <tr class="separator:a3bfbbc0bf021aa8f6f2730d42027d17d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a260427acb5128fa3303459de353c048c" id="r_a260427acb5128fa3303459de353c048c"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1SelectivityBase.html">SelectivityBase</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a260427acb5128fa3303459de353c048c">selectivity</a></td></tr>
+<tr class="memitem:a260427acb5128fa3303459de353c048c" id="r_a260427acb5128fa3303459de353c048c"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1SelectivityBase.html">SelectivityBase</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a260427acb5128fa3303459de353c048c">selectivity</a></td></tr>
 <tr class="separator:a260427acb5128fa3303459de353c048c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd765612ff3e1f5c6c5f0b3e4882f986" id="r_afd765612ff3e1f5c6c5f0b3e4882f986"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#afd765612ff3e1f5c6c5f0b3e4882f986">fleet_observed_catch_data_id_m</a> = -999</td></tr>
+<tr class="memitem:ac0dc3820cc040fbfe846e1fe7660a6da" id="r_ac0dc3820cc040fbfe846e1fe7660a6da"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1AgeToLengthConversionBase.html">AgeToLengthConversionBase</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ac0dc3820cc040fbfe846e1fe7660a6da">age_to_length_conversion_model</a></td></tr>
+<tr class="separator:ac0dc3820cc040fbfe846e1fe7660a6da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f2a82edd7b738e4d81d3514a2898051" id="r_a8f2a82edd7b738e4d81d3514a2898051"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a8f2a82edd7b738e4d81d3514a2898051">requires_age_length_mapping</a></td></tr>
+<tr class="separator:a8f2a82edd7b738e4d81d3514a2898051"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd765612ff3e1f5c6c5f0b3e4882f986" id="r_afd765612ff3e1f5c6c5f0b3e4882f986"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#afd765612ff3e1f5c6c5f0b3e4882f986">fleet_observed_catch_data_id_m</a> = -999</td></tr>
 <tr class="separator:afd765612ff3e1f5c6c5f0b3e4882f986"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8f228dc3ec93bb2bb86b143c854af61" id="r_ad8f228dc3ec93bb2bb86b143c854af61"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ad8f228dc3ec93bb2bb86b143c854af61">observed_catch_data</a></td></tr>
+<tr class="memitem:ad8f228dc3ec93bb2bb86b143c854af61" id="r_ad8f228dc3ec93bb2bb86b143c854af61"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ad8f228dc3ec93bb2bb86b143c854af61">observed_catch_data</a></td></tr>
 <tr class="separator:ad8f228dc3ec93bb2bb86b143c854af61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a393f94371f82b73f8f820c0cd268f754" id="r_a393f94371f82b73f8f820c0cd268f754"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a393f94371f82b73f8f820c0cd268f754">observed_catch_units</a></td></tr>
 <tr class="separator:a393f94371f82b73f8f820c0cd268f754"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab8fa4db5de7dba45fece778e182d4e27" id="r_ab8fa4db5de7dba45fece778e182d4e27"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ab8fa4db5de7dba45fece778e182d4e27">fleet_observed_index_data_id_m</a> = -999</td></tr>
+<tr class="memitem:ab8fa4db5de7dba45fece778e182d4e27" id="r_ab8fa4db5de7dba45fece778e182d4e27"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ab8fa4db5de7dba45fece778e182d4e27">fleet_observed_index_data_id_m</a> = -999</td></tr>
 <tr class="separator:ab8fa4db5de7dba45fece778e182d4e27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c6fde31050e3ea49f38ecbc694ffff6" id="r_a6c6fde31050e3ea49f38ecbc694ffff6"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a6c6fde31050e3ea49f38ecbc694ffff6">observed_index_data</a></td></tr>
+<tr class="memitem:a6c6fde31050e3ea49f38ecbc694ffff6" id="r_a6c6fde31050e3ea49f38ecbc694ffff6"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a6c6fde31050e3ea49f38ecbc694ffff6">observed_index_data</a></td></tr>
 <tr class="separator:a6c6fde31050e3ea49f38ecbc694ffff6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:affcc5764fce7eba009ba13845dedc962" id="r_affcc5764fce7eba009ba13845dedc962"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#affcc5764fce7eba009ba13845dedc962">observed_index_units</a></td></tr>
 <tr class="separator:affcc5764fce7eba009ba13845dedc962"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a650c1f21f4efce9a78472408e4abd2d2" id="r_a650c1f21f4efce9a78472408e4abd2d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a650c1f21f4efce9a78472408e4abd2d2">fleet_observed_agecomp_data_id_m</a> = -999</td></tr>
+<tr class="memitem:a650c1f21f4efce9a78472408e4abd2d2" id="r_a650c1f21f4efce9a78472408e4abd2d2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a650c1f21f4efce9a78472408e4abd2d2">fleet_observed_agecomp_data_id_m</a> = -999</td></tr>
 <tr class="separator:a650c1f21f4efce9a78472408e4abd2d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4eacf98c97dedaf93c7d7fec4107eace" id="r_a4eacf98c97dedaf93c7d7fec4107eace"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a4eacf98c97dedaf93c7d7fec4107eace">observed_agecomp_data</a></td></tr>
+<tr class="memitem:a4eacf98c97dedaf93c7d7fec4107eace" id="r_a4eacf98c97dedaf93c7d7fec4107eace"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a4eacf98c97dedaf93c7d7fec4107eace">observed_agecomp_data</a></td></tr>
 <tr class="separator:a4eacf98c97dedaf93c7d7fec4107eace"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33da0d3b4445a9407bd1d22ba1c7e31f" id="r_a33da0d3b4445a9407bd1d22ba1c7e31f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a33da0d3b4445a9407bd1d22ba1c7e31f">fleet_observed_lengthcomp_data_id_m</a> = -999</td></tr>
+<tr class="memitem:a33da0d3b4445a9407bd1d22ba1c7e31f" id="r_a33da0d3b4445a9407bd1d22ba1c7e31f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a33da0d3b4445a9407bd1d22ba1c7e31f">fleet_observed_lengthcomp_data_id_m</a> = -999</td></tr>
 <tr class="separator:a33da0d3b4445a9407bd1d22ba1c7e31f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa04ae98c8bab390e30431c8d046958c1" id="r_aa04ae98c8bab390e30431c8d046958c1"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#aa04ae98c8bab390e30431c8d046958c1">observed_lengthcomp_data</a></td></tr>
+<tr class="memitem:aa04ae98c8bab390e30431c8d046958c1" id="r_aa04ae98c8bab390e30431c8d046958c1"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#aa04ae98c8bab390e30431c8d046958c1">observed_lengthcomp_data</a></td></tr>
 <tr class="separator:aa04ae98c8bab390e30431c8d046958c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac572ee8c2fc48c99544ed01ae284c6e7" id="r_ac572ee8c2fc48c99544ed01ae284c6e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ac572ee8c2fc48c99544ed01ae284c6e7">log_Fmort</a></td></tr>
+<tr class="memitem:ac572ee8c2fc48c99544ed01ae284c6e7" id="r_ac572ee8c2fc48c99544ed01ae284c6e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ac572ee8c2fc48c99544ed01ae284c6e7">log_Fmort</a></td></tr>
 <tr class="separator:ac572ee8c2fc48c99544ed01ae284c6e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e49af4939f8a9f32d76b354a4cf7581" id="r_a1e49af4939f8a9f32d76b354a4cf7581"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a1e49af4939f8a9f32d76b354a4cf7581">log_q</a></td></tr>
+<tr class="memitem:a1e49af4939f8a9f32d76b354a4cf7581" id="r_a1e49af4939f8a9f32d76b354a4cf7581"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a1e49af4939f8a9f32d76b354a4cf7581">log_q</a></td></tr>
 <tr class="separator:a1e49af4939f8a9f32d76b354a4cf7581"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78cadc41e2e95ece2282873ad8e3b2b4" id="r_a78cadc41e2e95ece2282873ad8e3b2b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a78cadc41e2e95ece2282873ad8e3b2b4">Fmort</a></td></tr>
+<tr class="memitem:a78cadc41e2e95ece2282873ad8e3b2b4" id="r_a78cadc41e2e95ece2282873ad8e3b2b4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a78cadc41e2e95ece2282873ad8e3b2b4">Fmort</a></td></tr>
 <tr class="separator:a78cadc41e2e95ece2282873ad8e3b2b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9dbf02a91350fb062adc9ded0a89c66e" id="r_a9dbf02a91350fb062adc9ded0a89c66e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a9dbf02a91350fb062adc9ded0a89c66e">q</a></td></tr>
+<tr class="memitem:a9dbf02a91350fb062adc9ded0a89c66e" id="r_a9dbf02a91350fb062adc9ded0a89c66e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a9dbf02a91350fb062adc9ded0a89c66e">q</a></td></tr>
 <tr class="separator:a9dbf02a91350fb062adc9ded0a89c66e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0ba9edd8d93288939648869c2ab6996" id="r_ab0ba9edd8d93288939648869c2ab6996"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ab0ba9edd8d93288939648869c2ab6996">age_to_length_conversion</a></td></tr>
+<tr class="memitem:ab0ba9edd8d93288939648869c2ab6996" id="r_ab0ba9edd8d93288939648869c2ab6996"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#ab0ba9edd8d93288939648869c2ab6996">age_to_length_conversion</a></td></tr>
 <tr class="separator:ab0ba9edd8d93288939648869c2ab6996"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_structfims__model__object_1_1FIMSObject"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_structfims__model__object_1_1FIMSObject')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject&lt; Type &gt;</a></td></tr>
-<tr class="memitem:a3922946642efc5ec4309149f1e0b188a inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a3922946642efc5ec4309149f1e0b188a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a3922946642efc5ec4309149f1e0b188a">id</a></td></tr>
+<tr class="memitem:a3922946642efc5ec4309149f1e0b188a inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a3922946642efc5ec4309149f1e0b188a"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a3922946642efc5ec4309149f1e0b188a">id</a></td></tr>
 <tr class="separator:a3922946642efc5ec4309149f1e0b188a inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac625a90f1af6d01d8c476d0a1ecb5343 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_ac625a90f1af6d01d8c476d0a1ecb5343"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#ac625a90f1af6d01d8c476d0a1ecb5343">parameters</a></td></tr>
+<tr class="memitem:ac625a90f1af6d01d8c476d0a1ecb5343 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_ac625a90f1af6d01d8c476d0a1ecb5343"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Type * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#ac625a90f1af6d01d8c476d0a1ecb5343">parameters</a></td></tr>
 <tr class="separator:ac625a90f1af6d01d8c476d0a1ecb5343 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d8ddb11af5bb51a811f7d4c855f49b3 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a9d8ddb11af5bb51a811f7d4c855f49b3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a9d8ddb11af5bb51a811f7d4c855f49b3">random_effects_parameters</a></td></tr>
+<tr class="memitem:a9d8ddb11af5bb51a811f7d4c855f49b3 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a9d8ddb11af5bb51a811f7d4c855f49b3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Type * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a9d8ddb11af5bb51a811f7d4c855f49b3">random_effects_parameters</a></td></tr>
 <tr class="separator:a9d8ddb11af5bb51a811f7d4c855f49b3 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca6a96ab8e6a4cca573daa5f52e71c67 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_aca6a96ab8e6a4cca573daa5f52e71c67"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#aca6a96ab8e6a4cca573daa5f52e71c67">fixed_effects_parameters</a></td></tr>
+<tr class="memitem:aca6a96ab8e6a4cca573daa5f52e71c67 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_aca6a96ab8e6a4cca573daa5f52e71c67"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Type * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#aca6a96ab8e6a4cca573daa5f52e71c67">fixed_effects_parameters</a></td></tr>
 <tr class="separator:aca6a96ab8e6a4cca573daa5f52e71c67 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a278d9ec006b19fdaccec3ea13ea1e1b2" id="r_a278d9ec006b19fdaccec3ea13ea1e1b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a278d9ec006b19fdaccec3ea13ea1e1b2">id_g</a> = 0</td></tr>
+<tr class="memitem:a278d9ec006b19fdaccec3ea13ea1e1b2" id="r_a278d9ec006b19fdaccec3ea13ea1e1b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1Fleet.html#a278d9ec006b19fdaccec3ea13ea1e1b2">id_g</a> = 0</td></tr>
 <tr class="separator:a278d9ec006b19fdaccec3ea13ea1e1b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_attribs_structfims__model__object_1_1FIMSMemoryTracker"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_structfims__model__object_1_1FIMSMemoryTracker')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="structfims__model__object_1_1FIMSMemoryTracker.html">fims_model_object::FIMSMemoryTracker</a></td></tr>
 <tr class="memitem:a65be2ea8b9eede7570b46fcb8c753c5a inherit pub_static_attribs_structfims__model__object_1_1FIMSMemoryTracker" id="r_a65be2ea8b9eede7570b46fcb8c753c5a"><td class="memItemLeft" align="right" valign="top">
-<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">static</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a>&#160;</td><td class="memItemRight" valign="bottom"><b>total_active_objects</b> = 0</td></tr>
+static int&#160;</td><td class="memItemRight" valign="bottom"><b>total_active_objects</b> = 0</td></tr>
 <tr class="memdesc:a65be2ea8b9eede7570b46fcb8c753c5a inherit pub_static_attribs_structfims__model__object_1_1FIMSMemoryTracker"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total number of active <a class="el" href="structfims__model__object_1_1FIMSObject.html" title="FIMSObject struct that defines member types and returns the unique id.">FIMSObject</a> instances currently in memory. <br /></td></tr>
 <tr class="separator:a65be2ea8b9eede7570b46fcb8c753c5a inherit pub_static_attribs_structfims__model__object_1_1FIMSMemoryTracker"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt;<br />
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt;<br />
 struct fims_popdy::Fleet&lt; Type &gt;</div><p>Base class for all fleets. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
@@ -341,14 +349,31 @@ struct fims_popdy::Fleet&lt; Type &gt;</div><p>Base class for all fleets. </p>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::age_to_length_conversion</td>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::age_to_length_conversion</td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>derived quantity age to length conversion matrix </p>
+
+</div>
+</div>
+<a id="ac0dc3820cc040fbfe846e1fe7660a6da" name="ac0dc3820cc040fbfe846e1fe7660a6da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0dc3820cc040fbfe846e1fe7660a6da">&#9670;&#160;</a></span>age_to_length_conversion_model</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1AgeToLengthConversionBase.html">AgeToLengthConversionBase</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::age_to_length_conversion_model</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>fleet-specific age-to-length conversion model </p>
 
 </div>
 </div>
@@ -358,10 +383,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleet_observed_agecomp_data_id_m = -999</td>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::fleet_observed_agecomp_data_id_m = -999</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -375,10 +400,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleet_observed_catch_data_id_m = -999</td>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::fleet_observed_catch_data_id_m = -999</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -392,10 +417,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleet_observed_index_data_id_m = -999</td>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::fleet_observed_index_data_id_m = -999</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -409,10 +434,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleet_observed_lengthcomp_data_id_m = -999</td>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::fleet_observed_lengthcomp_data_id_m = -999</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -426,10 +451,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::fleet_selectivity_id_m = -999</td>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">int</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::fleet_selectivity_id_m = -999</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -443,10 +468,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::Fmort</td>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::Fmort</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -460,13 +485,13 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">uint32_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::id_g = 0</td>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">uint32_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::id_g = 0</td>
         </tr>
       </table>
   </td>
@@ -479,16 +504,50 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 
 </div>
 </div>
+<a id="aea2e3421162300dca8268bac6f0f01af" name="aea2e3421162300dca8268bac6f0f01af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea2e3421162300dca8268bac6f0f01af">&#9670;&#160;</a></span>length_bin_edges</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::length_bin_edges</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Resolved observation-bin edges for this fleet. </p>
+
+</div>
+</div>
+<a id="aeb388ecfda4ab33b111c343d296293c9" name="aeb388ecfda4ab33b111c343d296293c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb388ecfda4ab33b111c343d296293c9">&#9670;&#160;</a></span>lengths</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::lengths</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p><a class="el" href="structfims__popdy_1_1Fleet.html" title="Base class for all fleets.">Fleet</a> observation-bin centers for this fleet. </p>
+
+</div>
+</div>
 <a id="ac572ee8c2fc48c99544ed01ae284c6e7" name="ac572ee8c2fc48c99544ed01ae284c6e7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac572ee8c2fc48c99544ed01ae284c6e7">&#9670;&#160;</a></span>log_Fmort</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::log_Fmort</td>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::log_Fmort</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -502,10 +561,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::log_q</td>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::log_q</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -519,10 +578,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::n_ages</td>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::n_ages</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -536,14 +595,14 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::n_lengths</td>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::n_lengths</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>the number of lengths in the model </p>
+<p>the number of fleet observation bins for this fleet </p>
 
 </div>
 </div>
@@ -553,10 +612,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">size_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::n_years</td>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">size_t</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::n_years</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -570,10 +629,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_agecomp_data</td>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::observed_agecomp_data</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -587,10 +646,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_catch_data</td>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::observed_catch_data</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -604,10 +663,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::string <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_catch_units</td>
+          <td class="memname">std::string <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::observed_catch_units</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -621,10 +680,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_index_data</td>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::observed_index_data</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -638,10 +697,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::string <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_index_units</td>
+          <td class="memname">std::string <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::observed_index_units</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -655,10 +714,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::observed_lengthcomp_data</td>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__data__object_1_1DataObject.html">fims_data_object::DataObject</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::observed_lengthcomp_data</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -672,14 +731,33 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::q</td>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::q</td>
         </tr>
       </table>
 </div><div class="memdoc">
 <p>transformed parameter: the catchability of the fleet </p>
+
+</div>
+</div>
+<a id="a8f2a82edd7b738e4d81d3514a2898051" name="a8f2a82edd7b738e4d81d3514a2898051"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f2a82edd7b738e4d81d3514a2898051">&#9670;&#160;</a></span>requires_age_length_mapping</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">bool</a> <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::requires_age_length_mapping</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">=</div>
+<div class="line">      <span class="keyword">false</span></div>
+</div><!-- fragment --><p>whether an active modeled path requires age-to-length conversion-based mapping </p>
 
 </div>
 </div>
@@ -689,10 +767,10 @@ template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e34
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">class</a> <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt; </div>
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">class</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1SelectivityBase.html">SelectivityBase</a>&lt;<a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="rcpp__interface_8hpp.html#a9f5a235582e7cc0f29e3431fc89ef10d">Type</a> &gt;::selectivity</td>
+          <td class="memname">std::shared_ptr&lt;<a class="el" href="structfims__popdy_1_1SelectivityBase.html">SelectivityBase</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; &gt; <a class="el" href="structfims__popdy_1_1Fleet.html">fims_popdy::Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::selectivity</td>
         </tr>
       </table>
 </div><div class="memdoc">

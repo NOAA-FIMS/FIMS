@@ -270,6 +270,8 @@ parameters_projection <- setup_default_parameters(data = data_4_projections) |>
   )
 ```
 
+    ## Empirical weight-at-age rows found. Growth defaults to "EWAA".
+
 Reference-point targets are currently achieved by specifying a prior on
 `spawning_biomass_ratio`, a derived population quantity, in the final
 year/s of the projection period. Additionally, a prior can be specified
@@ -308,7 +310,7 @@ projection_fit <- parameters_projection |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 14.10826 seconds
+    ## ℹ Total run time was 14.65645 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00037
     ## ℹ Negative log likelihood (NLL):

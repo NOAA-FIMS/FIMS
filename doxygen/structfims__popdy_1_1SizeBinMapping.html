@@ -1,0 +1,562 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
+    <link href="bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.10.0</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-input-data.html">introducing FIMS input data</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-logging.html">introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-diagnostics.html">Running diagnostics on a FIMS model</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/adding-new-module.html">adding a new c++ module</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('structfims__popdy_1_1SizeBinMapping.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="structfims__popdy_1_1SizeBinMapping-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">fims_popdy::SizeBinMapping Struct Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Helper for mapping population biological size bins to observed fleet bins.  
+ <a href="structfims__popdy_1_1SizeBinMapping.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="size__bin__mapping_8hpp_source.html">size_bin_mapping.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a45f588f71db79c0062696af5ada4806d" id="r_a45f588f71db79c0062696af5ada4806d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeBinMapping.html#a45f588f71db79c0062696af5ada4806d">OverlapWidth</a> (<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">left_a</a>, <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">right_a</a>, <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">left_b</a>, <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">right_b</a>)</td></tr>
+<tr class="memdesc:a45f588f71db79c0062696af5ada4806d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the overlap width between two 1-D closed-open intervals.  <br /></td></tr>
+<tr class="separator:a45f588f71db79c0062696af5ada4806d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3277a3a99c2080daaf832cf989e01425" id="r_a3277a3a99c2080daaf832cf989e01425"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeBinMapping.html#a3277a3a99c2080daaf832cf989e01425">HasStrictlyIncreasingEdges</a> (<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;edges)</td></tr>
+<tr class="memdesc:a3277a3a99c2080daaf832cf989e01425"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check that a bin-edge vector is usable for geometric mapping.  <br /></td></tr>
+<tr class="separator:a3277a3a99c2080daaf832cf989e01425"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4215d06b070248ea58f6950beb2c541c" id="r_a4215d06b070248ea58f6950beb2c541c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeBinMapping.html#a4215d06b070248ea58f6950beb2c541c">BuildRebinWeights</a> (<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">source_edges</a>, <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">destination_edges</a>)</td></tr>
+<tr class="memdesc:a4215d06b070248ea58f6950beb2c541c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build overlap-based rebin weights from source bins to destination bins.  <br /></td></tr>
+<tr class="separator:a4215d06b070248ea58f6950beb2c541c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6de0f0d409220a92319acaa3a1420541" id="r_a6de0f0d409220a92319acaa3a1420541"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeBinMapping.html#a6de0f0d409220a92319acaa3a1420541">DestinationCoversSourceRange</a> (<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">source_edges</a>, <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">destination_edges</a>)</td></tr>
+<tr class="memdesc:a6de0f0d409220a92319acaa3a1420541"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check that the destination edges fully cover the source-bin range.  <br /></td></tr>
+<tr class="separator:a6de0f0d409220a92319acaa3a1420541"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf4ee072a693b417b0595b6e312b145d" id="r_aaf4ee072a693b417b0595b6e312b145d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeBinMapping.html#aaf4ee072a693b417b0595b6e312b145d">ExpandDestinationEdgesToCoverSourceRange</a> (<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">source_edges</a>, <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">destination_edges</a>)</td></tr>
+<tr class="memdesc:aaf4ee072a693b417b0595b6e312b145d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return explicit mapping edges whose support covers the source range while preserving the canonical destination bin breaks.  <br /></td></tr>
+<tr class="separator:aaf4ee072a693b417b0595b6e312b145d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99d0f3faf112f76f4c71157b41eccf41" id="r_a99d0f3faf112f76f4c71157b41eccf41"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </td></tr>
+<tr class="memitem:a99d0f3faf112f76f4c71157b41eccf41"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeBinMapping.html#a99d0f3faf112f76f4c71157b41eccf41">ApplyRebinWeights</a> (<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &gt; &amp;weights, <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &amp;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">source_mass</a>)</td></tr>
+<tr class="memdesc:a99d0f3faf112f76f4c71157b41eccf41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply a source-to-destination bin mapping to a size-mass vector.  <br /></td></tr>
+<tr class="separator:a99d0f3faf112f76f4c71157b41eccf41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Helper for mapping population biological size bins to observed fleet bins. </p>
+<p>This helper operates only on bin geometry. It does not depend on growth, age-to-length conversion, selectivity, or catch-at-age logic. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a99d0f3faf112f76f4c71157b41eccf41" name="a99d0f3faf112f76f4c71157b41eccf41"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99d0f3faf112f76f4c71157b41eccf41">&#9670;&#160;</a></span>ApplyRebinWeights()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; fims_popdy::SizeBinMapping::ApplyRebinWeights </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>weights</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>source_mass</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Apply a source-to-destination bin mapping to a size-mass vector. </p>
+<p>The source vector contains probability mass or another size-indexed quantity on the population biological size grid. The weight matrix must have been created by <code><a class="el" href="structfims__popdy_1_1SizeBinMapping.html#a4215d06b070248ea58f6950beb2c541c" title="Build overlap-based rebin weights from source bins to destination bins.">BuildRebinWeights()</a></code>, so each row corresponds to one destination bin and each column corresponds to one source bin. For each destination bin, this function multiplies the source mass in every source bin by its overlap fraction and sums the results. In matrix notation, the returned vector is <code>destination_mass = weights * source_mass</code>.</p>
+<p>In the growth-derived age-to-length path, the source vector is the population-level age-to-size probability row and the destination vector is the fleet-specific age-to-length probability row. The caller may first use <code><a class="el" href="structfims__popdy_1_1SizeBinMapping.html#aaf4ee072a693b417b0595b6e312b145d" title="Return explicit mapping edges whose support covers the source range while preserving the canonical de...">ExpandDestinationEdgesToCoverSourceRange()</a></code> to extend the outer destination edges, then use <code><a class="el" href="structfims__popdy_1_1SizeBinMapping.html#a4215d06b070248ea58f6950beb2c541c" title="Build overlap-based rebin weights from source bins to destination bins.">BuildRebinWeights()</a></code> to construct the geometric mapping. This function performs only the weighted aggregation; it does not validate or normalize the resulting row.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">weights</td><td>Overlap weights stored as <code>[destination_bin][source_bin]</code>, typically returned by <code><a class="el" href="structfims__popdy_1_1SizeBinMapping.html#a4215d06b070248ea58f6950beb2c541c" title="Build overlap-based rebin weights from source bins to destination bins.">BuildRebinWeights()</a></code>. </td></tr>
+    <tr><td class="paramname">source_mass</td><td>Mass or probability values indexed by source bin. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Values aggregated onto the destination bins, in destination-bin order. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>If a weight row has a different number of columns than <code>source_mass</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="structfims__popdy_1_1SizeBinMapping.html#a4215d06b070248ea58f6950beb2c541c" title="Build overlap-based rebin weights from source bins to destination bins.">BuildRebinWeights()</a> </dd>
+<dd>
+<a class="el" href="structfims__popdy_1_1SizeBinMapping.html#aaf4ee072a693b417b0595b6e312b145d" title="Return explicit mapping edges whose support covers the source range while preserving the canonical de...">ExpandDestinationEdgesToCoverSourceRange()</a> </dd>
+<dd>
+<a class="el" href="structfims__popdy_1_1AgeToLengthConversionDerived.html#afb2ae25765c865882041d94c496a5530" title="Build one fleet age-to-length conversion row by mapping a population age-to-size row onto fleet obser...">AgeToLengthConversionDerived::BuildMappedFleetAgeToLengthConversionRow()</a> </dd></dl>
+
+</div>
+</div>
+<a id="a4215d06b070248ea58f6950beb2c541c" name="a4215d06b070248ea58f6950beb2c541c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4215d06b070248ea58f6950beb2c541c">&#9670;&#160;</a></span>BuildRebinWeights()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &gt; fims_popdy::SizeBinMapping::BuildRebinWeights </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>source_edges</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>destination_edges</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Build overlap-based rebin weights from source bins to destination bins. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source_edges</td><td><a class="el" href="structfims__popdy_1_1Population.html" title="Population class. Contains subpopulations that are divided into generic partitions (e....">Population</a> biological size-grid edges. </td></tr>
+    <tr><td class="paramname">destination_edges</td><td><a class="el" href="structfims__popdy_1_1Fleet.html" title="Base class for all fleets.">Fleet</a> observation-bin edges. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Matrix of weights stored as [destination_bin][source_bin].</dd></dl>
+<p>Convert a probability distribution from FIMS's internal biological size grid into the same bins as observed by a fleet using geometric mass conservation when translating the growth-derived biological size distribution into the bins actually observed by a fleet. It requires destination support to cover source support and does not apply higher-level tail handling such as biological plus-group interpretation or observation-side compression rules. </p>
+
+</div>
+</div>
+<a id="a6de0f0d409220a92319acaa3a1420541" name="a6de0f0d409220a92319acaa3a1420541"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6de0f0d409220a92319acaa3a1420541">&#9670;&#160;</a></span>DestinationCoversSourceRange()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">bool</a> fims_popdy::SizeBinMapping::DestinationCoversSourceRange </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>source_edges</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>destination_edges</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check that the destination edges fully cover the source-bin range. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source_edges</td><td><a class="el" href="structfims__popdy_1_1Population.html" title="Population class. Contains subpopulations that are divided into generic partitions (e....">Population</a> biological size-grid edges. </td></tr>
+    <tr><td class="paramname">destination_edges</td><td><a class="el" href="structfims__popdy_1_1Fleet.html" title="Base class for all fleets.">Fleet</a> observation-bin edges. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True when the destination range contains the full source range. </dd></dl>
+
+</div>
+</div>
+<a id="aaf4ee072a693b417b0595b6e312b145d" name="aaf4ee072a693b417b0595b6e312b145d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf4ee072a693b417b0595b6e312b145d">&#9670;&#160;</a></span>ExpandDestinationEdgesToCoverSourceRange()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; fims_popdy::SizeBinMapping::ExpandDestinationEdgesToCoverSourceRange </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>source_edges</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>destination_edges</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return explicit mapping edges whose support covers the source range while preserving the canonical destination bin breaks. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source_edges</td><td><a class="el" href="structfims__popdy_1_1Population.html" title="Population class. Contains subpopulations that are divided into generic partitions (e....">Population</a> biological size-grid edges that must be covered. </td></tr>
+    <tr><td class="paramname">destination_edges</td><td><a class="el" href="structfims__popdy_1_1Fleet.html" title="Base class for all fleets.">Fleet</a> observation-bin edges. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Copy of destination edges with only the outer edges widened as needed to cover the full source-bin range.</dd></dl>
+<p>This is an explicit higher-level mapping policy. It does not redefine the canonical destination geometry itself; it only prepares a temporary edge vector for geometric translation when destination support is narrower than source support. </p>
+
+</div>
+</div>
+<a id="a3277a3a99c2080daaf832cf989e01425" name="a3277a3a99c2080daaf832cf989e01425"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3277a3a99c2080daaf832cf989e01425">&#9670;&#160;</a></span>HasStrictlyIncreasingEdges()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">bool</a> fims_popdy::SizeBinMapping::HasStrictlyIncreasingEdges </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>edges</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check that a bin-edge vector is usable for geometric mapping. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">edges</td><td>Bin edges to validate. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True when there are at least 2 edges and they are strictly increasing. </dd></dl>
+
+</div>
+</div>
+<a id="a45f588f71db79c0062696af5ada4806d" name="a45f588f71db79c0062696af5ada4806d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45f588f71db79c0062696af5ada4806d">&#9670;&#160;</a></span>OverlapWidth()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> fims_popdy::SizeBinMapping::OverlapWidth </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a>&#160;</td>
+          <td class="paramname"><em>left_a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a>&#160;</td>
+          <td class="paramname"><em>right_a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a>&#160;</td>
+          <td class="paramname"><em>left_b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a>&#160;</td>
+          <td class="paramname"><em>right_b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return the overlap width between two 1-D closed-open intervals. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">left_a</td><td>Left edge of interval A. </td></tr>
+    <tr><td class="paramname">right_a</td><td>Right edge of interval A. </td></tr>
+    <tr><td class="paramname">left_b</td><td>Left edge of interval B. </td></tr>
+    <tr><td class="paramname">right_b</td><td>Right edge of interval B. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Non-negative overlap width. </dd></dl>
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
+<li>inst/include/population_dynamics/size/functors/<a class="el" href="size__bin__mapping_8hpp_source.html">size_bin_mapping.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacefims__popdy.html">fims_popdy</a></li><li class="navelem"><a class="el" href="structfims__popdy_1_1SizeBinMapping.html">SizeBinMapping</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

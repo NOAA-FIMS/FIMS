@@ -184,7 +184,7 @@ returned.</p>
 
 <p><code>statistic</code> and <code>p.value</code> are computed as a two-sided Wald z-test:
 <code>z = estimate / std.error</code>,
-<code>p = 2 * pnorm(-|z|)</code>.
+<code>p = 2 * stats::pnorm(-|z|)</code>.
 These are asymptotically valid for fixed effects under regularity
 conditions; treat them as approximate for random effects and derived
 quantities.</p>

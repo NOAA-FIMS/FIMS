@@ -1,5 +1,7 @@
 var rcpp__growth_8hpp =
 [
     [ "GrowthInterfaceBase", "classGrowthInterfaceBase.html", "classGrowthInterfaceBase" ],
-    [ "EWAAGrowthInterface", "classEWAAGrowthInterface.html", "classEWAAGrowthInterface" ]
+    [ "GrowthDerivedObservationInterfaceBase", "classGrowthDerivedObservationInterfaceBase.html", "classGrowthDerivedObservationInterfaceBase" ],
+    [ "EWAAGrowthInterface", "classEWAAGrowthInterface.html", "classEWAAGrowthInterface" ],
+    [ "VonBertalanffySchnuteGrowthInterface", "classVonBertalanffySchnuteGrowthInterface.html", "classVonBertalanffySchnuteGrowthInterface" ]
 ];

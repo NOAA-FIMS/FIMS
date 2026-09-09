@@ -1,0 +1,661 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
+    <link href="bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.10.0</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-input-data.html">introducing FIMS input data</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-logging.html">introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-diagnostics.html">Running diagnostics on a FIMS model</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/adding-new-module.html">adding a new c++ module</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classVonBertalanffySchnuteGrowthInterface.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="classVonBertalanffySchnuteGrowthInterface-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">VonBertalanffySchnuteGrowthInterface Class Reference</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Rcpp-facing VonBertalanffySchnute growth module. Inherits "derived observation" capability so this growth can support growth-derived outputs used by downstream age-to-length conversion/weight- at-age paths.  
+ <a href="classVonBertalanffySchnuteGrowthInterface.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="rcpp__growth_8hpp_source.html">rcpp_growth.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for VonBertalanffySchnuteGrowthInterface:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classVonBertalanffySchnuteGrowthInterface.png" usemap="#VonBertalanffySchnuteGrowthInterface_map" alt=""/>
+  <map id="VonBertalanffySchnuteGrowthInterface_map" name="VonBertalanffySchnuteGrowthInterface_map">
+<area href="classGrowthDerivedObservationInterfaceBase.html" title="Rcpp interface base for growth models that can register a growth-derived observation capability with ..." alt="GrowthDerivedObservationInterfaceBase" shape="rect" coords="0,112,244,136"/>
+<area href="classGrowthInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp growth interfaces. This type should be inheri..." alt="GrowthInterfaceBase" shape="rect" coords="0,56,244,80"/>
+<area href="classFIMSRcppInterfaceBase.html" title="Base class for all interface objects." alt="FIMSRcppInterfaceBase" shape="rect" coords="0,0,244,24"/>
+  </map>
+</div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a61f9afbac650c383543a2f0c4e986a22" id="r_a61f9afbac650c383543a2f0c4e986a22"><td class="memItemLeft" align="right" valign="top"><a id="a61f9afbac650c383543a2f0c4e986a22" name="a61f9afbac650c383543a2f0c4e986a22"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>VonBertalanffySchnuteGrowthInterface</b> ()</td></tr>
+<tr class="memdesc:a61f9afbac650c383543a2f0c4e986a22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new VonBertalanffySchnute growth interface. <br /></td></tr>
+<tr class="separator:a61f9afbac650c383543a2f0c4e986a22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05f4d284a496cfc4990eb7f210766332" id="r_a05f4d284a496cfc4990eb7f210766332"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#a05f4d284a496cfc4990eb7f210766332">VonBertalanffySchnuteGrowthInterface</a> (const <a class="el" href="classVonBertalanffySchnuteGrowthInterface.html">VonBertalanffySchnuteGrowthInterface</a> &amp;other)</td></tr>
+<tr class="memdesc:a05f4d284a496cfc4990eb7f210766332"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <br /></td></tr>
+<tr class="separator:a05f4d284a496cfc4990eb7f210766332"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24ac3994cc1a4495a2f022f7d266346e" id="r_a24ac3994cc1a4495a2f022f7d266346e"><td class="memItemLeft" align="right" valign="top">virtual uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#a24ac3994cc1a4495a2f022f7d266346e">get_id</a> ()</td></tr>
+<tr class="memdesc:a24ac3994cc1a4495a2f022f7d266346e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the ID for the child growth interface objects to inherit.  <br /></td></tr>
+<tr class="separator:a24ac3994cc1a4495a2f022f7d266346e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f277db1e3e9aeb672bc799337e11360" id="r_a0f277db1e3e9aeb672bc799337e11360"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#a0f277db1e3e9aeb672bc799337e11360">finalize</a> ()</td></tr>
+<tr class="memdesc:a0f277db1e3e9aeb672bc799337e11360"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts derived quantities back to the Rcpp interface object from the Information object.  <br /></td></tr>
+<tr class="separator:a0f277db1e3e9aeb672bc799337e11360"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3883002e465e2b213528f1806d517d7e" id="r_a3883002e465e2b213528f1806d517d7e"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#a3883002e465e2b213528f1806d517d7e">evaluate</a> (double age)</td></tr>
+<tr class="memdesc:a3883002e465e2b213528f1806d517d7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method for each child growth interface object to inherit so each growth option can have an <a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#a3883002e465e2b213528f1806d517d7e" title="A method for each child growth interface object to inherit so each growth option can have an evaluate...">evaluate()</a> function.  <br /></td></tr>
+<tr class="separator:a3883002e465e2b213528f1806d517d7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae41310b37a052d5ef6419d016af89d87" id="r_ae41310b37a052d5ef6419d016af89d87"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#ae41310b37a052d5ef6419d016af89d87">to_json</a> ()</td></tr>
+<tr class="memdesc:ae41310b37a052d5ef6419d016af89d87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert the data to json representation for the output.  <br /></td></tr>
+<tr class="separator:ae41310b37a052d5ef6419d016af89d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classGrowthDerivedObservationInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classGrowthDerivedObservationInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classGrowthDerivedObservationInterfaceBase.html">GrowthDerivedObservationInterfaceBase</a></td></tr>
+<tr class="memitem:adbb6472d0e087dfbf59e2371329ae1f6 inherit pub_methods_classGrowthDerivedObservationInterfaceBase" id="r_adbb6472d0e087dfbf59e2371329ae1f6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGrowthDerivedObservationInterfaceBase.html#adbb6472d0e087dfbf59e2371329ae1f6">GrowthDerivedObservationInterfaceBase</a> (const <a class="el" href="classGrowthDerivedObservationInterfaceBase.html">GrowthDerivedObservationInterfaceBase</a> &amp;other)</td></tr>
+<tr class="memdesc:adbb6472d0e087dfbf59e2371329ae1f6 inherit pub_methods_classGrowthDerivedObservationInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor.  <br /></td></tr>
+<tr class="separator:adbb6472d0e087dfbf59e2371329ae1f6 inherit pub_methods_classGrowthDerivedObservationInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classGrowthInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classGrowthInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classGrowthInterfaceBase.html">GrowthInterfaceBase</a></td></tr>
+<tr class="memitem:ad85e41235e30d0c04aad6817ef81be12 inherit pub_methods_classGrowthInterfaceBase" id="r_ad85e41235e30d0c04aad6817ef81be12"><td class="memItemLeft" align="right" valign="top">
+&#160;</td><td class="memItemRight" valign="bottom"><b>GrowthInterfaceBase</b> ()</td></tr>
+<tr class="memdesc:ad85e41235e30d0c04aad6817ef81be12 inherit pub_methods_classGrowthInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The constructor. <br /></td></tr>
+<tr class="separator:ad85e41235e30d0c04aad6817ef81be12 inherit pub_methods_classGrowthInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b3aead008a2230892a64a51c804b4bf inherit pub_methods_classGrowthInterfaceBase" id="r_a6b3aead008a2230892a64a51c804b4bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGrowthInterfaceBase.html#a6b3aead008a2230892a64a51c804b4bf">GrowthInterfaceBase</a> (const <a class="el" href="classGrowthInterfaceBase.html">GrowthInterfaceBase</a> &amp;other)</td></tr>
+<tr class="memdesc:a6b3aead008a2230892a64a51c804b4bf inherit pub_methods_classGrowthInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new Growth Interface Base object.  <br /></td></tr>
+<tr class="separator:a6b3aead008a2230892a64a51c804b4bf inherit pub_methods_classGrowthInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3342351e04d570f9d4a4d29d2548de8 inherit pub_methods_classGrowthInterfaceBase" id="r_ad3342351e04d570f9d4a4d29d2548de8"><td class="memItemLeft" align="right" valign="top">
+virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~GrowthInterfaceBase</b> ()</td></tr>
+<tr class="memdesc:ad3342351e04d570f9d4a4d29d2548de8 inherit pub_methods_classGrowthInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The destructor. <br /></td></tr>
+<tr class="separator:ad3342351e04d570f9d4a4d29d2548de8 inherit pub_methods_classGrowthInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a9183d9379777d8be70ab66af1a07f94c"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a9183d9379777d8be70ab66af1a07f94c">add_to_fims_tmb</a> ()</td></tr>
+<tr class="memdesc:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A virtual method to inherit to add objects to the TMB model.  <br /></td></tr>
+<tr class="separator:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a46e0ce655ef707a6c66e863aa4f0b374"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a46e0ce655ef707a6c66e863aa4f0b374">value_to_string</a> (double value)</td></tr>
+<tr class="memdesc:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report the variable value as a string.  <br /></td></tr>
+<tr class="separator:a46e0ce655ef707a6c66e863aa4f0b374 inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a1fa6e0deb883a921fe70b328cdd30fee"><td class="memItemLeft" align="right" valign="top">
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>make_dimensions</b> (uint32_t start, uint32_t end, uint32_t rep=1)</td></tr>
+<tr class="memdesc:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make a string of dimensions for the model. <br /></td></tr>
+<tr class="separator:a1fa6e0deb883a921fe70b328cdd30fee inherit pub_methods_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a19eaf7612b0affa3112b3a2e3ed5db00" id="r_a19eaf7612b0affa3112b3a2e3ed5db00"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#a19eaf7612b0affa3112b3a2e3ed5db00">mean_length_young</a></td></tr>
+<tr class="memdesc:a19eaf7612b0affa3112b3a2e3ed5db00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expected length at the first reference age.    <br /></td></tr>
+<tr class="separator:a19eaf7612b0affa3112b3a2e3ed5db00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbd3caa8a8abc7f6c5cd0b1ddae8e4e6" id="r_adbd3caa8a8abc7f6c5cd0b1ddae8e4e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#adbd3caa8a8abc7f6c5cd0b1ddae8e4e6">mean_length_old</a></td></tr>
+<tr class="memdesc:adbd3caa8a8abc7f6c5cd0b1ddae8e4e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expected length at the second reference age.    <br /></td></tr>
+<tr class="separator:adbd3caa8a8abc7f6c5cd0b1ddae8e4e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3372a896d7e2e42c50afdd7fe836e344" id="r_a3372a896d7e2e42c50afdd7fe836e344"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#a3372a896d7e2e42c50afdd7fe836e344">growth_coefficient</a></td></tr>
+<tr class="memdesc:a3372a896d7e2e42c50afdd7fe836e344"><td class="mdescLeft">&#160;</td><td class="mdescRight">Growth coefficient.    <br /></td></tr>
+<tr class="separator:a3372a896d7e2e42c50afdd7fe836e344"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2791d59ea1ff35f9b7f9caf31ac217e4" id="r_a2791d59ea1ff35f9b7f9caf31ac217e4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#a2791d59ea1ff35f9b7f9caf31ac217e4">reference_age_for_length_young</a></td></tr>
+<tr class="memdesc:a2791d59ea1ff35f9b7f9caf31ac217e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">First reference age for the length parameterization.    <br /></td></tr>
+<tr class="separator:a2791d59ea1ff35f9b7f9caf31ac217e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98b7b7940df5ccdb6d87e8b5d1513448" id="r_a98b7b7940df5ccdb6d87e8b5d1513448"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#a98b7b7940df5ccdb6d87e8b5d1513448">reference_age_for_length_old</a></td></tr>
+<tr class="memdesc:a98b7b7940df5ccdb6d87e8b5d1513448"><td class="mdescLeft">&#160;</td><td class="mdescRight">Second reference age for the length parameterization.    <br /></td></tr>
+<tr class="separator:a98b7b7940df5ccdb6d87e8b5d1513448"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d632fb6319889cd578074467e6ebf89" id="r_a9d632fb6319889cd578074467e6ebf89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#a9d632fb6319889cd578074467e6ebf89">length_weight_a</a></td></tr>
+<tr class="memdesc:a9d632fb6319889cd578074467e6ebf89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coefficient in the length-weight relationship, W = a * L^b.    <br /></td></tr>
+<tr class="separator:a9d632fb6319889cd578074467e6ebf89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1c5bcdca98e9e9f3643935faad4ec4c" id="r_af1c5bcdca98e9e9f3643935faad4ec4c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#af1c5bcdca98e9e9f3643935faad4ec4c">length_weight_b</a></td></tr>
+<tr class="memdesc:af1c5bcdca98e9e9f3643935faad4ec4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exponent in the length-weight relationship, W = a * L^b.    <br /></td></tr>
+<tr class="separator:af1c5bcdca98e9e9f3643935faad4ec4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30d7a8a6129474eb0a05a1e4940eaa24" id="r_a30d7a8a6129474eb0a05a1e4940eaa24"><td class="memItemLeft" align="right" valign="top"><a id="a30d7a8a6129474eb0a05a1e4940eaa24" name="a30d7a8a6129474eb0a05a1e4940eaa24"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>length_at_age_sd_at_reference_ages</b></td></tr>
+<tr class="memdesc:a30d7a8a6129474eb0a05a1e4940eaa24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Natural-scale SD values at the two reference ages for the legacy interpolation path. <br /></td></tr>
+<tr class="separator:a30d7a8a6129474eb0a05a1e4940eaa24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a251f724cbd7ece1e2107f543ca9e00ee" id="r_a251f724cbd7ece1e2107f543ca9e00ee"><td class="memItemLeft" align="right" valign="top"><a id="a251f724cbd7ece1e2107f543ca9e00ee" name="a251f724cbd7ece1e2107f543ca9e00ee"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_sd_mean_length_young</b></td></tr>
+<tr class="memdesc:a251f724cbd7ece1e2107f543ca9e00ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Working-scale von Bertalanffy&ndash;Schnute variability parameter for sd(log(mean_length_young)). <br /></td></tr>
+<tr class="separator:a251f724cbd7ece1e2107f543ca9e00ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3deee87cd4e1b3b82281843a55328cc" id="r_aa3deee87cd4e1b3b82281843a55328cc"><td class="memItemLeft" align="right" valign="top"><a id="aa3deee87cd4e1b3b82281843a55328cc" name="aa3deee87cd4e1b3b82281843a55328cc"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_sd_mean_length_old</b></td></tr>
+<tr class="memdesc:aa3deee87cd4e1b3b82281843a55328cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Working-scale von Bertalanffy&ndash;Schnute variability parameter for sd(log(mean_length_old)). <br /></td></tr>
+<tr class="separator:aa3deee87cd4e1b3b82281843a55328cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06f68b7a65d4b001ab0d6841e921c328" id="r_a06f68b7a65d4b001ab0d6841e921c328"><td class="memItemLeft" align="right" valign="top"><a id="a06f68b7a65d4b001ab0d6841e921c328" name="a06f68b7a65d4b001ab0d6841e921c328"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>log_sd_growth_coefficient</b></td></tr>
+<tr class="memdesc:a06f68b7a65d4b001ab0d6841e921c328"><td class="mdescLeft">&#160;</td><td class="mdescRight">Working-scale von Bertalanffy&ndash;Schnute variability parameter for sd(log(growth_coefficient)). <br /></td></tr>
+<tr class="separator:a06f68b7a65d4b001ab0d6841e921c328"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab61204ce389b32f29375142a6c7b2ee1" id="r_ab61204ce389b32f29375142a6c7b2ee1"><td class="memItemLeft" align="right" valign="top"><a id="ab61204ce389b32f29375142a6c7b2ee1" name="ab61204ce389b32f29375142a6c7b2ee1"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>mean_length_young_mean_length_old_logit_corr</b></td></tr>
+<tr class="memdesc:ab61204ce389b32f29375142a6c7b2ee1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Working-scale von Bertalanffy&ndash;Schnute variability parameter for corr(log(mean_length_young), log(mean_length_old)). <br /></td></tr>
+<tr class="separator:ab61204ce389b32f29375142a6c7b2ee1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3029787a3c0a857803c9febd926575c5" id="r_a3029787a3c0a857803c9febd926575c5"><td class="memItemLeft" align="right" valign="top"><a id="a3029787a3c0a857803c9febd926575c5" name="a3029787a3c0a857803c9febd926575c5"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>mean_length_young_growth_coefficient_logit_corr</b></td></tr>
+<tr class="memdesc:a3029787a3c0a857803c9febd926575c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Working-scale von Bertalanffy&ndash;Schnute variability parameter for corr(log(mean_length_young), log(growth_coefficient)). <br /></td></tr>
+<tr class="separator:a3029787a3c0a857803c9febd926575c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad9333cdd2659fea0fa86d97f2bb7a7b" id="r_aad9333cdd2659fea0fa86d97f2bb7a7b"><td class="memItemLeft" align="right" valign="top"><a id="aad9333cdd2659fea0fa86d97f2bb7a7b" name="aad9333cdd2659fea0fa86d97f2bb7a7b"></a>
+<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>mean_length_old_growth_coefficient_logit_corr</b></td></tr>
+<tr class="memdesc:aad9333cdd2659fea0fa86d97f2bb7a7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Working-scale von Bertalanffy&ndash;Schnute variability parameter for corr(log(mean_length_old), log(growth_coefficient)). <br /></td></tr>
+<tr class="separator:aad9333cdd2659fea0fa86d97f2bb7a7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8431b0cf3a0df1b6394f081c91761623" id="r_a8431b0cf3a0df1b6394f081c91761623"><td class="memItemLeft" align="right" valign="top"><a id="a8431b0cf3a0df1b6394f081c91761623" name="a8431b0cf3a0df1b6394f081c91761623"></a>
+<a class="el" href="classSharedInt.html">SharedInt</a>&#160;</td><td class="memItemRight" valign="bottom"><b>n_ages</b> = 0</td></tr>
+<tr class="memdesc:a8431b0cf3a0df1b6394f081c91761623"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modeled number of ages used for validation. <br /></td></tr>
+<tr class="separator:a8431b0cf3a0df1b6394f081c91761623"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_classGrowthInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classGrowthInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classGrowthInterfaceBase.html">GrowthInterfaceBase</a></td></tr>
+<tr class="memitem:aedcf584aed8f0401ebb0b2bb99c3394a inherit pub_attribs_classGrowthInterfaceBase" id="r_aedcf584aed8f0401ebb0b2bb99c3394a"><td class="memItemLeft" align="right" valign="top">
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>id</b></td></tr>
+<tr class="memdesc:aedcf584aed8f0401ebb0b2bb99c3394a inherit pub_attribs_classGrowthInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The local id of the <a class="el" href="classGrowthInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp growth interfaces. This type should be inheri...">GrowthInterfaceBase</a> object. <br /></td></tr>
+<tr class="separator:aedcf584aed8f0401ebb0b2bb99c3394a inherit pub_attribs_classGrowthInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_attribs_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase" id="r_a44e4e3b1dd18103bf79ccb30a76f5933"><td class="memItemLeft" align="right" valign="top">
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>finalized</b> = false</td></tr>
+<tr class="memdesc:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the object already finalized? The default is false. <br /></td></tr>
+<tr class="separator:a44e4e3b1dd18103bf79ccb30a76f5933 inherit pub_attribs_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_attribs_classGrowthInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classGrowthInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classGrowthInterfaceBase.html">GrowthInterfaceBase</a></td></tr>
+<tr class="memitem:ac76907326cf02002a0c370c4d3cd13b2 inherit pub_static_attribs_classGrowthInterfaceBase" id="r_ac76907326cf02002a0c370c4d3cd13b2"><td class="memItemLeft" align="right" valign="top">
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>id_g</b> = 1</td></tr>
+<tr class="memdesc:ac76907326cf02002a0c370c4d3cd13b2 inherit pub_static_attribs_classGrowthInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The static id of the <a class="el" href="classGrowthInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp growth interfaces. This type should be inheri...">GrowthInterfaceBase</a> object. <br /></td></tr>
+<tr class="separator:ac76907326cf02002a0c370c4d3cd13b2 inherit pub_static_attribs_classGrowthInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00165d43c39a23fa524d96fbb6f3f32f inherit pub_static_attribs_classGrowthInterfaceBase" id="r_a00165d43c39a23fa524d96fbb6f3f32f"><td class="memItemLeft" align="right" valign="top">
+static std::map&lt; uint32_t, std::shared_ptr&lt; <a class="el" href="classGrowthInterfaceBase.html">GrowthInterfaceBase</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>live_objects</b></td></tr>
+<tr class="memdesc:a00165d43c39a23fa524d96fbb6f3f32f inherit pub_static_attribs_classGrowthInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The map associating the IDs of <a class="el" href="classGrowthInterfaceBase.html" title="Rcpp interface that serves as the parent class for Rcpp growth interfaces. This type should be inheri...">GrowthInterfaceBase</a> to the objects. This is a live object, which is an object that has been created and lives in memory. <br /></td></tr>
+<tr class="separator:a00165d43c39a23fa524d96fbb6f3f32f inherit pub_static_attribs_classGrowthInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_attribs_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
+<tr class="memitem:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase" id="r_a66ae9ad9c0adae77184eefa59e283c5e"><td class="memItemLeft" align="right" valign="top">
+static std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fims_interface_objects</b></td></tr>
+<tr class="memdesc:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">FIMS interface object vectors. <br /></td></tr>
+<tr class="separator:a66ae9ad9c0adae77184eefa59e283c5e inherit pub_static_attribs_classFIMSRcppInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_classGrowthDerivedObservationInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classGrowthDerivedObservationInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classGrowthDerivedObservationInterfaceBase.html">GrowthDerivedObservationInterfaceBase</a></td></tr>
+<tr class="memitem:ae62c23dc37378f2dfc11dcebb215a336 inherit pro_methods_classGrowthDerivedObservationInterfaceBase" id="r_ae62c23dc37378f2dfc11dcebb215a336"><td class="memTemplParams" colspan="2">template&lt;typename Type &gt; </td></tr>
+<tr class="memitem:ae62c23dc37378f2dfc11dcebb215a336 inherit pro_methods_classGrowthDerivedObservationInterfaceBase"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html">fims_popdy::GrowthDerivedObservationBase</a>&lt; Type &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classGrowthDerivedObservationInterfaceBase.html#ae62c23dc37378f2dfc11dcebb215a336">GetGrowthObservationFromInfo</a> () const</td></tr>
+<tr class="memdesc:ae62c23dc37378f2dfc11dcebb215a336 inherit pro_methods_classGrowthDerivedObservationInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Look up the registered growth-derived observation object.  <br /></td></tr>
+<tr class="separator:ae62c23dc37378f2dfc11dcebb215a336 inherit pro_methods_classGrowthDerivedObservationInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76acce6192ceac36979896026a699701 inherit pro_methods_classGrowthDerivedObservationInterfaceBase" id="r_a76acce6192ceac36979896026a699701"><td class="memTemplParams" colspan="2">template&lt;typename Type &gt; </td></tr>
+<tr class="memitem:a76acce6192ceac36979896026a699701 inherit pro_methods_classGrowthDerivedObservationInterfaceBase"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classGrowthDerivedObservationInterfaceBase.html#a76acce6192ceac36979896026a699701">RegisterGrowthObservationInInfo</a> (const std::shared_ptr&lt; <a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html">fims_popdy::GrowthDerivedObservationBase</a>&lt; Type &gt; &gt; &amp;growth_observation) const</td></tr>
+<tr class="memdesc:a76acce6192ceac36979896026a699701 inherit pro_methods_classGrowthDerivedObservationInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register a runtime growth-derived observation in Information.  <br /></td></tr>
+<tr class="separator:a76acce6192ceac36979896026a699701 inherit pro_methods_classGrowthDerivedObservationInterfaceBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Rcpp-facing VonBertalanffySchnute growth module. Inherits "derived observation" capability so this growth can support growth-derived outputs used by downstream age-to-length conversion/weight- at-age paths. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a05f4d284a496cfc4990eb7f210766332" name="a05f4d284a496cfc4990eb7f210766332"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05f4d284a496cfc4990eb7f210766332">&#9670;&#160;</a></span>VonBertalanffySchnuteGrowthInterface()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">VonBertalanffySchnuteGrowthInterface::VonBertalanffySchnuteGrowthInterface </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classVonBertalanffySchnuteGrowthInterface.html">VonBertalanffySchnuteGrowthInterface</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Copy constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">other</td><td>Source interface object. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a3883002e465e2b213528f1806d517d7e" name="a3883002e465e2b213528f1806d517d7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3883002e465e2b213528f1806d517d7e">&#9670;&#160;</a></span>evaluate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual double VonBertalanffySchnuteGrowthInterface::evaluate </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>age</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A method for each child growth interface object to inherit so each growth option can have an <a class="el" href="classVonBertalanffySchnuteGrowthInterface.html#a3883002e465e2b213528f1806d517d7e" title="A method for each child growth interface object to inherit so each growth option can have an evaluate...">evaluate()</a> function. </p>
+
+<p>Implements <a class="el" href="classGrowthInterfaceBase.html#a358cd72faf0e5bd0a9bf38ba0fddf146">GrowthInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="a0f277db1e3e9aeb672bc799337e11360" name="a0f277db1e3e9aeb672bc799337e11360"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f277db1e3e9aeb672bc799337e11360">&#9670;&#160;</a></span>finalize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void VonBertalanffySchnuteGrowthInterface::finalize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Extracts derived quantities back to the Rcpp interface object from the Information object. </p>
+
+<p>Reimplemented from <a class="el" href="classFIMSRcppInterfaceBase.html#abdfb6b47bd4ea86042f84590236036d7">FIMSRcppInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="a24ac3994cc1a4495a2f022f7d266346e" name="a24ac3994cc1a4495a2f022f7d266346e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24ac3994cc1a4495a2f022f7d266346e">&#9670;&#160;</a></span>get_id()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual uint32_t VonBertalanffySchnuteGrowthInterface::get_id </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the ID for the child growth interface objects to inherit. </p>
+
+<p>Implements <a class="el" href="classGrowthInterfaceBase.html#afbc10434dde3a23d19f74af494fff34c">GrowthInterfaceBase</a>.</p>
+
+</div>
+</div>
+<a id="ae41310b37a052d5ef6419d016af89d87" name="ae41310b37a052d5ef6419d016af89d87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae41310b37a052d5ef6419d016af89d87">&#9670;&#160;</a></span>to_json()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::string VonBertalanffySchnuteGrowthInterface::to_json </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Convert the data to json representation for the output. </p>
+
+<p>Reimplemented from <a class="el" href="classFIMSRcppInterfaceBase.html#aa97acd77c0c4d2e193c67cd0662d803c">FIMSRcppInterfaceBase</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a3372a896d7e2e42c50afdd7fe836e344" name="a3372a896d7e2e42c50afdd7fe836e344"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3372a896d7e2e42c50afdd7fe836e344">&#9670;&#160;</a></span>growth_coefficient</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classVariableVector.html">VariableVector</a> VonBertalanffySchnuteGrowthInterface::growth_coefficient</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Growth coefficient.   </p>
+
+</div>
+</div>
+<a id="a9d632fb6319889cd578074467e6ebf89" name="a9d632fb6319889cd578074467e6ebf89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d632fb6319889cd578074467e6ebf89">&#9670;&#160;</a></span>length_weight_a</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classVariableVector.html">VariableVector</a> VonBertalanffySchnuteGrowthInterface::length_weight_a</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Coefficient in the length-weight relationship, W = a * L^b.   </p>
+
+</div>
+</div>
+<a id="af1c5bcdca98e9e9f3643935faad4ec4c" name="af1c5bcdca98e9e9f3643935faad4ec4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1c5bcdca98e9e9f3643935faad4ec4c">&#9670;&#160;</a></span>length_weight_b</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classVariableVector.html">VariableVector</a> VonBertalanffySchnuteGrowthInterface::length_weight_b</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Exponent in the length-weight relationship, W = a * L^b.   </p>
+
+</div>
+</div>
+<a id="adbd3caa8a8abc7f6c5cd0b1ddae8e4e6" name="adbd3caa8a8abc7f6c5cd0b1ddae8e4e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbd3caa8a8abc7f6c5cd0b1ddae8e4e6">&#9670;&#160;</a></span>mean_length_old</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classVariableVector.html">VariableVector</a> VonBertalanffySchnuteGrowthInterface::mean_length_old</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Expected length at the second reference age.   </p>
+
+</div>
+</div>
+<a id="a19eaf7612b0affa3112b3a2e3ed5db00" name="a19eaf7612b0affa3112b3a2e3ed5db00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a19eaf7612b0affa3112b3a2e3ed5db00">&#9670;&#160;</a></span>mean_length_young</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classVariableVector.html">VariableVector</a> VonBertalanffySchnuteGrowthInterface::mean_length_young</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Expected length at the first reference age.   </p>
+
+</div>
+</div>
+<a id="a98b7b7940df5ccdb6d87e8b5d1513448" name="a98b7b7940df5ccdb6d87e8b5d1513448"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98b7b7940df5ccdb6d87e8b5d1513448">&#9670;&#160;</a></span>reference_age_for_length_old</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classVariableVector.html">VariableVector</a> VonBertalanffySchnuteGrowthInterface::reference_age_for_length_old</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Second reference age for the length parameterization.   </p>
+
+</div>
+</div>
+<a id="a2791d59ea1ff35f9b7f9caf31ac217e4" name="a2791d59ea1ff35f9b7f9caf31ac217e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2791d59ea1ff35f9b7f9caf31ac217e4">&#9670;&#160;</a></span>reference_age_for_length_young</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classVariableVector.html">VariableVector</a> VonBertalanffySchnuteGrowthInterface::reference_age_for_length_young</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>First reference age for the length parameterization.   </p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/interface/rcpp/rcpp_objects/<a class="el" href="rcpp__growth_8hpp_source.html">rcpp_growth.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html">VonBertalanffySchnuteGrowthInterface</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -4,12 +4,15 @@ var structfims__popdy_1_1Fleet =
     [ "~Fleet", "structfims__popdy_1_1Fleet.html#a8daf372e70483efaeba014d5ebf7500b", null ],
     [ "Prepare", "structfims__popdy_1_1Fleet.html#a889b7e1e0b2aa9f4a3114d3d6f8ad577", null ],
     [ "age_to_length_conversion", "structfims__popdy_1_1Fleet.html#ab0ba9edd8d93288939648869c2ab6996", null ],
+    [ "age_to_length_conversion_model", "structfims__popdy_1_1Fleet.html#ac0dc3820cc040fbfe846e1fe7660a6da", null ],
     [ "fleet_observed_agecomp_data_id_m", "structfims__popdy_1_1Fleet.html#a650c1f21f4efce9a78472408e4abd2d2", null ],
     [ "fleet_observed_catch_data_id_m", "structfims__popdy_1_1Fleet.html#afd765612ff3e1f5c6c5f0b3e4882f986", null ],
     [ "fleet_observed_index_data_id_m", "structfims__popdy_1_1Fleet.html#ab8fa4db5de7dba45fece778e182d4e27", null ],
     [ "fleet_observed_lengthcomp_data_id_m", "structfims__popdy_1_1Fleet.html#a33da0d3b4445a9407bd1d22ba1c7e31f", null ],
     [ "fleet_selectivity_id_m", "structfims__popdy_1_1Fleet.html#a3bfbbc0bf021aa8f6f2730d42027d17d", null ],
     [ "Fmort", "structfims__popdy_1_1Fleet.html#a78cadc41e2e95ece2282873ad8e3b2b4", null ],
+    [ "length_bin_edges", "structfims__popdy_1_1Fleet.html#aea2e3421162300dca8268bac6f0f01af", null ],
+    [ "lengths", "structfims__popdy_1_1Fleet.html#aeb388ecfda4ab33b111c343d296293c9", null ],
     [ "log_Fmort", "structfims__popdy_1_1Fleet.html#ac572ee8c2fc48c99544ed01ae284c6e7", null ],
     [ "log_q", "structfims__popdy_1_1Fleet.html#a1e49af4939f8a9f32d76b354a4cf7581", null ],
     [ "n_ages", "structfims__popdy_1_1Fleet.html#a8d3723853194985d3cc6645bb8fa206d", null ],
@@ -22,5 +25,6 @@ var structfims__popdy_1_1Fleet =
     [ "observed_index_units", "structfims__popdy_1_1Fleet.html#affcc5764fce7eba009ba13845dedc962", null ],
     [ "observed_lengthcomp_data", "structfims__popdy_1_1Fleet.html#aa04ae98c8bab390e30431c8d046958c1", null ],
     [ "q", "structfims__popdy_1_1Fleet.html#a9dbf02a91350fb062adc9ded0a89c66e", null ],
+    [ "requires_age_length_mapping", "structfims__popdy_1_1Fleet.html#a8f2a82edd7b738e4d81d3514a2898051", null ],
     [ "selectivity", "structfims__popdy_1_1Fleet.html#a260427acb5128fa3303459de353c048c", null ]
 ];

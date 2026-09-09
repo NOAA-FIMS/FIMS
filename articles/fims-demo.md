@@ -251,6 +251,11 @@ growth, and maturity modules can be created. For example,
 
 # Set up default parameters based on data
 default_parameters <- setup_default_parameters(data = data_4_model)
+```
+
+    ## Empirical weight-at-age rows found. Growth defaults to "EWAA".
+
+``` r
 
 default_parameters
 ```
@@ -414,7 +419,7 @@ fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 1.31952 minutes
+    ## ℹ Total run time was 1.29979 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00098
     ## ℹ Negative log likelihood (NLL):
@@ -451,7 +456,7 @@ log_data_frame[1, ]
 ```
 
     ##                  timestamp   level
-    ## 1 Tue Sep  1 17:08:04 2026 warning
+    ## 1 Wed Sep  9 17:34:20 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ##     user                                    wd
@@ -468,7 +473,7 @@ log_data_frame[1, ]
 dim(log_data_frame)
 ```
 
-    ## [1] 127   9
+    ## [1] 131   9
 
 ``` r
 
@@ -477,7 +482,7 @@ dplyr::count(log_data_frame, level)
 ```
 
     ##     level   n
-    ## 1    info 125
+    ## 1    info 129
     ## 2 warning   2
 
 ``` r
@@ -487,8 +492,8 @@ log_data_frame |> dplyr::filter(level == "warning")
 ```
 
     ##                  timestamp   level
-    ## 1 Tue Sep  1 17:08:04 2026 warning
-    ## 2 Tue Sep  1 17:08:04 2026 warning
+    ## 1 Wed Sep  9 17:34:20 2026 warning
+    ## 2 Wed Sep  9 17:34:20 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1
@@ -653,7 +658,7 @@ high_slope_fit <- parameters_high_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 1.24183 minutes
+    ## ℹ Total run time was 1.21675 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 3e-04
     ## ℹ Negative log likelihood (NLL):
@@ -676,7 +681,7 @@ low_slope_fit <- parameters_low_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 1.27943 minutes
+    ## ℹ Total run time was 1.25279 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00057
     ## ℹ Negative log likelihood (NLL):
@@ -787,7 +792,7 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 1.25123 minutes
+    ## ℹ Total run time was 1.223 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00033
     ## ℹ Negative log likelihood (NLL):
@@ -886,7 +891,7 @@ age_only_fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 11.85112 seconds
+    ## ℹ Total run time was 11.77225 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00021
     ## ℹ Negative log likelihood (NLL):
@@ -916,17 +921,13 @@ length_only_fit <- parameters_4_model |>
 
     ## Also defined by 'tibble'
 
-    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
-
-    ## Also defined by 'tibble'
-
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
     ## ℹ Maximum gradient went from 0.01122 to 3e-04 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.10.0.9000
-    ## ℹ Total run time was 1.19994 minutes
+    ## ℹ Total run time was 1.16872 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 3e-04
     ## ℹ Negative log likelihood (NLL):

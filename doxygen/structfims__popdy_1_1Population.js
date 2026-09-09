@@ -19,6 +19,8 @@ var structfims__popdy_1_1Population =
     [ "proportion_female", "structfims__popdy_1_1Population.html#ae47bb5ebf7a3f1b14f69b9cfd7ad8ecf", null ],
     [ "recruitment", "structfims__popdy_1_1Population.html#a962dbda1d550245a364674b7b0aefc53", null ],
     [ "recruitment_id", "structfims__popdy_1_1Population.html#a935b36af9b2596470bd0ab1f15f9973a", null ],
+    [ "size_distribution_provider", "structfims__popdy_1_1Population.html#a8b051f234554b4e33d8de61a4fbb225c", null ],
+    [ "size_grid", "structfims__popdy_1_1Population.html#aebf06e8365e3dd617561afaa7de1b90d", null ],
     [ "spawning_biomass_ratio", "structfims__popdy_1_1Population.html#a8eb044da00071f31ce522bb55359358e", null ],
     [ "years", "structfims__popdy_1_1Population.html#aee3ec924970cafa0d544102eaf79c9db", null ]
 ];

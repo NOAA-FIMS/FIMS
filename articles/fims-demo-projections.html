@@ -355,6 +355,7 @@ dimensions.</p>
 <span>    <span class="op">)</span>,</span>
 <span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"label"</span>, <span class="st">"age"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Empirical weight-at-age rows found. Growth defaults to "EWAA".</span></span></code></pre>
 <p>Reference-point targets are currently achieved by specifying a prior
 on <code>spawning_biomass_ratio</code>, a derived population quantity,
 in the final year/s of the projection period. Additionally, a prior can
@@ -379,7 +380,7 @@ test-projections-looped.R test files used to verify this approach.</p>
 <p>Regardless if there are projections or not, the model is fit using
 the <code><a href="../reference/fit_fims.html">FIMS::fit_fims()</a></code>, which facilitates that the model
 output will be in the same format that users are used to.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">projection_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_projection</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_4_projections</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -389,14 +390,14 @@ output will be in the same format that users are used to.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.10.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 14.10826 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 14.65645 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00037</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
 <span><span class="co">## • Marginal NLL= 1624.68892</span></span>
 <span><span class="co">## • Total NLL= 1560.83065</span></span>
 <span><span class="co">## ℹ Terminal SB= 993.44976</span></span></code></pre>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -408,7 +409,7 @@ list can contain multiple models, where the start and end year of each
 model that is included need not align. Thus, if we had fit the model
 without projections we could have plotted that here as well for
 comparison.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_biomass.html" class="external-link">plot_biomass</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    <span class="st">"age"</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFit.html">get_estimates</a></span><span class="op">(</span><span class="va">projection_fit</span><span class="op">)</span> <span class="op">|&gt;</span></span>

@@ -7,10 +7,20 @@ fields for module name, module type, label, value, and estimation type.
 ## Usage
 
 ``` r
-setup_default_Growth(module_type = c("EWAA"))
+setup_default_Growth(
+  data = NULL,
+  module_type = c("EWAA", "VonBertalanffySchnute")
+)
 ```
 
 ## Arguments
+
+- data:
+
+  A `FIMSFrame` object returned from running
+  [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)
+  on your long input data. Required when
+  `module_type = "VonBertalanffySchnute"`.
 
 - module_type:
 

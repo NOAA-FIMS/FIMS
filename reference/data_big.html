@@ -92,7 +92,7 @@ GitHub but will not be in your local installation because it is in the
     <p>A data frame with 2808 observations of 8
 variables:</p><dl><dt>type</dt>
 <dd><p>The type of input the row contains. Allowed types include
-age_comp, age_to_length_conversion, index, catch, length_comp, and weight_at_age.</p></dd>
+age_comp, age_to_length_conversion, index, catch, length_bin, length_comp, and weight_at_age.</p></dd>
 
 <dt>fleet</dt>
 <dd><p>A character string providing the name of the information
@@ -108,7 +108,9 @@ one not age zero.</p></dd>
 
 <dt>length</dt>
 <dd><p>A numeric length. Entry can be <code>NA</code> if information doesn't
-pertain to length.</p></dd>
+pertain to length. For <code>length_comp</code> rows, this identifies the observed
+length bin. For <code>length_bin</code> rows, this defines length-bin values used
+for age-to-length conversion.</p></dd>
 
 <dt>timing</dt>
 <dd><p>The timing, i.e., year the data was collected.</p></dd>

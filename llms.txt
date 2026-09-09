@@ -328,6 +328,7 @@ Links to the relevant doxygen documentation for the C++ code.
   [`DnormDistribution`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`DoubleLogisticSelectivity`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`EWAAGrowth`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`VonBertalanffySchnuteGrowth`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`Fleet`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`Index`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`Catch`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
@@ -391,6 +392,8 @@ Functions used to extract, tidy, and evaluate model fit results.
   (FIMS)](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md):
 - [Running diagnostics on a FIMS
   model](https://NOAA-FIMS.github.io/FIMS/articles/fims-diagnostics.md):
+- [FIMS Growth With
+  VonBertalanffySchnute](https://NOAA-FIMS.github.io/FIMS/articles/fims-growth-vonb-schnute.md):
 - [Introducing FIMS input
   data](https://NOAA-FIMS.github.io/FIMS/articles/fims-input-data.md):
 - [Introducing the FIMS Logging

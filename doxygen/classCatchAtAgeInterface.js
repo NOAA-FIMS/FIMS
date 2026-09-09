@@ -11,5 +11,6 @@ var classCatchAtAgeInterface =
     [ "get_id", "classCatchAtAgeInterface.html#a7bdfe469de81b88c082b37fe36dab1d6", null ],
     [ "IsReporting", "classCatchAtAgeInterface.html#ababc562cfa4f58d4ca39be9cd2967256", null ],
     [ "population_to_json", "classCatchAtAgeInterface.html#aa60e84b3fd7627c4bfd45ba172c051f1", null ],
+    [ "ReportAgeToLengthConversionDerivedTensor", "classCatchAtAgeInterface.html#a6fe0cf95a2ac7792df4810d9f442b42a", null ],
     [ "to_json", "classCatchAtAgeInterface.html#a1c4ce93749a4b7a8375f077b3d134657", null ]
 ];

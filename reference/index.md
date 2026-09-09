@@ -167,6 +167,7 @@ Links to the relevant doxygen documentation for the C++ code.
   [`DnormDistribution`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`DoubleLogisticSelectivity`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`EWAAGrowth`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
+  [`VonBertalanffySchnuteGrowth`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`Fleet`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`Index`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)
   [`Catch`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_classes.md)

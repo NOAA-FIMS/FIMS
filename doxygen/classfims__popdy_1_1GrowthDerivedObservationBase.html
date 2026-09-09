@@ -1,0 +1,545 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
+    <link href="bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.10.0</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-input-data.html">introducing FIMS input data</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-logging.html">introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-diagnostics.html">Running diagnostics on a FIMS model</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/adding-new-module.html">adding a new c++ module</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classfims__popdy_1_1GrowthDerivedObservationBase.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="classfims__popdy_1_1GrowthDerivedObservationBase-members.html">List of all members</a>  </div>
+  <div class="headertitle"><div class="title">fims_popdy::GrowthDerivedObservationBase&lt; Type &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>Generic capability interface for growth models that can feed the growth-derived age-to-length conversion / bin-based WAA path in catch-at-age.  
+ <a href="classfims__popdy_1_1GrowthDerivedObservationBase.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="growth__model__adapter_8hpp_source.html">growth_model_adapter.hpp</a>&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for fims_popdy::GrowthDerivedObservationBase&lt; Type &gt;:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classfims__popdy_1_1GrowthDerivedObservationBase.png" usemap="#fims_5Fpopdy::GrowthDerivedObservationBase_3C_20Type_20_3E_map" alt=""/>
+  <map id="fims_5Fpopdy::GrowthDerivedObservationBase_3C_20Type_20_3E_map" name="fims_5Fpopdy::GrowthDerivedObservationBase_3C_20Type_20_3E_map">
+<area href="structfims__popdy_1_1GrowthBase.html" title="Base class for all growth functors." alt="fims_popdy::GrowthBase&lt; Type &gt;" shape="rect" coords="0,112,385,136"/>
+<area href="structfims__model__object_1_1FIMSObject.html" title="FIMSObject struct that defines member types and returns the unique id." alt="fims_model_object::FIMSObject&lt; Type &gt;" shape="rect" coords="0,56,385,80"/>
+<area href="structfims__model__object_1_1FIMSMemoryTracker.html" title="FIMS struct that tracks object memory for leak detection." alt="fims_model_object::FIMSMemoryTracker" shape="rect" coords="0,0,385,24"/>
+<area href="classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html" title="von Bertalanffy–Schnute growth model adapter implementing the generic growth-derived observation capa..." alt="fims_popdy::VonBertalanffySchnuteGrowthModelAdapter&lt; Type &gt;" shape="rect" coords="0,224,385,248"/>
+  </map>
+</div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a717f891183366f17514b2e85420ca7c1" id="r_a717f891183366f17514b2e85420ca7c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html#a717f891183366f17514b2e85420ca7c1">SetAgeOffset</a> (<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> min_age)=0</td></tr>
+<tr class="memdesc:a717f891183366f17514b2e85420ca7c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the minimum modeled age used to translate cached age indices.  <br /></td></tr>
+<tr class="separator:a717f891183366f17514b2e85420ca7c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a57d5a3d51b537c12136fa86a20d94338" id="r_a57d5a3d51b537c12136fa86a20d94338"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html#a57d5a3d51b537c12136fa86a20d94338">Initialize</a> (std::size_t n_years, std::size_t n_ages, std::size_t n_sexes=1)=0</td></tr>
+<tr class="memdesc:a57d5a3d51b537c12136fa86a20d94338"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize any cached growth products.  <br /></td></tr>
+<tr class="separator:a57d5a3d51b537c12136fa86a20d94338"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b946046bf695547f1f6c889ad2bf575" id="r_a1b946046bf695547f1f6c889ad2bf575"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html#a1b946046bf695547f1f6c889ad2bf575">SupportsAgeToLengthConversionDerived</a> () <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> =0</td></tr>
+<tr class="memdesc:a1b946046bf695547f1f6c889ad2bf575"><td class="mdescLeft">&#160;</td><td class="mdescRight">Report whether this growth object can support the dynamic age-to-length conversion path.  <br /></td></tr>
+<tr class="separator:a1b946046bf695547f1f6c889ad2bf575"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82b5f1e16b7a4703dfaa9ab9cd670e9e" id="r_a82b5f1e16b7a4703dfaa9ab9cd670e9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html#a82b5f1e16b7a4703dfaa9ab9cd670e9e">PrepareGrowthProducts</a> ()=0</td></tr>
+<tr class="memdesc:a82b5f1e16b7a4703dfaa9ab9cd670e9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare growth products for the current model state.  <br /></td></tr>
+<tr class="separator:a82b5f1e16b7a4703dfaa9ab9cd670e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0f70d32f0ff088e934620cfd9ed4836" id="r_ae0f70d32f0ff088e934620cfd9ed4836"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="structfims__popdy_1_1GrowthProducts.html">GrowthProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html#ae0f70d32f0ff088e934620cfd9ed4836">TryGetPreparedGrowthProducts</a> () <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> =0</td></tr>
+<tr class="memdesc:ae0f70d32f0ff088e934620cfd9ed4836"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return prepared growth products without triggering preparation.  <br /></td></tr>
+<tr class="separator:ae0f70d32f0ff088e934620cfd9ed4836"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2682bee30ce2eed9b43117d1c19b269" id="r_aa2682bee30ce2eed9b43117d1c19b269"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html#aa2682bee30ce2eed9b43117d1c19b269">EvaluateWeightAtLength</a> (<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">length</a>) <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> =0</td></tr>
+<tr class="memdesc:aa2682bee30ce2eed9b43117d1c19b269"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate weight at a supplied length.  <br /></td></tr>
+<tr class="separator:aa2682bee30ce2eed9b43117d1c19b269"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_structfims__popdy_1_1GrowthBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structfims__popdy_1_1GrowthBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfims__popdy_1_1GrowthBase.html">fims_popdy::GrowthBase&lt; Type &gt;</a></td></tr>
+<tr class="memitem:a0352b6934eea814c055d7fdbc81efa14 inherit pub_methods_structfims__popdy_1_1GrowthBase" id="r_a0352b6934eea814c055d7fdbc81efa14"><td class="memItemLeft" align="right" valign="top">
+&#160;</td><td class="memItemRight" valign="bottom"><b>GrowthBase</b> ()</td></tr>
+<tr class="memdesc:a0352b6934eea814c055d7fdbc81efa14 inherit pub_methods_structfims__popdy_1_1GrowthBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
+<tr class="separator:a0352b6934eea814c055d7fdbc81efa14 inherit pub_methods_structfims__popdy_1_1GrowthBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a955f3f4ab3f30dfa2e6d6f884becfab6 inherit pub_methods_structfims__popdy_1_1GrowthBase" id="r_a955f3f4ab3f30dfa2e6d6f884becfab6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1GrowthBase.html#a955f3f4ab3f30dfa2e6d6f884becfab6">evaluate</a> (<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">int</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">year</a>, <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a> &amp;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">a</a>)=0</td></tr>
+<tr class="memdesc:a955f3f4ab3f30dfa2e6d6f884becfab6 inherit pub_methods_structfims__popdy_1_1GrowthBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the growth at the independent variable value.  <br /></td></tr>
+<tr class="separator:a955f3f4ab3f30dfa2e6d6f884becfab6 inherit pub_methods_structfims__popdy_1_1GrowthBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_structfims__model__object_1_1FIMSObject"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structfims__model__object_1_1FIMSObject')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject&lt; Type &gt;</a></td></tr>
+<tr class="memitem:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a7f1a6d1474f8ad7d8b460ce889ee6ebd"><td class="memItemLeft" align="right" valign="top">
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>GetId</b> () const</td></tr>
+<tr class="memdesc:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="mdescLeft">&#160;</td><td class="mdescRight">Getter that returns the unique id for parameters in the model. <br /></td></tr>
+<tr class="separator:a7f1a6d1474f8ad7d8b460ce889ee6ebd inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject" id="r_a81239daf538745bbb96c56f627edc781"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a81239daf538745bbb96c56f627edc781">CheckDimensions</a> (size_t actual, size_t expected)</td></tr>
+<tr class="memdesc:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the dimensions of an object.  <br /></td></tr>
+<tr class="separator:a81239daf538745bbb96c56f627edc781 inherit pub_methods_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_structfims__model__object_1_1FIMSMemoryTracker"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_structfims__model__object_1_1FIMSMemoryTracker')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structfims__model__object_1_1FIMSMemoryTracker.html">fims_model_object::FIMSMemoryTracker</a></td></tr>
+<tr class="memitem:aa714fd275e924fae47d51824b0e705cc inherit pub_methods_structfims__model__object_1_1FIMSMemoryTracker" id="r_aa714fd275e924fae47d51824b0e705cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSMemoryTracker.html#aa714fd275e924fae47d51824b0e705cc">register_self</a> (const uint32_t id)</td></tr>
+<tr class="memdesc:aa714fd275e924fae47d51824b0e705cc inherit pub_methods_structfims__model__object_1_1FIMSMemoryTracker"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers a <a class="el" href="structfims__model__object_1_1FIMSObject.html" title="FIMSObject struct that defines member types and returns the unique id.">FIMSObject</a> instance with the memory tracker.  <br /></td></tr>
+<tr class="separator:aa714fd275e924fae47d51824b0e705cc inherit pub_methods_structfims__model__object_1_1FIMSMemoryTracker"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_attribs_structfims__model__object_1_1FIMSObject"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_structfims__model__object_1_1FIMSObject')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject&lt; Type &gt;</a></td></tr>
+<tr class="memitem:a3922946642efc5ec4309149f1e0b188a inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a3922946642efc5ec4309149f1e0b188a"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a3922946642efc5ec4309149f1e0b188a">id</a></td></tr>
+<tr class="separator:a3922946642efc5ec4309149f1e0b188a inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac625a90f1af6d01d8c476d0a1ecb5343 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_ac625a90f1af6d01d8c476d0a1ecb5343"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Type * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#ac625a90f1af6d01d8c476d0a1ecb5343">parameters</a></td></tr>
+<tr class="separator:ac625a90f1af6d01d8c476d0a1ecb5343 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d8ddb11af5bb51a811f7d4c855f49b3 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a9d8ddb11af5bb51a811f7d4c855f49b3"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Type * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a9d8ddb11af5bb51a811f7d4c855f49b3">random_effects_parameters</a></td></tr>
+<tr class="separator:a9d8ddb11af5bb51a811f7d4c855f49b3 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca6a96ab8e6a4cca573daa5f52e71c67 inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_aca6a96ab8e6a4cca573daa5f52e71c67"><td class="memItemLeft" align="right" valign="top">std::vector&lt; Type * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#aca6a96ab8e6a4cca573daa5f52e71c67">fixed_effects_parameters</a></td></tr>
+<tr class="separator:aca6a96ab8e6a4cca573daa5f52e71c67 inherit pub_attribs_structfims__model__object_1_1FIMSObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_attribs_structfims__popdy_1_1GrowthBase"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_structfims__popdy_1_1GrowthBase')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="structfims__popdy_1_1GrowthBase.html">fims_popdy::GrowthBase&lt; Type &gt;</a></td></tr>
+<tr class="memitem:a016bebc606785d9be69f454def1b2855 inherit pub_static_attribs_structfims__popdy_1_1GrowthBase" id="r_a016bebc606785d9be69f454def1b2855"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">static</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">uint32_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1GrowthBase.html#a016bebc606785d9be69f454def1b2855">id_g</a> = 0</td></tr>
+<tr class="separator:a016bebc606785d9be69f454def1b2855 inherit pub_static_attribs_structfims__popdy_1_1GrowthBase"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_attribs_structfims__model__object_1_1FIMSMemoryTracker"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_structfims__model__object_1_1FIMSMemoryTracker')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="structfims__model__object_1_1FIMSMemoryTracker.html">fims_model_object::FIMSMemoryTracker</a></td></tr>
+<tr class="memitem:a65be2ea8b9eede7570b46fcb8c753c5a inherit pub_static_attribs_structfims__model__object_1_1FIMSMemoryTracker" id="r_a65be2ea8b9eede7570b46fcb8c753c5a"><td class="memItemLeft" align="right" valign="top">
+static int&#160;</td><td class="memItemRight" valign="bottom"><b>total_active_objects</b> = 0</td></tr>
+<tr class="memdesc:a65be2ea8b9eede7570b46fcb8c753c5a inherit pub_static_attribs_structfims__model__object_1_1FIMSMemoryTracker"><td class="mdescLeft">&#160;</td><td class="mdescRight">Total number of active <a class="el" href="structfims__model__object_1_1FIMSObject.html" title="FIMSObject struct that defines member types and returns the unique id.">FIMSObject</a> instances currently in memory. <br /></td></tr>
+<tr class="separator:a65be2ea8b9eede7570b46fcb8c753c5a inherit pub_static_attribs_structfims__model__object_1_1FIMSMemoryTracker"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><div class="compoundTemplParams">template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt;<br />
+class fims_popdy::GrowthDerivedObservationBase&lt; Type &gt;</div><p>Generic capability interface for growth models that can feed the growth-derived age-to-length conversion / bin-based WAA path in catch-at-age. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="aa2682bee30ce2eed9b43117d1c19b269" name="aa2682bee30ce2eed9b43117d1c19b269"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2682bee30ce2eed9b43117d1c19b269">&#9670;&#160;</a></span>EvaluateWeightAtLength()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html">fims_popdy::GrowthDerivedObservationBase</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::EvaluateWeightAtLength </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &amp;&#160;</td>
+          <td class="paramname"><em>length</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Evaluate weight at a supplied length. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">length</td><td>Length on the natural scale. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Weight on the natural scale. </dd></dl>
+
+<p>Implemented in <a class="el" href="classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html#aa4f0dd2f92ef05f97876ed68b55c7526">fims_popdy::VonBertalanffySchnuteGrowthModelAdapter&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a57d5a3d51b537c12136fa86a20d94338" name="a57d5a3d51b537c12136fa86a20d94338"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a57d5a3d51b537c12136fa86a20d94338">&#9670;&#160;</a></span>Initialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a> <a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html">fims_popdy::GrowthDerivedObservationBase</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::Initialize </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>n_years</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>n_ages</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>n_sexes</em> = <code>1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize any cached growth products. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n_years</td><td>Number of modeled years. </td></tr>
+    <tr><td class="paramname">n_ages</td><td>Number of modeled ages. </td></tr>
+    <tr><td class="paramname">n_sexes</td><td>Number of modeled sexes. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html#a52b6221e6f3b56fe2dcf89c3d6195497">fims_popdy::VonBertalanffySchnuteGrowthModelAdapter&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a82b5f1e16b7a4703dfaa9ab9cd670e9e" name="a82b5f1e16b7a4703dfaa9ab9cd670e9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82b5f1e16b7a4703dfaa9ab9cd670e9e">&#9670;&#160;</a></span>PrepareGrowthProducts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a> <a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html">fims_popdy::GrowthDerivedObservationBase</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::PrepareGrowthProducts </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Prepare growth products for the current model state. </p>
+
+<p>Implemented in <a class="el" href="classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html#abd86b3597cb0869a641338de80e21d86">fims_popdy::VonBertalanffySchnuteGrowthModelAdapter&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a717f891183366f17514b2e85420ca7c1" name="a717f891183366f17514b2e85420ca7c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a717f891183366f17514b2e85420ca7c1">&#9670;&#160;</a></span>SetAgeOffset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a> <a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html">fims_popdy::GrowthDerivedObservationBase</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::SetAgeOffset </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">double</a>&#160;</td>
+          <td class="paramname"><em>min_age</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the minimum modeled age used to translate cached age indices. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">min_age</td><td>Minimum age on the natural scale. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implemented in <a class="el" href="classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html#a322bf68bb807962d201d1b531fa80205">fims_popdy::VonBertalanffySchnuteGrowthModelAdapter&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a1b946046bf695547f1f6c889ad2bf575" name="a1b946046bf695547f1f6c889ad2bf575"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b946046bf695547f1f6c889ad2bf575">&#9670;&#160;</a></span>SupportsAgeToLengthConversionDerived()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">bool</a> <a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html">fims_popdy::GrowthDerivedObservationBase</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::SupportsAgeToLengthConversionDerived </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Report whether this growth object can support the dynamic age-to-length conversion path. </p>
+<dl class="section return"><dt>Returns</dt><dd>True when growth-derived age-to-length conversion calculations are available. </dd></dl>
+
+<p>Implemented in <a class="el" href="classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html#a32b56e84b3afad3b9363264b49a4fad5">fims_popdy::VonBertalanffySchnuteGrowthModelAdapter&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<a id="ae0f70d32f0ff088e934620cfd9ed4836" name="ae0f70d32f0ff088e934620cfd9ed4836"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0f70d32f0ff088e934620cfd9ed4836">&#9670;&#160;</a></span>TryGetPreparedGrowthProducts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">virtual</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> <a class="el" href="structfims__popdy_1_1GrowthProducts.html">GrowthProducts</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; * <a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html">fims_popdy::GrowthDerivedObservationBase</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::TryGetPreparedGrowthProducts </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return prepared growth products without triggering preparation. </p>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to prepared growth products, or nullptr if unavailable. </dd></dl>
+
+<p>Implemented in <a class="el" href="classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html#adab8a363af60447970576b8233a95e7e">fims_popdy::VonBertalanffySchnuteGrowthModelAdapter&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
+<li>inst/include/population_dynamics/growth/<a class="el" href="growth__model__adapter_8hpp_source.html">growth_model_adapter.hpp</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacefims__popdy.html">fims_popdy</a></li><li class="navelem"><a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html">GrowthDerivedObservationBase</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

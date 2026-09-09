@@ -10,6 +10,8 @@
   (FIMS)](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md):
 - [Running diagnostics on a FIMS
   model](https://NOAA-FIMS.github.io/FIMS/articles/fims-diagnostics.md):
+- [FIMS Growth With
+  VonBertalanffySchnute](https://NOAA-FIMS.github.io/FIMS/articles/fims-growth-vonb-schnute.md):
 - [Introducing FIMS input
   data](https://NOAA-FIMS.github.io/FIMS/articles/fims-input-data.md):
 - [Introducing the FIMS Logging

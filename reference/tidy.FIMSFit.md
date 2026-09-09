@@ -122,7 +122,7 @@ are returned.
 ## Inference
 
 `statistic` and `p.value` are computed as a two-sided Wald z-test:
-`z = estimate / std.error`, `p = 2 * pnorm(-|z|)`. These are
+`z = estimate / std.error`, `p = 2 * stats::pnorm(-|z|)`. These are
 asymptotically valid for fixed effects under regularity conditions;
 treat them as approximate for random effects and derived quantities.
 

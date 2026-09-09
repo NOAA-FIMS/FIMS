@@ -1,0 +1,539 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" data-bs-theme="auto">
+<head>
+    <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="generator" content="Doxygen 1.9.8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>FIMS</title><link href="tabs.css" rel="stylesheet" type="text/css"/>
+    <link rel="icon" type="image/png" href="https://noaa-fims.github.io/images/FIMS_hexlogo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="bootstrap-5bca210c7b8f52bd43562cb73b8f998e.min.css" rel="stylesheet">
+    <link href="bootstrap-dark-dabf027eac5ab6a58e890faf792e317e.min.css" rel="stylesheet" media="(prefers-color-scheme: dark)">
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="dynsections.js"></script>
+    <link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+    <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+    <script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  extensions: ["tex2jax.js"],
+  jax: ["input/TeX","output/HTML-CSS"],
+});
+</script>
+<script type="text/javascript" async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js"></script>
+    <link href="doxygen.css" rel="stylesheet" type="text/css" />
+    <link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="custom.css" rel="stylesheet" type="text/css"/>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-nav/quarto-nav.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/bootstrap/bootstrap.min.js"></script>
+    <script src="https://noaa-fims.github.io/site_libs/quarto-html/quarto.js" type="module"></script>
+</head>
+<body>
+<div id="top">
+    <div id="titlearea">
+        <table cellspacing="0" cellpadding="0">
+            <tbody>
+            <tr style="height: 70px;">
+                <td id="projectlogo"><img alt="Logo" src="FIMS_logo3.png"/></td>
+                <td id="projectalign" style="padding-left: 0.5em;">
+                    <div id="projectname">FIMS
+                        &#160;<span id="projectnumber">v0.10.0</span></div>
+                    <div id="projectbrief"></div></td>
+                <td style="padding-left: 0.5em;">
+                    <div id="projectbrief"></div>
+                </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="auto">
+      <div class="navbar-container container-fluid">
+        <div class="navbar-brand-container mx-auto">
+          <a href="https://noaa-fims.github.io/" class="navbar-brand navbar-brand-logo"></a>
+          <a class="navbar-brand" href="https://noaa-fims.github.io/">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav navbar-nav-scroll ms-auto">
+           <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">reference</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/reference/index.html">r/roxygen</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/doxygen/index.html">c++/doxygen</a></li>
+            </ul>
+           </li>
+            <li class="nav-item dropdown">
+            <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown"
+                    aria-expanded="false" aria-haspopup="true">articles</button>
+            <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+              <li><h6 class="dropdown-header" data-toc-skip>intro to fims</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo.html">introducing the fisheries integrated modeling system (fims)</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-input-data.html">introducing FIMS input data</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-logging.html">introducing the fims logging system</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-user-setup-guide.html">fims user setup guide</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-demo-projections.html">simple projections using fims</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-diagnostics.html">Running diagnostics on a FIMS model</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>developer</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/adding-new-module.html">adding a new c++ module</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/fims-path-maturity.html">fims path - maturity</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>c++ training</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/training-intro-cpp.html">intro to c++</a></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/training-intro-rcpp.html">intro to rcpp</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header" data-toc-skip>research and development</h6></li>
+              <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/articles/RD-re-sparsity.html">re sparsity</a></li>
+            </ul>
+          </li>
+            <li class="nav-item dropdown">
+              <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">news</button>
+              <ul class="dropdown-menu" aria-labelledby="dropdown-news">
+                <li><h6 class="dropdown-header" data-toc-skip="">Releases</h6></li>
+                <li><a class="external-link dropdown-item" href="https://github.com/NOAA-FIMS/FIMS/releases/latest">latest release</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="https://noaa-fims.github.io/FIMS/news/index.html">changelog</a></li>
+              </ul>
+            </li>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="external-link nav-link" href="https://noaa-fims.github.io/">fims website</a></li>
+            <li class="nav-item">
+              <a class="external-link nav-link" href="https://github.com/noaa-fims/fims/" aria-label="GitHub repository for FIMS">
+                <span class="fa fa-brands fa-github fa-lg"></span>
+              </a>
+            </li>
+            <!-- Keep the input; pkgdown’s autocomplete wrapper won’t exist in Doxygen -->
+            <li class="nav-item">
+              <form class="form-inline" role="search" onsubmit="return false;">
+                <input class="form-control" type="search" name="search-input" id="search-input"
+                      autocomplete="off" aria-label="Search site" placeholder="Search for">
+              </form>
+            </li>
+          </ul>
+      </div>
+    </div>
+  </nav>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Only on the cpp_directory_structure page!
+  document.querySelectorAll('.toc a').forEach(function(link) {
+    if (link.href && link.href.indexOf(location.pathname) !== -1) {
+      link.href = link.hash; // Just use the fragment
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  function updateTocActive() {
+    var links = Array.from(document.querySelectorAll('.toc a'));
+    var anchors = links.map(link => document.getElementById(link.getAttribute('href').replace('#', '')));
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var offset = 150; // Match your scroll-margin-top
+    let currentActive = -1;
+    for (let i = anchors.length - 1; i >= 0; i--) {
+      if (anchors[i] && (anchors[i].getBoundingClientRect().top + window.scrollY - offset) <= scrollTop) {
+        currentActive = i;
+        break;
+      }
+    }
+    links.forEach((link, i) => {
+      link.classList.remove('active', 'aboveActive');
+      if (i === currentActive) {
+        link.classList.add('active');
+      } else if (i < currentActive) {
+        link.classList.add('aboveActive');
+      }
+    });
+  }
+  window.addEventListener('scroll', updateTocActive);
+  window.addEventListener('hashchange', updateTocActive);
+  updateTocActive();
+});
+</script>
+    <!-- end header part -->
+<!-- Generated by Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('growth__model_8hpp_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">Loading...</div>
+<div class="SRStatus" id="Searching">Searching...</div>
+<div class="SRStatus" id="NoMatches">No Matches</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">growth_model.hpp</div></div>
+</div><!--header-->
+<div class="contents">
+<a href="growth__model_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#ifndef POPULATION_DYNAMICS_GROWTH_MODEL_HPP</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#define POPULATION_DYNAMICS_GROWTH_MODEL_HPP</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="preprocessor">#include &lt;cstddef&gt;</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="preprocessor">#include &lt;stdexcept&gt;</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#include &quot;<a class="code" href="growth__model__base_8hpp.html">growth_model_base.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#include &quot;<a class="code" href="growth__products_8hpp.html">growth_products.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#include &quot;<a class="code" href="vonb__schnute_8hpp.html">functors/vonb_schnute.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="preprocessor">#include &quot;../../common/def.hpp&quot;</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacefims__popdy.html">fims_popdy</a> {</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span> </div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="foldopen" id="foldopen00031" data-start="{" data-end="};">
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno"><a class="line" href="classfims__popdy_1_1GrowthModel.html">   31</a></span><span class="keyword">class </span><a class="code hl_class" href="classfims__popdy_1_1GrowthModel.html">GrowthModel</a> : <span class="keyword">public</span> <a class="code hl_class" href="classfims__popdy_1_1GrowthModelBase.html">GrowthModelBase</a>&lt;Type&gt; {</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> <span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00039" data-start="{" data-end="}">
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno"><a class="line" href="classfims__popdy_1_1GrowthModel.html#a3d36e88bf61f25eaf8ac9d38bee3fed6">   39</a></span>  <a class="code hl_function" href="classfims__popdy_1_1GrowthModel.html#a3d36e88bf61f25eaf8ac9d38bee3fed6">GrowthModel</a>(std::size_t n_years, std::size_t n_ages, std::size_t n_sexes = 1)</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>      : n_years_(n_years),</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>        n_ages_(n_ages),</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        n_sexes_(n_sexes),</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>        products_(n_years, n_ages, n_sexes) {}</div>
+</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span> </div>
+<div class="foldopen" id="foldopen00046" data-start="{" data-end="}">
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno"><a class="line" href="classfims__popdy_1_1GrowthModel.html#ac551fe294399475523a875a6f1311f36">   46</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classfims__popdy_1_1GrowthModel.html#ac551fe294399475523a875a6f1311f36">SetVonBertalanffySchnuteParameters</a>(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> mean_length_young,</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>                                          <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> mean_length_old,</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>                                          <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> growth_coefficient,</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>                                          <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> reference_age_for_length_young,</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>                                          <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> reference_age_for_length_old) {</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    vb_.mean_length_young = mean_length_young;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>    vb_.mean_length_old = mean_length_old;</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>    vb_.growth_coefficient = growth_coefficient;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>    vb_.reference_age_for_length_young = reference_age_for_length_young;</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    vb_.reference_age_for_length_old = reference_age_for_length_old;</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    needs_update_ = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>  }</div>
+</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span> </div>
+<div class="foldopen" id="foldopen00060" data-start="{" data-end="}">
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno"><a class="line" href="classfims__popdy_1_1GrowthModel.html#a84747412caa5aa81c495bbbb3674f449">   60</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classfims__popdy_1_1GrowthModel.html#a84747412caa5aa81c495bbbb3674f449">SetLengthWeightParameters</a>(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> length_weight_a, <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> length_weight_b) {</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    vb_.length_weight_a = length_weight_a;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    vb_.length_weight_b = length_weight_b;</div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    needs_update_ = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>  }</div>
+</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="foldopen" id="foldopen00068" data-start="{" data-end="}">
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno"><a class="line" href="classfims__popdy_1_1GrowthModel.html#a07ba0cdeb73d3914fb15e34758dd328c">   68</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classfims__popdy_1_1GrowthModel.html#a07ba0cdeb73d3914fb15e34758dd328c">SetLengthSdParams</a>(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">length_at_age_sd_at_reference_age_young</a>,</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>                         <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">length_at_age_sd_at_reference_age_old</a>) {</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    length_at_age_sd_at_reference_age_young_ =</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">length_at_age_sd_at_reference_age_young</a>;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    length_at_age_sd_at_reference_age_old_ =</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">length_at_age_sd_at_reference_age_old</a>;</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>    needs_update_ = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>  }</div>
+</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span> </div>
+<div class="foldopen" id="foldopen00085" data-start="{" data-end="}">
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno"><a class="line" href="classfims__popdy_1_1GrowthModel.html#ac3ff4de65f39a9581bb84b593ade3279">   85</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classfims__popdy_1_1GrowthModel.html#ac3ff4de65f39a9581bb84b593ade3279">SetGrowthParameterCovariance</a>(</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_variance</a>,</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_mean_length_old_covariance</a>,</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_growth_coefficient_covariance</a>,</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_variance</a>,</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_growth_coefficient_covariance</a>,</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">growth_coefficient_variance</a>) {</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    ValidateGrowthParameterCovariance(</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_variance</a>,</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_mean_length_old_covariance</a>,</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_growth_coefficient_covariance</a>,</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_variance</a>, <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_growth_coefficient_covariance</a>,</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">growth_coefficient_variance</a>);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    mean_length_young_variance_ = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_variance</a>;</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    mean_length_young_mean_length_old_covariance_ =</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_mean_length_old_covariance</a>;</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    mean_length_young_growth_coefficient_covariance_ =</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_growth_coefficient_covariance</a>;</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    mean_length_old_variance_ = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_variance</a>;</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    mean_length_old_growth_coefficient_covariance_ =</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_growth_coefficient_covariance</a>;</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    growth_coefficient_variance_ = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">growth_coefficient_variance</a>;</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>    use_delta_method_variability_ = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>    needs_update_ = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>  }</div>
+</div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span> </div>
+<div class="foldopen" id="foldopen00114" data-start="{" data-end="}">
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno"><a class="line" href="classfims__popdy_1_1GrowthModel.html#a77f80ccc2e75a51ffc521ac63bb25b26">  114</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classfims__popdy_1_1GrowthModel.html#a77f80ccc2e75a51ffc521ac63bb25b26">ClearGrowthParameterCovariance</a>() {</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    mean_length_young_variance_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    mean_length_young_mean_length_old_covariance_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>    mean_length_young_growth_coefficient_covariance_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    mean_length_old_variance_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    mean_length_old_growth_coefficient_covariance_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>    growth_coefficient_variance_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    use_delta_method_variability_ = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    needs_update_ = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>  }</div>
+</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
+<div class="foldopen" id="foldopen00126" data-start="{" data-end="}">
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno"><a class="line" href="classfims__popdy_1_1GrowthModel.html#a4a5bec6478df11606ff907450a57bbe7">  126</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classfims__popdy_1_1GrowthModel.html#a4a5bec6478df11606ff907450a57bbe7">Prepare</a>()<span class="keyword"> override </span>{</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    <span class="keywordflow">if</span> (!needs_update_) <span class="keywordflow">return</span>;</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span> </div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <span class="keywordflow">if</span> (n_ages_ == 0) {</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>      <span class="keywordflow">throw</span> std::runtime_error(</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>          <span class="stringliteral">&quot;VonBertalanffySchnuteGrowth requires n_ages &gt; 0&quot;</span>);</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    }</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    <span class="keywordflow">if</span> (vb_.reference_age_for_length_old &lt;=</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>        vb_.reference_age_for_length_young) {</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>      <span class="keywordflow">throw</span> std::runtime_error(</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>          <span class="stringliteral">&quot;VonBertalanffySchnuteGrowth reference_age_for_length_old must be &gt; &quot;</span></div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>          <span class="stringliteral">&quot;reference_age_for_length_young&quot;</span>);</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    }</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span> </div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa_min</a> = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(0.0);</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> slope = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(0.0);</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span>    <span class="keywordflow">if</span> (!use_delta_method_variability_) {</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa_min</a> = vb_.length_at_age(vb_.reference_age_for_length_young);</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>      <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa_max</a> = vb_.length_at_age(vb_.reference_age_for_length_old);</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>      <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa_delta_safe</a> = fims_math::ad_max(</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>          fims_math::ad_fabs(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa_max</a> - <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa_min</a>), <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(1<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">e</a>-8));</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>      slope = (n_ages_ &gt; 1) ? (length_at_age_sd_at_reference_age_old_ -</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>                               length_at_age_sd_at_reference_age_young_) /</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>                                  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa_delta_safe</a></div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>                            : <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(0.0);</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>    }</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    <span class="comment">// Fill mean length-at-age, sd, and mean weight-at-age.</span></div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>    <span class="keywordflow">for</span> (std::size_t <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">y</a> = 0; <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">y</a> &lt; n_years_; ++<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">y</a>) {</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>      <span class="keywordflow">for</span> (std::size_t <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">a</a> = 0; <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">a</a> &lt; n_ages_; ++<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">a</a>) {</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>        <span class="keywordflow">for</span> (std::size_t <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">s</a> = 0; <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">s</a> &lt; n_sexes_; ++<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">s</a>) {</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>          <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age</a> = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">a</a>) + age_offset_;</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span> </div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>          <span class="comment">// log-scale params live upstream; laa here is natural scale</span></div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>          <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa</a> = vb_.length_at_age(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age</a>);</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>          <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">sd_laa</a> = ComputeLengthSdAtAge(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age</a>, <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa</a>, <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa_min</a>, slope);</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>          <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">waa</a> = vb_.weight_at_age(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age</a>);</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span> </div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>          products_.MeanLAA(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">y</a>, <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">a</a>, <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">s</a>) = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa</a>;</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>          products_.SdLAA(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">y</a>, <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">a</a>, <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">s</a>) = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">sd_laa</a>;</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>          products_.MeanWAA(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">y</a>, <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">a</a>, <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">s</a>) = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">waa</a>;</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>        }</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>      }</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    }</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    needs_update_ = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>  }</div>
+</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span> </div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno"><a class="line" href="classfims__popdy_1_1GrowthModel.html#a9513b96556a841855bbec6adb6d942ce">  175</a></span>  <span class="keyword">const</span> <a class="code hl_struct" href="structfims__popdy_1_1GrowthProducts.html">GrowthProducts&lt;Type&gt;</a>&amp; <a class="code hl_function" href="classfims__popdy_1_1GrowthModel.html#a9513b96556a841855bbec6adb6d942ce">GetProducts</a>()<span class="keyword"> const override </span>{ <span class="keywordflow">return</span> products_; }</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span> </div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span> <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>  <span class="keywordtype">void</span> ValidateGrowthParameterCovariance(</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_variance</a>,</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_mean_length_old_covariance</a>,</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_growth_coefficient_covariance</a>,</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_variance</a>,</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_growth_coefficient_covariance</a>,</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>      <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">growth_coefficient_variance</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_variance</a> &lt; <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(0.0) ||</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_variance</a> &lt; <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(0.0) ||</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">growth_coefficient_variance</a> &lt; <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(0.0)) {</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Growth parameter variances must be &gt;= 0&quot;</span>);</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>    }</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span> </div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_mean_length_old_covariance</a> *</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>            <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_mean_length_old_covariance</a> &gt;</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_variance</a> * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_variance</a>) {</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>      <span class="keywordflow">throw</span> std::runtime_error(</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>          <span class="stringliteral">&quot;Growth covariance between mean_length_young and &quot;</span></div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>          <span class="stringliteral">&quot;mean_length_old is inconsistent with the supplied variances&quot;</span>);</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    }</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span> </div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_growth_coefficient_covariance</a> *</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>            <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_growth_coefficient_covariance</a> &gt;</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_variance</a> * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">growth_coefficient_variance</a>) {</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>      <span class="keywordflow">throw</span> std::runtime_error(</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>          <span class="stringliteral">&quot;Growth covariance between mean_length_young and &quot;</span></div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>          <span class="stringliteral">&quot;growth_coefficient is inconsistent with the supplied variances&quot;</span>);</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    }</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span> </div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_growth_coefficient_covariance</a> *</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>            <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_growth_coefficient_covariance</a> &gt;</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_variance</a> * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">growth_coefficient_variance</a>) {</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>      <span class="keywordflow">throw</span> std::runtime_error(</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>          <span class="stringliteral">&quot;Growth covariance between mean_length_old and &quot;</span></div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>          <span class="stringliteral">&quot;growth_coefficient is inconsistent with the supplied variances&quot;</span>);</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    }</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span> </div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>    <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">determinant</a> =</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_variance</a> *</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>            (<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_variance</a> * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">growth_coefficient_variance</a> -</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>             <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_growth_coefficient_covariance</a> *</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>                 <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_growth_coefficient_covariance</a>) -</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_mean_length_old_covariance</a> *</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>            (<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_mean_length_old_covariance</a> *</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>                 <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">growth_coefficient_variance</a> -</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>             <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_growth_coefficient_covariance</a> *</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>                 <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_growth_coefficient_covariance</a>) +</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>        <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_growth_coefficient_covariance</a> *</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>            (<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_mean_length_old_covariance</a> *</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>                 <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_growth_coefficient_covariance</a> -</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>             <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_young_growth_coefficient_covariance</a> *</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>                 <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">mean_length_old_variance</a>);</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span> </div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">determinant</a> &lt; <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(0.0)) {</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>      <span class="keywordflow">throw</span> std::runtime_error(</div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>          <span class="stringliteral">&quot;Growth parameter covariance matrix must be positive &quot;</span></div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>          <span class="stringliteral">&quot;semi-definite&quot;</span>);</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>    }</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>  }</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span> </div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> ComputeLengthSdAtAge(<span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&amp; <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age</a>, <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&amp; <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa</a>,</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>                            <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&amp; <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa_min</a>, <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&amp; slope)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    <span class="keywordflow">if</span> (use_delta_method_variability_) {</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>      <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">log_var</a> = ComputeLogLengthVarianceAtAge(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age</a>);</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>      <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">log_var_safe</a> =</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>          <a class="code hl_function" href="fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321">fims_math::ad_max</a>(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">log_var</a>, <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0));</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>      <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">sd_laa</a> = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa</a> * fims_math::sqrt(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">log_var_safe</a>);</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321">fims_math::ad_max</a>(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">sd_laa</a>, <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(1<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">e</a>-8));</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>    }</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span> </div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>    <span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">sd_laa</a> =</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>        (n_ages_ &gt; 1)</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>            ? length_at_age_sd_at_reference_age_young_ + slope * (<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa</a> - <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">laa_min</a>)</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>            : length_at_age_sd_at_reference_age_young_;</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span> </div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321">fims_math::ad_max</a>(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">sd_laa</a>, <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(1<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">e</a>-8));</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>  }</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span> </div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> ComputeLogLengthVarianceAtAge(<span class="keyword">const</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&amp; <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age</a>)<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_young</a> = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(0.0);</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_old</a> = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(0.0);</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_k</a> = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(0.0);</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span> </div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>    vb_.log_length_at_age_logscale_gradient(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">age</a>, <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_young</a>,</div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>                                            <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_old</a>,</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>                                            <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_k</a>);</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span> </div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_young</a> * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_young</a> *</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>               mean_length_young_variance_ +</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>           <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(2.0) * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_young</a> *</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>               <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_old</a> *</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>               mean_length_young_mean_length_old_covariance_ +</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>           <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(2.0) * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_young</a> * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_k</a> *</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>               mean_length_young_growth_coefficient_covariance_ +</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>           <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_old</a> * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_old</a> *</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>               mean_length_old_variance_ +</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span>           <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>(2.0) * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_length_old</a> * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_k</a> *</div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>               mean_length_old_growth_coefficient_covariance_ +</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>           <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_k</a> * <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">d_log_laa_d_log_k</a> * growth_coefficient_variance_;</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>  }</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span> </div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>  std::size_t n_years_;</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>  std::size_t n_ages_;</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>  std::size_t n_sexes_;</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span> </div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">GrowthProducts&lt;Type&gt;</a> products_;</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span> </div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>  <span class="comment">// Phase 1 functor</span></div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">VonBertalanffySchnuteGrowth&lt;Type&gt;</a> vb_;</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span> </div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>  <span class="comment">// Caching state</span></div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>  <span class="keywordtype">bool</span> needs_update_ = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> length_at_age_sd_at_reference_age_young_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(3.0);</div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> length_at_age_sd_at_reference_age_old_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(7.0);</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>  <span class="keywordtype">bool</span> use_delta_method_variability_ = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> mean_length_young_variance_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> mean_length_young_mean_length_old_covariance_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> mean_length_young_growth_coefficient_covariance_ =</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>      <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> mean_length_old_variance_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> mean_length_old_growth_coefficient_covariance_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> growth_coefficient_variance_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>  <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> age_offset_ = <span class="keyword">static_cast&lt;</span><a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a><span class="keyword">&gt;</span>(0.0);</div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span> </div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span> <span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00311" data-start="{" data-end="}">
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno"><a class="line" href="classfims__popdy_1_1GrowthModel.html#aec06a00cdff8ef4b6bcafb55638fbe90">  311</a></span>  <span class="keywordtype">void</span> <a class="code hl_function" href="classfims__popdy_1_1GrowthModel.html#aec06a00cdff8ef4b6bcafb55638fbe90">SetAgeOffset</a>(<a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">offset</a>) {</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>    age_offset_ = <a class="code hl_function" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">offset</a>;</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>    needs_update_ = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>  }</div>
+</div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>};</div>
+</div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span> </div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>}  <span class="comment">// namespace fims_popdy</span></div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span> </div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span><span class="preprocessor">#endif </span><span class="comment">/* POPULATION_DYNAMICS_GROWTH_MODEL_HPP */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="aclassfims__popdy_1_1GrowthModelBase_html"><div class="ttname"><a href="classfims__popdy_1_1GrowthModelBase.html">fims_popdy::GrowthModelBase</a></div><div class="ttdoc">Growth module boundary (product-oriented).</div><div class="ttdef"><b>Definition</b> growth_model_base.hpp:24</div></div>
+<div class="ttc" id="aclassfims__popdy_1_1GrowthModel_html"><div class="ttname"><a href="classfims__popdy_1_1GrowthModel.html">fims_popdy::GrowthModel</a></div><div class="ttdoc">Concrete growth model using VonBertalanffySchnute growth (Phase 1).</div><div class="ttdef"><b>Definition</b> growth_model.hpp:31</div></div>
+<div class="ttc" id="aclassfims__popdy_1_1GrowthModel_html_a07ba0cdeb73d3914fb15e34758dd328c"><div class="ttname"><a href="classfims__popdy_1_1GrowthModel.html#a07ba0cdeb73d3914fb15e34758dd328c">fims_popdy::GrowthModel::SetLengthSdParams</a></div><div class="ttdeci">void SetLengthSdParams(Type length_at_age_sd_at_reference_age_young, Type length_at_age_sd_at_reference_age_old)</div><div class="ttdef"><b>Definition</b> growth_model.hpp:68</div></div>
+<div class="ttc" id="aclassfims__popdy_1_1GrowthModel_html_a3d36e88bf61f25eaf8ac9d38bee3fed6"><div class="ttname"><a href="classfims__popdy_1_1GrowthModel.html#a3d36e88bf61f25eaf8ac9d38bee3fed6">fims_popdy::GrowthModel::GrowthModel</a></div><div class="ttdeci">GrowthModel(std::size_t n_years, std::size_t n_ages, std::size_t n_sexes=1)</div><div class="ttdoc">Construct a growth model with fixed dimensions.</div><div class="ttdef"><b>Definition</b> growth_model.hpp:39</div></div>
+<div class="ttc" id="aclassfims__popdy_1_1GrowthModel_html_a4a5bec6478df11606ff907450a57bbe7"><div class="ttname"><a href="classfims__popdy_1_1GrowthModel.html#a4a5bec6478df11606ff907450a57bbe7">fims_popdy::GrowthModel::Prepare</a></div><div class="ttdeci">void Prepare() override</div><div class="ttdoc">Compute and cache growth products.</div><div class="ttdef"><b>Definition</b> growth_model.hpp:126</div></div>
+<div class="ttc" id="aclassfims__popdy_1_1GrowthModel_html_a77f80ccc2e75a51ffc521ac63bb25b26"><div class="ttname"><a href="classfims__popdy_1_1GrowthModel.html#a77f80ccc2e75a51ffc521ac63bb25b26">fims_popdy::GrowthModel::ClearGrowthParameterCovariance</a></div><div class="ttdeci">void ClearGrowthParameterCovariance()</div><div class="ttdef"><b>Definition</b> growth_model.hpp:114</div></div>
+<div class="ttc" id="aclassfims__popdy_1_1GrowthModel_html_a84747412caa5aa81c495bbbb3674f449"><div class="ttname"><a href="classfims__popdy_1_1GrowthModel.html#a84747412caa5aa81c495bbbb3674f449">fims_popdy::GrowthModel::SetLengthWeightParameters</a></div><div class="ttdeci">void SetLengthWeightParameters(Type length_weight_a, Type length_weight_b)</div><div class="ttdoc">fixed length-weight params (phase 1)</div><div class="ttdef"><b>Definition</b> growth_model.hpp:60</div></div>
+<div class="ttc" id="aclassfims__popdy_1_1GrowthModel_html_a9513b96556a841855bbec6adb6d942ce"><div class="ttname"><a href="classfims__popdy_1_1GrowthModel.html#a9513b96556a841855bbec6adb6d942ce">fims_popdy::GrowthModel::GetProducts</a></div><div class="ttdeci">const GrowthProducts&lt; Type &gt; &amp; GetProducts() const override</div><div class="ttdoc">Read-only access to cached growth products.</div><div class="ttdef"><b>Definition</b> growth_model.hpp:175</div></div>
+<div class="ttc" id="aclassfims__popdy_1_1GrowthModel_html_ac3ff4de65f39a9581bb84b593ade3279"><div class="ttname"><a href="classfims__popdy_1_1GrowthModel.html#ac3ff4de65f39a9581bb84b593ade3279">fims_popdy::GrowthModel::SetGrowthParameterCovariance</a></div><div class="ttdeci">void SetGrowthParameterCovariance(Type mean_length_young_variance, Type mean_length_young_mean_length_old_covariance, Type mean_length_young_growth_coefficient_covariance, Type mean_length_old_variance, Type mean_length_old_growth_coefficient_covariance, Type growth_coefficient_variance)</div><div class="ttdef"><b>Definition</b> growth_model.hpp:85</div></div>
+<div class="ttc" id="aclassfims__popdy_1_1GrowthModel_html_ac551fe294399475523a875a6f1311f36"><div class="ttname"><a href="classfims__popdy_1_1GrowthModel.html#ac551fe294399475523a875a6f1311f36">fims_popdy::GrowthModel::SetVonBertalanffySchnuteParameters</a></div><div class="ttdeci">void SetVonBertalanffySchnuteParameters(Type mean_length_young, Type mean_length_old, Type growth_coefficient, Type reference_age_for_length_young, Type reference_age_for_length_old)</div><div class="ttdoc">Set fixed VonBertalanffySchnute parameters (explicit reference ages).</div><div class="ttdef"><b>Definition</b> growth_model.hpp:46</div></div>
+<div class="ttc" id="aclassfims__popdy_1_1GrowthModel_html_aec06a00cdff8ef4b6bcafb55638fbe90"><div class="ttname"><a href="classfims__popdy_1_1GrowthModel.html#aec06a00cdff8ef4b6bcafb55638fbe90">fims_popdy::GrowthModel::SetAgeOffset</a></div><div class="ttdeci">void SetAgeOffset(Type offset)</div><div class="ttdoc">Set an age offset if population ages do not start at zero.</div><div class="ttdef"><b>Definition</b> growth_model.hpp:311</div></div>
+<div class="ttc" id="afims__math_8hpp_html_a54cfbb09833fa0de10e18203526e8321"><div class="ttname"><a href="fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321">fims_math::ad_max</a></div><div class="ttdeci">const Type ad_max(const Type &amp;a, const Type &amp;b, Type C=1e-5)</div><div class="ttdef"><b>Definition</b> fims_math.hpp:365</div></div>
+<div class="ttc" id="agrowth__model__base_8hpp_html"><div class="ttname"><a href="growth__model__base_8hpp.html">growth_model_base.hpp</a></div><div class="ttdoc">Declares the GrowthModelBase interface. This is the growth module boundary that downstream code consu...</div></div>
+<div class="ttc" id="agrowth__products_8hpp_html"><div class="ttname"><a href="growth__products_8hpp.html">growth_products.hpp</a></div><div class="ttdoc">Declares the GrowthProducts struct holding growth &quot;products&quot; that downstream population dynamics code...</div></div>
+<div class="ttc" id="anamespacefims__popdy_html"><div class="ttname"><a href="namespacefims__popdy.html">fims_popdy</a></div><div class="ttdoc">The population dynamics of FIMS.</div><div class="ttdef"><b>Definition</b> catch_at_age.hpp:45</div></div>
+<div class="ttc" id="anamespacefims__popdy_html_a5a39b32817ff547732750cee9acf6fd8"><div class="ttname"><a href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">fims_popdy::BuildAgeToLengthConversionFleet</a></div><div class="ttdeci">std::shared_ptr&lt; AgeToLengthConversionBase&lt; Type &gt; &gt; BuildAgeToLengthConversionFleet(const std::shared_ptr&lt; Population&lt; Type &gt; &gt; &amp;population, const std::shared_ptr&lt; Fleet&lt; Type &gt; &gt; &amp;fleet)</div><div class="ttdoc">Build the active age-to-length conversion for a fleet from the current population and fleet state.</div><div class="ttdef"><b>Definition</b> age_to_length_conversion_runtime.hpp:44</div></div>
+<div class="ttc" id="astructfims__popdy_1_1GrowthProducts_html"><div class="ttname"><a href="structfims__popdy_1_1GrowthProducts.html">fims_popdy::GrowthProducts</a></div><div class="ttdoc">Growth &quot;products&quot; in a consistent (year, age, sex) space.</div><div class="ttdef"><b>Definition</b> growth_products.hpp:26</div></div>
+<div class="ttc" id="avonb__schnute_8hpp_html"><div class="ttname"><a href="vonb__schnute_8hpp.html">vonb_schnute.hpp</a></div><div class="ttdoc">Defines the VonBertalanffySchnuteGrowth class, which inherits from the GrowthBase class.</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_920884c6b3b2f0be94e27d51660adee5.html">inst</a></li><li class="navelem"><a class="el" href="dir_2b5d1a398a9eec011391d543f21db223.html">include</a></li><li class="navelem"><a class="el" href="dir_65a4bdb85444efa1ebe02557c74bf51a.html">population_dynamics</a></li><li class="navelem"><a class="el" href="dir_37bdea9fff2fdc698227d6fda51b8784.html">growth</a></li><li class="navelem"><a class="el" href="growth__model_8hpp.html">growth_model.hpp</a></li>
+    <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -142,11 +142,11 @@ looking at the raw data frame. To meet this second challenge, the FIMS
 team is working on functions to summarize, visualize, and check for
 errors in the input data.</p>
 <p>The currently available values for the <code>type</code> column are
-“age_comp”, “age_to_length_conversion”, “index”, “catch”, “length_comp”,
-and “weight_at_age”. The “weight_at_age” and “age_to_length_conversion”
-types are not currently treated as data in the sense that they are not
-included in the likelihood, just used within the population dynamics
-calculations.</p>
+“age_comp”, “age_to_length_conversion”, “index”, “catch”, “length_bin”,
+“length_comp”, and “weight_at_age”. The “weight_at_age” and
+“age_to_length_conversion” types are not currently treated as data in
+the sense that they are not included in the likelihood, just used within
+the population dynamics calculations.</p>
 <p>The individual data types are described in more detail below after
 introducing the example data set that is included in the package.</p>
 </div>
@@ -356,10 +356,16 @@ step).</p>
 </h2>
 <p>The length-composition data are similar to the age compositions,
 except with values in the <code>length</code> column and
-<code>age = NA</code>. FIMS does not yet have parametric growth
-implemented so the length bins can be any values as long as the
-distribution of each age among those bins is provided by the
-<code>age_to_length_conversion</code> data type described below.</p>
+<code>age = NA</code>. The <code>length</code> column identifies the
+length bin for each observation. The <code>observed</code> column
+contains either the number or the proportion of fish in each length bin.
+The <code>unit</code> column should be either “number” or “proportion”.
+The <code>uncertainty</code> column should be the input sample size for
+the time step, repeated across all length bins in that time step.</p>
+<p>When length compositions are included, FIMS needs a way to convert
+numbers at age into numbers at length. This can come from fixed
+<code>age_to_length_conversion</code> rows or from a growth-derived
+age-to-length conversion using the VonB-Schnute Growth module.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first three rows of the length composition data</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
@@ -386,6 +392,21 @@ distribution of each age among those bins is provided by the
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">timing</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Length compositions by time step in data_big example data set"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="fims-input-data_files/figure-html/data_big-length_comp-plot-1.png" class="r-plt" alt="Barplot showing length comp by time step with a mode around 450 mm which declines and becomes more sharply peaked over time." width="700"></p>
+</div>
+<div class="section level2">
+<h2 id="length-bins-type-length_bin">Length bins (<code>type == "length_bin"</code>)<a class="anchor" aria-label="anchor" href="#length-bins-type-length_bin"></a>
+</h2>
+<p>The <code>length_bin</code> data type defines length bins without
+providing length-composition observations. These rows are useful when a
+model needs length-bin geometry for a growth-derived age-to-length
+conversion, but the user is not fitting length-composition data for that
+fleet.</p>
+<p>For <code>length_bin</code> rows, the <code>length</code> column
+contains the length-bin values. The <code>observed</code>,
+<code>age</code>, and <code>uncertainty</code> columns should usually be
+<code>NA</code>. The <code>fleet</code> column identifies which fleet or
+survey the length bins apply to, and <code>timing</code> can be
+<code>NA</code> unless fleet-specific timing is needed.</p>
 </div>
 <div class="section level2">
 <h2 id="weight-at-age-data-type-weight_at_age">Weight-at-age data (<code>type == "weight_at_age"</code>)<a class="anchor" aria-label="anchor" href="#weight-at-age-data-type-weight_at_age"></a>

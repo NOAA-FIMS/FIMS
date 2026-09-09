@@ -6,5 +6,8 @@ var searchData=
   ['vector_3c_20double_20_3e_3',['Vector&lt; double &gt;',['../classfims_1_1Vector.html',1,'fims']]],
   ['vector_3c_20int_20_3e_4',['Vector&lt; int &gt;',['../classfims_1_1Vector.html',1,'fims']]],
   ['vector_3c_20size_5ft_20_3e_5',['Vector&lt; size_t &gt;',['../classfims_1_1Vector.html',1,'fims']]],
-  ['vector_3c_20std_3a_3astring_20_3e_6',['Vector&lt; std::string &gt;',['../classfims_1_1Vector.html',1,'fims']]]
+  ['vector_3c_20std_3a_3astring_20_3e_6',['Vector&lt; std::string &gt;',['../classfims_1_1Vector.html',1,'fims']]],
+  ['vonbertalanffyschnutegrowth_7',['VonBertalanffySchnuteGrowth',['../structfims__popdy_1_1VonBertalanffySchnuteGrowth.html',1,'fims_popdy']]],
+  ['vonbertalanffyschnutegrowthinterface_8',['VonBertalanffySchnuteGrowthInterface',['../classVonBertalanffySchnuteGrowthInterface.html',1,'']]],
+  ['vonbertalanffyschnutegrowthmodeladapter_9',['VonBertalanffySchnuteGrowthModelAdapter',['../classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html',1,'fims_popdy']]]
 ];

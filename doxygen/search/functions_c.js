@@ -1,4 +1,17 @@
 var searchData=
 [
-  ['normallpdf_0',['NormalLPDF',['../structfims__distributions_1_1NormalLPDF.html#a232feebfe9cb238f1f11fae46417a615',1,'fims_distributions::NormalLPDF']]]
+  ['make_5fdimensions_0',['make_dimensions',['../classFIMSRcppInterfaceBase.html#a1fa6e0deb883a921fe70b328cdd30fee',1,'FIMSRcppInterfaceBase']]],
+  ['make_5fmap_1',['make_map',['../classEWAAGrowthInterface.html#a91aeea13acd1864aef72e811e9647fc9',1,'EWAAGrowthInterface']]],
+  ['maturitybase_2',['MaturityBase',['../structfims__popdy_1_1MaturityBase.html#aba833b4d42149ff56e3f4c8c28333d7a',1,'fims_popdy::MaturityBase']]],
+  ['maturityinterfacebase_3',['maturityinterfacebase',['../classMaturityInterfaceBase.html#ae8ca26cc171f8b471deb6259704cfc18',1,'MaturityInterfaceBase::MaturityInterfaceBase()'],['../classMaturityInterfaceBase.html#ab191c30895c8dca3458e1e7f6a94e8c9',1,'MaturityInterfaceBase::MaturityInterfaceBase(const MaturityInterfaceBase &amp;other)']]],
+  ['max_5fsize_4',['max_size',['../classfims_1_1Vector.html#a15d40df5b4ef663486d9d712130dc6d7',1,'fims::Vector']]],
+  ['meanlaa_5',['meanlaa',['../structfims__popdy_1_1SizeProducts.html#a38e39948f27c08ce7236a582cfaa5d74',1,'fims_popdy::SizeProducts::MeanLAA(std::size_t year_index, std::size_t age_index)'],['../structfims__popdy_1_1SizeProducts.html#a0cea645bd47ee9371fa966541b89b63c',1,'fims_popdy::SizeProducts::MeanLAA(std::size_t year_index, std::size_t age_index) const'],['../classfims__popdy_1_1SizeDistributionProviderBase.html#ad22c4dcfbfdd13c7d4c772cb0397986a',1,'fims_popdy::SizeDistributionProviderBase::MeanLAA()'],['../classfims__popdy_1_1GrowthDerivedSizeProvider.html#a62bf1c8667430a26fc14825661206bc0',1,'fims_popdy::GrowthDerivedSizeProvider::MeanLAA()'],['../structfims__popdy_1_1GrowthProducts.html#aa4d02a6701bf65bf5ec96bf35b442dd9',1,'fims_popdy::GrowthProducts::MeanLAA(std::size_t y, std::size_t a, std::size_t s) const'],['../structfims__popdy_1_1GrowthProducts.html#a2ca023d76bacb20ee7db0d259f691cb4',1,'fims_popdy::GrowthProducts::MeanLAA(std::size_t y, std::size_t a, std::size_t s)']]],
+  ['meanlengtholdvector_6',['MeanLengthOldVector',['../classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html#aa708750a2743c70ed8b71c38a1da525f',1,'fims_popdy::VonBertalanffySchnuteGrowthModelAdapter']]],
+  ['meanlengthyoungvector_7',['MeanLengthYoungVector',['../classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html#aca8584cf6b6ad576b2f8e3691e8a5de6',1,'fims_popdy::VonBertalanffySchnuteGrowthModelAdapter']]],
+  ['meanwaa_8',['meanwaa',['../structfims__popdy_1_1GrowthProducts.html#a9ad1183738fef9604f35edb56ccdb174',1,'fims_popdy::GrowthProducts::MeanWAA(std::size_t y, std::size_t a, std::size_t s)'],['../structfims__popdy_1_1GrowthProducts.html#a2d8d4c9d4831f979954e7ae4741390c0',1,'fims_popdy::GrowthProducts::MeanWAA(std::size_t y, std::size_t a, std::size_t s) const']]],
+  ['meanweightfromagetolengthconversionderived_9',['MeanWeightFromAgeToLengthConversionDerived',['../classfims__popdy_1_1CatchAtAge.html#a7e1950dcc68d08da8bab3f99ef6f10ef',1,'fims_popdy::CatchAtAge']]],
+  ['meanweightfromagetolengthconversionrow_10',['MeanWeightFromAgeToLengthConversionRow',['../classfims__popdy_1_1CatchAtAge.html#a35775fb0c4f1409bbc7fed18bb5174fd',1,'fims_popdy::CatchAtAge']]],
+  ['min_11',['min',['../classFisheryModelInterfaceBase.html#a04bf9092ad891e8286e2e2ce55108ffa',1,'FisheryModelInterfaceBase']]],
+  ['model_12',['Model',['../classfims__model_1_1Model.html#a4538641e7f150147bf85aa0d4515e03d',1,'fims_model::Model']]],
+  ['multinomiallpmf_13',['MultinomialLPMF',['../structfims__distributions_1_1MultinomialLPMF.html#ab31b77abbda5863a2d6fd43cefb27b7e',1,'fims_distributions::MultinomialLPMF']]]
 ];

@@ -7,9 +7,13 @@ var searchData=
   ['re_5fexpected_5fvalues_4',['re_expected_values',['../structfims__distributions_1_1DensityComponentBase.html#ab95f7bcda5a96b40d1d5ea6e127f54c2',1,'fims_distributions::DensityComponentBase']]],
   ['recruitment_5',['recruitment',['../structfims__popdy_1_1Population.html#a962dbda1d550245a364674b7b0aefc53',1,'fims_popdy::Population::recruitment'],['../structfims__popdy_1_1RecruitmentBase.html#acf427056522e39bbc0d714473c4789ce',1,'fims_popdy::RecruitmentBase::recruitment']]],
   ['recruitment_5ferr_5fid_6',['recruitment_err_id',['../classPopulationInterface.html#a876ce3ce52884649b59f30d7df7ebf91',1,'PopulationInterface']]],
-  ['recruitment_5fid_7',['recruitment_id',['../classPopulationInterface.html#ac29b9cd4342fce77b72213d7a448bdf6',1,'PopulationInterface::recruitment_id'],['../structfims__popdy_1_1Population.html#a935b36af9b2596470bd0ab1f15f9973a',1,'fims_popdy::Population::recruitment_id']]],
+  ['recruitment_5fid_7',['recruitment_id',['../structfims__popdy_1_1Population.html#a935b36af9b2596470bd0ab1f15f9973a',1,'fims_popdy::Population::recruitment_id'],['../classPopulationInterface.html#ac29b9cd4342fce77b72213d7a448bdf6',1,'PopulationInterface::recruitment_id']]],
   ['recruitment_5fmodels_8',['recruitment_models',['../classfims__info_1_1Information.html#af84f12390187dbdf6864fdf5d052b499',1,'fims_info::Information']]],
   ['recruitment_5fprocess_5fmodels_9',['recruitment_process_models',['../classfims__info_1_1Information.html#a2ef86120762c7b017f3db7edbb929364',1,'fims_info::Information']]],
-  ['report_5fvectors_10',['report_vectors',['../classfims__popdy_1_1CatchAtAge.html#a30de85a9a907124a9a57243eccaa2a23',1,'fims_popdy::CatchAtAge']]],
-  ['routine_11',['routine',['../structfims_1_1LogEntry.html#a47814f40499111f33bed9fa4da6fa619',1,'fims::LogEntry']]]
+  ['reference_5fage_5ffor_5flength_5fold_10',['reference_age_for_length_old',['../classVonBertalanffySchnuteGrowthInterface.html#a98b7b7940df5ccdb6d87e8b5d1513448',1,'VonBertalanffySchnuteGrowthInterface::reference_age_for_length_old'],['../structfims__popdy_1_1VonBertalanffySchnuteGrowth.html#a3935ee1c35acef589c17877fcff31f85',1,'fims_popdy::VonBertalanffySchnuteGrowth::reference_age_for_length_old']]],
+  ['reference_5fage_5ffor_5flength_5fyoung_11',['reference_age_for_length_young',['../classVonBertalanffySchnuteGrowthInterface.html#a2791d59ea1ff35f9b7f9caf31ac217e4',1,'VonBertalanffySchnuteGrowthInterface::reference_age_for_length_young'],['../structfims__popdy_1_1VonBertalanffySchnuteGrowth.html#acd395a66d7459b1434e7bdc6446b7260',1,'fims_popdy::VonBertalanffySchnuteGrowth::reference_age_for_length_young']]],
+  ['report_5fage_5fto_5flength_5fconversion_5fderived_5ftensor_12',['report_age_to_length_conversion_derived_tensor',['../classfims__popdy_1_1CatchAtAge.html#a6e78c88ece6643ef484c34ae62fdf7ba',1,'fims_popdy::CatchAtAge']]],
+  ['report_5fvectors_13',['report_vectors',['../classfims__popdy_1_1CatchAtAge.html#a30de85a9a907124a9a57243eccaa2a23',1,'fims_popdy::CatchAtAge']]],
+  ['requires_5fage_5flength_5fmapping_14',['requires_age_length_mapping',['../structfims__popdy_1_1Fleet.html#a8f2a82edd7b738e4d81d3514a2898051',1,'fims_popdy::Fleet']]],
+  ['routine_15',['routine',['../structfims_1_1LogEntry.html#a47814f40499111f33bed9fa4da6fa619',1,'fims::LogEntry']]]
 ];

@@ -220,7 +220,11 @@ $(document).ready(function(){initNavTree('rcpp__growth_8hpp.html',''); initResiz
 
 <p>The Rcpp interface to declare different types of growth, e.g., empirical weight-at-age data. Allows for the use of methods::new() in R.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="growth_8hpp_source.html">../../../population_dynamics/growth/growth.hpp</a>&quot;</code><br />
+<div class="textblock"><code>#include &lt;algorithm&gt;</code><br />
+<code>#include &lt;cmath&gt;</code><br />
+<code>#include &quot;<a class="el" href="fims__math_8hpp_source.html">../../../common/fims_math.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="fims__vector_8hpp_source.html">../../../common/fims_vector.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="growth_8hpp_source.html">../../../population_dynamics/growth/growth.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="rcpp__interface__base_8hpp_source.html">rcpp_interface_base.hpp</a>&quot;</code><br />
 </div>
 <p><a href="rcpp__growth_8hpp_source.html">Go to the source code of this file.</a></p>
@@ -230,8 +234,14 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGrowthInterfaceBase.html">GrowthInterfaceBase</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rcpp interface that serves as the parent class for Rcpp growth interfaces. This type should be inherited and not called from R directly.  <a href="classGrowthInterfaceBase.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGrowthDerivedObservationInterfaceBase.html">GrowthDerivedObservationInterfaceBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rcpp interface base for growth models that can register a growth-derived observation capability with the runtime model.  <a href="classGrowthDerivedObservationInterfaceBase.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEWAAGrowthInterface.html">EWAAGrowthInterface</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rcpp interface for EWAAGrowth to instantiate the object from R: ewaa &lt;- methods::new(EWAAGrowth). Where, EWAA stands for empirical weight at age and growth is not actually estimated.  <a href="classEWAAGrowthInterface.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVonBertalanffySchnuteGrowthInterface.html">VonBertalanffySchnuteGrowthInterface</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Rcpp-facing VonBertalanffySchnute growth module. Inherits "derived observation" capability so this growth can support growth-derived outputs used by downstream age-to-length conversion/weight- at-age paths.  <a href="classVonBertalanffySchnuteGrowthInterface.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>

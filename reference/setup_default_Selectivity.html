@@ -110,6 +110,9 @@ functions for data, fleet, selectivity, recruitment, maturity, growth, and
 population components, then combines those defaults into one tibble.
 You can modify the returned tibble before fitting a model (for example,
 updating maturity and selectivity parameter values).</p>
+<p>Growth defaults are chosen from the data. Models with empirical weight-at-age
+data default to <code>"EWAA"</code>. Models without empirical weight-at-age data but with
+length-composition data default to <code>"VonBertalanffySchnute"</code>.</p>
 <p>To create the default initial numbers at age, this function uses the defaults
 from <code><a href="setup_default_Population.html">setup_default_Population()</a></code> and <code><a href="setup_default_Recruitment.html">setup_default_Recruitment()</a></code>, which
 are passed to <code>setup_default_init_naa()</code> to calculate initial numbers at age.</p>

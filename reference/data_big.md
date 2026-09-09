@@ -21,7 +21,7 @@ A data frame with 2808 observations of 8 variables:
 - type:
 
   The type of input the row contains. Allowed types include age_comp,
-  age_to_length_conversion, index, catch, length_comp, and
+  age_to_length_conversion, index, catch, length_bin, length_comp, and
   weight_at_age.
 
 - fleet:
@@ -41,7 +41,9 @@ A data frame with 2808 observations of 8 variables:
 - length:
 
   A numeric length. Entry can be `NA` if information doesn't pertain to
-  length.
+  length. For `length_comp` rows, this identifies the observed length
+  bin. For `length_bin` rows, this defines length-bin values used for
+  age-to-length conversion.
 
 - timing:
 

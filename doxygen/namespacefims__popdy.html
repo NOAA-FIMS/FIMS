@@ -213,7 +213,8 @@ $(document).ready(function(){initNavTree('namespacefims__popdy.html',''); initRe
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a>  </div>
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">fims_popdy Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -225,6 +226,15 @@ $(document).ready(function(){initNavTree('namespacefims__popdy.html',''); initRe
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1AgeSpecificSelectivity.html">AgeSpecificSelectivity</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Age-specific selectivity calculated using one parameter per age bin.  <a href="structfims__popdy_1_1AgeSpecificSelectivity.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1AgeToLengthConversionBase.html">AgeToLengthConversionBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base interface for age-length key implementations.  <a href="structfims__popdy_1_1AgeToLengthConversionBase.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1AgeToLengthConversionDerived.html">AgeToLengthConversionDerived</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Growth-derived age-to-length conversion implementation that reads prepared population age-to-size probabilities and maps them into fleet observation bins.  <a href="structfims__popdy_1_1AgeToLengthConversionDerived.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1AgeToLengthConversionFixed.html">AgeToLengthConversionFixed</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fixed age-to-length conversion implementation using a fleet's stored age-to-length conversion matrix.  <a href="structfims__popdy_1_1AgeToLengthConversionFixed.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1CatchAtAge.html">CatchAtAge</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a> is a class containing a catch-at-age model, which is just one of many potential fishery models that can be used in FIMS. The <a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a> class inherits from the <a class="el" href="classfims__popdy_1_1FisheryModelBase.html" title="FisheryModelBase is a base class for fishery models in FIMS.">FisheryModelBase</a> class and can be used to fit both age and length data even though it is called <a class="el" href="classfims__popdy_1_1CatchAtAge.html" title="CatchAtAge is a class containing a catch-at-age model, which is just one of many potential fishery mo...">CatchAtAge</a>.  <a href="classfims__popdy_1_1CatchAtAge.html#details">More...</a><br /></td></tr>
@@ -246,6 +256,21 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1GrowthBase.html">GrowthBase</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class for all growth functors.  <a href="structfims__popdy_1_1GrowthBase.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1GrowthDerivedObservationBase.html">GrowthDerivedObservationBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic capability interface for growth models that can feed the growth-derived age-to-length conversion / bin-based WAA path in catch-at-age.  <a href="classfims__popdy_1_1GrowthDerivedObservationBase.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1GrowthDerivedSizeProvider.html">GrowthDerivedSizeProvider</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size provider that converts growth outputs to population size products.  <a href="classfims__popdy_1_1GrowthDerivedSizeProvider.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1GrowthModel.html">GrowthModel</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concrete growth model using VonBertalanffySchnute growth (Phase 1).  <a href="classfims__popdy_1_1GrowthModel.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1GrowthModelBase.html">GrowthModelBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Growth module boundary (product-oriented).  <a href="classfims__popdy_1_1GrowthModelBase.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1GrowthProducts.html">GrowthProducts</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Growth "products" in a consistent (year, age, sex) space.  <a href="structfims__popdy_1_1GrowthProducts.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1LogDevs.html">LogDevs</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Log Devs class that returns the log of the input added to the log of the recruitment deviations.  <a href="structfims__popdy_1_1LogDevs.html#details">More...</a><br /></td></tr>
@@ -271,15 +296,162 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SelectivityBase.html">SelectivityBase</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base class for all selectivity functors.  <a href="structfims__popdy_1_1SelectivityBase.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeBinMapping.html">SizeBinMapping</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper for mapping population biological size bins to observed fleet bins.  <a href="structfims__popdy_1_1SizeBinMapping.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1SizeDistributionProviderBase.html">SizeDistributionProviderBase</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base interface for objects that provide population-level size distributions.  <a href="classfims__popdy_1_1SizeDistributionProviderBase.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeGrid.html">SizeGrid</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Population-level biological size grid.  <a href="structfims__popdy_1_1SizeGrid.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeGridBuilder.html">SizeGridBuilder</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper for constructing internally consistent population size grids.  <a href="structfims__popdy_1_1SizeGridBuilder.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SizeProducts.html">SizeProducts</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cached population-level size outputs on a biological size grid.  <a href="structfims__popdy_1_1SizeProducts.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1SRBevertonHolt.html">SRBevertonHolt</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">BevertonHolt class that returns the Beverton&ndash;Holt stock&ndash;recruitment from fims_math.  <a href="structfims__popdy_1_1SRBevertonHolt.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1Subpopulation.html">Subpopulation</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1VonBertalanffySchnuteGrowth.html">VonBertalanffySchnuteGrowth</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">VonBertalanffySchnute growth functor for length-at-age and weight-at-age.  <a href="structfims__popdy_1_1VonBertalanffySchnuteGrowth.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html">VonBertalanffySchnuteGrowthModelAdapter</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">von Bertalanffy&ndash;Schnute growth model adapter implementing the generic growth-derived observation capability for catch-at-age.  <a href="classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a5a39b32817ff547732750cee9acf6fd8" id="r_a5a39b32817ff547732750cee9acf6fd8"><td class="memTemplParams" colspan="2">template&lt;typename Type &gt; </td></tr>
+<tr class="memitem:a5a39b32817ff547732750cee9acf6fd8"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1AgeToLengthConversionBase.html">AgeToLengthConversionBase</a>&lt; Type &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">BuildAgeToLengthConversionFleet</a> (const std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">Population</a>&lt; Type &gt; &gt; &amp;population, const std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">Fleet</a>&lt; Type &gt; &gt; &amp;fleet)</td></tr>
+<tr class="memdesc:a5a39b32817ff547732750cee9acf6fd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the active age-to-length conversion for a fleet from the current population and fleet state.  <br /></td></tr>
+<tr class="separator:a5a39b32817ff547732750cee9acf6fd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb93d83f388594bdf6270692f306e9e4" id="r_aeb93d83f388594bdf6270692f306e9e4"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </td></tr>
+<tr class="memitem:aeb93d83f388594bdf6270692f306e9e4"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacefims__popdy.html#aeb93d83f388594bdf6270692f306e9e4">EnsureAgeToLengthConversionFleet</a> (<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">Population</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt; &amp;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">population</a>, <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt; &amp;fleet)</td></tr>
+<tr class="memdesc:aeb93d83f388594bdf6270692f306e9e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ensure a fleet has an active age-to-length conversion before length-based calculations.  <br /></td></tr>
+<tr class="separator:aeb93d83f388594bdf6270692f306e9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26febb1d5ef9f31d4a74db179c4ce532" id="r_a26febb1d5ef9f31d4a74db179c4ce532"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </td></tr>
+<tr class="memitem:a26febb1d5ef9f31d4a74db179c4ce532"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacefims__popdy.html#a26febb1d5ef9f31d4a74db179c4ce532">EnsurePopulationFleetAgeToLengthConversion</a> (<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">Population</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt; &amp;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">population</a>)</td></tr>
+<tr class="memdesc:a26febb1d5ef9f31d4a74db179c4ce532"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ensure all fleets linked to a population have a usable age-to-length conversion.  <br /></td></tr>
+<tr class="separator:a26febb1d5ef9f31d4a74db179c4ce532"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The population dynamics of FIMS. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="a5a39b32817ff547732750cee9acf6fd8" name="a5a39b32817ff547732750cee9acf6fd8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a39b32817ff547732750cee9acf6fd8">&#9670;&#160;</a></span>BuildAgeToLengthConversionFleet()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1AgeToLengthConversionBase.html">AgeToLengthConversionBase</a>&lt; Type &gt; &gt; fims_popdy::BuildAgeToLengthConversionFleet </td>
+          <td>(</td>
+          <td class="paramtype">const std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">Population</a>&lt; Type &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">Fleet</a>&lt; Type &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>fleet</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Build the active age-to-length conversion for a fleet from the current population and fleet state. </p>
+<p>Tries the growth-derived age-to-length conversion path when the linked population growth object exposes the required observation capability. That migrated path depends on a configured population size provider and a valid population biological size grid so prepared population age-to-size products can be mapped into fleet observation bins. When the growth-derived capability exists, that path must succeed or the build fails. Fixed age-to-length conversion is only used for growth objects that do not expose the growth-derived observation capability.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the owning population. </td></tr>
+    <tr><td class="paramname">fleet</td><td>Shared pointer to the fleet. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Shared pointer to an active age-to-length conversion implementation, or nullptr when no usable age-to-length conversion path exists. </dd></dl>
+
+</div>
+</div>
+<a id="aeb93d83f388594bdf6270692f306e9e4" name="aeb93d83f388594bdf6270692f306e9e4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb93d83f388594bdf6270692f306e9e4">&#9670;&#160;</a></span>EnsureAgeToLengthConversionFleet()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a> fims_popdy::EnsureAgeToLengthConversionFleet </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">Population</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Fleet.html">Fleet</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>fleet</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Ensure a fleet has an active age-to-length conversion before length-based calculations. </p>
+<p>Reuses the current fleet age-to-length conversion when it matches the current population growth path and can prepare for the current model state. For the migrated growth-derived path, this preparation includes both upstream growth products and linked population size-provider products. Otherwise rebuilds the fleet age-to-length conversion from the current population and fleet state. Throws when the fleet has length bins but no usable age-to-length conversion path can be constructed.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the owning population. </td></tr>
+    <tr><td class="paramname">fleet</td><td>Shared pointer to the fleet. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a26febb1d5ef9f31d4a74db179c4ce532" name="a26febb1d5ef9f31d4a74db179c4ce532"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26febb1d5ef9f31d4a74db179c4ce532">&#9670;&#160;</a></span>EnsurePopulationFleetAgeToLengthConversion()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">void</a> fims_popdy::EnsurePopulationFleetAgeToLengthConversion </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">const</a> std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">Population</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>population</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Ensure all fleets linked to a population have a usable age-to-length conversion. </p>
+<p>Applies <a class="el" href="namespacefims__popdy.html#aeb93d83f388594bdf6270692f306e9e4" title="Ensure a fleet has an active age-to-length conversion before length-based calculations.">EnsureAgeToLengthConversionFleet()</a> to each fleet linked to the population so runtime length-based calculations can safely assume age-to-length conversion availability.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">population</td><td>Shared pointer to the population whose fleets should be checked. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
