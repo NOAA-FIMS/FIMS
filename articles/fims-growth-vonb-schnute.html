@@ -646,16 +646,16 @@ growth to fleet length bins.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 5 times to improve gradient.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00038</span> to <span style="color: #0000BB;">0.00011</span> after 5 steps.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00028</span> to <span style="color: #0000BB;">0.00013</span> after 5 steps.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.10.0.9000</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">3.38345</span> seconds</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">2.58158</span> seconds</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=39, random_effects=1, and total=40</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00011</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">0.00013</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">187.51985</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">83.11833</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">24794.30866</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">83.15621</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">24789.25181</span></span></span>
 <span></span>
 <span><span class="co"># Keep only the core VonBertalanffySchnute Growth estimates.</span></span>
 <span><span class="va">growth_estimates</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/get_FIMSFit.html">get_estimates</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -693,7 +693,7 @@ gradient:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   convergence max_gradient</span></span>
 <span><span class="co">#&gt;         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>           0     0.000<span style="text-decoration: underline;">110</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>           0     0.000<span style="text-decoration: underline;">127</span></span></span></code></pre></div>
 <p>A convergence code of <code>0</code> indicates normal optimizer
 convergence. The maximum gradient should also be small. These
 diagnostics should be considered together with whether the estimated
