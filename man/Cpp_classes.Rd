@@ -10,6 +10,7 @@
 \alias{DnormDistribution}
 \alias{DoubleLogisticSelectivity}
 \alias{EWAAGrowth}
+\alias{VonBertalanffySchnuteGrowth}
 \alias{Fleet}
 \alias{Index}
 \alias{Catch}
@@ -41,6 +42,7 @@ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDnormDistributionsInterface.html}{DnormDistribution}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDoubleLogisticSelectivityInterface.html}{DoubleLogisticSelectivity}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classEWAAGrowthInterface.html}{EWAAGrowth}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classVonBertalanffySchnuteGrowthInterface.html}{VonBertalanffySchnuteGrowth}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classFleetInterface.html}{Fleet}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html}{Index}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classCatchDataInterface.html}{Catch}

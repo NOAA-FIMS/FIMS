@@ -73,7 +73,7 @@ returned.
 
 \code{statistic} and \code{p.value} are computed as a two-sided Wald z-test:
 \code{z = estimate / std.error},
-\verb{p = 2 * pnorm(-|z|)}.
+\verb{p = 2 * stats::pnorm(-|z|)}.
 These are asymptotically valid for fixed effects under regularity
 conditions; treat them as approximate for random effects and derived
 quantities.

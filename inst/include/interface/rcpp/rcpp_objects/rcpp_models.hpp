@@ -298,6 +298,26 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   }
 
   /**
+   * @brief Turn reporting of the Growth-derived age-to-length tensor on or off.
+   *
+   * @param report Whether to include the derived tensor in model reports.
+   */
+  void ReportAgeToLengthConversionDerivedTensor(bool report) {
+#ifdef TMB_MODEL
+    std::shared_ptr<fims_info::Information<double>> info =
+        fims_info::Information<double>::GetInstance();
+    typename fims_info::Information<double>::model_map_iterator model_it;
+    model_it = info->models_map.find(this->get_id());
+    if (model_it != info->models_map.end()) {
+      std::shared_ptr<fims_popdy::CatchAtAge<double>> model_ptr =
+          std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>(
+              (*model_it).second);
+      model_ptr->report_age_to_length_conversion_derived_tensor = report;
+    }
+#endif
+  }
+
+  /**
    * @brief Method to get this id.
    */
   virtual uint32_t get_id() { return this->id; }

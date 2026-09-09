@@ -12,6 +12,7 @@
 #' @export DnormDistribution
 #' @export DoubleLogisticSelectivity
 #' @export EWAAGrowth
+#' @export VonBertalanffySchnuteGrowth
 #' @export Fleet
 #' @export set_fixed
 #' @export get_fixed

@@ -46,6 +46,55 @@ test_that("`setup_default_parameters()` works with correct inputs", {
   )
 })
 
+test_that("`setup_default_parameters()` defaults to EWAA when empirical weight-at-age is present", {
+  result <- setup_default_parameters(data = data)
+
+  growth_type <- result |>
+    dplyr::filter(.data[["module_name"]] == "Growth") |>
+    dplyr::pull(.data[["module_type"]]) |>
+    unique()
+
+  #' @description Test that empirical weight-at-age data keep the default Growth module as EWAA.
+  expect_equal(growth_type, "EWAA")
+
+  clear()
+})
+
+test_that("`setup_default_parameters()` defaults to VonBertalanffySchnute when weight-at-age is absent and length compositions are present", {
+  data_without_weight_at_age <- FIMS::FIMSFrame(
+    dplyr::filter(data_big, type != "weight_at_age")
+  )
+
+  result <- setup_default_parameters(data = data_without_weight_at_age)
+
+  growth_type <- result |>
+    dplyr::filter(.data[["module_name"]] == "Growth") |>
+    dplyr::pull(.data[["module_type"]]) |>
+    unique()
+
+  #' @description Test that length-composition data trigger VonBertalanffySchnute when empirical weight-at-age data are absent.
+  expect_equal(growth_type, "VonBertalanffySchnute")
+
+  clear()
+})
+
+test_that("`setup_default_parameters()` errors when neither weight-at-age nor length compositions are present", {
+  data_without_growth_information <- FIMS::FIMSFrame(
+    dplyr::filter(
+      data_big,
+      !type %in% c("weight_at_age", "length_comp")
+    )
+  )
+
+  #' @description Test that FIMS does not silently choose a default Growth module without empirical weight-at-age or length-composition data.
+  expect_error(
+    setup_default_parameters(data = data_without_growth_information),
+    regexp = "cannot choose a default Growth module"
+  )
+
+  clear()
+})
+
 test_that("modular pipeline matches `setup_default_parameters()`", {
   fleet1_name <- "fleet1"
 

@@ -14,4 +14,3 @@ TEST(FIMSMemoryTracker, DetectsLeakedObject) {
 
   EXPECT_EQ(fims_model_object::FIMSMemoryTracker::total_active_objects, 0);
 }
-

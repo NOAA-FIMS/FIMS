@@ -242,8 +242,11 @@ test_that("`FIMSFrame()` returns correct error messages", {
     regexp = "`timing` can only handle years right now"
   )
 
-  #' @description Test that `FIMSFrame()` returns an error when a required type is not present.
-  expect_error(FIMSFrame(dplyr::filter(data_big, type != "weight_at_age")))
+  #' @description Test that `FIMSFrame()` can be created without empirical weight-at-age data.
+  expect_s4_class(
+    FIMSFrame(dplyr::filter(data_big, type != "weight_at_age")),
+    "FIMSFrame"
+  )
 
   #' @description Test that `FIMSFrame` validators pick up on a missing age in age-composition data.
   expect_error(

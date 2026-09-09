@@ -23,7 +23,9 @@
 #'     In this dataset, ages start at one, therefore recruitment happens at age
 #'     one not age zero.}
 #'   \item{length}{A numeric length. Entry can be `NA` if information doesn't
-#'     pertain to length.}
+#'     pertain to length. For `length_comp` rows, this identifies the observed
+#'     length bin. For `length_bin` rows, this defines length-bin values used
+#'     for age-to-length conversion.}
 #'   \item{timing}{The timing, i.e., year the data was collected.}
 #'   \item{observed}{The observed measurement of interest.}
 #'   \item{unit}{A character string specifying the units of `observed`. Allowed

@@ -65,6 +65,23 @@ inline const Type lgamma(const Type &x) {
 }
 
 inline double Value(const double &x) { return x; }
+
+/**
+ * @brief The cumulative distribution function of the normal distribution.
+ *
+ * @param x The value at which to evaluate the cumulative probability.
+ * @param mean The mean of the normal distribution.
+ * @param sd The standard deviation of the normal distribution.
+ * @return The probability that a normal random variable with the given mean
+ * and standard deviation is less than or equal to x.
+ */
+template <class Type>
+inline const Type pnorm(const Type &x, const Type &mean, const Type &sd) {
+  const double z = static_cast<double>(x - mean) /
+                   (static_cast<double>(sd) * std::sqrt(2.0));
+  return static_cast<Type>(0.5 * (1.0 + std::erf(z)));
+}
+
 #endif
 
 #ifdef TMB_MODEL
@@ -190,6 +207,17 @@ inline const Type lgamma(const Type &x) {
   // use std::lgamma for double type, look for TMB version of lgamma if AD type
   using std::lgamma;
   return lgamma(x);
+}
+
+/**
+ * @copydoc pnorm
+ */
+template <class Type>
+inline const Type pnorm(const Type &x, const Type &mean, const Type &sd) {
+  // Use :: to call TMB's global pnorm; an unqualified call recurses into this
+  // wrapper and can hang CreateTMBModel() when growth uses normal
+  // probabilities.
+  return ::pnorm(x, mean, sd);
 }
 
 #endif

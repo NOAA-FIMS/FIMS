@@ -9,7 +9,7 @@ A data frame with 2808 observations of 8
 variables:
 \describe{
 \item{type}{The type of input the row contains. Allowed types include
-age_comp, age_to_length_conversion, index, catch, length_comp, and weight_at_age.}
+age_comp, age_to_length_conversion, index, catch, length_bin, length_comp, and weight_at_age.}
 \item{fleet}{A character string providing the name of the information
 source that the input was collected from, e.g., \code{"Trawl fishery"} or
 \code{"age_zero_survey"}. Entries can be \code{NA} for information that is not
@@ -19,7 +19,9 @@ multiple ages, e.g., total catch rather than catch of age-4 fish.
 In this dataset, ages start at one, therefore recruitment happens at age
 one not age zero.}
 \item{length}{A numeric length. Entry can be \code{NA} if information doesn't
-pertain to length.}
+pertain to length. For \code{length_comp} rows, this identifies the observed
+length bin. For \code{length_bin} rows, this defines length-bin values used
+for age-to-length conversion.}
 \item{timing}{The timing, i.e., year the data was collected.}
 \item{observed}{The observed measurement of interest.}
 \item{unit}{A character string specifying the units of \code{observed}. Allowed

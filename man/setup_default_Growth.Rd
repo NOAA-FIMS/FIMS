@@ -4,11 +4,17 @@
 \alias{setup_default_Growth}
 \title{Set up default growth parameters}
 \usage{
-setup_default_Growth(module_type = c("EWAA"))
+setup_default_Growth(
+  data = NULL,
+  module_type = c("EWAA", "VonBertalanffySchnute")
+)
 }
 \arguments{
-\item{module_type}{A character string specifying the type of growth module. The
-default is \code{"EWAA"}.}
+\item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
+your long input data. Required when \code{module_type = "VonBertalanffySchnute"}.}
+
+\item{module_type}{A character string specifying the type of growth module.
+The default is \code{"EWAA"}.}
 }
 \value{
 A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
