@@ -299,31 +299,8 @@ extern "C" SEXP fims_call_quadra_fit(SEXP fixed_sexp, SEXP random_sexp,
   return R_NilValue;
 }
 
-// Objective-only calls use the primitive model and never traverse the AD tape.
-extern "C" SEXP fims_call_quadra_objective(SEXP fixed_sexp, SEXP random_sexp) {
-  try {
-    if (TYPEOF(fixed_sexp) != REALSXP || TYPEOF(random_sexp) != REALSXP) {
-      Rf_error("Quadra parameters must be numeric vectors.");
-    }
-    auto info = fims_info::Information<double>::GetInstance();
-    if (XLENGTH(fixed_sexp) != info->fixed_effects_parameters.size() ||
-        XLENGTH(random_sexp) != info->random_effects_parameters.size()) {
-      Rf_error("Quadra parameter count does not match the FIMS model.");
-    }
-    for (size_t i = 0; i < info->fixed_effects_parameters.size(); ++i) {
-      *info->fixed_effects_parameters[i] = REAL(fixed_sexp)[i];
-    }
-    for (size_t i = 0; i < info->random_effects_parameters.size(); ++i) {
-      *info->random_effects_parameters[i] = REAL(random_sexp)[i];
-    }
-    return Rf_ScalarReal(fims_model::Model<double>::GetInstance()->Evaluate(false));
-  } catch (const std::exception& exception) {
-    Rf_error("%s", exception.what());
-  }
-  return R_NilValue;
-}
-
-extern "C" SEXP fims_call_quadra_evaluate(SEXP fixed_sexp, SEXP random_sexp) {
+static SEXP evaluate_quadra(SEXP fixed_sexp, SEXP random_sexp,
+                            bool with_gradient) {
   try {
     if (TYPEOF(fixed_sexp) != REALSXP || TYPEOF(random_sexp) != REALSXP) {
       Rf_error("Quadra parameters must be numeric vectors.");
@@ -371,6 +348,9 @@ extern "C" SEXP fims_call_quadra_evaluate(SEXP fixed_sexp, SEXP random_sexp) {
     values.insert(values.end(), random.begin(), random.end());
     Eigen::VectorXd input = Eigen::Map<Eigen::VectorXd>(
         values.data(), static_cast<Eigen::Index>(values.size()));
+    if (!with_gradient) {
+      return Rf_ScalarReal(fims_quadra::evaluation_tape->EvaluateObjective(input));
+    }
     Eigen::VectorXd gradient;
     const double objective =
         fims_quadra::evaluation_tape->Evaluate(input, gradient);
@@ -390,6 +370,14 @@ extern "C" SEXP fims_call_quadra_evaluate(SEXP fixed_sexp, SEXP random_sexp) {
     Rf_error("Quadra evaluation failed: %s", exception.what());
   }
   return R_NilValue;
+}
+
+extern "C" SEXP fims_call_quadra_objective(SEXP fixed, SEXP random) {
+  return evaluate_quadra(fixed, random, false);
+}
+
+extern "C" SEXP fims_call_quadra_evaluate(SEXP fixed, SEXP random) {
+  return evaluate_quadra(fixed, random, true);
 }
 
 extern "C" SEXP fims_call_quadra_sdreport(SEXP fixed_sexp, SEXP random_sexp) {

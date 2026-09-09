@@ -20,6 +20,8 @@ public:
   void Build(const had::ADGraph &graph,
              const std::vector<had::VertexId> &parameter_vertices,
              had::VertexId objective_vertex) {
+    forward_valid_ = false;
+    gradient_valid_ = false;
     const std::size_t n = graph.vertices.size();
     if (objective_vertex >= n) {
       throw std::out_of_range("Compact tape objective vertex is out of range.");
@@ -65,7 +67,8 @@ public:
   std::size_t VertexCount() const { return primal_.size(); }
 
   std::size_t Bytes() const {
-    return primal_.capacity() * sizeof(double) +
+    return static_cast<std::size_t>(last_values_.size()) * sizeof(double) +
+           primal_.capacity() * sizeof(double) +
            adjoint_.capacity() * sizeof(double) +
            weight_left_.capacity() * sizeof(double) +
            weight_right_.capacity() * sizeof(double) +
@@ -76,20 +79,39 @@ public:
            arity_.capacity() * sizeof(std::uint8_t);
   }
 
-  double Evaluate(const Eigen::VectorXd &values, Eigen::VectorXd &gradient) {
+  // Reuse the last forward pass only for exactly identical parameter values.
+  double EvaluateObjective(const Eigen::VectorXd &values) {
     if (static_cast<std::size_t>(values.size()) != parameter_vertices_.size()) {
       throw std::invalid_argument("Compact tape parameter length mismatch.");
     }
-    for (Eigen::Index i = 0; i < values.size(); ++i) {
-      primal_[parameter_vertices_[static_cast<std::size_t>(i)]] = values[i];
+    bool same = forward_valid_ && last_values_.size() == values.size();
+    for (Eigen::Index i = 0; same && i < values.size(); ++i) {
+      same = values[i] == last_values_[i];
     }
-    Forward();
-    Reverse();
+    if (!same) {
+      forward_valid_ = false;
+      gradient_valid_ = false;
+      for (Eigen::Index i = 0; i < values.size(); ++i) {
+        primal_[parameter_vertices_[static_cast<std::size_t>(i)]] = values[i];
+      }
+      Forward();
+      last_values_ = values;
+      forward_valid_ = true;
+    }
+    return primal_[objective_vertex_];
+  }
+
+  double Evaluate(const Eigen::VectorXd &values, Eigen::VectorXd &gradient) {
+    const double objective = EvaluateObjective(values);
+    if (!gradient_valid_) {
+      Reverse();
+      gradient_valid_ = true;
+    }
     gradient.resize(values.size());
     for (Eigen::Index i = 0; i < values.size(); ++i) {
       gradient[i] = adjoint_[parameter_vertices_[static_cast<std::size_t>(i)]];
     }
-    return primal_[objective_vertex_];
+    return objective;
   }
 
 private:
@@ -193,6 +215,9 @@ private:
     }
   }
 
+  Eigen::VectorXd last_values_;
+  bool forward_valid_ = false;
+  bool gradient_valid_ = false;
   std::vector<double> primal_;
   std::vector<double> adjoint_;
   std::vector<double> weight_left_;

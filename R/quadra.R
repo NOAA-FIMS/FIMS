@@ -173,11 +173,12 @@ fit_fims_quadra <- function(input, get_sd, save_sd, optimize, control,
   fit
 }
 
-#' Evaluate the joint objective without automatic differentiation
+#' Evaluate the joint objective with forward-only tape replay
 #'
 #' @inheritParams quadra_evaluate
 #' @return The scalar joint negative log likelihood.
-#' @details Uses the model templated on double, without a derivative tape.
+#' @details Replays the compact tape forward without a reverse derivative sweep.
+#'   Exact repeated parameter vectors reuse the last forward pass and gradient.
 #'   Call [CreateTMBModel()] after assembling or changing modules.
 #' @export
 quadra_objective <- function(fixed = get_fixed(), random = get_random()) {
@@ -191,8 +192,9 @@ quadra_objective <- function(fixed = get_fixed(), random = get_random()) {
 #'
 #' @inheritParams quadra_evaluate
 #' @return A numeric gradient, fixed effects followed by random effects.
-#' @details Uses the Quadra first-order tape. The forward value required for
-#'   differentiation is computed internally; only the gradient is returned.
+#' @details Uses the Quadra first-order tape. A preceding objective call at
+#'   identical parameters supplies the cached forward pass. Only the gradient
+#'   is returned; repeated gradient requests reuse the cached reverse pass.
 #' @export
 quadra_gradient <- function(fixed = get_fixed(), random = get_random()) {
   quadra_evaluate(fixed, random)$gradient

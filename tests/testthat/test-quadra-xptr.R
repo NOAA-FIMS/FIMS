@@ -147,3 +147,22 @@ test_that("split callbacks agree with joint values and finite differences", {
   clear()
   expect_error(quadra_objective(), "Build the model")
 })
+
+
+test_that("forward-only cache follows parameters and model rebuilds", {
+  on.exit(clear())
+  for (random in c(FALSE, TRUE)) {
+    pars <- quadra_gaussian_fixture(random)
+    for (shift in c(0, 0, 1e-8, 0.25, -0.5, 0)) {
+      p <- pars$p + shift; re <- pars$re + shift
+      expected <- -sum(dnorm(c(p, re), 1, 2, log = TRUE))
+      expect_equal(quadra_objective(p, re), expected, tolerance = 1e-12)
+      expect_equal(quadra_gradient(p, re), (c(p, re) - 1) / 4, tolerance = 1e-12)
+      expect_equal(quadra_objective(p, re), expected, tolerance = 1e-12)
+      expect_equal(quadra_gradient(p, re), (c(p, re) - 1) / 4, tolerance = 1e-12)
+    }
+    CreateTMBModel()
+    expect_equal(quadra_objective(pars$p, pars$re),
+      -sum(dnorm(c(pars$p, pars$re), 1, 2, log = TRUE)), tolerance = 1e-12)
+  }
+})
