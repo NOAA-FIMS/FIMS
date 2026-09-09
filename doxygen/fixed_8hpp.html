@@ -186,7 +186,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('age__to__length__conversion__derived_8hpp.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('fixed_8hpp.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -215,29 +215,23 @@ $(document).ready(function(){initNavTree('age__to__length__conversion__derived_8
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a>  </div>
-  <div class="headertitle"><div class="title">age_to_length_conversion_derived.hpp File Reference</div></div>
+  <div class="headertitle"><div class="title">fixed.hpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Declares the AgeToLengthConversionDerived class, which implements AgeToLengthConversionBase by mapping prepared population age-to-size distributions onto fleet observation bins.  
+<p>Declares the AgeToLengthConversionFixed class, which implements AgeToLengthConversionBase using a fleet's fixed age-to-length conversion matrix.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;algorithm&gt;</code><br />
-<code>#include &lt;cstddef&gt;</code><br />
+<div class="textblock"><code>#include &lt;cstddef&gt;</code><br />
 <code>#include &lt;memory&gt;</code><br />
-<code>#include &lt;stdexcept&gt;</code><br />
-<code>#include &quot;<a class="el" href="fims__math_8hpp_source.html">../../../common/fims_math.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="age__to__length__conversion__base_8hpp_source.html">age_to_length_conversion_base.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="base_8hpp_source.html">base.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="fleet_8hpp_source.html">../../fleet/fleet.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="growth__model__adapter_8hpp_source.html">../../growth/growth_model_adapter.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="size__distribution__provider__base_8hpp_source.html">../../size/size_distribution_provider_base.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="size__bin__mapping_8hpp_source.html">../../size/functors/size_bin_mapping.hpp</a>&quot;</code><br />
 </div>
-<p><a href="age__to__length__conversion__derived_8hpp_source.html">Go to the source code of this file.</a></p>
+<p><a href="fixed_8hpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1AgeToLengthConversionDerived.html">fims_popdy::AgeToLengthConversionDerived&lt; Type &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Growth-derived age-to-length conversion implementation that reads prepared population age-to-size probabilities and maps them into fleet observation bins.  <a href="structfims__popdy_1_1AgeToLengthConversionDerived.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1AgeToLengthConversionFixed.html">fims_popdy::AgeToLengthConversionFixed&lt; Type &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fixed age-to-length conversion implementation using a fleet's stored age-to-length conversion matrix.  <a href="structfims__popdy_1_1AgeToLengthConversionFixed.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="namespaces" name="namespaces"></a>
@@ -247,14 +241,14 @@ Namespaces</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Declares the AgeToLengthConversionDerived class, which implements AgeToLengthConversionBase by mapping prepared population age-to-size distributions onto fleet observation bins. </p>
-<p>Defines guards for the growth-derived age-to-length conversion functor. </p><dl class="section copyright"><dt>Copyright</dt><dd>This file is part of the NOAA, National Marine Fisheries Service Fisheries Integrated Modeling System project. See LICENSE in the source folder for reuse information. </dd></dl>
+<div class="textblock"><p>Declares the AgeToLengthConversionFixed class, which implements AgeToLengthConversionBase using a fleet's fixed age-to-length conversion matrix. </p>
+<p>Defines guards for the fixed-matrix age-to-length conversion functor. </p><dl class="section copyright"><dt>Copyright</dt><dd>This file is part of the NOAA, National Marine Fisheries Service Fisheries Integrated Modeling System project. See LICENSE in the source folder for reuse information. </dd></dl>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_920884c6b3b2f0be94e27d51660adee5.html">inst</a></li><li class="navelem"><a class="el" href="dir_2b5d1a398a9eec011391d543f21db223.html">include</a></li><li class="navelem"><a class="el" href="dir_65a4bdb85444efa1ebe02557c74bf51a.html">population_dynamics</a></li><li class="navelem"><a class="el" href="dir_e6d4a2ee9d206a31cc8a593ef683a215.html">age_to_length_conversion</a></li><li class="navelem"><a class="el" href="dir_90b7b24310a503d9a602aa97b6e3c545.html">functors</a></li><li class="navelem"><a class="el" href="age__to__length__conversion__derived_8hpp.html">age_to_length_conversion_derived.hpp</a></li>
+    <li class="navelem"><a class="el" href="dir_920884c6b3b2f0be94e27d51660adee5.html">inst</a></li><li class="navelem"><a class="el" href="dir_2b5d1a398a9eec011391d543f21db223.html">include</a></li><li class="navelem"><a class="el" href="dir_65a4bdb85444efa1ebe02557c74bf51a.html">population_dynamics</a></li><li class="navelem"><a class="el" href="dir_e6d4a2ee9d206a31cc8a593ef683a215.html">age_to_length_conversion</a></li><li class="navelem"><a class="el" href="dir_90b7b24310a503d9a602aa97b6e3c545.html">functors</a></li><li class="navelem"><a class="el" href="fixed_8hpp.html">fixed.hpp</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

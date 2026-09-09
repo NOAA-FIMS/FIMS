@@ -534,7 +534,7 @@ fit <- FIMS::fit_fims(
 #> ℹ Maximum gradient went from 0.00038 to 0.00011 after 5 steps.
 #> ✔ Finished optimization
 #> ℹ FIMS model version: 0.10.0.9000
-#> ℹ Total run time was 3.43169 seconds
+#> ℹ Total run time was 3.38345 seconds
 #> ℹ Number of parameters: fixed_effects=39, random_effects=1, and total=40
 #> ℹ Maximum gradient= 0.00011
 #> ℹ Negative log likelihood (NLL):
