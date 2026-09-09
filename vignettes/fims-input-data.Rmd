@@ -5,6 +5,8 @@ vignette: >
   %\VignetteIndexEntry{Introducing FIMS input data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+level: "new-user"
+summary: "More details about the data structure for a FIMS model and how to prepare your data for using the `FIMSFrame()` function"
 ---
 
 ```{r setup, include=FALSE}

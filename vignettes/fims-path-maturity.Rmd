@@ -5,6 +5,8 @@ vignette: >
   %\VignetteIndexEntry{FIMS Path: Maturity}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+level: "power-user"
+summary: "Describes the hierarchical structure of FIMS by describing the linkages from R to C++ using maturity as an example"
 ---
 
 ```{r, include = FALSE}

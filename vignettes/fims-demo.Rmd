@@ -5,6 +5,8 @@ vignette: >
   %\VignetteIndexEntry{Introducing the Fisheries Integrated Modeling System (FIMS)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+level: "new-user"
+summary: "How to run a simple FIMS model."
 ---
 
 ```{r setup, include=FALSE}

@@ -5,6 +5,8 @@ vignette: >
   %\VignetteIndexEntry{Intro to C++}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+level: "power-user"
+summary: "Intro training to C++ for FIMS development"
 ---
 <!--
 EP - in general it would be really helpful to have side by side examples of similar things happening in FIMS to whatever basic "hello world" simple type of examples that are in this vignette so that people can immediately see the parallels to the FIMS code and make that connection quickly.
