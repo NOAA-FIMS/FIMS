@@ -681,7 +681,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
           "VonBertalanffySchnuteGrowthModelAdapter currently supports a single "
           "growth pattern; expected size 1 for von Bertalanffy--Schnute and "
           "length-weight parameter vectors");
-
     }
 
     const bool has_sd = HasInterpolationSdInputs();
