@@ -680,8 +680,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
       throw std::runtime_error(
           "VonBertalanffySchnuteGrowthModelAdapter currently supports a single "
           "growth pattern; expected size 1 for von Bertalanffy--Schnute and "
-          "length-weight "
-          "parameter vectors");
+          "length-weight parameter vectors");
+
     }
 
     const bool has_sd = HasInterpolationSdInputs();
@@ -704,8 +704,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
     if (has_sd && has_structured_delta) {
       throw std::runtime_error(
           "von Bertalanffy--Schnute growth adapter requires variability inputs "
-          "for "
-          "exactly one supported path. Supply either the interpolation "
+          "for exactly one supported path. Supply either the interpolation "
           "inputs length_at_age_sd_at_reference_ages or the full delta-method "
           "variability inputs, but not both");
     }
