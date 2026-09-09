@@ -17,6 +17,7 @@
 methods::setOldClass(Classes = "package_version")
 methods::setOldClass(Classes = "difftime")
 methods::setOldClass(Classes = "sdreport")
+methods::setOldClass(Classes = c("quadra_sdreport", "list"))
 # Join sdreport and list into a class in case the sdreport is not created
 methods::setClassUnion("sdreportOrList", members = c("sdreport", "list"))
 
@@ -505,6 +506,11 @@ FIMSFit <- function(
 #' @param control A list of optimizer settings passed to [stats::nlminb()]. The
 #'   the default is a list of length three with `eval.max = 1000`,
 #'   `iter.max = 10000`, and `trace = 0`.
+#' @param backend Estimation backend; TMB is the default.
+#' @param quadra_method Quadra uses joint optimization by default. Choose
+#'   `"laplace"` to integrate random effects. Joint parameter uncertainty uses
+#'   Quadra; Laplace uncertainty and model reports currently use TMB.
+#' @param gradient_tolerance Positive gradient tolerance for Quadra.
 #' @param filename Character string giving a file name to save the fitted
 #'   object as an RDS object. Defaults to 'fit.RDS', and a value of NULL
 #'   indicates not to save it. If specified, it must end in .RDS. The file is
@@ -530,7 +536,12 @@ fit_fims <- function(input,
                        iter.max = 10000,
                        trace = 0
                      ),
-                     filename = NULL) {
+                     filename = NULL,
+                     backend = c("TMB", "quadra"),
+                     quadra_method = c("joint", "laplace"),
+                     gradient_tolerance = 1e-5) {
+  backend <- match.arg(backend)
+  quadra_method <- match.arg(quadra_method)
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
   # NOTE: When we add implementation for newton step we need to
@@ -548,6 +559,11 @@ fit_fims <- function(input,
   # optimize is set to TRUE
   if (optimize == TRUE & all(purrr::map_vec(input[["parameters"]], length) == 0)) {
     cli::cli_abort("FIMS must have at least one parameter to optimize.")
+  }
+
+  if (backend == "quadra") {
+    return(fit_fims_quadra(input, get_sd, save_sd, optimize, control,
+                           quadra_method, gradient_tolerance))
   }
 
   obj <- TMB::MakeADFun(

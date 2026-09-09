@@ -26,6 +26,17 @@
 #include <cstring>
 
 #include <stdexcept>
+#include <functional>
+
+#ifdef QUADRA_MODEL
+#include "../interface/Quadra/core/had_quadra.hpp"
+
+namespace had {
+inline std::ostream& operator<<(std::ostream& stream, const AReal& value) {
+  return stream << value.val;
+}
+}  // namespace had
+#endif
 
 #if defined(linux) || defined(__linux) || defined(__linux__)
 #define FIMS_LINUX
@@ -90,6 +101,20 @@
 // simplify access to singletons
 #define TMB_FIMS_REAL_TYPE double
 #define TMBAD_FIMS_TYPE TMBad::ad_aug
+#endif
+
+#ifdef QUADRA_MODEL
+#define QUADRA_FIMS_TYPE had::AReal
+
+namespace fims_quadra {
+/** Reset the process-wide Quadra tape before constructing an AD model. */
+void reset_tape();
+/** Release all storage owned by the process-wide Quadra tape. */
+void release_tape();
+/** Rebuild registered XPtr modules on the active graph, without resetting it.
+ */
+extern std::function<bool()> rebuild_model;
+}  // namespace fims_quadra
 #endif
 
 /* Dictionary block for shared documentation.

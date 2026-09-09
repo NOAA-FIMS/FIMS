@@ -796,5 +796,6 @@ initialize_fims <- function(parameters, data) {
     model = fims_model
   )
 
+  attr(parameter_list, "model_handle") <- .fims_registry[["model_handle"]]
   return(parameter_list)
 }

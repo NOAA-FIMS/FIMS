@@ -153,6 +153,8 @@ class Information {
    *
    */
   void Clear() {
+    // Clear non-owning pointers before destroying their owners.
+    this->variable_map.clear();
     this->data_objects.clear();
     this->populations.clear();
     this->fixed_effects_parameters.clear();
@@ -165,7 +167,6 @@ class Information {
     this->random_effects_parameters.clear();
     this->selectivity_models.clear();
     this->models_map.clear();
-    this->variable_map.clear();
     this->n_years = 0;
     this->n_ages = 0;
 
@@ -398,7 +399,7 @@ class Information {
    */
   void SetFleetCatchData(bool& valid_model,
                          std::shared_ptr<fims_popdy::Fleet<Type>> f) {
-    if (f->fleet_observed_catch_data_id_m != static_cast<Type>(-999)) {
+    if (f->fleet_observed_catch_data_id_m != -999) {
       uint32_t observed_catch_id =
           static_cast<uint32_t>(f->fleet_observed_catch_data_id_m);
       data_iterator it = this->data_objects.find(observed_catch_id);
@@ -425,7 +426,7 @@ class Information {
    */
   void SetFleetIndexData(bool& valid_model,
                          std::shared_ptr<fims_popdy::Fleet<Type>> f) {
-    if (f->fleet_observed_index_data_id_m != static_cast<Type>(-999)) {
+    if (f->fleet_observed_index_data_id_m != -999) {
       uint32_t observed_index_id =
           static_cast<uint32_t>(f->fleet_observed_index_data_id_m);
       data_iterator it = this->data_objects.find(observed_index_id);
@@ -452,7 +453,7 @@ class Information {
    */
   void SetAgeCompositionData(bool& valid_model,
                              std::shared_ptr<fims_popdy::Fleet<Type>> f) {
-    if (f->fleet_observed_agecomp_data_id_m != static_cast<Type>(-999)) {
+    if (f->fleet_observed_agecomp_data_id_m != -999) {
       uint32_t observed_agecomp_id =
           static_cast<uint32_t>(f->fleet_observed_agecomp_data_id_m);
       data_iterator it = this->data_objects.find(observed_agecomp_id);
@@ -479,7 +480,7 @@ class Information {
    */
   void SetLengthCompositionData(bool& valid_model,
                                 std::shared_ptr<fims_popdy::Fleet<Type>> f) {
-    if (f->fleet_observed_lengthcomp_data_id_m != static_cast<Type>(-999)) {
+    if (f->fleet_observed_lengthcomp_data_id_m != -999) {
       uint32_t observed_lengthcomp_id =
           static_cast<uint32_t>(f->fleet_observed_lengthcomp_data_id_m);
       data_iterator it = this->data_objects.find(observed_lengthcomp_id);
@@ -507,7 +508,7 @@ class Information {
    */
   void SetFleetSelectivityModel(bool& valid_model,
                                 std::shared_ptr<fims_popdy::Fleet<Type>> f) {
-    if (f->fleet_selectivity_id_m != static_cast<Type>(-999)) {
+    if (f->fleet_selectivity_id_m != -999) {
       uint32_t sel_id = static_cast<uint32_t>(
           f->fleet_selectivity_id_m);  // cast as unsigned integer
       selectivity_models_iterator it = this->selectivity_models.find(
@@ -542,7 +543,7 @@ class Information {
    */
   void SetRecruitment(bool& valid_model,
                       std::shared_ptr<fims_popdy::Population<Type>> p) {
-    if (p->recruitment_id != static_cast<Type>(-999)) {
+    if (p->recruitment_id != -999) {
       uint32_t recruitment_uint = static_cast<uint32_t>(p->recruitment_id);
 
       recruitment_models_iterator it =
@@ -583,7 +584,7 @@ class Information {
     std::shared_ptr<fims_popdy::RecruitmentBase<Type>> r = p->recruitment;
     // if recruitment is defined
     if (r) {
-      if (r->process_id != static_cast<Type>(-999)) {
+      if (r->process_id != -999) {
         uint32_t process_uint = static_cast<uint32_t>(r->process_id);
         recruitment_process_iterator it =
             this->recruitment_process_models.find(process_uint);
@@ -622,7 +623,7 @@ class Information {
    */
   void SetGrowth(bool& valid_model,
                  std::shared_ptr<fims_popdy::Population<Type>> p) {
-    if (p->growth_id != static_cast<Type>(-999)) {
+    if (p->growth_id != -999) {
       uint32_t growth_uint = static_cast<uint32_t>(p->growth_id);
       growth_models_iterator it = this->growth_models.find(
           growth_uint);  // growth_models is specified in information.hpp
@@ -660,7 +661,7 @@ class Information {
    */
   void SetMaturity(bool& valid_model,
                    std::shared_ptr<fims_popdy::Population<Type>> p) {
-    if (p->maturity_id != static_cast<Type>(-999)) {
+    if (p->maturity_id != -999) {
       uint32_t maturity_uint = static_cast<uint32_t>(p->maturity_id);
       maturity_models_iterator it = this->maturity_models.find(
           maturity_uint);  // >maturity_models is specified in
@@ -723,7 +724,7 @@ class Information {
 
       // set data objects if distribution is a data type
       if (d->input_type == "data") {
-        if (d->observed_data_id_m != static_cast<Type>(-999)) {
+        if (d->observed_data_id_m != -999) {
           uint32_t observed_data_id =
               static_cast<uint32_t>(d->observed_data_id_m);
           data_iterator it = this->data_objects.find(observed_data_id);
@@ -958,7 +959,7 @@ class Information {
                 // Initialize fleet object
                 std::shared_ptr<fims_popdy::Fleet<Type>> f = (*it).second;
 
-                if (f->fleet_selectivity_id_m == static_cast<Type>(-999)) {
+                if (f->fleet_selectivity_id_m == -999) {
                   valid_model = false;
                   FIMS_ERROR_LOG(
                       "No selectivity pattern defined for fleet " +
@@ -969,7 +970,7 @@ class Information {
               }
             }
 
-            if (p->recruitment_id == static_cast<Type>(-999)) {
+            if (p->recruitment_id == -999) {
               valid_model = false;
               FIMS_ERROR_LOG(
                   "No recruitment function defined for population " +
@@ -981,7 +982,7 @@ class Information {
             std::shared_ptr<fims_popdy::RecruitmentBase<Type>> r =
                 p->recruitment;
             r = p->recruitment;
-            if (r->process_id == static_cast<Type>(-999)) {
+            if (r->process_id == -999) {
               valid_model = false;
               FIMS_ERROR_LOG(
                   "No recruitment process function defined for population " +
@@ -991,7 +992,7 @@ class Information {
                   "recruitments when running a catch at age model.");
             }
 
-            if (p->growth_id == static_cast<Type>(-999)) {
+            if (p->growth_id == -999) {
               valid_model = false;
               FIMS_ERROR_LOG(
                   "No growth function defined for population " +
@@ -1000,7 +1001,7 @@ class Information {
                   "populations when running a catch at age model.");
             }
 
-            if (p->maturity_id == static_cast<Type>(-999)) {
+            if (p->maturity_id == -999) {
               valid_model = false;
 
               FIMS_WARNING_LOG(

@@ -1,0 +1,6 @@
+Repository: https://github.com/NOAA-FIMS/Quadra.git
+Commit: 0d1f9c6eb6a4c0be663de36ed9ffd674a6f2eed7
+Date: 2026-08-05
+Local integration: dense Hessian topology freeze and cached destination
+routing from the Quadra working tree, plus the FIMS value-only mixed-derivative
+skip and full-forward compatibility adapter.

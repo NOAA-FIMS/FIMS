@@ -1,6 +1,9 @@
 # FIMS 0.11.0
 
-*
+* Adds Quadra evaluation, joint and Laplace fitting through the XPtr interface.
+  TMB remains the default backend; joint parameter uncertainty is available
+  through `quadra_sdreport()`.
+* Preserves age-specific selectivity through the XPtr module API.
 
 # FIMS 0.10.0
 

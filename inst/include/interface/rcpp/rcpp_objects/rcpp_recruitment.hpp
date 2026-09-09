@@ -380,9 +380,18 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
+#ifdef QUADRA_MODEL
+  /** @brief Register this module on the active Quadra graph. */
+  bool add_to_fims_quadra() override {
+    return this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
+  }
+#endif
   virtual bool add_to_fims_tmb() {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#ifdef QUADRA_MODEL
+    this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
+#endif
 
     return true;
   }
@@ -456,9 +465,18 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
+#ifdef QUADRA_MODEL
+  /** @brief Register this module on the active Quadra graph. */
+  bool add_to_fims_quadra() override {
+    return this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
+  }
+#endif
   virtual bool add_to_fims_tmb() {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#ifdef QUADRA_MODEL
+    this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
+#endif
 
     return true;
   }
@@ -532,9 +550,18 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief Adds the parameters to the TMB model.
    * @return A boolean of true.
    */
+#ifdef QUADRA_MODEL
+  /** @brief Register this module on the active Quadra graph. */
+  bool add_to_fims_quadra() override {
+    return this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
+  }
+#endif
   virtual bool add_to_fims_tmb() {
     this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
     this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+#ifdef QUADRA_MODEL
+    this->add_to_fims_tmb_internal<QUADRA_FIMS_TYPE>();
+#endif
 
     return true;
   }

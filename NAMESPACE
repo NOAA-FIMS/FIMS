@@ -3,6 +3,7 @@
 S3method(generics::augment,FIMSFit)
 S3method(generics::glance,FIMSFit)
 S3method(generics::tidy,FIMSFit)
+S3method(summary,quadra_sdreport)
 export(CreateTMBModel)
 export(FIMSFit)
 export(FIMSFrame)
@@ -94,6 +95,9 @@ export(model_weight_at_age)
 export(multinomial)
 export(plot_likelihood)
 export(print.fims_module)
+export(quadra_evaluate)
+export(quadra_fit)
+export(quadra_sdreport)
 export(run_fims_likelihood)
 export(run_fims_retrospective)
 export(run_modified_data_fims)
@@ -120,6 +124,7 @@ export(set_population_processes)
 export(set_random)
 export(set_recruitment_n_years)
 export(set_recruitment_process)
+export(set_selectivity_ages)
 export(set_variable_vector)
 export(setup_default_Fleet)
 export(setup_default_Growth)
@@ -136,16 +141,12 @@ exportMethods(plot)
 import(methods)
 import(stats)
 importFrom(TMB,MakeADFun)
-importFrom(generics,
-  augment,
-  glance,
-  tidy
-)
+importFrom(generics,augment)
+importFrom(generics,glance)
+importFrom(generics,tidy)
 importFrom(graphics,plot)
-importFrom(rlang,
-  ":=",
-  .data,
-  .env
-)
+importFrom(rlang,":=")
+importFrom(rlang,.data)
+importFrom(rlang,.env)
 importFrom(stockplotr,theme_noaa)
 useDynLib(FIMS, .registration = TRUE)

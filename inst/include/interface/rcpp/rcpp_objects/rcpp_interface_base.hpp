@@ -658,6 +658,11 @@ class FIMSRcppInterfaceBase {
   /**
    * @brief A virtual method to inherit to add objects to the TMB model.
    */
+#ifdef QUADRA_MODEL
+  /** @brief Register this module on the active Quadra graph. */
+  virtual bool add_to_fims_quadra() { return false; }
+#endif
+
   virtual bool add_to_fims_tmb() {
     Rcpp::Rcout << "fims_rcpp_interface_base::add_to_fims_tmb(): Not yet "
                    "implemented.\n";

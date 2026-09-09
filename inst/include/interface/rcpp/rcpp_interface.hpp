@@ -98,6 +98,13 @@ uint32_t CreateTMBModel(Rcpp::List xptr_list) {
       fims_info::Information<TMBAD_FIMS_TYPE>::GetInstance();
   info->Clear();
 
+#ifdef QUADRA_MODEL
+  auto info_quadra = fims_info::Information<QUADRA_FIMS_TYPE>::GetInstance();
+  info_quadra->Clear();
+  fims_quadra::reset_tape();
+  std::vector<std::weak_ptr<FIMSRcppInterfaceBase>> quadra_modules;
+#endif
+
   // Every entry is an XPtr<SharedBase>, so add_to_fims_tmb() reaches the right
   // derived implementation without this loop knowing which module family it is
   // holding. The list comes from the R-side registry, which collects each
@@ -114,6 +121,9 @@ uint32_t CreateTMBModel(Rcpp::List xptr_list) {
                  " is an empty pointer. This usually means clear() was called "
                  "while the module was still held in R.");
     }
+#ifdef QUADRA_MODEL
+    quadra_modules.push_back(*xp);
+#endif
     try {
       (*xp)->add_to_fims_tmb();
     } catch (const std::exception& error) {
@@ -127,6 +137,21 @@ uint32_t CreateTMBModel(Rcpp::List xptr_list) {
   info0->CheckModel();
 
   info->CreateModel();
+#ifdef QUADRA_MODEL
+  info_quadra->CreateModel();
+  // Weak ownership leaves the R registry in charge of module lifetime.
+  fims_quadra::rebuild_model = [quadra_modules]() {
+    auto info = fims_info::Information<QUADRA_FIMS_TYPE>::GetInstance();
+    info->Clear();
+    for (const auto& weak_module : quadra_modules) {
+      auto module = weak_module.lock();
+      if (!module || !module->add_to_fims_quadra()) {
+        throw std::runtime_error("Quadra model modules have been released.");
+      }
+    }
+    return info->CreateModel();
+  };
+#endif
 
   // instantiate the model? TODO: Ask Matthew what this does
   std::shared_ptr<fims_model::Model<TMB_FIMS_REAL_TYPE>> m0 =
@@ -310,6 +335,11 @@ void clear_impl(bool get_error_msg) {
 
   clear_internal<TMB_FIMS_REAL_TYPE>();
   clear_internal<TMBAD_FIMS_TYPE>();
+#ifdef QUADRA_MODEL
+  fims_quadra::rebuild_model = nullptr;
+  clear_internal<QUADRA_FIMS_TYPE>();
+  fims_quadra::release_tape();
+#endif
 
   fims::FIMSLog::fims_log->clear();
 

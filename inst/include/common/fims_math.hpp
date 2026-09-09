@@ -19,6 +19,10 @@
 #include "def.hpp"
 
 namespace fims_math {
+#ifdef QUADRA_MODEL
+/** @brief Extract a Quadra scalar value for discrete indexing. */
+inline double Value(const QUADRA_FIMS_TYPE& x) { return x.val; }
+#endif
 #ifdef STD_LIB
 
 /**
