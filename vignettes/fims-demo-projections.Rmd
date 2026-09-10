@@ -5,7 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Simple projections using FIMS}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-level: "intermediate"
+level: "intermediate-user"
 summary: "Instructions for running a FIMS model with projections."
 ---
 

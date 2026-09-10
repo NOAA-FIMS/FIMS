@@ -48,7 +48,7 @@ article_url_for <- function(rel_path) {
 }
 
 vignette_files <- dir_ls("vignettes", recurse = TRUE, type = "file") |>
-  keep(~ str_detect(path_file(.x), "\\.(qmd|Rmd|R)$"))
+  keep(~ str_detect(path_file(.x), "\\.(qmd|Rmd)$"))
 
 records <- map(vignette_files, function(file) {
   fm <- read_front_matter(file)
