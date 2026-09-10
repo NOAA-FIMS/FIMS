@@ -31,18 +31,20 @@ and signal handling), see the following resources:
 
 Model assembly can be triggered directly with `native_create_model()`. In normal
 use, `initialize_fims()` performs this step as part of constructing the model.
+Here we initialize the bundled example data to obtain native log entries.
 
 ```{r example-one-line}
-empty_model <- native_create_model()
+data_4_model <- FIMSFrame(data_big)
+model <- setup_default_parameters(data_4_model) |>
+  initialize_fims(data = data_4_model)
 log_string <- get_log()
 log_data_frame <- jsonlite::fromJSON(log_string)
-log_data_frame
+head(log_data_frame)
 
 clear()
 ```
 
-This entry originates in the native model assembly code in
-[`src/call_model.cpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/src/call_model.cpp).
+These entries originate in the native model initialization code.
 The `level`, `file`, `routine`, and `line` fields identify the severity and C++
 location that produced each entry.
 
@@ -50,7 +52,7 @@ See the [introduction to FIMS vignette](fims-demo.html) for a log of a complete 
 
 ## Using the Logging System in R
 
-The FIMS Logging System is also available from R, with a caveat! Logging from R gives less information than logging from C++. When a log entry originates from R, file, routine, and line information are absent. Further implementations may rectify this issue. Below are examples of adding log entries from R.
+The FIMS Logging System is also available from R, with a caveat! Logging from R gives less information than logging from C++. Entries from R use `R_env` for the file, `R_script_entry` for the routine, and -1 for the line instead of a C++ source location. Below are examples of adding log entries from R.
 
 ```{r r-logging-info, eval=TRUE}
 log_info("info entry from R script")
@@ -60,25 +62,25 @@ jsonlite::fromJSON(get_log())
 clear()
 ```
 
-The example above just logs information and warnings but you can also log errors. Notice that the "routine" information in the error log is not super informative even though it is filled with a lot of information. The R stack trace in this column is to large to capture the root cause of the error. For that reason, it's advised to make the error message as detailed as possible when calling `log_error(x)` from R. Note that the formatting is better when written to a file rather than printed to the screen so the following code chunk is not rendered here but you can on your own computer.
+You can also record errors. Use detailed messages to identify their cause; entries from R identify the routine as `R_script_entry`.
 
 ```{r r-logging-error, eval=FALSE}
 error <- log_error("error entry from R script")
 jsonlite::fromJSON(get_log_errors())
 ```
 
-There are several logging functions that are exported to R. Below is a list of all of the functions as well as an example of how you can find out more information about each of them. Note that because these are C++ functions that are exported to R, we have chosen to document them in the C++ code using doxygen and just provide links to that documentation when users call `methods::show()` on them.
+The logging functions are R wrappers around the native logger. Use `?FIMS::log_error` to read their documentation.
 
 ```{r}
 ls("package:FIMS") |>
   grep(pattern = "_log|log_", value = TRUE) |>
   cli::cli_bullets()
 
-# Get documentation for log_error
+# Inspect the R wrapper
 methods::show(log_error)
 ```
 
-Another useful option is `set_throw_on_error()`. If this option is set to TRUE, FIMS will abort immediately when an error occurs and if `write_log(TRUE)` was previously called, the log file will be written before FIMS terminates the session.
+Use `set_log_throw_on_error(TRUE)` to raise an R error immediately after recording an error message. This stops the current expression; it does not terminate the R session. `write_log(TRUE)` enables writing the log when the session exits.
 
 ```{r throw, eval = FALSE}
 set_log_throw_on_error(TRUE)

@@ -1667,6 +1667,7 @@ extern "C" SEXP fims_call_information_model_counts()
 
 extern "C" SEXP fims_call_information_clear()
 {
+    fims::FIMSLog::fims_log->clear();
     std::shared_ptr<fims_info::Information<double>> info_double =
         fims_info::Information<double>::GetInstance();
     info_double->Clear();

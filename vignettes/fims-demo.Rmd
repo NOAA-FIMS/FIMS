@@ -35,13 +35,7 @@ library(stockplotr)
 
 Use the traditional R help system, for example `?FIMS::fit_fims`, for user-facing functions. C++ implementation details are available in the generated Doxygen documentation.
 
-For example, `CreateTMBModel` is a C++ function that returns a boolean.
-```r
-methods::show(FIMS::CreateTMBModel)
-internal C++ function <0000014f7bd8ff00>
-    docstring : See the native-interface documentation in the package source and generated Doxygen reference.
-    signature : bool CreateTMBModel()
-```
+For example, `?FIMS::native_create_model` documents native model construction.
 
 ### Memory
 
@@ -224,7 +218,9 @@ The tibble returned by `setup_default_parameters()` is just a data frame contain
 
 ### `fit_fims()`
 
-The list returned from `initialize_fims()` can be passed to the parameter of `fit_fims()` called `input` to run a FIMS model. If `optimize = FALSE`, the model will not actually be optimized but instead just checked to ensure it is a viable model. When `optimize = TRUE`, the model will be fit using `stats::nlminb()` and an object of the class `FIMSFit` will be returned.
+This vignette selects `backend = "TMB"` because its plots use derived-quantity standard errors. The default Quadra backend currently reports parameter uncertainty but does not include those derived quantities in its uncertainty report.
+
+The list returned from `initialize_fims()` can be passed to the parameter of `fit_fims()` called `input` to run a FIMS model. If `optimize = FALSE`, the model will not actually be optimized but instead just checked to ensure it is a viable model. When `optimize = TRUE`, the model will be fit using `stats::nlminb()` with the explicitly selected TMB backend and an object of the class `FIMSFit` will be returned.
 
 ### Example
 
@@ -232,12 +228,12 @@ The list returned from `initialize_fims()` can be passed to the parameter of `fi
 # Run the model without optimization to help ensure a viable model
 test_fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
-  fit_fims(optimize = FALSE)
+  fit_fims(optimize = FALSE, backend = "TMB")
 clear()
 # Run the  model with optimization
 fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
-  fit_fims(optimize = TRUE)
+  fit_fims(optimize = TRUE, backend = "TMB")
 ```
 
 ### Logging system
@@ -266,7 +262,7 @@ output <- get_estimates(fit) |>
   dplyr::mutate(
     uncertainty_label = "se",
     year = year_i,
-    estimate = estimated
+    estimate = dplyr::coalesce(estimated, expected)
   )
 ```
 
@@ -276,7 +272,11 @@ output <- get_estimates(fit) |>
 #| fig.alt: >
 #|   Plot of spawning biomass.
 stockplotr::plot_spawning_biomass(
-  dplyr::filter(output, label == "spawning_biomass")
+  output |>
+    dplyr::filter(label == "spawning_biomass") |>
+    dplyr::mutate(year = seq.int(
+      get_start_year(data_4_model), length.out = dplyr::n()
+    ))
 ) +
   stockplotr::theme_noaa()
 ```
@@ -302,7 +302,7 @@ stockplotr::plot_timeseries(
 #|   Plot of estimated index of abundance versus observed values.
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
-    output |> dplyr::filter(module_id == 2),
+    output |> dplyr::filter(fleet == "survey1"),
     label_name = "^index_expected$",
     geom = "line"
   ),
@@ -326,7 +326,7 @@ stockplotr::plot_timeseries(
 #|   Plot of estimated catch.
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
-    output |> dplyr::filter(module_id == 1),
+    output |> dplyr::filter(fleet == "fleet1"),
     label_name = "^catch_expected$",
     geom = "line"
   ),
@@ -371,13 +371,13 @@ parameters_low_slope <- parameters_4_model |>
 
 high_slope_fit <- parameters_high_slope |>
   initialize_fims(data = data_4_model) |>
-  fit_fims(optimize = TRUE)
+  fit_fims(optimize = TRUE, backend = "TMB")
 
 clear()
 
 low_slope_fit <- parameters_low_slope |>
   initialize_fims(data = data_4_model) |>
-  fit_fims(optimize = TRUE)
+  fit_fims(optimize = TRUE, backend = "TMB")
 
 clear()
 ```
@@ -391,7 +391,7 @@ The same model can be fit to just the age data, removing the length-composition 
 age_only_fit <- parameters_4_model |>
   initialize_fims(data = get_data(data_4_model) |>
     dplyr::filter(!type %in% c("length_comp", "age_to_length_conversion"))) |>
-  fit_fims(optimize = TRUE)
+  fit_fims(optimize = TRUE, backend = "TMB")
 
 clear()
 ```
@@ -404,7 +404,7 @@ The same model can be fit to just the length data, removing the age-composition 
 length_only_fit <- parameters_4_model |>
   initialize_fims(data = get_data(data_4_model) |>
     dplyr::filter(!type %in% c("age_comp"))) |>
-  fit_fims(optimize = TRUE)
+  fit_fims(optimize = TRUE, backend = "TMB")
 clear()
 ```
 
@@ -419,13 +419,13 @@ stockplotr::plot_biomass(
       dplyr::mutate(
         uncertainty_label = "se",
         year = year_i,
-        estimate = estimated
+        estimate = dplyr::coalesce(estimated, expected)
       ),
     "length" = get_estimates(length_only_fit) |>
       dplyr::mutate(
         uncertainty_label = "se",
         year = year_i,
-        estimate = estimated
+        estimate = dplyr::coalesce(estimated, expected)
       )
   )
 )

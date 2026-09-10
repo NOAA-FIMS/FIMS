@@ -55,3 +55,12 @@ test_that("native split callbacks agree with combined evaluations and derivative
   initialize_fims(parameters, data)
   expect_identical(native_quadra_objective(fixed, random), expected)
 })
+
+test_that("FIMSFit accepts a Quadra sdreport", {
+  report <- structure(
+    list(par.fixed = c(alpha = 1)),
+    class = c("quadra_sdreport", "list")
+  )
+  slot_class <- methods::getSlots("FIMSFit")[["sdreport"]]
+  expect_true(methods::is(report, slot_class))
+})

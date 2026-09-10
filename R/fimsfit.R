@@ -17,6 +17,7 @@
 methods::setOldClass(Classes = "package_version")
 methods::setOldClass(Classes = "difftime")
 methods::setOldClass(Classes = "sdreport")
+methods::setOldClass(Classes = c("quadra_sdreport", "list"))
 # Join sdreport and list into a class in case the sdreport is not created
 methods::setClassUnion("sdreportOrList", members = c("sdreport", "list"))
 

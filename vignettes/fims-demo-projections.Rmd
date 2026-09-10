@@ -257,7 +257,7 @@ Regardless if there are projections or not, the model is fit using the `FIMS::fi
 ```{r projection-fit, eval=FALSE}
 projection_fit <- parameters_projection |>
   initialize_fims(data = data_4_projections) |>
-  fit_fims(optimize = TRUE)
+  fit_fims(optimize = TRUE, backend = "quadra")
 
 clear()
 ```

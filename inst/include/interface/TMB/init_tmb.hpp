@@ -19,6 +19,7 @@
 #include "../call/growth.hpp"
 #include "../call/maturity.hpp"
 #include "../call/model.hpp"
+#include "../call/logging.hpp"
 #include "../call/population.hpp"
 #include "../call/recruitment.hpp"
 #include "../call/selectivity.hpp"
@@ -47,6 +48,7 @@ extern "C"
    * @brief Callback definition to load the FIMS module.
    */
   static const R_CallMethodDef CallEntries[] = {
+    {"fims_call_logging", (DL_FUNC)&fims_call_logging, 2},
       {"fims_call_create_logistic_selectivity",
        (DL_FUNC)&fims_call_create_logistic_selectivity, 4},
       {"fims_call_logistic_selectivity",
