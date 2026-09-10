@@ -101,6 +101,8 @@ navbar:
           href: articles/fims-demo.html
         - text: Introducing FIMS Input Data
           href: articles/fims-input-data.html
+        - text: FIMS Growth With VonBertalanffySchnute
+          href: articles/fims-growth-vonb-schnute.html
         - text: Introducing the FIMS Logging System
           href: articles/fims-logging.html
         - text: FIMS User Setup Guide
