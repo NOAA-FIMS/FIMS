@@ -247,7 +247,7 @@ If you are unsure of starting values to use for the initial numbers-at-age param
 ```{r initial-numbers-at-age}
 FIMS:::setup_default_log_init_naa(
   n_ages = n_ages,
-  log_rzero = dplyr::filter( default_parameters, label == "log_rzero" ) |>
+  log_rzero = dplyr::filter(default_parameters, label == "log_rzero") |>
     dplyr::pull(value),
   log(0.2)
 )
