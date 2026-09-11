@@ -238,11 +238,10 @@ reshape_tmb_estimates <- function(obj,
         label = dimnames(std)[[1]],
         estimate = std[, "Estimate"],
         uncertainty = std[, "Std. Error"],
-        # Use obj[["env"]][["parameters"]][["p"]] as this will return both initial
-        # fixed and random effects while obj[["par"]] only returns initial fixed
-        # effects
+        # obj$par has the same reduced indexing as parameter_names when a TMB
+        # factor map fixes or shares parameters.
         initial = c(
-          obj[["env"]][["parameters"]][["p"]],
+          unname(obj[["par"]]),
           rep(NA_real_, derived_quantity_nrow)
         ),
         gradient = c(
@@ -257,11 +256,12 @@ reshape_tmb_estimates <- function(obj,
         )
       )
   } else {
+    estimate_values <- if (length(opt) > 0) opt[["par"]] else obj[["par"]]
     estimates <- estimates_outline |>
       tibble::add_row(
         label = names(obj[["par"]]),
-        initial = obj[["env"]][["parameters"]][["p"]],
-        estimate = obj[["env"]][["parameters"]][["p"]]
+        initial = unname(obj[["par"]]),
+        estimate = unname(estimate_values)
       )
   }
 
