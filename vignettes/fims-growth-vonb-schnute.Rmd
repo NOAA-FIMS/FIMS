@@ -695,39 +695,32 @@ ggplot2::ggplot(residual_plot_data, ggplot2::aes(x = age, y = residual)) +
 
 These residuals are not a formal model diagnostic because the observed lengths were created only for plotting. They are still useful for a branch-level check because they make it easy to see whether the fitted curve is tracking the known growth pattern.
 
-### One Light Downstream Check of the Shared Size Path
+### Inspect the Realized Age-to-Length Conversion
 
-The final plot is not meant to duplicate the test suite. It shows one visible downstream object from the migrated pathway: a realized growth-derived age-to-length row for a representative age.
+The final plot is not meant to duplicate the test suite. It shows the realized growth-derived age-to-length conversion in the final modeled year. This is useful for checking whether the fitted growth curve and length-at-age variability imply reasonable length distributions across ages.
 
 ```{r growth-size-handoff-plot}
 #| warning: false
 #| message: false
-#| fig.width: 8
+#| fig.width: 10
 #| fig.height: 8
 #| fig.cap: >
-#|   One realized growth-derived age-to-length row, showing how the fitted
-#|   growth curve is mapped into fleet observation-bin probabilities.
+#|   Realized growth-derived age-to-length conversion in the final modeled
+#|   year, showing length-bin probabilities by age.
 #| fig.alt: >
-#|   Bar plot of one realized growth-derived age-to-length row across fleet
-#|   observation-bin centers for a representative age.
+#|   Mirrored distributions of length-bin probabilities by age. Each age has
+#|   one vertical distribution, with wider areas showing higher probability.
 
 # Pull the report here because the realized age-to-length conversion tensor and path flags are
 # only available there.
 report <- FIMS::get_report(fit)
 
-# View the ages in the demo object to understand the age range.
-demo$ages
-
-# Pick a representative age/year slice so we can show one realized age-to-length conversion row.
-# `ceiling(length(demo$ages) / 2)` picks the middle modeled age, rounding up
-# when there are an even number of ages.
-representative_age <- demo$ages[ceiling(length(demo$ages) / 2)]
-representative_year <- demo$years[1]
+final_year <- max(demo$years)
 
 # Pull the full realized Growth-derived age-to-length conversion tensor from the report.
 realized_age_to_length_conversion <- report[["age_to_length_conversion_derived"]][[1]]
 
-# Reshape the flattened tensor into length x age x year form for slicing.
+# Reshape the flattened tensor into length x age x year form for plotting.
 realized_age_to_length_conversion_array <- array(
   realized_age_to_length_conversion,
   dim = c(
@@ -737,39 +730,43 @@ realized_age_to_length_conversion_array <- array(
   )
 )
 
-# Extract one age-year row so the probability mass across fleet bins is easy to read.
-downstream_check <- tibble::tibble(
-  length = demo$lengths,
-  probability = realized_age_to_length_conversion_array[
-    ,
-    match(representative_age, demo$ages),
-    match(representative_year, demo$years)
-  ]
-)
+realized_age_to_length_conversion_dataframe <- expand.grid(
+  length_i = seq_along(demo$lengths),
+  age_i = seq_along(demo$ages),
+  year_i = seq_along(demo$years)
+) |>
+  tibble::as_tibble() |>
+  dplyr::mutate(
+    length = demo$lengths[.data[["length_i"]]],
+    age = demo$ages[.data[["age_i"]]],
+    year = demo$years[.data[["year_i"]]],
+    proportion = realized_age_to_length_conversion_array[
+      cbind(.data[["length_i"]], .data[["age_i"]], .data[["year_i"]])
+    ]
+  )
 
-# Plot the realized age-to-length conversion row as probabilities over the fleet observation bins.
-ggplot2::ggplot(
-  downstream_check,
-  ggplot2::aes(x = length, y = probability)
-) +
-  ggplot2::geom_col() +
-  ggplot2::labs(
-    title = paste(
-      "Realized Growth-derived age-to-length conversion row at age",
-      representative_age,
-      "in year",
-      representative_year
-    ),
-    x = "Fleet observation bin",
-    y = "Probability"
-  ) +
-  stockplotr::theme_noaa()
+age_to_length_plot_data <- realized_age_to_length_conversion_dataframe |>
+  dplyr::filter(.data[["year"]] == final_year)
+
+plot_age_to_length_conversion(
+  age_to_length_conversion_dataframe = realized_age_to_length_conversion_dataframe,
+  year = final_year
+)
 ```
 
-The probabilities in the plotted row should sum to one:
+Each age-specific distribution should sum to one in the plotted year:
 
 ```{r downstream-check}
-sum(downstream_check$probability)
+age_to_length_plot_data |>
+  dplyr::group_by(.data[["age"]]) |>
+  dplyr::summarize(
+    proportion_sum = sum(.data[["proportion"]]),
+    .groups = "drop"
+  ) |>
+  dplyr::summarize(
+    min_proportion_sum = min(.data[["proportion_sum"]]),
+    max_proportion_sum = max(.data[["proportion_sum"]])
+  )
 ```
 
 For a quick non-graphical check, the report flag should also be `1` when the derived path is being used:
