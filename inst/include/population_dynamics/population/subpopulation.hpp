@@ -417,13 +417,14 @@ inline std::vector<size_t> RequestedStrata(const PartitionSpec &spec,
 }
 
 /**
- * @brief Build stratum split factors for the default sex-only partition.
+ * @brief Sex split policy: build per-stratum weights from proportion_female.
  *
  * @details Companion to MakeDefaultSexPartitionSpec(). Only valid when spec
  * has a single sex axis with levels female and male (n_strata = 2). Female
  * stratum (0) receives proportion_female; male stratum (1) receives
- * (1 - proportion_female). For any other partition (e.g. sex x area), callers
- * must supply user-defined per-stratum factors to stratum_split_factor().
+ * (1 - proportion_female). Pass the returned vector to
+ * WritePartitionedQuantityAtAge(). For any other partition (e.g. sex x area),
+ * callers supply a different policy that returns length-n_strata weights.
  *
  * @param spec Partition structure (sex-only; see MakeDefaultSexPartitionSpec()).
  * @param proportion_female Value from Population::proportion_female at the
@@ -443,19 +444,21 @@ std::vector<Type> SexStratumSplitFactors(const PartitionSpec &spec,
 /**
  * @brief Split a pooled at-age value into requested partition strata.
  *
- * @details No-op when demand is pooled (RequestedStrata is empty). For
- * non-pooled demand on the default sex partition, builds split factors from
- * proportion_female_at_age and adds pooled_value * factor into partitioned
- * storage at i_stratum_age_year for each requested stratum only.
+ * @details No-op when demand is pooled (RequestedStrata is empty). Otherwise
+ * adds pooled_value * split_factors[stratum] into partitioned storage at
+ * i_stratum_age_year for each requested stratum. The writer is partition-
+ * agnostic: callers supply per-stratum weights (e.g. from
+ * SexStratumSplitFactors() or a fleet/area policy).
  *
  * @tparam Type Numeric type (e.g. double or AD type).
  * @tparam PartitionedVector Vector-like type supporting size() and operator[].
  * @param partitioned Storage sized n_strata * n_years * n_ages.
  * @param pooled_value Pooled quantity at (year, age).
- * @param spec Partition structure (sex-only for current split factors).
+ * @param spec Partition structure.
  * @param layout Index layout matching partitioned storage.
  * @param demand Which strata to write.
- * @param proportion_female_at_age Population proportion_female at this age.
+ * @param split_factors Per-stratum weights; size must equal spec.n_strata()
+ *        when demand is non-pooled.
  * @param year Year index.
  * @param age Age index.
  */
@@ -465,14 +468,12 @@ void WritePartitionedQuantityAtAge(PartitionedVector &partitioned,
                                    const PartitionSpec &spec,
                                    const IndexLayout &layout,
                                    const PartitionDemand &demand,
-                                   Type proportion_female_at_age, size_t year,
-                                   size_t age) {
+                                   const std::vector<Type> &split_factors,
+                                   size_t year, size_t age) {
   const std::vector<size_t> strata = RequestedStrata(spec, demand);
   if (strata.empty()) {
     return;
   }
-  const std::vector<Type> split_factors =
-      SexStratumSplitFactors(spec, proportion_female_at_age);
   for (size_t stratum : strata) {
     const size_t index = layout.i_stratum_age_year(stratum, year, age);
     if (index >= partitioned.size()) {
