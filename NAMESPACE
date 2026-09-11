@@ -85,6 +85,7 @@ export(model_index)
 export(model_length_comp)
 export(model_weight_at_age)
 export(multinomial)
+export(plot_age_to_length_conversion)
 export(plot_likelihood)
 export(run_fims_likelihood)
 export(run_fims_retrospective)
@@ -108,16 +109,12 @@ exportMethods(plot)
 import(methods)
 import(stats)
 importFrom(TMB,MakeADFun)
-importFrom(generics,
-  augment,
-  glance,
-  tidy
-)
+importFrom(generics,augment)
+importFrom(generics,glance)
+importFrom(generics,tidy)
 importFrom(graphics,plot)
-importFrom(rlang,
-  ":=",
-  .data,
-  .env
-)
+importFrom(rlang,":=")
+importFrom(rlang,.data)
+importFrom(rlang,.env)
 importFrom(stockplotr,theme_noaa)
 useDynLib(FIMS, .registration = TRUE)
