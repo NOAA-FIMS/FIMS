@@ -50,6 +50,7 @@
 <li><h6 class="dropdown-header" data-toc-skip>Intro to FIMS</h6></li>
     <li><a class="dropdown-item" href="../articles/fims-demo.html">Introducing the Fisheries Integrated Modeling System (FIMS)</a></li>
     <li><a class="dropdown-item" href="../articles/fims-input-data.html">Introducing FIMS Input Data</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-growth-vonb-schnute.html">FIMS Growth With VonBertalanffySchnute</a></li>
     <li><a class="dropdown-item" href="../articles/fims-logging.html">Introducing the FIMS Logging System</a></li>
     <li><a class="dropdown-item" href="../articles/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
     <li><a class="dropdown-item" href="../articles/fims-demo-projections.html">Simple projections using FIMS</a></li>
@@ -587,7 +588,7 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.10.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.20706 minutes</span></span>
+<span><span class="co">## ℹ Total run time was 1.22556 minutes</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00098</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -616,7 +617,7 @@ documentation</a> for more information.</p>
 <span><span class="va">log_data_frame</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">log_json_string</span><span class="op">)</span></span>
 <span><span class="va">log_data_frame</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##                  timestamp   level</span></span>
-<span><span class="co">## 1 Thu Sep 10 13:21:08 2026 warning</span></span>
+<span><span class="co">## 1 Fri Sep 11 16:02:30 2026 warning</span></span>
 <span><span class="co">##                                                                   message id</span></span>
 <span><span class="co">## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0</span></span>
 <span><span class="co">##     user                                    wd</span></span>
@@ -640,8 +641,8 @@ documentation</a> for more information.</p>
 <code class="sourceCode R"><span><span class="co"># Subset for just the warnings</span></span>
 <span><span class="va">log_data_frame</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">level</span> <span class="op">==</span> <span class="st">"warning"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                  timestamp   level</span></span>
-<span><span class="co">## 1 Thu Sep 10 13:21:08 2026 warning</span></span>
-<span><span class="co">## 2 Thu Sep 10 13:21:08 2026 warning</span></span>
+<span><span class="co">## 1 Fri Sep 11 16:02:30 2026 warning</span></span>
+<span><span class="co">## 2 Fri Sep 11 16:02:30 2026 warning</span></span>
 <span><span class="co">##                                                                   message id</span></span>
 <span><span class="co">## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0</span></span>
 <span><span class="co">## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1</span></span>
@@ -772,7 +773,7 @@ changes due to changes to the initial value.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.10.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.13348 minutes</span></span>
+<span><span class="co">## ℹ Total run time was 1.15578 minutes</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 3e-04</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -791,7 +792,7 @@ changes due to changes to the initial value.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.10.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.1714 minutes</span></span>
+<span><span class="co">## ℹ Total run time was 1.187 minutes</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00057</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -888,7 +889,7 @@ estimate a small number of age-specific parameter values.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.10.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.14327 minutes</span></span>
+<span><span class="co">## ℹ Total run time was 1.16749 minutes</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00033</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -957,7 +958,7 @@ length-composition configurations.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.10.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 11.16982 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 11.40648 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00021</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -985,7 +986,7 @@ age-composition configurations.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.10.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.10526 minutes</span></span>
+<span><span class="co">## ℹ Total run time was 1.1495 minutes</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 3e-04</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>

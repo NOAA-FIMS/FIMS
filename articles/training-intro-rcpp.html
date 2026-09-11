@@ -50,6 +50,7 @@
 <li><h6 class="dropdown-header" data-toc-skip>Intro to FIMS</h6></li>
     <li><a class="dropdown-item" href="../articles/fims-demo.html">Introducing the Fisheries Integrated Modeling System (FIMS)</a></li>
     <li><a class="dropdown-item" href="../articles/fims-input-data.html">Introducing FIMS Input Data</a></li>
+    <li><a class="dropdown-item" href="../articles/fims-growth-vonb-schnute.html">FIMS Growth With VonBertalanffySchnute</a></li>
     <li><a class="dropdown-item" href="../articles/fims-logging.html">Introducing the FIMS Logging System</a></li>
     <li><a class="dropdown-item" href="../articles/fims-user-setup-guide.html">FIMS User Setup Guide</a></li>
     <li><a class="dropdown-item" href="../articles/fims-demo-projections.html">Simple projections using FIMS</a></li>
@@ -186,7 +187,7 @@ C++ code in <code><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html" class=
 <span><span class="co"># after compiling, add works like a regular R function</span></span>
 <span><span class="va">add</span></span></code></pre></div>
 <pre><code><span><span class="co">## function (x, y, z) </span></span>
-<span><span class="co">## .Call(&lt;pointer: 0x7f99e47a53f0&gt;, x, y, z)</span></span></code></pre>
+<span><span class="co">## .Call(&lt;pointer: 0x7f2c6f7af3f0&gt;, x, y, z)</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">add</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 6</span></span></code></pre>
@@ -291,9 +292,9 @@ compiled <code>meanC</code> function against the R function
 <span>  <span class="fu">meanC</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Unit: microseconds</span></span>
-<span><span class="co">##      expr     min      lq     mean   median       uq       max neval</span></span>
-<span><span class="co">##   mean(x) 423.880 433.668 439.4546 437.2250 445.5800   512.686   100</span></span>
-<span><span class="co">##  meanC(x)  94.145  94.326 196.4914  94.6215  95.2975 10158.862   100</span></span></code></pre>
+<span><span class="co">##      expr     min      lq     mean  median       uq       max neval</span></span>
+<span><span class="co">##   mean(x) 418.741 431.179 437.7411 435.507 444.6145   513.688   100</span></span>
+<span><span class="co">##  meanC(x)  94.096  94.361 207.0111  94.581  95.9190 11060.896   100</span></span></code></pre>
 </details>
 </div>
 <div class="section level3">
