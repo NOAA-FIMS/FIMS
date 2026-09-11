@@ -786,11 +786,11 @@ Each age-specific distribution should sum to one in the plotted year:
 ```{r downstream-check}
 age_to_length_plot_data |>
   dplyr::group_by(.data[["age"]]) |>
-  dplyr::summarise(
+  dplyr::summarize(
     probability_sum = sum(.data[["probability"]]),
     .groups = "drop"
   ) |>
-  dplyr::summarise(
+  dplyr::summarize(
     min_probability_sum = min(.data[["probability_sum"]]),
     max_probability_sum = max(.data[["probability_sum"]])
   )
