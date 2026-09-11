@@ -97,6 +97,7 @@ Imports:
 Suggests:
     covr,
     devtools,
+    ggridges,
     knitr,
     microbenchmark,
     parallel,
