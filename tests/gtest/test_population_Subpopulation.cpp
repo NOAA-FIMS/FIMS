@@ -255,10 +255,11 @@ TEST(WritePartitionedQuantityAtAge, PooledDemandIsNoOp) {
   layout.n_years = 2;
   layout.n_ages = 3;
   std::vector<double> partitioned(layout.n_partitioned_age_year(), 0.0);
+  const std::vector<double> split_factors = {0.3, 0.7};
 
   fims_popdy::WritePartitionedQuantityAtAge(
       partitioned, 10.0, spec, layout, fims_popdy::MakePooledPartitionDemand(),
-      0.3, 1, 2);
+      split_factors, 1, 2);
 
   EXPECT_EQ(partitioned, std::vector<double>(layout.n_partitioned_age_year(), 0.0));
 }
@@ -274,10 +275,12 @@ TEST(WritePartitionedQuantityAtAge, FemaleOnlyWritesFemaleStratum) {
   const double p_female = 0.3;
   const size_t year = 1;
   const size_t age = 2;
+  const std::vector<double> split_factors =
+      fims_popdy::SexStratumSplitFactors(spec, p_female);
 
   fims_popdy::WritePartitionedQuantityAtAge(
       partitioned, pooled, spec, layout,
-      fims_popdy::MakeSexPartitionDemand({"female"}), p_female, year, age);
+      fims_popdy::MakeSexPartitionDemand({"female"}), split_factors, year, age);
 
   EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(0, year, age)],
                    pooled * p_female);
@@ -295,10 +298,12 @@ TEST(WritePartitionedQuantityAtAge, MaleOnlyWritesMaleStratum) {
   const double p_female = 0.3;
   const size_t year = 1;
   const size_t age = 2;
+  const std::vector<double> split_factors =
+      fims_popdy::SexStratumSplitFactors(spec, p_female);
 
   fims_popdy::WritePartitionedQuantityAtAge(
       partitioned, pooled, spec, layout,
-      fims_popdy::MakeSexPartitionDemand({"male"}), p_female, year, age);
+      fims_popdy::MakeSexPartitionDemand({"male"}), split_factors, year, age);
 
   EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(0, year, age)], 0.0);
   EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(1, year, age)],
@@ -316,16 +321,48 @@ TEST(WritePartitionedQuantityAtAge, BothSexesWritesBothStrata) {
   const double p_female = 0.4;
   const size_t year = 0;
   const size_t age = 1;
+  const std::vector<double> split_factors =
+      fims_popdy::SexStratumSplitFactors(spec, p_female);
 
   fims_popdy::WritePartitionedQuantityAtAge(
       partitioned, pooled, spec, layout,
-      fims_popdy::MakeSexPartitionDemand({"female", "male"}), p_female, year,
-      age);
+      fims_popdy::MakeSexPartitionDemand({"female", "male"}), split_factors,
+      year, age);
 
   EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(0, year, age)],
                    pooled * p_female);
   EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(1, year, age)],
                    pooled * (1.0 - p_female));
+}
+
+TEST(WritePartitionedQuantityAtAge, AcceptsCallerProvidedNonSexWeights) {
+  fims_popdy::PartitionSpec spec;
+  fims_popdy::Axis area_axis;
+  area_axis.name = "area";
+  area_axis.levels = {"A1", "A2"};
+  spec.axes.push_back(std::move(area_axis));
+
+  fims_popdy::IndexLayout layout;
+  layout.n_strata = spec.n_strata();
+  layout.n_years = 1;
+  layout.n_ages = 1;
+  std::vector<double> partitioned(layout.n_partitioned_age_year(), 0.0);
+  const double pooled = 10.0;
+  const std::vector<double> split_factors = {0.25, 0.75};
+
+  fims_popdy::PartitionDemand demand;
+  fims_popdy::AxisLevelSelection selection;
+  selection.axis_name = "area";
+  selection.level_names = {"A1", "A2"};
+  demand.selections.push_back(std::move(selection));
+
+  fims_popdy::WritePartitionedQuantityAtAge(partitioned, pooled, spec, layout,
+                                           demand, split_factors, 0, 0);
+
+  EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(0, 0, 0)],
+                   pooled * 0.25);
+  EXPECT_DOUBLE_EQ(partitioned[layout.i_stratum_age_year(1, 0, 0)],
+                   pooled * 0.75);
 }
 
 }  // namespace
