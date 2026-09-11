@@ -740,7 +740,7 @@ realized_age_to_length_conversion_dataframe <- expand.grid(
     length = demo$lengths[.data[["length_i"]]],
     age = demo$ages[.data[["age_i"]]],
     year = demo$years[.data[["year_i"]]],
-    probability = realized_age_to_length_conversion_array[
+    proportion = realized_age_to_length_conversion_array[
       cbind(.data[["length_i"]], .data[["age_i"]], .data[["year_i"]])
     ]
   )
@@ -748,37 +748,10 @@ realized_age_to_length_conversion_dataframe <- expand.grid(
 age_to_length_plot_data <- realized_age_to_length_conversion_dataframe |>
   dplyr::filter(.data[["year"]] == final_year)
 
-ggplot2::ggplot(
-  age_to_length_plot_data,
-  ggplot2::aes(
-    x = .data[["length"]],
-    y = as.factor(.data[["age"]]),
-    weight = .data[["probability"]],
-    group = .data[["age"]]
-  )
-) +
-  ggridges::geom_density_ridges(
-    stat = "binline",
-    bins = dplyr::n_distinct(age_to_length_plot_data[["length"]]),
-    scale = 1.5,
-    alpha = 0.8
-  ) +
-  ggplot2::coord_flip() +
-  ggplot2::labs(
-    title = "Realized age-to-length conversion",
-    subtitle = paste("Length distributions by age in the modeled year", final_year),
-    x = "Length",
-    y = "Age"
-  ) +
-  ggridges::theme_ridges() +
-  ggplot2::theme_minimal() +
-  ggplot2::theme(
-    panel.grid.minor = ggplot2::element_blank(),
-    panel.grid.major.x = ggplot2::element_line(
-      color = "grey80",
-      linewidth = 0.3
-    )
-  )
+plot_age_to_length_conversion(
+  age_to_length_conversion_dataframe = realized_age_to_length_conversion_dataframe,
+  year = final_year
+)
 ```
 
 Each age-specific distribution should sum to one in the plotted year:
@@ -787,12 +760,12 @@ Each age-specific distribution should sum to one in the plotted year:
 age_to_length_plot_data |>
   dplyr::group_by(.data[["age"]]) |>
   dplyr::summarize(
-    probability_sum = sum(.data[["probability"]]),
+    proportion_sum = sum(.data[["proportion"]]),
     .groups = "drop"
   ) |>
   dplyr::summarize(
-    min_probability_sum = min(.data[["probability_sum"]]),
-    max_probability_sum = max(.data[["probability_sum"]])
+    min_proportion_sum = min(.data[["proportion_sum"]]),
+    max_proportion_sum = max(.data[["proportion_sum"]])
   )
 ```
 
