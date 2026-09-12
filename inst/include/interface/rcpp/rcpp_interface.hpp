@@ -74,10 +74,18 @@ void init_logging() {
  * in a particular model run, each an Rcpp::XPtr<SharedBase> as produced by the 
  * `*_to_fims_xptr_()` functions. The R wrapper `CreateTMBModel()` passes the 
  * package registry here, so users do not assemble this list by hand.
- * @return A boolean is returned, where true indicates that the model was
- * successfully created.
+ * @return A handle identifying this build of the model. It is a plain number
+ * that increases with every successful call, so two handles are equal only if
+ * they came from the same build. Failure is reported by throwing, not by the
+ * return value, so a returned handle always means the model was created.
  */
-bool CreateTMBModel(Rcpp::List xptr_list) {
+uint32_t CreateTMBModel(Rcpp::List xptr_list) {
+  // Identifies this build of the model. Incremented on every successful call
+  // and never rewound, so a handle taken from one build never matches a later
+  // one -- which is what lets R tell that a TMB objective function belongs to
+  // a model that has since been rebuilt. 
+  static uint32_t model_handle = 0;
+
   init_logging();
 
   // clear first
@@ -106,7 +114,12 @@ bool CreateTMBModel(Rcpp::List xptr_list) {
                  " is an empty pointer. This usually means clear() was called "
                  "while the module was still held in R.");
     }
-    (*xp)->add_to_fims_tmb();
+    try {
+      (*xp)->add_to_fims_tmb();
+    } catch (const std::exception& error) {
+      Rcpp::stop("Failed to register model component " +
+                 std::to_string(i + 1) + ": " + error.what());
+    }
   }
 
   // base model
@@ -119,7 +132,7 @@ bool CreateTMBModel(Rcpp::List xptr_list) {
   std::shared_ptr<fims_model::Model<TMB_FIMS_REAL_TYPE>> m0 =
       fims_model::Model<TMB_FIMS_REAL_TYPE>::GetInstance();
 
-  return true;
+  return ++model_handle;
 }
 
 /* Dictionary block for shared documentation.
@@ -134,7 +147,7 @@ bool CreateTMBModel(Rcpp::List xptr_list) {
   \code{.R}
   set_fixed_parameters(c(1, 2, 3))
   set_random_parameters(c(1, 2, 3))
-  catch_at_age$get_output()
+  get_output(catch_at_age)
   \endcode
   [details_set_x_parameters]
 */

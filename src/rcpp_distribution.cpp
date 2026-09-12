@@ -71,11 +71,12 @@ Rcpp::XPtr<SharedDistribution> create_distribution_(std::string type) {
  *   effect, or data. Determines which expected values the distribution reads
  *   during evaluation.
  * @param ids The variable_map IDs of the quantities being linked, as returned
- *   by get_parameter_id_().
+ *   by get_variable_vector_id_().
  * @return true if the distribution accepted the links, false otherwise.
  */
 bool set_distribution_links_(Rcpp::XPtr<SharedDistribution> xp,
                              std::string input_type, Rcpp::IntegerVector ids) {
+  require_module(xp, "distribution");
   return (*xp)->set_distribution_links(input_type, ids);
 }
 
@@ -89,6 +90,7 @@ bool set_distribution_links_(Rcpp::XPtr<SharedDistribution> xp,
  */
 bool set_distribution_observed_data_(Rcpp::XPtr<SharedDistribution> xp,
                                      int observed_data_id) {
+  require_module(xp, "distribution");
   return (*xp)->set_observed_data(observed_data_id);
 }
 
@@ -107,13 +109,14 @@ bool set_distribution_observed_data_(Rcpp::XPtr<SharedDistribution> xp,
  */
 bool set_distribution_fixed_mean_(Rcpp::XPtr<SharedDistribution> xp,
                                   double input_value) {
+  require_module(xp, "distribution");
   return (*xp)->set_distribution_mean(input_value);
 }
 
 // ── Multinomial-only settings ────────────────────────────────────────────────
 // `dims` is a plain numeric vector rather than a parameter vector, and
 // `notes` is a
-// string, so neither goes through get_parameter().
+// string, so neither goes through get_variable_vector().
 
 /**
  * @brief Attach a free-text note, carried through to the JSON output.
@@ -124,6 +127,7 @@ bool set_distribution_fixed_mean_(Rcpp::XPtr<SharedDistribution> xp,
  */
 void set_distribution_note_(Rcpp::XPtr<SharedDistribution> xp,
                             std::string note) {
+  require_module(xp, "distribution");
   std::shared_ptr<DmultinomDistributionsInterface> dmultinom =
       std::dynamic_pointer_cast<DmultinomDistributionsInterface>(*xp);
   if (!dmultinom) {
@@ -142,6 +146,7 @@ void set_distribution_note_(Rcpp::XPtr<SharedDistribution> xp,
  * @return The log probability density or mass.
  */
 double evaluate_distribution_(Rcpp::XPtr<SharedDistribution> xp) {
+  require_module(xp, "distribution");
   return (*xp)->evaluate();
 }
 

@@ -65,9 +65,12 @@ FIMS/
 │       ├── rcpp_recruitment.hpp
 │       └── ...
 ├── src/
-│   ├── fims_modules.hpp          # Rcpp module definitions
-│   └── init.hpp                  # Module initialization
+│   ├── rcpp_selectivity.cpp      # Creator and setters for selectivity
+│   ├── rcpp_interface_base.cpp   # get_variable_vector() and friends
+│   └── rcpp_functions.cpp        # clear(), CreateTMBModel(), and friends
 └── R/
+    ├── fims_interface.R          # Creators and the module type tables
+    ├── fims_module_api.R         # R wrappers over the registered functions
     └── initialize_modules.R      # R initialization functions
 ```
 
@@ -265,12 +268,17 @@ This distinction matters because the interface class receives `VariableVector` f
 A simple R example from the current selectivity tests looks like this:
 
 ```r
-selectivity <- methods::new(LogisticSelectivity)
-selectivity$inflection_point[1]$value <- 10.0
-selectivity$inflection_point[1]$set_estimation_status("random_effects")
-selectivity$slope[1]$value <- 0.2
-selectivity$evaluate(10.0)
+selectivity <- create_selectivity("Logistic")
+set_variable_vector(selectivity, "inflection_point", 10.0, "random_effects")
+set_variable_vector(selectivity, "slope", 0.2, "assumed_known")
+evaluate_selectivity(selectivity, 10.0)
 ```
+
+Fields are reached by name rather than as members. R holds an external pointer
+to the interface object, not an Rcpp class with `.field()` bindings, so
+`set_variable_vector()` asks the module for the field called
+`"inflection_point"` and fills it. A module makes its fields reachable this way
+by implementing `get_variable_vector()`, covered in the next section.
 
 **See also**
 
@@ -286,12 +294,12 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
  public:
   static uint32_t id_g;
   uint32_t id;
-  static std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
-      live_objects;
 
-  SelectivityInterfaceBase() {
-    this->id = SelectivityInterfaceBase::id_g++;
-  }
+  SelectivityInterfaceBase() { this->id = SelectivityInterfaceBase::id_g++; }
+
+  // Interface objects are owned by one shared_ptr and must not be copied.
+  SelectivityInterfaceBase(const SelectivityInterfaceBase &) = delete;
+  SelectivityInterfaceBase &operator=(const SelectivityInterfaceBase &) = delete;
 
   virtual ~SelectivityInterfaceBase() {}
   virtual uint32_t get_id() = 0;
@@ -299,22 +307,25 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 uint32_t SelectivityInterfaceBase::id_g = 1;
-std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
-    SelectivityInterfaceBase::live_objects;
 
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   VariableVector inflection_point;
   VariableVector slope;
 
-  LogisticSelectivityInterface() : SelectivityInterfaceBase() {
-    SelectivityInterfaceBase::live_objects[this->id] =
-        std::make_shared<LogisticSelectivityInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        SelectivityInterfaceBase::live_objects[this->id]);
-  }
+  LogisticSelectivityInterface() : SelectivityInterfaceBase() {}
+
+  LogisticSelectivityInterface(const LogisticSelectivityInterface &) = delete;
+  LogisticSelectivityInterface &operator=(
+      const LogisticSelectivityInterface &) = delete;
 
   virtual uint32_t get_id() { return this->id; }
+
+  virtual VariableVector *get_variable_vector(const std::string &name) {
+    if (name == "inflection_point") return &this->inflection_point;
+    if (name == "slope") return &this->slope;
+    return nullptr;
+  }
 
   virtual double evaluate(double x) {
     fims_popdy::LogisticSelectivity<double> logistic_sel;
@@ -332,8 +343,16 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 **Key components**
 
 - **Base interface class**: manages shared ID behavior and the common interface contract.
-- **Concrete interface class**: exposes module-specific `VariableVector` fields to R.
-- **Constructor registration**: the object must be stored in both `live_objects` and `fims_interface_objects` so it participates in the FIMS lifecycle.
+- **Concrete interface class**: holds the module-specific `VariableVector` fields.
+- **No constructor registration**: the object is owned by the `shared_ptr` inside
+  the `XPtr` that R holds. A module stays alive in memory exactly as long
+  as R holds its pointer. Interface objects are non-copyable so that ownership
+  stays in one place.
+- **`get_variable_vector()`**: makes fields reachable from R by name. A field
+  omitted here cannot be set or read, so add one for every variable the users 
+  needs to access. Fields declared as `fims::Vector<double>` rather than 
+  `VariableVector` -- observations, ages, empirical weights -- 
+  go in `get_numeric_vector()` instead.
 - **`evaluate()` helper**: provides a lightweight way to test the interface from R before building a full TMB model.
 - **`finalize()` method**: copies optimized or derived values back out of the `Information` object after a run.
 
@@ -421,40 +440,71 @@ A good `finalize()` implementation usually does the following:
 
 ## Step 3: Register the module with the R API
 
-### 3.1 Update `src/fims_modules.hpp`
+### 3.1 Add the type to the enum and the create_* function
 
-Add the Rcpp interface header and expose the class in `RCPP_MODULE(fims)`.
+Modules are not Rcpp classes. R receives an `Rcpp::XPtr` to the interface
+object, and one create function per family builds whichever form was asked
+for by the user. Adding a functional form means adding it to the enum, to the string
+lookup, and to the create switch.
 
-**File**: `src/fims_modules.hpp`
+**File**: `inst/include/common/enumerations.hpp`, or the family's own header
 
 ```cpp
-Rcpp::class_<LogisticSelectivityInterface>(
-    "LogisticSelectivity",
-    "See https://noaa-fims.github.io/doxygen/"
-    "classLogisticSelectivityInterface.html.")
-    .constructor()
-    .field("inflection_point",
-           &LogisticSelectivityInterface::inflection_point)
-    .field("slope", &LogisticSelectivityInterface::slope)
-    .method("get_id", &LogisticSelectivityInterface::get_id)
-    .method("evaluate", &LogisticSelectivityInterface::evaluate);
+enum class SelectivityType { kLogistic = 0, kDoubleLogistic = 1 };
+
+inline SelectivityType SelectivityTypeFromString(const std::string &name) {
+  if (name == "Logistic") return SelectivityType::kLogistic;
+  if (name == "DoubleLogistic") return SelectivityType::kDoubleLogistic;
+  Rcpp::stop("Invalid type: '" + name +
+             "'. Valid options are: Logistic, DoubleLogistic.");
+}
+```
+
+**File**: `src/rcpp_selectivity.cpp`
+
+```cpp
+Rcpp::XPtr<SharedSelectivity> create_selectivity_(std::string type) {
+  SharedSelectivity selectivity_interface;
+  switch (SelectivityTypeFromString(type)) {
+    case SelectivityType::kLogistic:
+      selectivity_interface = std::make_shared<LogisticSelectivityInterface>();
+      break;
+    // add the new form here
+  }
+  ...
+}
 ```
 
 **Key points**
 
-- **R class name**: the first string is the class name users call with `methods::new()`.
-- **Documentation string**: code often points to the Doxygen page for the interface class.
-- **Fields and methods**: these are the parts of the interface that become visible in R.
+- **The type string** is what users pass: `create_selectivity("Logistic")`. It
+  is the same string the parameters tibble carries in its `module_type` column,
+  so the two must agree.
+- **The error message** listing valid options is worth keeping current; it is
+  what a user sees after a typo.
+- **No `.field()` bindings**: fields are reached through
+  `get_variable_vector()`, added in step 2.2. A field that is declared but has
+  no entry in `get_variable_vector()` cannot be reached from R at all --
+  `set_variable_vector()` reports that the module has no field by that name,
+  even though the C++ member exists.
 
-### 3.2 Update `R/FIMS-package.R`
+### 3.2 Update the R type table
 
-Export the class so it is visible from R and rebuild the namespace:
+**File**: [R/fims_interface.R](../R/fims_interface.R)
+
+Add the type to `.fims_module_types`, which is both the list of what each
+create function accepts and what `describe_model()` reports:
 
 ```r
-#' @export LogisticSelectivity
+.fims_module_types <- list(
+  selectivity = c("Logistic", "DoubleLogistic"),
+  ...
+)
 ```
 
-Then run `devtools::document()`.
+Nothing needs exporting: users call `create_selectivity()`, which already
+exists, rather than a class name. Run `devtools::document()` if you added or
+changed roxygen.
 
 ## Step 4: Connect the module to the current R workflow
 
@@ -487,34 +537,35 @@ For a new selectivity or data-module option, you will often update an existing h
 
 **Relevant file**: [R/initialize_modules.R](../R/initialize_modules.R)
 
-`initialize_module()` currently builds the Rcpp class name by combining `module_type` and `module_name`:
+`initialize_module()` reads the tibble's `module_name` and
+`module_type` columns, asks the matching create function for the module, 
+and then sets every field the tibble has a row for:
 
 ```r
-module_class_name <- module_input |>
-  dplyr::mutate(
-    temp_name = paste0(
-      dplyr::coalesce(module_type, ""),
-      dplyr::coalesce(module_name, "")
-    )
-  ) |>
-  dplyr::pull(temp_name) |>
-  unique()
-
-module_class <- get(module_class_name)
-module <- methods::new(module_class)
+for (label in labels) {
+  rows <- dplyr::filter(module_input, .data$label == !!label)
+  set_variable_vector(
+    module, label, rows[["value"]], rows[["estimation_status"]]
+  )
+}
 ```
 
-It then populates each field by either:
-
-- setting scalar values such as `n_ages` or `n_years`,
-- filling `RealVector` fields such as `ages` or `weights`, or
-- calling `set_param_vector()` for `VariableVector` fields.
+Because `initialize_module()` reads the tibble rather than a list of fields
+written into `R/initialize_modules.R`, adding a parameter requires a tibble row
+without the need to change any code in `R/initialize_modules.R`. A parameter 
+listed in the tibble that the module does not have is an error, unless the row 
+carries a distribution, so a typo in the tibble fails loudly rather than 
+being ignored.
 
 That means a new module type typically needs:
 
-- a valid `module_type` value in the configuration/parameter tibble,
-- an exported Rcpp class name that matches `paste0(module_type, module_name)`, and
-- an initialization path inside `initialize_fims()` if the new module needs explicit linking to other modules.
+- a valid `module_type` value in the configuration/parameter tibble, matching
+  the string the create function accepts,
+- an entry in `.fims_module_types` from step 3.2, and
+- a change here only if the module needs something the tibble does not carry:
+  dimensions, links to other modules, or observed data. Those go in the
+  module's own `initialize_*()` function, as `initialize_fleet()` and
+  `initialize_population()` do, not in `initialize_module()`.
 
 ### 4.3 Keep the full run path in mind
 
@@ -527,7 +578,8 @@ input <- parameters |>
   initialize_fims(data = data_4_model)
 ```
 
-If your new module breaks any part of that pipeline, update the corresponding configuration, parameter, initialization, and registration code together.
+If your new module breaks any part of that pipeline, update the corresponding 
+configuration, parameter, initialization, and registration code together.
 
 ## Step 5: Add targeted tests
 
@@ -560,12 +612,15 @@ Use testthat to exercise the Rcpp-facing class and the R initialization helpers.
 
 Current selectivity tests illustrate the main patterns:
 
-- create the object with `methods::new()`,
-- assign `value` and `estimation_status`,
-- verify `get_id()` and `evaluate()`,
+- create the object with `create_selectivity()`,
+- set values and estimation statuses with `set_variable_vector()`,
+- read them back with `get_variable_vector()` and check they round-trip,
+- verify `get_module_id()` and `evaluate_selectivity()`,
+- verify that an unknown type string is rejected,
 - verify repeated object creation behaves as expected.
 
-Current `initialize_*()` tests also check that the returned object is an S4 object and that it exposes the expected methods in its reference-class definition.
+Current `initialize_*()` tests check that the returned object is a
+`fims_module` and that its fields hold what the parameters tibble specified.
 
 **See also**
 
@@ -597,11 +652,12 @@ When adding a new module or a new module type, you will usually touch several la
 - [ ] `inst/include/population_dynamics/[category]/functors/[category]_base.hpp` if you are introducing a new module for the population dynamics
 - [ ] `inst/include/population_dynamics/[category]/functors/[name].hpp` for the concrete implementation
 - [ ] `inst/include/population_dynamics/[category]/[category].hpp` to expose the new implementation through the umbrella header
-- [ ] `inst/include/interface/rcpp/rcpp_objects/rcpp_[category].hpp` for the Rcpp interface and TMB registration
-- [ ] `src/fims_modules.hpp` to expose the class to R
-- [ ] `R/FIMS-package.R` to export the class
+- [ ] `inst/include/interface/rcpp/rcpp_objects/rcpp_[category].hpp` for the Rcpp interface, its `get_variable_vector()` entries, and TMB registration
+- [ ] the type enum and its `*TypeFromString()` lookup, with the error message listing valid options
+- [ ] `src/rcpp_[category].cpp` to add the new form to the create switch
+- [ ] `R/fims_interface.R` to add the type to `.fims_module_types`
 - [ ] `R/setup_default_parameters.R` so default values and estimation settings are generated correctly
-- [ ] `R/initialize_modules.R` if the module needs special initialization or linking behavior
+- [ ] `R/initialize_modules.R` only if the module needs dimensions, links, or data that the parameters tibble does not carry
 - [ ] tests in `tests/gtest/` and/or `tests/testthat/`
 
 ## Validation checklist
@@ -636,7 +692,10 @@ MyInterface() {
 }
 ```
 
-Also make sure the constructor stores the object in both the module-specific `live_objects` map and `FIMSRcppInterfaceBase::fims_interface_objects`.
+Do not register the object anywhere else. Ownership sits with the `shared_ptr`
+held by the `XPtr` that R has, so the module is released when R releases it.
+Declare the interface non-copyable, so that ownership cannot be duplicated by
+accident.
 
 ## TMB integration
 
@@ -669,9 +728,9 @@ info->variable_map[this->param.id_m] = &(module_obj)->param;
 
 ### "undefined symbol" errors when loading the package
 
-**Cause**: the interface was not fully exposed in `src/fims_modules.hpp` or the corresponding header was not included.
+**Cause**: the Create function was declared but not defined, or its `src/*.cpp` file was not included in the build.
 
-**Solution**: verify the `Rcpp::class_<...>()` entry, the header include, and the matching export in `R/FIMS-package.R`.
+**Solution**: verify the `create_*_()` definition, its `Rcpp::function()` registration, and the header include.
 
 ### Parameters are not being estimated
 
@@ -687,9 +746,13 @@ info->variable_map[this->param.id_m] = &(module_obj)->param;
 
 ### The module initializes in R but is missing expected fields
 
-**Cause**: the configuration/parameter tibble, exported class name, and `initialize_module()` class lookup are out of sync.
+**Cause**: the field has no entry in `get_variable_vector()` or
+`get_numeric_vector()`, so R cannot reach it by name.
 
-**Solution**: confirm that `paste0(module_type, module_name)` resolves to the class you exported in `src/fims_modules.hpp`.
+**Solution**: add the field to `get_variable_vector()` if it is declared as a
+`VariableVector`, or to `get_numeric_vector()` if it is declared as a
+`fims::Vector<double>`. Then check that `set_variable_vector()` can set it and
+`get_variable_vector()` can read it back.
 
 ## Getting help
 
@@ -728,7 +791,7 @@ Adding a new module usually means coordinating updates across:
 
 1. **C++ functors** in `inst/include/`
 2. **Rcpp interface and TMB registration** in `inst/include/interface/rcpp/rcpp_objects/`
-3. **R exposure** in `src/fims_modules.hpp` and `R/FIMS-package.R`
+3. **R exposure** through the type enum, the creator in `src/rcpp_[category].cpp`, and `.fims_module_types` in `R/fims_interface.R`
 4. **R parameter and initialization workflow** in `R/setup_default_parameters.R` and `R/initialize_modules.R`
 5. **Tests and documentation** that explain and validate the new behavior
 

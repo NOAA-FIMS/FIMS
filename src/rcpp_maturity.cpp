@@ -26,7 +26,7 @@ using SharedMaturity = std::shared_ptr<MaturityInterfaceBase>;
  * binds the XPtr to R's garbage collector: when the R variable is garbage 
  * collected, 'delete shared_ptr*' runs and the reference count is decremented.
  *
- * @param type Currently only "logistic".
+ * @param type Currently only "Logistic".
  *
  * @return A pointer to the new maturity module.
  */
@@ -52,6 +52,7 @@ Rcpp::XPtr<SharedMaturity> create_maturity_(std::string type) {
  * @return Proportion mature at that point.
  */
 double evaluate_maturity_(Rcpp::XPtr<SharedMaturity> xp, double x) {
+  require_module(xp, "maturity");
   return (*xp)->evaluate(x);
 }
 

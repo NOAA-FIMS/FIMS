@@ -628,22 +628,21 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     Type phi_0 = CalculateSBPR0(population);
 
-    if (i_dev == population->n_years) {
-      dq_["numbers_at_age"][i_age_year] =
-          population->recruitment->evaluate_mean(
-              dq_["spawning_biomass"][year - 1], phi_0);
-      /*the final year of the time series has no data to inform recruitment
-      devs, so this value is set to the mean recruitment.*/
-    } else {
-      // Why are we using evaluate_mean, how come a virtual function was
+    // Why are we using evaluate_mean, how come a virtual function was
       // changed? AMH: there are now two virtual functions: evaluate_mean and
       // evaluate_process (see below)
-      population->recruitment->log_expected_recruitment[year - 1] =
+      population->recruitment->log_expected_recruitment[year] =
           fims_math::log(population->recruitment->evaluate_mean(
               dq_["spawning_biomass"][year - 1], phi_0));
 
+    if (i_dev == population->n_years) {
       dq_["numbers_at_age"][i_age_year] = fims_math::exp(
-          population->recruitment->process->evaluate_process(year - 1));
+          population->recruitment->log_expected_recruitment[year]);
+      /*the final year of the time series has no data to inform recruitment, 
+      so this value is set to the mean recruitment.*/
+    } else {
+      dq_["numbers_at_age"][i_age_year] = fims_math::exp(
+          population->recruitment->process->evaluate_process(year));
     }
 
     dq_["expected_recruitment"][year] = dq_["numbers_at_age"][i_age_year];
@@ -1120,6 +1119,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
              */
               pdq_["expected_recruitment"][y] =
                   pdq_["numbers_at_age"][i_age_year];
+              population->recruitment->log_expected_recruitment[y] =
+                fims_math::log(pdq_["numbers_at_age"][i_age_year]);
               pdq_["unfished_numbers_at_age"][i_age_year] =
                   fims_math::exp(population->recruitment->log_rzero[0]);
             } else {

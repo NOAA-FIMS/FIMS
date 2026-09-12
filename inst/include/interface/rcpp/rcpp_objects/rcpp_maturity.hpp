@@ -1,7 +1,7 @@
 /**
  * @file rcpp_maturity.hpp
  * @brief The Rcpp interface to declare different maturity options, e.g.,
- * logistic. Allows for the use of methods::new() in R.
+ * logistic. Allows the module to be created from R.
  * @copyright This file is part of the NOAA, National Marine Fisheries Service
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
@@ -16,7 +16,7 @@
  * @brief The maturity forms FIMS can build.
  *
  * @details The create_maturity_() function takes one of these names from R and
- * builds the matching class: "logistic" builds a LogisticMaturityInterface.
+ * builds the matching class: "Logistic" builds a LogisticMaturityInterface.
  * MaturityInterfaceBase is never built on its own; it only holds what all
  * maturity forms have in common.
  *
@@ -32,10 +32,10 @@ enum class MaturityType : uint8_t {
  * @brief Convert a type name supplied from R to a MaturityType.
  */
 inline MaturityType MaturityTypeFromString(const std::string &name) {
-  if (name == "logistic") return MaturityType::logistic;
+  if (name == "Logistic") return MaturityType::logistic;
   throw std::invalid_argument(
       "Invalid type: '" + name +
-      "'. Valid options are: logistic.");
+      "'. Valid options are: Logistic.");
 }
 
 /**
@@ -79,7 +79,7 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 
 /**
  * @brief Rcpp interface for logistic maturity to instantiate the object from R:
- * logistic_maturity <- methods::new(logistic_maturity).
+ * logistic_maturity <- create_maturity("Logistic").
  */
 class LogisticMaturityInterface : public MaturityInterfaceBase {
  public:
@@ -115,9 +115,9 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
   virtual uint32_t get_id() { return this->id; }
 
   /**
-   * @copydoc FIMSRcppInterfaceBase::get_parameter
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
    */
-  virtual VariableVector *get_parameter(const std::string &name) {
+  virtual VariableVector *get_variable_vector(const std::string &name) {
     if (name == "inflection_point") return &this->inflection_point;
     if (name == "slope") return &this->slope;
     return nullptr;
