@@ -24,7 +24,7 @@ kind of observation, or its ID, or \code{NULL} for none.}
 \value{
 For \code{set_fleet_observed_data()}, \code{fleet} invisibly. For
 \code{get_fleet_observed_data_ids()}, a named integer vector with elements
-\code{agecomp}, \code{lengthcomp}, \code{index}, and \code{catch}, where -999 means none.
+\code{age_comp}, \code{length_comp}, \code{index}, and \code{catch}, where -999 means none.
 }
 \description{
 Records which data modules hold this fleet's observations. Every slot is

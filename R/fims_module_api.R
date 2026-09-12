@@ -298,7 +298,7 @@ get_fleet_selectivity_id <- function(fleet) {
 #' @return
 #' For `set_fleet_observed_data()`, `fleet` invisibly. For
 #' `get_fleet_observed_data_ids()`, a named integer vector with elements
-#' `agecomp`, `lengthcomp`, `index`, and `catch`, where -999 means none.
+#' `age_comp`, `length_comp`, `index`, and `catch`, where -999 means none.
 #' @export
 #' @rdname fleet_observed_data
 set_fleet_observed_data <- function(fleet,
