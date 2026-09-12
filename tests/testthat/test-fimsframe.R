@@ -345,9 +345,12 @@ test_that("`model_*()` works with the correct inputs", {
       age_comp_dat[[fleet_names_age_comp[fleet_f]]],
       c(t(model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])))
     )
-    expect_silent(
-      age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data[] <- model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])
-    )
+expect_equal(
+  get_numeric_vector(
+    age_comp_dat[[fleet_names_age_comp[fleet_f]]], "values"
+  ),
+  c(t(model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])))
+)
   }
 
   clear()
