@@ -512,6 +512,33 @@ RCPP_EXPOSED_CLASS(VariableVector)
  * @param values The initial values.
  * @param estimation_status One status name, or one per element.
  */
+/**
+ * @brief Stop if a module's pointer has been released.
+ *
+ * @details The standalone setters and getters in the src/*.cpp files take a
+ * module's own typed pointer and dereference it. clear() releases those
+ * pointers, so a module retained in R across a clear() would otherwise
+ * dereference null and terminate R rather than raising an error. The R wrappers
+ * check this too, in check_module(); this is the guard for calls that reach a
+ * function directly.
+ *
+ * The `!xp` test short-circuits, so `*xp` is only evaluated once the external
+ * pointer's address is known to be non-null.
+ *
+ * @tparam Shared The shared_ptr type the XPtr wraps.
+ * @param xp The module to check.
+ * @param kind The module's name, used in the error message.
+ */
+template <typename Shared>
+inline void require_module(Rcpp::XPtr<Shared> xp, const char *kind) {
+  if (!xp || !(*xp)) {
+    Rcpp::stop(std::string("This ") + kind +
+               " module has been released and can no longer be used. clear() "
+               "releases every module it knows about; create a new one with "
+               "the create_*() functions.");
+  }
+}
+
 inline void fill_variable_vector(VariableVector &target,
                                 Rcpp::NumericVector values,
                                 Rcpp::CharacterVector estimation_status) {

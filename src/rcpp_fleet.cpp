@@ -43,6 +43,7 @@ Rcpp::XPtr<SharedFleet> create_fleet_() {
  */
 void set_fleet_constants_(Rcpp::XPtr<SharedFleet> xp, int n_years, int n_ages,
                           int n_lengths) {
+  require_module(xp, "fleet");
   (*xp)->n_years = n_years;
   (*xp)->n_ages = n_ages;
   (*xp)->n_lengths = n_lengths;
@@ -55,6 +56,7 @@ void set_fleet_constants_(Rcpp::XPtr<SharedFleet> xp, int n_years, int n_ages,
  * @param name The name to record.
  */
 void set_fleet_name_(Rcpp::XPtr<SharedFleet> xp, std::string name) {
+  require_module(xp, "fleet");
   (*xp)->SetName(name);
 }
 
@@ -68,6 +70,7 @@ void set_fleet_name_(Rcpp::XPtr<SharedFleet> xp, std::string name) {
 void set_fleet_units_(Rcpp::XPtr<SharedFleet> xp,
                       std::string observed_catch_units,
                       std::string observed_index_units) {
+  require_module(xp, "fleet");
   (*xp)->observed_catch_units = observed_catch_units;
   (*xp)->observed_index_units = observed_index_units;
 }
@@ -84,6 +87,7 @@ void set_fleet_units_(Rcpp::XPtr<SharedFleet> xp,
  *   get_module_id_().
  */
 void set_fleet_selectivity_id_(Rcpp::XPtr<SharedFleet> xp, int selectivity_id) {
+  require_module(xp, "fleet");
   (*xp)->SetSelectivityID(selectivity_id);
 }
 
@@ -106,6 +110,7 @@ void set_fleet_observed_data_ids_(Rcpp::XPtr<SharedFleet> xp,
                                   int lengthcomp_data_id = -999,
                                   int index_data_id = -999,
                                   int catch_data_id = -999) {
+  require_module(xp, "fleet");
   (*xp)->SetObservedAgeCompDataID(agecomp_data_id);
   (*xp)->SetObservedLengthCompDataID(lengthcomp_data_id);
   (*xp)->SetObservedIndexDataID(index_data_id);
@@ -123,6 +128,7 @@ void set_fleet_observed_data_ids_(Rcpp::XPtr<SharedFleet> xp,
  * @return The name.
  */
 std::string get_fleet_name_(Rcpp::XPtr<SharedFleet> xp) {
+  require_module(xp, "fleet");
   return (*xp)->GetName();
 }
 
@@ -133,6 +139,7 @@ std::string get_fleet_name_(Rcpp::XPtr<SharedFleet> xp) {
  * @return The ID, or -999 if none is linked.
  */
 int get_fleet_selectivity_id_(Rcpp::XPtr<SharedFleet> xp) {
+  require_module(xp, "fleet");
   return (*xp)->GetSelectivityID();
 }
 
@@ -149,6 +156,7 @@ int get_fleet_selectivity_id_(Rcpp::XPtr<SharedFleet> xp) {
  *   linked.
  */
 Rcpp::IntegerVector get_fleet_observed_data_ids_(Rcpp::XPtr<SharedFleet> xp) {
+  require_module(xp, "fleet");
   return Rcpp::IntegerVector::create(
       Rcpp::Named("age_comp") = (*xp)->GetObservedAgeCompDataID(),
       Rcpp::Named("length_comp") = (*xp)->GetObservedLengthCompDataID(),

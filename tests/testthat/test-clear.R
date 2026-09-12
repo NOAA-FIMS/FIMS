@@ -43,6 +43,21 @@ test_that("a module cannot be used after `clear()`", {
 
   #' @description Test that writing to a module after `clear()` is an error rather than undefined behavior.
   expect_error(set_variable_vector(selectivity, "slope", 1, "assumed_known"))
+
+  #' @description Test that a specialized accessor also errors, rather than dereferencing the released pointer.
+  # get_variable_vector() and set_variable_vector() take the base pointer,
+  # whose C++ side has always null-checked. The per-module functions take the
+  # module's own typed pointer, which is a separate path and the one that could
+  # terminate R.
+  expect_error(evaluate_selectivity(selectivity, 1))
+
+  fleet <- create_fleet()
+  maturity <- create_maturity("Logistic")
+  clear()
+  #' @description Test that a specialized setter errors after `clear()` rather than writing through a released pointer.
+  expect_error(set_fleet_constants(fleet, 30, 12, 20))
+  #' @description Test that a specialized evaluator errors after `clear()` rather than reading through a released pointer.
+  expect_error(evaluate_maturity(maturity, 1))
 })
 
 ## Error handling ----

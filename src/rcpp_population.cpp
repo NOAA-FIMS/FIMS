@@ -48,6 +48,7 @@ Rcpp::XPtr<SharedPopulation> create_population_() {
  */
 void set_population_constants_(Rcpp::XPtr<SharedPopulation> xp,
                                int n_years, int n_ages) {
+  require_module(xp, "population");
   (*xp)->n_years   = n_years;
   (*xp)->n_ages    = n_ages;
 }
@@ -59,6 +60,7 @@ void set_population_constants_(Rcpp::XPtr<SharedPopulation> xp,
  */
 void set_population_name_(Rcpp::XPtr<SharedPopulation> xp,
                           std::string name) {
+  require_module(xp, "population");
   (*xp)->name = name;
 }
 
@@ -80,6 +82,7 @@ void set_population_process_ids_(Rcpp::XPtr<SharedPopulation> xp,
                                  int growth_id = -999,
                                  int recruitment_id = -999,
                                  int recruitment_err_id = -999) {
+  require_module(xp, "population");
   (*xp)->maturity_id        = maturity_id;
   (*xp)->growth_id          = growth_id;
   (*xp)->recruitment_id     = recruitment_id;
@@ -124,6 +127,7 @@ Rcpp::IntegerVector get_population_process_ids_(
  */
 void set_population_fleets_(Rcpp::XPtr<SharedPopulation> xp,
                             Rcpp::List fleets) {
+  require_module(xp, "population");
   std::vector<std::shared_ptr<FleetInterface>> fleet_interfaces;
   fleet_interfaces.reserve(fleets.size());
   for (int i = 0; i < fleets.size(); i++) {
@@ -143,6 +147,7 @@ void set_population_fleets_(Rcpp::XPtr<SharedPopulation> xp,
  * @return The name.
  */
 std::string get_population_name_(Rcpp::XPtr<SharedPopulation> xp) {
+  require_module(xp, "population");
   return (*xp)->GetName();
 }
 

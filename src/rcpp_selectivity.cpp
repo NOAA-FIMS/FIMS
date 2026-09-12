@@ -60,6 +60,7 @@ Rcpp::XPtr<SharedSelectivity> create_selectivity_(std::string type) {
  * @return Selectivity at that point.
  */
 double evaluate_selectivity_(Rcpp::XPtr<SharedSelectivity> xp, double x) {
+  require_module(xp, "selectivity");
   return (*xp)->evaluate(x);
 }
 

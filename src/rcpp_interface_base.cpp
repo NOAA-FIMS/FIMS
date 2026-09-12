@@ -156,6 +156,24 @@ uint32_t get_variable_vector_id_(Rcpp::XPtr<SharedBase> xp, std::string name) {
  * @param name The field name as used in R.
  * @return true if the module has a field by that name.
  */
+/**
+ * @brief Report whether an external pointer has been released.
+ *
+ * @details Takes a bare SEXP rather than a typed XPtr so that one function
+ * answers for a module's own pointer and for its base pointer alike. clear()
+ * releases both, which sets the address to null in place, and the R side checks
+ * this before handing a module to any function that would dereference it.
+ *
+ * @param xp The external pointer to inspect.
+ * @return true if the pointer is null, or is not an external pointer at all.
+ */
+bool is_null_xptr_(SEXP xp) {
+  if (TYPEOF(xp) != EXTPTRSXP) {
+    return true;
+  }
+  return R_ExternalPtrAddr(xp) == nullptr;
+}
+
 bool has_variable_vector_(Rcpp::XPtr<SharedBase> xp, std::string name) {
   if (!xp || !(*xp)) {
     Rcpp::stop("Cannot look up '" + name + "' on a null module.");
@@ -236,6 +254,7 @@ void register_parameters(Rcpp::Module &m) {
   Rcpp::function("get_variable_vector_id_", &get_variable_vector_id_);
   Rcpp::function("get_variable_vector_", &get_variable_vector_);
   Rcpp::function("has_variable_vector_", &has_variable_vector_);
+  Rcpp::function("is_null_xptr_", &is_null_xptr_);
   Rcpp::function("get_numeric_vector_", &get_numeric_vector_);
   Rcpp::function("release_base_", &release_base_);
 }

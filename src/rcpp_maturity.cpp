@@ -52,6 +52,7 @@ Rcpp::XPtr<SharedMaturity> create_maturity_(std::string type) {
  * @return Proportion mature at that point.
  */
 double evaluate_maturity_(Rcpp::XPtr<SharedMaturity> xp, double x) {
+  require_module(xp, "maturity");
   return (*xp)->evaluate(x);
 }
 

@@ -1191,17 +1191,17 @@ library(FIMS)
 age_comp <- create_data("age_comp", n_years = 10, n_bins = 5)
 index    <- create_data("index", n_years = 10)
 pop      <- create_population()
-growth   <- create_empirical_growth()
+growth   <- create_growth("EWAA")
 
 # 2. Set values via the shared setter functions.
 #    set_numeric_vector_() and set_variable_vector_() cover every module in FIMS: the field is
 #    named rather than typed, so no module type appears in the call. They take
 #    the base XPtr, which the R wrappers hold alongside the concrete one.
-set_vector(age_comp, "values", my_age_comp_data)
-set_vector(age_comp, "uncertainty", my_age_comp_cv)
-set_vector(index, "values", my_index_data)
+set_data(age_comp, my_age_comp_data)
+set_numeric_vector(age_comp, "uncertainty", my_age_comp_cv)
+set_data(index, my_index_data)
 set_population_constants(pop, n_years = 10L, n_ages = 5L)
-set_population_process_ids(pop, growth_id = get_module_id(growth))
+set_population_processes(pop, growth = growth)
 
 # 3. Build the TMB model — registry is passed automatically, no list needed
 CreateTMBModel()
@@ -1216,20 +1216,25 @@ CreateTMBModel()
 #    The registry already holds base XPtrs pointing to the same underlying C++ objects,
 #    so any change made here is automatically visible when CreateTMBModel() runs again —
 #    no re-registration or clear() needed between scenarios.
-set_vector(age_comp, "values", new_age_comp_data)   # update age composition data
-set_vector(index, "values", new_index_data)         # update index data
-set_parameter(pop, "log_M",                         # update starting values
-              values = new_log_M,
-              estimation_status = "assumed_known")
-set_parameter(pop, "log_init_naa",
-              values = new_log_init_naa,
-              estimation_status = "fixed_effects")
+set_data(age_comp, new_age_comp_data)                # update age composition data
+set_data(index, new_index_data)                      # update index data
+set_variable_vector(pop, "log_M",                    # update starting values
+                    new_log_M, "assumed_known")
+set_variable_vector(pop, "log_init_naa",
+                    new_log_init_naa, "fixed_effects")
 
 # 5. Rebuild — CreateTMBModel() internally calls fims::Information::Clear() on both
 #    TMB singletons (double and TMBAD types) before re-populating from the registry,
 #    so the previous model run's state is fully reset. The R registry itself is NOT
 #    cleared, which is what allows the same objects to be reused across scenarios.
 CreateTMBModel()
+
+# 5b. Read the parameter vector again. It is a snapshot taken when the model was
+#     built, not a view onto the modules, so the one from the first build no
+#     longer matches what the modules now hold. initialize_fims() returns such a
+#     snapshot in its `parameters` element, which is why a second fit cannot
+#     reuse the list from the first.
+parameters <- list(p = get_fixed(), re = get_random())
 
 # fit model...
 
@@ -1343,6 +1348,13 @@ semantics. `Rcpp::NumericVector` was considered as the replacement and rejected:
 to the main R thread.
 
 **Still to do.**
+
+- The reuse-across-scenarios path in Section 3.1 --- change one value on one module, call
+  `CreateTMBModel()` again --- is covered by `tests/testthat/test-model-rebuild.R`, which
+  checks that the module keeps its id, that the other modules survive, that the change
+  reaches `get_fixed()`, and that the snapshot from the first build no longer matches. What
+  is not covered is a second `fit_fims()` on the rebuilt model; the test stops at the
+  parameter vector because fitting twice on the integration fixture is slow.
 
 - `deep_copy()` for interface modules. Now that copying is a compile error, a user who
   wants a second scenario built from an existing module needs an explicit function. The

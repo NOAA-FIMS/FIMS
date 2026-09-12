@@ -30,7 +30,34 @@ check_module <- function(module, module_name = NULL, arg = "module") {
       "x" = "Got a {.val {module[['module_name']]}} module."
     ))
   }
+  # clear() releases both of a module's pointers, which leaves the R object
+  # holding a null external pointer. The C++ functions that take a module's own
+  # typed pointer dereference it without checking, so a released module has to
+  # be stopped here rather than reaching them.
+  if (is_module_released(module)) {
+    cli::cli_abort(c(
+      "{.arg {arg}} has been released and can no longer be used.",
+      "x" = "{.fn clear} releases every module it knows about.",
+      "i" = "Create a new module with the {.code create_*()} functions."
+    ))
+  }
   invisible(module)
+}
+
+#' Report whether a module's pointers have been released
+#'
+#' @description
+#' A released module is an R object whose external pointers are null, which is
+#' what [clear()] leaves behind. Using one is an error rather than a crash only
+#' because [check_module()] stops it first.
+#'
+#' @param module A [fims_module].
+#' @return
+#' `TRUE` if either of the module's pointers has been released.
+#' @noRd
+is_module_released <- function(module) {
+  is_null_xptr_(module[["pointer"]]) ||
+    is_null_xptr_(module[["base_pointer"]])
 }
 
 #' Take an ID from either a module or a number

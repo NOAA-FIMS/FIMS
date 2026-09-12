@@ -76,6 +76,7 @@ Rcpp::XPtr<SharedDistribution> create_distribution_(std::string type) {
  */
 bool set_distribution_links_(Rcpp::XPtr<SharedDistribution> xp,
                              std::string input_type, Rcpp::IntegerVector ids) {
+  require_module(xp, "distribution");
   return (*xp)->set_distribution_links(input_type, ids);
 }
 
@@ -89,6 +90,7 @@ bool set_distribution_links_(Rcpp::XPtr<SharedDistribution> xp,
  */
 bool set_distribution_observed_data_(Rcpp::XPtr<SharedDistribution> xp,
                                      int observed_data_id) {
+  require_module(xp, "distribution");
   return (*xp)->set_observed_data(observed_data_id);
 }
 
@@ -107,6 +109,7 @@ bool set_distribution_observed_data_(Rcpp::XPtr<SharedDistribution> xp,
  */
 bool set_distribution_fixed_mean_(Rcpp::XPtr<SharedDistribution> xp,
                                   double input_value) {
+  require_module(xp, "distribution");
   return (*xp)->set_distribution_mean(input_value);
 }
 
@@ -124,6 +127,7 @@ bool set_distribution_fixed_mean_(Rcpp::XPtr<SharedDistribution> xp,
  */
 void set_distribution_note_(Rcpp::XPtr<SharedDistribution> xp,
                             std::string note) {
+  require_module(xp, "distribution");
   std::shared_ptr<DmultinomDistributionsInterface> dmultinom =
       std::dynamic_pointer_cast<DmultinomDistributionsInterface>(*xp);
   if (!dmultinom) {
@@ -142,6 +146,7 @@ void set_distribution_note_(Rcpp::XPtr<SharedDistribution> xp,
  * @return The log probability density or mass.
  */
 double evaluate_distribution_(Rcpp::XPtr<SharedDistribution> xp) {
+  require_module(xp, "distribution");
   return (*xp)->evaluate();
 }
 
