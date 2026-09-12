@@ -173,6 +173,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
         this->populations[p]->proportion_female[0] = static_cast<Type>(0.5);
       }
 
+      this->populations[p]->partition_spec = MakeDefaultSexPartitionSpec();
+      this->populations[p]->partition_demand = MakePooledPartitionDemand();
+      this->populations[p]->index_layout.n_years = this->populations[p]->n_years;
+      this->populations[p]->index_layout.n_ages = this->populations[p]->n_ages;
+      this->populations[p]->index_layout.n_strata =
+          this->populations[p]->partition_spec.n_strata();
+
       this->populations[p]->M.resize(this->populations[p]->n_years *
                                      this->populations[p]->n_ages);
 
@@ -745,6 +752,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
       size_t age) {
     int i_age_year = year * population->n_ages + age;
+    const std::vector<Type> split_factors =
+        population->partition_demand.is_pooled()
+            ? std::vector<Type>{}
+            : fims_popdy::SexStratumSplitFactors(
+                  population->partition_spec,
+                  population->proportion_female.get_force_scalar(age));
 
     if (population->growth == nullptr) {
       throw std::runtime_error(
@@ -760,8 +773,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       Type mean_weight_at_age = PopulationMeanWeightAA(population, year, age);
 
-      fdq_["catch_weight_at_age"][i_age_year] =
+      Type catch_waa =
           fdq_["catch_numbers_at_age"][i_age_year] * mean_weight_at_age;
+      fdq_["catch_weight_at_age"][i_age_year] = catch_waa;
+      fims_popdy::WritePartitionedQuantityAtAge(
+          fdq_["catch_weight_at_age_by_partition"], catch_waa,
+          population->partition_spec, population->index_layout,
+          population->partition_demand, split_factors, year, age);
     }
   }
 
@@ -787,19 +805,30 @@ class CatchAtAge : public FisheryModelBase<Type> {
       size_t i_age_year, size_t year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &pdq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
+    const std::vector<Type> split_factors =
+        population->partition_demand.is_pooled()
+            ? std::vector<Type>{}
+            : fims_popdy::SexStratumSplitFactors(
+                  population->partition_spec,
+                  population->proportion_female.get_force_scalar(age));
 
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
       // Baranov Catch Equation
-      fdq_["catch_numbers_at_age"][i_age_year] +=
+      Type catch_naa =
           (population->fleets[fleet_]->Fmort[year] *
            population->f_multiplier[year] *
            population->fleets[fleet_]->selectivity->evaluate(
                population->ages[age], year)) /
           pdq_["mortality_Z"][i_age_year] * pdq_["numbers_at_age"][i_age_year] *
           (1 - fims_math::exp(-(pdq_["mortality_Z"][i_age_year])));
+      fdq_["catch_numbers_at_age"][i_age_year] += catch_naa;
+      fims_popdy::WritePartitionedQuantityAtAge(
+          fdq_["catch_numbers_at_age_by_partition"], catch_naa,
+          population->partition_spec, population->index_layout,
+          population->partition_demand, split_factors, year, age);
     }
   }
 
@@ -856,16 +885,27 @@ class CatchAtAge : public FisheryModelBase<Type> {
       size_t i_age_year, size_t year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &pdq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
+    const std::vector<Type> split_factors =
+        population->partition_demand.is_pooled()
+            ? std::vector<Type>{}
+            : fims_popdy::SexStratumSplitFactors(
+                  population->partition_spec,
+                  population->proportion_female.get_force_scalar(age));
 
     for (size_t fleet_ = 0; fleet_ < population->n_fleets; fleet_++) {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(population->fleets[fleet_]->GetId());
 
-      fdq_["index_numbers_at_age"][i_age_year] +=
+      Type index_naa =
           (population->fleets[fleet_]->q.get_force_scalar(year) *
            population->fleets[fleet_]->selectivity->evaluate(
                population->ages[age], year)) *
           pdq_["numbers_at_age"][i_age_year];
+      fdq_["index_numbers_at_age"][i_age_year] += index_naa;
+      fims_popdy::WritePartitionedQuantityAtAge(
+          fdq_["index_numbers_at_age_by_partition"], index_naa,
+          population->partition_spec, population->index_layout,
+          population->partition_demand, split_factors, year, age);
     }
   }
 
@@ -890,6 +930,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
       size_t age) {
     int i_age_year = year * population->n_ages + age;
+    const std::vector<Type> split_factors =
+        population->partition_demand.is_pooled()
+            ? std::vector<Type>{}
+            : fims_popdy::SexStratumSplitFactors(
+                  population->partition_spec,
+                  population->proportion_female.get_force_scalar(age));
 
     if (population->growth == nullptr) {
       throw std::runtime_error(
@@ -905,8 +951,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       Type mean_weight_at_age = PopulationMeanWeightAA(population, year, age);
 
-      fdq_["index_weight_at_age"][i_age_year] =
+      Type index_waa =
           fdq_["index_numbers_at_age"][i_age_year] * mean_weight_at_age;
+      fdq_["index_weight_at_age"][i_age_year] = index_waa;
+      fims_popdy::WritePartitionedQuantityAtAge(
+          fdq_["index_weight_at_age_by_partition"], index_waa,
+          population->partition_spec, population->index_layout,
+          population->partition_demand, split_factors, year, age);
     }
   }
 
