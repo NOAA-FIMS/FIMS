@@ -321,7 +321,9 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @details Empty or NULL means pooled (no partitioned output). Otherwise
    * each list name is an axis and each value is a character vector of level
    * labels, e.g. list(sex = "female") or list(sex = c("female", "male")).
-   * A single "*" for a level means all levels on that axis (wildcard).
+   * Each axis may appear only once; use a level vector for multiple levels
+   * rather than repeating the axis name. A single "*" for a level means all
+   * levels on that axis (wildcard).
    *
    * @param demand_list Named list of axis → level labels, or NULL/empty.
    */
@@ -348,6 +350,14 @@ class PopulationInterface : public PopulationInterfaceBase {
       if (selection.axis_name.empty()) {
         throw std::invalid_argument(
             "SetPartitionDemand: axis names must be non-empty.");
+      }
+      for (const fims_popdy::AxisLevelSelection &existing : demand.selections) {
+        if (existing.axis_name == selection.axis_name) {
+          throw std::invalid_argument(
+              "SetPartitionDemand: duplicate axis \"" + selection.axis_name +
+              "\". Provide each axis once with a level vector, e.g. list(sex = "
+              "c(\"female\", \"male\")).");
+        }
       }
       Rcpp::CharacterVector levels =
           Rcpp::as<Rcpp::CharacterVector>(lst[static_cast<int>(i)]);

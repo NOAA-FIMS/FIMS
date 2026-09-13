@@ -128,6 +128,28 @@ TEST(ValidatePartitionDemand, RejectsUnknownLevelWithKnownList) {
   }
 }
 
+TEST(ValidatePartitionDemand, RejectsDuplicateAxisNames) {
+  fims_popdy::PartitionSpec spec = fims_popdy::MakeDefaultSexPartitionSpec();
+  fims_popdy::PartitionDemand demand;
+  fims_popdy::AxisLevelSelection female;
+  female.axis_name = "sex";
+  female.level_names = {"female"};
+  fims_popdy::AxisLevelSelection male;
+  male.axis_name = "sex";
+  male.level_names = {"male"};
+  demand.selections.push_back(std::move(female));
+  demand.selections.push_back(std::move(male));
+
+  try {
+    fims_popdy::ValidatePartitionDemand(spec, demand);
+    FAIL() << "Expected std::invalid_argument";
+  } catch (const std::invalid_argument &e) {
+    const std::string message(e.what());
+    EXPECT_NE(message.find("duplicate axis \"sex\""), std::string::npos);
+    EXPECT_NE(message.find("c(\"female\", \"male\")"), std::string::npos);
+  }
+}
+
 TEST(PartitionDemand, OmittedAxisIsWildcardOnMultiAxisSpec) {
   fims_popdy::PartitionSpec spec;
   fims_popdy::Axis sex_axis;

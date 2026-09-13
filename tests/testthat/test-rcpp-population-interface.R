@@ -128,5 +128,11 @@ test_that("rcpp population SetPartitionDemand rejects invalid lists", {
     regexp = "must be named"
   )
 
+  #' @description Test that duplicate axis names error with guidance.
+  expect_error(
+    population$SetPartitionDemand(list(sex = "female", sex = "male")),
+    regexp = "duplicate axis"
+  )
+
   clear()
 })

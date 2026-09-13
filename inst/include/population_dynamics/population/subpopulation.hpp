@@ -420,9 +420,12 @@ inline std::vector<size_t> RequestedStrata(const PartitionSpec &spec,
  * @brief Validate PartitionDemand axis and level names against a PartitionSpec.
  *
  * @details No-op for pooled (empty) demand. Otherwise checks that every
- * requested axis exists on the spec and every level label is known (or "*").
- * Throws std::invalid_argument with messages that list known names to help
- * users fix R-side list(sex = ...) configuration.
+ * requested axis exists on the spec and every level label is known (or "*"),
+ * and that each axis appears at most once in the demand. Duplicate axis
+ * entries (e.g. list(sex = "female", sex = "male")) are rejected; use a
+ * single entry with a level vector instead, e.g. list(sex = c("female",
+ * "male")). Throws std::invalid_argument with messages that list known names
+ * to help users fix R-side configuration.
  */
 inline void ValidatePartitionDemand(const PartitionSpec &spec,
                                     const PartitionDemand &demand) {
@@ -451,7 +454,20 @@ inline void ValidatePartitionDemand(const PartitionSpec &spec,
     known_axes.push_back(axis.name);
   }
 
+  std::vector<std::string> seen_axes;
+  seen_axes.reserve(demand.selections.size());
   for (const AxisLevelSelection &selection : demand.selections) {
+    for (const std::string &seen : seen_axes) {
+      if (seen == selection.axis_name) {
+        throw std::invalid_argument(
+            "Invalid partition_demand: duplicate axis \"" +
+            selection.axis_name +
+            "\". Provide each axis once with a level vector, e.g. list(sex = "
+            "c(\"female\", \"male\")).");
+      }
+    }
+    seen_axes.push_back(selection.axis_name);
+
     const int axis_index = detail::find_axis_index(spec, selection.axis_name);
     if (axis_index < 0) {
       throw std::invalid_argument(
