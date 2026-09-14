@@ -54,4 +54,8 @@ jobs:
       - name: Run devtools::test()
         shell: Rscript {0}
         run: |
+          # Rcpp aborts on invalid casts with -UNDEBUG; retain catchable errors.
+          options(pkg.build_extra_flags = FALSE)
+          # Rebuild to avoid reusing objects compiled with debug flags.
+          pkgbuild::clean_dll()
           devtools::test()

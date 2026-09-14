@@ -52,9 +52,6 @@ test_that("Rcpp interface works for modules", {
 
 ## Error handling ----
 test_that("Rcpp interface returns correct error messages", {
-  # Temporarily skip while investigating Rcpp constructor exception handling.
-  skip("Invalid Rcpp constructor input aborts GHA with exit 134; pending investigation.")
-
   #' @description Test that Rcpp Variable interface returns an error when given incorrect input.
   expect_error(
     methods::new(Variable, "a"),
