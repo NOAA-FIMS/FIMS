@@ -26,10 +26,7 @@ spawning_biomass_for_prop_female <- function(prop_female) {
     initialize_fims(data = data_4_model) |>
     fit_fims(optimize = FALSE)
 
-  spawning_biomass <- get_estimates(fit) |>
-    dplyr::filter(label == "spawning_biomass") |>
-    dplyr::arrange(year_i) |>
-    dplyr::pull(estimated)
+  spawning_biomass <- get_report(fit)[["spawning_biomass"]][[1]]
 
   clear()
 
