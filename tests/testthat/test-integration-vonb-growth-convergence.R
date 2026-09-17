@@ -495,7 +495,7 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
   )
 })
 
-test_that("von bertalanffy report defaults to lightweight derived age-to-length conversion diagnostics", {
+test_that("von bertalanffy defaults to lightweight derived age-to-length conversion diagnostics", {
   ctx <- make_vonb_convergence_context()
   on.exit(
     {
@@ -510,6 +510,16 @@ test_that("von bertalanffy report defaults to lightweight derived age-to-length 
     FIMS::fit_fims(optimize = FALSE)
 
   report <- FIMS::get_report(fit)
+  model_output <- FIMS::get_model_output(fit) |>
+    jsonlite::fromJSON(simplifyVector = FALSE)
+
+  fleet_derived_quantities <-
+    model_output[["fleets"]][[1]][["derived_quantities"]]
+  derived_quantity_index <- which(vapply(
+    fleet_derived_quantities,
+    \(x) x[["name"]] == "age_to_length_conversion_derived",
+    logical(1)
+  ))
 
   #' @description Test that the derived von Bertalanffy--Schnute path is still selected in reports by default.
   expect_equal(report[["age_to_length_conversion_derived_used"]][[1]][1], 1)
@@ -519,6 +529,108 @@ test_that("von bertalanffy report defaults to lightweight derived age-to-length 
 
   #' @description Test that default reporting does not materialize the full derived age-to-length conversion tensor.
   expect_equal(length(report[["age_to_length_conversion_derived"]][[1]]), 0)
+
+  #' @description Test that standard output omits the full derived tensor unless requested.
+  expect_length(derived_quantity_index, 0)
+})
+
+test_that("von bertalanffy includes requested derived age-to-length conversion in model output", {
+  ctx <- make_vonb_convergence_context()
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
+
+  input <- ctx$parameters |>
+    FIMS::initialize_fims(data = ctx$data)
+  input$model$ReportAgeToLengthConversionDerivedTensor(TRUE)
+
+  fit <- FIMS::fit_fims(
+    input = input,
+    optimize = FALSE
+  )
+
+  report <- FIMS::get_report(fit)
+  model_output <- FIMS::get_model_output(fit) |>
+    jsonlite::fromJSON(simplifyVector = FALSE)
+
+  fleet_derived_quantities <-
+    model_output[["fleets"]][[1]][["derived_quantities"]]
+  derived_quantity_index <- which(vapply(
+    fleet_derived_quantities,
+    \(x) x[["name"]] == "age_to_length_conversion_derived",
+    logical(1)
+  ))
+
+  #' @description Test that requested growth-derived age-to-length conversion appears once in standard fleet output.
+  expect_length(derived_quantity_index, 1)
+
+  derived_age_to_length_conversion <-
+    fleet_derived_quantities[[derived_quantity_index]]
+
+  #' @description Test that standard output records year, age, and fleet length dimensions.
+  expect_equal(
+    unlist(derived_age_to_length_conversion[["dimensionality"]][["header"]]),
+    c("n_years", "n_ages", "n_lengths")
+  )
+
+  fleet <- initialize_test_fleet(
+    parameters = ctx$parameters,
+    data = ctx$data,
+    fleet = "fleet1"
+  )
+
+  #' @description Test that standard output records the expected dimension sizes.
+  expect_equal(
+    unlist(derived_age_to_length_conversion[["dimensionality"]][["dimensions"]]),
+    c(
+      FIMS::get_n_years(ctx$data),
+      FIMS::get_n_ages(ctx$data),
+      fleet$n_lengths$get()
+    )
+  )
+
+  #' @description Test that standard-output values match the realized TMB-report conversion.
+  expect_equal(
+    unlist(derived_age_to_length_conversion[["value"]]),
+    report[["age_to_length_conversion_derived"]][[1]],
+    tolerance = 1e-8
+  )
+
+  all_estimates <- FIMS::get_estimates(fit)
+  json_fleet_names <- purrr::map_chr(
+    model_output[["fleets"]],
+    \(x) x[["fleet"]]
+  )
+  tidy_fleet_names <- all_estimates |>
+    dplyr::filter(
+      .data[["label"]] == "age_to_length_conversion_derived"
+    ) |>
+    dplyr::pull(.data[["fleet"]]) |>
+    unique()
+
+  estimates <- all_estimates |>
+    dplyr::filter(
+      .data[["fleet"]] == "fleet1",
+      .data[["label"]] == "age_to_length_conversion_derived"
+    )
+
+  #' @description Test that standard JSON output retains names for both active fleets.
+  expect_setequal(json_fleet_names, c("fleet1", "survey1"))
+
+  #' @description Test that tidy estimates retain fleet names for both derived tensors.
+  expect_setequal(tidy_fleet_names, c("fleet1", "survey1"))
+
+  #' @description Test that the requested fleet tensor is available through tidy estimates.
+  expect_equal(
+    nrow(estimates),
+    FIMS::get_n_years(ctx$data) *
+      FIMS::get_n_ages(ctx$data) *
+      fleet$n_lengths$get()
+  )
 })
 
 test_that("von bertalanffy uses fleet length-comp bins when fixed fleet age-to-length conversion rows are absent", {
@@ -644,11 +756,26 @@ test_that("default non-derived growth keeps the historical fixed age-to-length c
     add = TRUE
   )
 
-  fit <- ctx$parameters |>
-    FIMS::initialize_fims(data = ctx$data) |>
-    FIMS::fit_fims(optimize = FALSE)
+  input <- ctx$parameters |>
+    FIMS::initialize_fims(data = ctx$data)
+  input$model$ReportAgeToLengthConversionDerivedTensor(TRUE)
+
+  fit <- FIMS::fit_fims(
+    input = input,
+    optimize = FALSE
+  )
 
   report <- FIMS::get_report(fit)
+  model_output <- FIMS::get_model_output(fit) |>
+    jsonlite::fromJSON(simplifyVector = FALSE)
+
+  fleet_derived_quantities <-
+    model_output[["fleets"]][[1]][["derived_quantities"]]
+  derived_quantity_index <- which(vapply(
+    fleet_derived_quantities,
+    \(x) x[["name"]] == "age_to_length_conversion_derived",
+    logical(1)
+  ))
 
   #' @description Test that the fixed age_to_length_conversion matrix is present for the historical non-derived growth path.
   expect_gt(length(report[["age_to_length_conversion"]][[1]]), 0)
@@ -658,6 +785,9 @@ test_that("default non-derived growth keeps the historical fixed age-to-length c
 
   #' @description Test that no realized growth-derived age-to-length conversion tensor is produced for the fixed historical path.
   expect_equal(length(report[["age_to_length_conversion_derived"]][[1]]), 0)
+
+  #' @description Test that standard output omits the Growth-derived-only tensor for the fixed historical path.
+  expect_length(derived_quantity_index, 0)
 })
 
 test_that("von bertalanffy Newton polishing does not worsen objective or gradient", {

@@ -298,9 +298,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   }
 
   /**
-   * @brief Turn reporting of the Growth-derived age-to-length tensor on or off.
+   * @brief Turn output of the Growth-derived age-to-length tensor on or off.
    *
-   * @param report Whether to include the derived tensor in model reports.
+   * @param report Whether to include the derived tensor in standard output and
+   * TMB reports.
    */
   void ReportAgeToLengthConversionDerivedTensor(bool report) {
 #ifdef TMB_MODEL
@@ -1383,6 +1384,15 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<std::string>{"n_years", "n_lengths"});
       info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
           &derived_quantities["lengthcomp_expected"];
+
+      derived_quantities_dim_info["age_to_length_conversion_derived"] =
+          fims_popdy::DimensionInfo(
+              "age_to_length_conversion_derived",
+              fims::Vector<int>{(fleet_interface->n_years.get()),
+                                (fleet_interface->n_ages.get()),
+                                (fleet_interface->n_lengths.get())},
+              fims::Vector<std::string>{
+                  "n_years", "n_ages", "n_lengths"});
     }
 
     return true;
