@@ -150,8 +150,31 @@ class Information {
 
   Information() {}
 
-  virtual ~Information() {}
+  // Explicit Clear() is not guaranteed before package unload or process exit.
+  // Break recruitment/process ownership cycles while both maps are still alive.
+  virtual ~Information() { ResetRecruitmentLinks(); }
 
+ private:
+  /** @brief Release reciprocal and self-owning recruitment links.
+   *
+   * Only detach shared ownership here. Unlike Clear(), this must not inspect
+   * density-component raw pointers or depend on other singleton lifetimes.
+   */
+  void ResetRecruitmentLinks() noexcept {
+    auto detach = [](auto& models) {
+      for (auto& entry : models) {
+        const auto& recruitment = entry.second;
+        if (recruitment) {
+          recruitment->process.reset();
+          recruitment->recruitment.reset();
+        }
+      }
+    };
+    detach(this->recruitment_models);
+    detach(this->recruitment_process_models);
+  }
+
+ public:
   /**
    * @brief Clears all containers.
    *
@@ -172,28 +195,7 @@ class Information {
     this->n_years = 0;
     this->n_ages = 0;
 
-    for (recruitment_models_iterator it = recruitment_models.begin();
-         it != recruitment_models.end(); ++it) {
-      std::shared_ptr<fims_popdy::RecruitmentBase<Type>> recruitment =
-          (*it).second;
-      if (recruitment->process) {
-        recruitment->process.reset();
-      }
-      if (recruitment->recruitment) {
-        recruitment->recruitment.reset();
-      }
-    }
-    for (recruitment_process_iterator it = recruitment_process_models.begin();
-         it != recruitment_process_models.end(); ++it) {
-      std::shared_ptr<fims_popdy::RecruitmentBase<Type>> recruitment =
-          (*it).second;
-      if (recruitment->process) {
-        recruitment->process.reset();
-      }
-      if (recruitment->recruitment) {
-        recruitment->recruitment.reset();
-      }
-    }
+    ResetRecruitmentLinks();
     this->recruitment_models.clear();
     this->recruitment_process_models.clear();
 

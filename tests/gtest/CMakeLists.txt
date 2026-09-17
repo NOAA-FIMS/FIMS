@@ -410,3 +410,11 @@ target_link_libraries(def_FIMSLog_clear
   fims_test
 )
 gtest_discover_tests(def_FIMSLog_clear)
+
+# Verify recruitment cycles are released during Clear and owner destruction.
+add_executable(information_RecruitmentLifetime
+  test_information_Information_RecruitmentLifetime.cpp
+)
+add_as_invoker_manifest(information_RecruitmentLifetime)
+target_link_libraries(information_RecruitmentLifetime fims_test)
+add_test(NAME information_RecruitmentLifetime COMMAND information_RecruitmentLifetime)
