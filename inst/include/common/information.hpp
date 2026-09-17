@@ -175,7 +175,6 @@ class Information {
   }
 
  public:
-
   /**
    * @brief Clears all containers.
    *
