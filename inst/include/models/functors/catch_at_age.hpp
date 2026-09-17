@@ -13,6 +13,7 @@
 #include <set>
 #include <regex>
 #include <stdexcept>
+#include <type_traits>
 
 #include "fishery_model_base.hpp"
 #include "population_dynamics/age_to_length_conversion/functors/runtime.hpp"
@@ -1057,7 +1058,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * state so standard output cannot retain a stale opt-in tensor.
    */
   void PrepareAgeToLengthConversionDerivedOutput() {
-    if (!isDouble<Type>::value) {
+    if constexpr (!std::is_same_v<Type, double>) {
       return;
     }
 
