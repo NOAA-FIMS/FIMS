@@ -739,8 +739,8 @@ realized_age_to_length_conversion_dataframe <- expand.grid(
   dplyr::mutate(
     length = demo$lengths[.data[["length_i"]]],
     age = demo$ages[.data[["age_i"]]],
-    year = demo$years[.data[["year_i"]]],
-    proportion = realized_age_to_length_conversion_array[
+    timing = demo$years[.data[["year_i"]]],
+    estimated = realized_age_to_length_conversion_array[
       cbind(.data[["length_i"]], .data[["age_i"]], .data[["year_i"]])
     ]
   )
@@ -749,8 +749,8 @@ age_to_length_plot_data <- realized_age_to_length_conversion_dataframe |>
   dplyr::filter(.data[["year"]] == final_year)
 
 plot_age_to_length_conversion(
-  age_to_length_conversion_dataframe = realized_age_to_length_conversion_dataframe,
-  year = final_year
+  data = realized_age_to_length_conversion_dataframe |>
+    dplyr::filter(timing == 2)
 )
 ```
 

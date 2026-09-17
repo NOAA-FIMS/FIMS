@@ -3,61 +3,62 @@
 #' Creates a ridgeline histogram plot of realized age-to-length conversion
 #' probabilities by age for a selected year.
 #'
-#' @param age_to_length_conversion_dataframe A data frame or tibble with columns
-#'   `length`, `age`, `year`, and `proportion`.
-#' @param year Optional integer year to plot. If `NULL`, the maximum available
-#'   year in `age_to_length_conversion_dataframe` is used.
+#' @param data A data frame or tibble with columns `length`, `age`, and
+#'   `timing`, plus either `estimated` or `observed`.
 #'
 #' @return A ggplot object.
 #'
 #' @export
-plot_age_to_length_conversion <- function(age_to_length_conversion_dataframe, year = NULL) {
+plot_age_to_length_conversion <- function(data) {
   if (!requireNamespace("ggridges", quietly = TRUE)) {
     cli::cli_abort(
       "Package {.pkg ggridges} is required to plot age-to-length conversion."
     )
   }
-
-  selected_year <- if (is.null(year)) {
-    max(age_to_length_conversion_dataframe[["year"]])
+  value_column <- if ("estimated" %in% names(data)) {
+    "estimated"
+  } else if ("observed" %in% names(data)) {
+    "observed"
   } else {
-    year
-  }
-
-  if (!selected_year %in% age_to_length_conversion_dataframe[["year"]]) {
     cli::cli_abort(
-      "Input year {.val {selected_year}} is not present in the supplied data."
+      "Data must contain either an {.field estimated} or {.field observed} column."
     )
   }
+  length_bins <- unique(data[["length"]])
+  n_length_bins <- dplyr::n_distinct(data[["length"]])
 
-  age_to_length_conversion_dataframe |>
-    dplyr::filter(.data[["year"]] == selected_year) |>
+  data |>
     ggplot2::ggplot(
       ggplot2::aes(
         x = .data[["length"]],
         y = as.factor(.data[["age"]]),
-        weight = .data[["proportion"]],
+        weight = .data[[value_column]],
         group = .data[["age"]]
       )
     ) +
     ggridges::geom_density_ridges(
       stat = "binline",
-      bins = dplyr::n_distinct(age_to_length_conversion_dataframe[["length"]]),
+      bins = n_length_bins,
       scale = 1.5,
       alpha = 0.8
     ) +
     ggplot2::labs(
-      title = "Realized age-to-length conversion",
-      subtitle = paste(
-        "Length distributions by age in modeled year",
-        selected_year
+      title = paste(
+        dplyr::if_else(
+          value_column == "observed",
+          "Observed",
+          "Realized"
+        ),
+        "age-to-length conversion"
       ),
+      subtitle = "Length distributions by age (x-axis) and time (panel)",
       x = "Length",
       y = "Age"
     ) +
     ggplot2::scale_x_continuous(
-      breaks = unique(age_to_length_conversion_dataframe[["length"]])
+      breaks = length_bins
     ) +
+    ggplot2::facet_grid(timing ~ .) +
     ggridges::theme_ridges() +
     ggplot2::coord_flip() +
     ggplot2::theme_minimal() +
