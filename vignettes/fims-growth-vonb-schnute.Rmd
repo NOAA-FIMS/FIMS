@@ -708,8 +708,8 @@ The final plot is not meant to duplicate the test suite. It shows the realized g
 #|   Realized growth-derived age-to-length conversion in the final modeled
 #|   year, showing length-bin probabilities by age.
 #| fig.alt: >
-#|   Mirrored distributions of length-bin probabilities by age. Each age has
-#|   one vertical distribution, with wider areas showing higher probability.
+#|   Ridgeline plot of length-bin probabilities by age. Each age has one
+#|   distribution, with wider areas showing higher probability.
 
 # Pull the report here because the realized age-to-length conversion tensor and path flags are
 # only available there.

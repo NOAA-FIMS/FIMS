@@ -18,14 +18,20 @@ plot_age_to_length_conversion <- function(age_to_length_conversion_dataframe, ye
     )
   }
 
+  selected_year <- if (is.null(year)) {
+    max(age_to_length_conversion_dataframe[["year"]])
+  } else {
+    year
+  }
+
+  if (!selected_year %in% age_to_length_conversion_dataframe[["year"]]) {
+    cli::cli_abort(
+      "Input year {.val {selected_year}} is not present in the supplied data."
+    )
+  }
+
   age_to_length_conversion_dataframe |>
-    dplyr::filter(
-      .data[["year"]] == if (is.null(year)) {
-        max(age_to_length_conversion_dataframe[["year"]])
-      } else {
-        year
-      }
-    ) |>
+    dplyr::filter(.data[["year"]] == selected_year) |>
     ggplot2::ggplot(
       ggplot2::aes(
         x = .data[["length"]],
@@ -42,7 +48,10 @@ plot_age_to_length_conversion <- function(age_to_length_conversion_dataframe, ye
     ) +
     ggplot2::labs(
       title = "Realized age-to-length conversion",
-      subtitle = "Length distributions by age in the final modeled year",
+      subtitle = paste(
+        "Length distributions by age in modeled year",
+        selected_year
+      ),
       x = "Length",
       y = "Age"
     ) +
