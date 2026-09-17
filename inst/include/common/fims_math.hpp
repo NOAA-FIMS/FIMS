@@ -406,7 +406,7 @@ T sum(const fims::Vector<T> &v) {
  *
  * Calculates the log-probability of the Dirichlet-multinomial distribution
  * using the linear parameterization (theta) as in Fisch et al (2021)
- * \cite fishres:Fisch:2021:ALF. Let 
+ * \cite fishres:Fisch:2021:ALF. Let
  * \f$ n = \sum x_i \f$ be the total count and \f$ \alpha_i = \theta n p_i \f$
  * be the category-specific precision. The log-likelihood is:
  * \f[
