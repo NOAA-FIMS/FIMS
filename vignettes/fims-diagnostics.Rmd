@@ -25,7 +25,7 @@ clear()
 
 ## Set up FIMS model
 
-Following the [minimal FIMS demo vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo-minimal.html), we will set up a FIMS model and run it. This model will contain the all years of data and will be our reference model (see section below for more information about reference models). We need to run it initially to get the MLE parameter estimates. For this example we are using the dataset included in the FIMS package and creating a set of default parameters.
+Following the [FIMS demo vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo.html), we will set up a FIMS model and run it. This model will contain the all years of data and will be our reference model (see section below for more information about reference models). We need to run it initially to get the MLE parameter estimates. For this example we are using the dataset included in the FIMS package and creating a set of default parameters.
 
 ```{r run_fims_model}
 # Load sample data
@@ -44,6 +44,30 @@ base_model <- parameters |>
 # Clear memory post-run
 clear()
 ```
+
+## Observation predictions and dates
+
+For repeated surveys within a year, use `date` and `observation_id` to identify
+samples; `year_i` alone does not uniquely identify an observation. Composition
+rows also need their age or length bin. Annual population estimates still use
+annual coordinates.
+
+`get_estimates()` stores natural-scale observation predictions in `estimated`
+and their standard errors in `uncertainty`. The `expected` column retains the
+likelihood input, such as a log mean for a lognormal index or probabilities for
+a multinomial composition. `generics::augment()` pairs observed values with
+predictions on the same scale and excludes missing (`-999`) observations.
+Timing metadata remains available after `clear()`.
+
+```{r observation-predictions}
+generics::augment(base_model) |>
+  dplyr::filter(fleet == "survey1", label == "index_expected") |>
+  dplyr::select(observation_id, date, .truth, .pred) |>
+  head()
+```
+
+See the [dated survey example](fims-observation-timing.html) for predictions
+from multiple samples per year.
 
 ## Likelihood profile
 
@@ -101,7 +125,7 @@ $$\rho = \frac{1}{n} \sum_{i=1}^{n} \frac{x_{p,y} - x_{base,y}}{x_{base,y}}$$
 
 where $n$ is the number of retrospective peels, $x_{p, y}$ is the estimated value (e.g., spawning biomass, fishing mortality, etc.) from peel $p$ at its terminal year $y$, and $x_{base,y}$ is the value from the reference model, $base$, at that same year $y$.
 
-Some things to note about `run_fims_retrospective()` is that you can provide data that is already a `FIMSFrame` object or you can give it one that is not. In the example below, we are using the `FIMSFrame` data object (`data_4_model`) created above. Additionally, it expects a vector of positive values of `years_to_remove` from the base model, starting from 0. If you are running many peels, it may be more efficient to use multiple cores, which can be specified with the `n_cores` argument. 
+Some things to note about `run_fims_retrospective()` is that you can provide data that is already a `FIMSFrame` object or you can give it one that is not. In the example below, we are using the `FIMSFrame` data object (`data_4_model`) created above. Additionally, it expects a vector of finite, nonnegative integer values of `years_to_remove`, with 0 representing the reference model. If you are running many peels, it may be more efficient to use multiple cores, which can be specified with the `n_cores` argument.
 
 > NOTE: If left empty, the default for `n_cores` is one less than the number of cores on your machine so this could unexpectedly use up a lot of your computing power. 
 
@@ -113,6 +137,13 @@ retro_fit <- run_fims_retrospective(
   n_cores = 1
 )
 ```
+
+Peels remove terminal years of index and composition observations, including
+all dates within each removed year. Annual catch, biological inputs, undated
+bin configuration, and the annual model horizon are retained. Wholly missing
+survey years receive placeholder predictions; `augment()` excludes these from
+observation diagnostics. Thus a peel does not shorten the annual population
+trajectory.
 
 ### Mohn's Rho
 

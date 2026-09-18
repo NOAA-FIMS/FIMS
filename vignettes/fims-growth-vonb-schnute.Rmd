@@ -46,7 +46,9 @@ FIMS uses the fitted growth curve and supplied variability in length-at-age to p
 
 This vignette uses the interpolation-based variability pathway that supplies the standard deviation at the two reference ages through `length_at_age_sd_at_reference_ages`.
 
-> Note:  The delta-method variability pathway is wired into FIMS, but it is not used here because it depends on using von Bertalanffy growth, which is not yet available in FIMS.
+> Note: This example uses interpolation-based variability. The provider also
+> supports delta-method variability; dated evaluations use the configured
+> variability method at the fractional age.
 
 ## Main Example: Estimable VonBertalanffySchnute With Generated Data
 
@@ -809,6 +811,23 @@ fleet observation-bin probabilities
         v
 length-composition and catch calculations
 ```
+
+## Growth at survey dates
+
+The year-only observations above use January 1 growth products. Dated surveys
+use `age + year_fraction`, where the fraction is elapsed days divided by the
+calendar year's 365 or 366 days. The VonBertalanffySchnute provider evaluates
+mean length, length spread, and weight at that fractional age. Growth-derived
+length compositions then use the size distribution at the survey date and the
+fleet's length bins. The oldest plus group uses its representative age plus
+the same fraction; the model does not track individual ages inside that group.
+
+Empirical weight tables and fixed age-to-length conversions remain constant
+within each year. Annual growth reports and population transitions retain their
+annual interpretation. For models with non-January survey dates,
+`get_report(fit)$observation_biology` provides dated biological products; see the
+[worked timing example](fims-observation-timing.html) for the report and its
+associated fit object.
 
 ## Next Steps
 

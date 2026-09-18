@@ -106,6 +106,16 @@ You can use the base R function `plot(data_4_model)` to see the data types (e.g.
 plot(data_4_model)
 ```
 
+### Survey timing
+
+The year-only survey inputs in this example refer to January 1. You can supply
+ISO dates and multiple survey samples per year without changing the annual
+population time step. Catch and fishery compositions remain annual. Use
+`get_observations(data_4_model)` to inspect sample dates and IDs, and see
+[observation timing](fims-observation-timing.html) for a complete dated example.
+The [input-data guide](fims-input-data.html#observation-dates) describes accepted
+formats and validation rules.
+
 ## Parameters
 
 The parameters that are in the model will depend on which modules are used from the FIMS framework. This combination of modules rather than the use of a control file negates the need for complicated if{} else{} statements in the code.

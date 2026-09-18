@@ -16,6 +16,17 @@ surveys at their observation dates. Dates use `YYYY-MM-DD`; a year alone means
 January 1, and `YYYY-MM` means the first day of that month. Mortality rates remain
 annual. Elapsed time is calendar days divided by 365 or 366.
 
+The current implementation supports one population with a pooled partition.
+Catch and compositions from fleets with catch require year-only input.
+Within a fleet and observation type, each date identifies one sample; duplicate
+indices or composition bins are rejected. See the
+[input-data guide](fims-input-data.html#observation-dates) for input conventions.
+
+January 1 observations use the post-transition annual state. Within a year,
+surviving numbers are `N * exp(-Z * year_fraction)`, where `Z` includes natural
+and fishing mortality. December 31 remains inside that year; the next January 1
+belongs to the next modeled year.
+
 This example uses three years of the built-in data, adds July surveys, and uses
 parametric growth at fractional age. To keep the fit small, it estimates only
 survey catchability while holding the other parameters fixed.

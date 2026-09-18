@@ -47,7 +47,7 @@ A sample data frame for a catch-at-age model with both ages and lengths is store
 
 `FIMSFrame()` must be used to create a data object that can be passed to a FIMS model. This function returns an object that has the `FIMSFrame` class. This class contains a data slot that stores the input data frame and several other slots that store summary information about the object, e.g., the fleet names, the number of age bins, etc. All of this information can be accessed using `get_*()` functions, e.g., `get_n_years()`, `get_fleets()`.
 
-When you execute `FIMSFrame()` on a long data frame, such as `data_big`, the function executes several error checks to help ensure that your data is ready for a FIMS model. For example, until the internal estimation of growth is possible, all catch-at-age models require weight-at-age data. If your data frame does not have weight-at-age data, then `FIMSFrame()` will error and return helpful information on what you are missing.
+When you execute `FIMSFrame()` on a long data frame, such as `data_big`, the function executes several error checks to help ensure that your data is ready for a FIMS model. For example, the default empirical-growth configuration requires weight-at-age data. Parametric growth can instead supply weights; see the [growth vignette](fims-growth-vonb-schnute.html). If your data frame does not have weight-at-age data, then `FIMSFrame()` will error and return helpful information on what you are missing.
 
 The output of `FIMSFrame()` also contains summary information about your data and has an internal plotting function. See the [FIMS overview vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo.html) for more information.
 
@@ -56,9 +56,67 @@ data_4_model <- FIMSFrame(data_big)
 data_4_model
 ```
 
+## Observation dates
+
+`timing` accepts integer years, ISO strings (`YYYY`, `YYYY-MM`, or
+`YYYY-MM-DD`), and R `Date` values. For mixed annual and dated rows, use a
+character column: catch and biological inputs can use `"2028"` while survey
+samples use `"2028-07-01"`. A survey year alone means January 1; a missing day
+means the first day of the month. Fractional numeric years, timestamps, and
+ambiguous dates such as `07/01/2028` are not supported.
+
+| Input | Timing interpretation |
+| --- | --- |
+| Catch | Annual interval; requires year-only input |
+| Age/length compositions for a fleet with catch | Annual catch composition; requires year-only input |
+| Index | Point observation on the supplied date |
+| Survey age/length compositions | Point samples; each stream can have its own dates |
+| Biological tables | Annual inputs; fixed tables can retain missing timing |
+
+This example moves survey samples to July while retaining annual fishery data.
+The built-in year labels are shifted to calendar years for this illustration.
+
+```{r survey-dates}
+dated_data <- data_big
+dated_data$timing <- ifelse(
+  is.na(dated_data$timing), NA_character_,
+  sprintf("%04d", dated_data$timing + 2026L)
+)
+survey_rows <- dated_data$fleet == "survey1" &
+  dated_data$type %in% c("index", "age_comp", "length_comp")
+dated_data$timing[survey_rows] <- paste0(
+  dated_data$timing[survey_rows], "-07-01"
+)
+dated_frame <- FIMSFrame(dated_data)
+get_observations(dated_frame) |>
+  dplyr::filter(fleet == "survey1", type == "index") |>
+  dplyr::select(date, timing, year_i, sample_i, year_fraction) |>
+  head(3)
+```
+
+Multiple samples in one year are allowed on different dates. Within a fleet
+and data type, a date identifies one pooled sample: duplicate indices or
+repeated composition bins on that date are errors. Composition bins share one
+`observation_id`; supplying a separate `sample_id` does not enable replicates
+on the same date. The current timing implementation supports one population
+and a pooled partition.
+
+`get_data()` retains integer model years in `timing` and normalized dates in
+`date`. When editing normalized data, keep `timing`, `date`, and
+`input_precision` consistent. For substantial date changes, edit the original
+input table and rebuild the `FIMSFrame`. `get_observations()` returns one row
+per sample, including January 1 placeholders for wholly missing years. It does
+not insert extra January samples into years that already have dated samples.
+
+Input age labels remain integers. Within-year survival uses elapsed calendar
+days divided by 365 or 366; parametric biology uses age plus that fraction.
+Empirical weights and fixed age-to-length mappings retain their annual values.
+See [Annual catch with dated survey observations](fims-observation-timing.html)
+for fitting, predictions, and diagnostic examples.
+
 ## Catch (`type == "catch"`)
 
-The catch data type contains the total catch in weight for each time step. FIMS does not yet include the option to model discards internally, so "catch" should account for all catch. The catch are not associated with an age or length so those columns should only contain `NA` values. The `unit` column should currently always be `mt`. The `uncertainty` column should be the standard deviation of the logged observations if you are using the lognormal distribution to fit your data. `log_Fmort` parameters for each fleet and time step with catch can be estimated to fit the model to the catch data, informed by the uncertainty values. Common practice is to set the uncertainty to a small number, like 0.001, so the catch data are fit closely.
+The catch data type contains the total catch in weight for each annual interval. FIMS does not yet include the option to model discards internally, so "catch" should account for all catch. The catch are not associated with an age or length so those columns should only contain `NA` values. The `unit` column should currently always be `mt`. The `uncertainty` column should be the standard deviation of the logged observations if you are using the lognormal distribution to fit your data. `log_Fmort` parameters for each fleet and time step with catch can be estimated to fit the model to the catch data, informed by the uncertainty values. Common practice is to set the uncertainty to a small number, like 0.001, so the catch data are fit closely.
 
 ```{r data_big-catch}
 # first three rows of the catch data
@@ -81,7 +139,7 @@ FIMS::data_big |>
 
 ## Indices (`type == "index"`)
 
-The index data type contains the relative or absolute abundance index for each time step. The inputs are similar to catch, in having `NA` values for age and length, `mt` for `unit`, and index uncertainty as the standard deviation of the logged observations.
+The index data type contains the relative or absolute abundance index for each observation date. The inputs are similar to catch, in having `NA` values for age and length, `mt` for `unit`, and index uncertainty as the standard deviation of the logged observations.
 
 ```{r data_big-indices}
 # first three rows of the index data

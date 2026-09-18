@@ -123,6 +123,25 @@ data_4_projections <- data_big_with_extra_year |>
   FIMSFrame()
 ```
 
+### Survey predictions during projections
+
+Projection years still require annual catch or fishing-mortality settings and
+biological inputs, including terminal weights for empirical growth. A survey
+date does not replace these annual inputs. Year-only survey rows predict
+January 1 values; explicit dates predict surviving abundance within the year.
+
+To request a future survey prediction, supply its date, missing observation
+(`-999`), and the appropriate likelihood uncertainty. Build these rows in the
+original input table before calling `FIMSFrame()`. When changing normalized
+output from `get_data()`, also update `date` and `input_precision` consistently
+with `timing`.
+
+Predictions for missing samples are available through `get_estimates()`;
+`augment()` excludes them because there is no observed value to compare.
+Adding survey prediction dates leaves annual population states, catch, and
+spawning biomass unchanged when parameters and annual inputs are held fixed.
+See [observation timing](fims-observation-timing.html) for dated predictions.
+
 ### Model
 
 The default configuration from a model without projections can be used as the default configuration. After the parameter configuration is created it must be manipulated to alter the default parameters for things like selectivity, fishing mortality, etc. We believe that it is easier to alter default configurations rather than creating your own from scratch. So, much of what is done below for projections was also done in the [introductory vignette](fims-demo.html).
