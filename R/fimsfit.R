@@ -358,6 +358,34 @@ is.FIMSFit <- function(x) {
 
 # Constructors ----
 
+# Apply TMB's factor map to names from FIMS's full parameter registry.
+# TMB omits NA entries and returns one optimized parameter per factor level.
+tmb_mapped_parameter_names <- function(parameter_names, map = NULL) {
+  if (is.null(map)) {
+    return(parameter_names)
+  }
+  if (!is.factor(map)) {
+    cli::cli_abort("A TMB parameter map must be a factor.")
+  }
+  if (length(parameter_names) != length(map)) {
+    cli::cli_abort(c(
+      "A TMB parameter map must have one entry per FIMS parameter.",
+      "i" = paste0(
+        "Found {length(map)} map entries for ",
+        "{length(parameter_names)} parameters."
+      )
+    ))
+  }
+
+  keep <- !is.na(map)
+  active_map <- droplevels(map[keep])
+  active_names <- parameter_names[keep]
+
+  vapply(levels(active_map), function(level) {
+    active_names[as.character(active_map) == level][[1L]]
+  }, character(1L), USE.NAMES = FALSE)
+}
+
 #' Class constructors for class `FIMSFit` and associated child classes
 #'
 #' Create an object with the class of `FIMSFit` after running a FIMS model. This
@@ -449,10 +477,25 @@ FIMSFit <- function(
   }
   max_gradient <- if (length(opt) > 0) max(abs(gradient_vector)) else NA_real_
 
-  # Rename parameters instead of "p"
-  parameter_names <- names(get_parameter_names(obj[["par"]]))
+  # get_parameter_names() describes the full FIMS vector. Reduce those names
+  # using the same factor map that TMB used to construct obj$par.
+  full_parameter_names <- names(get_parameter_names(
+    as.list(input[["parameters"]][["p"]])
+  ))
+  parameter_names <- tmb_mapped_parameter_names(
+    full_parameter_names,
+    input[["map"]][["p"]]
+  )
+  if (length(parameter_names) != length(obj[["par"]])) {
+    cli::cli_abort(c(
+      "TMB and FIMS produced different numbers of fixed parameters.",
+      "i" = paste0(
+        "TMB produced {length(obj[[\"par\"]])}; FIMS produced ",
+        "{length(parameter_names)} mapped names."
+      )
+    ))
+  }
   names(obj[["par"]]) <- parameter_names
-  random_effects_names <- names(get_random_names(obj[["env"]]$parList()[["re"]]))
 
   # Get the report
   report <- if (length(opt) == 0) {
@@ -637,7 +680,10 @@ fit_fims <- function(input,
 
   check_mle_convergence(input, obj, opt, maxgrad)
 
-  FIMS::set_fixed(opt[["par"]])
+  # Expand TMB's reduced optimization vector back to the full FIMS parameter
+  # vector before copying values into the C++ model. This is a no-op when no
+  # TMB map is present and restores fixed/shared entries when one is present.
+  FIMS::set_fixed(obj[["env"]]$parList(opt[["par"]])[["p"]])
 
   time_sdreport <- NA
   if (get_sd) {
