@@ -2,6 +2,7 @@
 #' Tests fixed input and realized Growth-derived output plotting, fleet selection,
 #' and informative errors for unsupported or incomplete inputs.
 
+testthat::skip_if_not_installed("ggridges")
 
 ## Setup ----
 data("data_big", package = "FIMS")

@@ -717,6 +717,8 @@ The final plot shows the realized growth-derived age-to-length conversion across
 report <- FIMS::get_report(fit)
 
 # Standard output expands the requested derived tensor into long model output.
+# The current JSON parser returns dimension positions, so year_i, age_i, and
+# length_i are indices rather than the original year, age, or length-bin values.
 age_to_length_plot_data <- model_estimates |>
   dplyr::filter(
     .data[["label"]] == "age_to_length_conversion_derived"
