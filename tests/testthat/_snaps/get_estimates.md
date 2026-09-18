@@ -7,7 +7,7 @@
         width = Inf))
       cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
     Output
-      # A tibble: 19,816 x 19
+      # A tibble: 13,996 x 19
           module_name module_id module_type label            type   type_id
           <chr>           <int> <chr>       <chr>            <chr>    <int>
         1 Fleet               1 <NA>        log_Fmort        vector       4
@@ -974,7 +974,7 @@
       318 derived_quantity multinomial  data       -836.     NA
       319 derived_quantity multinomial  data       -836.     NA
       320 derived_quantity multinomial  data       -836.     NA
-      # i 19,496 more rows
+      # i 13,676 more rows
 
 # `get_estimates()` works with estimation run
 
@@ -985,7 +985,7 @@
         width = Inf))
       cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
     Output
-      # A tibble: 19,816 x 19
+      # A tibble: 13,996 x 19
           module_name module_id module_type label            type   type_id
           <chr>           <int> <chr>       <chr>            <chr>    <int>
         1 Fleet               1 <NA>        log_Fmort        vector       4
@@ -1952,5 +1952,5 @@
       318 derived_quantity multinomial  data       -826.     NA
       319 derived_quantity multinomial  data       -826.     NA
       320 derived_quantity multinomial  data       -826.     NA
-      # i 19,496 more rows
+      # i 13,676 more rows
 
