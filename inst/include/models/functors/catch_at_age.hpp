@@ -13,6 +13,7 @@
 #include <set>
 #include <regex>
 #include <stdexcept>
+#include <type_traits>
 
 #include "fishery_model_base.hpp"
 #include "population_dynamics/age_to_length_conversion/functors/runtime.hpp"
@@ -121,11 +122,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   std::map<std::string, fims::Vector<fims::Vector<Type>>> report_vectors;
   /**
-   * @brief Controls whether reporting materializes the full derived
+   * @brief Controls whether output materializes the full derived
    * age-to-length tensor for fleets using the growth-derived age-to-length
    * conversion path.
    *
-   * Default is false to avoid large report-side allocations.
+   * Default is false to avoid large output-side allocations.
    */
   bool report_age_to_length_conversion_derived_tensor = false;
 
@@ -1051,6 +1052,64 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
+   * @brief Populate the requested fleet growth-derived age-to-length tensor.
+   *
+   * Remove a previously materialized tensor before checking current reporting
+   * state so standard output cannot retain a stale opt-in tensor.
+   */
+  void PrepareAgeToLengthConversionDerivedOutput() {
+    if constexpr (!std::is_same_v<Type, double>) {
+      return;
+    }
+
+    for (fleet_iterator fit = this->fleets.begin();
+         fit != this->fleets.end(); ++fit) {
+      std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+      std::map<std::string, fims::Vector<Type>> &derived_quantities =
+          this->GetFleetDerivedQuantities(fleet->GetId());
+
+      derived_quantities.erase("age_to_length_conversion_derived");
+
+      if (!this->report_age_to_length_conversion_derived_tensor) {
+        continue;
+      }
+
+      std::shared_ptr<fims_popdy::AgeToLengthConversionDerived<Type>>
+          age_to_length_conversion_derived =
+              std::dynamic_pointer_cast<
+                  fims_popdy::AgeToLengthConversionDerived<Type>>(
+                  fleet->age_to_length_conversion_model);
+
+      if (age_to_length_conversion_derived == nullptr ||
+          !age_to_length_conversion_derived->IsActive()) {
+        continue;
+      }
+
+      fims::Vector<Type> &age_to_length_conversion_output =
+          derived_quantities["age_to_length_conversion_derived"];
+      age_to_length_conversion_output.resize(
+          fleet->n_years * fleet->n_ages * fleet->n_lengths);
+
+      for (size_t year = 0; year < fleet->n_years; ++year) {
+        for (size_t age = 0; age < fleet->n_ages; ++age) {
+          fims::Vector<Type> age_to_length_conversion_row;
+          BuildAgeToLengthConversionDerivedRowOrThrow(
+              age_to_length_conversion_derived, fleet, year, age,
+              age_to_length_conversion_row);
+
+          for (size_t length = 0; length < fleet->n_lengths; ++length) {
+            const size_t output_index =
+                year * (fleet->n_ages * fleet->n_lengths) +
+                age * fleet->n_lengths + length;
+            age_to_length_conversion_output[output_index] =
+                age_to_length_conversion_row[length];
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * @brief Compute fleet-specific mean weight-at-age from one growth-derived
    * age-to-length conversion row.
    *
@@ -1404,6 +1463,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     Prepare();
     PreparePopulationGrowthProducts();
     EnsureAllFleetAgeToLengthConversion();
+    PrepareAgeToLengthConversionDerivedOutput();
     /*
      start at year=0, age=0;
      here year 0 is the estimated initial population structure and age 0 are

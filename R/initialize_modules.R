@@ -456,6 +456,7 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     fleet = fleet,
     module_name = "Fleet"
   )
+  module$SetName(fleet)
 
   fleet_types <- get_data(data) |>
     dplyr::filter(.data$fleet == .env$fleet) |>
