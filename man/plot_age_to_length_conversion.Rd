@@ -2,21 +2,22 @@
 % Please edit documentation in R/plot_age_to_length_conversion.R
 \name{plot_age_to_length_conversion}
 \alias{plot_age_to_length_conversion}
-\title{Plot Realized Age-to-Length Conversion}
+\title{Plot Age-to-Length Conversion}
 \usage{
-plot_age_to_length_conversion(age_to_length_conversion_dataframe, year = NULL)
+plot_age_to_length_conversion(data, fleet = NULL)
 }
 \arguments{
-\item{age_to_length_conversion_dataframe}{A data frame or tibble with columns
-\code{length}, \code{age}, \code{year}, and \code{proportion}.}
+\item{data}{A \code{\link[=FIMSFrame]{FIMSFrame()}} containing \code{age_to_length_conversion} rows, or
+long output from \code{\link[=get_estimates]{get_estimates()}} containing
+\code{age_to_length_conversion_derived} rows.}
 
-\item{year}{Optional integer year to plot. If \code{NULL}, the maximum available
-year in \code{age_to_length_conversion_dataframe} is used.}
+\item{fleet}{Optional fleet name for realized Growth-derived output. It is
+required when the output contains multiple fleets.}
 }
 \value{
 A ggplot object.
 }
 \description{
-Creates a ridgeline histogram plot of realized age-to-length conversion
-probabilities by age for a selected year.
+Creates a ridgeline plot of either fixed age-to-length conversion input or
+realized Growth-derived age-to-length conversion output.
 }

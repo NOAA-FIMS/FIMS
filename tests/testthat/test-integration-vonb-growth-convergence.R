@@ -631,6 +631,15 @@ test_that("von bertalanffy includes requested derived age-to-length conversion i
       FIMS::get_n_ages(ctx$data) *
       fleet$n_lengths$get()
   )
+
+  #' @description Test that realized derived output from a fitted model can be plotted by fleet.
+  expect_s3_class(
+    plot_age_to_length_conversion(
+      data = all_estimates,
+      fleet = "fleet1"
+    ),
+    "ggplot"
+  )
 })
 
 test_that("von bertalanffy uses fleet length-comp bins when fixed fleet age-to-length conversion rows are absent", {
