@@ -41,6 +41,8 @@ databucket
 dataframe
 dataframes
 DCMAKE
+ddirichlet
+DDirichletMultinomialDistributionsInterface
 deqn
 dlognorm
 dmultinorm
@@ -63,6 +65,7 @@ fimsfit
 fimsframe
 fimslog
 firstname
+Fisch
 fishprior
 fishres
 Fmort
@@ -114,6 +117,8 @@ MAINPAGE
 Makevars
 Mangel
 mape
+mathbf
+mathcal
 mathrel
 mathrm
 maxgrad
@@ -128,6 +133,7 @@ mohns
 Moolgavkar
 multicore
 MULTINOMIAL
+multinom
 multisession
 mymap
 Nages
@@ -148,6 +154,7 @@ opensci
 oppy
 ordinnames
 Ovec
+overdispersion
 overparameterized
 parameterizations
 Pdev

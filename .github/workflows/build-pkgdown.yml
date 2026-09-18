@@ -70,8 +70,18 @@ jobs:
 
       - name: Installing build dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y coreutils grep findutils
-          sudo apt install cmake doxygen gcc git ninja-build
+          sudo apt-get update 
+          sudo apt-get install -y \
+            coreutils \
+            grep \
+            findutils \
+            cmake \
+            doxygen \
+            gcc \
+            git \
+            ninja-build \
+            perl \
+            texlive-binaries
 
       - name: Building HTML documentation with Doxygen
         # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
