@@ -1062,8 +1062,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       return;
     }
 
-    for (fleet_iterator fit = this->fleets.begin();
-         fit != this->fleets.end(); ++fit) {
+    for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end();
+         ++fit) {
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           this->GetFleetDerivedQuantities(fleet->GetId());
@@ -1075,10 +1075,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
       }
 
       std::shared_ptr<fims_popdy::AgeToLengthConversionDerived<Type>>
-          age_to_length_conversion_derived =
-              std::dynamic_pointer_cast<
-                  fims_popdy::AgeToLengthConversionDerived<Type>>(
-                  fleet->age_to_length_conversion_model);
+          age_to_length_conversion_derived = std::dynamic_pointer_cast<
+              fims_popdy::AgeToLengthConversionDerived<Type>>(
+              fleet->age_to_length_conversion_model);
 
       if (age_to_length_conversion_derived == nullptr ||
           !age_to_length_conversion_derived->IsActive()) {
@@ -1087,8 +1086,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       fims::Vector<Type> &age_to_length_conversion_output =
           derived_quantities["age_to_length_conversion_derived"];
-      age_to_length_conversion_output.resize(
-          fleet->n_years * fleet->n_ages * fleet->n_lengths);
+      age_to_length_conversion_output.resize(fleet->n_years * fleet->n_ages *
+                                             fleet->n_lengths);
 
       for (size_t year = 0; year < fleet->n_years; ++year) {
         for (size_t age = 0; age < fleet->n_ages; ++age) {

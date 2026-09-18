@@ -1391,8 +1391,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<int>{(fleet_interface->n_years.get()),
                                 (fleet_interface->n_ages.get()),
                                 (fleet_interface->n_lengths.get())},
-              fims::Vector<std::string>{
-                  "n_years", "n_ages", "n_lengths"});
+              fims::Vector<std::string>{"n_years", "n_ages", "n_lengths"});
     }
 
     return true;
