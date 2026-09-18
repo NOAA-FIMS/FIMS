@@ -380,8 +380,8 @@ dimensions_to_tibble <- function(data) {
   #' Example: "n_ages+1" with "age_i"
   #' This matches names starting with 'n' (with or without an underscore)
   #' and shortens them to a simple indexed form.
-  # Map n_strata before the plural-strip regex: "n_strata" would otherwise
-  # become "trata_i" because the trailing "s" is consumed by the pattern.
+  # Map n_strata before the plural-strip regex; otherwise the trailing "s" in
+  # "strata" is stripped and the index name is wrong.
   better_names <- unlist(data[["header"]], use.names = FALSE)
   is_strata <- better_names == "n_strata"
   better_names <- gsub(
