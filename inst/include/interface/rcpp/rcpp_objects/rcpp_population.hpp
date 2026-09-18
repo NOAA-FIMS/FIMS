@@ -145,6 +145,19 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   VariableVector proportion_female;
   /**
+   * @brief Which partition strata to materialize in derived quantities.
+   *
+   * @details Mirrors Population::partition_demand. Empty selections mean
+   * pooled output only (backward-compatible default). Non-empty selections
+   * are named axis filters, e.g. axis \"sex\" with level \"female\". Held in
+   * a shared_ptr so the R-facing instance and the live_objects clone stay in
+   * sync (same pattern as fleet_ids). Configure from R with
+   * SetPartitionDemand() / GetPartitionDemand().
+   */
+  std::shared_ptr<fims_popdy::PartitionDemand> partition_demand =
+      std::make_shared<fims_popdy::PartitionDemand>(
+          fims_popdy::MakePooledPartitionDemand());
+  /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
    */
@@ -261,6 +274,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
         proportion_female(other.proportion_female),
+        partition_demand(other.partition_demand),
         ages(other.ages),
         name(other.name),
         total_catch_weight(other.total_catch_weight),
@@ -300,6 +314,89 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @return The name.
    */
   std::string GetName() const { return this->name.get(); }
+
+  /**
+   * @brief Set partition demand from an R named list.
+   *
+   * @details Empty or NULL means pooled (no partitioned output). Otherwise
+   * each list name is an axis and each value is a character vector of level
+   * labels, e.g. list(sex = "female") or list(sex = c("female", "male")).
+   * Each axis may appear only once; use a level vector for multiple levels
+   * rather than repeating the axis name. A single "*" for a level means all
+   * levels on that axis (wildcard).
+   *
+   * @param demand_list Named list of axis → level labels, or NULL/empty.
+   */
+  void SetPartitionDemand(Rcpp::Nullable<Rcpp::List> demand_list) {
+    if (demand_list.isNull()) {
+      *this->partition_demand = fims_popdy::MakePooledPartitionDemand();
+      return;
+    }
+    Rcpp::List lst(demand_list.get());
+    if (lst.size() == 0) {
+      *this->partition_demand = fims_popdy::MakePooledPartitionDemand();
+      return;
+    }
+    if (Rf_isNull(lst.names())) {
+      throw std::invalid_argument(
+          "SetPartitionDemand: demand list must be named, e.g. "
+          "list(sex = \"female\").");
+    }
+    Rcpp::CharacterVector axis_names = lst.names();
+    fims_popdy::PartitionDemand demand;
+    for (R_xlen_t i = 0; i < lst.size(); ++i) {
+      fims_popdy::AxisLevelSelection selection;
+      selection.axis_name = Rcpp::as<std::string>(axis_names[i]);
+      if (selection.axis_name.empty()) {
+        throw std::invalid_argument(
+            "SetPartitionDemand: axis names must be non-empty.");
+      }
+      for (const fims_popdy::AxisLevelSelection &existing : demand.selections) {
+        if (existing.axis_name == selection.axis_name) {
+          throw std::invalid_argument(
+              "SetPartitionDemand: duplicate axis \"" + selection.axis_name +
+              "\". Provide each axis once with a level vector, e.g. list(sex = "
+              "c(\"female\", \"male\")).");
+        }
+      }
+      Rcpp::CharacterVector levels =
+          Rcpp::as<Rcpp::CharacterVector>(lst[static_cast<int>(i)]);
+      if (levels.size() == 0) {
+        throw std::invalid_argument(
+            "SetPartitionDemand: level vector for axis \"" +
+            selection.axis_name + "\" must be non-empty.");
+      }
+      for (R_xlen_t j = 0; j < levels.size(); ++j) {
+        selection.level_names.push_back(Rcpp::as<std::string>(levels[j]));
+      }
+      demand.selections.push_back(std::move(selection));
+    }
+    *this->partition_demand = std::move(demand);
+  }
+
+  /**
+   * @brief Get partition demand as an R named list.
+   *
+   * @details Empty list means pooled. Otherwise same shape as
+   * SetPartitionDemand(), e.g. list(sex = "female").
+   *
+   * @return Named list of axis → level labels, or empty list if pooled.
+   */
+  Rcpp::List GetPartitionDemand() const {
+    const fims_popdy::PartitionDemand &demand = *this->partition_demand;
+    if (demand.is_pooled()) {
+      return Rcpp::List::create();
+    }
+    Rcpp::List out(demand.selections.size());
+    Rcpp::CharacterVector names(demand.selections.size());
+    for (size_t i = 0; i < demand.selections.size(); ++i) {
+      const fims_popdy::AxisLevelSelection &selection = demand.selections[i];
+      names[i] = selection.axis_name;
+      out[i] = Rcpp::wrap(selection.level_names);
+    }
+    out.attr("names") = names;
+    return out;
+  }
 
   /**
    * @brief Sets the unique ID for the Maturity object.
@@ -565,6 +662,10 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     info->variable_map[this->proportion_female.id_m] =
         &(population)->proportion_female;
+
+    // Copy user demand from the interface (empty = pooled). Must happen
+    // before CatchAtAge::Initialize(), which must not overwrite this.
+    population->partition_demand = *this->partition_demand;
 
     for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
