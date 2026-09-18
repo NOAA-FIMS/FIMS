@@ -1,8 +1,11 @@
 # `get_estimates()` works with deterministic run
 
     Code
-      print(dplyr::select(get_estimates(deterministic_results), -estimated, -expected,
-      -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient), n = 320, width = Inf)
+      estimates_snapshot <- dplyr::select(get_estimates(deterministic_results),
+      -estimated, -expected, -uncertainty, -gradient, -likelihood, -log_like_cv)
+      estimates_snapshot_lines <- capture.output(print(estimates_snapshot, n = 320,
+        width = Inf))
+      cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
     Output
       # A tibble: 19,816 x 19
           module_name module_id module_type label            type   type_id
@@ -976,9 +979,11 @@
 # `get_estimates()` works with estimation run
 
     Code
-      print(dplyr::select(get_estimates(readRDS(fit_files[[1]])), -estimated,
-      -expected, -uncertainty, -gradient, -likelihood, -log_like_cv, -gradient), n = 320,
-      width = Inf)
+      estimates_snapshot <- dplyr::select(get_estimates(readRDS(fit_files[[1]])),
+      -estimated, -expected, -uncertainty, -gradient, -likelihood, -log_like_cv)
+      estimates_snapshot_lines <- capture.output(print(estimates_snapshot, n = 320,
+        width = Inf))
+      cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
     Output
       # A tibble: 19,816 x 19
           module_name module_id module_type label            type   type_id

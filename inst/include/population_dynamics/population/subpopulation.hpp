@@ -285,11 +285,17 @@ inline PartitionSpec MakeDefaultSexPartitionSpec() {
 
 namespace detail {
 
+/**
+ * @brief True when spec is a single sex axis with female and male levels.
+ */
 inline bool is_sex_only_partition(const PartitionSpec &spec) {
   return spec.axes.size() == 1 && spec.axes[0].name == "sex" &&
          spec.axes[0].size() == 2 && spec.n_strata() == 2;
 }
 
+/**
+ * @brief Index of axis_name in spec, or -1 if missing.
+ */
 inline int find_axis_index(const PartitionSpec &spec,
                            const std::string &axis_name) {
   for (size_t i = 0; i < spec.axes.size(); ++i) {
@@ -300,6 +306,9 @@ inline int find_axis_index(const PartitionSpec &spec,
   return -1;
 }
 
+/**
+ * @brief Index of level_name on axis, or -1 if missing.
+ */
 inline int find_level_index(const Axis &axis, const std::string &level_name) {
   for (size_t i = 0; i < axis.levels.size(); ++i) {
     if (axis.levels[i] == level_name) {
@@ -309,6 +318,9 @@ inline int find_level_index(const Axis &axis, const std::string &level_name) {
   return -1;
 }
 
+/**
+ * @brief True when level_names is a permutation of every level on axis.
+ */
 inline bool selection_covers_all_levels(
     const Axis &axis, const std::vector<std::string> &level_names) {
   if (level_names.size() != axis.size()) {

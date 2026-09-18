@@ -161,12 +161,19 @@ reshape_json_estimates <- function(model_output) {
     fleet_information,
     module_information,
     population_information
-  ) |>
+  )
+  # Keep a stable index schema: pooled fixtures have no n_strata dimension, but
+  # get_estimates() still exposes stratum_i (NA) so colnames stay consistent.
+  if (!"stratum_i" %in% names(out)) {
+    out$stratum_i <- NA_integer_
+  }
+  out <- out |>
     dplyr::select(
       dplyr::all_of(c("module_name", "module_id", "module_type")),
       "label" = dplyr::all_of("name"),
       dplyr::all_of(c("type", "type_id")), "parameter_id" = dplyr::all_of("id"),
-      dplyr::all_of("fleet"), dplyr::ends_with("_i"),
+      dplyr::all_of("fleet"),
+      dplyr::any_of(c("year_i", "age_i", "stratum_i", "length_i")),
       "input" = dplyr::all_of("value"),
       estimated = "estimated_value",
       "expected" = expected_values,
@@ -373,9 +380,16 @@ dimensions_to_tibble <- function(data) {
   #' Example: "n_ages+1" with "age_i"
   #' This matches names starting with 'n' (with or without an underscore)
   #' and shortens them to a simple indexed form.
-  better_names <- unlist(data[["header"]]) |>
-    gsub(pattern = "^n_?(.+?)s([-\\+]\\d+)?$", replacement = "\\1_i")
-  better_names[better_names == "n_strata"] <- "stratum_i"
+  # Map n_strata before the plural-strip regex: "n_strata" would otherwise
+  # become "trata_i" because the trailing "s" is consumed by the pattern.
+  better_names <- unlist(data[["header"]], use.names = FALSE)
+  is_strata <- better_names == "n_strata"
+  better_names <- gsub(
+    pattern = "^n_?(.+?)s([-\\+]\\d+)?$",
+    replacement = "\\1_i",
+    x = better_names
+  )
+  better_names[is_strata] <- "stratum_i"
   names(data[["dimensions"]]) <- better_names
   if (length(better_names) == 0) {
     # When the header is NULL
