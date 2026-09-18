@@ -203,11 +203,9 @@ namespace fims_math
   /**
    * @brief Computes the natural logarithm of the absolute value of the [gamma
    * function](https://en.wikipedia.org/wiki/Gamma_function) of x for a TMB
-   * model. The function specifically uses std::lgamma, defined in cmath header,
-   * instead of ::lgamma because the standard library function works with TMBad
-   * library, which is designed to recognize and apply its automatic
-   * differentiation capabilities to functions from the standard library. Also
-   * note that this function cannot be tested using the compilation flag
+   * model. Calls TMB's global lgamma overload, which supports automatic
+   * differentiation types as well as doubles. Note that this function cannot
+   * be tested using the compilation flag
    * -DTMB_MODEL through CMake and Google Test.
    * @param x The value to take the natural logarithm of the absolute value of
    * the gamma function of. Please use fims_math::lgamma<double>(x) if x is an
@@ -218,9 +216,8 @@ namespace fims_math
   template <class Type>
   inline const Type lgamma(const Type &x)
   {
-    // use std::lgamma for double type, look for TMB version of lgamma if AD type
-    using std::lgamma;
-    return lgamma(x);
+    // TMB's overload is global and is not found by argument-dependent lookup.
+    return ::lgamma(x);
   }
 
   /**
