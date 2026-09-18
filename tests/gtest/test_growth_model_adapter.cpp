@@ -95,14 +95,29 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, HonorsAgeOffset) {
   EXPECT_NEAR(W, expected, 1e-8);
 }
 
-TEST(VonBertalanffySchnuteGrowthModelAdapter, RejectsFractionalAge) {
+TEST(VonBertalanffySchnuteGrowthModelAdapter, EvaluatesFractionalAge) {
   fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double> adapter;
   ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
   adapter.SetAgeOffset(1.0);
   adapter.Initialize(1, 12, 1);
 
-  EXPECT_THROW(adapter.evaluate(0, 5.5), std::runtime_error);
+  const double denom =
+      fims_math::ad_max(fims_math::ad_fabs(1 - std::exp(-0.18 * 11.0)), 1e-8);
+  const double length = 275.0 + 450.0 * (1 - std::exp(-0.18 * 4.5)) / denom;
+  const double old_length =
+      275.0 + 450.0 * (1 - std::exp(-0.18 * 11.0)) / denom;
+  const double sd = fims_math::ad_max(
+      28 + 45 * (length - 275) /
+               fims_math::ad_max(fims_math::ad_fabs(old_length - 275), 1e-8),
+      1e-8);
+  EXPECT_NEAR(adapter.evaluate(0, 5.5), 2.5e-11 * std::pow(length, 3.0), 1e-10);
+  adapter.PrepareGrowthProducts();
+  const auto products = adapter.EvaluateGrowthAtAge(0, 5.5);
+  EXPECT_NEAR(products.mean_length, length, 1e-10);
+  EXPECT_NEAR(products.sd_length, sd, 1e-10);
+  EXPECT_NEAR(products.mean_weight, adapter.evaluate(0, 5.5), 1e-10);
+  EXPECT_THROW(adapter.EvaluateGrowthAtAge(1, 5.5), std::runtime_error);
 }
 
 TEST(VonBertalanffySchnuteGrowthModelAdapter, RejectsNegativeAge) {

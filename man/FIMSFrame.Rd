@@ -25,6 +25,19 @@ class. Future, associated child classes will have the additional slots
 needed for different types of models.
 }
 \details{
+Observation timing accepts integer years, ISO strings (\code{YYYY},
+\code{YYYY-MM}, \code{YYYY-MM-DD}), or R Date values. Survey dates default
+missing months/days to January/the first day. Catch and fishery compositions
+require year-only input and represent annual intervals. Biological input tables
+remain annual. Returned data retain integer years in \code{timing} and
+normalized dates in \code{date}. Use \code{\link[=get_observations]{get_observations()}} for sample IDs
+and backend coordinates. Multiple survey samples per year are supported. Dated
+survey predictions apply within-year mortality and evaluate parametric growth
+and maturity at fractional ages. Empirical weights and fixed age-to-length
+mappings retain their annual values. Population transitions and fishery
+observations remain annual.
+
+
 \subsection{data}{
 
 The input data are both sorted (see the section below on sorting) and
@@ -32,9 +45,9 @@ expanded to include -999 observations for all missing rows before returning
 them in the data slot.
 \subsection{Ages}{
 
-Currently, ages must be integers, i.e., FIMS cannot accommodate numeric ages
-like age 1.5 but we hope that this is something that we will be able to
-accommodate in the future. Additionally, the first age in your data set will
+Input age-class labels must be integers. Parametric biology at survey dates
+uses these ages plus the elapsed fraction of the year. The first age in your
+data set will
 be the age at which fish recruit to the population. So, if you do not have
 age-0 age compositions and age two is the first age you have in your
 composition data, then recruitment will happen at age two. Furthermore, you

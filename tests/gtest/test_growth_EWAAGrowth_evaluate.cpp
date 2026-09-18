@@ -69,4 +69,11 @@ TEST(EWAAGrowth_evaluate, HandlesEdgeCase) {
   // above
   EXPECT_EQ(ewaa2.GetId(), 0);
 }
+TEST(EWAAGrowth_evaluate, ObservationDatesUseAnnualLookup) {
+  fims_popdy::EWAAGrowth<double> growth;
+  growth.ewaa[0][5] = 2;
+  EXPECT_EQ(growth.EvaluateAtObservation(0, 5, .5), 2);
+  EXPECT_EQ(growth.ewaa[0].size(), 1u);
+}
+
 }  // namespace

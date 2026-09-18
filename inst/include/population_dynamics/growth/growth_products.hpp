@@ -16,6 +16,14 @@
 
 namespace fims_popdy {
 
+/** @brief Biological products at one continuous age (no annual cache indices).
+ */
+template <typename Type> struct GrowthAtAge {
+  Type mean_length;
+  Type sd_length;
+  Type mean_weight;
+};
+
 /**
  * @brief Growth "products" in a consistent (year, age, sex) space.
  *

@@ -113,8 +113,9 @@ run_fims_retrospective <- function(
     cli::cli_abort("years_to_remove must have at least one value")
   }
 
-  if (any(years_to_remove < 0)) {
-    cli::cli_abort("years_to_remove must contain non-negative values")
+  if (!is.numeric(years_to_remove) || any(!is.finite(years_to_remove)) ||
+      any(years_to_remove < 0 | years_to_remove %% 1 != 0)) {
+    cli::cli_abort("years_to_remove must contain non-negative integer values")
   }
 
   # Set number of cores to use

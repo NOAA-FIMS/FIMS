@@ -44,6 +44,15 @@ struct GrowthBase : public fims_model_object::FIMSObject<Type> {
    * @param a The age at which to return weight of the fish (in kg).
    */
   virtual const Type evaluate(int year, const double& a) = 0;
+
+  /** @brief Whether biological age can advance between annual boundaries. */
+  virtual bool SupportsContinuousAge() const { return false; }
+
+  /** @brief Evaluate weight using the provider's declared within-year policy.
+   */
+  Type EvaluateAtObservation(int year, double age, double fraction) {
+    return evaluate(year, SupportsContinuousAge() ? age + fraction : age);
+  }
 };
 
 template <typename Type>

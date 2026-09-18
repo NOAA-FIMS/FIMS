@@ -191,6 +191,8 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
     return length_weight_a * fims_math::pow(length, length_weight_b);
   }
 
+  bool SupportsContinuousAge() const override { return true; }
+
   virtual const Type evaluate(int year, const double& a) override {
     (void)year;
     return weight_at_age(Type(a));

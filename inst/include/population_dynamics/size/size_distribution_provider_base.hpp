@@ -9,7 +9,9 @@
 #ifndef FIMS_POPULATION_DYNAMICS_SIZE_DISTRIBUTION_PROVIDER_BASE_HPP
 #define FIMS_POPULATION_DYNAMICS_SIZE_DISTRIBUTION_PROVIDER_BASE_HPP
 
+#include "../../common/fims_vector.hpp"
 #include <cstddef>
+#include <stdexcept>
 
 #include "size_grid.hpp"
 
@@ -62,6 +64,14 @@ class SizeDistributionProviderBase {
    * @brief Prepare size products for the current model state.
    */
   virtual void PrepareSizeProducts() = 0;
+
+  /** @brief Build a date-specific row without modifying prepared annual rows.
+   */
+  virtual fims::Vector<Type> BuildProbabilityRow(const Type &mean,
+                                                 const Type &sd) const {
+    throw std::runtime_error(
+        "Size provider does not support date-specific products");
+  }
 
   /**
    * @brief Invalidate any prepared size state held by this provider.

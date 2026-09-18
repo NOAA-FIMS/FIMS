@@ -639,7 +639,7 @@ methods::setMethod(
         type = gsub("_", " ", .data$type)
       ) |>
       dplyr::group_by(dplyr::across(
-        dplyr::all_of(c("fleet", "timing", "type"))
+        dplyr::all_of(c("fleet", "timing", "date", "type"))
       )) |>
       dplyr::filter(.data$observed != -999) |>
       dplyr::summarize(
@@ -649,7 +649,7 @@ methods::setMethod(
     ggplot2::ggplot(
       data = data_for_plot,
       mapping = ggplot2::aes(
-        x = .data$timing,
+        x = .data$date,
         y = .data$fleet,
         col = .data$fleet
       )
@@ -754,7 +754,7 @@ methods::setValidity(
     for (present_type in grep("_comp", present_types, value = TRUE)) {
       test <- object@data |>
         dplyr::filter(.data$type == present_type, .data$observed != -999) |>
-        dplyr::group_by(.data$fleet, .data$timing, .drop = FALSE) |>
+        dplyr::group_by(.data$fleet, .data$date, .drop = FALSE) |>
         dplyr::group_map(.keep = TRUE, \(.x, .y) {
           validate_composition_data(.x)
         })
@@ -954,9 +954,9 @@ resolve_fleet_length_bins <- function(
 #' expanded to include -999 observations for all missing rows before returning
 #' them in the data slot.
 #' ### Ages
-#' Currently, ages must be integers, i.e., FIMS cannot accommodate numeric ages
-#' like age 1.5 but we hope that this is something that we will be able to
-#' accommodate in the future. Additionally, the first age in your data set will
+#' Input age-class labels must be integers. Parametric biology at survey dates
+#' uses these ages plus the elapsed fraction of the year. The first age in your
+#' data set will
 #' be the age at which fish recruit to the population. So, if you do not have
 #' age-0 age compositions and age two is the first age you have in your
 #' composition data, then recruitment will happen at age two. Furthermore, you
@@ -1016,6 +1016,19 @@ resolve_fleet_length_bins <- function(
 #' information will be provided for that next age. Once the year is complete
 #' for a given fleet then the next year will begin.
 #'
+#' @details
+#' Observation timing accepts integer years, ISO strings (`YYYY`, `YYYY-MM`,
+#' `YYYY-MM-DD`), or R Date values. Survey dates default missing months/days
+#' to January/the first day. Catch and fishery compositions require year-only
+#' input and represent annual intervals. Biological input tables remain annual.
+#' The returned data retain integer years in `timing` and normalized dates in
+#' `date`. Use [get_observations()] for sample IDs and backend coordinates.
+#' Multiple survey samples per year are supported. Dated survey predictions
+#' apply within-year mortality and evaluate parametric growth and maturity at
+#' fractional ages. Empirical weights and fixed age-to-length mappings retain
+#' their annual values. Population transitions and fishery observations remain
+#' annual.
+#'
 #' @rdname FIMSFrame
 #'
 #' @param data A `data.frame` that contains the necessary columns to construct
@@ -1046,22 +1059,15 @@ FIMSFrame <- function(data) {
     )
   }
 
-  if (!all(is.numeric(data[["timing"]]))) {
-    cli::cli_abort("{.var timing} must be in numeric format.")
-  }
-  if (!all(
-    as.integer(data[["timing"]]) - data[["timing"]] == 0,
-    na.rm = TRUE
-  )) {
-    cli::cli_abort("{.var timing} can only handle years right now.")
-  }
+  data <- normalize_observation_timing(data)
 
   # Get the earliest and latest year formatted as integers
   data_to_use_4_timing <- dplyr::filter(
     data,
-    !.data$type %in% c("age_to_length_conversion", "weight_at_age")
+    .data$type %in% observation_types()
   ) |>
     dplyr::pull(.data$timing)
+  if (!length(data_to_use_4_timing)) cli::cli_abort("At least one observation is required.")
   start_year <- as.integer(floor(min(data_to_use_4_timing, na.rm = TRUE)))
   end_year <- as.integer(floor(max(data_to_use_4_timing, na.rm = TRUE)))
   n_years <- as.integer(end_year - start_year + 1)
@@ -1105,6 +1111,7 @@ FIMSFrame <- function(data) {
     ages <- integer()
   }
   n_ages <- length(ages)
+  validate_observation_samples(data)
 
   if ("length" %in% colnames(data)) {
     if (all(is.na(data[["length"]]))) {
@@ -1168,7 +1175,7 @@ FIMSFrame <- function(data) {
       column = "age",
       types = c("weight_at_age", "age_comp")
     )
-    summary_by_name <- dplyr::count(missing_ages, .data$fleet, .data$timing) |>
+    summary_by_name <- dplyr::count(missing_ages, .data$fleet, .data$timing, .data$date) |>
       dplyr::filter(.data$n != n_ages) |>
       dplyr::summarize(
         timings = paste(.data$timing, collapse = ", "),
@@ -1216,7 +1223,7 @@ FIMSFrame <- function(data) {
     summary_by_name <- dplyr::count(
       missing_lengths,
       .data$fleet,
-      .data$timing
+      .data$timing, .data$date
     ) |>
       dplyr::left_join(expected_length_counts, by = "fleet") |>
       dplyr::filter(.data$n != .data$expected_n) |>
@@ -1254,7 +1261,7 @@ FIMSFrame <- function(data) {
     missing_lengths
   )
   sort_order <- intersect(
-    c("fleet", "type", "timing", "age", "length"),
+    c("fleet", "type", "timing", "date", "age", "length"),
     colnames(formatted_data)
   )
   complete_data <- dplyr::full_join(
@@ -1263,6 +1270,7 @@ FIMSFrame <- function(data) {
     by = colnames(missing_data)
   ) |>
     dplyr::arrange(!!!rlang::parse_exprs(sort_order))
+  complete_data <- normalize_observation_timing(complete_data)
 
   # Fill the empty data frames with data extracted from the data file
   methods::new("FIMSFrame",
@@ -1286,50 +1294,29 @@ create_missing_data <- function(
   column,
   types = c("catch", "index")
 ) {
-  bin_column <- if (!missing(column)) {
-    rlang::sym(column)
-  }
-  use_this_data <- data |>
-    dplyr::group_by(.data$type, .data$fleet)
-  out_data <- if (missing(bins)) {
-    # This only pertains to annual data without bins
-    use_this_data |>
-      dplyr::filter(.data$type %in% types) |>
-      tidyr::expand(
-        !!rlang::sym("unit"),
-        !!rlang::sym("timing") := timings
-      ) |>
-      dplyr::anti_join(
-        y = dplyr::select(
-          use_this_data,
-          dplyr::all_of(c("type", "fleet", "unit", "timing"))
-        ),
-        by = c("type", "fleet", "unit", "timing")
-      )
-  } else {
-    use_this_data |>
-      dplyr::group_by(.data$type, .data$fleet) |>
-      dplyr::filter(.data$type %in% types) |>
-      tidyr::expand(
-        !!rlang::sym("unit"),
-        !!rlang::sym("timing") := timings,
-        !!bin_column := bins
-      ) |>
-      dplyr::anti_join(
-        y = dplyr::select(
-          use_this_data,
-          dplyr::all_of(
-            c("type", "fleet", "unit", "timing", rlang::as_string(bin_column))
-          )
-        ),
-        by = c("type", "fleet", "unit", "timing", rlang::as_string(bin_column))
-      )
-  }
-  out_data |>
-    dplyr::mutate(
-      observed = -999
-    ) |>
-    dplyr::ungroup()
+  missing_bins <- missing(bins)
+  selected <- data[data$type %in% types, , drop = FALSE]
+  if (!nrow(selected)) return(data[0, ])
+  # Retain actual sample dates; add January 1 only for wholly missing years.
+  groups <- dplyr::group_split(dplyr::group_by(selected, .data$type, .data$fleet))
+  out <- lapply(groups, function(g) {
+    samples <- dplyr::distinct(g[, c("type", "fleet", "unit", "timing", "date")])
+    absent <- setdiff(timings, samples$timing)
+    if (length(absent)) {
+      extra <- samples[rep(1L, length(absent)), ]
+      extra$timing <- absent
+      extra$date <- as.Date(sprintf("%04d-01-01", absent))
+      samples <- dplyr::bind_rows(samples, extra)
+    }
+    if (!missing_bins) {
+      samples <- samples[rep(seq_len(nrow(samples)), each = length(bins)), ]
+      samples[[column]] <- rep(bins, length.out = nrow(samples))
+    }
+    dplyr::anti_join(samples, g, by = names(samples))
+  })
+  dplyr::bind_rows(out) |>
+    dplyr::mutate(observed = -999)
+
 }
 
 pretty_type <- function(x) {

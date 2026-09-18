@@ -557,10 +557,8 @@ class VonBertalanffySchnuteGrowthInterface
     if (this->n_ages.get() <= 0) {
       Rcpp::stop("n_ages not set");
     }
-    const double age_round = std::round(age);
-    const double tol = 1e-8;
-    if (std::fabs(age - age_round) > tol) {
-      Rcpp::stop("Non-integer age not supported yet");
+    if (!std::isfinite(age)) {
+      Rcpp::stop("Age must be finite");
     }
     ValidateVonBertalanffySchnuteGrowthInputs(false);
 

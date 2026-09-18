@@ -462,6 +462,15 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     dplyr::pull(.data$type) |>
     unique()
 
+  module$SetName(fleet)
+  for (stream in c("index", "age_comp", "length_comp")) {
+    samples <- observation_table(data, fleet, stream)
+    if (nrow(samples)) module$SetObservationTiming(
+      stream, as.integer(samples$year_i - 1L), samples$day, as.integer(samples$time_id), samples$observation_id,
+      format(samples$date, "%Y-%m-%d"), samples$year_fraction
+    )
+  }
+
   has_growth_derived_support <- any(
     parameters |>
       dplyr::filter(.data$module_name == "Growth") |>
@@ -635,7 +644,7 @@ initialize_index <- function(data, fleet) {
     dplyr::pull(.data$type)
 
   if ("index" %in% fleet_type) {
-    module <- methods::new(Index, get_n_years(data))
+    module <- methods::new(Index, nrow(observation_table(data, fleet, "index")))
     module$index_data[] <- model_index(data, fleet)
 
     return(module)
@@ -724,12 +733,6 @@ initialize_comp <- function(data,
     get_n_ages(data)
   }
 
-  module <- methods::new(
-    comp[["comp_object"]],
-    get_n_years(data),
-    expected_n
-  )
-
   comp_data <- comp[["m_comp"]](data, fleet)
   pretty_comp_name <- gsub("_comp", "-composition", comp[["name"]])
   if (is.null(comp_data) || length(comp_data) == 0) {
@@ -738,6 +741,12 @@ initialize_comp <- function(data,
       unavailable or empty."
     ))
   }
+
+  module <- methods::new(
+    comp[["comp_object"]],
+    nrow(observation_table(data, fleet, comp[["name"]])),
+    expected_n
+  )
 
   model_uncertainty <- get_data(data) |>
     dplyr::filter(
@@ -784,7 +793,7 @@ initialize_comp <- function(data,
         .data$length %in% fleet_length_bins
       ) |>
       dplyr::mutate(length_order = match(.data$length, fleet_length_bins)) |>
-      dplyr::arrange(.data$timing, .data$length_order) |>
+      dplyr::arrange(.data$date, .data$length_order) |>
       dplyr::mutate(
         sample_size = ifelse(
           .data$observed == -999,
@@ -805,12 +814,12 @@ initialize_comp <- function(data,
     model_uncertainty <- model_uncertainty |>
       dplyr::filter(.data$length %in% fleet_length_bins) |>
       dplyr::mutate(length_order = match(.data$length, fleet_length_bins)) |>
-      dplyr::arrange(.data$timing, .data$length_order)
+      dplyr::arrange(.data$date, .data$length_order)
   }
 
   model_data <- comp_data
 
-  if (length(model_data) != get_n_years(data) * expected_n) {
+  if (length(model_data) != nrow(observation_table(data, fleet, comp[["name"]])) * expected_n) {
     bad_data_years <- model_uncertainty |>
       dplyr::count(.data$timing) |>
       dplyr::filter(.data$n != expected_n) |>
@@ -819,7 +828,7 @@ initialize_comp <- function(data,
     cli::cli_abort(c(
       "The length of the `{comp[['name']]}`-composition data for fleet
       `{fleet}` does not match the expected dimensions.",
-      "i" = "Expected length: {get_n_years(data) * expected_n}",
+      "i" = "Expected length: {nrow(observation_table(data, fleet, comp[['name']])) * expected_n}",
       "i" = "Actual length: {length(model_data)}",
       "i" = "Number of -999 values: {sum(model_data == -999)}",
       "i" = "Timings with invalid data: {toString(bad_data_years)}"
@@ -901,6 +910,8 @@ initialize_fims <- function(parameters, data) {
       i = "Invalid values found: {invalid_estimation_types}."
     ))
   }
+
+  samples <- observation_table(data)
 
   # Clear any previous FIMS settings
   clear()
@@ -1216,6 +1227,12 @@ initialize_fims <- function(parameters, data) {
     model = fims_model
   )
 
+  parametric_growth <- any(parameters$module_name == "Growth" &
+    parameters$module_type == "VonBertalanffySchnute", na.rm = TRUE)
+  samples$weight_timing <- if (parametric_growth) "fractional_age" else "annual_lookup"
+  samples$length_mapping_timing <- if (parametric_growth) "fractional_age" else "fixed_annual"
+  samples$maturity_timing <- "fractional_age"
+  attr(parameter_list, "observation_timing") <- samples
   return(parameter_list)
 }
 

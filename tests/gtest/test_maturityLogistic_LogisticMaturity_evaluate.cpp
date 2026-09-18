@@ -26,4 +26,13 @@ TEST(LogisticMaturity_evaluate, HandlesCorrectInput) {
   EXPECT_NEAR(maturity.evaluate(maturity_x), expect_maturity, 0.0001);
 }
 
+TEST(LogisticMaturity_evaluate, ObservationAgeRetainsAnnualParameters) {
+  fims_popdy::LogisticMaturity<double> maturity;
+  maturity.inflection_point = {4, 6};
+  maturity.slope = {1, 2};
+  EXPECT_NEAR(maturity.EvaluateAtObservation(5, .5, 1), 1 / (1 + std::exp(1.0)),
+              1e-12);
+  EXPECT_EQ(maturity.EvaluateAtObservation(5, 0, 1), maturity.evaluate(5, 1));
+}
+
 }  // namespace

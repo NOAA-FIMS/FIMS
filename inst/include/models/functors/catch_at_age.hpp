@@ -129,7 +129,49 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   bool report_age_to_length_conversion_derived_tensor = false;
 
- public:
+  // Report-only rows: day, year_i, age, fraction, mean length, SD, weight,
+  // maturity. Cleared on every evaluation; never used as a biological cache.
+  std::vector<std::vector<Type>> observation_biology_rows;
+
+  struct ObservationRequest {
+    std::shared_ptr<fims_popdy::Fleet<Type>> fleet;
+    std::string stream;
+    size_t sample;
+  };
+  struct ObservationNode {
+    fims::ObservationTime time;
+    bool needs_size = false;
+    std::vector<ObservationRequest> requests;
+  };
+  // Fixed configuration only; no parameter-dependent values survive evaluation.
+  std::map<int, ObservationNode> observation_plan;
+  size_t observation_size_rows = 0;
+  size_t observation_request_count = 0;
+
+  void CompileObservationPlan() {
+    observation_plan.clear();
+    observation_request_count = 0;
+    for (const auto &entry : this->fleets) {
+      const auto &fleet = entry.second;
+      for (const auto &stream : fleet->observation_times) {
+        if (stream.first != "index" &&
+            fleet->fleet_observed_catch_data_id_m != -999)
+          continue;
+        for (size_t i = 0; i < stream.second.size(); ++i) {
+          const auto &time = stream.second[i];
+          if (time.fraction == 0)
+            continue;
+          auto &node = observation_plan[time.day];
+          node.time = time;
+          node.needs_size = node.needs_size || stream.first == "length_comp";
+          node.requests.push_back({fleet, stream.first, i});
+          ++observation_request_count;
+        }
+      }
+    }
+  }
+
+public:
   std::vector<Type> ages; /*!< vector of the ages for referencing*/
   /**
    * Constructor for the CatchAtAge class. This constructor initializes the
@@ -154,6 +196,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         report_age_to_length_conversion_derived_tensor(
             other.report_age_to_length_conversion_derived_tensor) {
     this->model_type_m = "caa";
+    CompileObservationPlan();
   }
 
   /**
@@ -193,6 +236,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       fleet->q.resize(fleet->log_q.size());
       fleet->Fmort.resize(fleet->n_years);
     }
+    CompileObservationPlan();
   }
 
   /**
@@ -920,7 +964,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
           this->GetFleetDerivedQuantities((*fit).second->GetId());
 
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-      for (size_t y = 0; y < fleet->n_years; y++) {
+      for (size_t sample = 0; sample < fleet->ObservationCount("age_comp");
+           sample++) {
+        const size_t y = fleet->ObservationYear("age_comp", sample);
         Type sum = static_cast<Type>(0.0);
         Type sum_obs = static_cast<Type>(0.0);
         // robust_add is a small value to add to expected composition
@@ -932,7 +978,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
         // = static_cast<Type>(1.0);
 
         for (size_t a = 0; a < fleet->n_ages; a++) {
-          size_t i_age_year = y * fleet->n_ages + a;
+          size_t i_age_year = sample * fleet->n_ages + a;
+          size_t annual_index = y * fleet->n_ages + a;
           // Here we have a check to determine if the age comp
           // should be calculated from the retained catch or
           // the total population. These values are slightly different.
@@ -941,10 +988,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
           // the year.
           if (fleet->fleet_observed_catch_data_id_m == -999) {
             fdq_["agecomp_expected"][i_age_year] =
-                fdq_["index_numbers_at_age"][i_age_year];
+                fdq_["index_numbers_at_age"][annual_index];
           } else {
             fdq_["agecomp_expected"][i_age_year] =
-                fdq_["catch_numbers_at_age"][i_age_year];
+                fdq_["catch_numbers_at_age"][annual_index];
           }
           sum += fdq_["agecomp_expected"][i_age_year];
           // robust_sum -= robust_add;
@@ -964,7 +1011,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
           }
         }
         for (size_t a = 0; a < fleet->n_ages; a++) {
-          size_t i_age_year = y * fleet->n_ages + a;
+          size_t i_age_year = sample * fleet->n_ages + a;
           fdq_["agecomp_proportion"][i_age_year] =
               fdq_["agecomp_expected"][i_age_year] / sum;
           // robust_add + robust_sum * this->agecomp_expected[i_age_year] / sum;
@@ -1269,84 +1316,60 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * Evaluate the proportion of catch numbers at length.
    */
   void evaluate_length_comp() {
-    fleet_iterator fit;
-    for (fit = this->fleets.begin(); fit != this->fleets.end(); ++fit) {
-      std::map<std::string, fims::Vector<Type>> &fdq_ =
-          this->GetFleetDerivedQuantities((*fit).second->GetId());
-
-      std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
-
-      if (!fleet->requires_age_length_mapping || fleet->n_lengths == 0) {
+    for (auto &entry : this->fleets) {
+      auto &fleet = entry.second;
+      auto &dq = this->GetFleetDerivedQuantities(fleet->GetId());
+      if (!fleet->requires_age_length_mapping || fleet->n_lengths == 0)
         continue;
-      }
-
       if (fleet->age_to_length_conversion_model == nullptr ||
           !fleet->age_to_length_conversion_model->IsActive()) {
-        std::stringstream ss;
-        ss << "Fleet id " << fleet->GetId()
-           << "no usable age-to-length conversion path";
-        FIMS_ERROR_LOG(ss.str());
-        throw std::runtime_error(ss.str());
+        throw std::runtime_error("No usable age-to-length conversion path.");
       }
-
-      for (size_t y = 0; y < fleet->n_years; y++) {
-        Type sum = static_cast<Type>(0.0);
-        Type sum_obs = static_cast<Type>(0.0);
-        // robust_add is a small value to add to expected composition
-        // proportions at age to stabilize likelihood calculations
-        // when the expected proportions are close to zero.
-        // Type robust_add = static_cast<Type>(0.0); // 0.0001; zeroed out
-        // before testing sum robust is used to calculate the total sum of
-        // robust additions to ensure that proportions sum to 1. Type
-        // robust_sum = static_cast<Type>(1.0);
-        for (size_t a = 0; a < fleet->n_ages; a++) {
-          size_t i_age_year = y * fleet->n_ages + a;
-          fims::Vector<Type> age_to_length_conversion_row;
+      // Annual diagnostic arrays retain their existing dimensions. Sample
+      // predictions below have their own mapping, independent of age samples.
+      for (size_t y = 0; y < fleet->n_years; ++y) {
+        for (size_t a = 0; a < fleet->n_ages; ++a) {
+          fims::Vector<Type> row;
           if (!fleet->age_to_length_conversion_model
-                   ->BuildAgeToLengthConversionRow(
-                       y, a, age_to_length_conversion_row)) {
-            std::stringstream ss;
-            ss << "Failed to build age-to-length conversion row for fleet id "
-               << fleet->GetId() << ", year " << y << ", age " << a << ".";
-            FIMS_ERROR_LOG(ss.str());
-            throw std::runtime_error(ss.str());
+                   ->BuildAgeToLengthConversionRow(y, a, row)) {
+            throw std::runtime_error(
+                "Failed to build age-to-length conversion row.");
           }
-
-          for (size_t l = 0; l < fleet->n_lengths; l++) {
-            size_t i_length_year = y * fleet->n_lengths + l;
-            const Type age_to_length_prob = age_to_length_conversion_row[l];
-            fdq_["lengthcomp_expected"][i_length_year] +=
-                fdq_["agecomp_expected"][i_age_year] * age_to_length_prob;
-
-            fdq_["catch_numbers_at_length"][i_length_year] +=
-                fdq_["catch_numbers_at_age"][i_age_year] * age_to_length_prob;
-
-            fdq_["index_numbers_at_length"][i_length_year] +=
-                fdq_["index_numbers_at_age"][i_age_year] * age_to_length_prob;
+          for (size_t l = 0; l < fleet->n_lengths; ++l) {
+            const size_t target = y * fleet->n_lengths + l;
+            const size_t source = y * fleet->n_ages + a;
+            dq["catch_numbers_at_length"][target] +=
+                dq["catch_numbers_at_age"][source] * row[l];
+            dq["index_numbers_at_length"][target] +=
+                dq["index_numbers_at_age"][source] * row[l];
           }
         }
-
-        for (size_t l = 0; l < fleet->n_lengths; l++) {
-          size_t i_length_year = y * fleet->n_lengths + l;
-          sum += fdq_["lengthcomp_expected"][i_length_year];
-          // robust_sum -= robust_add;
-
-          if (fleet->fleet_observed_lengthcomp_data_id_m != -999) {
-            if (fleet->observed_lengthcomp_data->at(i_length_year) !=
-                fleet->observed_lengthcomp_data->na_value) {
-              sum_obs += fleet->observed_lengthcomp_data->at(i_length_year);
-            }
+      }
+      const bool fishery = fleet->fleet_observed_catch_data_id_m != -999;
+      for (size_t sample = 0; sample < fleet->ObservationCount("length_comp");
+           ++sample) {
+        const size_t year = fleet->ObservationYear("length_comp", sample);
+        Type total = Type(0), observed_total = Type(0);
+        for (size_t l = 0; l < fleet->n_lengths; ++l) {
+          const size_t target = sample * fleet->n_lengths + l;
+          const size_t source = year * fleet->n_lengths + l;
+          dq["lengthcomp_expected"][target] =
+              dq[fishery ? "catch_numbers_at_length"
+                         : "index_numbers_at_length"][source];
+          total += dq["lengthcomp_expected"][target];
+          if (fleet->fleet_observed_lengthcomp_data_id_m != -999 &&
+              fleet->observed_lengthcomp_data->at(target) !=
+                  fleet->observed_lengthcomp_data->na_value) {
+            observed_total += fleet->observed_lengthcomp_data->at(target);
           }
         }
-        for (size_t l = 0; l < fleet->n_lengths; l++) {
-          size_t i_length_year = y * fleet->n_lengths + l;
-          fdq_["lengthcomp_proportion"][i_length_year] =
-              fdq_["lengthcomp_expected"][i_length_year] / sum;
-          // robust_add + robust_sum *
-          // this->lengthcomp_expected[i_length_year] / sum;
+        for (size_t l = 0; l < fleet->n_lengths; ++l) {
+          const size_t target = sample * fleet->n_lengths + l;
+          dq["lengthcomp_proportion"][target] =
+              dq["lengthcomp_expected"][target] / total;
           if (fleet->fleet_observed_lengthcomp_data_id_m != -999) {
-            fdq_["lengthcomp_expected"][i_length_year] =
-                fdq_["lengthcomp_proportion"][i_length_year] * sum_obs;
+            dq["lengthcomp_expected"][target] =
+                dq["lengthcomp_proportion"][target] * observed_total;
           }
         }
       }
@@ -1363,11 +1386,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
           this->GetFleetDerivedQuantities((*fit).second->GetId());
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
-      for (size_t i = 0; i < fdq_["index_numbers"].size(); i++) {
+      for (size_t i = 0; i < fleet->ObservationCount("index"); i++) {
+        const size_t year = fleet->ObservationYear("index", i);
         if (fleet->observed_index_units == "number") {
-          fdq_["index_expected"][i] = fdq_["index_numbers"][i];
+          fdq_["index_expected"][i] = fdq_["index_numbers"][year];
         } else {
-          fdq_["index_expected"][i] = fdq_["index_weight"][i];
+          fdq_["index_expected"][i] = fdq_["index_weight"][year];
         }
         fdq_["log_index_expected"][i] = log(fdq_["index_expected"][i]);
       }
@@ -1391,6 +1415,123 @@ class CatchAtAge : public FisheryModelBase<Type> {
           fdq_["catch_expected"][i] = fdq_["catch_weight"][i];
         }
         fdq_["log_catch_expected"][i] = log(fdq_["catch_expected"][i]);
+      }
+    }
+  }
+
+  /** @brief Apply mortality and provider-specific biology at point-sample
+   * dates. Survival vectors are shared by date across fleets and streams and
+   * exist only within this evaluation, so no parameter-dependent cache survives
+   * AD.
+   */
+  void EvaluateTimedObservations() {
+    observation_biology_rows.clear();
+    observation_size_rows = 0;
+    if (observation_plan.empty())
+      return;
+    if (this->populations.size() != 1)
+      throw std::runtime_error("Dated observations require one population.");
+    const auto &population = this->populations[0];
+    auto &pdq = this->GetPopulationDerivedQuantities(population->GetId());
+    auto growth = std::dynamic_pointer_cast<
+        fims_popdy::GrowthDerivedObservationBase<Type>>(population->growth);
+    for (const auto &item : observation_plan) {
+      const auto &node = item.second;
+      const auto &sample = node.time;
+      struct Biology {
+        std::vector<Type> survival, weight;
+        std::vector<fims::Vector<Type>> size_rows;
+      } biology;
+      biology.survival.resize(population->n_ages);
+      biology.weight.resize(population->n_ages);
+      biology.size_rows.resize(population->n_ages);
+      for (size_t a = 0; a < population->n_ages; ++a) {
+        biology.survival[a] = fims_math::exp(
+            -pdq["mortality_Z"][sample.year * population->n_ages + a] *
+            Type(sample.fraction));
+        const double age = population->ages[a];
+        Type mean_length = Type(-999), sd_length = Type(-999);
+        if (growth) {
+          const auto products =
+              growth->EvaluateGrowthAtAge(sample.year, age + sample.fraction);
+          mean_length = products.mean_length;
+          sd_length = products.sd_length;
+          biology.weight[a] = products.mean_weight;
+          if (node.needs_size) {
+            if (!population->size_distribution_provider)
+              throw std::runtime_error(
+                  "Dated length samples require a size provider");
+            biology.size_rows[a] =
+                population->size_distribution_provider->BuildProbabilityRow(
+                    mean_length, sd_length);
+            ++observation_size_rows;
+          }
+        } else {
+          biology.weight[a] = population->growth->EvaluateAtObservation(
+              sample.year, age, sample.fraction);
+        }
+        const Type maturity = population->maturity->EvaluateAtObservation(
+            age, sample.fraction, sample.year);
+        observation_biology_rows.push_back(
+            {Type(sample.day), Type(sample.year + 1), Type(age),
+             Type(sample.fraction), mean_length, sd_length, biology.weight[a],
+             maturity});
+      }
+      for (const auto &request : node.requests) {
+        const auto &fleet = request.fleet;
+        const size_t i = request.sample;
+        const bool index = request.stream == "index";
+        const bool length = request.stream == "length_comp";
+        auto &dq = this->GetFleetDerivedQuantities(fleet->GetId());
+        auto conversion = std::dynamic_pointer_cast<
+            fims_popdy::AgeToLengthConversionDerived<Type>>(
+            fleet->age_to_length_conversion_model);
+        const size_t bins =
+            index ? 1 : (length ? fleet->n_lengths : fleet->n_ages);
+        std::vector<Type> values(bins, Type(0));
+        for (size_t a = 0; a < fleet->n_ages; ++a) {
+          const size_t source = sample.year * fleet->n_ages + a;
+          Type selected =
+              dq["index_numbers_at_age"][source] * biology.survival[a];
+          if (index && fleet->observed_index_units != "number")
+            selected *= biology.weight[a];
+          if (index)
+            values[0] += selected;
+          else if (!length)
+            values[a] = selected;
+          else {
+            fims::Vector<Type> row;
+            if (conversion) {
+              row =
+                  conversion->MapPopulationProbabilityRow(biology.size_rows[a]);
+            } else if (!fleet->age_to_length_conversion_model
+                            ->BuildAgeToLengthConversionRow(sample.year, a,
+                                                            row))
+              throw std::runtime_error(
+                  "Failed to build timed age-to-length row.");
+            for (size_t l = 0; l < bins; ++l)
+              values[l] += selected * row[l];
+          }
+        }
+        if (index) {
+          dq["index_expected"][i] = values[0];
+          dq["log_index_expected"][i] = fims_math::log(values[0]);
+        } else {
+          const std::string prefix = length ? "lengthcomp" : "agecomp";
+          auto observed = length ? fleet->observed_lengthcomp_data
+                                 : fleet->observed_agecomp_data;
+          Type total = Type(0), observed_total = Type(0);
+          for (size_t b = 0; b < bins; ++b) {
+            total += values[b];
+            if (observed && observed->at(i * bins + b) != observed->na_value)
+              observed_total += observed->at(i * bins + b);
+          }
+          for (size_t b = 0; b < bins; ++b) {
+            dq[prefix + "_proportion"][i * bins + b] = values[b] / total;
+            dq[prefix + "_expected"][i * bins + b] =
+                observed ? values[b] / total * observed_total : values[b];
+          }
+        }
       }
     }
   }
@@ -1534,6 +1675,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     evaluate_age_comp();
     evaluate_length_comp();
     evaluate_index();
+    EvaluateTimedObservations();
     evaluate_catch();
   }
   /**
@@ -1547,6 +1689,19 @@ class CatchAtAge : public FisheryModelBase<Type> {
     if (this->do_reporting == true) {
       EnsureAllFleetAgeToLengthConversion();
       report_vectors.clear();
+      if (!observation_biology_rows.empty()) {
+        matrix<Type> observation_biology(observation_biology_rows.size(), 8);
+        for (size_t r = 0; r < observation_biology_rows.size(); ++r)
+          for (size_t c = 0; c < 8; ++c)
+            observation_biology(r, c) = observation_biology_rows[r][c];
+        FIMS_REPORT_F_("observation_biology", observation_biology, this->of);
+        vector<double> observation_work(3);
+        observation_work[0] = observation_plan.size();
+        observation_work[1] = observation_size_rows;
+        observation_work[2] = observation_request_count;
+        FIMS_REPORT_F_("observation_work", observation_work, this->of);
+      }
+
       // std::shared_ptr<UncertaintyReportInfoMap>
       // population_uncertainty_report_info_map =
       //     this->GetPopulationUncertaintyReportInfoMap();

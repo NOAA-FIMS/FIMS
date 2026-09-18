@@ -602,6 +602,25 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     return ss.str();
   }
 
+  /** @brief Quote user-supplied fleet/sample names safely in JSON reports. */
+  static std::string QuoteTimingString(const std::string &value) {
+    std::string out = "\"";
+    const char *hex = "0123456789abcdef";
+    for (unsigned char c : value) {
+      if (c == '"' || c == '\\') {
+        out += '\\';
+        out += c;
+      } else if (c < 0x20) {
+        out += "\\u00";
+        out += hex[c >> 4];
+        out += hex[c & 15];
+      } else {
+        out += c;
+      }
+    }
+    return out + "\"";
+  }
+
   /**
    * @brief Method to convert a fleet to a JSON string.
    */
@@ -632,11 +651,30 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
       ss << "{\n";
       ss << " \"module_name\": \"Fleet\",\n";
-      ss << " \"fleet\": \"" << fleet_interface->name << "\",\n";
+      ss << " \"fleet\": " << QuoteTimingString(fleet_interface->name.get())
+         << ",\n";
       ss << " \"module_id\": " << fleet_interface->id << ",\n";
       ss << " \"n_ages\": " << fleet_interface->n_ages.get() << ",\n";
       ss << " \"n_years\": " << fleet_interface->n_years.get() << ",\n";
       ss << " \"n_lengths\": " << fleet_interface->n_lengths.get() << ",\n";
+      ss << "\"observation_timing\": [";
+      bool first_sample = true;
+      for (const auto &stream : fleet->observation_times) {
+        for (size_t i = 0; i < stream.second.size(); ++i) {
+          const auto &sample = stream.second[i];
+          if (!first_sample)
+            ss << ",";
+          first_sample = false;
+          ss << "{\"type\":" << QuoteTimingString(stream.first)
+             << ",\"sample_i\":" << i + 1 << ",\"year_i\":" << sample.year + 1
+             << ",\"day\":" << sample.day << ",\"time_id\":" << sample.time_id
+             << ",\"year_fraction\":" << sample.fraction
+             << ",\"date\":" << QuoteTimingString(sample.date)
+             << ",\"observation_id\":"
+             << QuoteTimingString(sample.observation_id) << "}";
+        }
+      }
+      ss << "],\n";
       ss << "\"data_ids\" : [\n";
       ss << "{\"agecomp\": " << fleet_interface->GetObservedAgeCompDataID()
          << "},\n";
@@ -964,7 +1002,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 #ifdef TMB_MODEL
     model->do_reporting = true;
 #endif
-    return fims::JsonParser::PrettyFormatJSON(ss.str());
+    // The serializer already emits whitespace. The generic formatter strips
+    // whitespace inside string values, corrupting fleet names and sample IDs.
+    return ss.str();
   }
 
 #ifdef TMB_MODEL
@@ -1272,25 +1312,36 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       info->variable_map[fleet_interface->log_catch_expected.id_m] =
           &derived_quantities["log_catch_expected"];
 
-      derived_quantities["agecomp_proportion"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_ages.get());
+      derived_quantities["agecomp_proportion"] =
+          fims::Vector<Type>(fleet_interface->ObservationCount("age_comp") *
+                             fleet_interface->n_ages.get());
       derived_quantities_dim_info["agecomp_proportion"] =
           fims_popdy::DimensionInfo(
               "agecomp_proportion",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
+              fims::Vector<int>{(fleet_interface->ObservationCount("age_comp")),
                                 fleet_interface->n_ages.get()},
-              fims::Vector<std::string>{"n_years", "n_ages"});
+              fims::Vector<std::string>{
+                  (fleet_interface->observation_times->count("age_comp")
+                       ? "n_samples"
+                       : "n_years"),
+                  "n_ages"});
       info->variable_map[fleet_interface->agecomp_proportion.id_m] =
           &derived_quantities["agecomp_proportion"];
 
-      derived_quantities["lengthcomp_proportion"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_lengths.get());
+      derived_quantities["lengthcomp_proportion"] =
+          fims::Vector<Type>(fleet_interface->ObservationCount("length_comp") *
+                             fleet_interface->n_lengths.get());
       derived_quantities_dim_info["lengthcomp_proportion"] =
           fims_popdy::DimensionInfo(
               "lengthcomp_proportion",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                fleet_interface->n_lengths.get()},
-              fims::Vector<std::string>{"n_years", "n_lengths"});
+              fims::Vector<int>{
+                  (fleet_interface->ObservationCount("length_comp")),
+                  fleet_interface->n_lengths.get()},
+              fims::Vector<std::string>{
+                  (fleet_interface->observation_times->count("length_comp")
+                       ? "n_samples"
+                       : "n_years"),
+                  "n_lengths"});
       info->variable_map[fleet_interface->lengthcomp_proportion.id_m] =
           &derived_quantities["lengthcomp_proportion"];
 
@@ -1345,42 +1396,59 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
           &derived_quantities["index_numbers"];
 
       derived_quantities["index_expected"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
+          fims::Vector<Type>(fleet_interface->ObservationCount("index"));
       derived_quantities_dim_info["index_expected"] = fims_popdy::DimensionInfo(
-          "index_expected", fims::Vector<int>{(fleet_interface->n_years.get())},
-          fims::Vector<std::string>{"n_years"});
+          "index_expected",
+          fims::Vector<int>{(fleet_interface->ObservationCount("index"))},
+          fims::Vector<std::string>{(
+              fleet_interface->observation_times->count("index") ? "n_samples"
+                                                                 : "n_years")});
       info->variable_map[fleet_interface->index_expected.id_m] =
           &derived_quantities["index_expected"];
 
       derived_quantities["log_index_expected"] =
-          fims::Vector<Type>(fleet_interface->n_years.get());
+          fims::Vector<Type>(fleet_interface->ObservationCount("index"));
       derived_quantities_dim_info["log_index_expected"] =
           fims_popdy::DimensionInfo(
               "log_index_expected",
-              fims::Vector<int>{(fleet_interface->n_years.get())},
-              fims::Vector<std::string>{"n_years"});
+              fims::Vector<int>{(fleet_interface->ObservationCount("index"))},
+              fims::Vector<std::string>{
+                  (fleet_interface->observation_times->count("index")
+                       ? "n_samples"
+                       : "n_years")});
       info->variable_map[fleet_interface->log_index_expected.id_m] =
           &derived_quantities["log_index_expected"];
 
-      derived_quantities["agecomp_expected"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_ages.get());
+      derived_quantities["agecomp_expected"] =
+          fims::Vector<Type>(fleet_interface->ObservationCount("age_comp") *
+                             fleet_interface->n_ages.get());
       derived_quantities_dim_info["agecomp_expected"] =
           fims_popdy::DimensionInfo(
               "agecomp_expected",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
+              fims::Vector<int>{(fleet_interface->ObservationCount("age_comp")),
                                 (fleet_interface->n_ages.get())},
-              fims::Vector<std::string>{"n_years", "n_ages"});
+              fims::Vector<std::string>{
+                  (fleet_interface->observation_times->count("age_comp")
+                       ? "n_samples"
+                       : "n_years"),
+                  "n_ages"});
       info->variable_map[fleet_interface->agecomp_expected.id_m] =
           &derived_quantities["agecomp_expected"];
 
-      derived_quantities["lengthcomp_expected"] = fims::Vector<Type>(
-          fleet_interface->n_years.get() * fleet_interface->n_lengths.get());
+      derived_quantities["lengthcomp_expected"] =
+          fims::Vector<Type>(fleet_interface->ObservationCount("length_comp") *
+                             fleet_interface->n_lengths.get());
       derived_quantities_dim_info["lengthcomp_expected"] =
           fims_popdy::DimensionInfo(
               "lengthcomp_expected",
-              fims::Vector<int>{(fleet_interface->n_years.get()),
-                                (fleet_interface->n_lengths.get())},
-              fims::Vector<std::string>{"n_years", "n_lengths"});
+              fims::Vector<int>{
+                  (fleet_interface->ObservationCount("length_comp")),
+                  (fleet_interface->n_lengths.get())},
+              fims::Vector<std::string>{
+                  (fleet_interface->observation_times->count("length_comp")
+                       ? "n_samples"
+                       : "n_years"),
+                  "n_lengths"});
       info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
           &derived_quantities["lengthcomp_expected"];
     }

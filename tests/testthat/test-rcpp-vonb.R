@@ -39,16 +39,15 @@ ad_fabs <- function(x, C = 1e-5) sqrt(x * x + C)
 ad_max <- function(a, b, C = 1e-5) 0.5 * (a + b + ad_fabs(a - b, C))
 
 new_vonb <- function(
-  ctx,
-  mean_length_young_in = ctx$mean_length_young,
-  mean_length_old_in = ctx$mean_length_old,
-  growth_coefficient_in = ctx$growth_coefficient,
-  reference_age_for_length_young_in = ctx$reference_age_for_length_young,
-  reference_age_for_length_old_in = ctx$reference_age_for_length_old,
-  length_weight_a_in = ctx$length_weight_a,
-  length_weight_b_in = ctx$length_weight_b,
-  length_at_age_sd_at_reference_ages_in = ctx$length_at_age_sd_at_reference_ages
-) {
+    ctx,
+    mean_length_young_in = ctx$mean_length_young,
+    mean_length_old_in = ctx$mean_length_old,
+    growth_coefficient_in = ctx$growth_coefficient,
+    reference_age_for_length_young_in = ctx$reference_age_for_length_young,
+    reference_age_for_length_old_in = ctx$reference_age_for_length_old,
+    length_weight_a_in = ctx$length_weight_a,
+    length_weight_b_in = ctx$length_weight_b,
+    length_at_age_sd_at_reference_ages_in = ctx$length_at_age_sd_at_reference_ages) {
   vb <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
 
   vb$mean_length_young$resize(1)
@@ -82,21 +81,20 @@ new_vonb <- function(
 }
 
 new_vonb_with_delta_block <- function(
-  ctx,
-  mean_length_young_in = ctx$mean_length_young,
-  mean_length_old_in = ctx$mean_length_old,
-  growth_coefficient_in = ctx$growth_coefficient,
-  reference_age_for_length_young_in = ctx$reference_age_for_length_young,
-  reference_age_for_length_old_in = ctx$reference_age_for_length_old,
-  length_weight_a_in = ctx$length_weight_a,
-  length_weight_b_in = ctx$length_weight_b,
-  log_sd_mean_length_young_in = log(0.1),
-  log_sd_mean_length_old_in = log(0.1),
-  log_sd_growth_coefficient_in = log(0.1),
-  mean_length_young_mean_length_old_logit_corr_in = 0,
-  mean_length_young_growth_coefficient_logit_corr_in = 0,
-  mean_length_old_growth_coefficient_logit_corr_in = 0
-) {
+    ctx,
+    mean_length_young_in = ctx$mean_length_young,
+    mean_length_old_in = ctx$mean_length_old,
+    growth_coefficient_in = ctx$growth_coefficient,
+    reference_age_for_length_young_in = ctx$reference_age_for_length_young,
+    reference_age_for_length_old_in = ctx$reference_age_for_length_old,
+    length_weight_a_in = ctx$length_weight_a,
+    length_weight_b_in = ctx$length_weight_b,
+    log_sd_mean_length_young_in = log(0.1),
+    log_sd_mean_length_old_in = log(0.1),
+    log_sd_growth_coefficient_in = log(0.1),
+    mean_length_young_mean_length_old_logit_corr_in = 0,
+    mean_length_young_growth_coefficient_logit_corr_in = 0,
+    mean_length_old_growth_coefficient_logit_corr_in = 0) {
   vb <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
 
   vb$mean_length_young$resize(1)
@@ -280,7 +278,7 @@ test_that("rcpp von bertalanffy growth rejects both variability paths at once", 
 })
 
 ## Edge handling ----
-test_that("rcpp von bertalanffy growth rejects fractional ages", {
+test_that("rcpp von bertalanffy growth evaluates fractional ages", {
   ctx <- make_vonb_test_context()
   vb <- new_vonb(ctx)
   on.exit(
@@ -291,12 +289,16 @@ test_that("rcpp von bertalanffy growth rejects fractional ages", {
     add = TRUE
   )
 
-  #' @description Test that VonBertalanffySchnuteGrowth evaluate() rejects
-  #' non-integer ages.
-  expect_error(
-    vb$evaluate(ctx$reference_age_for_length_young + 0.5),
-    regexp = "Non-integer age"
+  #' @description Fractional-age weight follows the continuous growth equation; nonfinite ages fail.
+  denom <- ad_max(ad_fabs(1 - exp(-ctx$growth_coefficient *
+    (ctx$reference_age_for_length_old - ctx$reference_age_for_length_young))), 1e-8)
+  length <- ctx$mean_length_young + (ctx$mean_length_old - ctx$mean_length_young) *
+    (1 - exp(-ctx$growth_coefficient * 0.5)) / denom
+  expect_equal(vb$evaluate(ctx$reference_age_for_length_young + 0.5),
+    ctx$length_weight_a * length^ctx$length_weight_b,
+    tolerance = 1e-10
   )
+  for (age in c(NA_real_, NaN, Inf)) expect_error(vb$evaluate(age), "finite")
 })
 
 test_that("rcpp von bertalanffy growth handles below-range ages", {

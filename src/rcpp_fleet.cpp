@@ -51,6 +51,7 @@ void register_fleet(Rcpp::Module& m) {
       .field("index_expected", &FleetInterface::index_expected)
       .field("agecomp_expected", &FleetInterface::agecomp_expected)
       .field("lengthcomp_expected", &FleetInterface::lengthcomp_expected)
+      .method("SetObservationTiming", &FleetInterface::SetObservationTiming)
       .method("get_id", &FleetInterface::get_id)
       .method("SetName", &FleetInterface::SetName)
       .method("GetName", &FleetInterface::GetName)

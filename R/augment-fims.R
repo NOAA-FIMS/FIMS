@@ -11,7 +11,7 @@
 #' | Column        | Role                                                      |
 #' |---------------|-----------------------------------------------------------|
 #' | `.truth`      | Observed data value (maps from `observed`)                |
-#' | `.pred`       | Model-expected value (maps from `expected`)               |
+#' | `.pred`       | Model prediction on the observed-data scale               |
 #' | `.weight`     | Inverse-variance weight from `uncertainty` (optional)     |
 #' | `label`       | Parameter / quantity label, e.g. `"catch_expected"`    |
 #' | `fleet`       | Fleet identifier (integer)                                |
@@ -53,6 +53,8 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   # this function only selects the
   # data-fit rows (where both observed and expected are non-NA) and maps
   # column names to the yardstick convention (.truth, .pred, .weight).
+  # The density expected column can be a log mean or a probability; the
+  # corresponding *_expected derived estimate has the observed-data scale.
   # After applying fimsfit-patches.R the gradient is stored in x@gradient at
   # fit time, so this call is safe after clear().
   estimates <- get_estimates(x)
@@ -63,6 +65,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   fit_rows <- estimates |>
     dplyr::filter(
       !is.na(.data$observed),
+      .data$observed != -999,
       !is.na(.data$expected)
     )
 
@@ -90,7 +93,10 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   meta_cols <- intersect(
     c(
       "label", "module_id", "module_type", "fleet", "distribution",
-      "estimation_type", index_cols
+      "estimation_type", "observation_id", "date", "interval_end",
+      "input_precision", "prediction_basis", "support", "partition",
+      "weight_timing", "length_mapping_timing", "maturity_timing",
+      "population", "timing", "time_id", "year_fraction", "prediction_timing", index_cols
     ),
     names(fit_rows)
   )
@@ -98,7 +104,11 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   out <- fit_rows |>
     dplyr::mutate(
       .truth = as.numeric(.data$observed),
-      .pred  = as.numeric(.data$expected)
+      .pred  = as.numeric(dplyr::if_else(
+        .data$label %in% c("index_expected", "catch_expected", "agecomp_expected", "lengthcomp_expected"),
+        dplyr::coalesce(.data$estimated, .data$expected),
+        .data$expected
+      ))
     ) |>
     dplyr::select(
       dplyr::all_of(c(meta_cols, ".truth", ".pred")),

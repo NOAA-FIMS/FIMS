@@ -107,6 +107,8 @@ navbar:
           href: articles/fims-logging.html
         - text: FIMS User Setup Guide
           href: articles/fims-user-setup-guide.html
+        - text: Annual catch with dated survey observations
+          href: articles/fims-observation-timing.html
         - text: Simple projections using FIMS
           href: articles/fims-demo-projections.html
         - text: Running a diagnostics on a FIMS model

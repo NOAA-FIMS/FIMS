@@ -68,6 +68,12 @@ class GrowthDerivedObservationBase : public GrowthBase<Type> {
    * @return Weight on the natural scale.
    */
   virtual Type EvaluateWeightAtLength(const Type& length) const = 0;
+
+  /** @brief Request date-specific products without changing annual caches. */
+  virtual GrowthAtAge<Type> EvaluateGrowthAtAge(size_t year, double age) const {
+    throw std::runtime_error(
+        "Growth provider does not support continuous-age products");
+  }
 };
 
 /**
@@ -343,15 +349,24 @@ class VonBertalanffySchnuteGrowthModelAdapter
    */
   bool SupportsAgeToLengthConversionDerived() const override { return true; }
 
+  bool SupportsContinuousAge() const override { return true; }
+
+  GrowthAtAge<Type> EvaluateGrowthAtAge(size_t year,
+                                        double age) const override {
+    if (!std::isfinite(age) || age < 0)
+      throw std::runtime_error("Growth age must be finite and nonnegative");
+    if (!model_ || !growth_products_prepared_ || year >= n_years_)
+      throw std::runtime_error(
+          "Continuous-age growth requires prepared products and a valid year");
+    return model_->EvaluateAtAge(Type(age));
+  }
+
   virtual const Type evaluate(int year, const double& a) override {
-    if (a < 0.0) {
+    if (!std::isfinite(a) || a < 0.0) {
       throw std::runtime_error("Negative age not supported");
     }
-    const double a_round = std::round(a);
     const double tol = 1e-8;
-    if (std::fabs(a - a_round) > tol) {
-      throw std::runtime_error("Non-integer age not supported yet");
-    }
+
     EnsureParamsSet();
     const Type ref_age_young = CurrentReferenceAgeForLengthYoung();
     const Type ref_age_old = CurrentReferenceAgeForLengthOld();
@@ -369,7 +384,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
     model_->Prepare();
     const auto& p = model_->GetProducts();
     const double offset = age_offset_set_ ? age_offset_ : 0.0;
-    const double age_index_raw = a_round - offset;
+    const double age_index_raw = a - offset;
     const double age_index_round = std::round(age_index_raw);
     if (std::fabs(age_index_raw - age_index_round) <= tol &&
         age_index_round >= 0.0) {

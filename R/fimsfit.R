@@ -134,14 +134,30 @@ methods::setMethod("get_input", "FIMSFit", function(x) x@input)
 
 #' @return
 #' [get_report()] returns the TMB report, where anything that is flagged as
-#' reportable in the C++ code is returned.
+#' reportable in the C++ code is returned. For dated samples,
+#' `observation_biology` contains shared date/age rows with day, year index,
+#' age class, year fraction, mean length, length SD, mean weight, and maturity.
+#' Empirical growth uses -999 for unavailable length and length SD products.
+#' `observation_work` counts shared dates, biological size rows, and requests.
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
 methods::setGeneric("get_report", function(x) standardGeneric("get_report"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
-methods::setMethod("get_report", "FIMSFit", function(x) x@report)
+methods::setMethod("get_report", "FIMSFit", function(x) {
+  report <- x@report
+  if (!is.null(report$observation_biology)) {
+    colnames(report$observation_biology) <- c(
+      "day", "year_i", "age", "year_fraction", "mean_length", "sd_length",
+      "mean_weight", "proportion_mature"
+    )
+  }
+  if (!is.null(report$observation_work)) {
+    names(report$observation_work) <- c("dates", "size_rows", "requests")
+  }
+  report
+})
 
 #' @return
 #' [get_obj()] returns the output from [TMB::MakeADFun()].
@@ -262,6 +278,7 @@ methods::setMethod(
     ) |>
       dplyr::select(-dplyr::all_of("unique_id")) |>
       dplyr::relocate(dplyr::all_of("uncertainty"), .after = dplyr::all_of("estimation_type"))
+    attach_observation_timing(estimates, attr(x@input, "observation_timing"))
   }
 )
 

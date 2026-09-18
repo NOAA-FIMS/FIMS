@@ -1,0 +1,110 @@
+---
+title: "Annual catch with dated survey observations"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Annual catch with dated survey observations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+FIMS keeps annual population transitions and annual catch while predicting
+surveys at their observation dates. Dates use `YYYY-MM-DD`; a year alone means
+January 1, and `YYYY-MM` means the first day of that month. Mortality rates remain
+annual. Elapsed time is calendar days divided by 365 or 366.
+
+This example uses three years of the built-in data, adds July surveys, and uses
+parametric growth at fractional age. To keep the fit small, it estimates only
+survey catchability while holding the other parameters fixed.
+
+```{r dated-data, message=FALSE}
+library(FIMS)
+library(dplyr)
+
+observations <- data_big |>
+  filter(is.na(timing) | timing <= 3 | (type == "weight_at_age" & timing == 4))
+observations$timing <- ifelse(is.na(observations$timing), NA_character_,
+  sprintf("%04d", observations$timing + 2026L))
+
+july <- observations |>
+  filter(fleet == "survey1", type %in% c("index", "age_comp", "length_comp"))
+july$timing <- paste0(july$timing, "-07-01")
+frame <- FIMSFrame(bind_rows(observations, july))
+
+get_observations(frame) |>
+  filter(fleet == "survey1", type == "index") |>
+  select(date, year_i, sample_i, year_fraction)
+```
+
+These extra samples reuse the example observations to demonstrate the interface;
+they do not represent additional measured data. In an assessment, supply each
+survey's actual observed values and uncertainty. Index, age-composition, and
+length-composition dates may differ.
+
+```{r fit, message=FALSE}
+parameters <- setup_default_parameters(frame) |>
+  filter(module_name != "Growth") |>
+  bind_rows(setup_default_Growth(frame, module_type = "VonBertalanffySchnute"))
+parameters$estimation_type <- "constant"
+parameters$distribution[parameters$module_name == "Recruitment"] <- NA_character_
+parameters$distribution_type[parameters$module_name == "Recruitment"] <- NA_character_
+parameters$estimation_type[parameters$module_name == "Fleet" &
+  parameters$fleet == "survey1" & parameters$label == "log_q"] <- "fixed_effects"
+
+fit <- initialize_fims(parameters, frame) |>
+  fit_fims(number_of_loops = 1)
+get_max_gradient(fit)
+```
+
+`estimated` holds the reported prediction on its natural scale. For likelihood
+rows, `expected` retains the likelihood input: for example, a log mean for a
+lognormal index. `uncertainty` is the standard error of the reported estimate.
+`augment()` pairs observations with predictions on the same scale and excludes
+missing (`-999`) observations.
+
+```{r predictions}
+get_estimates(fit) |>
+  filter(fleet == "survey1", label == "index_expected") |>
+  select(observation_id, date, estimated, uncertainty, weight_timing)
+
+generics::augment(fit) |>
+  filter(fleet == "survey1", label == "index_expected") |>
+  select(date, .truth, .pred)
+```
+
+Parametric growth uses `age + year_fraction`, including the representative age
+of the oldest plus group. Age-class labels stay fixed within the year. Empirical
+annual weights and fixed age-to-length matrices use annual lookup instead.
+Maturity at observation dates is diagnostic; spawning and recruitment retain
+their annual calculations.
+
+```{r shared-products}
+head(get_report(fit)$observation_biology)
+get_report(fit)$observation_work
+```
+
+The work counters give distinct non-January-1 dates, biological size rows built,
+and observation requests. Shared survey dates reuse biological products, while
+each fleet retains its own length-bin mapping. Size distributions are built
+only for dates with length-composition requests.
+
+A retrospective peel removes terminal survey/composition years but preserves
+annual catch, biological inputs, bin configuration, and the annual model horizon.
+Missing survey years receive placeholder predictions, which diagnostics exclude.
+
+```{r peel, message=FALSE}
+peeled <- run_modified_data_fims(1, frame, parameters)
+generics::augment(peeled) |>
+  filter(fleet == "survey1", label == "index_expected") |>
+  select(date, .truth, .pred)
+clear()
+```
+
+For projections, extend annual catch or fishing-mortality inputs and the required
+biological tables as in [Simple projections using FIMS](fims-demo-projections.html).
+Future survey predictions may have dates and missing observed values. Adding
+those prediction dates does not change projected population states, catch, or
+spawning biomass when parameters and annual inputs stay fixed.

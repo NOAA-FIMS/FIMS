@@ -30,6 +30,8 @@ interest (x); e.g. age at which 50 percent of the fish are mature */
 
   LogisticMaturity() : MaturityBase<Type>() {}
 
+  bool SupportsContinuousAge() const override { return true; }
+
   /**
    * @brief Method of the logistic maturity class that implements the
    * logistic function from FIMS math.

@@ -12,9 +12,10 @@
 #include "common/data_object.hpp"
 #include "common/fims_vector.hpp"
 #include "common/model_object.hpp"
+#include "common/observation_time.hpp"
 #include "distributions/distributions.hpp"
-#include "population_dynamics/selectivity/selectivity.hpp"
 #include "population_dynamics/age_to_length_conversion/functors/base.hpp"
+#include "population_dynamics/selectivity/selectivity.hpp"
 
 namespace fims_popdy {
 
@@ -32,6 +33,22 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       lengths; /*!< Fleet observation-bin centers for this fleet. */
   fims::Vector<double>
       length_bin_edges; /*!< Resolved observation-bin edges for this fleet. */
+
+  fims::ObservationTimes
+      observation_times; ///< Fixed per-stream sample mappings.
+
+  /** @brief Sample count; legacy direct interfaces default to annual samples.
+   */
+  size_t ObservationCount(const std::string &type) const {
+    auto it = observation_times.find(type);
+    return it == observation_times.end() ? n_years : it->second.size();
+  }
+
+  /** @brief Resolve a sample to its annual dynamics state. */
+  size_t ObservationYear(const std::string &type, size_t sample) const {
+    auto it = observation_times.find(type);
+    return it == observation_times.end() ? sample : it->second.at(sample).year;
+  }
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/

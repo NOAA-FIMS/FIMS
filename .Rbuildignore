@@ -14,6 +14,7 @@ tests/test_plan
 ^data-raw$
 ^\.devcontainer$
 CONTRIBUTING.md
+^timing-design\.md$
 fims.log
 ^doc$
 ^doxygen$

@@ -112,25 +112,11 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
 
     for (std::size_t year_index = 0; year_index < n_years_; ++year_index) {
       for (std::size_t age_index = 0; age_index < n_ages_; ++age_index) {
-        fims::Vector<Type> prob_row(population_size_grid_->n_bins);
-        Type row_sum = static_cast<Type>(0.0);
-        const Type minimum_bin_prob = static_cast<Type>(1e-12);
-
-        for (std::size_t size_bin_index = 0;
-             size_bin_index < population_size_grid_->n_bins; ++size_bin_index) {
-          Type bin_prob = PopulationSizeBinProb(growth_products, year_index,
-                                                age_index, size_bin_index) +
-                          minimum_bin_prob;
-
-          prob_row[size_bin_index] = bin_prob;
-          row_sum += bin_prob;
-        }
-
-        for (std::size_t size_bin_index = 0;
-             size_bin_index < population_size_grid_->n_bins; ++size_bin_index) {
-          size_products_.ProbSize(year_index, age_index, size_bin_index) =
-              prob_row[size_bin_index] / row_sum;
-        }
+        const auto prob_row = BuildProbabilityRow(
+            growth_products.MeanLAA(year_index, age_index, 0),
+            growth_products.SdLAA(year_index, age_index, 0));
+        for (std::size_t b = 0; b < prob_row.size(); ++b)
+          size_products_.ProbSize(year_index, age_index, b) = prob_row[b];
 
         const Type plus_group_prob = size_products_.ProbSize(
             year_index, age_index, population_size_grid_->n_bins - 1);
@@ -193,45 +179,60 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     plus_group_warning_emitted_ = false;
   }
 
- private:
-  Type PopulationSizeBinProb(const GrowthProducts<Type>& growth_products,
-                             std::size_t year_index, std::size_t age_index,
-                             std::size_t size_bin_index) const {
-    if (!population_size_grid_ || population_size_grid_->n_bins == 0) {
+  /** @brief Apply the same normal-bin and tail policy at an observation date.
+   */
+  fims::Vector<Type> BuildProbabilityRow(const Type &mean,
+                                         const Type &sd) const override {
+    if (!population_size_grid_ || !population_size_grid_->IsConsistent() ||
+        population_size_grid_->n_bins == 0)
       throw std::runtime_error(
-          "GrowthDerivedSizeProvider requires a population biological size grid"
-          " before computing ProbSize");
+          "Date-specific size products require a valid biological grid");
+    fims::Vector<Type> row(population_size_grid_->n_bins);
+    Type sum = Type(0);
+    for (size_t b = 0; b < row.size(); ++b) {
+      row[b] = PopulationSizeBinProb(mean, sd, b) + Type(1e-12);
+      sum += row[b];
     }
-
-    const Type mean_laa = growth_products.MeanLAA(year_index, age_index, 0);
-    const Type sd_laa =
-        fims_math::ad_max(growth_products.SdLAA(year_index, age_index, 0),
-                          static_cast<Type>(1e-8));
-
-    if (population_size_grid_->n_bins == 1) {
-      return static_cast<Type>(1.0);
-    }
-
-    if (size_bin_index == 0) {
-      const Type upper = static_cast<Type>(population_size_grid_->edges[1]);
-      return fims_math::pnorm(upper, mean_laa, sd_laa);
-    }
-
-    if (size_bin_index + 1 == population_size_grid_->n_bins) {
-      const Type lower = static_cast<Type>(
-          population_size_grid_->edges[population_size_grid_->n_bins - 1]);
-      return fims_math::pnorm(static_cast<Type>(2.0) * mean_laa - lower,
-                              mean_laa, sd_laa);
-    }
-
-    const Type lower =
-        static_cast<Type>(population_size_grid_->edges[size_bin_index]);
-    const Type upper =
-        static_cast<Type>(population_size_grid_->edges[size_bin_index + 1]);
-
-    return fims_math::pnorm(upper, mean_laa, sd_laa) -
-           fims_math::pnorm(lower, mean_laa, sd_laa);
+    for (size_t b = 0; b < row.size(); ++b)
+      row[b] /= sum;
+    return row;
   }
+
+ private:
+   Type PopulationSizeBinProb(const Type &mean_laa, const Type &sd,
+                              std::size_t size_bin_index) const {
+     if (!population_size_grid_ || population_size_grid_->n_bins == 0) {
+       throw std::runtime_error("GrowthDerivedSizeProvider requires a "
+                                "population biological size grid"
+                                " before computing ProbSize");
+     }
+
+     const Type sd_laa = fims_math::ad_max(sd, static_cast<Type>(1e-8));
+
+     if (population_size_grid_->n_bins == 1) {
+       return static_cast<Type>(1.0);
+     }
+
+     if (size_bin_index == 0) {
+       const Type upper = static_cast<Type>(population_size_grid_->edges[1]);
+       return fims_math::pnorm(upper, mean_laa, sd_laa);
+     }
+
+     if (size_bin_index + 1 == population_size_grid_->n_bins) {
+       const Type lower = static_cast<Type>(
+           population_size_grid_->edges[population_size_grid_->n_bins - 1]);
+       return fims_math::pnorm(static_cast<Type>(2.0) * mean_laa - lower,
+                               mean_laa, sd_laa);
+     }
+
+     const Type lower =
+         static_cast<Type>(population_size_grid_->edges[size_bin_index]);
+     const Type upper =
+         static_cast<Type>(population_size_grid_->edges[size_bin_index + 1]);
+
+     return fims_math::pnorm(upper, mean_laa, sd_laa) -
+            fims_math::pnorm(lower, mean_laa, sd_laa);
+   }
 
   const GrowthProducts<Type>& PreparedGrowthProducts() const {
     if (!growth_observation_) {

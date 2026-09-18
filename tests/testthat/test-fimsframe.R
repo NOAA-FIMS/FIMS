@@ -204,7 +204,7 @@ test_that("`FIMSFrame()` returns correct outputs for edge cases", {
   expect_silent(FIMSFrame(
     dplyr::filter(
       data_big,
-      !type %in% c("length_comp", "age_to_length_conversion")
+      !type %in% c("age_comp", "weight_at_age", "length_comp", "age_to_length_conversion")
     ) |>
       dplyr::select(-age)
   ))
@@ -213,7 +213,7 @@ test_that("`FIMSFrame()` returns correct outputs for edge cases", {
   expect_silent(FIMSFrame(
     dplyr::filter(
       data_big,
-      !type %in% c("length", "age_to_length_conversion")
+      !type %in% c("length_comp", "age_to_length_conversion")
     ) |>
       dplyr::select(-length)
   ))
@@ -230,16 +230,16 @@ test_that("`FIMSFrame()` returns correct error messages", {
   #' @description Test that `FIMSFrame()` returns an error when there is no data in the FIMSFrame object.
   expect_error(FIMSFrame(data_big[0, ]))
 
-  #' @description Test that `FIMSFrame()` returns an error when timing is not numeric.
+  #' @description Test that `FIMSFrame()` returns an error when timing has an unsupported input type.
   expect_error(
-    FIMSFrame(dplyr::mutate(data_big, timing = as.character(timing))),
-    regexp = "`timing` must be in numeric"
+    FIMSFrame(dplyr::mutate(data_big, timing = factor(timing))),
+    regexp = "`timing` must contain integer years"
   )
 
   #' @description Test that `FIMSFrame()` returns an error when timing is composed of non-integer values.
   expect_error(
     FIMSFrame(dplyr::mutate(data_big, timing = 1.1)),
-    regexp = "`timing` can only handle years right now"
+    regexp = "fractional years are unsupported"
   )
 
   #' @description Test that `FIMSFrame()` can be created without empirical weight-at-age data.
@@ -290,7 +290,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
   #' @description Test that `FIMSFrame()` returns an error when the age column is not present but `age_to_length_conversion` is present in type.
   expect_error(
     FIMSFrame(dplyr::select(data_big, -age)),
-    "requires having an age column"
+    "age is a required column"
   )
 
   #' @description Test that `FIMSFrame()` returns an error when the length column is not present but `age_to_length_conversion` is present in type.

@@ -128,6 +128,10 @@ run_modified_pars_fims <- function(
 #' )
 #' }
 run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
+  if (length(years_to_remove) != 1L || !is.numeric(years_to_remove) ||
+      !is.finite(years_to_remove) || years_to_remove < 0 || years_to_remove %% 1 != 0) {
+    cli::cli_abort("years_to_remove must be one non-negative integer")
+  }
   # check if the input is a FIMSframe object and if so, extract the data
   # this is to avoid the warning:
   # no applicable method for 'filter' applied to an object of class "FIMSFrame"
@@ -137,6 +141,8 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
     data_to_use <- data
   }
 
+  data_to_use <- normalize_observation_timing(data_to_use)
+
   # Remove years from data, but leave catch, weight_at_age,
   # and age_to_length_conversion (if present)
   if (years_to_remove == 0) {
@@ -144,13 +150,14 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
   } else {
     # exclude weight-at-age from the calculation of the max year of data
     max_timing <- data_to_use |>
-      dplyr::filter(.data[["type"]] != "weight_at_age") |>
+      dplyr::filter(.data[["type"]] %in% observation_types()) |>
       dplyr::pull(.data[["timing"]]) |>
       max(na.rm = TRUE)
     data_mod <- data_to_use |>
       dplyr::filter(
         (.data[["type"]] %in%
           c("catch", "age_to_length_conversion", "weight_at_age")) |
+          is.na(.data[["timing"]]) |
           .data[["timing"]] <= max_timing - years_to_remove
       )
   }

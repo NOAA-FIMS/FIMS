@@ -174,6 +174,29 @@ class GrowthModel : public GrowthModelBase<Type> {
 
   const GrowthProducts<Type>& GetProducts() const override { return products_; }
 
+  /** @brief Evaluate all biological products at a continuous representative
+   * age. Uses the same interpolation or delta-method spread as annual products.
+   * Does not mutate the annual products or their cache state.
+   */
+  GrowthAtAge<Type> EvaluateAtAge(const Type &age) const {
+    if (vb_.reference_age_for_length_old <= vb_.reference_age_for_length_young)
+      throw std::runtime_error("Growth reference ages must be increasing");
+    Type laa_min = Type(0), slope = Type(0);
+    if (!use_delta_method_variability_) {
+      laa_min = vb_.length_at_age(vb_.reference_age_for_length_young);
+      const Type laa_max = vb_.length_at_age(vb_.reference_age_for_length_old);
+      const Type delta =
+          fims_math::ad_max(fims_math::ad_fabs(laa_max - laa_min), Type(1e-8));
+      slope = n_ages_ > 1 ? (length_at_age_sd_at_reference_age_old_ -
+                             length_at_age_sd_at_reference_age_young_) /
+                                delta
+                          : Type(0);
+    }
+    const Type length = vb_.length_at_age(age);
+    return {length, ComputeLengthSdAtAge(age, length, laa_min, slope),
+            vb_.weight_at_age(age)};
+  }
+
  private:
   /// Validate that the supplied 3-parameter covariance matrix on the
   /// log-scale FIMS estimation parameterization is usable for the

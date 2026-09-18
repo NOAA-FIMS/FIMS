@@ -84,7 +84,11 @@ get_model_output(x)
 is the returned object from \code{\link[=setup_default_parameters]{setup_default_parameters()}}.
 
 \code{\link[=get_report]{get_report()}} returns the TMB report, where anything that is flagged as
-reportable in the C++ code is returned.
+reportable in the C++ code is returned. For dated samples,
+\code{observation_biology} contains shared date/age rows with day, year index,
+age class, year fraction, mean length, length SD, mean weight, and maturity.
+Empirical growth uses -999 for unavailable length and length SD products.
+\code{observation_work} counts shared dates, biological size rows, and requests.
 
 \code{\link[=get_obj]{get_obj()}} returns the output from \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}.
 

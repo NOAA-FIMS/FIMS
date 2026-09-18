@@ -32,7 +32,7 @@ The returned tibble follows the conventions expected by every
 \code{\link[yardstick:metric_set]{yardstick::metric_set()}} metric function:\tabular{ll}{
    Column \tab Role \cr
    \code{.truth} \tab Observed data value (maps from \code{observed}) \cr
-   \code{.pred} \tab Model-expected value (maps from \code{expected}) \cr
+   \code{.pred} \tab Model prediction on the observed-data scale \cr
    \code{.weight} \tab Inverse-variance weight from \code{uncertainty} (optional) \cr
    \code{label} \tab Parameter / quantity label, e.g. \code{"catch_expected"} \cr
    \code{fleet} \tab Fleet identifier (integer) \cr

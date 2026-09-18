@@ -103,6 +103,7 @@ reshape_json_estimates <- function(model_output) {
     dplyr::ungroup()
 
   fleet_information <- read_list[["fleets"]] |>
+    dplyr::select(-dplyr::any_of("observation_timing")) |>
     tidyr::pivot_longer(
       cols = dplyr::all_of(c("parameters", "derived_quantities")),
       names_to = "delete_me",

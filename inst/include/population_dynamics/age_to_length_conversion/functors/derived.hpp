@@ -139,6 +139,40 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
     return fleet_ptr != nullptr && out_row.size() == fleet_ptr->n_lengths;
   }
 
+  /** @brief Map an already prepared population row to this fleet's bins.
+   * Shared by annual and observation-date paths; biological products can be
+   * reused across fleets while mappings remain fleet specific.
+   */
+  fims::Vector<Type> MapPopulationProbabilityRow(
+      const fims::Vector<Type> &population_prob_size) const {
+    auto fleet_ptr = fleet_.lock();
+    auto provider = TryGetSizeProvider();
+    if (!IsActive() || !provider || !provider->TryGetSizeGrid())
+      throw std::runtime_error("Cannot map observation-date size products");
+    const auto *population_size_grid = provider->TryGetSizeGrid();
+    if (population_prob_size.size() != population_size_grid->n_bins)
+      throw std::runtime_error(
+          "Observation-date size row does not match biological grid");
+    const fims::Vector<double> mapping_fleet_edges =
+        SizeBinMapping::ExpandDestinationEdgesToCoverSourceRange(
+            population_size_grid->edges, fleet_ptr->length_bin_edges);
+
+    const fims::Vector<fims::Vector<double>> rebin_weights =
+        SizeBinMapping::BuildRebinWeights(population_size_grid->edges,
+                                          mapping_fleet_edges);
+
+    fims::Vector<Type> fleet_row =
+        SizeBinMapping::ApplyRebinWeights(rebin_weights, population_prob_size);
+
+    if (!TryFinalizeMappedProbabilityRow(fleet_row, fleet_ptr->n_lengths)) {
+      throw std::runtime_error(
+          "AgeToLengthConversionDerived produced an invalid mapped fleet "
+          "probability row");
+    }
+
+    return fleet_row;
+  }
+
  protected:
   /**
    * @brief Read one prepared age-to-size row from the linked population size
@@ -242,24 +276,7 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
       return fims::Vector<Type>();
     }
 
-    const fims::Vector<double> mapping_fleet_edges =
-        SizeBinMapping::ExpandDestinationEdgesToCoverSourceRange(
-            population_size_grid->edges, fleet_ptr->length_bin_edges);
-
-    const fims::Vector<fims::Vector<double>> rebin_weights =
-        SizeBinMapping::BuildRebinWeights(population_size_grid->edges,
-                                          mapping_fleet_edges);
-
-    fims::Vector<Type> fleet_row =
-        SizeBinMapping::ApplyRebinWeights(rebin_weights, population_prob_size);
-
-    if (!TryFinalizeMappedProbabilityRow(fleet_row, fleet_ptr->n_lengths)) {
-      throw std::runtime_error(
-          "AgeToLengthConversionDerived produced an invalid mapped fleet "
-          "probability row");
-    }
-
-    return fleet_row;
+    return MapPopulationProbabilityRow(population_prob_size);
   }
 
   /**

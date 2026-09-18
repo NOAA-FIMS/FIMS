@@ -49,6 +49,16 @@ struct MaturityBase : public fims_model_object::FIMSObject<Type> {
    * @param pos Position index, e.g., which year.
    */
   virtual const Type evaluate(const Type& x, size_t pos) = 0;
+
+  /** @brief Whether this provider accepts continuous biological ages. */
+  virtual bool SupportsContinuousAge() const { return false; }
+
+  /** @brief Age-based maturity at a sample date, retaining annual parameters.
+   * Annual spawning calculations deliberately continue to call evaluate().
+   */
+  Type EvaluateAtObservation(double age, double fraction, size_t year) {
+    return evaluate(Type(SupportsContinuousAge() ? age + fraction : age), year);
+  }
 };
 
 // default id of the singleton maturity class

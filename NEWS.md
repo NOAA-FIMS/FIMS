@@ -1,6 +1,20 @@
 # FIMS 0.11.0
 
-*
+* Compile dated requests once and build size distributions only for length-sample
+  dates. Add workflow tests, a worked timing vignette, and a reproducible benchmark.
+* Keep undated configuration during retrospective peels and validate peel counts.
+  Diagnostics exclude missing observations and compare observations with predictions
+  on the same scale.
+
+* Add observation timing infrastructure for ISO dates and multiple survey samples
+  per year. `get_observations()` exposes sample IDs and coordinates; estimates,
+  augmentation, and JSON reports retain sample mappings. Catch and fishery
+  compositions remain annual. Dated survey indices and compositions apply total
+  mortality using Gregorian year fractions, sharing survival calculations across
+  samples on the same date. Parametric growth, weight, maturity, and derived
+  length mappings use fractional biological ages at observation dates. Empirical
+  weights and fixed length mappings retain annual lookup policies. Estimates
+  expose these policies, and `get_report()` includes dated biological products.
 
 # FIMS 0.10.0
 

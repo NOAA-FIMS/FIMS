@@ -196,4 +196,48 @@ TEST(GrowthModel, SingleAgeRejectsCoincidentReferenceAges) {
   EXPECT_THROW(gm.Prepare(), std::runtime_error);
 }
 
+TEST(GrowthModel, ContinuousProductsPreserveAnnualCache) {
+  fims_popdy::GrowthModel<double> model(2, 12, 1);
+  model.SetVonBertalanffySchnuteParameters(275, 725, .18, 1, 12);
+  model.SetLengthWeightParameters(2.5e-11, 3);
+  model.SetAgeOffset(1);
+  model.SetLengthSdParams(28, 73);
+  model.Prepare();
+  const auto annual = model.GetProducts();
+  for (int a = 1; a <= 12; ++a) {
+    const auto at = model.EvaluateAtAge(a);
+    EXPECT_EQ(at.mean_length, annual.MeanLAA(0, a - 1, 0));
+    EXPECT_EQ(at.sd_length, annual.SdLAA(0, a - 1, 0));
+    EXPECT_EQ(at.mean_weight, annual.MeanWAA(0, a - 1, 0));
+  }
+  EXPECT_NEAR(model.EvaluateAtAge(.5).mean_length, 137.5, 1e-10);
+  EXPECT_GT(model.EvaluateAtAge(12.9).mean_length, annual.MeanLAA(0, 11, 0));
+  EXPECT_EQ(model.GetProducts().mean_LAA, annual.mean_LAA);
+  model.SetGrowthParameterCovariance(.01, 0, 0, .01, 0, .01);
+  model.Prepare();
+  const auto at = model.EvaluateAtAge(5.5);
+  fims_popdy::VonBertalanffySchnuteGrowth<double> vb;
+  vb.mean_length_young = 275;
+  vb.mean_length_old = 725;
+  vb.growth_coefficient = .18;
+  vb.reference_age_for_length_young = 1;
+  vb.reference_age_for_length_old = 12;
+  double variance = 0;
+  for (double *parameter :
+       {&vb.mean_length_young, &vb.mean_length_old, &vb.growth_coefficient}) {
+    const double original = *parameter, h = 1e-5;
+    *parameter = original * std::exp(h);
+    const double plus = std::log(vb.length_at_age(5.5));
+    *parameter = original * std::exp(-h);
+    const double minus = std::log(vb.length_at_age(5.5));
+    *parameter = original;
+    variance += .01 * std::pow((plus - minus) / (2 * h), 2);
+  }
+  // Existing analytic delta derivatives approximate the smooth denominator
+  // floor.
+  const double expected = fims_math::ad_max(
+      at.mean_length * std::sqrt(fims_math::ad_max(variance, 0.0)), 1e-8);
+  EXPECT_NEAR(at.sd_length, expected, 1e-3);
+}
+
 }  // namespace

@@ -9,8 +9,9 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_FLEET_HPP
 
-#include "rcpp_interface_base.hpp"
 #include "../../../population_dynamics/fleet/fleet.hpp"
+#include "common/observation_time.hpp"
+#include "rcpp_interface_base.hpp"
 
 /**
  * @brief Rcpp interface that serves as the parent class for Rcpp fleet
@@ -66,6 +67,60 @@ class FleetInterfaceBase : public FIMSRcppInterfaceBase {
  * fleet <- methods::new(Fleet)
  */
 class FleetInterface : public FleetInterfaceBase {
+public:
+  /** @brief Shared with the registered interface copy, like other input fields.
+   */
+  std::shared_ptr<fims::ObservationTimes> observation_times =
+      std::make_shared<fims::ObservationTimes>();
+
+  /** @brief Set fixed sample timing; values are never registered as parameters.
+   */
+  void SetObservationTiming(std::string type, Rcpp::IntegerVector years,
+                            Rcpp::IntegerVector days, Rcpp::IntegerVector ids,
+                            Rcpp::CharacterVector observation_ids,
+                            Rcpp::CharacterVector dates,
+                            Rcpp::NumericVector fractions) {
+    if (type != "index" && type != "age_comp" && type != "length_comp") {
+      throw std::invalid_argument("Unsupported observation timing stream.");
+    }
+    if (years.size() != days.size() || years.size() != ids.size() ||
+        years.size() != observation_ids.size() ||
+        years.size() != dates.size() || years.size() != fractions.size() ||
+        years.size() == 0) {
+      throw std::invalid_argument(
+          "Observation timing vectors must have equal nonzero lengths.");
+    }
+    std::vector<fims::ObservationTime> samples;
+    for (int i = 0; i < years.size(); ++i) {
+      if (years[i] < 0 || years[i] >= n_years.get() || days[i] < 0 ||
+          ids[i] < 0 || !R_finite(fractions[i]) || fractions[i] < 0 ||
+          fractions[i] >= 1) {
+        throw std::invalid_argument(
+            "Observation timing coordinates are out of range.");
+      }
+      if (i > 0 && (days[i] <= days[i - 1] || years[i] < years[i - 1])) {
+        throw std::invalid_argument(
+            "Observation times must be strictly increasing within a stream.");
+      }
+      if (Rcpp::CharacterVector::is_na(observation_ids[i]) ||
+          Rcpp::CharacterVector::is_na(dates[i])) {
+        throw std::invalid_argument("Observation IDs cannot be missing.");
+      }
+      samples.push_back({fractions[i], static_cast<size_t>(years[i]), days[i],
+                         ids[i], Rcpp::as<std::string>(dates[i]),
+                         Rcpp::as<std::string>(observation_ids[i])});
+    }
+    (*observation_times)[type] = samples;
+  }
+
+  /** @brief Number of predictions in a stream (annual for legacy callers). */
+  int ObservationCount(const std::string &type) const {
+    auto it = observation_times->find(type);
+    return it == observation_times->end() ? n_years.get()
+                                          : static_cast<int>(it->second.size());
+  }
+
+private:
   /**
    * @brief The ID of the observed age-composition data object.
    */
@@ -247,7 +302,7 @@ class FleetInterface : public FleetInterfaceBase {
    * @param other
    */
   FleetInterface(const FleetInterface &other)
-      : FleetInterfaceBase(other),
+      : FleetInterfaceBase(other), observation_times(other.observation_times),
         interface_observed_agecomp_data_id_m(
             other.interface_observed_agecomp_data_id_m),
         interface_observed_lengthcomp_data_id_m(
@@ -259,21 +314,16 @@ class FleetInterface : public FleetInterfaceBase {
         interface_observed_catch_data_id_m(
             other.interface_observed_catch_data_id_m),
         interface_selectivity_id_m(other.interface_selectivity_id_m),
-        name(other.name),
-        n_ages(other.n_ages),
-        n_lengths(other.n_lengths),
-        lengths(other.lengths),
-        n_years(other.n_years),
+        name(other.name), n_ages(other.n_ages), n_lengths(other.n_lengths),
+        lengths(other.lengths), n_years(other.n_years),
         observed_catch_units(other.observed_catch_units),
-        observed_index_units(other.observed_index_units),
-        log_q(other.log_q),
+        observed_index_units(other.observed_index_units), log_q(other.log_q),
         log_Fmort(other.log_Fmort),
         age_to_length_conversion(other.age_to_length_conversion),
         catch_numbers_at_age(other.catch_numbers_at_age),
         catch_weight_at_age(other.catch_weight_at_age),
         catch_numbers_at_length(other.catch_numbers_at_length),
-        catch_weight(other.catch_weight),
-        catch_numbers(other.catch_numbers),
+        catch_weight(other.catch_weight), catch_numbers(other.catch_numbers),
         catch_expected(other.catch_expected),
         log_catch_expected(other.log_catch_expected),
         agecomp_proportion(other.agecomp_proportion),
@@ -281,8 +331,7 @@ class FleetInterface : public FleetInterfaceBase {
         index_numbers_at_age(other.index_numbers_at_age),
         index_weight_at_age(other.index_weight_at_age),
         index_numbers_at_length(other.index_numbers_at_length),
-        index_weight(other.index_weight),
-        index_numbers(other.index_numbers),
+        index_weight(other.index_weight), index_numbers(other.index_numbers),
         index_expected(other.index_expected),
         log_index_expected(other.log_index_expected),
         agecomp_expected(other.agecomp_expected),
@@ -489,6 +538,7 @@ class FleetInterface : public FleetInterfaceBase {
     fleet->n_ages = this->n_ages.get();
     fleet->n_lengths = this->n_lengths.get();
     fleet->n_years = this->n_years.get();
+    fleet->observation_times = *this->observation_times;
     fleet->observed_catch_units = this->observed_catch_units;
     fleet->observed_index_units = this->observed_index_units;
 
