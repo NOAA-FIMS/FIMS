@@ -214,3 +214,33 @@ test_that("fleet names and sample IDs survive JSON escaping", {
   expected <- get_observations(f)
   expect_setequal(ids, expected$observation_id[expected$fleet == name])
 })
+
+
+test_that("early model years work when the platform does not pad date years", {
+  #' @description Emulate unpadded %Y output and preserve annual input round trips.
+  iso <- observation_date_iso
+  environment(iso) <- list2env(list(
+    format = function(x, format = "", ...) {
+      result <- base::format(x, format = format, ...)
+      if (inherits(x, "Date") && grepl("%Y", format, fixed = TRUE)) {
+        result <- sub("^0+([0-9])", "\\1", result)
+      }
+      result
+    }
+  ), parent = environment(iso))
+  testthat::local_mocked_bindings(observation_date_iso = iso, .package = "FIMS")
+  dates <- as.Date(c("0001-01-01", "0004-02-29", "0099-12-31",
+    "0100-01-01", "0999-01-01", "1000-01-01", NA))
+  expect_equal(observation_date_iso(dates), c("0001-01-01", "0004-02-29",
+    "0099-12-31", "0100-01-01", "0999-01-01", "1000-01-01", NA))
+  f <- FIMSFrame(data_big)
+  expect_equal(get_data(FIMSFrame(get_data(f))), get_data(f))
+  obs <- get_observations(f)
+  expect_true(any(grepl("0001-01-01", obs$observation_id, fixed = TRUE)))
+  survey <- data.frame(type = "index", fleet = "survey1", timing = dates[1:3])
+  normalized <- normalize_observation_timing(survey)
+  expect_equal(normalized$timing, c(1L, 4L, 99L))
+  expect_equal(normalized$date, dates[1:3])
+  survey$timing <- c("0001-02-29", "0004-02-29", "0099-12-31")
+  expect_error(normalize_observation_timing(survey), "Invalid calendar date")
+})

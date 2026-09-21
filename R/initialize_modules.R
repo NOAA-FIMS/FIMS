@@ -467,7 +467,7 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     samples <- observation_table(data, fleet, stream)
     if (nrow(samples)) module$SetObservationTiming(
       stream, as.integer(samples$year_i - 1L), samples$day, as.integer(samples$time_id), samples$observation_id,
-      format(samples$date, "%Y-%m-%d"), samples$year_fraction
+      observation_date_iso(samples$date), samples$year_fraction
     )
   }
 

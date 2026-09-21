@@ -1,5 +1,8 @@
 # FIMS 0.11.0
 
+* Pad early calendar years consistently across platforms when validating dates
+  and exporting sample identifiers, preserving year-only example data.
+
 * Compile dated requests once and build size distributions only for length-sample
   dates. Add workflow tests, a worked timing vignette, and a reproducible benchmark.
 * Keep undated configuration during retrospective peels and validate peel counts.

@@ -1,6 +1,14 @@
 # Fixed observation timing. Calendar calculations stay outside the AD tape.
 observation_types <- function() c("catch", "index", "age_comp", "length_comp")
 
+# Some platforms format %Y without leading zeros for years before 1000.
+# Pad explicitly for validation, Date input, and stable sample identifiers.
+observation_date_iso <- function(x) {
+  out <- sprintf("%04d-%s", as.integer(format(x, "%Y")), format(x, "%m-%d"))
+  out[is.na(x)] <- NA_character_
+  out
+}
+
 normalize_observation_timing <- function(data) {
   x <- data$timing
   if (inherits(x, "POSIXt") || is.factor(x) ||
@@ -19,7 +27,7 @@ normalize_observation_timing <- function(data) {
     }
     raw <- ifelse(is.na(x), NA_character_, sprintf("%04d", as.integer(x)))
   } else {
-    raw <- if (inherits(x, "Date")) format(x, "%Y-%m-%d") else as.character(x)
+    raw <- if (inherits(x, "Date")) observation_date_iso(x) else as.character(x)
   }
   # A normalized data frame can be passed back through FIMSFrame, e.g. a peel.
   if (all(c("date", "input_precision") %in% names(data))) {
@@ -29,7 +37,7 @@ normalize_observation_timing <- function(data) {
     if (any(keep & !is.na(input_year) & input_year != as.integer(format(data$date, "%Y")))) {
       cli::cli_abort("Normalized `date` and `timing` disagree; update both when changing the model year.")
     }
-    raw[keep] <- format(data$date[keep], "%Y-%m-%d")
+    raw[keep] <- observation_date_iso(data$date[keep])
     precision <- data$input_precision
     precision[is.na(precision)] <- "year"
     if (any(!precision %in% c("year", "month", "day"))) {
@@ -51,7 +59,7 @@ normalize_observation_timing <- function(data) {
   )
   date <- as.Date(full, format = "%Y-%m-%d")
   year <- as.integer(substr(full, 1, 4))
-  invalid <- !is.na(raw) & (is.na(date) | format(date, "%Y-%m-%d") != full |
+  invalid <- !is.na(raw) & (is.na(date) | observation_date_iso(date) != full |
     year < 1L | year > 9999L)
   if (any(invalid)) cli::cli_abort("Invalid calendar date in timing at rows {which(invalid)}.")
   obs <- data$type %in% observation_types()
@@ -113,7 +121,10 @@ validate_observation_samples <- function(data) {
 
 observation_key <- function(data) {
   # Length-prefixing avoids ambiguous keys when fleet names contain separators.
-  parts <- lapply(data, function(x) paste0(nchar(as.character(x)), ":", x))
+  parts <- lapply(data, function(x) {
+    x <- if (inherits(x, "Date")) observation_date_iso(x) else as.character(x)
+    paste0(nchar(x), ":", x)
+  })
   do.call(paste, c(parts, sep = "|"))
 }
 
