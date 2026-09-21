@@ -225,11 +225,11 @@ print(forecasts)
 obs <- dplyr::filter(get_data(ff),
                      type == "catch", fleet == "fleet1") |>
   dplyr::arrange(timing) |>
-  dplyr::select(time = timing, value)
+  dplyr::select(time = timing, observed)
 
 ggplot() +
-  geom_line(data = obs, aes(x = time, y = value), colour = "grey40") +
-  geom_point(data = obs, aes(x = time, y = value), colour = "grey40") +
+  geom_line(data = obs, aes(x = time, y = observed), colour = "grey40") +
+  geom_point(data = obs, aes(x = time, y = observed), colour = "grey40") +
   geom_line(data = forecasts,
             aes(x = time, y = forecast, colour = method, group = method),
             linetype = "dashed", linewidth = 1) +
