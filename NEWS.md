@@ -1,5 +1,8 @@
 # FIMS 0.11.0
 
+* Convert data-frame inputs to `FIMSFrame` before recruitment-schedule validation
+  in `initialize_fims()`, preserving age-only and length-only vignette workflows.
+
 * Support fixed recruitment phases with distinct biological entry ages, splitting
   one annual recruitment total across dates. Phase cohorts retain biological ages
   across annual age bins; survival and catch reflect partial-year exposure.

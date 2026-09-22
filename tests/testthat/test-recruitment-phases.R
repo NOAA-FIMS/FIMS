@@ -261,6 +261,27 @@ test_that("positive compositions cannot be explained by an empty population", {
   expect_error(phase_fit(x), "no predicted fish")
 })
 
+test_that("initialization accepts tables with annual or phased recruitment", {
+  #' @description Table and FIMSFrame inputs produce the same predictions, including age-only and length-only workflows.
+  on.exit(clear(), add = TRUE)
+  for (excluded in list(c("length_comp", "age_to_length_conversion"), "age_comp")) {
+    x <- phase_fixture()
+    d <- get_data(x$data)
+    d <- d[!d$type %in% excluded, ]
+    for (schedule in list(NULL, x$schedule)) {
+      expected <- get_report(fit_fims(
+        initialize_fims(x$parameters, FIMSFrame(d), schedule),
+        optimize = FALSE, get_sd = FALSE
+      ))
+      actual <- get_report(fit_fims(
+        initialize_fims(x$parameters, d, schedule),
+        optimize = FALSE, get_sd = FALSE
+      ))
+      expect_equal(actual, expected)
+    }
+  }
+})
+
 test_that("projections require extended schedules and ignore survey-only dates", {
   #' @description Future recruitment uses explicit phases, while added missing surveys do not alter the projected population or catch.
   x <- phase_fixture()

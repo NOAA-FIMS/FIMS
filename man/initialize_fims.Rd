@@ -13,8 +13,9 @@ fleet exists in the data but parameter information for how to specify
 selectivity for that fleet is not provided, then selectivity will not be
 initialized for that fleet.}
 
-\item{data}{An S4 object with the \code{FIMSFrame} class, which is returned from
-\code{\link[=FIMSFrame]{FIMSFrame()}}. Passing the data is required because initialization of the
+\item{data}{A \code{FIMSFrame} object or a data frame accepted by \code{\link[=FIMSFrame]{FIMSFrame()}}.
+Data frames are converted before initialization. Passing the data is
+required because initialization of the
 modules requires passing the data and information regarding the uncertainty
 of that data, i.e., input sample sizes for the multinomial distribution.}
 
