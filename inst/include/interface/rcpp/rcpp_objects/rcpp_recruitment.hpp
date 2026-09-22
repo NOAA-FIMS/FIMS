@@ -88,6 +88,55 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief The number of years.
    */
   SharedInt n_years;
+  /** @brief Shared fixed schedule, retained by the registered interface copy.
+   */
+  std::shared_ptr<std::vector<fims::RecruitmentTime>> recruitment_schedule =
+      std::make_shared<std::vector<fims::RecruitmentTime>>();
+
+  /** @brief Set validated phase coordinates; all years are zero-based.
+   * @param years Modeled year indices.
+   * @param times Elapsed fractions of each calendar year.
+   * @param fractions Fractions of annual recruitment.
+   * @param phases Stable phase identifiers.
+   */
+  void SetRecruitmentSchedule(Rcpp::IntegerVector years,
+                              Rcpp::NumericVector times,
+                              Rcpp::NumericVector fractions,
+                              Rcpp::CharacterVector phases) {
+    const auto n = years.size();
+    if (n == 0 || times.size() != n || fractions.size() != n ||
+        phases.size() != n) {
+      Rcpp::stop(
+          "Recruitment schedule vectors must have equal nonzero lengths.");
+    }
+    if (n_years.get() <= 0)
+      Rcpp::stop("Set n_years before recruitment timing.");
+    std::vector<fims::RecruitmentTime> candidate;
+    for (R_xlen_t i = 0; i < n; ++i) {
+      if (Rcpp::CharacterVector::is_na(phases[i])) {
+        Rcpp::stop("Recruitment phase identifiers must not be missing.");
+      }
+      candidate.push_back(
+          {years[i], times[i], fractions[i], Rcpp::as<std::string>(phases[i])});
+    }
+    fims::ValidateRecruitmentSchedule(candidate, n_years.get());
+    *recruitment_schedule = std::move(candidate);
+  }
+
+  /** @brief Set the biological entry age of each scheduled event. */
+  void SetRecruitmentEntryAges(Rcpp::NumericVector ages) {
+    if (ages.size() != static_cast<R_xlen_t>(recruitment_schedule->size()))
+      Rcpp::stop("Recruitment entry ages must match the schedule length.");
+    auto candidate = *recruitment_schedule;
+    for (R_xlen_t i = 0; i < ages.size(); ++i) {
+      if (!std::isfinite(ages[i]) || ages[i] < 0)
+        Rcpp::stop("Recruitment entry ages must be finite and nonnegative.");
+      candidate[i].entry_age = ages[i];
+    }
+    fims::ValidateRecruitmentSchedule(candidate, n_years.get());
+    *recruitment_schedule = std::move(candidate);
+  }
+
   /**
    * @brief The logistic transformation of steepness (h; productivity of the
    * population), where the parameter is transformed to constrain it between
@@ -139,9 +188,10 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @param other The passed object to copy.
    */
   BevertonHoltRecruitmentInterface(
-      const BevertonHoltRecruitmentInterface &other)
+      const BevertonHoltRecruitmentInterface& other)
       : RecruitmentInterfaceBase(other),
         n_years(other.n_years),
+        recruitment_schedule(other.recruitment_schedule),
         logit_steep(other.logit_steep),
         log_rzero(other.log_rzero),
         log_devs(other.log_devs),
@@ -320,6 +370,8 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     // set relative info
     recruitment->id = this->id;
     recruitment->process_id = this->process_id.get();
+    fims::ValidateRecruitmentSchedule(*recruitment_schedule, n_years.get());
+    recruitment->recruitment_schedule = *recruitment_schedule;
     // set logit_steep
     recruitment->logit_steep.resize(this->logit_steep.size());
     for (size_t i = 0; i < this->logit_steep.size(); i++) {

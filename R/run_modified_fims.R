@@ -11,6 +11,8 @@
 #' @param parameters The tibble of input parameters for a FIMS model
 #' @param data A dataframe of input data for FIMS model
 #'
+#' @param recruitment_schedule A schedule from [setup_recruitment_schedule()].
+#'   Pass the base model schedule to retain phase timing when refitting.
 #' @return FIMS model fitted to the new parameter input value
 #' @export
 #' @keywords diagnostics
@@ -35,7 +37,8 @@ run_modified_pars_fims <- function(
   parameter_name,
   module_name = NULL,
   parameters,
-  data
+  data,
+  recruitment_schedule = NULL
 ) {
   # Need to load packages for each worker for furrr functions
   # suppressWarnings({
@@ -93,7 +96,7 @@ run_modified_pars_fims <- function(
   data_model <- FIMS::FIMSFrame(data)
 
   new_fit <- parameters_mod |>
-    FIMS::initialize_fims(data = data_model) |>
+    FIMS::initialize_fims(data = data_model, recruitment_schedule = recruitment_schedule) |>
     FIMS::fit_fims(optimize = TRUE)
 
   return(new_fit)
@@ -108,6 +111,8 @@ run_modified_pars_fims <- function(
 #' @param years_to_remove number of years to remove
 #' @param data full dataset used in base model run
 #' @param parameters input parameters used in base FIMS model
+#' @param recruitment_schedule A schedule from [setup_recruitment_schedule()].
+#'   Pass the base model schedule to retain phase timing when refitting.
 #' @return FIMS model fitted with years of data removed
 #' @export
 #' @keywords diagnostics
@@ -127,7 +132,7 @@ run_modified_pars_fims <- function(
 #'   parameters = parameters
 #' )
 #' }
-run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
+run_modified_data_fims <- function(years_to_remove = 0, data, parameters, recruitment_schedule = NULL) {
   if (length(years_to_remove) != 1L || !is.numeric(years_to_remove) ||
       !is.finite(years_to_remove) || years_to_remove < 0 || years_to_remove %% 1 != 0) {
     cli::cli_abort("years_to_remove must be one non-negative integer")
@@ -171,7 +176,7 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
 
   # User supplies parameters from base model
   fit <- parameters |>
-    FIMS::initialize_fims(data = data_model) |>
+    FIMS::initialize_fims(data = data_model, recruitment_schedule = recruitment_schedule) |>
     FIMS::fit_fims(optimize = TRUE)
 
   return(fit)

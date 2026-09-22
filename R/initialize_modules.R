@@ -860,6 +860,13 @@ initialize_comp <- function(data,
 #'   [FIMSFrame()]. Passing the data is required because initialization of the
 #'   modules requires passing the data and information regarding the uncertainty
 #'   of that data, i.e., input sample sizes for the multinomial distribution.
+#' @param recruitment_schedule NULL for annual January 1 recruitment, or a
+#'   schedule accepted by [setup_recruitment_schedule()]. Phases split one annual
+#'   recruitment total and retain distinct biological ages. The youngest initial
+#'   abundance is the first-year recruitment budget. Older initial ages use the
+#'   first schedule year's unfished phase proportions. The resolved schedule is
+#'   retained as an attribute of the returned input list. See the recruitment
+#'   phases vignette for reference, terminal-year, and plus-group conventions.
 #' @return
 #' A list is returned with two elements, `parameters` and `model`. The list can
 #' be passed to the `input` argument of [fit_fims()] to fit the model. The first
@@ -888,7 +895,7 @@ initialize_comp <- function(data,
 #'   initialize_fims(data = data_4_model)
 #' clear()
 #' }
-initialize_fims <- function(parameters, data) {
+initialize_fims <- function(parameters, data, recruitment_schedule = NULL) {
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
@@ -910,6 +917,8 @@ initialize_fims <- function(parameters, data) {
       i = "Invalid values found: {invalid_estimation_types}."
     ))
   }
+
+  phases <- setup_recruitment_schedule(data, recruitment_schedule)
 
   samples <- observation_table(data)
 
@@ -1092,6 +1101,12 @@ initialize_fims <- function(parameters, data) {
     data = data
   )
 
+  recruitment$SetRecruitmentSchedule(
+    as.integer(phases$year_i - 1L), phases$year_fraction,
+    phases$fraction, phases$phase
+  )
+  recruitment$SetRecruitmentEntryAges(phases$entry_age)
+
   recruitment_process_input <- parameters |>
     dplyr::filter(.data$module_name == "Recruitment" & .data$distribution_type == "process" & !is.na(.data$distribution))
   if (recruitment_process_input |> nrow() == 0) {
@@ -1118,7 +1133,7 @@ initialize_fims <- function(parameters, data) {
     # TODO: need to revisit initialize_process_structure and add R tests
     recruitment_process <- initialize_process_structure(
       module = recruitment,
-      par = "log_devs"
+      par = if (length(process_par_name) == 1L) process_par_name else "log_devs"
     )
   } else {
     par <- recruitment_process_input |>
@@ -1229,10 +1244,21 @@ initialize_fims <- function(parameters, data) {
 
   parametric_growth <- any(parameters$module_name == "Growth" &
     parameters$module_type == "VonBertalanffySchnute", na.rm = TRUE)
+  phase_biology <- nrow(phases) != get_n_years(data) ||
+    any(phases$year_fraction != 0 | phases$fraction != 1 |
+      phases$entry_age != min(get_ages(data)))
   samples$weight_timing <- if (parametric_growth) "fractional_age" else "annual_lookup"
   samples$length_mapping_timing <- if (parametric_growth) "fractional_age" else "fixed_annual"
   samples$maturity_timing <- "fractional_age"
+  if (phase_biology) {
+    if (parametric_growth) {
+      samples$weight_timing <- "phase_age"
+      samples$length_mapping_timing <- "phase_age"
+    }
+    samples$maturity_timing <- "phase_age"
+  }
   attr(parameter_list, "observation_timing") <- samples
+  attr(parameter_list, "recruitment_schedule") <- phases
   return(parameter_list)
 }
 

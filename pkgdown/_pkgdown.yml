@@ -109,6 +109,8 @@ navbar:
           href: articles/fims-user-setup-guide.html
         - text: Annual catch with dated survey observations
           href: articles/fims-observation-timing.html
+        - text: Multiple recruitment phases
+          href: articles/fims-recruitment-phases.html
         - text: Simple projections using FIMS
           href: articles/fims-demo-projections.html
         - text: Running a diagnostics on a FIMS model

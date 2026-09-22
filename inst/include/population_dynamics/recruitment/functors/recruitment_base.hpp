@@ -15,6 +15,7 @@
 #include "common/fims_math.hpp"  // for using fims_math::log()
 #include "common/fims_vector.hpp"
 #include "common/model_object.hpp"
+#include "common/recruitment_time.hpp"
 
 namespace fims_popdy {
 
@@ -37,6 +38,9 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
       log_r; /**< Natural log of recruitment used for random effects */
   fims::Vector<Type>
       log_expected_recruitment; /**< Expectation of the recruitment process */
+
+  std::vector<fims::RecruitmentTime>
+      recruitment_schedule; /**< Fixed phase schedule. */
 
   bool estimate_log_recruit_devs = true; /*!< A flag to indicate if recruitment
                                   deviations are estimated or not */

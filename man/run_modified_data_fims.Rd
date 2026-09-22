@@ -4,9 +4,10 @@
 \alias{run_modified_data_fims}
 \title{Modify data for a FIMS Model}
 \usage{
-run_modified_data_fims(years_to_remove = 0, data, parameters)
+run_modified_data_fims(years_to_remove = 0, data, parameters, recruitment_schedule = NULL)
 }
 \arguments{
+\item{recruitment_schedule}{A schedule from \code{\link{setup_recruitment_schedule}}. Pass the base model schedule to retain phase timing when refitting.}
 \item{years_to_remove}{number of years to remove}
 
 \item{data}{full dataset used in base model run}

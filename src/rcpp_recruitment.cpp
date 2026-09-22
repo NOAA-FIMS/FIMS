@@ -29,6 +29,10 @@ void register_recruitment(Rcpp::Module& m) {
       .field("log_expected_recruitment",
              &BevertonHoltRecruitmentInterface::log_expected_recruitment)
       .field("n_years", &BevertonHoltRecruitmentInterface::n_years)
+      .method("SetRecruitmentEntryAges",
+              &BevertonHoltRecruitmentInterface::SetRecruitmentEntryAges)
+      .method("SetRecruitmentSchedule",
+              &BevertonHoltRecruitmentInterface::SetRecruitmentSchedule)
       .method("get_id", &BevertonHoltRecruitmentInterface::get_id)
       .method("SetRecruitmentProcessID",
               &BevertonHoltRecruitmentInterface::SetRecruitmentProcessID)

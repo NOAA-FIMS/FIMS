@@ -4,7 +4,7 @@
 \alias{initialize_fims}
 \title{Initialize C++ modules via Rcpp for a FIMS model}
 \usage{
-initialize_fims(parameters, data)
+initialize_fims(parameters, data, recruitment_schedule = NULL)
 }
 \arguments{
 \item{parameters}{A tibble returned from \code{\link[=setup_default_parameters]{setup_default_parameters()}}. It
@@ -17,6 +17,14 @@ initialized for that fleet.}
 \code{\link[=FIMSFrame]{FIMSFrame()}}. Passing the data is required because initialization of the
 modules requires passing the data and information regarding the uncertainty
 of that data, i.e., input sample sizes for the multinomial distribution.}
+
+\item{recruitment_schedule}{NULL for annual January 1 recruitment, or a
+schedule accepted by \code{\link{setup_recruitment_schedule}}. Phases split one
+annual recruitment total and retain distinct biological ages. The youngest
+initial abundance is the first-year recruitment budget. Older initial ages use
+the first schedule year's unfished phase proportions. The resolved schedule is
+retained as an attribute of the returned input list. See the recruitment phases
+vignette for reference, terminal-year, and plus-group conventions.}
 }
 \value{
 A list is returned with two elements, \code{parameters} and \code{model}. The list can

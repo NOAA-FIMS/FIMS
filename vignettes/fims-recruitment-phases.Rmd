@@ -1,0 +1,154 @@
+---
+title: "Multiple recruitment phases"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Multiple recruitment phases}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", error = FALSE)
+```
+
+Recruitment phases split one annual recruitment total across fixed dates.
+Each phase has a biological age at entry and retains its own biological age
+as it moves through annual age classes. Recruitment is entry into the modeled
+population, not necessarily birth. Dates and fractions are configuration, not
+estimated parameters or additional recruitment-process likelihoods.
+
+This example allocates 40% of recruitment to January 1 and 60% to July 1,
+both entering at biological age 1. At July 1, the early recruits have aged by
+181/365 years in 2027, while the late recruits have just reached age 1.
+Calendar-year age labels still advance together on January 1.
+
+## Data and schedules
+
+```{r phase-data, message=FALSE}
+library(FIMS)
+library(dplyr)
+observations <- data_big |>
+  filter(is.na(timing) | timing <= 3 | (type == "weight_at_age" & timing == 4))
+observations$timing <- ifelse(is.na(observations$timing), NA_character_,
+  sprintf("%04d", observations$timing + 2026L))
+july <- observations |>
+  filter(fleet == "survey1", type %in% c("index", "age_comp", "length_comp"))
+july$timing <- paste0(july$timing, "-07-01")
+frame <- FIMSFrame(bind_rows(observations, july))
+
+early <- setup_recruitment_schedule(frame) |>
+  mutate(phase = "early", fraction = 0.4, entry_age = 1)
+late <- early |>
+  mutate(phase = "late", fraction = 0.6,
+    date = as.Date(sprintf("%04d-07-01", timing)))
+schedule <- setup_recruitment_schedule(frame, bind_rows(early, late))
+schedule |> select(phase, date, fraction, entry_age, year_fraction)
+```
+
+The extra survey samples reuse example observations to illustrate the interface;
+they are not new measured data. Use actual observations and uncertainties in an
+assessment. Index and composition dates need not coincide with recruitment dates.
+
+Schedules require the same phase identifiers in every modeled year, unique dates,
+and nonnegative fractions summing to one within 1e-8 each year. Fractions and
+dates may differ between years; entry age must be constant within each phase.
+The default entry age is the youngest modeled age. Dates use full ISO strings
+or whole-day R Dates. The extra terminal reporting year is not an input year.
+
+## Fit and inspect
+
+```{r phase-fit, message=FALSE}
+parameters <- setup_default_parameters(frame) |>
+  filter(module_name != "Growth") |>
+  bind_rows(setup_default_Growth(frame, module_type = "VonBertalanffySchnute"))
+parameters$estimation_type <- "constant"
+parameters$distribution[parameters$module_name == "Recruitment"] <- NA_character_
+parameters$distribution_type[parameters$module_name == "Recruitment"] <- NA_character_
+parameters$estimation_type[parameters$module_name == "Fleet" &
+  parameters$fleet == "survey1" & parameters$label == "log_q"] <- "fixed_effects"
+fit <- initialize_fims(parameters, frame, recruitment_schedule = schedule) |>
+  fit_fims(number_of_loops = 1)
+get_max_gradient(fit)
+
+get_estimates(fit) |>
+  filter(fleet == "survey1", label == "index_expected") |>
+  select(date, estimated, weight_timing)
+```
+
+The fit estimates only survey catchability to keep the example small. Shared
+parametric growth and maturity are evaluated at each cohort's biological age.
+Empirical weights and fixed age-to-length matrices keep their annual lookup
+policy. Mortality and selectivity remain annual age-class quantities.
+
+```{r phase-reports}
+report <- get_report(fit)
+report$recruitment_events
+cohorts <- as.data.frame(report$recruitment_cohorts)
+cohorts |> filter(year_i == 2, age_i == 2)
+```
+
+`recruitment_events` gives the amount added at each phase date. `expected_recruitment`
+remains the annual recruitment budget, which differs from youngest abundance on
+January 1 when some recruits arrive later. `recruitment_cohorts` gives abundance
+and biological age at `available_from` within each year: zero for surviving
+cohorts and the entry fraction for new cohorts. It is not a table of all cohorts
+at one common observation date. `phase_i` identifies the phase in the resolved
+schedule retained on the fitted input:
+
+```{r retained-schedule}
+clear()
+attr(get_input(fit), "recruitment_schedule") |>
+  distinct(phase_i, phase, entry_age)
+```
+
+Annual abundance, biomass, and spawning biomass reports remain January 1
+post-recruitment snapshots. The phase cohort reports replace the single-age
+`observation_biology` diagnostic in phase mode. Annual growth-product reports
+still describe the provider's reference ages, not phase-weighted population means.
+
+## Survival, catch, and boundaries
+
+Before a phase enters, it contributes neither abundance nor catch. After entry,
+its abundance decays by `exp(-Z * elapsed_year_fraction)`. Catch numbers use the
+Baranov calculation over the remaining part of that year. Catch weight and
+fishery length compositions use eight-point Gauss-Legendre quadrature over each
+cohort's exposure interval, normalized to its exact catch numbers. These
+biological integrals are approximations; their accuracy should be checked for
+unusually sharp growth or length-bin transitions. Survey dates do not determine
+the integration nodes and cannot change annual catch.
+
+Same-day surveys observe newly recruited fish. Annual survival is completed
+before aging and January 1 recruitment. December 31 recruits experience one day
+of mortality before the next annual boundary, using 365 or 366 days as appropriate.
+
+## Initial, reference, and terminal conditions
+
+- The youngest `log_init_naa` parameter defines the first year's total recruitment
+  budget. It is allocated across phases rather than also inserted in full on January 1.
+- Older initial age-class totals retain their existing meaning. Their phase shares
+  use unfished survival under the first modeled year's schedule and natural mortality.
+- Unfished spawning biomass per recruit uses that same first-year reference schedule,
+  including its calendar-year fractions, entry ages, biological products, and mortality.
+  Later annual schedules drive subsequent unfished trajectories. A changing schedule
+  need not maintain the initial reference equilibrium.
+- The oldest plus group uses a representative biological age for each phase.
+  Cohorts retain their entry-time offset but stop advancing their representative
+  age after reaching the plus group; exact individual ages inside it are not tracked.
+- The extra terminal January 1 report uses mean recruitment without a process
+  deviation. It repeats the final modeled year's phase pattern and inserts only
+  its January 1 allocation; later unmodeled events are not inserted.
+
+With one January 1 phase, fraction one, and the default entry age, FIMS uses the
+original annual calculation exactly. The alternative initialization and integrated
+catch-biology conventions above apply only when phase mode is enabled.
+
+## Retrospectives and projections
+
+Pass `recruitment_schedule = schedule` to `run_modified_data_fims()` or
+`run_fims_retrospective()` to retain phase timing. Peels retain the annual catch
+horizon, so the full schedule remains applicable. Likelihood profiles obtain the
+schedule from the fitted model automatically.
+
+For projections, extend the schedule through every new modeled year as well as
+the annual fishing and biological inputs. Missing schedule years are rejected;
+FIMS does not silently supply January 1 recruitment in those years.

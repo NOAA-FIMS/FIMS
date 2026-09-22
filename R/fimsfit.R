@@ -139,6 +139,11 @@ methods::setMethod("get_input", "FIMSFit", function(x) x@input)
 #' age class, year fraction, mean length, length SD, mean weight, and maturity.
 #' Empirical growth uses -999 for unavailable length and length SD products.
 #' `observation_work` counts shared dates, biological size rows, and requests.
+#' For phased recruitment, `recruitment_events` reports annual allocations by
+#' phase. `recruitment_cohorts` reports phase-specific abundance and biological
+#' age at each cohort's `available_from` fraction within the year. These replace
+#' the single-age observation biology diagnostic in phase mode. `phase_i` maps
+#' to the resolved recruitment schedule on [get_input()].
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
@@ -147,6 +152,12 @@ methods::setGeneric("get_report", function(x) standardGeneric("get_report"))
 #' @keywords fit_fims
 methods::setMethod("get_report", "FIMSFit", function(x) {
   report <- x@report
+  if (!is.null(report$recruitment_events)) {
+    colnames(report$recruitment_events) <- c("year_i", "phase_i", "year_fraction",
+      "entry_age", "recruits", "unfished_recruits")
+    colnames(report$recruitment_cohorts) <- c("year_i", "phase_i", "age_i",
+      "biological_age", "available_from", "numbers", "unfished_numbers")
+  }
   if (!is.null(report$observation_biology)) {
     colnames(report$observation_biology) <- c(
       "day", "year_i", "age", "year_fraction", "mean_length", "sd_length",

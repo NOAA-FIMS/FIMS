@@ -211,6 +211,11 @@ public:
    */
   virtual void Initialize() {
     for (size_t p = 0; p < this->populations.size(); p++) {
+      const auto& population = this->populations[p];
+      if (population->recruitment) {
+        fims::ValidateRecruitmentSchedule(
+            population->recruitment->recruitment_schedule, population->n_years);
+      }
       if (this->populations[p]->proportion_female.size() == 0) {
         this->populations[p]->proportion_female.resize(1);
         this->populations[p]->proportion_female[0] = static_cast<Type>(0.5);
@@ -674,22 +679,21 @@ public:
    * \f$\phi_0\f$, and \f$g(y-1)\f$ evaluates recruitment deviations.
    *
    * @snippet{doc} this param_population
-   * @snippet{doc} this param_i_age_year
    * @snippet{doc} this param_year
    * @snippet{doc} this param_i_dev
    */
-  void CalculateRecruitment(
-      std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_age_year, size_t year, size_t i_dev) {
+  Type CalculateAnnualRecruitment(
+      std::shared_ptr<fims_popdy::Population<Type>>& population, size_t year,
+      size_t i_dev) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
     Type phi_0 = CalculateSBPR0(population);
+    Type annual_recruitment;
 
     if (i_dev == population->n_years) {
-      dq_["numbers_at_age"][i_age_year] =
-          population->recruitment->evaluate_mean(
-              dq_["spawning_biomass"][year - 1], phi_0);
+      annual_recruitment = population->recruitment->evaluate_mean(
+          dq_["spawning_biomass"][year - 1], phi_0);
       /*the final year of the time series has no data to inform recruitment
       devs, so this value is set to the mean recruitment.*/
     } else {
@@ -700,11 +704,27 @@ public:
           fims_math::log(population->recruitment->evaluate_mean(
               dq_["spawning_biomass"][year - 1], phi_0));
 
-      dq_["numbers_at_age"][i_age_year] = fims_math::exp(
+      annual_recruitment = fims_math::exp(
           population->recruitment->process->evaluate_process(year - 1));
     }
 
-    dq_["expected_recruitment"][year] = dq_["numbers_at_age"][i_age_year];
+    return annual_recruitment;
+  }
+
+  /** @brief Insert the annual recruitment budget at the legacy boundary.
+   * @param population Population receiving recruits.
+   * @param i_age_year Youngest age cell at the annual boundary.
+   * @param year Model year index.
+   * @param i_dev Recruitment process index.
+   */
+  void CalculateRecruitment(
+      std::shared_ptr<fims_popdy::Population<Type>>& population,
+      size_t i_age_year, size_t year, size_t i_dev) {
+    auto& dq = this->GetPopulationDerivedQuantities(population->GetId());
+    const Type annual_recruitment =
+        CalculateAnnualRecruitment(population, year, i_dev);
+    dq["numbers_at_age"][i_age_year] = annual_recruitment;
+    dq["expected_recruitment"][year] = annual_recruitment;
   }
 
   /**
@@ -1536,6 +1556,375 @@ public:
     }
   }
 
+  /** @brief A phase cohort with its own biological clock and annual age bin. */
+  struct RecruitmentCohort {
+    size_t age, phase;
+    double biological_age, available_from;
+    Type numbers, unfished;
+  };
+  std::vector<std::vector<Type>> recruitment_event_rows,
+      recruitment_cohort_rows;
+
+  /** @brief Select phase dynamics only when annual semantics are insufficient.
+   */
+  bool UsesPhasedRecruitment() const {
+    for (const auto& p : this->populations)
+      if (!fims::IsAnnualRecruitmentSchedule(
+              p->recruitment->recruitment_schedule, p->n_years, p->ages[0]))
+        return true;
+    return false;
+  }
+
+  /** @brief Continuous-age biology, with declared annual empirical fallback. */
+  Type CohortWeight(const std::shared_ptr<fims_popdy::Population<Type>>& p,
+                    size_t year, size_t age, double biological_age) {
+    return p->growth->evaluate(year, p->growth->SupportsContinuousAge()
+                                         ? biological_age
+                                         : p->ages[age]);
+  }
+
+  /** @brief Evaluate maturity at the cohort age with annual parameter lookup.
+   */
+  Type CohortMaturity(const std::shared_ptr<fims_popdy::Population<Type>>& p,
+                      size_t year, size_t age, double biological_age) {
+    return p->maturity->evaluate(
+        Type(p->maturity->SupportsContinuousAge() ? biological_age
+                                                  : p->ages[age]),
+        std::min(year, p->n_years - 1));
+  }
+
+  /** @brief Map cohort-specific size probabilities onto fleet length bins. */
+  fims::Vector<Type> CohortLengthRow(
+      const std::shared_ptr<fims_popdy::Population<Type>>& p,
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet, size_t year,
+      size_t age, double biological_age) {
+    auto conversion = std::dynamic_pointer_cast<
+        fims_popdy::AgeToLengthConversionDerived<Type>>(
+        fleet->age_to_length_conversion_model);
+    if (conversion) {
+      auto growth = std::dynamic_pointer_cast<
+          fims_popdy::GrowthDerivedObservationBase<Type>>(p->growth);
+      if (!growth || !p->size_distribution_provider)
+        throw std::runtime_error(
+            "Phase length predictions require growth products.");
+      auto products = growth->EvaluateGrowthAtAge(year, biological_age);
+      return conversion->MapPopulationProbabilityRow(
+          p->size_distribution_provider->BuildProbabilityRow(
+              products.mean_length, products.sd_length));
+    }
+    fims::Vector<Type> row;
+    if (!fleet->age_to_length_conversion_model ||
+        !fleet->age_to_length_conversion_model->BuildAgeToLengthConversionRow(
+            year, age, row))
+      throw std::runtime_error("Missing phase age-to-length conversion.");
+    return row;
+  }
+
+  /** @brief Exact mortality exposure, including the zero-mortality limit.
+   * Rates come from exponentiated parameters; zero is possible only by
+   * underflow.
+   */
+  Type CohortExposure(const Type& z, double duration) {
+    if (fims_math::Value(z) == 0.0) return Type(duration);
+    using std::expm1;
+    return -expm1(-z * Type(duration)) / z;
+  }
+
+  /** @brief Write a composition with its original observed sample total. */
+  void WritePhaseComposition(
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet, bool length,
+      size_t sample, const std::vector<Type>& values) {
+    auto& dq = this->GetFleetDerivedQuantities(fleet->GetId());
+    auto observed =
+        length ? fleet->observed_lengthcomp_data : fleet->observed_agecomp_data;
+    const std::string prefix = length ? "lengthcomp" : "agecomp";
+    Type total = Type(0), observed_total = Type(0);
+    for (size_t b = 0; b < values.size(); ++b) {
+      total += values[b];
+      if (observed &&
+          observed->at(sample * values.size() + b) != observed->na_value)
+        observed_total += observed->at(sample * values.size() + b);
+    }
+    if (total == Type(0) && observed_total > Type(0)) {
+      throw std::runtime_error(
+          "Positive composition observations have no predicted fish at this date.");
+    }
+    for (size_t b = 0; b < values.size(); ++b) {
+      const size_t i = sample * values.size() + b;
+      // A composition with no fish has no defined proportions. The uniform
+      // fallback only keeps missing/zero-size samples finite; indices stay
+      // zero.
+      const Type proportion =
+          total > Type(0) ? values[b] / total : Type(1.0 / values.size());
+      dq[prefix + "_proportion"][i] = proportion;
+      dq[prefix + "_expected"][i] =
+          observed ? proportion * observed_total : values[b];
+    }
+  }
+
+  /** @brief Point predictions include only cohorts already recruited. */
+  void PredictPhaseSurvey(
+      const std::shared_ptr<fims_popdy::Population<Type>>& p,
+      const std::shared_ptr<fims_popdy::Fleet<Type>>& fleet,
+      const std::vector<RecruitmentCohort>& cohorts, size_t year, double time,
+      const std::string& stream, size_t sample,
+      bool annual_diagnostic = false) {
+    auto& pdq = this->GetPopulationDerivedQuantities(p->GetId());
+    auto& dq = this->GetFleetDerivedQuantities(fleet->GetId());
+    const bool index = stream == "index", length = stream == "length_comp";
+    std::vector<Type> values(
+        index ? 1 : (length ? fleet->n_lengths : fleet->n_ages), Type(0));
+    for (const auto& c : cohorts) {
+      if (time < c.available_from) continue;
+      const size_t i = year * p->n_ages + c.age;
+      const Type selected = c.numbers *
+                            fims_math::exp(-pdq["mortality_Z"][i] *
+                                           Type(time - c.available_from)) *
+                            fleet->q.get_force_scalar(year) *
+                            fleet->selectivity->evaluate(p->ages[c.age], year);
+      const double biological_age = c.biological_age + time;
+      if (annual_diagnostic) {
+        const Type weight = CohortWeight(p, year, c.age, biological_age);
+        dq["index_numbers_at_age"][i] += selected;
+        dq["index_weight_at_age"][i] += selected * weight;
+        dq["index_numbers"][year] += selected;
+        dq["index_weight"][year] += selected * weight;
+        if (fleet->requires_age_length_mapping && fleet->n_lengths) {
+          const auto row =
+              CohortLengthRow(p, fleet, year, c.age, biological_age);
+          for (size_t l = 0; l < fleet->n_lengths; ++l)
+            dq["index_numbers_at_length"][year * fleet->n_lengths + l] +=
+                selected * row[l];
+        }
+      } else if (index) {
+        values[0] +=
+            selected * (fleet->observed_index_units == "number"
+                            ? Type(1)
+                            : CohortWeight(p, year, c.age, biological_age));
+      } else if (length) {
+        const auto row = CohortLengthRow(p, fleet, year, c.age, biological_age);
+        for (size_t l = 0; l < fleet->n_lengths; ++l)
+          values[l] += selected * row[l];
+      } else
+        values[c.age] += selected;
+    }
+    if (annual_diagnostic) return;
+    if (index) {
+      dq["index_expected"][sample] = values[0];
+      dq["log_index_expected"][sample] = fims_math::log(values[0]);
+    } else
+      WritePhaseComposition(fleet, length, sample, values);
+  }
+
+  /** @brief Phase-resolved annual dynamics. Survey dates never split catch
+   * integrals. */
+  void EvaluatePhasedRecruitment() {
+    if (this->populations.size() != 1)
+      throw std::runtime_error(
+          "Phased recruitment currently requires one population.");
+    auto& p = this->populations[0];
+    if (p->n_ages < 2)
+      throw std::runtime_error(
+          "Phased recruitment requires at least two age bins.");
+    auto& dq = this->GetPopulationDerivedQuantities(p->GetId());
+    const auto& schedule = p->recruitment->recruitment_schedule;
+    std::map<std::string, size_t> phase_ids;
+    for (const auto& e : schedule) phase_ids.emplace(e.phase, 0);
+    size_t phase_id = 0;
+    for (auto& item : phase_ids) item.second = phase_id++;
+    std::vector<fims::RecruitmentTime> reference;
+    for (const auto& e : schedule)
+      if (e.year == 0) reference.push_back(e);
+    const size_t nphases = reference.size();
+    std::vector<std::vector<Type>> equilibrium(
+        p->n_ages, std::vector<Type>(nphases, Type(0)));
+    Type phi0 = Type(0);
+    for (size_t k = 0; k < nphases; ++k) {
+      const auto& e = reference[k];
+      const double entry_age = e.entry_age < 0 ? p->ages[0] : e.entry_age;
+      equilibrium[0][k] = e.year_fraction == 0 ? Type(e.fraction) : Type(0);
+      Type survivors = Type(e.fraction) *
+                       fims_math::exp(-p->M[0] * Type(1 - e.year_fraction));
+      for (size_t a = 1; a < p->n_ages; ++a) {
+        equilibrium[a][k] = survivors;
+        if (a == p->n_ages - 1)
+          equilibrium[a][k] /= (Type(1) - fims_math::exp(-p->M[a]));
+        survivors *= fims_math::exp(-p->M[a]);
+      }
+      for (size_t a = 0; a < p->n_ages; ++a) {
+        if (a == 0 && e.year_fraction != 0) continue;
+        const double age = entry_age + a - e.year_fraction;
+        phi0 += equilibrium[a][k] * CohortWeight(p, 0, a, age) *
+                CohortMaturity(p, 0, a, age) *
+                p->proportion_female.get_force_scalar(a);
+      }
+    }
+    std::vector<RecruitmentCohort> cohorts;
+    const Type rzero = fims_math::exp(p->recruitment->log_rzero[0]);
+    // The youngest initial parameter is a recruitment budget; older initial
+    // classes retain their totals and use the reference phase survivor shares.
+    for (size_t a = 1; a < p->n_ages; ++a) {
+      Type total = Type(0);
+      for (const auto& n : equilibrium[a]) total += n;
+      for (size_t k = 0; k < nphases; ++k) {
+        const auto& e = reference[k];
+        const double entry_age = e.entry_age < 0 ? p->ages[0] : e.entry_age;
+        cohorts.push_back(
+            {a, phase_ids[e.phase], entry_age + a - e.year_fraction, 0,
+             fims_math::exp(p->log_init_naa[a]) * equilibrium[a][k] / total,
+             rzero * equilibrium[a][k]});
+      }
+    }
+    for (size_t y = 0; y <= p->n_years; ++y) {
+      if (y < p->n_years)
+        for (size_t a = 0; a < p->n_ages; ++a)
+          CalculateMortality(p, y * p->n_ages + a, y, a);
+      Type recruitment;
+      if (y == 0)
+        recruitment = fims_math::exp(p->log_init_naa[0]);
+      else {
+        const Type mean =
+            p->recruitment->evaluate_mean(dq["spawning_biomass"][y - 1], phi0);
+        if (y == p->n_years)
+          recruitment = mean;
+        else {
+          p->recruitment->log_expected_recruitment[y - 1] =
+              fims_math::log(mean);
+          recruitment =
+              fims_math::exp(p->recruitment->process->evaluate_process(y - 1));
+        }
+      }
+      dq["expected_recruitment"][y] = recruitment;
+      // Terminal January 1 uses the final modeled year's phase pattern and a
+      // mean-only budget; events later in that unmodeled year are not inserted.
+      const size_t schedule_year = std::min(y, p->n_years - 1);
+      for (const auto& e : schedule) {
+        if (static_cast<size_t>(e.year) != schedule_year ||
+            (y == p->n_years && e.year_fraction != 0))
+          continue;
+        const double entry_age = e.entry_age < 0 ? p->ages[0] : e.entry_age;
+        cohorts.push_back({0, phase_ids[e.phase], entry_age - e.year_fraction,
+                           e.year_fraction, recruitment * Type(e.fraction),
+                           rzero * Type(e.fraction)});
+        recruitment_event_rows.push_back(
+            {Type(y + 1), Type(phase_ids[e.phase] + 1), Type(e.year_fraction),
+             Type(entry_age), recruitment * Type(e.fraction),
+             rzero * Type(e.fraction)});
+      }
+      for (const auto& c : cohorts) {
+        recruitment_cohort_rows.push_back(
+            {Type(y + 1), Type(c.phase + 1), Type(c.age + 1),
+             Type(c.biological_age + c.available_from), Type(c.available_from),
+             c.numbers, c.unfished});
+        if (c.available_from != 0) continue;
+        const size_t i = y * p->n_ages + c.age;
+        const Type weight = CohortWeight(p, y, c.age, c.biological_age);
+        const Type mature = CohortMaturity(p, y, c.age, c.biological_age);
+        const Type female = p->proportion_female.get_force_scalar(c.age);
+        dq["numbers_at_age"][i] += c.numbers;
+        dq["unfished_numbers_at_age"][i] += c.unfished;
+        dq["proportion_mature_at_age"][i] += c.numbers * mature;
+        dq["biomass"][y] += c.numbers * weight;
+        dq["unfished_biomass"][y] += c.unfished * weight;
+        dq["spawning_biomass"][y] += c.numbers * weight * mature * female;
+        dq["unfished_spawning_biomass"][y] +=
+            c.unfished * weight * mature * female;
+      }
+      for (size_t a = 0; a < p->n_ages; ++a) {
+        const size_t i = y * p->n_ages + a;
+        if (dq["numbers_at_age"][i] > Type(0))
+          dq["proportion_mature_at_age"][i] /= dq["numbers_at_age"][i];
+      }
+      CalculateSpawningBiomassRatio(p, y);
+      if (y == p->n_years) break;
+      // Eight-point Gauss-Legendre catch-weight/length integration. Normalize
+      // quadrature exposure to exact Baranov catch so numbers are conserved.
+      const double nodes[8] = {-0.9602898564975363, -0.7966664774136267,
+                               -0.5255324099163290, -0.1834346424956498,
+                               0.1834346424956498,  0.5255324099163290,
+                               0.7966664774136267,  0.9602898564975363};
+      const double weights[8] = {0.1012285362903763, 0.2223810344533745,
+                                 0.3137066458778873, 0.3626837833783620,
+                                 0.3626837833783620, 0.3137066458778873,
+                                 0.2223810344533745, 0.1012285362903763};
+      for (const auto& fleet : p->fleets) {
+        auto& fdq = this->GetFleetDerivedQuantities(fleet->GetId());
+        for (const auto& c : cohorts) {
+          const size_t i = y * p->n_ages + c.age;
+          const Type z = dq["mortality_Z"][i];
+          const Type fishing = fleet->Fmort[y] * p->f_multiplier[y] *
+                               fleet->selectivity->evaluate(p->ages[c.age], y);
+          const Type catch_n =
+              c.numbers * fishing * CohortExposure(z, 1 - c.available_from);
+          fdq["catch_numbers_at_age"][i] += catch_n;
+          Type weight_sum = Type(0), exposure_sum = Type(0);
+          std::vector<Type> lengths(fleet->n_lengths, Type(0));
+          for (size_t q = 0; q < 8; ++q) {
+            const double t = c.available_from +
+                             (1 - c.available_from) * (nodes[q] + 1) * 0.5;
+            const Type exposure =
+                Type(weights[q]) *
+                fims_math::exp(-z * Type(t - c.available_from -
+                  (1 - c.available_from) * (nodes[0] + 1) * 0.5));
+            exposure_sum += exposure;
+            weight_sum +=
+                exposure * CohortWeight(p, y, c.age, c.biological_age + t);
+            if (fleet->requires_age_length_mapping && fleet->n_lengths) {
+              const auto row =
+                  CohortLengthRow(p, fleet, y, c.age, c.biological_age + t);
+              for (size_t l = 0; l < fleet->n_lengths; ++l)
+                lengths[l] += exposure * row[l];
+            }
+          }
+          fdq["catch_weight_at_age"][i] += catch_n * weight_sum / exposure_sum;
+          if (fleet->requires_age_length_mapping)
+            for (size_t l = 0; l < fleet->n_lengths; ++l)
+              fdq["catch_numbers_at_length"][y * fleet->n_lengths + l] +=
+                  catch_n * lengths[l] / exposure_sum;
+        }
+        PredictPhaseSurvey(p, fleet, cohorts, y, 0, "index", 0, true);
+        for (const std::string stream : {"index", "age_comp", "length_comp"}) {
+          for (size_t i = 0; i < fleet->ObservationCount(stream); ++i) {
+            if (fleet->ObservationYear(stream, i) != y) continue;
+            const bool fishery = stream != "index" &&
+                                 fleet->fleet_observed_catch_data_id_m != -999;
+            const bool length = stream == "length_comp";
+            if (length && !fleet->requires_age_length_mapping) continue;
+            if (fishery) {
+              const size_t bins = length ? fleet->n_lengths : fleet->n_ages;
+              std::vector<Type> values(bins);
+              for (size_t b = 0; b < bins; ++b)
+                values[b] = fdq[length ? "catch_numbers_at_length"
+                                       : "catch_numbers_at_age"][y * bins + b];
+              WritePhaseComposition(fleet, length, i, values);
+            } else {
+              auto times = fleet->observation_times.find(stream);
+              const double t = times == fleet->observation_times.end()
+                                   ? 0
+                                   : times->second[i].fraction;
+              PredictPhaseSurvey(p, fleet, cohorts, y, t, stream, i);
+            }
+          }
+        }
+      }
+      for (size_t a = 0; a < p->n_ages; ++a) CalculateCatch(p, y, a);
+      for (auto& c : cohorts) {
+        const size_t i = y * p->n_ages + c.age;
+        c.numbers *=
+            fims_math::exp(-dq["mortality_Z"][i] * Type(1 - c.available_from));
+        c.unfished *= fims_math::exp(-p->M[i] * Type(1 - c.available_from));
+        // Keep a phase-specific representative age once the cohort is in the
+        // plus group.
+        if (c.age + 1 < p->n_ages) {
+          ++c.age;
+          c.biological_age += 1;
+        }
+        c.available_from = 0;
+      }
+    }
+    evaluate_catch();
+  }
+
   virtual void Evaluate() {
     /*
                Sets derived vectors to zero
@@ -1543,8 +1932,15 @@ public:
                Sets recruitment deviations to mean 0.
      */
     Prepare();
+    recruitment_event_rows.clear();
+    recruitment_cohort_rows.clear();
+    observation_biology_rows.clear();
     PreparePopulationGrowthProducts();
     EnsureAllFleetAgeToLengthConversion();
+    if (UsesPhasedRecruitment()) {
+      EvaluatePhasedRecruitment();
+      return;
+    }
     /*
      start at year=0, age=0;
      here year 0 is the estimated initial population structure and age 0 are
@@ -1689,6 +2085,18 @@ public:
     if (this->do_reporting == true) {
       EnsureAllFleetAgeToLengthConversion();
       report_vectors.clear();
+      if (!recruitment_event_rows.empty()) {
+        matrix<Type> recruitment_events(recruitment_event_rows.size(), 6);
+        for (size_t r = 0; r < recruitment_event_rows.size(); ++r)
+          for (size_t c = 0; c < 6; ++c)
+            recruitment_events(r, c) = recruitment_event_rows[r][c];
+        FIMS_REPORT_F_("recruitment_events", recruitment_events, this->of);
+        matrix<Type> recruitment_cohorts(recruitment_cohort_rows.size(), 7);
+        for (size_t r = 0; r < recruitment_cohort_rows.size(); ++r)
+          for (size_t c = 0; c < 7; ++c)
+            recruitment_cohorts(r, c) = recruitment_cohort_rows[r][c];
+        FIMS_REPORT_F_("recruitment_cohorts", recruitment_cohorts, this->of);
+      }
       if (!observation_biology_rows.empty()) {
         matrix<Type> observation_biology(observation_biology_rows.size(), 8);
         for (size_t r = 0; r < observation_biology_rows.size(); ++r)

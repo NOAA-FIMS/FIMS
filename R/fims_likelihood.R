@@ -211,17 +211,20 @@ run_fims_likelihood <- function(
   # Ensure cleanup happens
   on.exit(future::plan(future::sequential), add = TRUE)
 
+  recruitment_schedule <- attr(get_input(model), "recruitment_schedule")
+
   # run FIMS in parallel for each of the likelihood profile values
   estimates_list <- furrr::future_map(
     .x = vec,
-    .f = function(value, parameter_name, module_name, parameters, data) {
+    .f = function(value, parameter_name, module_name, parameters, data, recruitment_schedule) {
       # Run the model
       fit <- run_modified_pars_fims(
         new_value = value,
         parameter_name = parameter_name,
         module_name = module_name,
         parameters = parameters,
-        data = data
+        data = data,
+        recruitment_schedule = recruitment_schedule
       )
       # Extract estimates immediately while still in worker
       FIMS::get_estimates(fit)
@@ -230,6 +233,7 @@ run_fims_likelihood <- function(
     module_name = module_name,
     parameters = parameters,
     data = data,
+    recruitment_schedule = recruitment_schedule,
     .options = furrr::furrr_options(seed = TRUE, globals = TRUE)
   )
 

@@ -4,9 +4,11 @@
 \alias{run_fims_retrospective}
 \title{Run Retrospective Analysis}
 \usage{
-run_fims_retrospective(years_to_remove, data, parameters, n_cores = NULL)
+run_fims_retrospective(years_to_remove, data, parameters, n_cores = NULL,
+  recruitment_schedule = NULL)
 }
 \arguments{
+\item{recruitment_schedule}{A schedule from \code{\link{setup_recruitment_schedule}}. Pass the base model schedule to retain phase timing when refitting.}
 \item{years_to_remove}{A numeric vector specifying the number of terminal
 years to remove for each retrospective peel. For example, \code{0:5} creates
 six model runs: the reference model (0 years removed) and five

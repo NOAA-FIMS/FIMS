@@ -89,6 +89,11 @@ reportable in the C++ code is returned. For dated samples,
 age class, year fraction, mean length, length SD, mean weight, and maturity.
 Empirical growth uses -999 for unavailable length and length SD products.
 \code{observation_work} counts shared dates, biological size rows, and requests.
+For phased recruitment, \code{recruitment_events} reports annual allocations by
+phase. \code{recruitment_cohorts} reports phase-specific abundance and biological
+age at each cohort's \code{available_from} fraction within the year. These replace
+the single-age observation biology diagnostic in phase mode. \code{phase_i} maps
+to the resolved recruitment schedule on \code{get_input()}.
 
 \code{\link[=get_obj]{get_obj()}} returns the output from \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}.
 

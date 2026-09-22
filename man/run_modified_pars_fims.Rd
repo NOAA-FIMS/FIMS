@@ -9,10 +9,12 @@ run_modified_pars_fims(
   parameter_name,
   module_name = NULL,
   parameters,
-  data
+  data,
+  recruitment_schedule = NULL
 )
 }
 \arguments{
+\item{recruitment_schedule}{A schedule from \code{\link{setup_recruitment_schedule}}. Pass the base model schedule to retain phase timing when refitting.}
 \item{new_value}{The new value to be changed in the FIMS model.}
 
 \item{parameter_name}{A string specifying the parameter name to modify.

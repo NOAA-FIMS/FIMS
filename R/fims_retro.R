@@ -39,6 +39,8 @@
 #'   parallel processing. If `NULL` (default), uses `parallel::detectCores() - 1`.
 #'   Set to 1 for sequential processing. Must be a positive integer.
 #'
+#' @param recruitment_schedule A schedule from [setup_recruitment_schedule()].
+#'   Retrospective peels retain the annual horizon and this schedule.
 #' @return
 #' A list with two named elements:
 #' * `years_to_remove` - The input vector of years removed for each peel
@@ -106,7 +108,8 @@ run_fims_retrospective <- function(
   years_to_remove,
   data,
   parameters,
-  n_cores = NULL
+  n_cores = NULL,
+  recruitment_schedule = NULL
 ) {
   # Validate years_to_remove
   if (length(years_to_remove) == 0) {
@@ -148,7 +151,8 @@ run_fims_retrospective <- function(
       fit <- run_modified_data_fims(
         years_to_remove = years,
         data = data,
-        parameters = parameters
+        parameters = parameters,
+        recruitment_schedule = recruitment_schedule
       )
       FIMS::get_estimates(fit)
     },

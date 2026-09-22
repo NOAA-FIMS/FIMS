@@ -1,5 +1,12 @@
 # FIMS 0.11.0
 
+* Support fixed recruitment phases with distinct biological entry ages, splitting
+  one annual recruitment total across dates. Phase cohorts retain biological ages
+  across annual age bins; survival and catch reflect partial-year exposure.
+  Add phase-aware unfished reference quantities, cohort/event reports, and
+  schedule preservation in retrospective and likelihood refits. The default
+  single January 1 phase retains the legacy annual calculation.
+
 * Pad early calendar years consistently across platforms when validating dates
   and exporting sample identifiers, preserving year-only example data.
 

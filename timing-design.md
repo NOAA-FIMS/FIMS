@@ -400,3 +400,209 @@ columns with their existing meanings; reported standard errors match `estimated`
 The executed worked example is `vignettes/fims-observation-timing.Rmd`.
 The reproducible benchmark and measured comparison are in
 `inst/benchmarks/observation-timing.R` and `observation-timing-results.md`.
+
+## Extension: multiple recruitment phases
+
+Status: phase-aware dynamics implemented on `dev-extend-timing-multi-recruiment`.
+The investigation and staged implementation notes below are historical; the
+current implemented conventions are summarized at the end of this document.
+Confirmed scope: split one annual recruitment total across fixed dates.
+Other semantics below remain proposals, not implemented capabilities or approved
+biological assumptions. The default remains one January 1 recruitment event.
+
+### Current implementation constraints
+
+`CatchAtAge::CalculateRecruitment()` computes the annual recruitment process
+from previous-year spawning biomass and `CalculateSBPR0()`, then writes directly
+into the youngest January 1 abundance cell. The initial year instead uses
+`log_init_naa`; the terminal report year uses mean recruitment without a process
+deviation. Both `LogDevs` and `LogR` use annual process indices.
+
+`CalculateNumbersAA()` advances survivors after a full year of mortality.
+`CalculateCatchNumbersAA()` applies a full-year Baranov calculation to January 1
+abundance. `EvaluateTimedObservations()` runs after annual population evaluation
+and propagates January 1 selected abundance without adding fish. Consequently,
+adding dates only to the observation plan cannot implement recruitment pulses.
+`CalculateSBPR0()` and unfished abundance also assume January 1 recruitment and
+must be reviewed alongside the fished dynamics.
+
+### Confirmed first scope
+
+Use fixed phase dates and fixed nonnegative fractions of one annual recruitment
+total, with fractions summing to one in each modeled year. Preserve the annual
+stock–recruit relationship and its existing lag and process parameterization;
+calculate its total once, then allocate `R[y,k] = R[y] * fraction[y,k]`.
+Independent phase-level deviations, estimated dates, seasonal mortality,
+multiple spawning events, and continuous recruitment are later extensions.
+Splitting recruitment does not imply splitting spawning or the likelihood for
+the annual recruitment process.
+
+A proposed separate population-level configuration table has columns
+`population`, `phase`, `date`, and `fraction`. Recruitment is a state-changing
+process, so these rows should not be inserted into the observation/likelihood
+table. Use explicit ISO dates initially; a later convenience helper can expand
+recurring month/day schedules. Require complete schedules for modeled years,
+stable phase identifiers, unique dates per population, valid calendar dates,
+finite nonnegative fractions, and a sum of one within a documented tolerance.
+Reject unspecified leap-day substitutions. Compile fixed schedules outside the
+AD tape; rebuild whenever input schedules change.
+
+### Event calculations
+
+For constant rates over a segment of duration `dt` in calendar-year units:
+
+```
+N_end[a] = N_start[a] * exp(-Z[a] * dt)
+C[f,a]   = N_start[a] * F[f,a] * (1 - exp(-Z[a] * dt)) / Z[a]
+```
+
+Use a numerically stable implementation and the continuous limit at `Z = 0`.
+Accumulate catch over segments, then add recruits at each recruitment boundary.
+Survey dates only read the state and must not change annual catch or dynamics.
+Use a merged schedule of annual boundaries, recruitment events, and survey
+requests, with deterministic same-day ordering: finish survival/catch, age
+cohorts at annual boundaries, add recruitment, calculate annual summaries when
+applicable, then evaluate surveys. A January 1 event occurs once, not as both
+an end-of-year and a start-of-year insertion. December 31 recruitment experiences
+one remaining calendar day of mortality before the next annual boundary.
+
+For fixed age-class rates, an independent analytic check is:
+
+```
+N[a,t] = N_initial[a] * exp(-Z[a] * t)
+       + sum over pulses in class a with tau[k] <= t:
+           R[k] * exp(-Z[a] * (t - tau[k]))
+```
+
+The corresponding contribution of pulse k to annual catch numbers is
+`R[k] * F[f,a]/Z[a] * (1 - exp(-Z[a] * (1 - tau[k])))`.
+A phase must contribute neither abundance nor catch before its event.
+
+### Biological decisions to resolve before implementation
+
+1. **Entry age versus birth time.** Recruitment means entry into the modeled
+   population and is not necessarily birth. An annual-age-class interpretation
+   assigns entrants the same `age + year_fraction` biology as their class.
+   A distinct-cohort interpretation assigns an age at entry and tracks elapsed
+   age from the event. These are different models; dates alone do not identify
+   which is appropriate.
+2. **Cohort retention.** If phases have distinct biological ages, retain phase
+   state across annual boundaries and apply growth/maturity to each phase before
+   aggregation. Annual class labels cannot recover that information after
+   phases are pooled. Specify plus-group representative ages and initial phase
+   composition explicitly. A bounded phase-by-age representation is possible
+   with a fixed recurring phase structure, but arbitrary new phases each year
+   require a cohort-retention policy.
+3. **Initial year.** Existing youngest initial abundance already includes
+   recruitment. Do not also add a full new annual total. Either define it as
+   the first year's recruitment budget and allocate it across phases (an
+   explicit new interpretation in pulse mode), or retain initial abundance and
+   supply a separate first-year recruitment budget. Older initial classes need
+   phase allocations if phase-specific biology is enabled.
+4. **Reference quantities.** Recalculate unfished survival and spawning biomass
+   per recruit using the same recruitment schedule and biology. Keeping the old
+   `phi_0` while changing entry times would make stock–recruit calibration
+   inconsistent. A repeating reference schedule and reference-year day-count
+   convention must be specified for year-varying schedules and leap years.
+5. **Catch biology.** Annual catch numbers must include partial-year exposure.
+   Choose and document whether catch weight and fishery length compositions
+   retain annual biological lookup or use an explicit within-year integration
+   rule. Survey frequency must never determine the catch integration grid.
+6. **Terminal reporting.** The extra January 1 report should contain only
+   recruitment scheduled for that boundary, not the whole next year's total.
+   Preserve the existing mean-only terminal recruitment policy, with separate
+   reporting of the annual budget and realized phase additions.
+
+### Suggested implementation milestones
+
+1. Resolve the biological choices above; add schedule normalization, validation,
+   and a single-January-1 default, with no change to model predictions.
+2. Separate annual recruitment calculation from abundance insertion. Implement
+   event survival, recruitment additions, annual aging, and catch accumulation
+   together, initially verified with fixed rates and biological products.
+3. Implement the chosen phase/cohort biology, initial conditions, unfished
+   reference quantities, and terminal boundary semantics before exposing the
+   new mode for assessment use.
+4. Connect survey predictions, annual fishery compositions, R configuration,
+   Rcpp validation, and reports. Report annual recruitment totals and per-phase
+   additions separately from January 1 abundance.
+5. Validate gradients, fitting, retrospective/projection workflows, invariance
+   to extra survey dates, and performance; add a two-phase worked vignette.
+
+Acceptance cases include exact legacy recovery for a single January 1 event;
+zero-size phases; two pulses checked against analytic abundance and catch;
+surveys immediately before/on/after a pulse; December 31/January 1 and leap-year
+boundaries; no first-year double counting; plus-group accumulation; equilibrium
+consistency between fished and unfished paths at zero fishing; both annual
+recruitment process types; and finite-difference checks of recruitment, mortality,
+and biological parameters. Schedule row ordering and added survey-only dates
+must not change population states or annual catch.
+
+### First implementation increment (historical)
+
+`setup_recruitment_schedule()` now prepares and validates population-level
+schedules, with one January 1 phase per modeled year by default. The helper
+returns calendar coordinates and fractions without modifying observations,
+parameters, or population dynamics. It requires a consistent set of phase IDs
+across years and excludes the extra terminal reporting year. Non-default
+schedules are configuration only until the event-dynamics milestone is complete.
+Biological age semantics remain an explicit decision before that milestone.
+
+### Backend preparation increment (historical)
+
+`initialize_fims(..., recruitment_schedule = NULL)` now resolves the schedule
+before clearing backend state. It accepts the legacy-compatible single January 1
+phase, retains the schedule on the fitted input, and explicitly rejects other
+schedules. The Rcpp recruitment interface validates fixed coordinates and copies
+them into both scalar and AD recruitment objects. A shared C++ validator checks
+ordering, coverage, phase identity, and annual allocation totals; a separate
+guard prevents unsupported events from entering the current annual evaluator.
+
+`CalculateAnnualRecruitment()` computes the annual process result without writing
+abundance. The existing `CalculateRecruitment()` inserts that budget and reports
+it at the annual boundary. First-year initialization, terminal mean recruitment,
+and the stock–recruit/process likelihood remain unchanged. The event-survival and
+partial-year catch implementation is still outstanding; this increment must not
+be described as support for multi-phase model fitting.
+
+### Phase-aware dynamics implementation
+
+Confirmed biological choice: distinct biological ages for each phase, shared
+biological parameters, annual age-class reporting. `entry_age` is optional and
+defaults to the youngest modeled age; it must be constant by phase across years.
+Phase IDs are sorted to produce stable one-based `phase_i` values in R and C++.
+
+The new evaluator retains separate cohorts, applies mortality only after entry,
+and advances annual age bins independently of biological entry-time offsets.
+Same-day surveys are post-recruitment. Catch numbers use exact partial-year
+Baranov exposure. Catch weight and fishery length compositions use eight-point
+Gauss-Legendre quadrature per exposure interval, normalized to exact catch
+numbers. Survey dates never define quadrature nodes. Mortality and selectivity
+remain annual age-class rates. Empirical weights and fixed length mappings
+retain their existing annual policy.
+
+The youngest initial abundance is the first annual recruitment budget. Older
+initial totals are split using phase-specific unfished survivorship under the
+first schedule year and first-year natural mortality. Unfished spawning biomass
+per recruit uses that reference schedule, its calendar fractions, and the same
+phase biological ages. This is an explicit reference-year convention for
+changing schedules and leap years. Later unfished trajectories follow actual
+annual schedules and need not remain at the initial reference equilibrium.
+
+The plus group preserves a separate representative age for each phase/cohort
+entry-time offset, rather than tracking exact individual ages inside it. The
+terminal January 1 report repeats the last modeled schedule's January 1 fraction
+of mean recruitment; later events in the unmodeled terminal year are not added.
+Annual recruitment budgets are distinct from January 1 youngest abundance.
+
+`recruitment_events` reports per-phase allocations. `recruitment_cohorts` reports
+cohort abundance and biological age at its `available_from` time in each year,
+not at a common survey date. These replace `observation_biology` in phase mode.
+Annual growth-product reports remain reference-age provider outputs, not
+phase-weighted population averages. The worked recruitment-phases vignette
+explains these conventions and the quadrature approximation.
+
+A single January 1 phase with fraction one and the default entry age continues
+to use the original annual evaluator. Explicit schedules are passed through
+retrospective refits; likelihood profiles inherit the fitted schedule. Projection
+inputs must supply a schedule for every extended modeled year.
