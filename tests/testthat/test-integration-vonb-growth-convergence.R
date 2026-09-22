@@ -288,7 +288,9 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   fit <- FIMS::fit_fims(
     input = input,
     optimize = TRUE,
-    number_of_loops = 4,
+    # Allow additional restarts for platform-dependent optimizer stopping.
+    # Keep the gradient criterion below unchanged.
+    number_of_loops = 8,
     number_of_newton_steps = 0,
     get_sd = FALSE
   )
@@ -311,6 +313,7 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   #' @description Test that the von Bertalanffy--Schnute growth fit reaches a small maximum gradient under the current non-Newton optimization path.
   # Allow small cross-platform optimizer jitter while still requiring a low
   # gradient for the growth-estimation integration test.
+  expect_equal(FIMS::get_opt(fit)$convergence, 0L)
   expect_lte(FIMS::get_max_gradient(fit), 2e-3)
 
   #' @description Test that the estimable von Bertalanffy--Schnute growth parameters remain finite and positive.
