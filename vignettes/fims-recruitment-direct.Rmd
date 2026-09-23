@@ -1,0 +1,511 @@
+---
+title: "Recruitment phases and April surveys with direct Rcpp interfaces"
+output: github_document
+vignette: >
+  %\VignetteIndexEntry{Recruitment phases and April surveys with direct Rcpp interfaces}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", error = FALSE)
+```
+
+This walkthrough builds and fits a small FIMS catch-at-age model directly through
+its exposed C++ modules and TMB. It combines two recruitment phases, annual
+fishery observations, and April survey observations. Every data object and
+likelihood connection is explicit; it does not use `FIMSFrame()`,
+`setup_default_parameters()`, `initialize_fims()`, or `fit_fims()`.
+
+For the higher-level interface, start with
+[Multiple recruitment phases](fims-recruitment-phases.html). A standalone version
+of this example is installed at
+`system.file("examples", "recruitment-phases-without-wrappers.R", package = "FIMS")`.
+
+## Start a fresh model
+
+Use an installed FIMS version that includes recruitment phases, together with
+Rcpp and TMB. Run the chunks in order in a fresh R session. The `FIMS::` prefix
+resolves each exposed C++ class explicitly.
+
+FIMS registers module objects globally. `clear()` resets that registry, so do
+not call it while you still need to evaluate an existing TMB objective. Here
+we clear it before constructing any modules.
+
+```{r direct-setup}
+library(FIMS)
+# Use explicit namespace references so class lookup does not depend on the
+# search path. These are the exposed C++ classes, not model setup wrappers.
+FIMS::clear() # Resets the global FIMS registry; use a fresh R session for this example.
+
+years <- 2027:2029
+ages <- 1:5
+ny <- length(years)
+na <- length(ages)
+```
+
+## Annual fishery and April survey data
+
+We model 2027–2029 with five annual age classes; the last class is a plus group.
+The numbers below are hand-selected teaching data, not observations from an
+assessment or a simulated parameter-recovery experiment.
+
+| Data stream | Timing | Observation model | Sample size or uncertainty |
+|:--|:--|:--|:--|
+| Fishery biomass catch | Total over each year | Lognormal | Log-scale SD 0.20 |
+| Fishery age composition | Catch over each year | Multinomial | 200 fish per year |
+| Survey biomass index | April 1 | Lognormal | Log-scale SD 0.25 |
+| Survey age composition | April 1 | Multinomial | 150 fish per survey |
+
+Composition matrices have samples in rows and ages in columns. Their entries
+are counts: row sums supply multinomial sample sizes. If starting from
+proportions, multiply by the intended sample size before creating these data
+objects.
+
+Despite the table column name `log_sd`, its values are **SDs on the log-observation
+scale**. The distribution module's `log_sd` parameter stores the logarithm of
+that SD. If uncertainty is supplied as a coefficient of variation, first use
+`sqrt(log(1 + CV^2))` to obtain the log-scale SD.
+
+Catch and growth-derived weights must use consistent mass units. Survey
+catchability converts vulnerable biomass into the relative index's units.
+
+```{r direct-data}
+# Illustrative observations: annual fishery totals and April 1 survey samples.
+# Biomass uses the same units as growth-derived weight; the survey index is
+# relative biomass (q scales it). Composition entries are COUNTS, not proportions.
+annual_data <- data.frame(year = years, catch = c(500, 550, 600), log_sd = 0.2)
+annual_age_counts <- rbind(
+  c(10, 25, 45, 50, 70),
+  c(12, 28, 43, 52, 65),
+  c(15, 30, 45, 50, 60)
+)
+survey_data <- data.frame(
+  year = years, date = as.Date(paste0(years, "-04-01")),
+  index = c(220, 230, 240), log_sd = 0.25
+)
+survey_age_counts <- rbind(
+  c(10, 25, 30, 35, 50),
+  c(12, 28, 32, 35, 43),
+  c(15, 30, 35, 32, 38)
+)
+colnames(annual_age_counts) <- colnames(survey_age_counts) <- ages
+rownames(annual_age_counts) <- years
+rownames(survey_age_counts) <- as.character(survey_data$date)
+stopifnot(nrow(annual_age_counts) == ny, nrow(survey_age_counts) == ny,
+          all(annual_age_counts >= 0), all(survey_age_counts >= 0))
+```
+
+## Split recruitment across January and July
+
+Each year's recruitment budget is split 40% on January 1 and 60% on July 1.
+Both groups enter at biological age 1 **on their own entry date**. On April 1,
+that year's January recruits are present and have aged since entry; that year's
+July recruits are not yet present. Surviving July recruits from earlier years
+can still contribute to the April survey.
+
+The Beverton–Holt module supplies the annual mean, and `LogDevsRecruitmentProcess`
+applies annual deviations. Here the deviations are fixed at zero. Fractions
+allocate the resulting annual total; they do not define separate recruitment
+processes. The transformation below maps steepness from `(0.2, 1)` onto the
+module's unconstrained scale.
+
+`SetRecruitmentSchedule()` takes zero-based model-year indices, within-year
+fractions, allocation fractions, and phase identifiers. Calculate fractions
+from actual dates: 2028 has 366 days. Supply a complete, chronologically ordered
+schedule with fractions summing to one in each year and consistent phase IDs.
+No schedule row is supplied for the extra terminal reporting year.
+
+```{r direct-recruitment}
+# One annual recruitment total, allocated 40% in January and 60% in July.
+# C++ year coordinates are ZERO-based. Fractions use actual calendar year length
+# (2028 is a leap year); do not approximate July 1 as exactly half a year.
+dates <- as.Date(paste0(rep(years, each = 2), rep(c("-01-01", "-07-01"), ny)))
+year_start <- as.Date(paste0(rep(years, each = 2), "-01-01"))
+year_end <- as.Date(paste0(rep(years + 1L, each = 2), "-01-01"))
+phase <- rep(c("early", "late"), ny)
+year_fraction <- as.numeric(dates - year_start) / as.numeric(year_end - year_start)
+
+recruitment <- methods::new(FIMS::BevertonHoltRecruitment)
+process <- methods::new(FIMS::LogDevsRecruitmentProcess)
+recruitment$SetRecruitmentProcessID(process$get_id())
+recruitment$n_years$set(ny)
+recruitment$log_rzero[1]$value <- log(1e6)
+h <- 0.75
+recruitment$logit_steep[1]$value <- log((h - 0.2) / (1 - h))
+recruitment$log_devs[] <- rep(0, ny - 1L)
+recruitment$SetRecruitmentSchedule(
+  rep(seq_len(ny) - 1L, each = 2), year_fraction,
+  rep(c(0.4, 0.6), ny), phase
+)
+recruitment$SetRecruitmentEntryAges(rep(1, length(dates)))
+# Both enter at biological age 1 on their own date. The July cohort is younger
+# than the January cohort when observed together. All parameters default to
+# constant unless explicitly marked below.
+```
+
+## Define shared biology and fishery selectivity
+
+Growth and maturity parameters are shared across phases. The model evaluates
+them at each phase cohort's biological age. These illustrative growth settings
+use length in millimetres and weight in metric tonnes; the length–weight
+coefficient supplies that conversion. The two length SDs describe variability
+at the growth reference ages. This example has no length-composition data, so
+it does not activate a fleet age-to-length mapping.
+
+Mortality and selectivity remain annual age-class quantities. Logistic maturity
+and fishery selectivity have separate inflection points and slopes. Parameters
+remain constant unless their `estimation_type` is explicitly changed.
+
+```{r direct-biology}
+growth <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
+growth$n_ages$set(na)
+growth$mean_length_young[1]$value <- 275
+growth$mean_length_old[1]$value <- 725
+growth$reference_age_for_length_young[1]$value <- min(ages)
+growth$reference_age_for_length_old[1]$value <- max(ages)
+growth$growth_coefficient[1]$value <- 0.18
+growth$length_weight_a[1]$value <- 2.5e-11
+growth$length_weight_b[1]$value <- 3
+growth$length_at_age_sd_at_reference_ages[] <- c(28, 73)
+
+maturity <- methods::new(FIMS::LogisticMaturity)
+maturity$inflection_point[1]$value <- 3
+maturity$slope[1]$value <- 1
+selectivity <- methods::new(FIMS::LogisticSelectivity)
+selectivity$inflection_point[1]$value <- 2.5
+selectivity$slope[1]$value <- 1
+```
+
+## Connect annual fishery data and likelihoods
+
+Creating a data object alone does not add a likelihood. Each stream needs three
+connections: the fleet points to observed data, the distribution points to the
+same data, and the distribution links to the fleet's expected-value vector.
+
+For lognormal catch, that vector is `log_catch_expected`. For multinomial ages,
+it is `agecomp_proportion`. `c(t(counts))` flattens a sample-by-age R matrix in
+the row order expected by C++.
+
+There is one estimated log fishing-mortality parameter per year. Annual catch
+includes each cohort only after recruitment. Catch numbers use its remaining
+exposure time; biomass catch integrates its changing biological weight. Fishery
+age proportions describe this annual catch, not a January snapshot.
+
+```{r direct-fishery}
+# Annual fishing fleet: lognormal biomass catch and multinomial age counts.
+catch_data <- methods::new(FIMS::Catch, ny)
+catch_data$catch_data[] <- annual_data$catch
+annual_age_data <- methods::new(FIMS::AgeComp, ny, na)
+# Flatten sample-by-age matrices in row-major order for C++.
+annual_age_data$age_comp_data[] <- c(t(annual_age_counts))
+fleet <- methods::new(FIMS::Fleet)
+fleet$n_years$set(ny)
+fleet$n_ages$set(na)
+fleet$log_Fmort[] <- rep(log(0.2), ny)
+fleet$log_Fmort$set_estimation_types("fixed_effects")
+fleet$log_q[1]$value <- 0
+fleet$SetSelectivityID(selectivity$get_id())
+fleet$SetObservedCatchDataID(catch_data$get_id())
+fleet$SetObservedAgeCompDataID(annual_age_data$get_id())
+catch_likelihood <- methods::new(FIMS::DlnormDistribution)
+# log_sd stores log(SD on the log-observation scale), not log(CV).
+catch_likelihood$log_sd[] <- log(annual_data$log_sd)
+catch_likelihood$set_observed_data(catch_data$get_id())
+catch_likelihood$set_distribution_links("data", fleet$log_catch_expected$get_id())
+
+annual_age_likelihood <- methods::new(FIMS::DmultinomDistribution)
+annual_age_likelihood$set_observed_data(annual_age_data$get_id())
+annual_age_likelihood$set_distribution_links("data", fleet$agecomp_proportion$get_id())
+```
+
+## Connect the April survey and its likelihoods
+
+A survey is represented by a second fleet with its own selectivity and one
+estimated catchability parameter shared across years. Its fishing mortality is
+fixed at `exp(-200)`, effectively zero. Its index is vulnerable biomass scaled
+by catchability; its age composition describes the selected population at the
+sample date.
+
+Both survey streams need explicit timing. Otherwise low-level callers use the
+legacy annual timing. The order of timing rows must match the corresponding
+data rows. `SetObservationTiming()` takes the following coordinates:
+
+| Argument | Meaning in this example |
+|:--|:--|
+| `type` | `"index"` or `"age_comp"` |
+| `years` | Zero-based model years: 0, 1, 2 |
+| `days` | Integer days since 1970-01-01, obtained from an R `Date` |
+| `ids` | Zero-based sample indices within the stream |
+| `observation_ids` | Distinct text identifiers for the samples |
+| `dates` | ISO date strings |
+| `fractions` | Elapsed days since January 1 divided by days in that year |
+
+The model evaluates survival and phase-specific biology at those dates. An
+observation on a recruitment date includes that day's newly recruited fish.
+Adding or moving survey samples does not define the annual integration intervals
+or change the population trajectory.
+
+```{r direct-survey}
+# April survey: a separate non-extractive fleet with its own selectivity and q.
+# No annual integration for these samples: predictions are evaluated on April 1.
+survey_index_data <- methods::new(FIMS::Index, ny)
+survey_index_data$index_data[] <- survey_data$index
+survey_age_data <- methods::new(FIMS::AgeComp, ny, na)
+survey_age_data$age_comp_data[] <- c(t(survey_age_counts))
+survey_selectivity <- methods::new(FIMS::LogisticSelectivity)
+survey_selectivity$inflection_point[1]$value <- 2
+survey_selectivity$slope[1]$value <- 1
+survey <- methods::new(FIMS::Fleet)
+survey$n_years$set(ny)
+survey$n_ages$set(na)
+survey$log_Fmort[] <- rep(-200, ny) # Fixed, effectively zero survey mortality.
+survey$log_q[1]$value <- log(0.03)
+survey$log_q[1]$estimation_type$set("fixed_effects")
+survey$SetSelectivityID(survey_selectivity$get_id())
+survey$SetObservedIndexDataID(survey_index_data$get_id())
+survey$SetObservedAgeCompDataID(survey_age_data$get_id())
+
+survey_start <- as.Date(paste0(years, "-01-01"))
+survey_end <- as.Date(paste0(years + 1L, "-01-01"))
+survey_fraction <- as.numeric(survey_data$date - survey_start) /
+  as.numeric(survey_end - survey_start)
+# days are absolute days since 1970-01-01, NOT day-of-year. Year and sample
+# coordinates are zero-based. Each stream's rows must match its data row order.
+for (stream in c("index", "age_comp")) {
+  survey$SetObservationTiming(
+    stream, seq_len(ny) - 1L, as.integer(survey_data$date), seq_len(ny) - 1L,
+    paste0("survey1_", stream, "_", survey_data$date),
+    as.character(survey_data$date), survey_fraction
+  )
+}
+survey_index_likelihood <- methods::new(FIMS::DlnormDistribution)
+survey_index_likelihood$log_sd[] <- log(survey_data$log_sd)
+survey_index_likelihood$set_observed_data(survey_index_data$get_id())
+survey_index_likelihood$set_distribution_links("data", survey$log_index_expected$get_id())
+survey_age_likelihood <- methods::new(FIMS::DmultinomDistribution)
+survey_age_likelihood$set_observed_data(survey_age_data$get_id())
+survey_age_likelihood$set_distribution_links("data", survey$agecomp_proportion$get_id())
+# Recruitment deviations remain fixed at zero, so no recruitment-process
+# likelihood is needed here. Estimating random deviations requires a process
+# distribution as well as registering those deviations as random effects.
+```
+
+## Assemble the population and model
+
+Modules connect through the IDs returned by `get_id()`. The population links to
+recruitment, growth, maturity, and both fleets; the catch-at-age model links to
+the population. Keep the R module objects available while constructing the model.
+
+Natural mortality is fixed at 0.2 for every year and age. The first element of
+`log_init_naa` represents the **entire first-year recruitment budget**, not the
+number already present on January 1. It therefore supplies 400,000 January
+recruits and 600,000 July recruits. The older elements specify initial annual
+age-class totals, which the model distributes among phases using reference
+unfished survivorship.
+
+Only the three annual fishing mortalities and survey catchability are estimated.
+Initial abundance, recruitment parameters, biological parameters, selectivity,
+observation SDs, and phase fractions remain fixed. This limited fit illustrates
+the connections; it is not evidence that all these quantities can be estimated
+jointly from three years of data.
+
+```{r direct-population}
+population <- methods::new(FIMS::Population)
+population$n_years$set(ny)
+population$n_ages$set(na)
+population$n_fleets$set(2L)
+population$ages[] <- ages
+population$log_M[] <- rep(log(0.2), ny * na)
+population$log_init_naa[] <- log(c(1e6, 8e5, 6e5, 4e5, 5e5))
+# The first element is the FULL first-year recruitment budget: 400,000 early
+# and 600,000 late. Older initial age totals are split internally among phases.
+population$SetRecruitmentID(recruitment$get_id())
+population$SetGrowthID(growth$get_id())
+population$SetMaturityID(maturity$get_id())
+population$AddFleet(fleet$get_id())
+population$AddFleet(survey$get_id())
+model <- methods::new(FIMS::CatchAtAge)
+model$AddPopulation(population$get_id())
+```
+
+## Build the TMB objective and fit
+
+`CreateTMBModel()` copies the registered interfaces into the numerical model.
+`get_fixed()` and `get_random()` return its estimable parameter vectors. TMB
+receives an empty data list because observations have already been registered
+through the FIMS data modules.
+
+There are no estimated random effects in this example, and therefore no
+recruitment-process likelihood term. Adding random recruitment deviations would
+also require their process distribution and `random = "re"` in `MakeADFun()`;
+changing the estimation type alone is insufficient.
+
+We use `nlminb()` directly. Its convergence code, finite objective, and maximum
+absolute gradient are useful diagnostics. A zero convergence code alone does
+not guarantee an adequate fit. Set `optimize` to `FALSE` to inspect predictions
+at the starting values.
+
+Reports below are evaluated explicitly at `parameters`. They do not depend on
+copying optimized values back into the original Rcpp interface objects.
+
+```{r direct-fit}
+FIMS::CreateTMBModel()
+obj <- TMB::MakeADFun(
+  data = list(), parameters = list(p = FIMS::get_fixed(), re = FIMS::get_random()),
+  DLL = "FIMS", silent = TRUE
+)
+
+# Fit annual fishing mortality and survey catchability using nlminb directly.
+# Set FALSE for a forward evaluation at the initial parameter values.
+optimize <- TRUE
+parameters <- obj$par
+if (optimize) {
+  opt <- nlminb(parameters, obj$fn, obj$gr)
+  stopifnot(opt$convergence == 0L)
+  parameters <- opt$par
+}
+max_gc <- max(abs(obj$gr(parameters)))
+nll <- obj$fn(parameters)
+report <- obj$report(parameters)
+stopifnot(is.finite(nll), all(is.finite(obj$gr(parameters))))
+```
+
+## Inspect phase allocations and predictions
+
+Unlike the zero-based schedule inputs, raw report indices are one-based.
+Here fleet 1 is the fishery and fleet 2 is the survey, following their creation
+order. Phase indices follow the sorted identifiers (`early`, then `late`).
+
+`recruitment_events` reports phase allocations. `recruitment_cohorts` gives
+biological age and abundance at each row's `available_from` time: January 1 for
+survivors or the entry time for new recruits. It is **not** an April survey
+snapshot. Use the survey prediction vectors to inspect the April observations.
+
+The terminal year reports only its January allocation of mean recruitment using
+the final modeled year's phase pattern. The plus group retains a representative
+biological age per phase rather than all individual ages. See
+[Multiple recruitment phases](fims-recruitment-phases.html) for the initialization,
+unfished-reference, and catch-quadrature conventions.
+
+```{r direct-reports}
+# Report coordinates are ONE-based (unlike schedule inputs); columns are unnamed.
+events <- as.data.frame(report$recruitment_events)
+names(events) <- c(
+  "year_i", "phase_i", "year_fraction", "entry_age",
+  "recruits", "unfished_recruits"
+)
+events$year <- c(years, max(years) + 1L)[events$year_i]
+events$phase <- c("early", "late")[events$phase_i]
+cohorts <- as.data.frame(report$recruitment_cohorts)
+names(cohorts) <- c(
+  "year_i", "phase_i", "age_i", "biological_age",
+  "available_from", "numbers", "unfished_numbers"
+)
+# The extra terminal year reports January only, using the final year's phase
+# pattern and mean recruitment; later terminal-year pulses are not inserted.
+# Cohort ages/numbers describe their available_from date, not a shared survey
+# date. The plus group uses a representative biological age for each phase.
+cat("\nRecruitment events:\n")
+print(events)
+cat("\nInitial-year cohorts:\n")
+print(subset(cohorts, year_i == 1))
+cat("\nAnnual catch predictions:\n")
+print(data.frame(annual_data, predicted = as.numeric(report$catch_expected[[1]])))
+cat("\nApril survey index predictions:\n")
+survey_predictions <- data.frame(survey_data,
+  predicted = as.numeric(report$index_expected[[2]]))
+print(survey_predictions)
+annual_age_predictions <- matrix(report$agecomp_proportion[[1]], ny, na, byrow = TRUE)
+survey_age_predictions <- matrix(report$agecomp_proportion[[2]], ny, na, byrow = TRUE)
+cat("\nApril survey age probabilities (rows are dates):\n")
+rownames(survey_age_predictions) <- as.character(survey_data$date)
+colnames(survey_age_predictions) <- ages
+print(survey_age_predictions)
+```
+
+The panels below compare observations (points) with fitted predictions (lines).
+Annual catch and the April index have different units and temporal meanings, so
+they are plotted separately. The model need not pass through every point: one
+shared survey catchability and the age-composition likelihoods constrain the fit.
+
+```{r direct-prediction-plots, fig.width=8, fig.height=3.5, fig.alt="Annual fishery catch and April survey index observations compared with fitted predictions in separate panels."}
+local({
+  old <- par(mfrow = c(1, 2), mar = c(4, 4, 2, 1))
+  on.exit(par(old))
+  plot(years, annual_data$catch, pch = 16, xlab = "Year",
+       ylab = "Annual catch (tonnes)", main = "Annual fishery",
+       ylim = range(c(annual_data$catch, report$catch_expected[[1]])))
+  lines(years, report$catch_expected[[1]], col = "steelblue", lwd = 2)
+  legend("topleft", c("Observed", "Predicted"), pch = c(16, NA),
+         lty = c(NA, 1), col = c("black", "steelblue"), bty = "n")
+  plot(years, survey_data$index, pch = 16, xlab = "Year",
+       ylab = "Relative biomass index", main = "April 1 survey",
+       ylim = range(c(survey_data$index, survey_predictions$predicted)))
+  lines(years, survey_predictions$predicted, col = "steelblue", lwd = 2)
+})
+```
+
+## Verify the likelihood components
+
+The total negative log likelihood is the sum of four observation components:
+
+\[
+\mathrm{NLL} = \mathrm{NLL}_{\mathrm{catch}} +
+\mathrm{NLL}_{\mathrm{fishery\ ages}} +
+\mathrm{NLL}_{\mathrm{survey\ index}} +
+\mathrm{NLL}_{\mathrm{survey\ ages}}.
+\]
+
+For catch and index, FIMS uses `meanlog = log(prediction)`, including the
+lognormal density's Jacobian term. Thus the prediction is the lognormal median;
+there is no additional mean-bias adjustment in this example. For age counts,
+multinomial probabilities are normalized within each sample.
+
+The following calculations independently reconstruct the four components with
+base R distributions. Their sum must agree with TMB's objective, including
+normalizing constants. This checks that all four streams are connected to the
+intended prediction vectors. It does not assess model adequacy or parameter
+identifiability.
+
+```{r direct-likelihood-check}
+# Independent R calculations make each likelihood link inspectable. FIMS uses
+# log(prediction) as meanlog, with no lognormal mean-bias adjustment.
+nll_by_component <- c(
+  annual_catch = -sum(dlnorm(annual_data$catch,
+    log(report$catch_expected[[1]]), annual_data$log_sd, log = TRUE)),
+  annual_age = -sum(vapply(seq_len(ny), function(i)
+    dmultinom(annual_age_counts[i, ], prob = annual_age_predictions[i, ], log = TRUE), numeric(1))),
+  april_index = -sum(dlnorm(survey_data$index,
+    log(survey_predictions$predicted), survey_data$log_sd, log = TRUE)),
+  april_age = -sum(vapply(seq_len(ny), function(i)
+    dmultinom(survey_age_counts[i, ], prob = survey_age_predictions[i, ], log = TRUE), numeric(1)))
+)
+stopifnot(isTRUE(all.equal(sum(nll_by_component), nll, tolerance = 1e-7)),
+          all(abs(rowSums(survey_age_predictions) - 1) < 1e-8))
+cat("\nNegative log likelihood by component:\n")
+print(nll_by_component)
+cat("\nNegative log likelihood:", nll, "\n")
+cat("Maximum gradient component:", max_gc, "\n")
+```
+
+## Adapting the example
+
+Replace the illustrative tables with your observations, keeping sample ordering,
+units, dates, and sample sizes consistent. Additional survey samples require
+larger data objects and matching timing vectors for each affected stream; they
+do not require additional modeled years. For projections, extend the annual
+inputs and recruitment schedule through every future modeled year.
+
+Length compositions require `LengthComp` data, a multinomial likelihood linked
+to `lengthcomp_proportion`, and an enabled age-to-length mapping with explicit
+fleet length bins. The present example deliberately uses age compositions only.
+
+After collecting numerical results, release the TMB objective before resetting
+the global FIMS registry. Do not evaluate an old objective after `clear()`.
+
+```{r direct-cleanup, include=FALSE}
+TMB::FreeADFun(obj)
+rm(obj)
+FIMS::clear()
+```

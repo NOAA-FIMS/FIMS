@@ -1,6 +1,7 @@
 # Run with an installed FIMS built from dev-extend-timing-multi-recruiment:
 # Rscript inst/examples/recruitment-phases-without-wrappers.R
 # Or source this file to inspect the module objects, obj, and report in R.
+# Walkthrough: vignette("fims-recruitment-direct", package = "FIMS").
 # This uses exposed Rcpp modules and TMB directly: no FIMSFrame,
 # setup_default_parameters(), setup_recruitment_schedule(), initialize_fims(),
 # fit_fims(), or get_report(). The data below are illustrative, not a stock fit.

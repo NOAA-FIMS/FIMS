@@ -24,6 +24,10 @@ Calendar-year age labels still advance together on January 1.
 
 ## Data and schedules
 
+For an explicit setup of the C++ modules, annual fishery and April survey data,
+and their likelihoods, see [Recruitment phases with direct Rcpp
+interfaces](fims-recruitment-direct.html).
+
 ```{r phase-data, message=FALSE}
 library(FIMS)
 library(dplyr)
