@@ -50,17 +50,21 @@ jobs:
           needs: check
 
       # Rebuild against the runner's R/compiler rather than using the cached
-      # macOS TMB binary that failed to resolve an OpenMP runtime symbol.
-      - name: Rebuild TMB from source on macOS
+      # macOS binaries that failed to resolve an OpenMP runtime symbol.
+      # dotCall64 is loaded through the SparseNUTS test dependency chain.
+      - name: Rebuild TMB and dotCall64 from source on macOS
         if: runner.os == 'macOS'
         shell: Rscript {0}
-        run: install.packages("TMB", type = "source")
+        run: install.packages(c("TMB", "dotCall64"), type = "source")
 
-      - name: Verify TMB loads in a fresh R process
+      - name: Verify compiled test dependencies load in a fresh R process
         shell: Rscript {0}
         run: |
           library(TMB)
+          loadNamespace("dotCall64")
+          loadNamespace("SparseNUTS")
           packageVersion("TMB")
+          packageVersion("dotCall64")
           sessionInfo()
 
       - uses: r-lib/actions/check-r-package@v2
