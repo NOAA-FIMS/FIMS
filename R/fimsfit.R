@@ -369,21 +369,29 @@ tmb_mapped_parameter_names <- function(parameter_names, map = NULL) {
   }
   if (length(parameter_names) != length(map)) {
     cli::cli_abort(c(
-      "A TMB parameter map must have one entry per FIMS parameter.",
-      "i" = paste0(
-        "Found {length(map)} map entries for ",
-        "{length(parameter_names)} parameters."
-      )
+      "x" = "A TMB parameter map must have one entry per FIMS parameter.",
+      "i" = "Found {length(map)} map entries for {length(parameter_names)}
+      parameters."
     ))
   }
 
+  # Remove NAs in map because NAs indicate a parameter is fixed at its initial
+  # value, and therefore is not active.
   keep <- !is.na(map)
   active_map <- droplevels(map[keep])
   active_names <- parameter_names[keep]
 
-  vapply(levels(active_map), function(level) {
-    active_names[as.character(active_map) == level][[1L]]
-  }, character(1L), USE.NAMES = FALSE)
+  # Return one representative FIMS parameter name for each active TMB map level.
+  # When multiple parameters share a level, TMB optimizes one value, so use the
+  # first corresponding FIMS name. Factor levels determine the output order.
+  vapply(
+    X = levels(active_map),
+    FUN = function(level, XX = active_names, YY = active_map) {
+      XX[as.character(YY) == level][[1L]]
+    },
+    FUN.VALUE = character(1L),
+    USE.NAMES = FALSE
+  )
 }
 
 #' Class constructors for class `FIMSFit` and associated child classes
@@ -488,11 +496,9 @@ FIMSFit <- function(
   )
   if (length(parameter_names) != length(obj[["par"]])) {
     cli::cli_abort(c(
-      "TMB and FIMS produced different numbers of fixed parameters.",
-      "i" = paste0(
-        "TMB produced {length(obj[[\"par\"]])}; FIMS produced ",
-        "{length(parameter_names)} mapped names."
-      )
+      "x" = "TMB and FIMS produced different numbers of fixed parameters.",
+      "i" = "TMB produced {length(obj[[\"par\"]])} parameters",
+      "i" = "FIMS produced {length(parameter_names)} parameters"
     ))
   }
   names(obj[["par"]]) <- parameter_names
