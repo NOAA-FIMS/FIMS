@@ -1210,6 +1210,10 @@ as_numeric_values <- function(values) {
 
 extract_composition_sample_sizes <- function(values) {
   vapply(as.character(values), function(value) {
+    if (is.na(value) || !nzchar(value)) {
+      return(NA_real_)
+    }
+
     direct_value <- suppressWarnings(as.numeric(value))
 
     if (!is.na(direct_value)) {
@@ -1262,12 +1266,12 @@ composition_related_input <- function(data_frame, fleet) {
 }
 
 composition_timing_summary <- function(rows) {
-  timings <- rows[["timing"]]
+  timing_column <- if ("year" %in% names(rows)) "year" else "timing"
+  timings <- rows[[timing_column]]
   timings <- timings[!is.na(timings)]
 
   if (length(timings) == 0) {
     return(list(
-      year_range = "not supplied",
       observed_years = "not supplied",
       missing_years = "not calculated"
     ))
@@ -1284,8 +1288,14 @@ composition_timing_summary <- function(rows) {
     missing_timings <- setdiff(expected_timings, numeric_timings)
 
     return(list(
-      year_range = format_numeric_range(numeric_timings),
-      observed_years = paste0(length(numeric_timings), " of ", length(expected_timings)),
+      observed_years = paste0(
+        format_numeric_range(numeric_timings),
+        " (",
+        length(numeric_timings),
+        " of ",
+        length(expected_timings),
+        ")"
+      ),
       missing_years = if (length(missing_timings) == 0) {
         "None"
       } else {
@@ -1296,8 +1306,12 @@ composition_timing_summary <- function(rows) {
 
   character_timings <- sort(unique(as.character(timings)))
   list(
-    year_range = collapse_display_values(character_timings, max_values = 2),
-    observed_years = paste(length(character_timings), "observed"),
+    observed_years = paste0(
+      collapse_display_values(character_timings, max_values = 2),
+      " (",
+      length(character_timings),
+      " observed)"
+    ),
     missing_years = "not calculated"
   )
 }
@@ -1390,7 +1404,6 @@ composition_summaries_for_data_type <- function(data_frame, data_type) {
     list(
       fleet = fleet,
       related_input = composition_related_input(data_frame, fleet),
-      year_range = timing_summary[["year_range"]],
       observed_years = timing_summary[["observed_years"]],
       missing_years = timing_summary[["missing_years"]],
       bin_label = bin_label,
@@ -3270,7 +3283,7 @@ html <- paste0(
   "function renderOptionContext(node){const selected=node.selected_option_label || node.selected_module_type || ''; const labels=arrayValue(node.available_option_labels).filter(Boolean); if(!selected && labels.length===0){return '';} const others=labels.filter((label)=>label!==selected); const otherHtml=others.length>0 ? renderList(others,'No alternatives listed') : `<span class='empty'>No alternatives listed.</span>`; const roleLabel=(node.role || 'Module').replace(/ module$/i,''); return `<section class='section'><h3>${esc(roleLabel)} option</h3><div class='option-context'><div><strong>Selected</strong><div class='chip-list'><span class='chip'>${esc(selected || node.component || node.label)}</span></div></div><div><strong>Available alternatives</strong>${otherHtml}</div></div></section>`;}\n",
   "function renderFleetGroups(node,title='Fleets'){const groups=arrayValue(node.fleet_groups).filter((group)=>group && arrayValue(group.fleets).filter(Boolean).length>0); if(groups.length===0){return '';} const groupHtml=groups.map((group)=>{const fleets=arrayValue(group.fleets).filter(Boolean); const chips=fleets.map((fleet)=>`<span class='chip'>${esc(fleet)}</span>`).join(''); const count=group.count_label || `${fleets.length} ${fleets.length===1 ? 'fleet' : 'fleets'}`; return `<div class='fleet-group'><div class='fleet-group-title'><span>${esc(group.label || 'Fleets')}</span><span class='fleet-count'>${esc(count)}</span></div><div class='chip-list'>${chips}</div></div>`;}).join(''); return `<section class='section'><h3>${esc(title)}</h3><div class='fleet-groups'>${groupHtml}</div></section>`;}\n",
   "function renderRelatedValueLinks(node){const links=arrayValue(node.related_value_links).filter((link)=>link && link.target_id && nodeById[link.target_id]); if(links.length===0){return '';} const buttons=links.map((link)=>`<button type='button' class='related-link-button' data-related-node='${esc(link.target_id)}' data-related-tab='${esc(link.target_tab || 'values')}'>${esc(link.label)}</button>`).join(''); return `<section class='section'><h3>Related composition data</h3><div class='related-link-list'>${buttons}</div></section>`;}\n",
-  "function renderCompositionSummaries(node){const summaries=arrayValue(node.composition_summaries).filter((summary)=>summary && summary.fleet); if(summaries.length===0){return '';} const cards=summaries.map((summary,index)=>{const rows=[['Related input',summary.related_input],['Years',summary.year_range],['Observed years',summary.observed_years],['Missing years',summary.missing_years],[summary.bin_label || 'Observed bins',summary.bin_range],['Sample size',summary.sample_size]].filter((row)=>row[1]); const rowHtml=rows.map(([label,value])=>`<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join(''); const open=summaries.length<=3 || index===0 ? ' open' : ''; return `<details class='composition-summary'${open}><summary><span>${esc(summary.fleet)}</span></summary><dl class='composition-summary-list'>${rowHtml}</dl></details>`;}).join(''); return `<section class='section'><div class='composition-section-header'><h3>Composition by fleet</h3><div class='composition-actions'><button type='button' class='composition-toggle-button' data-composition-open='true'>Expand all</button><button type='button' class='composition-toggle-button' data-composition-open='false'>Collapse all</button></div></div><div class='composition-summaries'>${cards}</div></section>`;}\n",
+  "function renderCompositionSummaries(node){const summaries=arrayValue(node.composition_summaries).filter((summary)=>summary && summary.fleet); if(summaries.length===0){return '';} const cards=summaries.map((summary,index)=>{const rows=[['Related input',summary.related_input],['Observed years',summary.observed_years],['Missing years',summary.missing_years],[summary.bin_label || 'Observed bins',summary.bin_range],['Sample size',summary.sample_size]].filter((row)=>row[1]); const rowHtml=rows.map(([label,value])=>`<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join(''); const open=summaries.length<=3 || index===0 ? ' open' : ''; return `<details class='composition-summary'${open}><summary><span>${esc(summary.fleet)}</span></summary><dl class='composition-summary-list'>${rowHtml}</dl></details>`;}).join(''); return `<section class='section'><div class='composition-section-header'><h3>Composition by fleet</h3><div class='composition-actions'><button type='button' class='composition-toggle-button' data-composition-open='true'>Expand all</button><button type='button' class='composition-toggle-button' data-composition-open='false'>Collapse all</button></div></div><div class='composition-summaries'>${cards}</div></section>`;}\n",
   "function statusClass(status){return `status-${String(status || '').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}`;}\n",
   "function formatDisplayValue(value){return String(value ?? '').replace(/_/g,' ');}\n",
   "function formatParameterName(value){return esc(value).replace(/_/g,'_<wbr>');}\n",
