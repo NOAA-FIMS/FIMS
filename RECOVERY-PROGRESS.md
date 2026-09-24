@@ -75,3 +75,27 @@ Reinstallation, tools::checkRd(), and tools::undoc() verify the documentation fi
 Existing non-portable compiler flags remain a check warning; installed size and
 GNU make produce notes. Repository-index network access was unavailable, but
 installed dependencies allowed the check to proceed.
+
+## Recovery edge-case hardening
+
+Added input validation before FIMS::clear(): positive finite starting values in
+explicit parameter order, three ordered model years, positive catch/index and
+log-scale SDs, nonnegative 3-by-5 composition matrices with positive row totals,
+and whole survey Dates within their corresponding years. Run settings reject
+invalid replicate counts and seeds before changing the caller's RNG state.
+
+Summaries now separate failed (exceptions) and unusable (returned but rejected)
+fits, with attempted = usable + failed + unusable. Injected-failure tests verify
+all-failed runs return NA summaries, exceptions are retained, Hessian failures
+preserve estimates and optimizer diagnostics, and outcomes are neither dropped
+nor duplicated. Invalid-input tests mock registry clearing to establish that
+rejection occurs before changing FIMS state.
+
+Validation after these changes:
+- Recovery tests: 94 passes, zero failures/warnings/skips.
+- Related recruitment/timing tests: 325 passes, zero failures/warnings/skips.
+- Updated 30-replicate vignette rendered: all 60 noisy fits usable.
+- Reviewed rendered summary table and input-contract text; git diff --check clean.
+Logs: /tmp/fims-recovery-validation/edge-{install,tests,related-tests,render}.log.
+The earlier full package check applies before this edge-case change; the latest
+changes were validated with the focused tests and vignette above.

@@ -43,8 +43,48 @@ recovery_nll <- function(observations, prediction) {
     composition(observations$survey_age, prediction$survey_age))
 }
 
+# Reject malformed inputs before clearing the shared FIMS registry or entering C++.
+recovery_validate_inputs <- function(observations, start, january_only, fit) {
+  positive <- function(x, n) {
+    is.numeric(x) && is.null(dim(x)) && length(x) == n &&
+      all(is.finite(x) & x > 0)
+  }
+  parameter_names <- c("F_2027", "F_2028", "F_2029", "q")
+  if (!positive(start, 4L) ||
+      (!is.null(names(start)) && !identical(names(start), parameter_names)))
+    stop("start must contain four finite positive values in F_2027, F_2028, F_2029, q order")
+  for (flag in list(january_only = january_only, fit = fit)) {
+    if (!is.logical(flag) || length(flag) != 1L || is.na(flag))
+      stop("january_only and fit must each be TRUE or FALSE")
+  }
+  if (!is.list(observations)) stop("observations must be a list")
+  for (stream in c("annual", "survey")) {
+    data <- observations[[stream]]
+    value <- if (stream == "annual") "catch" else "index"
+    if (!is.data.frame(data) || nrow(data) != 3L ||
+        !all(c("year", value, "log_sd") %in% names(data)) ||
+        !is.numeric(data$year) || !identical(as.numeric(data$year), as.numeric(2027:2029)))
+      stop(stream, " must have one row per year, ordered 2027, 2028, 2029")
+    if (!positive(data[[value]], 3L) || !positive(data$log_sd, 3L))
+      stop(stream, " observations and log_sd must be finite and positive")
+    counts <- observations[[paste0(stream, "_age")]]
+    if (!is.matrix(counts) || !is.numeric(counts) ||
+        !identical(dim(counts), c(3L, 5L)) ||
+        any(!is.finite(counts) | counts < 0) || any(rowSums(counts) <= 0))
+      stop(stream, "_age must be a finite nonnegative 3-by-5 count matrix with positive row totals")
+  }
+  dates <- observations$survey$date
+  if (!inherits(dates, "Date") || length(dates) != 3L ||
+      any(!is.finite(dates)) || any(as.numeric(dates) != trunc(as.numeric(dates))) ||
+      any(dates < as.Date(paste0(2027:2029, "-01-01"))) ||
+      any(dates >= as.Date(paste0(2028:2030, "-01-01"))))
+    stop("survey dates must be whole calendar Dates within their corresponding years")
+  invisible(NULL)
+}
+
 recovery_model <- function(observations, start, january_only = FALSE,
                            fit = TRUE) {
+  recovery_validate_inputs(observations, start, january_only, fit)
   FIMS::clear()
   obj <- NULL
   on.exit({
@@ -260,8 +300,14 @@ recovery_observations <- function(prediction = NULL, noisy = FALSE) {
 }
 
 run_recruitment_recovery <- function(n_replicates = 50L, seed = 20260924L) {
-  stopifnot(length(n_replicates) == 1L, is.finite(n_replicates),
-            n_replicates >= 2, n_replicates == as.integer(n_replicates))
+  scalar_integer <- function(x, minimum) {
+    is.numeric(x) && length(x) == 1L && is.finite(x) &&
+      x >= minimum && x <= .Machine$integer.max && x == trunc(x)
+  }
+  if (!scalar_integer(n_replicates, 2L))
+    stop("n_replicates must be an integer between 2 and .Machine$integer.max")
+  if (!scalar_integer(seed, 0L))
+    stop("seed must be an integer between 0 and .Machine$integer.max")
   had_seed <- exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
   if (had_seed) old_seed <- get(".Random.seed", envir = .GlobalEnv)
   on.exit({
@@ -351,8 +397,10 @@ run_recruitment_recovery <- function(n_replicates = 50L, seed = 20260924L) {
     do.call(rbind, lapply(names(truth), function(parameter) {
       rows <- draws[draws$model == mode & draws$parameter == parameter & draws$usable, ]
       n <- nrow(rows)
+      failed <- sum(failures$model == mode)
       data.frame(model = mode, parameter = parameter,
-        attempted = n_replicates, usable = n,
+        attempted = n_replicates, usable = n, failed = failed,
+        unusable = n_replicates - failed - n,
         relative_bias = if (n) mean(rows$estimate / rows$truth - 1) else NA_real_,
         relative_rmse = if (n) sqrt(mean((rows$estimate / rows$truth - 1)^2)) else NA_real_,
         coverage = if (n) mean(rows$covered) else NA_real_,

@@ -17,6 +17,13 @@ It follows [Recruitment phases with direct Rcpp interfaces](fims-recruitment-dir
 The executable helpers are installed with FIMS; they build each model through
 Rcpp and TMB, without the FIMS model-setup or fitting wrappers.
 
+The helper is deliberately limited to the three-year, five-age design below.
+Before changing the FIMS registry, it checks that observations are finite and
+positive, composition count matrices have three rows and five columns with
+positive row totals, and each survey date belongs to its stated model year.
+Years must be ordered 2027–2029. Starting values must be positive and ordered
+`F_2027`, `F_2028`, `F_2029`, `q`; named vectors must use those exact names.
+
 Use a fresh R session. Each fit releases its TMB objective before clearing the
 global FIMS registry and returns only ordinary R values. These helpers should
 not run alongside another live FIMS objective.
@@ -63,7 +70,8 @@ result <- run_recruitment_recovery(n_replicates = 30, seed = 20260924)
 
 Thirty replicates keep this vignette quick and illustrate the workflow. For a
 more precise study, increase `n_replicates` to several hundred or more and inspect
-all convergence diagnostics. The function returns its seed and raw replicate
+all convergence diagnostics. The seed must be a nonnegative integer and `n_replicates` an integer of at least
+two, both within R's integer range. The function returns its seed and raw replicate
 results, replicate count, and `sessionInfo()` (including package versions).
 It also restores the caller's random-number state. Save the complete result for
 reproduction and inspection:
@@ -158,8 +166,10 @@ of that fraction. With just 30 replicates, even a method with 95% coverage has
 substantial sampling variation: near 95%, its coverage Monte Carlo SE is about
 four percentage points.
 
-Summaries use usable fits only and explicitly report their denominator alongside
-the number attempted. Exceptions are retained in `failures`; nonzero convergence
+Summaries use usable fits only and report `attempted`, `usable`, `failed`
+(exceptions), and `unusable` (returned fits that fail diagnostics). The last three
+counts sum to the number attempted for every parameter and schedule. When no
+fits are usable, bias, RMSE, coverage, and coverage Monte Carlo SE are `NA`. Exceptions are retained in `failures`; nonzero convergence
 codes, large gradients, or unsuitable Hessians remain in `draws` with
 `usable = FALSE`. Hessian calculation or inversion errors retain the fitted
 estimates and optimizer diagnostics, with unavailable intervals and a reason in
