@@ -37,3 +37,41 @@ The independent likelihood uses FIMS predictions; population dynamics still
 require separate analytic tests. Thirty replicates illustrate the workflow and
 are not a precise coverage study. Existing timing-design.html and FIMS Notes
 Timing.docx were left unchanged and excluded from the checkpoint.
+
+## Broader validation follow-up
+
+Related recruitment and observation-timing tests passed: 270 checks, no failures,
+warnings, or skips. Run them with the installed package namespace available:
+
+```r
+testthat::test_dir("tests/testthat", filter = "recruitment|observation-timing",
+                   package = "FIMS", load_package = "installed",
+                   stop_on_failure = TRUE)
+```
+
+A plain test_dir() invocation without the package namespace cannot resolve
+internal timing helpers; that was a test invocation issue, corrected above.
+Added build exclusions for this progress note, timing-design.html, and
+FIMS Notes Timing.docx so local work documents do not enter the source package.
+
+The complete vignette build passed. A clean source archive retaining those built
+vignettes is 17 MB. Generated fit/data/parameter/deterministic RDS fixtures are
+now excluded from builds, matching the existing Git exclusions; committed
+integration inputs and initial_value_scale.RDS remain included. Tests regenerate
+the excluded files. Local cached fit files had inflated the initial archive by
+several gigabytes.
+
+R CMD check --no-manual --no-build-vignettes completed against that archive in
+/tmp/fims-recovery-validation/clean-build/FIMS.Rcheck: zero errors, two warnings,
+and two notes. The test suite regenerated its fixtures and reported 2,166 passes,
+zero failures, three test warnings, and 13 skips. The skips cover CRAN-only
+exclusions, opt-in slow tests, and explicitly disabled random-effects/Newton
+tests. All 15 vignette code checks passed. Build/check logs are in
+/tmp/fims-recovery-validation. The check predates the documentation fix below;
+that fix was validated separately rather than rerunning the whole suite.
+The check found missing documentation for AgeSpecificSelectivity; added its
+alias and C++ documentation link to R/Rcpp_exports.R and man/Cpp_classes.Rd.
+Reinstallation, tools::checkRd(), and tools::undoc() verify the documentation fix.
+Existing non-portable compiler flags remain a check warning; installed size and
+GNU make produce notes. Repository-index network access was unavailable, but
+installed dependencies allowed the check to proceed.

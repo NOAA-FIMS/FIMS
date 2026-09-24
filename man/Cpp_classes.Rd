@@ -3,6 +3,7 @@
 \name{Cpp_classes}
 \alias{Cpp_classes}
 \alias{AgeComp}
+\alias{AgeSpecificSelectivity}
 \alias{BevertonHoltRecruitment}
 \alias{CatchAtAge}
 \alias{DlnormDistribution}
@@ -35,6 +36,7 @@ docs.
 \details{
 \itemize{
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classAgeCompDataInterface.html}{AgeComp}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classAgeSpecificSelectivityInterface.html}{AgeSpecificSelectivity}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classBevertonHoltRecruitmentInterface.html}{BevertonHoltRecruitment}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html}{CatchAtAge}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDlnormDistributionsInterface.html}{DlnormDistribution}

@@ -24,3 +24,7 @@ fims.log
 ^pkgdown$
 ^assets$
 setup_fims.sh
+^RECOVERY-PROGRESS\.md$
+^timing-design\.html$
+^FIMS Notes Timing\.docx$
+^tests/testthat/fixtures/(fit|data|parameters|deterministic).*\.RDS$
