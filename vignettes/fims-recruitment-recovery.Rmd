@@ -116,6 +116,15 @@ knitr::kable(result$likelihood_check, digits = 8)
 This checks the observation likelihood connections and scales; it still uses
 FIMS predictions and does not independently validate population dynamics.
 
+Separate regression tests in `tests/testthat/test-recruitment-analytic.R` check
+three age classes with known annual recruitment totals (1000, 1200, and 1400),
+natural mortality 0.2, fixed empirical weights, and constant selectivity 0.5.
+Their expected values are calculated directly from the inputs using exponential
+survival and the Baranov catch equation, without reading FIMS-reported rates.
+They cover January and July entry boundaries, April surveys, leap-year exposure,
+aging into the plus group, and conservation of recruits, survivors, catches,
+and natural deaths. January-only and July-only allocations are also checked.
+
 ## What changes if all recruitment enters in January?
 
 The same observations are also fitted with fractions 1 and 0 for January and

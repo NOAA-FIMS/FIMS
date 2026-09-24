@@ -99,3 +99,57 @@ Validation after these changes:
 Logs: /tmp/fims-recovery-validation/edge-{install,tests,related-tests,render}.log.
 The earlier full package check applies before this edge-case change; the latest
 changes were validated with the focused tests and vignette above.
+
+## Independent dynamics validation and output fix
+
+Added tests/testthat/test-recruitment-analytic.R: a three-age, three-year model
+with fixed recruitment budgets 1000/1200/1400, M = 0.2, fishing rates
+0.3/0.4/0.2, constant selectivity 0.5, q = 0.4, and weights 1/2/3. Expected
+values use only these inputs, calendar constants, exponential survival, and
+Baranov catch. They do not use FIMS-reported rates or states as an oracle.
+Checks cover January/July entry dates and adjacent days, April exclusion of
+late recruits, 2028 leap-year fractions, annual aging and the plus group,
+recruitment allocation, abundance/catch/death conservation, and 100% January
+or 100% July allocation while retaining the phase evaluator.
+
+The exact-zero survey mortality fixture exposed invalid '-inf' JSON in derived
+log catch, causing get_estimates() to fail. Updated derived-quantity JSON output
+to use its existing -999 sentinel for all non-finite values, including both
+interior and final vector elements. Raw reports retain -Inf. The regression
+checks valid JSON, successful extraction, and unchanged finite survey indices.
+NEWS and the recovery vignette describe these changes.
+
+Clean rebuild passed using Apple's compiler with PATH limited to system/R
+binaries. The first rebuild selected local Homebrew LLVM and failed in its
+standard-library headers; the Apple compiler used in earlier validation worked.
+Analytic/output tests: 92 passes, no failures/warnings/skips.
+Updated recovery vignette rendered successfully.
+
+The 500-replicate study (seed 20260924) completed with all 1,000 fitted models
+usable, no exceptions, and no rejected fits. Conditional Wald interval results:
+
+| Schedule | Parameter | Relative bias | Relative RMSE | Coverage | Coverage MCSE |
+|---|---|---:|---:|---:|---:|
+| January/July | F_2027 | 0.021575 | 0.204768 | 0.974 | 0.007117 |
+| January/July | F_2028 | 0.011237 | 0.206607 | 0.950 | 0.009747 |
+| January/July | F_2029 | 0.037085 | 0.232470 | 0.944 | 0.010282 |
+| January/July | q | 0.013555 | 0.149292 | 0.950 | 0.009747 |
+| January only | F_2027 | -0.143587 | 0.216647 | 0.880 | 0.014533 |
+| January only | F_2028 | -0.166950 | 0.231339 | 0.844 | 0.016227 |
+| January only | F_2029 | -0.133910 | 0.226740 | 0.880 | 0.014533 |
+| January only | q | -0.132435 | 0.183246 | 0.828 | 0.016877 |
+
+These results describe the fixed biological settings in this experiment, not
+uncertainty in the recruitment schedule itself. No test imposes a target bias
+or coverage. Raw results and session metadata are saved in
+/tmp/fims-recovery-validation/recovery-500.rds; the log is recovery-500.log.
+Reproduce with run_recruitment_recovery(500L, seed = 20260924L).
+
+Broader post-rebuild validation completed: 542 passes, zero failures/warnings,
+and two existing CRAN-guarded snapshot skips across recruitment, observation,
+reshape_json_estimates, tidy, and get_estimates tests. This includes the 92 new
+analytic/output checks. Logs are analytic-install.log, analytic-tests.log,
+analytic-related-tests.log, and analytic-render.log under the validation folder.
+This pass did not rerun the entire package check. The pre-existing formatting
+edit to inst/examples/recruitment-phase-recovery.R was retained and excluded
+from this checkpoint.

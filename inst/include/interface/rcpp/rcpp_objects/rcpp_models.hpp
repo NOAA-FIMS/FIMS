@@ -545,14 +545,14 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     ss << std::fixed << std::setprecision(10);
     if (dq.size() > 0) {
       for (size_t i = 0; i < dq.size() - 1; i++) {
-        if (dq[i] != dq[i])  // check for NaN
+        if (!std::isfinite(dq[i]))  // JSON cannot represent NaN or infinities
         {
           ss << "-999" << ", ";
         } else {
           ss << dq[i] << ", ";
         }
       }
-      if (dq[dq.size() - 1] != dq[dq.size() - 1])  // check for NaN
+      if (!std::isfinite(dq[dq.size() - 1]))  // preserve the -999 sentinel
       {
         ss << "-999]" << "\n";
       } else {

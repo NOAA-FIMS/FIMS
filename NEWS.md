@@ -1,5 +1,9 @@
 # FIMS 0.11.0
 
+* Keep model JSON valid when derived quantities contain infinities, such as log
+  catch from a survey with exactly zero fishing mortality. JSON uses the existing
+  `-999` sentinel for non-finite derived values; raw reports retain their values.
+
 * Convert data-frame inputs to `FIMSFrame` before recruitment-schedule validation
   in `initialize_fims()`, preserving age-only and length-only vignette workflows.
 
