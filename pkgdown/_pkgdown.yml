@@ -113,6 +113,8 @@ navbar:
           href: articles/fims-recruitment-phases.html
         - text: Recruitment phases with direct Rcpp interfaces
           href: articles/fims-recruitment-direct.html
+        - text: Simulation and recovery with recruitment phases
+          href: articles/fims-recruitment-recovery.html
         - text: Simple projections using FIMS
           href: articles/fims-demo-projections.html
         - text: Running a diagnostics on a FIMS model

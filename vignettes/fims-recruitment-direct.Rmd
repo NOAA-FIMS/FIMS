@@ -491,6 +491,10 @@ cat("Maximum gradient component:", max_gc, "\n")
 
 ## Adapting the example
 
+For known-parameter simulations, exact-data recovery, noisy replicates, and a
+January-only timing comparison, see [Simulation and recovery with recruitment
+phases](fims-recruitment-recovery.html).
+
 Replace the illustrative tables with your observations, keeping sample ordering,
 units, dates, and sample sizes consistent. Additional survey samples require
 larger data objects and matching timing vectors for each affected stream; they
