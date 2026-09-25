@@ -204,11 +204,18 @@ test_that("fit_fims() errors when optimization fails to converge", {
   initialized_model <- parameters_4_model |>
     initialize_fims(data = data_age_comp)
 
-  #' @description Test that fit_fims() throws an informative warning when parameter SE values are NA.
-  expect_warning(
+  #' @description Test that fit_fims() warns about both the NA standard errors and the large condition number when parameter SE values are NA.
+  warning_text <- character()
+  withCallingHandlers(
     result <- initialized_model |> fit_fims(optimize = TRUE),
-    regexp = "NA standard errors"
+    warning = function(w) {
+      warning_text <<- c(warning_text, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
   )
+  expect_true(any(grepl("NA standard errors", warning_text)))
+  expect_true(any(grepl("Large condition number", warning_text)))
+  expect_false(any(grepl("\"NaN\"", warning_text)))
 
   clear()
 

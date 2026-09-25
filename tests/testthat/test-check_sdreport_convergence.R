@@ -97,6 +97,22 @@ register_mock_sdreport_summary <- function() {
   registerS3method("summary", "mock_sdreport", summary.mock_sdreport)
 }
 
+# expect_warning() stops at the first warning, so collect every message to
+# check cases where more than one warning is expected
+collect_warnings <- function(expr) {
+  messages <- character()
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      messages <<- c(messages, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  messages
+}
+
+ill_conditioned_hessian <- diag(c(1, 1e-8, 1e-8))
+
 ## IO correctness ----
 test_that("check_sdreport_convergence() works with correct inputs", {
   #' @description Test that `check_sdreport_convergence()` has no warnings with clean inputs and stable Hessian.
@@ -149,6 +165,94 @@ test_that("check_sdreport_convergence() works with correct inputs", {
 
   expect_equal(object = out$tag, expected = "mock_fit")
   expect_identical(object = out$sdreport, expected = sdreport)
+
+  #' @description Test that `check_sdreport_convergence()` names fixed effects with NA standard errors using the parameter names.
+  obj <- make_mock_obj(random = numeric())
+  opt <- list(par = c(0, 0))
+  sdreport <- make_mock_sdreport(
+    fixed_se = c(0.2, NA_real_),
+    random_se = numeric(),
+    report_se = c(0.4, 0.5)
+  )
+  expect_warning(
+    object = FIMS:::check_sdreport_convergence(
+      list(),
+      obj,
+      opt,
+      sdreport,
+      parameter_names = c("Recruitment.1.log_rzero.1", "Fleet.1.log_q.3")
+    ),
+    regexp = "1 fixed effect has NA standard error: \"Fleet 1: log_q (parameter_id 3)\".",
+    fixed = TRUE
+  )
+
+  #' @description Test that `check_sdreport_convergence()` names random effects with NA standard errors using the random-effect names.
+  obj <- make_mock_obj(random = 1)
+  sdreport <- make_mock_sdreport(
+    fixed_se = c(0.2, 0.3),
+    random_se = c(NA_real_, 0.3),
+    report_se = c(0.4, 0.5)
+  )
+  expect_warning(
+    object = FIMS:::check_sdreport_convergence(
+      list(),
+      obj,
+      opt,
+      sdreport,
+      random_effects_names = c(
+        "Recruitment.1.log_devs.729",
+        "Recruitment.1.log_devs.730"
+      )
+    ),
+    regexp = "1 random effect has NA standard error: \"Recruitment 1: log_devs (parameter_id 729)\".",
+    fixed = TRUE
+  )
+
+  #' @description Test that `check_sdreport_convergence()` ranks only fixed effects, labeled with parameter names, when there are no random effects.
+  obj <- make_mock_obj(random = numeric(), hessian = ill_conditioned_hessian)
+  sdreport <- make_mock_sdreport(
+    fixed_se = c(10, 9),
+    random_se = numeric(),
+    report_se = c(1e6, 1)
+  )
+  warning_text <- collect_warnings(
+    FIMS:::check_sdreport_convergence(
+      list(),
+      obj,
+      opt,
+      sdreport,
+      parameter_names = c("Recruitment.1.log_rzero.1", "Fleet.1.log_q.3")
+    )
+  )
+  expect_length(warning_text, 1)
+  expect_match(warning_text, "Among fixed effects", fixed = TRUE)
+  expect_match(warning_text, "1. \"Recruitment 1: log_rzero (parameter_id 1)\"", fixed = TRUE)
+  expect_match(warning_text, "2. \"Fleet 1: log_q (parameter_id 3)\"", fixed = TRUE)
+  expect_no_match(warning_text, "report_", fixed = TRUE)
+
+  #' @description Test that `check_sdreport_convergence()` ranks random effects, the block the Hessian covers, when there are random effects.
+  obj <- make_mock_obj(random = 1, hessian = ill_conditioned_hessian)
+  sdreport <- make_mock_sdreport(
+    fixed_se = c(1e3, 1e3),
+    random_se = c(5, 50),
+    report_se = c(1e6, 1)
+  )
+  warning_text <- collect_warnings(
+    FIMS:::check_sdreport_convergence(
+      list(),
+      obj,
+      opt,
+      sdreport,
+      random_effects_names = c(
+        "Recruitment.1.log_devs.729",
+        "Recruitment.1.log_devs.730"
+      )
+    )
+  )
+  expect_length(warning_text, 1)
+  expect_match(warning_text, "Among random effects", fixed = TRUE)
+  expect_match(warning_text, "1. \"Recruitment 1: log_devs (parameter_id 730)\"", fixed = TRUE)
+  expect_no_match(warning_text, "fixed_|report_")
 })
 
 ## Edge handling ----
@@ -166,6 +270,84 @@ test_that("check_sdreport_convergence() returns correct outputs for edge cases",
     object = FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport),
     regexp = "Unable to extract summary from sdreport"
   )
+
+  #' @description Test that `check_sdreport_convergence()` still reports the condition number, without a ranking, when the summary used for ranking fails.
+  obj <- make_mock_obj(random = numeric(), hessian = ill_conditioned_hessian)
+  opt <- list(par = c(0, 0, 0))
+  sdreport <- make_mock_sdreport(fail_on = "fixed", random_se = numeric())
+  warning_text <- collect_warnings(
+    FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport)
+  )
+  expect_length(warning_text, 2)
+  expect_match(warning_text[1], "Unable to extract summary from sdreport")
+  expect_match(warning_text[2], "Condition number of Hessian")
+  expect_match(warning_text[2], "Unable to rank parameters by standard error")
+  expect_no_match(warning_text[2], "Unable to extract Hessian")
+
+  #' @description Test that `check_sdreport_convergence()` leaves NA and NaN standard errors out of the ranking.
+  obj <- make_mock_obj(random = numeric(), hessian = ill_conditioned_hessian)
+  sdreport <- make_mock_sdreport(
+    fixed_se = c(NaN, NA_real_, 3),
+    random_se = numeric(),
+    report_se = c(0.4, 0.5)
+  )
+  warning_text <- collect_warnings(
+    FIMS:::check_sdreport_convergence(
+      list(),
+      obj,
+      opt,
+      sdreport,
+      parameter_names = c("a", "b", "Fleet.1.log_q.3")
+    )
+  )
+  expect_length(warning_text, 2)
+  expect_match(warning_text[2], "1. \"Fleet 1: log_q (parameter_id 3)\"", fixed = TRUE)
+  expect_no_match(warning_text[2], "NaN|\"a\"|\"b\"")
+
+  #' @description Test that `check_sdreport_convergence()` does not rank when every standard error is NA.
+  sdreport <- make_mock_sdreport(
+    fixed_se = c(NaN, NA_real_),
+    random_se = numeric(),
+    report_se = c(0.4, 0.5)
+  )
+  warning_text <- collect_warnings(
+    FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport)
+  )
+  expect_match(warning_text[2], "Unable to rank parameters by standard error")
+
+  #' @description Test that `check_sdreport_convergence()` names only the first five NA standard errors and counts the rest.
+  obj <- make_mock_obj(random = numeric())
+  opt <- list(par = numeric(7))
+  sdreport <- make_mock_sdreport(
+    fixed_se = rep(NA_real_, 7),
+    random_se = numeric(),
+    report_se = c(0.4, 0.5)
+  )
+  warning_text <- collect_warnings(
+    FIMS:::check_sdreport_convergence(
+      list(),
+      obj,
+      opt,
+      sdreport,
+      parameter_names = paste0("Fleet.1.log_Fmort.", 1:7)
+    )
+  )
+  expect_match(warning_text, "7 fixed effects have NA standard errors", fixed = TRUE)
+  expect_match(warning_text, "Fleet 1: log_Fmort (parameter_id 5)", fixed = TRUE)
+  expect_no_match(warning_text, "(parameter_id 6)", fixed = TRUE)
+  expect_match(warning_text, "(2 more not shown)", fixed = TRUE)
+
+  #' @description Test that `check_sdreport_convergence()` falls back to the summary row names when parameter names are not supplied.
+  sdreport <- make_mock_sdreport(
+    fixed_se = c(0.2, NA_real_),
+    random_se = numeric(),
+    report_se = c(0.4, NA_real_)
+  )
+  warning_text <- collect_warnings(
+    FIMS:::check_sdreport_convergence(list(), obj, list(par = c(0, 0)), sdreport)
+  )
+  expect_match(warning_text, "\"fixed_2\"", fixed = TRUE)
+  expect_match(warning_text, "1 derived value has NA standard error: \"report_2\"", fixed = TRUE)
 })
 
 ## Error handling ----
@@ -212,4 +394,26 @@ test_that("check_sdreport_convergence() returns correct error messages", {
     object = FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport),
     regexp = "Large condition number detected in Hessian"
   )
+
+  #' @description Test that `check_sdreport_convergence()` reports both the NA standard errors and the large condition number when both occur.
+  obj <- make_mock_obj(random = numeric(), hessian = ill_conditioned_hessian)
+  sdreport <- make_mock_sdreport(
+    pdHess = TRUE,
+    fixed_se = c(NA_real_, 9),
+    random_se = numeric(),
+    report_se = c(8, 7)
+  )
+  warning_text <- collect_warnings(
+    FIMS:::check_sdreport_convergence(
+      list(),
+      obj,
+      opt,
+      sdreport,
+      parameter_names = c("Recruitment.1.log_rzero.1", "Fleet.1.log_q.3")
+    )
+  )
+  expect_length(warning_text, 2)
+  expect_match(warning_text[1], "sdreport convergence issues detected")
+  expect_match(warning_text[1], "Recruitment 1: log_rzero (parameter_id 1)", fixed = TRUE)
+  expect_match(warning_text[2], "Large condition number detected in Hessian")
 })

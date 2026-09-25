@@ -22,6 +22,24 @@ test_that("`initialize_fims()` works with correct inputs", {
   expect_named(result, c("parameters", "model"))
   #' @description Test that `initialize_fims()` returns a list with two elements.
   expect_equal(length(result), 2)
+  #' @description Test that `initialize_fims()` records the fleet, selectivity, and data-distribution modules of each fleet in the "fleet_modules" attribute.
+  fleet_modules <- attr(result, "fleet_modules")
+  expect_s3_class(fleet_modules, "tbl_df")
+  expect_named(fleet_modules, c("fleet", "module_name", "module_id", "data_type"))
+  expect_setequal(unique(fleet_modules[["fleet"]]), c("fleet1", "survey1"))
+  expect_equal(
+    sum(fleet_modules[["module_name"]] == "Fleet"),
+    2
+  )
+  expect_equal(
+    sum(fleet_modules[["module_name"]] == "Selectivity"),
+    2
+  )
+  expect_true(all(
+    fleet_modules[["data_type"]][fleet_modules[["module_name"]] == "distribution"] %in%
+      c("index", "catch", "age_comp", "length_comp")
+  ))
+  clear()
   #' @description Test that `initialize_fims()` returns a list when it is provided parameters that are nested.
   expect_type(
     initialize_fims(
