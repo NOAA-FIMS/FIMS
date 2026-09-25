@@ -478,7 +478,9 @@ check_sdreport_convergence <- function(
     }
   )
 
-  # Separate issues and warnings
+  # Issues and warnings are reported independently: NA standard errors are
+  # often a symptom of a near-singular Hessian, so the conditioning warning is
+  # most useful exactly when NA standard errors are present.
   if (length(se_check_result[["issues"]]) > 0) {
     cli::cli_warn(c(
       "x" = "sdreport convergence issues detected:",
@@ -487,7 +489,8 @@ check_sdreport_convergence <- function(
         rep("i", length(se_check_result[["issues"]]))
       )
     ))
-  } else if (length(hessian_check_result[["warnings"]]) > 0) {
+  }
+  if (length(hessian_check_result[["warnings"]]) > 0) {
     cli::cli_warn(c(
       "!" = "Large condition number detected in Hessian; the matrix may be near singular.",
       setNames(
