@@ -1,3 +1,105 @@
+#' Label values for convergence messages
+#'
+#' Returns one label per value so that convergence messages can point at a
+#' specific parameter or derived quantity.
+#'
+#' @param values A vector of values, e.g., gradients or standard errors.
+#' @param labels A character vector of labels with the same length as
+#'   `values`, or `NULL`.
+#' @param fallback A string used to build labels, e.g., `"p[2]"`, when
+#'   `labels` is `NULL` or does not line up with `values`.
+#' @return
+#' A character vector the same length as `values`. Repeated labels, e.g., the
+#' rows of an ADREPORT vector, are indexed within their name, e.g.,
+#' `"biomass[3]"`. FIMS parameter names are made readable with
+#' [readable_parameter_labels()].
+#' @noRd
+label_values <- function(values, labels = NULL, fallback = "p") {
+  n <- length(values)
+  if (n == 0) {
+    return(character(0))
+  }
+  # A length mismatch means the labels cannot be trusted to line up, so index
+  # the fallback rather than risk naming the wrong parameter. The fallback is
+  # always indexed so a message never shows a bare "p".
+  if (is.null(labels) || length(labels) != n) {
+    return(sprintf("%s[%d]", fallback, seq_len(n)))
+  }
+  labels <- as.character(labels)
+  position <- stats::ave(seq_len(n), labels, FUN = seq_along)
+  repeated <- duplicated(labels) | duplicated(labels, fromLast = TRUE)
+  # Labels end up inside cli_warn(), which interpolates `{}` again; FIMS
+  # parameter and ADREPORT names never contain braces.
+  ifelse(repeated, sprintf("%s[%d]", labels, position), labels) |>
+    readable_parameter_labels()
+}
+
+#' Make FIMS parameter names readable
+#'
+#' FIMS parameter names have the form `module_name.module_id.label.
+#' parameter_id`, e.g., `"Selectivity.2.slope.47"`, which is hard to read in a
+#' warning. This splits them into the same pieces as the columns returned by
+#' [get_estimates()] so users can find the row.
+#'
+#' @param labels A character vector of labels.
+#' @param fleet_modules A tibble with the columns `fleet`, `module_name`,
+#'   `module_id`, and `data_type`, i.e., the `"fleet_modules"` attribute of the
+#'   list returned by [initialize_fims()], or `NULL`. When supplied, the fleet
+#'   name is added to fleet, selectivity, and data-distribution parameters.
+#' @return
+#' A character vector the same length as `labels`, e.g.,
+#' `"Selectivity 2 (survey1): slope (parameter_id 47)"`, or without the fleet
+#' when it is unknown. Labels that do not follow the FIMS pattern, e.g.,
+#' `"p[2]"` or `"biomass[3]"`, are returned unchanged, so the function can be
+#' applied more than once.
+#' @noRd
+readable_parameter_labels <- function(labels, fleet_modules = NULL) {
+  # Distribution modules share one id counter in C++, so any distribution
+  # prefix is looked up under the same name
+  distribution_prefixes <- c("dnorm", "dlnorm", "dmultinom")
+  fleet_alias <- function(module_name, module_id) {
+    if (is.null(fleet_modules) || nrow(fleet_modules) == 0) {
+      return(NULL)
+    }
+    lookup_name <- if (module_name %in% distribution_prefixes) {
+      "distribution"
+    } else {
+      module_name
+    }
+    match <- fleet_modules[
+      fleet_modules[["module_name"]] == lookup_name &
+        fleet_modules[["module_id"]] == as.integer(module_id), ,
+      drop = FALSE
+    ]
+    if (nrow(match) != 1) {
+      return(NULL)
+    }
+    paste(stats::na.omit(c(match[["fleet"]], match[["data_type"]])), collapse = " ")
+  }
+  # Same split as reshape_tmb_estimates(), but only applied when all four
+  # pieces are present so other labels are never mangled
+  pieces <- strsplit(labels, split = ".", fixed = TRUE)
+  vapply(
+    seq_along(labels),
+    function(i) {
+      piece <- pieces[[i]]
+      is_fims_name <- length(piece) == 4 &&
+        grepl("^[0-9]+$", piece[[2]]) &&
+        grepl("^[0-9]+$", piece[[4]])
+      if (!is_fims_name) {
+        return(labels[[i]])
+      }
+      alias <- fleet_alias(piece[[1]], piece[[2]])
+      module <- paste(piece[[1]], piece[[2]])
+      if (!is.null(alias)) {
+        module <- paste0(module, " (", alias, ")")
+      }
+      sprintf("%s: %s (parameter_id %s)", module, piece[[3]], piece[[4]])
+    },
+    character(1)
+  )
+}
+
 #' Check convergence of nlminb optimization
 #'
 #' Checks the convergence of the nlminb optimization by evaluating the
@@ -14,14 +116,38 @@
 #' information.
 #' @param maxgrad The maximum absolute gradient from the optimization, used to
 #' assess convergence quality.
+#' @param gradient The gradient vector of the fixed effects at the optimum, used
+#' to name the parameter with the largest absolute gradient. The default of
+#' `NULL` leaves the name out of the messages.
+#' @param parameter_names A character vector of fixed-effect names, e.g., from
+#' [get_parameter_names()], in the same order as `gradient`. If `NULL`, labels
+#' such as `"p[2]"` are used.
 #' @return
 #' If convergence issues are detected, a FIMSFit object is returned for
 #' diagnostics. Otherwise, the function returns NULL.
 #' @noRd
-check_mle_convergence <- function(input, obj, opt, maxgrad) {
+check_mle_convergence <- function(
+  input,
+  obj,
+  opt,
+  maxgrad,
+  gradient = NULL,
+  parameter_names = NULL
+) {
   # Check convergence status
   convergence_issues <- c()
   convergence_warnings <- c()
+
+  # which.max() drops NaN, so an all-NaN gradient would give an empty label
+  largest_gradient_message <- NULL
+  if (length(gradient) > 0 && any(is.finite(gradient))) {
+    largest_gradient_label <- label_values(gradient, parameter_names)[
+      which.max(abs(gradient))
+    ]
+    largest_gradient_message <- cli::format_inline(
+      "Largest absolute gradient is on {.val {largest_gradient_label}}."
+    )
+  }
 
   # Check 1: nlminb convergence flag
   if (opt[["convergence"]] != 0) {
@@ -33,7 +159,11 @@ check_mle_convergence <- function(input, obj, opt, maxgrad) {
     } else {
       cli::format_inline("Convergence code = {.val {opt[['convergence']]}}.")
     }
-    convergence_issues <- c(convergence_issues, convergence_message)
+    convergence_issues <- c(
+      convergence_issues,
+      convergence_message,
+      largest_gradient_message
+    )
   } else {
     # if optimizer converged, check the gradient to see if it is close enough
     # to zero
@@ -45,7 +175,8 @@ check_mle_convergence <- function(input, obj, opt, maxgrad) {
           "Maximum absolute gradient
           ({.val {format(maxgrad, scientific = TRUE)}})
           is higher than {.val {1}}. Model does not seem converged."
-        )
+        ),
+        largest_gradient_message
       )
     } else if (maxgrad > 0.01) {
       convergence_warnings <- c(
@@ -54,7 +185,8 @@ check_mle_convergence <- function(input, obj, opt, maxgrad) {
           "Maximum absolute gradient
           ({.val {format(maxgrad, scientific = TRUE)}})
           is higher than {.val {0.01}}. Model might not be converged."
-        )
+        ),
+        largest_gradient_message
       )
     }
   }
@@ -113,21 +245,48 @@ check_mle_convergence <- function(input, obj, opt, maxgrad) {
 #' @inheritParams check_mle_convergence
 #' @param sdreport The sdreport output from TMB, containing standard errors and
 #' Hessian information.
+#' @param random_effects_names A character vector of random-effect names, e.g.,
+#' from [get_random_names()], in the same order as the random effects in
+#' `sdreport`. If `NULL`, labels such as `"re[2]"` are used.
 #' @return
 #' If convergence issues are detected, a FIMSFit object is returned for
 #' diagnostics. Otherwise, the function returns NULL and allows the fitting
 #' process to continue to sdreport.
 #' @noRd
-check_sdreport_convergence <- function(input, obj, opt, sdreport) {
+check_sdreport_convergence <- function(
+  input,
+  obj,
+  opt,
+  sdreport,
+  parameter_names = NULL,
+  random_effects_names = NULL
+) {
   condition_number_threshold <- 1e5
-  format_na_se_issue <- function(std_errors, parameter_type) {
-    na_se <- sum(is.na(std_errors))
+  has_random_effects <- length(obj[["env"]][["random"]]) > 0
+  # TMB labels every fixed effect "p" and every random effect "re", so prefer
+  # the FIMS names and only fall back to the summary row names without them.
+  summary_labels <- function(summary_matrix, names, fallback) {
+    labels <- if (is.null(names)) rownames(summary_matrix) else names
+    label_values(summary_matrix[, "Std. Error"], labels, fallback)
+  }
+  format_na_se_issue <- function(std_errors, labels, noun) {
+    is_na <- is.na(std_errors)
+    na_se <- sum(is_na)
     if (na_se == 0) {
       return(NULL)
     }
-    cli::format_inline(
-      "{na_se} {parameter_type} effect{?s} {?has/have} NA standard error{?s}."
+    # Long models can have hundreds of NA standard errors, so only name a few
+    shown <- utils::head(labels[is_na], 5)
+    n_more <- na_se - length(shown)
+    # qty() is needed because cli otherwise pluralizes on the length of `noun`
+    message <- cli::format_inline(
+      "{na_se} {noun}{cli::qty(na_se)}{?s} {?has/have} NA standard
+      error{?s}: {.val {shown}}"
     )
+    if (n_more > 0) {
+      message <- paste0(message, " (", n_more, " more not shown)")
+    }
+    paste0(message, ".")
   }
 
   # Check 1: Hessian is invertible (positive definite)
@@ -170,18 +329,24 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport) {
       fixed_summary <- summary(sdreport, "fixed")
 
       if (!is.null(fixed_summary) && nrow(fixed_summary) > 0) {
-        std_errors <- fixed_summary[, "Std. Error"]
-        issue <- format_na_se_issue(std_errors, "fixed")
+        issue <- format_na_se_issue(
+          fixed_summary[, "Std. Error"],
+          summary_labels(fixed_summary, parameter_names, "p"),
+          "fixed effect"
+        )
         if (!is.null(issue)) {
           se_issues <- c(se_issues, issue)
         }
       }
 
-      if (length(obj[["env"]][["random"]]) > 0) {
+      if (has_random_effects) {
         random_summary <- summary(sdreport, "random")
         if (!is.null(random_summary) && nrow(random_summary) > 0) {
-          std_errors <- random_summary[, "Std. Error"]
-          issue <- format_na_se_issue(std_errors, "random")
+          issue <- format_na_se_issue(
+            random_summary[, "Std. Error"],
+            summary_labels(random_summary, random_effects_names, "re"),
+            "random effect"
+          )
           if (!is.null(issue)) {
             se_issues <- c(se_issues, issue)
           }
@@ -191,16 +356,13 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport) {
 
       derived_summary <- summary(sdreport, "report")
       if (!is.null(derived_summary) && nrow(derived_summary) > 0) {
-        std_errors <- derived_summary[, "Std. Error"]
-
-        na_se <- sum(is.na(std_errors))
-        if (na_se > 0) {
-          se_issues <- c(
-            se_issues,
-            cli::format_inline(
-              "{na_se} derived value{?s} {?has/have} NA standard error{?s}."
-            )
-          )
+        issue <- format_na_se_issue(
+          derived_summary[, "Std. Error"],
+          summary_labels(derived_summary, NULL, "report"),
+          "derived value"
+        )
+        if (!is.null(issue)) {
+          se_issues <- c(se_issues, issue)
         }
       }
       list(issues = se_issues)
@@ -211,33 +373,62 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport) {
   )
 
   # Check 3: Condition number of covariance matrix (warning)
+  # Rank the same block of parameters the Hessian below covers (random effects
+  # when there are any, otherwise fixed effects). Derived quantities are left
+  # out because their standard errors are on the scale of the output, e.g.,
+  # numbers at age, and would crowd out the parameters. This is kept separate
+  # from the Hessian tryCatch so a failed ranking does not hide the condition
+  # number.
+  effect_type <- if (has_random_effects) "random" else "fixed"
+  largest_se <- tryCatch(
+    {
+      ranked_summary <- summary(sdreport, effect_type)
+      if (is.null(ranked_summary) || nrow(ranked_summary) == 0) {
+        NULL
+      } else {
+        labels <- if (has_random_effects) {
+          summary_labels(ranked_summary, random_effects_names, "re")
+        } else {
+          summary_labels(ranked_summary, parameter_names, "p")
+        }
+        std_errors <- ranked_summary[, "Std. Error"]
+        # NA and NaN standard errors are reported by Check 2 and would
+        # otherwise be listed here as the "largest"
+        ranked <- order(std_errors, decreasing = TRUE)
+        ranked <- ranked[is.finite(std_errors[ranked])]
+        if (length(ranked) == 0) {
+          NULL
+        } else {
+          utils::head(
+            data.frame(label = labels[ranked], std_error = std_errors[ranked]),
+            2
+          )
+        }
+      }
+    },
+    error = function(e) NULL
+  )
+
   # Safely extract hessian and check condition number
   hessian_check_result <- tryCatch(
     {
-      if (length(obj[["env"]][["random"]]) > 0) {
+      if (has_random_effects) {
         hessian <- obj[["env"]]$spHess(random = TRUE)
       } else {
         hessian <- as.matrix(obj$he(opt[["par"]]))
       }
       # Compare condition number to threshold
       condition_number <- kappa(hessian)
-      sdr_mat <- summary(sdreport) |>
-        as.data.frame()
-      if (!is.null(sdr_mat) && nrow(sdr_mat) > 0 && "Std. Error" %in% names(sdr_mat)) {
-        sdr_mat <- sdr_mat[order(sdr_mat[["Std. Error"]], decreasing = TRUE), , drop = FALSE]
-        sdr_mat <- utils::head(sdr_mat, 2)
-      }
-
 
       if (condition_number > condition_number_threshold) {
-        n_show <- nrow(sdr_mat)
+        n_show <- if (is.null(largest_se)) 0 else nrow(largest_se)
         largest_se_messages <- if (n_show > 0) {
           vapply(
             seq_len(n_show),
             function(i) {
               cli::format_inline(
-                "{i}. {.val {rownames(sdr_mat)[i]}}:
-                {.val {format(sdr_mat[i, 'Std. Error'], scientific = TRUE)}}"
+                "{i}. {.val {largest_se[['label']][i]}}:
+                {.val {format(largest_se[['std_error']][i], scientific = TRUE)}}"
               )
             },
             character(1)
@@ -258,7 +449,8 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport) {
           warning_bullets <- c(
             warning_bullets,
             cli::format_inline(
-              "The {n_show} largest standard error value{?s} {?is/are} for parameter{?s}:"
+              "Among {effect_type} effects, the {n_show} largest standard error
+              value{?s} {?is/are}:"
             ),
             largest_se_messages
           )
@@ -287,20 +479,21 @@ check_sdreport_convergence <- function(input, obj, opt, sdreport) {
   )
 
   # Separate issues and warnings
-  if (length(se_check_result$issues) > 0) {
+  if (length(se_check_result[["issues"]]) > 0) {
     cli::cli_warn(c(
       "x" = "sdreport convergence issues detected:",
-      setNames(se_check_result$issues, rep("i", length(se_check_result$issues)))
+      setNames(
+        se_check_result[["issues"]],
+        rep("i", length(se_check_result[["issues"]]))
+      )
     ))
-  } else {
-    if (length(hessian_check_result$warnings) > 0) {
-      cli::cli_warn(c(
-        "!" = "Large condition number detected in Hessian; the matrix may be near singular.",
-        setNames(
-          hessian_check_result$warnings,
-          rep("i", length(hessian_check_result$warnings))
-        )
-      ))
-    }
+  } else if (length(hessian_check_result[["warnings"]]) > 0) {
+    cli::cli_warn(c(
+      "!" = "Large condition number detected in Hessian; the matrix may be near singular.",
+      setNames(
+        hessian_check_result[["warnings"]],
+        rep("i", length(hessian_check_result[["warnings"]]))
+      )
+    ))
   }
 }

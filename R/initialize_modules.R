@@ -863,6 +863,12 @@ initialize_comp <- function(data,
 #' It is important that you only have one FIMS model initialized in your R
 #' workspace at a time. Thus, after you initialize and fit the model, you should
 #' run [clear()].
+#'
+#' The returned list also carries a `"fleet_modules"` attribute, a tibble with
+#' one row per fleet-related module (`fleet`, `module_name`, `module_id`,
+#' `data_type`). [fit_fims()] uses it to name the fleet in convergence
+#' messages because the C++ module ids alone do not say which fleet a
+#' parameter belongs to.
 #' @export
 #' @seealso
 #' * [setup_default_parameters()]
@@ -1073,6 +1079,36 @@ initialize_fims <- function(parameters, data) {
   }
 
   # Recruitment
+  # Record which fleet each module belongs to while the links are known
+  fleet_modules <- purrr::map(seq_along(fleets), \(i) {
+    distributions <- list(
+      index = fleet_index_distribution[[i]],
+      catch = fleet_catch_distribution[[i]],
+      age_comp = fleet_agecomp_distribution[[i]],
+      length_comp = fleet_lengthcomp_distribution[[i]]
+    ) |>
+      purrr::compact()
+    # Computed outside tibble() because its `fleet` column would mask the
+    # `fleet` list of modules
+    module_ids <- c(
+      fleet[[i]]$get_id(),
+      fleet_selectivity[[i]]$get_id(),
+      purrr::map_dbl(distributions, \(x) x$get_id())
+    ) |>
+      as.integer()
+    tibble::tibble(
+      fleet = fleets[i],
+      module_name = c(
+        "Fleet",
+        "Selectivity",
+        rep("distribution", length(distributions))
+      ),
+      module_id = module_ids,
+      data_type = c(NA_character_, NA_character_, names(distributions))
+    )
+  }) |>
+    dplyr::bind_rows()
+
   # create new module in the recruitment class (specifically Beverton--Holt,
   # when there are other options, this would be where the option would be
   # chosen)
@@ -1215,6 +1251,9 @@ initialize_fims <- function(parameters, data) {
     ),
     model = fims_model
   )
+  # An attribute rather than a list element so the returned list keeps its
+  # documented shape
+  attr(parameter_list, "fleet_modules") <- fleet_modules
 
   return(parameter_list)
 }
