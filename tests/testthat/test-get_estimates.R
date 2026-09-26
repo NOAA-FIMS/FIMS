@@ -77,6 +77,14 @@ test_that("`get_estimates()` works with estimation run", {
   # Use purrr::map to apply the function to each file
   result <- purrr::map(fit_files, check_estimates_colnames)
 
+  #' @description Test that `get_estimates()` gives every fleet and selectivity row the name of its own fleet.
+  estimates <- get_estimates(readRDS(fit_files[[1]]))
+  fleet_rows <- estimates[["module_name"]] %in% c("Fleet", "Selectivity")
+  expect_equal(
+    object = estimates[["fleet"]][fleet_rows],
+    expected = c("fleet1", "survey1")[estimates[["module_id"]][fleet_rows]]
+  )
+
   #' @description Test that the result values from the model fit have not changed from the accepted version.
   expect_snapshot({
     # Read the first RDS file, get estimates, and print a snapshot
