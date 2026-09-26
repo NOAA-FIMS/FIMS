@@ -56,6 +56,11 @@ label_values <- function(values, labels = NULL, fallback = "p") {
 #'   name is added to fleet, selectivity, and data-distribution parameters, and
 #'   process-distribution parameters say what they describe, e.g.,
 #'   `"dnorm 7 (Recruitment log_devs): log_sd (parameter_id 763)"`.
+#' @param parameter_links A tibble with the columns `parameter_id`, `timing`,
+#'   `age`, and `length`, i.e., the `"parameter_links"` attribute of the list
+#'   returned by [initialize_fims()], or `NULL`. When supplied, the year, age,
+#'   and length of each parameter element are added, e.g.,
+#'   `"Fleet 1 (fleet1): log_Fmort, year 5 (parameter_id 27)"`.
 #' @return
 #' A character vector the same length as `labels`, e.g.,
 #' `"Selectivity 2 (survey1): slope (parameter_id 47)"`, or without the fleet
@@ -63,7 +68,9 @@ label_values <- function(values, labels = NULL, fallback = "p") {
 #' `"p[2]"` or `"biomass[3]"`, are returned unchanged, so the function can be
 #' applied more than once.
 #' @noRd
-readable_parameter_labels <- function(labels, module_links = NULL) {
+readable_parameter_labels <- function(labels,
+                                      module_links = NULL,
+                                      parameter_links = NULL) {
   # Same pieces as reshape_tmb_estimates(), but only for labels that have all
   # four so other labels, e.g., "p[2]" or already readable ones, are unchanged
   fims_pattern <- "^([^.]+)\\.([0-9]+)\\.([^.]+)\\.([0-9]+)$"
@@ -107,6 +114,27 @@ readable_parameter_labels <- function(labels, module_links = NULL) {
     paste(module_name, module_id),
     paste0(module_name, " ", module_id, " (", alias, ")")
   )
+  if (!is.null(parameter_links) && nrow(parameter_links) > 0) {
+    link_row <- match(
+      as.integer(parameter_id),
+      parameter_links[["parameter_id"]]
+    )
+    for (dimension in c("timing", "age", "length")) {
+      value <- parameter_links[[dimension]][link_row]
+      # FIMS uses timing for the year
+      dimension_name <- if (dimension == "timing") "year" else dimension
+      label <- ifelse(
+        is.na(value),
+        label,
+        paste0(
+          label, ", ", dimension_name, " ",
+          # Formatted one value at a time so 5 does not become "5.0" next to
+          # 12.5, and without scientific notation
+          trimws(formatC(value, format = "fg", digits = 15))
+        )
+      )
+    }
+  }
   labels[is_fims_name] <- sprintf(
     "%s: %s (parameter_id %s)",
     module, label, parameter_id

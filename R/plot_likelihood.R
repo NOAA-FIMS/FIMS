@@ -32,9 +32,9 @@
 #'     profiled value
 #' @param group A character string or vector specifying the grouping variable(s)
 #'   for likelihood components. Default is `"label"` to group by data type.
-#'   Other options could include `c("label", "fleet_name")` for more detailed
-#'   grouping, though fleet names are not currently in FIMS output. Must match
-#'   column name(s) in the estimates data frame
+#'   Another option is `"fleet"` to group by fleet name, in which case
+#'   components that do not belong to a fleet are grouped as `NA`. Must match a
+#'   column name in the estimates data frame
 #'
 #' @return
 #' A ggplot object displaying likelihood profiles. The plot includes:

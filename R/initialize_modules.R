@@ -256,26 +256,11 @@ initialize_growth <- function(parameters, data) {
       "mean_length_old_growth_coefficient_logit_corr"
     )
 
+    parameters <- arrange_growth_reference_rows(parameters)
+    growth_input <- parameters |>
+      dplyr::filter(.data$module_name == "Growth")
     sd_rows <- growth_input |>
       dplyr::filter(.data$label == "length_at_age_sd_at_reference_ages")
-
-    if (nrow(sd_rows) > 1 && all(!is.na(sd_rows$age))) {
-      sd_rows <- sd_rows |>
-        dplyr::arrange(.data$age)
-
-      parameters <- parameters |>
-        dplyr::filter(!(
-          .data$module_name == "Growth" &
-            .data$label == "length_at_age_sd_at_reference_ages"
-        )) |>
-        dplyr::bind_rows(sd_rows)
-
-      growth_input <- parameters |>
-        dplyr::filter(.data$module_name == "Growth")
-
-      sd_rows <- growth_input |>
-        dplyr::filter(.data$label == "length_at_age_sd_at_reference_ages")
-    }
 
     missing_reference_labels <- setdiff(
       c("reference_age_for_length_young", "reference_age_for_length_old"),
@@ -870,8 +855,11 @@ initialize_comp <- function(data,
 #' distribution modules, and the process distribution for recruitment
 #' deviations. [fit_fims()] uses it to label parameters in convergence
 #' messages because the C++ module ids alone do not say what a module is for.
+#' A `"parameter_links"` attribute, a tibble with one row per parameter
+#' element (`parameter_id`, `timing`, `age`, `length`), lets the same messages
+#' say which year, age, or length a parameter is for.
 #' Operations that build a new list, e.g., `c()` or `input[c("parameters",
-#' "model")]`, drop the attribute; the labels then leave out the fleet.
+#' "model")]`, drop these attributes; the labels then leave out that detail.
 #' @export
 #' @seealso
 #' * [setup_default_parameters()]
@@ -1265,8 +1253,109 @@ initialize_fims <- function(parameters, data) {
   # An attribute rather than a list element so the returned list keeps its
   # documented shape
   attr(parameter_list, "module_links") <- module_links
+  attr(parameter_list, "parameter_links") <- dplyr::bind_rows(
+    purrr::map(seq_along(fleets), \(i) {
+      dplyr::bind_rows(
+        link_module_parameters(fleet[[i]], parameters, "Fleet", fleets[i]),
+        link_module_parameters(
+          fleet_selectivity[[i]], parameters, "Selectivity", fleets[i]
+        )
+      )
+    }),
+    link_module_parameters(recruitment, parameters, "Recruitment"),
+    link_module_parameters(growth, parameters, "Growth"),
+    link_module_parameters(maturity, parameters, "Maturity"),
+    link_module_parameters(population, parameters, "Population")
+  )
 
   return(parameter_list)
+}
+
+#' Order the reference-age standard deviation rows of growth by age
+#'
+#' @description
+#' The von Bertalanffy growth module expects the standard deviations at the
+#' reference ages in increasing order of age, so the rows are sorted before the
+#' module is filled. Shared by `initialize_growth()` and
+#' `link_module_parameters()` so both see the rows in the same order.
+#' @param parameters The parameter tibble passed to [initialize_fims()].
+#' @return
+#' `parameters`, with the Growth `length_at_age_sd_at_reference_ages` rows
+#' moved to the end and sorted by `age` when there is more than one and none
+#' is missing an age; otherwise `parameters` unchanged.
+#' @noRd
+arrange_growth_reference_rows <- function(parameters) {
+  is_sd_row <- parameters[["module_name"]] %in% "Growth" &
+    parameters[["label"]] %in% "length_at_age_sd_at_reference_ages"
+  sd_rows <- parameters[is_sd_row, , drop = FALSE]
+  if (nrow(sd_rows) <= 1 || any(is.na(sd_rows[["age"]]))) {
+    return(parameters)
+  }
+  parameters[!is_sd_row, , drop = FALSE] |>
+    dplyr::bind_rows(dplyr::arrange(sd_rows, .data$age))
+}
+
+#' Link the parameters of a module to their timing, age, and length
+#'
+#' @description
+#' Reads the id of each element of each parameter vector in an initialized
+#' module and pairs it with the matching row of the parameter tibble. The C++
+#' side does not keep which year, age, or length an element belongs to, so this
+#' is recorded while the rows and the module are both at hand.
+#' @param module An initialized module object.
+#' @param parameters The parameter tibble passed to [initialize_fims()].
+#' @param module_name A string, e.g., `"Fleet"`, used to select the rows of
+#'   `parameters` for this module.
+#' @param fleet A string with the fleet name for fleet-specific modules, or
+#'   `NA` for other modules.
+#' @return
+#' A tibble with the columns `parameter_id`, `timing`, `age`, and `length` and
+#' one row per parameter element. Labels that are not parameter vectors of the
+#' module, e.g., a distribution's `log_sd`, are skipped.
+#' @noRd
+link_module_parameters <- function(module,
+                                   parameters,
+                                   module_name,
+                                   fleet = NA_character_) {
+  # Same row selection and order as initialize_module() receives, so rows and
+  # elements line up
+  if (module_name == "Growth") {
+    parameters <- arrange_growth_reference_rows(parameters)
+  }
+  module_input <- parameters |>
+    dplyr::filter(.data$module_name == !!module_name)
+  if (!is.na(fleet)) {
+    module_input <- module_input |>
+      dplyr::filter(.data$fleet == !!fleet)
+  }
+  labels <- module_input |>
+    dplyr::pull(.data$label) |>
+    unique() |>
+    stats::na.omit()
+  column_or_na <- function(rows, name) {
+    if (name %in% names(rows)) as.numeric(rows[[name]]) else NA_real_
+  }
+  purrr::map(labels, \(label) {
+    parameter_vector <- tryCatch(module[[label]], error = function(e) NULL)
+    element_count <- tryCatch(parameter_vector$size(), error = function(e) 0)
+    label_rows <- module_input |>
+      dplyr::filter(.data$label == !!label)
+    # Only vectors that set_param_vector() filled from these rows line up
+    if (element_count == 0 || element_count != nrow(label_rows)) {
+      return(NULL)
+    }
+    tibble::tibble(
+      parameter_id = vapply(
+        seq_len(element_count),
+        \(i) as.integer(parameter_vector[i][["id"]]),
+        integer(1)
+      ),
+      timing = column_or_na(label_rows, "timing"),
+      age = column_or_na(label_rows, "age"),
+      length = column_or_na(label_rows, "length")
+    )
+  }) |>
+    dplyr::bind_rows()
 }
 
 #' Set parameter vector values based on module input

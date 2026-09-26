@@ -262,6 +262,26 @@ methods::setMethod(
     ) |>
       dplyr::select(-dplyr::all_of("unique_id")) |>
       dplyr::relocate(dplyr::all_of("uncertainty"), .after = dplyr::all_of("estimation_type"))
+
+    # The model output reports every fleet as "NA" and writes selectivity
+    # separately from its fleet, so the fleet name comes from the links
+    # recorded by initialize_fims(). The names are not set in C++ because the
+    # JSON formatter removes whitespace inside strings.
+    module_links <- attr(get_input(x), "module_links")
+    if (is.null(module_links) || nrow(module_links) == 0) {
+      return(estimates)
+    }
+    fleet_names <- module_links |>
+      dplyr::filter(.data$module_name %in% c("Fleet", "Selectivity")) |>
+      dplyr::distinct(.data$module_name, .data$module_id, .keep_all = TRUE) |>
+      dplyr::select(dplyr::all_of(c("module_name", "module_id", "fleet"))) |>
+      dplyr::rename(linked_fleet = "fleet")
+    estimates |>
+      dplyr::left_join(fleet_names, by = c("module_name", "module_id")) |>
+      dplyr::mutate(
+        fleet = dplyr::coalesce(.data$linked_fleet, .data$fleet)
+      ) |>
+      dplyr::select(-dplyr::all_of("linked_fleet"))
   }
 )
 
@@ -640,15 +660,16 @@ fit_fims <- function(input,
   # Labels are looked up here, while the C++ Information singleton is still
   # populated, because TMB names every fixed effect "p" and every random
   # effect "re", which makes convergence messages impossible to act on.
-  # The module links are only available when `input` came from
-  # initialize_fims(); without them the labels leave out the fleet and what a
-  # distribution describes.
+  # The module and parameter links are only available when `input` came from
+  # initialize_fims(); without them the labels leave out the fleet, what a
+  # distribution describes, and the year, age, or length.
   module_links <- attr(input, "module_links")
+  parameter_links <- attr(input, "parameter_links")
   parameter_names <- names(get_parameter_names(obj[["par"]])) |>
-    readable_parameter_labels(module_links)
+    readable_parameter_labels(module_links, parameter_links)
   random_effects_names <- if (length(obj[["env"]][["random"]]) > 0) {
     names(get_random_names(obj[["env"]]$parList()[["re"]])) |>
-      readable_parameter_labels(module_links)
+      readable_parameter_labels(module_links, parameter_links)
   }
   check_mle_convergence(
     input, obj, opt, maxgrad,
