@@ -287,6 +287,31 @@ test_that("readable_parameter_labels() works with correct inputs", {
       "Recruitment 1: log_devs (parameter_id 729)"
     )
   )
+
+  #' @description Test that `readable_parameter_labels()` adds the year, age, and length from the parameter links.
+  parameter_links <- tibble::tibble(
+    parameter_id = c(27L, 900L, 1209L),
+    timing = c(5, 3, NA),
+    age = c(NA, 2, 11),
+    length = NA_real_
+  )
+  expect_equal(
+    object = FIMS:::readable_parameter_labels(
+      c(
+        "Fleet.1.log_Fmort.27",
+        "Population.1.log_M.900",
+        "Population.1.log_init_naa.1209",
+        "Recruitment.1.log_rzero.728"
+      ),
+      parameter_links = parameter_links
+    ),
+    expected = c(
+      "Fleet 1: log_Fmort, year 5 (parameter_id 27)",
+      "Population 1: log_M, year 3, age 2 (parameter_id 900)",
+      "Population 1: log_init_naa, age 11 (parameter_id 1209)",
+      "Recruitment 1: log_rzero (parameter_id 728)"
+    )
+  )
 })
 
 ## Edge handling ----

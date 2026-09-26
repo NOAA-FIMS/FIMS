@@ -46,6 +46,37 @@ test_that("`initialize_fims()` works with correct inputs", {
     sum(module_links[["describes"]] == "Recruitment log_devs", na.rm = TRUE),
     1
   )
+
+  parameter_links <- attr(result, "parameter_links")
+  #' @description Test that `initialize_fims()` returns a "parameter_links" attribute with the parameter id, timing, age, and length columns.
+  expect_named(parameter_links, c("parameter_id", "timing", "age", "length"))
+  #' @description Test that `initialize_fims()` records each parameter element once in the "parameter_links" attribute.
+  expect_false(anyDuplicated(parameter_links[["parameter_id"]]) > 0)
+  #' @description Test that `initialize_fims()` records every estimated fixed effect of a module, i.e., not of a distribution, in the "parameter_links" attribute.
+  estimated_ids <- names(get_parameter_names(get_fixed())) |>
+    grep(
+      pattern = "^(dnorm|dlnorm|dmultinom)\\.",
+      invert = TRUE,
+      value = TRUE
+    ) |>
+    sub(pattern = ".*\\.", replacement = "") |>
+    as.integer()
+  expect_true(all(estimated_ids %in% parameter_links[["parameter_id"]]))
+  #' @description Test that `initialize_fims()` links each `log_Fmort` element of fleet1 to its year.
+  log_fmort_rows <- default_parameters |>
+    dplyr::filter(.data$fleet == "fleet1", .data$label == "log_Fmort")
+  log_fmort_ids <- names(get_parameter_names(get_fixed())) |>
+    grep(pattern = "^Fleet\\.1\\.log_Fmort\\.", value = TRUE) |>
+    sub(pattern = ".*\\.", replacement = "") |>
+    as.integer()
+  expect_equal(
+    object = parameter_links[["timing"]][
+      match(log_fmort_ids, parameter_links[["parameter_id"]])
+    ],
+    expected = as.numeric(log_fmort_rows[["timing"]][
+      log_fmort_rows[["estimation_type"]] == "fixed_effects"
+    ])
+  )
   clear()
   #' @description Test that `initialize_fims()` returns a list when it is provided parameters that are nested.
   expect_type(
@@ -59,6 +90,36 @@ test_that("`initialize_fims()` works with correct inputs", {
 })
 
 ## Edge handling ----
+test_that("`initialize_fims()` links unsorted growth reference ages", {
+  #' @description Test that `initialize_fims()` links each von Bertalanffy reference-age standard deviation to its own age when the rows are not sorted by age.
+  vonb_parameters <- default_parameters |>
+    dplyr::filter(.data$module_name != "Growth") |>
+    dplyr::bind_rows(
+      setup_default_Growth(data = data, module_type = "VonBertalanffySchnute")
+    )
+  sd_rows <- which(
+    vonb_parameters[["label"]] == "length_at_age_sd_at_reference_ages"
+  )
+  vonb_parameters[["estimation_type"]][sd_rows] <- "fixed_effects"
+  vonb_parameters[sd_rows, ] <- vonb_parameters[rev(sd_rows), ]
+  result <- initialize_fims(parameters = vonb_parameters, data = data)
+  parameter_links <- attr(result, "parameter_links")
+  # The module stores the reference ages in increasing order, so element ids
+  # in increasing order must link to the ages in increasing order
+  sd_ids <- names(get_parameter_names(get_fixed())) |>
+    grep(pattern = "length_at_age_sd_at_reference_ages", value = TRUE) |>
+    sub(pattern = ".*\\.", replacement = "") |>
+    as.integer() |>
+    sort()
+  expect_equal(
+    object = parameter_links[["age"]][
+      match(sd_ids, parameter_links[["parameter_id"]])
+    ],
+    expected = sort(vonb_parameters[["age"]][sd_rows])
+  )
+  clear()
+})
+
 test_that("`initialize_fims()` works with edge cases", {
   modified_log_devs <- default_parameters |>
     dplyr::filter(label == "log_devs") |>
