@@ -29,6 +29,9 @@ label_values <- function(values, labels = NULL, fallback = "p") {
   labels <- as.character(labels)
   # A missing label cannot be indexed within its name, so fall back per value
   labels[is.na(labels)] <- sprintf("%s[%d]", fallback, which(is.na(labels)))
+  # Repeated labels are indexed before they are made readable, so an indexed
+  # FIMS name keeps its raw form; FIMS names are unique, so only other labels,
+  # e.g., ADREPORT names, are ever indexed
   position <- stats::ave(seq_len(n), labels, FUN = seq_along)
   repeated <- duplicated(labels) | duplicated(labels, fromLast = TRUE)
   ifelse(repeated, sprintf("%s[%d]", labels, position), labels) |>
@@ -43,8 +46,8 @@ label_values <- function(values, labels = NULL, fallback = "p") {
 #'
 #' FIMS parameter names have the form `module_name.module_id.label.
 #' parameter_id`, e.g., `"Selectivity.2.slope.47"`, which is hard to read in a
-#' warning. This splits them into the same pieces as the columns returned by
-#' [get_estimates()] so users can find the row.
+#' warning. This splits them into the same pieces as the `module_name`,
+#' `module_id`, `label`, and `parameter_id` columns of [get_estimates()].
 #'
 #' @param labels A character vector of labels.
 #' @param module_links A tibble with the columns `fleet`, `module_name`,
