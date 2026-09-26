@@ -37,7 +37,10 @@ one row per module that belongs to something else (\code{fleet}, \code{module_na
 distribution modules, and the process distribution for recruitment
 deviations. \code{\link[=fit_fims]{fit_fims()}} uses it to label parameters in convergence
 messages because the C++ module ids alone do not say what a module is for.
-Operations that build a new list, e.g., \code{c()} or \code{input[c("parameters", "model")]}, drop the attribute; the labels then leave out the fleet.
+A \code{"parameter_links"} attribute, a tibble with one row per parameter
+element (\code{parameter_id}, \code{timing}, \code{age}, \code{length}), lets the same messages
+say which year, age, or length a parameter is for.
+Operations that build a new list, e.g., \code{c()} or \code{input[c("parameters", "model")]}, drop these attributes; the labels then leave out that detail.
 }
 \description{
 This function uses information from a parameter data frame that stores the

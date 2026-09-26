@@ -16,9 +16,9 @@ profiled value
 
 \item{group}{A character string or vector specifying the grouping variable(s)
 for likelihood components. Default is \code{"label"} to group by data type.
-Other options could include \code{c("label", "fleet_name")} for more detailed
-grouping, though fleet names are not currently in FIMS output. Must match
-column name(s) in the estimates data frame}
+Another option is \code{"fleet"} to group by fleet name, in which case
+components that do not belong to a fleet are grouped as \code{NA}. Must match a
+column name in the estimates data frame}
 }
 \value{
 A ggplot object displaying likelihood profiles. The plot includes:
