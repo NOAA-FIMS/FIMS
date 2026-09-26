@@ -22,23 +22,30 @@ test_that("`initialize_fims()` works with correct inputs", {
   expect_named(result, c("parameters", "model"))
   #' @description Test that `initialize_fims()` returns a list with two elements.
   expect_equal(length(result), 2)
-  #' @description Test that `initialize_fims()` records the fleet, selectivity, and data-distribution modules of each fleet in the "fleet_modules" attribute.
-  fleet_modules <- attr(result, "fleet_modules")
-  expect_s3_class(fleet_modules, "tbl_df")
-  expect_named(fleet_modules, c("fleet", "module_name", "module_id", "data_type"))
-  expect_setequal(unique(fleet_modules[["fleet"]]), c("fleet1", "survey1"))
+  #' @description Test that `initialize_fims()` records the fleet, selectivity, and data-distribution modules of each fleet, and the recruitment process distribution, in the "module_links" attribute.
+  module_links <- attr(result, "module_links")
+  expect_s3_class(module_links, "tbl_df")
+  expect_named(module_links, c("fleet", "module_name", "module_id", "describes"))
+  expect_setequal(
+    unique(stats::na.omit(module_links[["fleet"]])),
+    c("fleet1", "survey1")
+  )
   expect_equal(
-    sum(fleet_modules[["module_name"]] == "Fleet"),
+    sum(module_links[["module_name"]] == "Fleet"),
     2
   )
   expect_equal(
-    sum(fleet_modules[["module_name"]] == "Selectivity"),
+    sum(module_links[["module_name"]] == "Selectivity"),
     2
   )
   expect_true(all(
-    fleet_modules[["data_type"]][fleet_modules[["module_name"]] == "distribution"] %in%
-      c("index", "catch", "age_comp", "length_comp")
+    module_links[["describes"]][module_links[["module_name"]] == "distribution"] %in%
+      c("index", "catch", "age_comp", "length_comp", "Recruitment log_devs")
   ))
+  expect_equal(
+    sum(module_links[["describes"]] == "Recruitment log_devs", na.rm = TRUE),
+    1
+  )
   clear()
   #' @description Test that `initialize_fims()` returns a list when it is provided parameters that are nested.
   expect_type(

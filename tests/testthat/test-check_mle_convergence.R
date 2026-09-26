@@ -96,7 +96,7 @@ test_that("check_mle_convergence() returns correct outputs for edge cases", {
     regexp = "Optimization failed convergence checks"
   )
 
-  #' @description Test that `check_mle_convergence()` leaves out the gradient name when no gradient is supplied, as in calls made before names were added.
+  #' @description Test that `check_mle_convergence()` leaves out the gradient name when `gradient` is `NULL`.
   warning_text <- tryCatch(
     FIMS:::check_mle_convergence(input, obj, make_mock_mle_opt(), maxgrad = 5),
     warning = conditionMessage
@@ -115,6 +115,20 @@ test_that("check_mle_convergence() returns correct outputs for edge cases", {
       parameter_names = mock_parameter_names[1:2]
     ),
     regexp = "Largest absolute gradient is on \"p[2]\"",
+    fixed = TRUE
+  )
+
+  #' @description Test that `check_mle_convergence()` names a parameter when every gradient is infinite.
+  expect_warning(
+    object = FIMS:::check_mle_convergence(
+      input,
+      obj,
+      make_mock_mle_opt(),
+      maxgrad = Inf,
+      gradient = c(Inf, -Inf, Inf),
+      parameter_names = mock_parameter_names
+    ),
+    regexp = "Largest absolute gradient is on \"Recruitment 1: log_rzero (parameter_id 1)\"",
     fixed = TRUE
   )
 
@@ -214,6 +228,18 @@ test_that("label_values() returns correct outputs for edge cases", {
     expected = c("p[1]", "p[2]", "p[3]")
   )
 
+  #' @description Test that `label_values()` gives each missing label its own fallback label.
+  expect_equal(
+    object = FIMS:::label_values(1:4, c("a", NA, "a", NA)),
+    expected = c("a[1]", "p[2]", "a[2]", "p[4]")
+  )
+
+  #' @description Test that `label_values()` escapes braces so cli shows them rather than evaluating them.
+  expect_equal(
+    object = FIMS:::label_values(1, "survey {north}"),
+    expected = "survey {{north}}"
+  )
+
   #' @description Test that `label_values()` returns an empty character vector for empty input.
   expect_identical(
     object = FIMS:::label_values(numeric(0), character(0)),
@@ -235,27 +261,29 @@ test_that("readable_parameter_labels() works with correct inputs", {
     )
   )
 
-  #' @description Test that `readable_parameter_labels()` adds the fleet name, and the data type for distributions, from the fleet lookup.
-  fleet_modules <- tibble::tibble(
-    fleet = c("fleet1", "survey1", "survey1"),
-    module_name = c("Selectivity", "Fleet", "distribution"),
-    module_id = c(2L, 2L, 7L),
-    data_type = c(NA, NA, "index")
+  #' @description Test that `readable_parameter_labels()` adds the fleet name to fleet modules and what each distribution describes from the module links.
+  module_links <- tibble::tibble(
+    fleet = c("fleet1", "survey1", "survey1", NA),
+    module_name = c("Selectivity", "Fleet", "distribution", "distribution"),
+    module_id = c(2L, 2L, 4L, 7L),
+    describes = c(NA, NA, "index", "Recruitment log_devs")
   )
   expect_equal(
     object = FIMS:::readable_parameter_labels(
       c(
         "Selectivity.2.slope.47",
         "Fleet.2.log_q.366",
+        "dlnorm.4.log_sd.700",
         "dnorm.7.log_sd.763",
         "Recruitment.1.log_devs.729"
       ),
-      fleet_modules
+      module_links
     ),
     expected = c(
       "Selectivity 2 (fleet1): slope (parameter_id 47)",
       "Fleet 2 (survey1): log_q (parameter_id 366)",
-      "dnorm 7 (survey1 index): log_sd (parameter_id 763)",
+      "dlnorm 4 (survey1 index): log_sd (parameter_id 700)",
+      "dnorm 7 (Recruitment log_devs): log_sd (parameter_id 763)",
       "Recruitment 1: log_devs (parameter_id 729)"
     )
   )
@@ -267,7 +295,7 @@ test_that("readable_parameter_labels() returns correct outputs for edge cases", 
   once <- FIMS:::readable_parameter_labels("Selectivity.2.slope.47")
   expect_equal(object = FIMS:::readable_parameter_labels(once), expected = once)
 
-  #' @description Test that `readable_parameter_labels()` leaves out the fleet when a module is not in the lookup.
+  #' @description Test that `readable_parameter_labels()` leaves out the link when a module is not in the module links.
   expect_equal(
     object = FIMS:::readable_parameter_labels(
       "Selectivity.9.slope.47",
@@ -275,10 +303,24 @@ test_that("readable_parameter_labels() returns correct outputs for edge cases", 
         fleet = "fleet1",
         module_name = "Selectivity",
         module_id = 1L,
-        data_type = NA_character_
+        describes = NA_character_
       )
     ),
     expected = "Selectivity 9: slope (parameter_id 47)"
+  )
+
+  #' @description Test that `readable_parameter_labels()` leaves out the link when a module is listed twice in the module links.
+  expect_equal(
+    object = FIMS:::readable_parameter_labels(
+      "Selectivity.1.slope.47",
+      tibble::tibble(
+        fleet = c("fleet1", "survey1"),
+        module_name = "Selectivity",
+        module_id = 1L,
+        describes = NA_character_
+      )
+    ),
+    expected = "Selectivity 1: slope (parameter_id 47)"
   )
 
   #' @description Test that `readable_parameter_labels()` leaves labels that do not follow the FIMS pattern unchanged.

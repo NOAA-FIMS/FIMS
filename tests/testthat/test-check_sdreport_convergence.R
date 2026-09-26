@@ -97,20 +97,6 @@ register_mock_sdreport_summary <- function() {
   registerS3method("summary", "mock_sdreport", summary.mock_sdreport)
 }
 
-# expect_warning() stops at the first warning, so collect every message to
-# check cases where more than one warning is expected
-collect_warnings <- function(expr) {
-  messages <- character()
-  withCallingHandlers(
-    expr,
-    warning = function(w) {
-      messages <<- c(messages, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    }
-  )
-  messages
-}
-
 ill_conditioned_hessian <- diag(c(1, 1e-8, 1e-8))
 
 ## IO correctness ----
@@ -303,6 +289,43 @@ test_that("check_sdreport_convergence() returns correct outputs for edge cases",
   expect_length(warning_text, 2)
   expect_match(warning_text[2], "1. \"Fleet 1: log_q (parameter_id 3)\"", fixed = TRUE)
   expect_no_match(warning_text[2], "NaN|\"a\"|\"b\"")
+
+  #' @description Test that `check_sdreport_convergence()` ranks an infinite standard error first.
+  sdreport <- make_mock_sdreport(
+    fixed_se = c(NA_real_, 1, Inf),
+    random_se = numeric(),
+    report_se = c(0.4, 0.5)
+  )
+  warning_text <- collect_warnings(
+    FIMS:::check_sdreport_convergence(
+      list(),
+      obj,
+      opt,
+      sdreport,
+      parameter_names = c("a", "b", "c")
+    )
+  )
+  expect_match(warning_text[2], "1. \"c\": \"Inf\"", fixed = TRUE)
+
+  #' @description Test that `check_sdreport_convergence()` shows a label containing braces instead of evaluating it.
+  sdreport <- make_mock_sdreport(
+    fixed_se = c(0.2, NA_real_),
+    random_se = numeric(),
+    report_se = c(0.4, 0.5)
+  )
+  obj <- make_mock_obj(random = numeric())
+  expect_warning(
+    object = FIMS:::check_sdreport_convergence(
+      list(),
+      obj,
+      list(par = c(0, 0)),
+      sdreport,
+      parameter_names = c("a", "Fleet 1 (survey {north}): log_q (parameter_id 3)")
+    ),
+    regexp = "survey {north}",
+    fixed = TRUE
+  )
+  obj <- make_mock_obj(random = numeric(), hessian = ill_conditioned_hessian)
 
   #' @description Test that `check_sdreport_convergence()` does not rank when every standard error is NA.
   sdreport <- make_mock_sdreport(
