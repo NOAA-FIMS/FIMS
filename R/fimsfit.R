@@ -640,14 +640,15 @@ fit_fims <- function(input,
   # Labels are looked up here, while the C++ Information singleton is still
   # populated, because TMB names every fixed effect "p" and every random
   # effect "re", which makes convergence messages impossible to act on.
-  # The fleet lookup is only available when `input` came from
-  # initialize_fims(); without it the labels leave out the fleet.
-  fleet_modules <- attr(input, "fleet_modules")
+  # The module links are only available when `input` came from
+  # initialize_fims(); without them the labels leave out the fleet and what a
+  # distribution describes.
+  module_links <- attr(input, "module_links")
   parameter_names <- names(get_parameter_names(obj[["par"]])) |>
-    readable_parameter_labels(fleet_modules)
+    readable_parameter_labels(module_links)
   random_effects_names <- if (length(obj[["env"]][["random"]]) > 0) {
     names(get_random_names(obj[["env"]]$parList()[["re"]])) |>
-      readable_parameter_labels(fleet_modules)
+      readable_parameter_labels(module_links)
   }
   check_mle_convergence(
     input, obj, opt, maxgrad,

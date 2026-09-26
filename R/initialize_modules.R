@@ -864,11 +864,14 @@ initialize_comp <- function(data,
 #' workspace at a time. Thus, after you initialize and fit the model, you should
 #' run [clear()].
 #'
-#' The returned list also carries a `"fleet_modules"` attribute, a tibble with
-#' one row per fleet-related module (`fleet`, `module_name`, `module_id`,
-#' `data_type`). [fit_fims()] uses it to name the fleet in convergence
-#' messages because the C++ module ids alone do not say which fleet a
-#' parameter belongs to.
+#' The returned list also carries a `"module_links"` attribute, a tibble with
+#' one row per module that belongs to something else (`fleet`, `module_name`,
+#' `module_id`, `describes`): each fleet's Fleet, Selectivity, and data
+#' distribution modules, and the process distribution for recruitment
+#' deviations. [fit_fims()] uses it to label parameters in convergence
+#' messages because the C++ module ids alone do not say what a module is for.
+#' Operations that build a new list, e.g., `c()` or `input[c("parameters",
+#' "model")]`, drop the attribute; the labels then leave out the fleet.
 #' @export
 #' @seealso
 #' * [setup_default_parameters()]
@@ -1078,9 +1081,8 @@ initialize_fims <- function(parameters, data) {
     }
   }
 
-  # Recruitment
-  # Record which fleet each module belongs to while the links are known
-  fleet_modules <- purrr::map(seq_along(fleets), \(i) {
+  # Record what each module belongs to while the links are known
+  module_links <- purrr::map(seq_along(fleets), \(i) {
     distributions <- list(
       index = fleet_index_distribution[[i]],
       catch = fleet_catch_distribution[[i]],
@@ -1104,10 +1106,12 @@ initialize_fims <- function(parameters, data) {
         rep("distribution", length(distributions))
       ),
       module_id = module_ids,
-      data_type = c(NA_character_, NA_character_, names(distributions))
+      describes = c(NA_character_, NA_character_, names(distributions))
     )
   }) |>
     dplyr::bind_rows()
+
+  # Recruitment
 
   # create new module in the recruitment class (specifically Beverton--Holt,
   # when there are other options, this would be where the option would be
@@ -1201,6 +1205,13 @@ initialize_fims <- function(parameters, data) {
       family = gaussian(),
       sd = sd_input
     )
+    module_links <- module_links |>
+      tibble::add_row(
+        fleet = NA_character_,
+        module_name = "distribution",
+        module_id = as.integer(recruitment_distribution$get_id()),
+        describes = paste("Recruitment", paste(par, collapse = ", "))
+      )
 
     recruitment_process <- initialize_process_structure(
       module = recruitment,
@@ -1253,7 +1264,7 @@ initialize_fims <- function(parameters, data) {
   )
   # An attribute rather than a list element so the returned list keeps its
   # documented shape
-  attr(parameter_list, "fleet_modules") <- fleet_modules
+  attr(parameter_list, "module_links") <- module_links
 
   return(parameter_list)
 }

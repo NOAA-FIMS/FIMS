@@ -12,7 +12,8 @@
 #' A character vector the same length as `values`. Repeated labels, e.g., the
 #' rows of an ADREPORT vector, are indexed within their name, e.g.,
 #' `"biomass[3]"`. FIMS parameter names are made readable with
-#' [readable_parameter_labels()].
+#' `readable_parameter_labels()`, and braces are escaped so the labels can be
+#' placed in cli messages.
 #' @noRd
 label_values <- function(values, labels = NULL, fallback = "p") {
   n <- length(values)
@@ -26,12 +27,16 @@ label_values <- function(values, labels = NULL, fallback = "p") {
     return(sprintf("%s[%d]", fallback, seq_len(n)))
   }
   labels <- as.character(labels)
+  # A missing label cannot be indexed within its name, so fall back per value
+  labels[is.na(labels)] <- sprintf("%s[%d]", fallback, which(is.na(labels)))
   position <- stats::ave(seq_len(n), labels, FUN = seq_along)
   repeated <- duplicated(labels) | duplicated(labels, fromLast = TRUE)
-  # Labels end up inside cli_warn(), which interpolates `{}` again; FIMS
-  # parameter and ADREPORT names never contain braces.
   ifelse(repeated, sprintf("%s[%d]", labels, position), labels) |>
-    readable_parameter_labels()
+    readable_parameter_labels() |>
+    # Labels are formatted with cli::format_inline() and then passed to
+    # cli::cli_warn(), which interpolates `{}` a second time. Fleet names come
+    # from the user, so a brace in a name would otherwise be evaluated as code.
+    gsub(pattern = "([{}])", replacement = "\\1\\1")
 }
 
 #' Make FIMS parameter names readable
@@ -42,10 +47,12 @@ label_values <- function(values, labels = NULL, fallback = "p") {
 #' [get_estimates()] so users can find the row.
 #'
 #' @param labels A character vector of labels.
-#' @param fleet_modules A tibble with the columns `fleet`, `module_name`,
-#'   `module_id`, and `data_type`, i.e., the `"fleet_modules"` attribute of the
+#' @param module_links A tibble with the columns `fleet`, `module_name`,
+#'   `module_id`, and `describes`, i.e., the `"module_links"` attribute of the
 #'   list returned by [initialize_fims()], or `NULL`. When supplied, the fleet
-#'   name is added to fleet, selectivity, and data-distribution parameters.
+#'   name is added to fleet, selectivity, and data-distribution parameters, and
+#'   process-distribution parameters say what they describe, e.g.,
+#'   `"dnorm 7 (Recruitment log_devs): log_sd (parameter_id 763)"`.
 #' @return
 #' A character vector the same length as `labels`, e.g.,
 #' `"Selectivity 2 (survey1): slope (parameter_id 47)"`, or without the fleet
@@ -53,51 +60,55 @@ label_values <- function(values, labels = NULL, fallback = "p") {
 #' `"p[2]"` or `"biomass[3]"`, are returned unchanged, so the function can be
 #' applied more than once.
 #' @noRd
-readable_parameter_labels <- function(labels, fleet_modules = NULL) {
-  # Distribution modules share one id counter in C++, so any distribution
-  # prefix is looked up under the same name
-  distribution_prefixes <- c("dnorm", "dlnorm", "dmultinom")
-  fleet_alias <- function(module_name, module_id) {
-    if (is.null(fleet_modules) || nrow(fleet_modules) == 0) {
-      return(NULL)
-    }
-    lookup_name <- if (module_name %in% distribution_prefixes) {
-      "distribution"
-    } else {
-      module_name
-    }
-    match <- fleet_modules[
-      fleet_modules[["module_name"]] == lookup_name &
-        fleet_modules[["module_id"]] == as.integer(module_id), ,
-      drop = FALSE
-    ]
-    if (nrow(match) != 1) {
-      return(NULL)
-    }
-    paste(stats::na.omit(c(match[["fleet"]], match[["data_type"]])), collapse = " ")
+readable_parameter_labels <- function(labels, module_links = NULL) {
+  # Same pieces as reshape_tmb_estimates(), but only for labels that have all
+  # four so other labels, e.g., "p[2]" or already readable ones, are unchanged
+  fims_pattern <- "^([^.]+)\\.([0-9]+)\\.([^.]+)\\.([0-9]+)$"
+  is_fims_name <- grepl(fims_pattern, labels)
+  if (!any(is_fims_name)) {
+    return(labels)
   }
-  # Same split as reshape_tmb_estimates(), but only applied when all four
-  # pieces are present so other labels are never mangled
-  pieces <- strsplit(labels, split = ".", fixed = TRUE)
-  vapply(
-    seq_along(labels),
-    function(i) {
-      piece <- pieces[[i]]
-      is_fims_name <- length(piece) == 4 &&
-        grepl("^[0-9]+$", piece[[2]]) &&
-        grepl("^[0-9]+$", piece[[4]])
-      if (!is_fims_name) {
-        return(labels[[i]])
-      }
-      alias <- fleet_alias(piece[[1]], piece[[2]])
-      module <- paste(piece[[1]], piece[[2]])
-      if (!is.null(alias)) {
-        module <- paste0(module, " (", alias, ")")
-      }
-      sprintf("%s: %s (parameter_id %s)", module, piece[[3]], piece[[4]])
-    },
-    character(1)
+  fims_names <- labels[is_fims_name]
+  module_name <- sub(fims_pattern, "\\1", fims_names)
+  module_id <- sub(fims_pattern, "\\2", fims_names)
+  label <- sub(fims_pattern, "\\3", fims_names)
+  parameter_id <- sub(fims_pattern, "\\4", fims_names)
+
+  alias <- rep(NA_character_, length(fims_names))
+  if (!is.null(module_links) && nrow(module_links) > 0) {
+    # Distribution modules share one id counter in C++, so any distribution
+    # prefix is looked up under the same name
+    lookup_name <- ifelse(
+      module_name %in% c("dnorm", "dlnorm", "dmultinom"),
+      "distribution",
+      module_name
+    )
+    link_keys <- paste(
+      module_links[["module_name"]],
+      module_links[["module_id"]]
+    )
+    fleet <- module_links[["fleet"]]
+    describes <- module_links[["describes"]]
+    link_text <- paste(
+      ifelse(is.na(fleet), "", fleet),
+      ifelse(is.na(describes), "", describes)
+    ) |>
+      trimws()
+    # A module listed twice is ambiguous, so it is left without an alias
+    ambiguous <- duplicated(link_keys) | duplicated(link_keys, fromLast = TRUE)
+    link_text[ambiguous | link_text == ""] <- NA_character_
+    alias <- link_text[match(paste(lookup_name, module_id), link_keys)]
+  }
+  module <- ifelse(
+    is.na(alias),
+    paste(module_name, module_id),
+    paste0(module_name, " ", module_id, " (", alias, ")")
   )
+  labels[is_fims_name] <- sprintf(
+    "%s: %s (parameter_id %s)",
+    module, label, parameter_id
+  )
+  labels
 }
 
 #' Check convergence of nlminb optimization
@@ -138,9 +149,10 @@ check_mle_convergence <- function(
   convergence_issues <- c()
   convergence_warnings <- c()
 
-  # which.max() drops NaN, so an all-NaN gradient would give an empty label
+  # which.max() drops NA and NaN, so an all-NaN gradient would give an empty
+  # label; Inf is kept because it is the most informative gradient to name
   largest_gradient_message <- NULL
-  if (length(gradient) > 0 && any(is.finite(gradient))) {
+  if (length(gradient) > 0 && any(!is.na(gradient))) {
     largest_gradient_label <- label_values(gradient, parameter_names)[
       which.max(abs(gradient))
     ]
@@ -393,9 +405,9 @@ check_sdreport_convergence <- function(
         }
         std_errors <- ranked_summary[, "Std. Error"]
         # NA and NaN standard errors are reported by Check 2 and would
-        # otherwise be listed here as the "largest"
+        # otherwise be listed here as the "largest"; Inf is kept and ranks first
         ranked <- order(std_errors, decreasing = TRUE)
-        ranked <- ranked[is.finite(std_errors[ranked])]
+        ranked <- ranked[!is.na(std_errors[ranked])]
         if (length(ranked) == 0) {
           NULL
         } else {
@@ -426,9 +438,12 @@ check_sdreport_convergence <- function(
           vapply(
             seq_len(n_show),
             function(i) {
+              std_error <- format(
+                largest_se[["std_error"]][i],
+                scientific = TRUE
+              )
               cli::format_inline(
-                "{i}. {.val {largest_se[['label']][i]}}:
-                {.val {format(largest_se[['std_error']][i], scientific = TRUE)}}"
+                "{i}. {.val {largest_se[['label']][i]}}: {.val {std_error}}"
               )
             },
             character(1)

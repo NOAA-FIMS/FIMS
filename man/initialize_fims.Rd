@@ -30,6 +30,14 @@ model.
 It is important that you only have one FIMS model initialized in your R
 workspace at a time. Thus, after you initialize and fit the model, you should
 run \code{\link[=clear]{clear()}}.
+
+The returned list also carries a \code{"module_links"} attribute, a tibble with
+one row per module that belongs to something else (\code{fleet}, \code{module_name},
+\code{module_id}, \code{describes}): each fleet's Fleet, Selectivity, and data
+distribution modules, and the process distribution for recruitment
+deviations. \code{\link[=fit_fims]{fit_fims()}} uses it to label parameters in convergence
+messages because the C++ module ids alone do not say what a module is for.
+Operations that build a new list, e.g., \code{c()} or \code{input[c("parameters", "model")]}, drop the attribute; the labels then leave out the fleet.
 }
 \description{
 This function uses information from a parameter data frame that stores the
