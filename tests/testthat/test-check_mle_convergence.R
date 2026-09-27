@@ -96,12 +96,13 @@ test_that("check_mle_convergence() returns correct outputs for edge cases", {
     regexp = "Optimization failed convergence checks"
   )
 
-  #' @description Test that `check_mle_convergence()` leaves out the gradient name when `gradient` is `NULL`.
   warning_text <- tryCatch(
     FIMS:::check_mle_convergence(input, obj, make_mock_mle_opt(), maxgrad = 5),
     warning = conditionMessage
   )
+  #' @description Test that `check_mle_convergence()` keeps the gradient message when `gradient` is `NULL`.
   expect_match(warning_text, "Model does not seem converged")
+  #' @description Test that `check_mle_convergence()` leaves out the gradient name when `gradient` is `NULL`.
   expect_no_match(warning_text, "Largest absolute gradient")
 
   #' @description Test that `check_mle_convergence()` falls back to indexed labels when the names do not line up with the gradient.
@@ -190,156 +191,5 @@ test_that("check_mle_convergence() returns correct error messages", {
       )
     },
     .package = "FIMS"
-  )
-})
-
-# label_values ----
-## IO correctness ----
-test_that("label_values() works with correct inputs", {
-  #' @description Test that `label_values()` returns readable FIMS parameter names when they are unique and line up with the values.
-  expect_equal(
-    object = FIMS:::label_values(1:3, mock_parameter_names),
-    expected = c(
-      "Recruitment 1: log_rzero (parameter_id 1)",
-      "Selectivity 2: slope (parameter_id 47)",
-      "Fleet 1: log_q (parameter_id 3)"
-    )
-  )
-
-  #' @description Test that `label_values()` indexes repeated labels within their name, as for ADREPORT vectors.
-  expect_equal(
-    object = FIMS:::label_values(1:4, c("biomass", "biomass", "ssb", "biomass")),
-    expected = c("biomass[1]", "biomass[2]", "ssb", "biomass[3]")
-  )
-})
-
-## Edge handling ----
-test_that("label_values() returns correct outputs for edge cases", {
-  #' @description Test that `label_values()` indexes the fallback, even for a single value, so a bare "p" is never shown.
-  expect_equal(object = FIMS:::label_values(0.1), expected = "p[1]")
-  expect_equal(
-    object = FIMS:::label_values(1:2, NULL, fallback = "re"),
-    expected = c("re[1]", "re[2]")
-  )
-
-  #' @description Test that `label_values()` uses the fallback when the labels do not line up with the values.
-  expect_equal(
-    object = FIMS:::label_values(1:3, c("a", "b")),
-    expected = c("p[1]", "p[2]", "p[3]")
-  )
-
-  #' @description Test that `label_values()` gives each missing label its own fallback label.
-  expect_equal(
-    object = FIMS:::label_values(1:4, c("a", NA, "a", NA)),
-    expected = c("a[1]", "p[2]", "a[2]", "p[4]")
-  )
-
-  #' @description Test that `label_values()` escapes braces so cli shows them rather than evaluating them.
-  expect_equal(
-    object = FIMS:::label_values(1, "survey {north}"),
-    expected = "survey {{north}}"
-  )
-
-  #' @description Test that `label_values()` returns an empty character vector for empty input.
-  expect_identical(
-    object = FIMS:::label_values(numeric(0), character(0)),
-    expected = character(0)
-  )
-})
-
-# readable_parameter_labels ----
-## IO correctness ----
-test_that("readable_parameter_labels() works with correct inputs", {
-  #' @description Test that `readable_parameter_labels()` splits FIMS names into module name, module id, label, and parameter id.
-  expect_equal(
-    object = FIMS:::readable_parameter_labels(
-      c("Selectivity.2.slope.47", "Recruitment.1.log_devs.729")
-    ),
-    expected = c(
-      "Selectivity 2: slope (parameter_id 47)",
-      "Recruitment 1: log_devs (parameter_id 729)"
-    )
-  )
-
-  #' @description Test that `readable_parameter_labels()` adds the fleet name to fleet modules and what each distribution describes from the module links.
-  module_links <- tibble::tibble(
-    fleet = c("fleet1", "survey1", "survey1", NA),
-    module_name = c("Selectivity", "Fleet", "distribution", "distribution"),
-    module_id = c(2L, 2L, 4L, 7L),
-    describes = c(NA, NA, "index", "Recruitment log_devs")
-  )
-  expect_equal(
-    object = FIMS:::readable_parameter_labels(
-      c(
-        "Selectivity.2.slope.47",
-        "Fleet.2.log_q.366",
-        "dlnorm.4.log_sd.700",
-        "dnorm.7.log_sd.763",
-        "Recruitment.1.log_devs.729"
-      ),
-      module_links
-    ),
-    expected = c(
-      "Selectivity 2 (fleet1): slope (parameter_id 47)",
-      "Fleet 2 (survey1): log_q (parameter_id 366)",
-      "dlnorm 4 (survey1 index): log_sd (parameter_id 700)",
-      "dnorm 7 (Recruitment log_devs): log_sd (parameter_id 763)",
-      "Recruitment 1: log_devs (parameter_id 729)"
-    )
-  )
-})
-
-## Edge handling ----
-test_that("readable_parameter_labels() returns correct outputs for edge cases", {
-  #' @description Test that `readable_parameter_labels()` leaves labels unchanged when applied a second time.
-  once <- FIMS:::readable_parameter_labels("Selectivity.2.slope.47")
-  expect_equal(object = FIMS:::readable_parameter_labels(once), expected = once)
-
-  #' @description Test that `readable_parameter_labels()` leaves out the link when a module is not in the module links.
-  expect_equal(
-    object = FIMS:::readable_parameter_labels(
-      "Selectivity.9.slope.47",
-      tibble::tibble(
-        fleet = "fleet1",
-        module_name = "Selectivity",
-        module_id = 1L,
-        describes = NA_character_
-      )
-    ),
-    expected = "Selectivity 9: slope (parameter_id 47)"
-  )
-
-  #' @description Test that `readable_parameter_labels()` leaves out the link when a module is listed twice in the module links.
-  expect_equal(
-    object = FIMS:::readable_parameter_labels(
-      "Selectivity.1.slope.47",
-      tibble::tibble(
-        fleet = c("fleet1", "survey1"),
-        module_name = "Selectivity",
-        module_id = 1L,
-        describes = NA_character_
-      )
-    ),
-    expected = "Selectivity 1: slope (parameter_id 47)"
-  )
-
-  #' @description Test that `readable_parameter_labels()` leaves labels that do not follow the FIMS pattern unchanged.
-  other_labels <- c(
-    "p[2]",
-    "biomass[3]",
-    "fixed_1",
-    "a.b.c.d",
-    "Fleet.1.log_q",
-    "Fleet.1.log.q.3"
-  )
-  expect_equal(
-    object = FIMS:::readable_parameter_labels(other_labels),
-    expected = other_labels
-  )
-
-  #' @description Test that `readable_parameter_labels()` returns an empty character vector for empty input.
-  expect_identical(
-    object = FIMS:::readable_parameter_labels(character(0)),
-    expected = character(0)
   )
 })

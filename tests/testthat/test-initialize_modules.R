@@ -22,26 +22,32 @@ test_that("`initialize_fims()` works with correct inputs", {
   expect_named(result, c("parameters", "model"))
   #' @description Test that `initialize_fims()` returns a list with two elements.
   expect_equal(length(result), 2)
-  #' @description Test that `initialize_fims()` records the fleet, selectivity, and data-distribution modules of each fleet, and the recruitment process distribution, in the "module_links" attribute.
   module_links <- attr(result, "module_links")
+  #' @description Test that `initialize_fims()` returns a "module_links" attribute that is a tibble.
   expect_s3_class(module_links, "tbl_df")
+  #' @description Test that `initialize_fims()` returns a "module_links" attribute with the fleet, module name, module id, and describes columns.
   expect_named(module_links, c("fleet", "module_name", "module_id", "describes"))
+  #' @description Test that `initialize_fims()` records the modules of every fleet in the "module_links" attribute.
   expect_setequal(
     unique(stats::na.omit(module_links[["fleet"]])),
     c("fleet1", "survey1")
   )
+  #' @description Test that `initialize_fims()` records one fleet module per fleet in the "module_links" attribute.
   expect_equal(
     sum(module_links[["module_name"]] == "Fleet"),
     2
   )
+  #' @description Test that `initialize_fims()` records one selectivity module per fleet in the "module_links" attribute.
   expect_equal(
     sum(module_links[["module_name"]] == "Selectivity"),
     2
   )
+  #' @description Test that `initialize_fims()` records what each distribution in the "module_links" attribute describes.
   expect_true(all(
     module_links[["describes"]][module_links[["module_name"]] == "distribution"] %in%
       c("index", "catch", "age_comp", "length_comp", "Recruitment log_devs")
   ))
+  #' @description Test that `initialize_fims()` records the recruitment process distribution once in the "module_links" attribute.
   expect_equal(
     sum(module_links[["describes"]] == "Recruitment log_devs", na.rm = TRUE),
     1
