@@ -128,7 +128,8 @@ readable_parameter_labels <- function(parameter_labels,
     )
     for (dimension in c("timing", "age", "length")) {
       dimension_value <- parameter_links[[dimension]][link_row]
-      # FIMS uses timing for the year
+      # FIMS uses timing for the year; update the wording here if timing ever
+      # holds something other than a year, e.g., seasons
       dimension_name <- if (dimension == "timing") "year" else dimension
       label <- ifelse(
         is.na(dimension_value),

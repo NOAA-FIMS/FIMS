@@ -1256,6 +1256,8 @@ initialize_fims <- function(parameters, data) {
   # An attribute rather than a list element so the returned list keeps its
   # documented shape
   attr(parameter_list, "module_links") <- module_links
+  # One call per module type that holds parameter vectors; a new module type
+  # needs a call here for its labels to show the year, age, or length
   attr(parameter_list, "parameter_links") <- dplyr::bind_rows(
     purrr::map(seq_along(fleets), \(i) {
       dplyr::bind_rows(
@@ -1314,7 +1316,9 @@ arrange_growth_reference_rows <- function(parameters) {
 #' @return
 #' A tibble with the columns `parameter_id`, `timing`, `age`, and `length` and
 #' one row per parameter element. Labels that are not parameter vectors of the
-#' module, e.g., a distribution's `log_sd`, are skipped.
+#' module, e.g., a distribution's `log_sd`, are skipped, as are labels whose
+#' element values do not match the rows in order, so a pairing that cannot be
+#' trusted is left out instead of recorded wrongly.
 #' @noRd
 link_module_parameters <- function(module,
                                    parameters,
@@ -1345,6 +1349,23 @@ link_module_parameters <- function(module,
       dplyr::filter(.data$label == !!label)
     # Only vectors that set_param_vector() filled from these rows line up
     if (element_count == 0 || element_count != nrow(label_rows)) {
+      return(NULL)
+    }
+    # Rows and elements are paired by position, which relies on the rows being
+    # in the order initialize_module() used. If an initialize_*() function
+    # reorders rows without going through this function, the element values
+    # no longer match the rows, and no links are recorded rather than wrong
+    # ones. Rows with equal values cannot be told apart this way.
+    element_values <- vapply(
+      seq_len(element_count),
+      \(i) as.numeric(parameter_vector[i][["value"]]),
+      numeric(1)
+    )
+    if (!isTRUE(all.equal(
+      element_values,
+      as.numeric(label_rows[["value"]]),
+      check.attributes = FALSE
+    ))) {
       return(NULL)
     }
     tibble::tibble(

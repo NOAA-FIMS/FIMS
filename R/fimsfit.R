@@ -266,7 +266,8 @@ methods::setMethod(
     # The model output reports every fleet as "NA" and writes selectivity
     # separately from its fleet, so the fleet name comes from the links
     # recorded by initialize_fims(). The names are not set in C++ because the
-    # JSON formatter removes whitespace inside strings.
+    # JSON formatter removes whitespace inside strings; once the model output
+    # carries fleet names (NOAA-FIMS/FIMS#1748), this join can be removed.
     module_links <- attr(get_input(x), "module_links")
     if (is.null(module_links) || nrow(module_links) == 0) {
       return(estimates)
