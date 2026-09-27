@@ -96,6 +96,103 @@ test_that("`initialize_fims()` works with correct inputs", {
 })
 
 ## Edge handling ----
+test_that("`initialize_fims()` links parameters for other module types", {
+  estimated_module_ids <- function() {
+    names(get_parameter_names(get_fixed())) |>
+      grep(
+        pattern = "^d[a-z]+\\.",
+        invert = TRUE,
+        value = TRUE
+      ) |>
+      sub(pattern = ".*\\.", replacement = "") |>
+      as.integer()
+  }
+  all_fixed <- default_parameters |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$estimation_type == "random_effects",
+        "fixed_effects",
+        .data$estimation_type
+      )
+    )
+
+  log_m_estimated <- all_fixed |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$label == "log_M",
+        "fixed_effects",
+        .data$estimation_type
+      )
+    )
+  result <- initialize_fims(parameters = log_m_estimated, data = data)
+  #' @description Test that `initialize_fims()` links every estimated parameter when `log_M` varies by year and age.
+  expect_true(all(
+    estimated_module_ids() %in% attr(result, "parameter_links")[["parameter_id"]]
+  ))
+  clear()
+
+  other_selectivity <- all_fixed |>
+    dplyr::filter(.data$module_name != "Selectivity") |>
+    dplyr::bind_rows(
+      setup_default_Selectivity(
+        data = data,
+        fleet = "fleet1",
+        module_type = "DoubleLogistic"
+      ),
+      setup_default_Selectivity(
+        data = data,
+        fleet = "survey1",
+        module_type = "AgeSpecific"
+      )
+    )
+  result <- initialize_fims(parameters = other_selectivity, data = data)
+  #' @description Test that `initialize_fims()` links every estimated parameter with double-logistic and age-specific selectivity.
+  expect_true(all(
+    estimated_module_ids() %in% attr(result, "parameter_links")[["parameter_id"]]
+  ))
+  clear()
+})
+
+test_that("`link_module_parameters()` leaves out rows that do not match", {
+  age_specific <- default_parameters |>
+    dplyr::filter(
+      !(.data$module_name == "Selectivity" & .data$fleet == "fleet1")
+    ) |>
+    dplyr::bind_rows(
+      setup_default_Selectivity(
+        data = data,
+        fleet = "fleet1",
+        module_type = "AgeSpecific"
+      )
+    )
+  selectivity <- FIMS:::initialize_selectivity(
+    parameters = age_specific,
+    data = data,
+    fleet = "fleet1"
+  )
+  #' @description Test that `link_module_parameters()` links each age-specific selectivity element when the rows are in module order.
+  expect_equal(
+    object = nrow(FIMS:::link_module_parameters(
+      selectivity, age_specific, "Selectivity", "fleet1"
+    )),
+    expected = get_n_ages(data)
+  )
+  selectivity_rows <- which(
+    age_specific[["module_name"]] == "Selectivity" &
+      age_specific[["fleet"]] == "fleet1"
+  )
+  reordered <- age_specific
+  reordered[selectivity_rows, ] <- age_specific[rev(selectivity_rows), ]
+  #' @description Test that `link_module_parameters()` records no links when the rows are not in the order the module was filled from.
+  expect_equal(
+    object = nrow(FIMS:::link_module_parameters(
+      selectivity, reordered, "Selectivity", "fleet1"
+    )),
+    expected = 0
+  )
+  clear()
+})
+
 test_that("`initialize_fims()` links unsorted growth reference ages", {
   #' @description Test that `initialize_fims()` links each von Bertalanffy reference-age standard deviation to its own age when the rows are not sorted by age.
   vonb_parameters <- default_parameters |>
