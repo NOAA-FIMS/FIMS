@@ -4,10 +4,10 @@
 #' specific parameter or derived quantity.
 #'
 #' @param values A vector of values, e.g., gradients or standard errors.
-#' @param labels A character vector of labels with the same length as
+#' @param value_labels A character vector of labels with the same length as
 #'   `values`, or `NULL`.
 #' @param fallback A string used to build labels, e.g., `"p[2]"`, when
-#'   `labels` is `NULL` or does not line up with `values`.
+#'   `value_labels` is `NULL` or does not line up with `values`.
 #' @return
 #' A character vector the same length as `values`. Repeated labels, e.g., the
 #' rows of an ADREPORT vector, are indexed within their name, e.g.,
@@ -15,7 +15,7 @@
 #' `readable_parameter_labels()`, and braces are escaped so the labels can be
 #' placed in cli messages.
 #' @noRd
-label_values <- function(values, labels = NULL, fallback = "p") {
+label_values <- function(values, value_labels = NULL, fallback = "p") {
   n <- length(values)
   if (n == 0) {
     return(character(0))
@@ -23,18 +23,22 @@ label_values <- function(values, labels = NULL, fallback = "p") {
   # A length mismatch means the labels cannot be trusted to line up, so index
   # the fallback rather than risk naming the wrong parameter. The fallback is
   # always indexed so a message never shows a bare "p".
-  if (is.null(labels) || length(labels) != n) {
+  if (is.null(value_labels) || length(value_labels) != n) {
     return(sprintf("%s[%d]", fallback, seq_len(n)))
   }
-  labels <- as.character(labels)
+  value_labels <- as.character(value_labels)
   # A missing label cannot be indexed within its name, so fall back per value
-  labels[is.na(labels)] <- sprintf("%s[%d]", fallback, which(is.na(labels)))
+  missing_label <- is.na(value_labels)
+  value_labels[missing_label] <- sprintf(
+    "%s[%d]", fallback, which(missing_label)
+  )
   # Repeated labels are indexed before they are made readable, so an indexed
   # FIMS name keeps its raw form; FIMS names are unique, so only other labels,
   # e.g., ADREPORT names, are ever indexed
-  position <- stats::ave(seq_len(n), labels, FUN = seq_along)
-  repeated <- duplicated(labels) | duplicated(labels, fromLast = TRUE)
-  ifelse(repeated, sprintf("%s[%d]", labels, position), labels) |>
+  position <- stats::ave(seq_len(n), value_labels, FUN = seq_along)
+  repeated <- duplicated(value_labels) |
+    duplicated(value_labels, fromLast = TRUE)
+  ifelse(repeated, sprintf("%s[%d]", value_labels, position), value_labels) |>
     readable_parameter_labels() |>
     # Labels are formatted with cli::format_inline() and then passed to
     # cli::cli_warn(), which interpolates `{}` a second time. Fleet names come
@@ -49,7 +53,7 @@ label_values <- function(values, labels = NULL, fallback = "p") {
 #' warning. This splits them into the same pieces as the `module_name`,
 #' `module_id`, `label`, and `parameter_id` columns of [get_estimates()].
 #'
-#' @param labels A character vector of labels.
+#' @param parameter_labels A character vector of labels.
 #' @param module_links A tibble with the columns `fleet`, `module_name`,
 #'   `module_id`, and `describes`, i.e., the `"module_links"` attribute of the
 #'   list returned by [initialize_fims()], or `NULL`. When supplied, the fleet
@@ -57,21 +61,21 @@ label_values <- function(values, labels = NULL, fallback = "p") {
 #'   process-distribution parameters say what they describe, e.g.,
 #'   `"dnorm 7 (Recruitment log_devs): log_sd (parameter_id 763)"`.
 #' @return
-#' A character vector the same length as `labels`, e.g.,
+#' A character vector the same length as `parameter_labels`, e.g.,
 #' `"Selectivity 2 (survey1): slope (parameter_id 47)"`, or without the fleet
 #' when it is unknown. Labels that do not follow the FIMS pattern, e.g.,
 #' `"p[2]"` or `"biomass[3]"`, are returned unchanged, so the function can be
 #' applied more than once.
 #' @noRd
-readable_parameter_labels <- function(labels, module_links = NULL) {
+readable_parameter_labels <- function(parameter_labels, module_links = NULL) {
   # Same pieces as reshape_tmb_estimates(), but only for labels that have all
   # four so other labels, e.g., "p[2]" or already readable ones, are unchanged
   fims_pattern <- "^([^.]+)\\.([0-9]+)\\.([^.]+)\\.([0-9]+)$"
-  is_fims_name <- grepl(fims_pattern, labels)
+  is_fims_name <- grepl(fims_pattern, parameter_labels)
   if (!any(is_fims_name)) {
-    return(labels)
+    return(parameter_labels)
   }
-  fims_names <- labels[is_fims_name]
+  fims_names <- parameter_labels[is_fims_name]
   module_name <- sub(fims_pattern, "\\1", fims_names)
   module_id <- sub(fims_pattern, "\\2", fims_names)
   label <- sub(fims_pattern, "\\3", fims_names)
@@ -107,11 +111,11 @@ readable_parameter_labels <- function(labels, module_links = NULL) {
     paste(module_name, module_id),
     paste0(module_name, " ", module_id, " (", alias, ")")
   )
-  labels[is_fims_name] <- sprintf(
+  parameter_labels[is_fims_name] <- sprintf(
     "%s: %s (parameter_id %s)",
     module, label, parameter_id
   )
-  labels
+  parameter_labels
 }
 
 #' Check convergence of nlminb optimization
@@ -280,28 +284,32 @@ check_sdreport_convergence <- function(
   has_random_effects <- length(obj[["env"]][["random"]]) > 0
   # TMB labels every fixed effect "p" and every random effect "re", so prefer
   # the FIMS names and only fall back to the summary row names without them.
-  summary_labels <- function(summary_matrix, names, fallback) {
-    labels <- if (is.null(names)) rownames(summary_matrix) else names
-    label_values(summary_matrix[, "Std. Error"], labels, fallback)
+  summary_labels <- function(summary_matrix, preferred_labels, fallback) {
+    row_labels <- if (is.null(preferred_labels)) {
+      rownames(summary_matrix)
+    } else {
+      preferred_labels
+    }
+    label_values(summary_matrix[, "Std. Error"], row_labels, fallback)
   }
-  format_na_se_issue <- function(std_errors, labels, noun) {
+  format_na_se_issue <- function(std_errors, value_labels, noun) {
     is_na <- is.na(std_errors)
     na_se <- sum(is_na)
     if (na_se == 0) {
       return(NULL)
     }
     # Long models can have hundreds of NA standard errors, so only name a few
-    shown <- utils::head(labels[is_na], 5)
+    shown <- utils::head(value_labels[is_na], 5)
     n_more <- na_se - length(shown)
     # qty() is needed because cli otherwise pluralizes on the length of `noun`
-    message <- cli::format_inline(
+    issue_text <- cli::format_inline(
       "{na_se} {noun}{cli::qty(na_se)}{?s} {?has/have} NA standard
       error{?s}: {.val {shown}}"
     )
     if (n_more > 0) {
-      message <- paste0(message, " (", n_more, " more not shown)")
+      issue_text <- paste0(issue_text, " (", n_more, " more not shown)")
     }
-    paste0(message, ".")
+    paste0(issue_text, ".")
   }
 
   # Check 1: Hessian is invertible (positive definite)
@@ -401,7 +409,7 @@ check_sdreport_convergence <- function(
       if (is.null(ranked_summary) || nrow(ranked_summary) == 0) {
         NULL
       } else {
-        labels <- if (has_random_effects) {
+        ranked_labels <- if (has_random_effects) {
           summary_labels(ranked_summary, random_effects_names, "re")
         } else {
           summary_labels(ranked_summary, parameter_names, "p")
@@ -415,7 +423,10 @@ check_sdreport_convergence <- function(
           NULL
         } else {
           utils::head(
-            data.frame(label = labels[ranked], std_error = std_errors[ranked]),
+            data.frame(
+              label = ranked_labels[ranked],
+              std_error = std_errors[ranked]
+            ),
             2
           )
         }
@@ -502,7 +513,7 @@ check_sdreport_convergence <- function(
   if (length(se_check_result[["issues"]]) > 0) {
     cli::cli_warn(c(
       "x" = "sdreport convergence issues detected:",
-      setNames(
+      stats::setNames(
         se_check_result[["issues"]],
         rep("i", length(se_check_result[["issues"]]))
       )
@@ -511,7 +522,7 @@ check_sdreport_convergence <- function(
   if (length(hessian_check_result[["warnings"]]) > 0) {
     cli::cli_warn(c(
       "!" = "Large condition number detected in Hessian; the matrix may be near singular.",
-      setNames(
+      stats::setNames(
         hessian_check_result[["warnings"]],
         rep("i", length(hessian_check_result[["warnings"]]))
       )
