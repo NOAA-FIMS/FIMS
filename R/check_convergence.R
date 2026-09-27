@@ -84,9 +84,12 @@ readable_parameter_labels <- function(parameter_labels, module_links = NULL) {
   alias <- rep(NA_character_, length(fims_names))
   if (!is.null(module_links) && nrow(module_links) > 0) {
     # Distribution modules share one id counter in C++, so any distribution
-    # prefix is looked up under the same name
+    # prefix is looked up under the same name. Distributions register their
+    # parameters under R-style lowercase names (dnorm, dlnorm, ...) while
+    # modules use capitalized names, so the pattern also covers distributions
+    # added later.
     lookup_name <- ifelse(
-      module_name %in% c("dnorm", "dlnorm", "dmultinom"),
+      grepl("^d[a-z]+$", module_name),
       "distribution",
       module_name
     )

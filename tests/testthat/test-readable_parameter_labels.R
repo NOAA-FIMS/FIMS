@@ -54,6 +54,20 @@ test_that("readable_parameter_labels() works with correct inputs", {
 
 ## Edge handling ----
 test_that("readable_parameter_labels() returns correct outputs for edge cases", {
+  #' @description Test that `readable_parameter_labels()` links a distribution it has not seen before by its lowercase name.
+  expect_equal(
+    object = FIMS:::readable_parameter_labels(
+      "dgamma.8.log_shape.900",
+      tibble::tibble(
+        fleet = NA_character_,
+        module_name = "distribution",
+        module_id = 8L,
+        describes = "Growth log_k"
+      )
+    ),
+    expected = "dgamma 8 (Growth log_k): log_shape (parameter_id 900)"
+  )
+
   #' @description Test that `readable_parameter_labels()` leaves labels unchanged when applied a second time.
   once <- FIMS:::readable_parameter_labels("Selectivity.2.slope.47")
   expect_equal(object = FIMS:::readable_parameter_labels(once), expected = once)

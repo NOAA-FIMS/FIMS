@@ -1081,7 +1081,10 @@ initialize_fims <- function(parameters, data) {
     }
   }
 
-  # Record what each module belongs to while the links are known
+  # Record what each module belongs to while the links are known. New modules
+  # that belong to a fleet, and new process distributions, need a row here for
+  # convergence labels to say what they belong to; without one the label
+  # simply leaves that part out.
   module_links <- purrr::map(seq_along(fleets), \(i) {
     distributions <- list(
       index = fleet_index_distribution[[i]],
