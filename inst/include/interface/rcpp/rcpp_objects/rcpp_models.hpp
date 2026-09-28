@@ -366,7 +366,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << "{\n";
 
       ss << " \"module_name\": \"Population\",\n";
-      ss << " \"population\": \"" << population_interface->name << "\",\n";
+      ss << " \"population\": \""
+         << fims::JsonParser::EscapeString(population_interface->name.get())
+         << "\",\n";
       ss << " \"module_id\": " << population_interface->id << ",\n";
       ss << " \"recruitment_id\": " << population_interface->recruitment_id
          << ",\n";
@@ -632,7 +634,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
       ss << "{\n";
       ss << " \"module_name\": \"Fleet\",\n";
-      ss << " \"fleet\": \"" << fleet_interface->name << "\",\n";
+      ss << " \"fleet\": \""
+         << fims::JsonParser::EscapeString(fleet_interface->name.get())
+         << "\",\n";
       ss << " \"module_id\": " << fleet_interface->id << ",\n";
       ss << " \"n_ages\": " << fleet_interface->n_ages.get() << ",\n";
       ss << " \"n_years\": " << fleet_interface->n_years.get() << ",\n";
