@@ -100,14 +100,59 @@ JsonValue JsonParser::ParseNumber() {
  */
 JsonValue JsonParser::ParseString() {
   position++;  // Skip the initial '"'
-  size_t end_pos = data.find('"', position);
-  if (end_pos == std::string::npos) {
-    std::string str = data.substr(position);
-    position = data.size();
-    return JsonValue(str);
+  std::string str;
+  while (position < data.size() && data[position] != '"') {
+    char current = data[position++];
+    if (current != '\\' || position >= data.size()) {
+      str += current;
+      continue;
+    }
+    // An escape sequence; an escaped quote does not end the string
+    char escaped = data[position++];
+    switch (escaped) {
+      case 'n':
+        str += '\n';
+        break;
+      case 'r':
+        str += '\r';
+        break;
+      case 't':
+        str += '\t';
+        break;
+      case 'b':
+        str += '\b';
+        break;
+      case 'f':
+        str += '\f';
+        break;
+      case 'u': {
+        if (position + 4 > data.size()) {
+          position = data.size();
+          break;
+        }
+        unsigned int code_point = static_cast<unsigned int>(
+            std::stoul(data.substr(position, 4), nullptr, 16));
+        position += 4;
+        // Encode the code point as UTF-8
+        if (code_point < 0x80) {
+          str += static_cast<char>(code_point);
+        } else if (code_point < 0x800) {
+          str += static_cast<char>(0xC0 | (code_point >> 6));
+          str += static_cast<char>(0x80 | (code_point & 0x3F));
+        } else {
+          str += static_cast<char>(0xE0 | (code_point >> 12));
+          str += static_cast<char>(0x80 | ((code_point >> 6) & 0x3F));
+          str += static_cast<char>(0x80 | (code_point & 0x3F));
+        }
+        break;
+      }
+      default:  // '"', '\\', and '/' stand for themselves
+        str += escaped;
+    }
   }
-  std::string str = data.substr(position, end_pos - position);
-  position = end_pos + 1;
+  if (position < data.size()) {
+    position++;  // Skip the closing '"'
+  }
   return JsonValue(str);
 }
 

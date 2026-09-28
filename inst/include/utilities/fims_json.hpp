@@ -11,6 +11,7 @@
  * folder for reuse information.
  */
 #include <cctype>
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -112,11 +113,64 @@ class JsonParser {
   /** Display a JSON value to the standard output. */
   void Show(JsonValue jsonValue);
 
-  /** Remove whitespace in JSON. */
+  /** Remove whitespace in JSON, except inside strings. */
   static std::string removeWhitespace(const std::string& input) {
-    std::string result = input;
-    result.erase(std::remove_if(result.begin(), result.end(), ::isspace),
-                 result.end());
+    std::string result;
+    result.reserve(input.size());
+    bool inQuotes = false;
+    bool escaped = false;
+    for (char current : input) {
+      if (inQuotes) {
+        result += current;
+        if (escaped) {
+          escaped = false;
+        } else if (current == '\\') {
+          escaped = true;
+        } else if (current == '"') {
+          inQuotes = false;
+        }
+      } else if (current == '"') {
+        inQuotes = true;
+        result += current;
+      } else if (!std::isspace(static_cast<unsigned char>(current))) {
+        result += current;
+      }
+    }
+    return result;
+  }
+
+  /** Escape a string so it can be written as a JSON string value. */
+  static std::string EscapeString(const std::string& input) {
+    std::string result;
+    result.reserve(input.size());
+    for (char current : input) {
+      switch (current) {
+        case '"':
+          result += "\\\"";
+          break;
+        case '\\':
+          result += "\\\\";
+          break;
+        case '\n':
+          result += "\\n";
+          break;
+        case '\r':
+          result += "\\r";
+          break;
+        case '\t':
+          result += "\\t";
+          break;
+        default:
+          if (static_cast<unsigned char>(current) < 0x20) {
+            char buffer[7];
+            std::snprintf(buffer, sizeof(buffer), "\\u%04x",
+                          static_cast<unsigned char>(current));
+            result += buffer;
+          } else {
+            result += current;
+          }
+      }
+    }
     return result;
   }
 
@@ -168,13 +222,18 @@ class JsonParser {
           if (!inQuotes) result += " ";
           break;
 
-        case '"':
+        case '"': {
           result += current;
-          // Toggle inQuotes when we encounter a double-quote
-          if (i == 0 || input[i - 1] != '\\') {
+          // A quote is escaped only when preceded by an odd number of '\'
+          size_t backslashes = 0;
+          for (size_t j = i; j > 0 && input[j - 1] == '\\'; --j) {
+            backslashes++;
+          }
+          if (backslashes % 2 == 0) {
             inQuotes = !inQuotes;
           }
           break;
+        }
 
         default:
           result += current;
