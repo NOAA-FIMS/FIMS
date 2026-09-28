@@ -208,7 +208,7 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Pointer to the TMB objective function.
    */
-  ::objective_function<Type>* of;
+  ::objective_function<Type>* of = NULL;
 #endif
 
   /**
