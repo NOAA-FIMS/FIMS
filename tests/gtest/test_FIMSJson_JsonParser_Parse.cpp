@@ -69,6 +69,24 @@ TEST(JsonParser_Parse, HandlesNestedObjects) {
 }
 
 // Edge handling
+TEST(JsonParser_Parse, DecodesEscapedStrings) {
+  using fims::JsonParser;
+
+  JsonParser parser;
+
+  // Test that an escaped quote does not end the string.
+  auto quoted = parser.Parse("{\"fleet\":\"survey \\\"A\\\"\"}");
+  EXPECT_EQ(quoted.GetObject()["fleet"].GetString(), "survey \"A\"");
+
+  // Test that escaped backslashes, tabs, and newlines are decoded.
+  auto escaped = parser.Parse("{\"a\":\"dir\\\\x\\ty\\nz\"}");
+  EXPECT_EQ(escaped.GetObject()["a"].GetString(), "dir\\x\ty\nz");
+
+  // Test that a \u escape for a control character is decoded.
+  auto unicode = parser.Parse("{\"a\":\"x\\u0001y\"}");
+  EXPECT_EQ(unicode.GetObject()["a"].GetString(), std::string("x\x01y"));
+}
+
 TEST(JsonParser_Parse, HandlesObjectWithTrailingWhitespace) {
   using fims::JsonParser;
 

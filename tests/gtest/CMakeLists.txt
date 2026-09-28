@@ -418,3 +418,31 @@ add_executable(information_RecruitmentLifetime
 add_as_invoker_manifest(information_RecruitmentLifetime)
 target_link_libraries(information_RecruitmentLifetime fims_test)
 add_test(NAME information_RecruitmentLifetime COMMAND information_RecruitmentLifetime)
+
+
+# test_FIMSJson_JsonParser_PrettyFormatJSON.cpp
+add_executable(FIMSJson_JsonParser_PrettyFormatJSON
+  test_FIMSJson_JsonParser_PrettyFormatJSON.cpp
+)
+add_as_invoker_manifest(FIMSJson_JsonParser_PrettyFormatJSON)
+
+target_link_libraries(FIMSJson_JsonParser_PrettyFormatJSON
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(FIMSJson_JsonParser_PrettyFormatJSON)
+
+
+# test_FIMSJson_JsonParser_EscapeString.cpp
+add_executable(FIMSJson_JsonParser_EscapeString
+  test_FIMSJson_JsonParser_EscapeString.cpp
+)
+add_as_invoker_manifest(FIMSJson_JsonParser_EscapeString)
+
+target_link_libraries(FIMSJson_JsonParser_EscapeString
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(FIMSJson_JsonParser_EscapeString)
