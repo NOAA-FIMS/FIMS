@@ -450,6 +450,7 @@ dimensions_to_tibble <- function(data) {
 #' density_to_tibble(dummy_density)
 #' @noRd
 density_to_tibble <- function(data) {
+  data <- json_infinity_to_numeric(data)
   # Check that each list element is of length-one or the same length otherwise
   # the resulting tibble will not be the correct dimensions
   element_lengths <- purrr::map_int(data, length)
@@ -471,4 +472,30 @@ density_to_tibble <- function(data) {
     tibble::as_tibble() |>
     tidyr::unnest(dplyr::contains("value")) |>
     dplyr::rename(likelihood = dplyr::all_of("value"))
+}
+
+#' Convert infinite values written as JSON strings back to numbers
+#'
+#' @description
+#' JSON has no representation for infinity, so the C++ `value_to_string()`
+#' writes infinite density values, e.g., the log-likelihood of an observation
+#' with an expected value of zero, as the strings `"Infinity"` and
+#' `"-Infinity"`. This turns them back into `Inf` and `-Inf` so numeric columns
+#' stay numeric.
+#'
+#' @param x A value or a list of values read with `jsonlite::fromJSON()` and
+#'   `simplifyVector = FALSE`.
+#' @return `x` with the same structure, where the strings `"Infinity"` and
+#'   `"-Infinity"` are replaced with `Inf` and `-Inf`.
+#' @noRd
+json_infinity_to_numeric <- function(x) {
+  if (is.list(x)) {
+    return(purrr::map(x, json_infinity_to_numeric))
+  }
+  is_infinity <- is.character(x) && length(x) > 0 &&
+    all(x %in% c("Infinity", "-Infinity"))
+  if (is_infinity) {
+    return(dplyr::if_else(x == "Infinity", Inf, -Inf))
+  }
+  x
 }
