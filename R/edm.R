@@ -570,6 +570,7 @@ select_embedding_dimension <- function(data,
                                        series_type,
                                        series_name,
                                        tau       = 1L,
+                                       forecast_horizon = 1L,
                                        E_min     = 1L,
                                        E_max     = 10L,
                                        drop_missing = TRUE) {
@@ -622,7 +623,11 @@ select_embedding_dimension <- function(data,
       {
         if (isTRUE(drop_missing)) {
           de$construct_drop_missing(
-            as.numeric(series_data), as.integer(E_try), as.integer(tau), -999.0
+            as.numeric(series_data),
+            as.integer(E_try),
+            as.integer(tau),
+            as.integer(forecast_horizon),
+            -999.0
           )
         } else {
           de$construct(

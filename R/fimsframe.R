@@ -722,6 +722,7 @@ create_edm_embedding <- function(
     series_name,
     E,
     tau,
+    forecast_horizon = tau,
     drop_missing = TRUE,
     uncertainty_name = NULL,
     embedding_name = paste0(series_type, "_", series_name,
@@ -734,6 +735,10 @@ create_edm_embedding <- function(
   }
   if (!is.character(series_name) || length(series_name) != 1) {
     cli::cli_abort("{.var series_name} must be a single string.")
+  }
+  if (!is.numeric(forecast_horizon) || length(forecast_horizon) != 1 ||
+    forecast_horizon < 1 || forecast_horizon %% 1 != 0) {
+    cli::cli_abort("{.var forecast_horizon} must be a positive integer.")
   }
   if (!is.numeric(E) || length(E) != 1 || E < 1 || E %% 1 != 0) {
     cli::cli_abort("{.var E} must be a positive integer.")
@@ -801,6 +806,7 @@ create_edm_embedding <- function(
             as.numeric(series_data),
             as.integer(E),
             as.integer(tau),
+            as.integer(forecast_horizon),
             -999.0,
             as.numeric(uncertainty_data)
           )
@@ -809,6 +815,7 @@ create_edm_embedding <- function(
             as.numeric(series_data),
             as.integer(E),
             as.integer(tau),
+            as.integer(forecast_horizon),
             -999.0
           )
         }
@@ -818,13 +825,15 @@ create_edm_embedding <- function(
             as.numeric(series_data),
             as.integer(E),
             as.integer(tau),
+            as.integer(forecast_horizon),
             as.numeric(uncertainty_data)
           )
         } else {
           edm_obj$construct(
             as.numeric(series_data),
             as.integer(E),
-            as.integer(tau)
+            as.integer(tau),
+            as.integer(forecast_horizon)
           )
         }
       }

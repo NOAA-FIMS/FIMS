@@ -19,6 +19,7 @@ local_ff <- local({
     series_type = "catch",
     series_name = "fleet1",
     E = 3L,
+    forecast_horizon = 1L,
     tau = 1L
   )
 })

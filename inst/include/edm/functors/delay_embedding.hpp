@@ -119,10 +119,11 @@ struct DelayEmbeddingMatrix {
  */
 template <typename Type>
 DelayEmbeddingMatrix<Type> MakeDelayEmbedding(
-    const fims::Vector<Type>& series, size_t embedding_dimension,
+    const fims::Vector<Type>& series,
+    size_t embedding_dimension,
     size_t time_lag,
-    const fims::Vector<Type>& uncertainty = fims::Vector<Type>(),
-    size_t forecast_horizon = 1) {
+    size_t forecast_horizon,
+    const fims::Vector<Type>& uncertainty = fims::Vector<Type>()) {
   if (embedding_dimension == 0) {
     throw std::invalid_argument("embedding_dimension must be greater than 0.");
   }
@@ -198,12 +199,15 @@ DelayEmbeddingMatrix<Type> MakeDelayEmbedding(
  */
 template <typename Type>
 DelayEmbeddingMatrix<Type> MakeDelayEmbeddingDropMissing(
-    const fims::Vector<Type>& series, size_t embedding_dimension,
-    size_t time_lag, const Type& missing_value,
-    const fims::Vector<Type>& uncertainty = fims::Vector<Type>(),
-    size_t forecast_horizon = 1) {
+    const fims::Vector<Type>& series,
+    size_t embedding_dimension,
+    size_t time_lag,
+    size_t forecast_horizon,
+    const Type& missing_value,
+    const fims::Vector<Type>& uncertainty = fims::Vector<Type>()
+    ) {
   DelayEmbeddingMatrix<Type> full_embedding = MakeDelayEmbedding(
-      series, embedding_dimension, time_lag, uncertainty, forecast_horizon);
+      series, embedding_dimension, time_lag, forecast_horizon, uncertainty);
 
   DelayEmbeddingMatrix<Type> embedding;
   embedding.n_cols = full_embedding.n_cols;

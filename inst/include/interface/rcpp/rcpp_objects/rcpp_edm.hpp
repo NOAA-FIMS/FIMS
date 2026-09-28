@@ -109,6 +109,10 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    */
   SharedInt time_lag;
   /**
+   * @brief TODO
+   */
+  SharedInt forecast_horizon;
+  /**
    * @brief The number of rows in the constructed delay embedding matrix.
    */
   SharedInt n_rows;
@@ -156,6 +160,7 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
       : EDMInterfaceBase(),
         embedding_dimension(0),
         time_lag(0),
+        forecast_horizon(0),
         n_rows(0),
         n_cols(0) {
     EDMInterfaceBase::live_objects[this->id] =
@@ -171,6 +176,7 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
       : EDMInterfaceBase(other),
         embedding_dimension(other.embedding_dimension),
         time_lag(other.time_lag),
+        forecast_horizon(other.forecast_horizon),
         n_rows(other.n_rows),
         n_cols(other.n_cols),
         embedded_values(other.embedded_values),
@@ -201,8 +207,9 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * series.
    * @param E The embedding dimension (must be > 0).
    * @param tau The time lag (must be > 0).
+   * @param forecast_horizon TODO.
    */
-  void construct(Rcpp::NumericVector series, uint32_t E, uint32_t tau) {
+  void construct(Rcpp::NumericVector series, uint32_t E, uint32_t tau, uint32_t forecast_horizon) {
     fims::Vector<double> fims_series;
     fims_series.resize(series.size());
     for (R_xlen_t i = 0; i < series.size(); i++) {
@@ -210,10 +217,11 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
     }
 
     fims_edm::DelayEmbeddingMatrix<double> embedding =
-        fims_edm::MakeDelayEmbedding(fims_series, E, tau);
+        fims_edm::MakeDelayEmbedding(fims_series, E, tau, forecast_horizon);
 
     this->embedding_dimension = E;
     this->time_lag = tau;
+    this->forecast_horizon = forecast_horizon;
     this->n_rows = embedding.n_rows;
     this->n_cols = embedding.n_cols;
 
@@ -263,7 +271,7 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
     }
 
     fims_edm::DelayEmbeddingMatrix<double> embedding =
-        fims_edm::MakeDelayEmbedding(fims_series, E, tau, fims_uncertainty);
+        fims_edm::MakeDelayEmbedding(fims_series, E, tau, forecast_horizon, fims_uncertainty);
 
     this->embedding_dimension = E;
     this->time_lag = tau;
@@ -299,11 +307,15 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * series.
    * @param E The embedding dimension (must be > 0).
    * @param tau The time lag (must be > 0).
+   * @param forecast_horizon
    * @param missing_value The sentinel value representing missing data
    * (e.g., -999.0).
    */
-  void construct_drop_missing(Rcpp::NumericVector series, uint32_t E,
-                              uint32_t tau, double missing_value) {
+  void construct_drop_missing(Rcpp::NumericVector series,
+                              uint32_t E,
+                              uint32_t tau,
+                              uint32_t forecast_horizon,
+                              double missing_value) {
     fims::Vector<double> fims_series;
     fims_series.resize(series.size());
     for (R_xlen_t i = 0; i < series.size(); i++) {
@@ -311,13 +323,17 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
     }
 
     fims_edm::DelayEmbeddingMatrix<double> embedding =
-        fims_edm::MakeDelayEmbeddingDropMissing(fims_series, E, tau,
+        fims_edm::MakeDelayEmbeddingDropMissing(fims_series,
+                                                E,
+                                                tau,
+                                                forecast_horizon,
                                                 missing_value);
 
     this->embedding_dimension = E;
     this->time_lag = tau;
     this->n_rows = embedding.n_rows;
     this->n_cols = embedding.n_cols;
+    this->forecast_horizon = forecast_horizon;
 
     this->embedded_values.resize(embedding.embedded_values.size());
     for (size_t i = 0; i < embedding.embedded_values.size(); i++) {
@@ -346,13 +362,18 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * series.
    * @param E The embedding dimension (must be > 0).
    * @param tau The time lag (must be > 0).
+   * @param forecast_horizon TODO.
    * @param missing_value The sentinel value representing missing data.
    * @param uncertainty An Rcpp::NumericVector of uncertainty values with the
    * same length as @p series.
    */
   void construct_drop_missing_with_uncertainty(
-      Rcpp::NumericVector series, uint32_t E, uint32_t tau,
-      double missing_value, Rcpp::NumericVector uncertainty) {
+      Rcpp::NumericVector series,
+      uint32_t E,
+      uint32_t tau,
+      uint32_t forecast_horizon,
+      double missing_value,
+      Rcpp::NumericVector uncertainty) {
     fims::Vector<double> fims_series;
     fims_series.resize(series.size());
     for (R_xlen_t i = 0; i < series.size(); i++) {
@@ -366,11 +387,15 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
     }
 
     fims_edm::DelayEmbeddingMatrix<double> embedding =
-        fims_edm::MakeDelayEmbeddingDropMissing(fims_series, E, tau,
+        fims_edm::MakeDelayEmbeddingDropMissing(fims_series,
+                                                E,
+                                                tau,
+                                                forecast_horizon,
                                                 missing_value, fims_uncertainty);
 
     this->embedding_dimension = E;
     this->time_lag = tau;
+    this->forecast_horizon = forecast_horizon;
     this->n_rows = embedding.n_rows;
     this->n_cols = embedding.n_cols;
 
