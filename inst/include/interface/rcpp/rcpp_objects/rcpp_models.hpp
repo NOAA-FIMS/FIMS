@@ -546,20 +546,12 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     ss << "\"value\":[";
     ss << std::fixed << std::setprecision(10);
     if (dq.size() > 0) {
+      // JSON has no NaN or Inf, e.g., log(0) for an expected catch of zero, so
+      // non-finite values are written as -999 like missing values elsewhere
       for (size_t i = 0; i < dq.size() - 1; i++) {
-        if (dq[i] != dq[i])  // check for NaN
-        {
-          ss << "-999" << ", ";
-        } else {
-          ss << dq[i] << ", ";
-        }
+        ss << sanitize_val(dq[i]) << ", ";
       }
-      if (dq[dq.size() - 1] != dq[dq.size() - 1])  // check for NaN
-      {
-        ss << "-999]" << "\n";
-      } else {
-        ss << dq[dq.size() - 1] << "]\n";
-      }
+      ss << sanitize_val(dq[dq.size() - 1]) << "]\n";
     } else {
       ss << "]\n";
     }
