@@ -199,25 +199,18 @@ class Information {
     this->recruitment_models.clear();
     this->recruitment_process_models.clear();
 
+    // Density components borrow these vectors from the population, fleet, and
+    // recruitment modules released above, so only drop the links. Reading
+    // through them here would touch freed memory.
     for (density_components_iterator it = density_components.begin();
          it != density_components.end(); ++it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
-      if ((d->priors)[0]) {
-        d->priors.clear();
-      }
-      if (d->data_observed_values) {
-        d->data_observed_values.reset();
-      }
-      if (d->data_expected_values) {
-        d->data_expected_values->clear();
-      }
-      if (d->re) {
-        d->re->clear();
-      }
-      if (d->re_expected_values) {
-        d->re_expected_values->clear();
-      }
+      d->priors.clear();
+      d->data_observed_values.reset();
+      d->data_expected_values = nullptr;
+      d->re = nullptr;
+      d->re_expected_values = nullptr;
     }
     this->density_components.clear();
   }

@@ -446,3 +446,16 @@ target_link_libraries(FIMSJson_JsonParser_EscapeString
 )
 
 gtest_discover_tests(FIMSJson_JsonParser_EscapeString)
+
+# test_information_Information_Clear.cpp
+add_executable(information_Information_Clear
+  test_information_Information_Clear.cpp
+)
+add_as_invoker_manifest(information_Information_Clear)
+
+target_link_libraries(information_Information_Clear
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(information_Information_Clear)
