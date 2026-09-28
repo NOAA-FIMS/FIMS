@@ -9,6 +9,11 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 
+#include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include "rcpp_interface_base.hpp"
 #include "../../../distributions/distributions.hpp"
 
@@ -158,6 +163,54 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * each distribution can have an evaluate() function.
    */
   virtual double evaluate() = 0;
+
+  /**
+   * @brief Writes the parameters of a distribution as a JSON "parameters"
+   * member, in the same shape the modules use, so each element keeps its
+   * parameter id in the model output.
+   *
+   * @details Each distribution passes the parameter vectors it owns, e.g.,
+   * `{{"log_sd", &this->log_sd}}`, so any process that uses the distribution
+   * reports its parameters, and a distribution with other parameters only
+   * needs to add them to its list. Empty vectors are skipped because the
+   * VariableVector stream operator does not handle a size of zero.
+   *
+   * @param parameters Pairs of parameter names and pointers to the vectors.
+   * @return The JSON member followed by a comma and a newline, or an empty
+   * string when no vector has elements.
+   */
+  std::string parameters_to_json(
+      const std::vector<std::pair<std::string, VariableVector *>> &parameters) {
+    std::vector<std::string> entries;
+    for (const auto &parameter : parameters) {
+      VariableVector *values = parameter.second;
+      if (values == nullptr || values->size() == 0) {
+        continue;
+      }
+      std::stringstream entry;
+      entry << "{\n";
+      entry << "   \"name\": \"" << parameter.first << "\",\n";
+      entry << "   \"id\": " << values->id_m << ",\n";
+      entry << "   \"type\": \"vector\",\n";
+      entry << "   \"dimensionality\": {\n";
+      entry << "    \"header\": [null],\n";
+      entry << "    \"dimensions\": [" << values->size() << "]\n";
+      entry << "   },\n";
+      entry << "   \"values\": " << *values << "\n";
+      entry << "  }";
+      entries.push_back(entry.str());
+    }
+    if (entries.empty()) {
+      return "";
+    }
+    std::stringstream ss;
+    ss << " \"parameters\": [\n";
+    for (size_t i = 0; i < entries.size(); i++) {
+      ss << (i == 0 ? "  " : ",\n  ") << entries[i];
+    }
+    ss << "\n ],\n";
+    return ss.str();
+  }
 };
 
 /**
@@ -386,6 +439,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m
        << ",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
+    ss << this->parameters_to_json({{"log_sd", &this->log_sd}});
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
     ss << "  \"value\":[";
@@ -726,6 +780,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m
        << ",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
+    ss << this->parameters_to_json({{"log_sd", &this->log_sd}});
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
     ss << "  \"value\":[";
