@@ -26,7 +26,9 @@ namespace fims_distributions {
  *
  * For `data` input, if any element in a row is equal to `na_value`, the entire
  * row is skipped and contributes zero to the objective. Contributions are
- * stored in `lpdf_vec`, where every element of a skipped row stays zero. The
+ * stored in `lpdf_vec`, which has one element per bin. Each bin of a row holds
+ * the row's log-probability mass divided by the number of bins, so the sum of
+ * `lpdf_vec` equals `lpdf`, and every element of a skipped row stays zero. The
  * summed total is returned by `evaluate()` and stored in `lpdf`.
  *
  * Row observations could be counts of each age for a given time step, where
@@ -141,12 +143,16 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       }
 
       if (!containsNA) {
+        Type row_lpmf = dmultinom(observed_values_vector.to_tmb(),
+                                  prob_vector.to_tmb(), true);
+        // The multinomial is a joint density over the bins of a row and does
+        // not split into per-bin terms. Each bin reports an equal share so
+        // that summing lpdf_vec over a composition counts each row once.
         std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
                   this->lpdf_vec.begin() + lpdf_vec_idx + dims[1],
-                  dmultinom(observed_values_vector.to_tmb(),
-                            prob_vector.to_tmb(), true));
+                  row_lpmf / static_cast<Type>(dims[1]));
 
-        this->lpdf += this->lpdf_vec[lpdf_vec_idx];
+        this->lpdf += row_lpmf;
       }
       lpdf_vec_idx += dims[1];
 /*
