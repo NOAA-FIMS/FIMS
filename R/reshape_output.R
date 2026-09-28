@@ -10,7 +10,9 @@
 #' @param model_output A JSON object containing the finalized FIMS output as
 #'   returned from `get_output()`, which is an internal function to each model
 #'   family.
-#' @return A tibble containing the reshaped parameter estimates.
+#' @return A tibble containing the reshaped parameter estimates. Parameters of
+#' distributions, e.g., `log_sd`, are included with one row per parameter id
+#' and `module_name` `"density"`.
 reshape_json_estimates <- function(model_output) {
   # Helper functions
   join_density_information <- function(x, density_tibble) {
@@ -40,10 +42,37 @@ reshape_json_estimates <- function(model_output) {
   )
 
 
+  # Distribution parameters, e.g., log_sd, are written with their parameter
+  # ids so they can be reported like module parameters. Any parameter a
+  # distribution writes is handled the same way, so new ones need no change
+  # here. They are split off before the density components are joined to other
+  # rows, because the joins keep every density column and would add them to
+  # every row.
+  density_components <- read_list[["density_components"]]
+  distribution_information <- NULL
+  if ("parameters" %in% names(density_components)) {
+    distribution_information <- density_components |>
+      dplyr::filter(purrr::map_lgl(.data$parameters, \(x) length(x) > 0)) |>
+      dplyr::select(
+        dplyr::all_of(c("module_name", "module_id", "module_type", "parameters"))
+      ) |>
+      dplyr::mutate(
+        parameters = purrr::map(
+          .data$parameters,
+          \(x) purrr::map_df(x, dimension_folded_to_tibble)
+        )
+      ) |>
+      tidyr::unnest(dplyr::all_of("parameters")) |>
+      # A single log_sd is copied to every element with the same id
+      dplyr::distinct(.data$id, .keep_all = TRUE)
+    density_components <- density_components |>
+      dplyr::select(-dplyr::all_of("parameters"))
+  }
+
   # Process the density components
   # TODO: Still need links to the parameter id because we are just joining by
   #       parameter values, which is fragile
-  density_information <- read_list[["density_components"]] |>
+  density_information <- density_components |>
     dplyr::mutate(
       density_component = purrr::map(.data$density_component, density_to_tibble)
     ) |>
@@ -85,7 +114,7 @@ reshape_json_estimates <- function(model_output) {
       name = paste(.data$data_type, "expected", sep = "_")
     ) |>
     dplyr::left_join(
-      y = read_list[["density_components"]] |>
+      y = density_components |>
         dplyr::filter(
           .data$observed_data_id != -999
         ) |>
@@ -160,7 +189,8 @@ reshape_json_estimates <- function(model_output) {
   out <- dplyr::bind_rows(
     fleet_information,
     module_information,
-    population_information
+    population_information,
+    distribution_information
   ) |>
     dplyr::select(
       dplyr::all_of(c("module_name", "module_id", "module_type")),

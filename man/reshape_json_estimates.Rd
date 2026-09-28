@@ -12,7 +12,9 @@ returned from \code{get_output()}, which is an internal function to each model
 family.}
 }
 \value{
-A tibble containing the reshaped parameter estimates.
+A tibble containing the reshaped parameter estimates. Parameters of
+distributions, e.g., \code{log_sd}, are included with one row per parameter id
+and \code{module_name} \code{"density"}.
 }
 \description{
 This function processes the finalized FIMS JSON output and reshapes the
