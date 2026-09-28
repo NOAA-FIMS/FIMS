@@ -26,8 +26,8 @@ namespace fims_distributions {
  *
  * For `data` input, if any element in a row is equal to `na_value`, the entire
  * row is skipped and contributes zero to the objective. Contributions are
- * stored in `lpdf_vec`. The summed total is returned by `evaluate()` and
- * stored in `lpdf`.
+ * stored in `lpdf_vec`, where every element of a skipped row stays zero. The
+ * summed total is returned by `evaluate()` and stored in `lpdf`.
  *
  * Row observations could be counts of each age for a given time step, where
  * additional time steps would be additional rows. Thus, columns are bins.
@@ -147,8 +147,6 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
                             prob_vector.to_tmb(), true));
 
         this->lpdf += this->lpdf_vec[lpdf_vec_idx];
-      } else {
-        this->lpdf_vec[i] = 0;
       }
       lpdf_vec_idx += dims[1];
 /*
