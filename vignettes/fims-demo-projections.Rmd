@@ -133,8 +133,9 @@ January 1 values; explicit dates predict surviving abundance within the year.
 To request a future survey prediction, supply its date, missing observation
 (`-999`), and the appropriate likelihood uncertainty. Build these rows in the
 original input table before calling `FIMSFrame()`. When changing normalized
-output from `get_data()`, also update `date` and `input_precision` consistently
-with `timing`.
+output from `get_data()`, supply the new full ISO date (`YYYY-MM-DD`) in
+`timing` and rebuild the `FIMSFrame`; `date` and `input_precision` are updated
+automatically.
 
 Predictions for missing samples are available through `get_estimates()`;
 `augment()` excludes them because there is no observed value to compare.

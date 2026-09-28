@@ -102,9 +102,9 @@ on the same date. The current timing implementation supports one population
 and a pooled partition.
 
 `get_data()` retains integer model years in `timing` and normalized dates in
-`date`. When editing normalized data, keep `timing`, `date`, and
-`input_precision` consistent. For substantial date changes, edit the original
-input table and rebuild the `FIMSFrame`. `get_observations()` returns one row
+`date`. To change a date in normalized data, supply the new full ISO date
+(`YYYY-MM-DD`) in `timing` and rebuild the `FIMSFrame`; the derived `date` and
+`input_precision` fields are updated automatically. `get_observations()` returns one row
 per sample, including January 1 placeholders for wholly missing years. It does
 not insert extra January samples into years that already have dated samples.
 
