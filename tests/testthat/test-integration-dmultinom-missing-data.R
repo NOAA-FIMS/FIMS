@@ -33,8 +33,6 @@ multinomial_rows <- multinomial_cells |>
   dplyr::summarize(
     missing = any(observed == na_value),
     n_likelihood_values = dplyr::n_distinct(likelihood),
-    row_likelihood = dplyr::first(likelihood),
-    lpdf = dplyr::first(lpdf),
     .by = c(module_id, label, year_i)
   )
 
@@ -42,22 +40,22 @@ multinomial_rows <- multinomial_cells |>
 test_that("dmultinom reports one log-likelihood per observed composition row", {
   observed_rows <- dplyr::filter(multinomial_rows, !missing)
 
-  #' @description Test that every bin of an observed composition row reports the same log-likelihood.
+  #' @description Test that every bin of an observed composition row reports the same share of the row log-likelihood.
   expect_equal(
     object = unique(observed_rows[["n_likelihood_values"]]),
     expected = 1
   )
 
-  #' @description Test that the row log-likelihoods of each composition sum to that composition's total lpdf.
-  totals <- multinomial_rows |>
+  #' @description Test that summing the per-bin likelihood over a composition gives that composition's total lpdf, counting each row once.
+  totals <- multinomial_cells |>
     dplyr::summarize(
-      sum_rows = sum(row_likelihood),
+      sum_cells = sum(likelihood),
       lpdf = dplyr::first(lpdf),
       .by = c(module_id, label)
     )
   # lpdf is written to the output with 6 significant digits
   expect_equal(
-    object = totals[["sum_rows"]],
+    object = totals[["sum_cells"]],
     expected = totals[["lpdf"]],
     tolerance = 1e-5
   )
