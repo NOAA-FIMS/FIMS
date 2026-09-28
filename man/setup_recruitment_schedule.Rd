@@ -7,14 +7,17 @@
 setup_recruitment_schedule(data, schedule = NULL)
 }
 \arguments{
-\item{data}{A FIMSFrame defining the modeled years.}
-\item{schedule}{NULL for one January 1 phase per year, or a data frame with
-population, phase, date, and fraction columns. Dates must be full ISO
-YYYY-MM-DD strings or whole-day Date values. Fractions must be finite,
-nonnegative, and sum to one within 1e-8 in each year. Accepted fractions
-are retained without renormalization. Optional entry_age specifies the biological
-age at entry (default: the youngest modeled age); it must be finite, nonnegative,
-and constant across years within each phase.}
+\item{data}{A FIMSFrame defining the modeled years and optional recruitment rows.}
+
+\item{schedule}{Optional explicit schedule for existing callers, with
+population, phase, timing, and fraction columns. The previous \code{date} column
+is also accepted. Timing must be full ISO YYYY-MM-DD strings or whole-day
+Date values. NULL reads recruitment_fraction rows from data, or uses one
+January 1 phase per year when no rows are supplied. If both sources are
+supplied, they must agree. Fractions must be finite, nonnegative, and sum to
+one within 1e-8 in each year; they are not renormalized. Optional entry_age
+defaults to the youngest modeled age and must be finite, nonnegative, and
+constant across years within each phase.}
 }
 \value{
 A tibble sorted by date, containing the input columns plus timing,
@@ -22,20 +25,20 @@ entry_age, phase_i, year_i, day, and year_fraction. Only modeled years are inclu
 terminal reporting year is excluded. Population must be population1.
 }
 \description{
-Validate dates and fractions that split one annual recruitment total among
-phases. Pass the result to initialize_fims(recruitment_schedule = ...) to
-enable phase-specific biological ages and partial-year mortality and catch.
+Validate timing and fractions that split one annual recruitment total among
+phases. Add \code{type = "recruitment_fraction"} rows to the ordinary input data
+frame, with entry dates in \code{timing}, fractions in \code{observed}, phase names in
+\code{phase}, and optional \code{entry_age}. Initialization reads these rows automatically.
 }
 \examples{
-frame <- FIMSFrame(data_big)
-annual <- setup_recruitment_schedule(frame)
-early <- annual
-early$phase <- "early"
-early$fraction <- 0.4
-late <- annual
-late$phase <- "late"
-late$fraction <- 0.6
-late$date <- as.Date(sprintf("\%04d-07-01", late$timing))
-phases <- setup_recruitment_schedule(frame, rbind(early, late))
-head(phases)
+observations <- data_big
+observations$timing <- sprintf("\%04d", observations$timing)
+observations$timing[is.na(data_big$timing)] <- NA_character_
+years <- seq_len(get_n_years(FIMSFrame(data_big)))
+recruitment <- data.frame(
+  type = "recruitment_fraction", phase = "annual",
+  timing = sprintf("\%04d-01-01", years), observed = 1
+)
+frame <- FIMSFrame(dplyr::bind_rows(observations, recruitment))
+head(setup_recruitment_schedule(frame))
 }

@@ -14,7 +14,6 @@ run_modified_pars_fims(
 )
 }
 \arguments{
-\item{recruitment_schedule}{A schedule from \code{\link{setup_recruitment_schedule}}. Pass the base model schedule to retain phase timing when refitting.}
 \item{new_value}{The new value to be changed in the FIMS model.}
 
 \item{parameter_name}{A string specifying the parameter name to modify.
@@ -25,6 +24,11 @@ This should match a value in the \code{label} column of the parameters tibble.}
 \item{parameters}{The tibble of input parameters for a FIMS model}
 
 \item{data}{A dataframe of input data for FIMS model}
+
+\item{recruitment_schedule}{Optional explicit schedule from
+\code{\link[=setup_recruitment_schedule]{setup_recruitment_schedule()}}. Recruitment rows in data are retained
+automatically when this argument is omitted.
+Supply the base model schedule only when it was passed separately.}
 }
 \value{
 FIMS model fitted to the new parameter input value

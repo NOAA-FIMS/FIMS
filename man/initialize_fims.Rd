@@ -19,13 +19,15 @@ required because initialization of the
 modules requires passing the data and information regarding the uncertainty
 of that data, i.e., input sample sizes for the multinomial distribution.}
 
-\item{recruitment_schedule}{NULL for annual January 1 recruitment, or a
-schedule accepted by \code{\link{setup_recruitment_schedule}}. Phases split one
-annual recruitment total and retain distinct biological ages. The youngest
-initial abundance is the first-year recruitment budget. Older initial ages use
-the first schedule year's unfished phase proportions. The resolved schedule is
-retained as an attribute of the returned input list. See the recruitment phases
-vignette for reference, terminal-year, and plus-group conventions.}
+\item{recruitment_schedule}{Optional explicit schedule for existing callers.
+By default, recruitment_fraction rows in data define the phases; without
+those rows, recruitment enters annually on January 1. See
+\code{\link[=setup_recruitment_schedule]{setup_recruitment_schedule()}} for validation. Phases split one annual
+recruitment total and retain distinct biological ages. The youngest initial
+abundance is the first-year recruitment budget. Older initial ages use the
+first schedule year's unfished phase proportions. The resolved schedule is
+retained as an attribute of the returned input list. See the recruitment
+phases vignette for reference, terminal-year, and plus-group conventions.}
 }
 \value{
 A list is returned with two elements, \code{parameters} and \code{model}. The list can

@@ -81,7 +81,7 @@ annual_age_counts <- rbind(
   c(15, 30, 45, 50, 60)
 )
 survey_data <- data.frame(
-  year = years, date = as.Date(paste0(years, "-04-01")),
+  year = years, timing = as.Date(paste0(years, "-04-01")),
   index = c(220, 230, 240), log_sd = 0.25
 )
 survey_age_counts <- rbind(
@@ -91,7 +91,7 @@ survey_age_counts <- rbind(
 )
 colnames(annual_age_counts) <- colnames(survey_age_counts) <- ages
 rownames(annual_age_counts) <- years
-rownames(survey_age_counts) <- as.character(survey_data$date)
+rownames(survey_age_counts) <- as.character(survey_data$timing)
 stopifnot(nrow(annual_age_counts) == ny, nrow(survey_age_counts) == ny,
           all(annual_age_counts >= 0), all(survey_age_counts >= 0))
 ```
@@ -268,15 +268,15 @@ survey$SetObservedAgeCompDataID(survey_age_data$get_id())
 
 survey_start <- as.Date(paste0(years, "-01-01"))
 survey_end <- as.Date(paste0(years + 1L, "-01-01"))
-survey_fraction <- as.numeric(survey_data$date - survey_start) /
+survey_fraction <- as.numeric(survey_data$timing - survey_start) /
   as.numeric(survey_end - survey_start)
 # days are absolute days since 1970-01-01, NOT day-of-year. Year and sample
 # coordinates are zero-based. Each stream's rows must match its data row order.
 for (stream in c("index", "age_comp")) {
   survey$SetObservationTiming(
-    stream, seq_len(ny) - 1L, as.integer(survey_data$date), seq_len(ny) - 1L,
-    paste0("survey1_", stream, "_", survey_data$date),
-    as.character(survey_data$date), survey_fraction
+    stream, seq_len(ny) - 1L, as.integer(survey_data$timing), seq_len(ny) - 1L,
+    paste0("survey1_", stream, "_", survey_data$timing),
+    as.character(survey_data$timing), survey_fraction
   )
 }
 survey_index_likelihood <- methods::new(FIMS::DlnormDistribution)
@@ -419,7 +419,7 @@ print(survey_predictions)
 annual_age_predictions <- matrix(report$agecomp_proportion[[1]], ny, na, byrow = TRUE)
 survey_age_predictions <- matrix(report$agecomp_proportion[[2]], ny, na, byrow = TRUE)
 cat("\nApril survey age probabilities (rows are dates):\n")
-rownames(survey_age_predictions) <- as.character(survey_data$date)
+rownames(survey_age_predictions) <- as.character(survey_data$timing)
 colnames(survey_age_predictions) <- ages
 print(survey_age_predictions)
 ```

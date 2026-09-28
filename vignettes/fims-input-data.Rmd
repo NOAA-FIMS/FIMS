@@ -330,3 +330,19 @@ FIMS::data_big |>
   geom_hline(yintercept = 0) +
   ggtitle("Age-to-length conversion for the data_big example data set")
 ```
+
+
+## Recruitment phases in the input table
+
+Fixed recruitment timing uses the same `timing` column as observations. Add
+`type = "recruitment_fraction"` rows with full ISO entry dates in `timing`, the
+allocated fractions in `observed`, and phase names in `phase`. An optional
+`entry_age` sets biological age at entry; otherwise the youngest modeled age is
+used. Leave `fleet`, `age`, `length`, and `uncertainty` missing. The unit is
+`"proportion"` (or missing) and population defaults to `"population1"`.
+
+Supply every modeled year, with the same phase names and entry ages each year
+and fractions summing to one per year. These configuration rows do not create
+observations or extend the modeled years. `initialize_fims(parameters, frame)`
+reads them automatically. See [Multiple recruitment phases](fims-recruitment-phases.html)
+for a complete example, including January and July recruitment.

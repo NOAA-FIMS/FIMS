@@ -32,14 +32,20 @@ normalize_observation_timing <- function(data) {
   # A normalized data frame can be passed back through FIMSFrame, e.g. a peel.
   if (all(c("date", "input_precision") %in% names(data))) {
     if (!inherits(data$date, "Date")) cli::cli_abort("Normalized `date` must be an R Date vector.")
-    keep <- !is.na(data$date)
+    # A full user-facing timing value takes precedence over derived metadata.
+    # Annual timing values on normalized tables retain their stored dates.
+    explicit <- !is.na(raw) & nchar(raw) %in% c(7L, 10L)
+    keep <- !is.na(data$date) & !explicit
     input_year <- as.integer(substr(raw, 1, 4))
     if (any(keep & !is.na(input_year) & input_year != as.integer(format(data$date, "%Y")))) {
-      cli::cli_abort("Normalized `date` and `timing` disagree; update both when changing the model year.")
+      cli::cli_abort("Normalized `date` and `timing` disagree; use full ISO `timing` to change dated inputs.")
     }
+    inferred <- ifelse(nchar(raw) == 4, "year",
+      ifelse(nchar(raw) == 7, "month", "day"))
+    inferred[is.na(inferred)] <- "year"
     raw[keep] <- observation_date_iso(data$date[keep])
     precision <- data$input_precision
-    precision[is.na(precision)] <- "year"
+    precision[!keep | is.na(precision)] <- inferred[!keep | is.na(precision)]
     if (any(!precision %in% c("year", "month", "day"))) {
       cli::cli_abort("Unknown timing input precision.")
     }
@@ -76,7 +82,7 @@ normalize_observation_timing <- function(data) {
   if (any(interval & precision != "year", na.rm = TRUE)) {
     cli::cli_abort("Catch and fishery compositions require annual support (year-only timing); dated fishery samples are unsupported.")
   }
-  if (any(!obs & precision != "year", na.rm = TRUE)) {
+  if (any(!obs & !data$type %in% "recruitment_fraction" & precision != "year", na.rm = TRUE)) {
     cli::cli_abort("Biological input tables currently require year-only timing.")
   }
   data$timing <- year
@@ -158,7 +164,8 @@ observation_table <- function(data, fleet = NULL, type = NULL) {
   d$year_fraction <- as.numeric(d$date - as.Date(sprintf("%04d-01-01", d$timing))) / ifelse(leap, 366, 365)
   d$year_i <- d$timing - start + 1L
   d$day <- as.integer(d$date - as.Date(sprintf("%04d-01-01", start)))
-  all_dates <- get_data(data)$date
+  all_data <- get_data(data)
+  all_dates <- all_data$date[!all_data$type %in% "recruitment_fraction"]
   d$time_id <- match(d$date, sort(unique(all_dates))) - 1L
   d <- dplyr::group_by(d, .data$fleet, .data$type) |>
     dplyr::mutate(sample_i = dplyr::row_number()) |>

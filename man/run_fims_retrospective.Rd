@@ -4,11 +4,15 @@
 \alias{run_fims_retrospective}
 \title{Run Retrospective Analysis}
 \usage{
-run_fims_retrospective(years_to_remove, data, parameters, n_cores = NULL,
-  recruitment_schedule = NULL)
+run_fims_retrospective(
+  years_to_remove,
+  data,
+  parameters,
+  n_cores = NULL,
+  recruitment_schedule = NULL
+)
 }
 \arguments{
-\item{recruitment_schedule}{A schedule from \code{\link{setup_recruitment_schedule}}. Pass the base model schedule to retain phase timing when refitting.}
 \item{years_to_remove}{A numeric vector specifying the number of terminal
 years to remove for each retrospective peel. For example, \code{0:5} creates
 six model runs: the reference model (0 years removed) and five
@@ -26,6 +30,11 @@ and initial parameter values for the base model.}
 \item{n_cores}{An integer specifying the number of CPU cores to use for
 parallel processing. If \code{NULL} (default), uses \code{parallel::detectCores() - 1}.
 Set to 1 for sequential processing. Must be a positive integer.}
+
+\item{recruitment_schedule}{Optional explicit schedule from
+\code{\link[=setup_recruitment_schedule]{setup_recruitment_schedule()}}. Recruitment rows in data are retained
+automatically when this argument is omitted.
+Retrospective peels retain the annual horizon and this schedule.}
 }
 \value{
 A list with two named elements:
@@ -114,8 +123,8 @@ ICES Journal of Marine Science 72(1): 99-110.
 }
 
 Other diagnostic_functions:
-\code{\link[=plot_likelihood]{plot_likelihood()}},
-\code{\link[=run_fims_likelihood]{run_fims_likelihood()}}
+\code{\link{plot_likelihood}()},
+\code{\link{run_fims_likelihood}()}
 }
 \concept{diagnostic_functions}
 \keyword{diagnostics}

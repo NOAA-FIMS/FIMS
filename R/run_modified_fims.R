@@ -11,8 +11,10 @@
 #' @param parameters The tibble of input parameters for a FIMS model
 #' @param data A dataframe of input data for FIMS model
 #'
-#' @param recruitment_schedule A schedule from [setup_recruitment_schedule()].
-#'   Pass the base model schedule to retain phase timing when refitting.
+#' @param recruitment_schedule Optional explicit schedule from
+#'   [setup_recruitment_schedule()]. Recruitment rows in data are retained
+#'   automatically when this argument is omitted.
+#'   Supply the base model schedule only when it was passed separately.
 #' @return FIMS model fitted to the new parameter input value
 #' @export
 #' @keywords diagnostics
@@ -111,8 +113,10 @@ run_modified_pars_fims <- function(
 #' @param years_to_remove number of years to remove
 #' @param data full dataset used in base model run
 #' @param parameters input parameters used in base FIMS model
-#' @param recruitment_schedule A schedule from [setup_recruitment_schedule()].
-#'   Pass the base model schedule to retain phase timing when refitting.
+#' @param recruitment_schedule Optional explicit schedule from
+#'   [setup_recruitment_schedule()]. Recruitment rows in data are retained
+#'   automatically when this argument is omitted.
+#'   Supply the base model schedule only when it was passed separately.
 #' @return FIMS model fitted with years of data removed
 #' @export
 #' @keywords diagnostics
@@ -161,7 +165,7 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters, recrui
     data_mod <- data_to_use |>
       dplyr::filter(
         (.data[["type"]] %in%
-          c("catch", "age_to_length_conversion", "weight_at_age")) |
+          c("catch", "age_to_length_conversion", "weight_at_age", "recruitment_fraction")) |
           is.na(.data[["timing"]]) |
           .data[["timing"]] <= max_timing - years_to_remove
       )

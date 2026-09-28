@@ -861,8 +861,10 @@ initialize_comp <- function(data,
 #'   required because initialization of the
 #'   modules requires passing the data and information regarding the uncertainty
 #'   of that data, i.e., input sample sizes for the multinomial distribution.
-#' @param recruitment_schedule NULL for annual January 1 recruitment, or a
-#'   schedule accepted by [setup_recruitment_schedule()]. Phases split one annual
+#' @param recruitment_schedule Optional explicit schedule for existing callers.
+#'   By default, recruitment_fraction rows in data define the phases; without
+#'   those rows, recruitment enters annually on January 1. See
+#'   [setup_recruitment_schedule()] for validation. Phases split one annual
 #'   recruitment total and retain distinct biological ages. The youngest initial
 #'   abundance is the first-year recruitment budget. Older initial ages use the
 #'   first schedule year's unfished phase proportions. The resolved schedule is

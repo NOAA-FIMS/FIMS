@@ -964,6 +964,17 @@ resolve_fleet_length_bins <- function(
 #' age in the model. For example, you cannot bin fish into bins that span
 #' multiple years, you must have age-2, age-3, and age-4 not just age-2 and
 #' age-4 fish in your composition data.
+#' ### Recruitment timing
+#' Fixed recruitment phases belong in this same input table. Use
+#' `type = "recruitment_fraction"`, full ISO dates in `timing`, allocated
+#' fractions in `observed`, and a `phase` name for each row. `entry_age` is
+#' optional and defaults to the youngest modeled age. Leave `fleet`, `age`,
+#' `length`, and `uncertainty` missing; `unit` is `"proportion"` or missing.
+#' `population` defaults to `"population1"`. Fractions must sum to one in every
+#' modeled year, with consistent phase identifiers and entry ages across years.
+#' These are fixed configuration rows, not likelihood observations. They cannot
+#' extend the model horizon or define fleets or age bins. See
+#' [setup_recruitment_schedule()] and the recruitment-phases vignette.
 #' ### Uncertainty
 #' Uncertainty information for your data contains information for fitting the
 #' model and for creating bootstrapped data sets. Right-handed formulas are
@@ -1020,7 +1031,8 @@ resolve_fleet_length_bins <- function(
 #' Observation timing accepts integer years, ISO strings (`YYYY`, `YYYY-MM`,
 #' `YYYY-MM-DD`), or R Date values. Survey dates default missing months/days
 #' to January/the first day. Catch and fishery compositions require year-only
-#' input and represent annual intervals. Biological input tables remain annual.
+#' input and represent annual intervals. Biological input tables remain annual;
+#' recruitment_fraction rows require full dates in `timing`.
 #' The returned data retain integer years in `timing` and normalized dates in
 #' `date`. Use [get_observations()] for sample IDs and backend coordinates.
 #' Multiple survey samples per year are supported. Dated survey predictions
@@ -1059,6 +1071,10 @@ FIMSFrame <- function(data) {
     )
   }
 
+  # Resolve recruitment configuration separately so it cannot extend the model
+  # horizon, create fleets/bins, or be padded into synthetic observations.
+  recruitment_rows <- data[data$type %in% "recruitment_fraction", , drop = FALSE]
+  data <- data[!data$type %in% "recruitment_fraction", , drop = FALSE]
   data <- normalize_observation_timing(data)
 
   # Get the earliest and latest year formatted as integers
@@ -1273,7 +1289,7 @@ FIMSFrame <- function(data) {
   complete_data <- normalize_observation_timing(complete_data)
 
   # Fill the empty data frames with data extracted from the data file
-  methods::new("FIMSFrame",
+  frame <- methods::new("FIMSFrame",
     data = complete_data,
     fleets = fleets,
     n_years = n_years,
@@ -1284,6 +1300,8 @@ FIMSFrame <- function(data) {
     lengths = lengths,
     n_lengths = n_lengths
   )
+  if (nrow(recruitment_rows)) frame <- append_recruitment_input(frame, recruitment_rows)
+  frame
 }
 
 # Unexported functions ----

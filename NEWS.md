@@ -1,5 +1,12 @@
 # FIMS 0.11.0
 
+* Supply fixed recruitment phases in the input data frame as
+  `recruitment_fraction` rows, using `timing` for entry dates and `observed` for
+  fractions. Initialization and retrospective refits retain these rows without
+  a separate schedule argument. Explicit schedules remain supported, with
+  conflicting sources rejected. Full `timing` values now update derived date
+  metadata when editing normalized input tables.
+
 * Keep model JSON valid when derived quantities contain infinities, such as log
   catch from a survey with exactly zero fishing mortality. JSON uses the existing
   `-999` sentinel for non-finite derived values; raw reports retain their values.

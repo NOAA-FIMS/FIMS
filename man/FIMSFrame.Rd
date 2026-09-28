@@ -16,7 +16,7 @@ See the \code{data_big} object in FIMS, e.g., \code{data(data_big, package = "FI
 An object of the S4 class \code{FIMSFrame} class, or one of its child classes, is
 validated and then returned. All objects will at a minimum have a slot
 called \code{data} to store the input data frame. Additional slots are dependent
-on the child class. Use \code{\link[methods:showClass]{methods::showClass()}} to see all available slots.
+on the child class. Use \code{\link[methods:RClassUtils]{methods::showClass()}} to see all available slots.
 }
 \description{
 All constructor functions take a single input and build an object specific
@@ -25,19 +25,6 @@ class. Future, associated child classes will have the additional slots
 needed for different types of models.
 }
 \details{
-Observation timing accepts integer years, ISO strings (\code{YYYY},
-\code{YYYY-MM}, \code{YYYY-MM-DD}), or R Date values. Survey dates default
-missing months/days to January/the first day. Catch and fishery compositions
-require year-only input and represent annual intervals. Biological input tables
-remain annual. Returned data retain integer years in \code{timing} and
-normalized dates in \code{date}. Use \code{\link[=get_observations]{get_observations()}} for sample IDs
-and backend coordinates. Multiple survey samples per year are supported. Dated
-survey predictions apply within-year mortality and evaluate parametric growth
-and maturity at fractional ages. Empirical weights and fixed age-to-length
-mappings retain their annual values. Population transitions and fishery
-observations remain annual.
-
-
 \subsection{data}{
 
 The input data are both sorted (see the section below on sorting) and
@@ -55,6 +42,20 @@ must have composition entries for every integer between your first and last
 age in the model. For example, you cannot bin fish into bins that span
 multiple years, you must have age-2, age-3, and age-4 not just age-2 and
 age-4 fish in your composition data.
+}
+
+\subsection{Recruitment timing}{
+
+Fixed recruitment phases belong in this same input table. Use
+\code{type = "recruitment_fraction"}, full ISO dates in \code{timing}, allocated
+fractions in \code{observed}, and a \code{phase} name for each row. \code{entry_age} is
+optional and defaults to the youngest modeled age. Leave \code{fleet}, \code{age},
+\code{length}, and \code{uncertainty} missing; \code{unit} is \code{"proportion"} or missing.
+\code{population} defaults to \code{"population1"}. Fractions must sum to one in every
+modeled year, with consistent phase identifiers and entry ages across years.
+These are fixed configuration rows, not likelihood observations. They cannot
+extend the model horizon or define fleets or age bins. See
+\code{\link[=setup_recruitment_schedule]{setup_recruitment_schedule()}} and the recruitment-phases vignette.
 }
 
 \subsection{Uncertainty}{
@@ -115,6 +116,19 @@ for a given fleet then the next year will begin.
 }
 
 }
+
+Observation timing accepts integer years, ISO strings (\code{YYYY}, \code{YYYY-MM},
+\code{YYYY-MM-DD}), or R Date values. Survey dates default missing months/days
+to January/the first day. Catch and fishery compositions require year-only
+input and represent annual intervals. Biological input tables remain annual;
+recruitment_fraction rows require full dates in \code{timing}.
+The returned data retain integer years in \code{timing} and normalized dates in
+\code{date}. Use \code{\link[=get_observations]{get_observations()}} for sample IDs and backend coordinates.
+Multiple survey samples per year are supported. Dated survey predictions
+apply within-year mortality and evaluate parametric growth and maturity at
+fractional ages. Empirical weights and fixed age-to-length mappings retain
+their annual values. Population transitions and fishery observations remain
+annual.
 }
 \seealso{
 \code{\link[=plot,FIMSFrame,missing-method]{plot,FIMSFrame,missing-method()}} for plotting \code{FIMSFrame} objects.

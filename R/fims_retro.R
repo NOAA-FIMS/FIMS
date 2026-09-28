@@ -39,7 +39,9 @@
 #'   parallel processing. If `NULL` (default), uses `parallel::detectCores() - 1`.
 #'   Set to 1 for sequential processing. Must be a positive integer.
 #'
-#' @param recruitment_schedule A schedule from [setup_recruitment_schedule()].
+#' @param recruitment_schedule Optional explicit schedule from
+#'   [setup_recruitment_schedule()]. Recruitment rows in data are retained
+#'   automatically when this argument is omitted.
 #'   Retrospective peels retain the annual horizon and this schedule.
 #' @return
 #' A list with two named elements:

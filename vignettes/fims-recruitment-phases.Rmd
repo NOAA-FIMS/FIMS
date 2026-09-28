@@ -22,7 +22,7 @@ both entering at biological age 1. At July 1, the early recruits have aged by
 181/365 years in 2027, while the late recruits have just reached age 1.
 Calendar-year age labels still advance together on January 1.
 
-## Data and schedules
+## Recruitment in the input data
 
 For an explicit setup of the C++ modules, annual fishery and April survey data,
 and their likelihoods, see [Recruitment phases with direct Rcpp
@@ -38,20 +38,31 @@ observations$timing <- ifelse(is.na(observations$timing), NA_character_,
 july <- observations |>
   filter(fleet == "survey1", type %in% c("index", "age_comp", "length_comp"))
 july$timing <- paste0(july$timing, "-07-01")
-frame <- FIMSFrame(bind_rows(observations, july))
-
-early <- setup_recruitment_schedule(frame) |>
-  mutate(phase = "early", fraction = 0.4, entry_age = 1)
-late <- early |>
-  mutate(phase = "late", fraction = 0.6,
-    date = as.Date(sprintf("%04d-07-01", timing)))
-schedule <- setup_recruitment_schedule(frame, bind_rows(early, late))
-schedule |> select(phase, date, fraction, entry_age, year_fraction)
+recruitment <- tibble(
+  type = "recruitment_fraction",
+  timing = paste0(rep(2027:2029, each = 2),
+    rep(c("-01-01", "-07-01"), 3)),
+  phase = rep(c("early", "late"), 3),
+  observed = rep(c(0.4, 0.6), 3),
+  entry_age = 1
+)
+frame <- FIMSFrame(bind_rows(observations, july, recruitment))
+recruitment |> select(phase, timing, observed, entry_age)
 ```
 
 The extra survey samples reuse example observations to illustrate the interface;
 they are not new measured data. Use actual observations and uncertainties in an
 assessment. Index and composition dates need not coincide with recruitment dates.
+
+The recruitment rows belong in the same input data frame as catch, surveys, and
+biological inputs. `timing` remains the input column for both observation and
+recruitment dates. `observed` holds the allocated fraction for these rows; they
+are fixed configuration, not additional observations or likelihood terms.
+Leave `fleet`, `age`, `length`, and `uncertainty` missing. `unit` may be
+`"proportion"` or missing, and `population` defaults to `"population1"`.
+No separate schedule argument is needed. Normalized `date` and calendar-year
+coordinates are derived internally; full dates entered through `timing` take
+precedence over that derived metadata when editing normalized input tables.
 
 Schedules require the same phase identifiers in every modeled year, unique dates,
 and nonnegative fractions summing to one within 1e-8 each year. Fractions and
@@ -70,7 +81,7 @@ parameters$distribution[parameters$module_name == "Recruitment"] <- NA_character
 parameters$distribution_type[parameters$module_name == "Recruitment"] <- NA_character_
 parameters$estimation_type[parameters$module_name == "Fleet" &
   parameters$fleet == "survey1" & parameters$label == "log_q"] <- "fixed_effects"
-fit <- initialize_fims(parameters, frame, recruitment_schedule = schedule) |>
+fit <- initialize_fims(parameters, frame) |>
   fit_fims(number_of_loops = 1)
 get_max_gradient(fit)
 
@@ -148,11 +159,15 @@ catch-biology conventions above apply only when phase mode is enabled.
 
 ## Retrospectives and projections
 
-Pass `recruitment_schedule = schedule` to `run_modified_data_fims()` or
-`run_fims_retrospective()` to retain phase timing. Peels retain the annual catch
-horizon, so the full schedule remains applicable. Likelihood profiles obtain the
-schedule from the fitted model automatically.
+`run_modified_data_fims()` and `run_fims_retrospective()` retain the recruitment
+rows automatically. Peels retain the annual catch horizon, so the full schedule
+remains applicable. Likelihood profiles preserve the fitted schedule as well.
 
-For projections, extend the schedule through every new modeled year as well as
+Existing callers may still pass an explicit `recruitment_schedule` accepted by
+`setup_recruitment_schedule()`. It accepts `timing` for full dates and retains
+support for the earlier `date` column. If a table also contains recruitment
+rows, an explicit schedule must agree with those rows; conflicts are rejected.
+
+For projections, add recruitment rows for every new modeled year as well as
 the annual fishing and biological inputs. Missing schedule years are rejected;
 FIMS does not silently supply January 1 recruitment in those years.

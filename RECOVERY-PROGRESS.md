@@ -153,3 +153,42 @@ analytic-related-tests.log, and analytic-render.log under the validation folder.
 This pass did not rerun the entire package check. The pre-existing formatting
 edit to inst/examples/recruitment-phase-recovery.R was retained and excluded
 from this checkpoint.
+
+## Kelli's input-interface request — 2026-09-28
+
+Recruitment phases can now be supplied inside the ordinary input data frame:
+`type = "recruitment_fraction"`, full calendar entry dates in `timing`, allocated
+fractions in `observed`, phase names in `phase`, and optional `entry_age`.
+`fleet`, `age`, `length`, and `uncertainty` stay missing; `unit` is proportion or
+missing and population defaults to population1. Initialization discovers these
+rows automatically. Configuration does not create observations, fleets, bins,
+likelihood terms, or model years, and is not padded as missing data.
+
+`timing` remains the user-facing input column. Full timing edits supersede
+previously normalized date metadata. Internal calendar-year/date coordinates
+remain available for backend indexing and existing callers. Explicit separate
+schedules remain supported, accepting timing or the old date column. Conflicting
+embedded and explicit schedules fail before the active model is cleared.
+
+Recruitment rows survive FIMSFrame/get_data round trips, raw-table initialization,
+retrospective peels, likelihood profiles, and projection setup. Projection years
+require complete recruitment rows. The single-January-phase model retains the
+same reports as the previous implicit annual default.
+
+Updated the recruitment-phases vignette to demonstrate initialize_fims(parameters,
+frame) with recruitment already in the table. The direct-interface survey example
+now uses a timing column too. Input guide, help pages, supported type registry,
+and NEWS were updated.
+
+Validation:
+- Broader recruitment/observation/FIMSFrame/initialization/default-parameter tests:
+  766 passed, no failures or warnings, one existing CRAN-guarded snapshot skip.
+- Final focused input/schedule/timing tests after compatibility refinements:
+  191 passed, no failures, warnings, or skips (64 new input-interface checks).
+- Rendered fims-recruitment-phases, fims-recruitment-direct,
+  fims-recruitment-recovery, and fims-input-data successfully.
+- Ran the setup_recruitment_schedule help example and checked updated Rd syntax.
+- git diff --check passed. No full package check was repeated in this pass.
+Logs and rendered artifacts: /tmp/fims-recovery-validation/embedded-*.log.
+The pre-existing formatting edit to inst/examples/recruitment-phase-recovery.R
+and local timing documents remain outside this checkpoint.
