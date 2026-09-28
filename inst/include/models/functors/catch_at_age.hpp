@@ -374,6 +374,49 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
+   * @brief Calculates unfished numbers at age in the first year.
+   *
+   * The first year has no previous year to project from, so unfished numbers
+   * at age are set to the equilibrium age structure implied by unfished
+   * recruitment and year-0 natural mortality. This is the same age structure
+   * used for \f$\phi_0\f$ in CalculateSBPR0(), so that
+   * \f$SB^U_0 = R_0 \phi_0\f$.
+   *
+   * Standard update, with \f$N^U_{0,0} = R_0\f$ set by the caller:
+   * \f[
+   * N^U_{a,0} = N^U_{a-1,0} \exp(-M_{a-1,0})
+   * \f]
+   *
+   * Plus group update (if \f$a = A\f$), where the plus group holds survivors
+   * of all older ages and so is the sum of a geometric series:
+   * \f[
+   * N^U_{A,0} = \frac{N^U_{A-1,0} \exp(-M_{A-1,0})}{1 - \exp(-M_{A,0})}
+   * \f]
+   *
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_age
+   */
+  void CalculateUnfishedInitialNumbersAA(
+      std::shared_ptr<fims_popdy::Population<Type>> &population,
+      size_t i_age_year, size_t age) {
+    std::map<std::string, fims::Vector<Type>> &dq_ =
+        this->GetPopulationDerivedQuantities(population->GetId());
+
+    // In year 0, the previous age is the previous element of the same year
+    size_t i_agem1 = i_age_year - 1;
+    dq_["unfished_numbers_at_age"][i_age_year] =
+        dq_["unfished_numbers_at_age"][i_agem1] *
+        fims_math::exp(-population->M[i_agem1]);
+
+    if (age == (population->n_ages - 1)) {
+      dq_["unfished_numbers_at_age"][i_age_year] =
+          dq_["unfished_numbers_at_age"][i_age_year] /
+          (1.0 - fims_math::exp(-population->M[i_age_year]));
+    }
+  }
+
+  /**
    * @brief Calculates total mortality for a population.
    *
    * This function calculates total mortality \f$Z\f$ for a specific age and
@@ -567,8 +610,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * w_a
    * \f]
    *
-   * The numbers at age \f$N_a\f$ are calculated recursively with natural
-   * mortality: \f[ N_a = N_{a-1} \times \exp(-M_a) \quad \text{for } a = 1,
+   * The numbers at age \f$N_a\f$ are calculated recursively with the natural
+   * mortality of the age being left, as in the population dynamics:
+   * \f[ N_a = N_{a-1} \times \exp(-M_{a-1}) \quad \text{for } a = 1,
    * \ldots, A-1 \f]
    *
    * Plus group update:
@@ -591,7 +635,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
              dq_["proportion_mature_at_age"][0] *
              PopulationMeanWeightAA(population, 0, 0);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
-      numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
+      numbers_spr[a] =
+          numbers_spr[a - 1] * fims_math::exp(-population->M[a - 1]);
       phi_0 += numbers_spr[a] *
                population->proportion_female.get_force_scalar(a) *
                dq_["proportion_mature_at_age"][a] *
@@ -1474,7 +1519,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
               pdq_["unfished_numbers_at_age"][i_age_year] =
                   fims_math::exp(population->recruitment->log_rzero[0]);
             } else {
-              CalculateUnfishedNumbersAA(population, i_age_year, a - 1, a);
+              CalculateUnfishedInitialNumbersAA(population, i_age_year, a);
             }
 
           } else {
