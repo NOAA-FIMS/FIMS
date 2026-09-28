@@ -145,9 +145,10 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       if (!containsNA) {
         Type row_lpmf = dmultinom(observed_values_vector.to_tmb(),
                                   prob_vector.to_tmb(), true);
-        // The multinomial is a joint density over the bins of a row and does
-        // not split into per-bin terms. Each bin reports an equal share so
-        // that summing lpdf_vec over a composition counts each row once.
+        // The row log-probability mass has no unique split across bins because
+        // the log(n!) term belongs to the whole row. Each bin reports an equal
+        // share so that summing lpdf_vec over a composition counts each row
+        // once.
         std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
                   this->lpdf_vec.begin() + lpdf_vec_idx + dims[1],
                   row_lpmf / static_cast<Type>(dims[1]));
