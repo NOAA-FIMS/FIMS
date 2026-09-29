@@ -9,23 +9,30 @@
 
 # calculate_mohns_rho ----
 ## Setup ----
-# A reference run (peel 0) and a 1-year peel, 10 years each, where the peel
-# estimates 20% more spawning biomass than the reference in its terminal year 9
+# A reference run (peel 0) and 2 peels over 10 years. Each peel spans all years,
+# as in run_fims_retrospective() output, and is compared at its terminal year:
+# peel 1 at year 9 is 20% above the reference and peel 2 at year 8 is 10% above.
+# Values after each peel's terminal year (999) must be ignored.
 retro_fit <- list(
-  years_to_remove = c(0, 1),
+  years_to_remove = c(0, 1, 2),
   estimates = tibble::tibble(
     label = "spawning_biomass",
-    year_i = c(1:10, 1:9),
-    retrospective_peel = c(rep(0, 10), rep(1, 9)),
-    estimated = c(rep(100, 10), rep(100, 8), 120)
+    year_i = rep(1:10, 3),
+    timing = rep(2001:2010, 3),
+    retrospective_peel = rep(0:2, each = 10),
+    estimated = c(
+      rep(100, 10),
+      rep(100, 8), 120, 999,
+      rep(100, 7), 110, 999, 999
+    )
   )
 )
 
 ## IO correctness ----
 test_that("calculate_mohns_rho() works with correct inputs", {
-  #' @description Test that a peel estimating more than the reference model gives a positive rho equal to the relative difference.
+  #' @description Test that peels estimating more than the reference model give a positive rho equal to the mean relative difference at their terminal years.
   expect_equal(
     object = calculate_mohns_rho(retro_fit, quantity = "spawning_biomass"),
-    expected = 0.2
+    expected = 0.15
   )
 })
