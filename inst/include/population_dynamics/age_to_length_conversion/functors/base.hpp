@@ -55,6 +55,14 @@ struct AgeToLengthConversionBase : public fims_model_object::FIMSObject<Type> {
    */
   virtual bool BuildAgeToLengthConversionRow(
       size_t year, size_t age, fims::Vector<Type>& out_row) const = 0;
+  // Fixed empirical keys are time-invariant; derived keys override this method.
+  virtual bool VariesWithinYear() const { return false; }
+
+  virtual bool BuildAgeToLengthConversionRowAtTime(
+      size_t year, size_t age, double fraction, fims::Vector<Type>& out_row) const {
+    return BuildAgeToLengthConversionRow(year, age, out_row);
+  }
+
 };
 
 template <typename Type>

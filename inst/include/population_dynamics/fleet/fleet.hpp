@@ -9,6 +9,9 @@
 #ifndef FIMS_POPULATION_DYNAMICS_FLEET_HPP
 #define FIMS_POPULATION_DYNAMICS_FLEET_HPP
 
+#include <cmath>
+#include "../population/observation_time.hpp"
+#include <stdexcept>
 #include "common/data_object.hpp"
 #include "common/fims_vector.hpp"
 #include "common/model_object.hpp"
@@ -32,6 +35,61 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       lengths; /*!< Fleet observation-bin centers for this fleet. */
   fims::Vector<double>
       length_bin_edges; /*!< Resolved observation-bin edges for this fleet. */
+
+  // One reference per annual likelihood row; -1 is missing, -2 is annual.
+  // Empty reference vectors retain the direct-C++ legacy prediction behavior.
+  fims::Vector<int> index_time_id;
+  fims::Vector<int> age_comp_time_id;
+  fims::Vector<int> length_comp_time_id;
+  std::shared_ptr<const std::vector<ObservationTime>> observation_times;
+
+  void BindObservationTimes(
+      const std::shared_ptr<std::vector<ObservationTime>>& times) {
+    if (observation_times && *observation_times != *times) {
+      throw std::invalid_argument(
+          "Populations sharing a fleet must use the same observation times");
+    }
+    observation_times = times;
+    for (const auto* ids : {&index_time_id, &age_comp_time_id,
+                            &length_comp_time_id}) {
+      if (ids->size() != 0 && ids->size() != n_years) {
+        throw std::invalid_argument(
+            "Observation references must have one entry per year");
+      }
+      for (size_t year = 0; year < ids->size(); ++year) {
+        const int id = (*ids)[year];
+        if (id < -2 || (id >= 0 &&
+            (static_cast<size_t>(id) >= times->size() ||
+             (*times)[id].year != year))) {
+          throw std::invalid_argument(
+              "Observation reference must identify a time in its sample year");
+        }
+      }
+    }
+  }
+
+  bool IsAnnualSample(const fims::Vector<int>& ids, size_t year) const {
+    return ids.size() != 0 && ids[year] == -2;
+  }
+
+  bool IsDatedSample(const fims::Vector<int>& ids, size_t year) const {
+    return ids.size() != 0 && ids[year] >= 0;
+  }
+
+  double ObservationFraction(const fims::Vector<int>& ids, size_t year) const {
+    if (ids.size() == 0) return 0.0;
+    if (ids.size() != n_years || year >= ids.size()) {
+      throw std::invalid_argument(
+          "Observation references must have one entry per year");
+    }
+    const int id = ids[year];
+    if (id < 0) return 0.0;
+    if (!observation_times ||
+        static_cast<size_t>(id) >= observation_times->size()) {
+      throw std::invalid_argument("Invalid observation reference");
+    }
+    return (*observation_times)[id].fraction;
+  }
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/

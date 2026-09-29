@@ -91,7 +91,8 @@ prepare_test_data <- function() {
   )
   data_age_length_comp_na <- data_age_length_comp_raw |>
     dplyr::filter(
-      !(fleet == "survey1" & type %in% c("age_comp") & timing == na_index)
+      !(fleet == "survey1" & type %in% c("age_comp") &
+          timing == sprintf("%04d-01-01", na_index))
     ) |>
     dplyr::filter(
       !(fleet == "fleet1" &
@@ -263,7 +264,7 @@ prepare_test_data <- function() {
   data_missing_agecomp <- data_big |>
     dplyr::filter(
       !(type == "age_comp" & fleet == "fleet1" & timing == 3),
-      !(type == "age_comp" & fleet == "survey1" & timing == 5)
+      !(type == "age_comp" & fleet == "survey1" & timing == "0005-01-01")
     ) |>
     FIMSFrame()
   # Uses the same parameters as deterministic_age_length_comp so the expected

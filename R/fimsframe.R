@@ -949,6 +949,37 @@ resolve_fleet_length_bins <- function(
 #' needed for different types of models.
 #'
 #' @details
+#' ## Timing
+#' `timing` accepts R `Date` values, dates written as `YYYY-MM-DD`, or
+#' one- to four-digit years (numeric or character). `FIMSFrame()` normalizes
+#' year-only inputs to December 31: `3` becomes `0003-12-31` and `2025`
+#' becomes `2025-12-31`. Years and dates can be mixed in a character column.
+#' Missing calendar years are padded on December 31. Missing timing values
+#' (`NA`) are retained for data without an associated time. At least one timed
+#' observation other than weight-at-age or age-to-length conversion is needed
+#' to set the model year range.
+#'
+#' December 31 is reserved for observations representing the whole year,
+#' including when supplied as an explicit date. Fishery compositions use annual
+#' catch; surveys use annual averages of surviving abundance. All other dates,
+#' including January 1, represent instantaneous samples. Catch remains annual.
+#' An instantaneous December 31 sample cannot be represented.
+#' Model initialization supports one sample per fleet, data type, and year.
+#' Dated samples account for survival to the sample date and, when using a
+#' growth curve, growth before sampling. The shared observation-time table is
+#' built automatically from the data; no Population timing setting is required.
+#' Missing observations do not add sample dates.
+#'
+#' Low-level Rcpp data constructors accept optional ISO date strings, for
+#' example `methods::new(Index, 2L, c("1996-12-31", "1997-06-10"))`.
+#' Omitting dates from these constructors means annual observations in the
+#' calendar inferred from other data, or a calendar starting at year 1 when
+#' no data supply dates. Pass years through `FIMSFrame()` to normalize them.
+#' Empirical weight-at-age and fixed age-to-length keys remain time-invariant
+#' within a year. Annual observations with growth-derived weights or length
+#' distributions use eight-point Gauss-Legendre integration over the year;
+#' otherwise annual survival is integrated analytically.
+#'
 #' ## data
 #' The input data are both sorted (see the section below on sorting) and
 #' expanded to include -999 observations for all missing rows before returning
@@ -1046,15 +1077,7 @@ FIMSFrame <- function(data) {
     )
   }
 
-  if (!all(is.numeric(data[["timing"]]))) {
-    cli::cli_abort("{.var timing} must be in numeric format.")
-  }
-  if (!all(
-    as.integer(data[["timing"]]) - data[["timing"]] == 0,
-    na.rm = TRUE
-  )) {
-    cli::cli_abort("{.var timing} can only handle years right now.")
-  }
+  data[["timing"]] <- normalize_timing(data[["timing"]])
 
   # Get the earliest and latest year formatted as integers
   data_to_use_4_timing <- dplyr::filter(
@@ -1062,10 +1085,15 @@ FIMSFrame <- function(data) {
     !.data$type %in% c("age_to_length_conversion", "weight_at_age")
   ) |>
     dplyr::pull(.data$timing)
+  data_to_use_4_timing <- as.integer(format(data_to_use_4_timing, "%Y"))
+  if (all(is.na(data_to_use_4_timing))) {
+    cli::cli_abort("At least one timed observation is needed to set the year range.")
+  }
   start_year <- as.integer(floor(min(data_to_use_4_timing, na.rm = TRUE)))
   end_year <- as.integer(floor(max(data_to_use_4_timing, na.rm = TRUE)))
   n_years <- as.integer(end_year - start_year + 1)
-  years <- start_year:end_year
+  years <- as.Date(sprintf("%04d-12-31", start_year:end_year))
+  first_timing <- as.Date(sprintf("%04d-01-01", start_year))
 
   # Get the fleets represented in the data
   fleets <- unique(na.omit(data[["fleet"]]))
@@ -1153,7 +1181,7 @@ FIMSFrame <- function(data) {
   # order so that getting information out with model_*() are correct.
   formatted_data <- data |>
     dplyr::filter(
-      .data$timing >= start_year | is.na(.data$timing)
+      .data$timing >= first_timing | is.na(.data$timing)
     ) |>
     tibble::as_tibble()
   missing_time_series <- create_missing_data(
@@ -1279,6 +1307,40 @@ FIMSFrame <- function(data) {
 }
 
 # Unexported functions ----
+# Normalize years and dates to Date, preserving missing timing values.
+normalize_timing <- function(timing) {
+  if (inherits(timing, "Date")) {
+    return(timing)
+  }
+  if (is.numeric(timing)) {
+    if (any(!is.na(timing) & (!is.finite(timing) | timing != floor(timing)))) {
+      cli::cli_abort("{.var timing} must contain whole years or valid dates.")
+    }
+  } else if (!is.character(timing) && !all(is.na(timing))) {
+    cli::cli_abort("{.var timing} must contain years or dates.")
+  }
+  text <- as.character(timing)
+  year_only <- !is.na(text) & grepl("^[0-9]{1,4}$", text)
+  text[year_only] <- sprintf("%04d-12-31", as.integer(text[year_only]))
+  dates <- as.Date(text, format = "%Y-%m-%d")
+  invalid <- !is.na(text) & (
+    !grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", text) |
+      is.na(dates) | format(dates, "%Y-%m-%d") != text
+  )
+  if (any(invalid)) {
+    cli::cli_abort(
+      "{.var timing} must contain one- to four-digit years or valid YYYY-MM-DD dates."
+    )
+  }
+  dates
+}
+
+# Fill absent calendar years on December 31, retaining each observed date.
+complete_timings <- function(timing, timings) {
+  observed <- unique(timing[!is.na(timing)])
+  c(observed, timings[!format(timings, "%Y") %in% format(observed, "%Y")])
+}
+
 create_missing_data <- function(
   data,
   bins,
@@ -1297,7 +1359,7 @@ create_missing_data <- function(
       dplyr::filter(.data$type %in% types) |>
       tidyr::expand(
         !!rlang::sym("unit"),
-        !!rlang::sym("timing") := timings
+        !!rlang::sym("timing") := complete_timings(.data$timing, timings)
       ) |>
       dplyr::anti_join(
         y = dplyr::select(
@@ -1312,7 +1374,7 @@ create_missing_data <- function(
       dplyr::filter(.data$type %in% types) |>
       tidyr::expand(
         !!rlang::sym("unit"),
-        !!rlang::sym("timing") := timings,
+        !!rlang::sym("timing") := complete_timings(.data$timing, timings),
         !!bin_column := bins
       ) |>
       dplyr::anti_join(
@@ -1335,4 +1397,25 @@ create_missing_data <- function(
 pretty_type <- function(x) {
   gsub("comp", "composition", x) |>
     gsub(pattern = "_", replacement = " ")
+}
+
+# Keep the annual likelihood layout and one-sample-per-type/fleet/year limit.
+data_timing <- function(data, fleet, type) {
+  observations <- get_data(data) |>
+    dplyr::filter(.data$fleet == .env$fleet, .data$type == .env$type)
+  years <- as.integer(format(observations$timing, "%Y"))
+  dates <- unique(data.frame(year = years, date = observations$timing))
+  sample_columns <- c("timing", switch(type,
+    age_comp = "age",
+    length_comp = "length",
+    NULL
+  ))
+  if (anyNA(dates$date) || anyDuplicated(dates$year) ||
+    anyDuplicated(observations[sample_columns])) {
+    cli::cli_abort(
+      "Fleet `{fleet}` {type} requires one dated sample per year; multiple samples within a year, duplicate bins, or NA sample dates are not supported."
+    )
+  }
+  # FIMSFrame has already normalized and padded every annual observation row.
+  format(dates$date[order(dates$year)], "%Y-%m-%d")
 }

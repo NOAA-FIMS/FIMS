@@ -8,7 +8,10 @@
 #'   one one fleet or one survey.
 #' * Timing:
 #'   * Fishery is assumed to operate over the entire year
-#'   * Survey occurs instantaneously at the start of the year
+#'   * Survey occurs instantaneously on January 1 (explicit YYYY-01-01 dates)
+#'   * Year-only fishery timing represents annual observations
+#'   * Length compositions inherit timing from their source age compositions;
+#'     the fixed age-to-length key does not imply January 1 fishery sampling
 #' * Note: If you encounter warning messages such as `cannot open the
 #'   connection: warning messages from top-level task callback
 #'   'vsc.workspace'` while running the code in VS Code, try calling
@@ -275,7 +278,7 @@ index_data <- data.frame(
   type = "index",
   fleet = names(returned_om[["om_output"]][["survey_index"]])[1],
   age = NA, # Not by age in this case, but there is a by age option.
-  timing = returned_om[["om_input"]][["year"]],
+  timing = sprintf("%04d-01-01", returned_om[["om_input"]][["year"]]),
   observed = returned_om[["em_input"]][["surveyB.obs"]][[1]],
   unit = "mt",
   uncertainty = paste(
@@ -309,7 +312,7 @@ age_data <- rbind(
       returned_om[["om_input"]][["n.survey"]][["survey1"]],
       ")"
     ),
-    timing = returned_om[["om_input"]][["year"]]
+    timing = sprintf("%04d-01-01", returned_om[["om_input"]][["year"]])
   )
 ) |>
   dplyr::mutate(
@@ -401,7 +404,14 @@ length_comp_data <- data.frame(
     ),
     ")"
   )
-)
+) |>
+  dplyr::mutate(
+    timing = dplyr::if_else(
+      fleet == "survey1",
+      sprintf("%04d-01-01", timing),
+      as.character(timing)
+    )
+  )
 
 # Save individual dataframes to a single file for {testthat} integration tests
 save(

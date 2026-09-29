@@ -322,3 +322,35 @@ TEST(GrowthDerivedSizeProvider,
 }
 
 }  // namespace
+
+TEST(GrowthDerivedSizeProvider, DatedRowsGrowAndAreReusedUntilParametersChange) {
+  auto growth = std::make_shared<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
+  ConfigureAdapter(*growth, 275, 725, 0.18, 1, 12, 2.5e-11, 3, 28, 73);
+  growth->SetAgeOffset(1);
+  growth->Initialize(2, 3, 1);
+  growth->PrepareGrowthProducts();
+  const auto grid = fims_popdy::SizeGridBuilder::BuildFromEdges({0, 250, 300, 350, 450, 600, 900});
+  fims_popdy::GrowthDerivedSizeProvider<double> provider(growth);
+  provider.SetMinimumAge(1);
+  provider.SetPopulationDimensions(2, 3);
+  provider.SetPopulationSizeGrid(&grid);
+  provider.PrepareSizeProducts();
+  EXPECT_EQ(provider.TimedSizeRows(), 0u);
+  EXPECT_DOUBLE_EQ(provider.ProbSizeAtTime(0, 0, 0, 0), provider.ProbSize(0, 0, 0));
+  EXPECT_EQ(provider.TimedSizeRows(), 0u);
+  double total = 0;
+  for (size_t b = 0; b < grid.n_bins; ++b) total += provider.ProbSizeAtTime(1, 0, b, 104.0 / 366.0);
+  EXPECT_NEAR(total, 1, 1e-12);
+  EXPECT_LT(provider.ProbSizeAtTime(1, 0, 0, 104.0 / 366.0), provider.ProbSize(1, 0, 0));
+  EXPECT_EQ(provider.TimedSizeRows(), 1u);
+  EXPECT_EQ(growth->TimedGrowthAges(), 1u);
+  double mean, sd, weight;
+  growth->EvaluateAtAge(1 + 104.0 / 366.0, mean, sd, weight);
+  EXPECT_EQ(growth->TimedGrowthAges(), 1u);
+  const double before = provider.ProbSizeAtTime(1, 0, 0, 104.0 / 366.0);
+  growth->MeanLengthYoungVector()[0] = std::log(300.0);
+  growth->PrepareGrowthProducts();
+  provider.PrepareSizeProducts();
+  EXPECT_EQ(provider.TimedSizeRows(), 0u);
+  EXPECT_NE(provider.ProbSizeAtTime(1, 0, 0, 104.0 / 366.0), before);
+}

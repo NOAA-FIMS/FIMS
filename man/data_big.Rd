@@ -22,7 +22,9 @@ one not age zero.}
 pertain to length. For \code{length_comp} rows, this identifies the observed
 length bin. For \code{length_bin} rows, this defines length-bin values used
 for age-to-length conversion.}
-\item{timing}{The timing, i.e., year the data was collected.}
+\item{timing}{Character years for annual fishery observations and explicit
+January 1 dates for survey index and composition samples. Untimed inputs
+use NA. These are simulated years, not historical collection dates.}
 \item{observed}{The observed measurement of interest.}
 \item{unit}{A character string specifying the units of \code{observed}. Allowed
 units for each data type are as follows. \code{mt} is used for \code{index},

@@ -25,6 +25,38 @@ class. Future, associated child classes will have the additional slots
 needed for different types of models.
 }
 \details{
+\subsection{Timing}{
+\code{timing} accepts R \code{Date} values, dates written as \code{YYYY-MM-DD}, or
+one- to four-digit years (numeric or character). \code{FIMSFrame()} normalizes
+year-only inputs to December 31: \code{3} becomes \code{0003-12-31} and \code{2025}
+becomes \code{2025-12-31}. Years and dates can be mixed in a character column.
+Missing calendar years are padded on December 31. Missing timing values
+(\code{NA}) are retained for data without an associated time. At least one timed
+observation other than weight-at-age or age-to-length conversion is needed
+to set the model year range.
+
+December 31 is reserved for observations representing the whole year,
+including when supplied as an explicit date. Fishery compositions use annual
+catch; surveys use annual averages of surviving abundance. All other dates,
+including January 1, represent instantaneous samples. Catch remains annual.
+An instantaneous December 31 sample cannot be represented.
+Model initialization supports one sample per fleet, data type, and year.
+Dated samples account for survival to the sample date and, when using a
+growth curve, growth before sampling. The shared observation-time table is
+built automatically from the data; no Population timing setting is required.
+Missing observations do not add sample dates.
+
+Low-level Rcpp data constructors accept optional ISO date strings, for
+example \code{methods::new(Index, 2L, c("1996-12-31", "1997-06-10"))}.
+Omitting dates from these constructors means annual observations in the
+calendar inferred from other data, or a calendar starting at year 1 when
+no data supply dates. Pass years through \code{FIMSFrame()} to normalize them.
+Empirical weight-at-age and fixed age-to-length keys remain time-invariant
+within a year. Annual observations with growth-derived weights or length
+distributions use eight-point Gauss-Legendre integration over the year;
+otherwise annual survival is integrated analytically.
+}
+
 \subsection{data}{
 
 The input data are both sorted (see the section below on sorting) and

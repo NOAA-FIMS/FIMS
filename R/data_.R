@@ -26,7 +26,11 @@
 #'     pertain to length. For `length_comp` rows, this identifies the observed
 #'     length bin. For `length_bin` rows, this defines length-bin values used
 #'     for age-to-length conversion.}
-#'   \item{timing}{The timing, i.e., year the data was collected.}
+#'   \item{timing}{The timing the data was collected. For annual samples, a
+#'     four-digit year is sufficient and is typically used for fishery data.
+#'     Otherwise, dates should be provided using a YYYY-MM-DD format, where the
+#'     year be any four-digit entry, e.g., 0001 or 1999. Untimed inputs use
+#'     NA.}
 #'   \item{observed}{The observed measurement of interest.}
 #'   \item{unit}{A character string specifying the units of `observed`. Allowed
 #'     units for each data type are as follows. `mt` is used for `index`,

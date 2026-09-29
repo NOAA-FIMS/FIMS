@@ -10,6 +10,7 @@
 #define FIMS_POPULATION_DYNAMICS_SIZE_DISTRIBUTION_PROVIDER_BASE_HPP
 
 #include <cstddef>
+#include <stdexcept>
 
 #include "size_grid.hpp"
 
@@ -99,6 +100,14 @@ class SizeDistributionProviderBase {
    */
   virtual const Type& ProbSize(std::size_t year_index, std::size_t age_index,
                                std::size_t size_bin_index) const = 0;
+  virtual const Type& ProbSizeAtTime(std::size_t year, std::size_t age,
+                                    std::size_t bin, double fraction) const {
+    if (fraction != 0.0) {
+      throw std::runtime_error("Size provider does not support observation timing");
+    }
+    return ProbSize(year, age, bin);
+  }
+
 };
 
 }  // namespace fims_popdy

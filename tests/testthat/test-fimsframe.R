@@ -230,16 +230,10 @@ test_that("`FIMSFrame()` returns correct error messages", {
   #' @description Test that `FIMSFrame()` returns an error when there is no data in the FIMSFrame object.
   expect_error(FIMSFrame(data_big[0, ]))
 
-  #' @description Test that `FIMSFrame()` returns an error when timing is not numeric.
-  expect_error(
-    FIMSFrame(dplyr::mutate(data_big, timing = as.character(timing))),
-    regexp = "`timing` must be in numeric"
-  )
-
   #' @description Test that `FIMSFrame()` returns an error when timing is composed of non-integer values.
   expect_error(
     FIMSFrame(dplyr::mutate(data_big, timing = 1.1)),
-    regexp = "`timing` can only handle years right now"
+    regexp = "`timing` must contain whole years"
   )
 
   #' @description Test that `FIMSFrame()` can be created without empirical weight-at-age data.
@@ -474,3 +468,122 @@ test_that("`get_n_fleets()` works with correct inputs", {
 
 ## Error handling ----
 # No error handling to test.
+
+
+test_that("FIMSFrame normalizes calendar timing and preserves annual data", {
+  #' @description Years and explicit dates share calendar labels but preserve their distinct sampling interpretations.
+  calendar <- dplyr::mutate(data_big, timing = timing + 2000)
+  numeric_frame <- FIMSFrame(calendar)
+  character_frame <- FIMSFrame(dplyr::mutate(calendar, timing = as.character(timing)))
+  date_frame <- FIMSFrame(dplyr::mutate(
+    calendar,
+    timing = as.Date(paste0(timing, "-12-31"))
+  ))
+  expect_identical(numeric_frame, character_frame)
+  expect_identical(get_data(numeric_frame)$timing, get_data(date_frame)$timing)
+  expect_s3_class(get_data(numeric_frame)$timing, "Date")
+  expect_true(all(format(get_data(numeric_frame)$timing, "%m-%d") == "12-31", na.rm = TRUE))
+  expect_identical(get_start_year(numeric_frame), get_start_year(fims_frame) + 2000L)
+  expect_identical(get_n_years(numeric_frame), get_n_years(fims_frame))
+  expect_equal(model_index(numeric_frame, "survey1"), model_index(fims_frame, "survey1"))
+  expect_equal(model_age_comp(numeric_frame, "fleet1"), model_age_comp(fims_frame, "fleet1"))
+  expect_s3_class(get_data(fims_frame)$timing, "Date")
+})
+
+test_that("FIMSFrame preserves observation dates and fills only absent years", {
+  #' @description Mixed years and dates retain their dates without spurious January observations.
+  input <- tibble::tibble(
+    type = "index", fleet = "survey", length = NA_real_,
+    timing = c("2025", "2026-06-10", "2028-02-29"),
+    observed = c(10, 20, 30), unit = "number",
+    uncertainty = "~dnorm(mean = index_expected, sd = 1)"
+  )
+  frame <- FIMSFrame(input)
+  expect_identical(get_data(frame)$timing, as.Date(c(
+    "2025-12-31", "2026-06-10", "2027-12-31", "2028-02-29"
+  )))
+  expect_equal(model_index(frame, "survey"), c(10, 20, -999, 30))
+  expect_identical(get_start_year(frame), 2025L)
+  expect_identical(get_end_year(frame), 2028L)
+  expect_identical(get_n_years(frame), 4L)
+  input$timing <- as.Date(c("2025-12-31", "2026-06-10", "2028-02-29"))
+  expect_identical(get_data(FIMSFrame(input))$timing, get_data(frame)$timing)
+  expect_identical(FIMSFrame(get_data(frame)), frame)
+
+  #' @description Partial composition bins on an observation date still fail validation.
+  dated <- dplyr::mutate(data_big, timing = ifelse(
+    is.na(timing), NA_character_, paste0(timing + 2000, "-06-10")
+  ))
+  expect_equal(nrow(get_data(FIMSFrame(dated))), nrow(get_data(fims_frame)))
+  expect_error(
+    FIMSFrame(dplyr::filter(dated, !(type == "age_comp" & age == 3 & timing == "2002-06-10"))),
+    "Please check the age-composition data for missing ages"
+  )
+})
+
+test_that("FIMSFrame rejects invalid calendar timing", {
+  #' @description Invalid dates, malformed years, and non-finite numeric timing are rejected.
+  for (bad in c("2025-02-29", "2025-13-01", "2025-06-10junk", "2025.5", "", "June 10")) {
+    expect_error(
+      FIMSFrame(dplyr::mutate(data_big, timing = bad)),
+      "`timing` must contain one- to four-digit years"
+    )
+  }
+  for (bad in c(2025.5, Inf, -Inf)) {
+    expect_error(
+      FIMSFrame(dplyr::mutate(data_big, timing = bad)),
+      "`timing` must contain whole years"
+    )
+  }
+  #' @description Missing timing in time-invariant biological data remains missing.
+  dated <- dplyr::mutate(data_big, timing = ifelse(
+    type == "age_to_length_conversion", NA_character_, paste0(timing + 2000, "-01-01")
+  ))
+  result <- get_data(FIMSFrame(dated))
+  expect_true(all(is.na(result$timing[result$type == "age_to_length_conversion"])))
+})
+
+
+test_that("FIMSFrame treats short integer years as calendar years and retains NA", {
+  #' @description One- to four-digit numeric and character years are zero-padded to December 31.
+  for (year in c(3L, 25L, 125L, 2025L)) {
+    input <- dplyr::mutate(data_big, timing = ifelse(is.na(timing), NA, year))
+    # Use a single annual slice to avoid combining composition observations.
+    input <- input[is.na(data_big$timing) | data_big$timing == 1, ]
+    numeric_frame <- FIMSFrame(input)
+    input$timing <- as.character(input$timing)
+    expect_identical(FIMSFrame(input), numeric_frame)
+    dates <- get_data(numeric_frame)$timing
+    expect_identical(unique(dates[!is.na(dates)]), as.Date(sprintf("%04d-12-31", year)))
+    expect_identical(get_start_year(numeric_frame), year)
+    expect_identical(get_end_year(numeric_frame), year)
+    expect_true(anyNA(dates))
+  }
+  #' @description Mixed short years, full dates, and missing values retain their meanings.
+  expect_identical(
+    FIMS:::normalize_timing(c("3", "0025", "0125-06-10", NA)),
+    as.Date(c("0003-12-31", "0025-12-31", "0125-06-10", NA))
+  )
+  expect_identical(FIMS:::normalize_timing(NA), as.Date(NA_character_))
+  expect_identical(FIMS:::normalize_timing(c(NA_real_, 3)), as.Date(c(NA, "0003-12-31")))
+  #' @description Negative and five-digit years are rejected; all-NA observations cannot define a year range.
+  for (bad in c(-1, 10000)) {
+    expect_error(FIMSFrame(dplyr::mutate(data_big, timing = bad)), "one- to four-digit years")
+  }
+  expect_error(FIMSFrame(dplyr::mutate(data_big, timing = NA)), "At least one timed observation")
+})
+
+
+test_that("December 31 is annual while explicit January 1 remains dated", {
+  #' @description The sentinel needs no extra column and survives reconstruction.
+  input <- tibble::tibble(
+    type = "index", fleet = "survey", length = NA_real_,
+    timing = c("2025", "2026-01-01", "2027-12-31"),
+    observed = c(10, 20, 30), unit = "number",
+    uncertainty = "~dnorm(mean = index_expected, sd = 1)"
+  )
+  frame <- FIMSFrame(input)
+  expect_identical(get_data(frame)$timing, as.Date(c("2025-12-31", "2026-01-01", "2027-12-31")))
+  expect_false("timing_type" %in% names(get_data(frame)))
+  expect_identical(FIMSFrame(get_data(frame)), frame)
+})

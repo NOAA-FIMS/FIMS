@@ -32,7 +32,7 @@ fixed_effect_parameters <- function(data) {
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
-  "parameter_id", "fleet", "year_i", "age_i", "length_i",
+  "parameter_id", "fleet", "timing", "age_i", "length_i",
   "input", "estimated", "expected", "observed",
   "estimation_type", "uncertainty",
   "distribution", "input_type",
@@ -52,11 +52,11 @@ test_that("`get_estimates()` works with deterministic run", {
   #' @description Test that the result values from the model fit have not changed from the accepted version.
   expect_snapshot({
     estimates_snapshot <- get_estimates(deterministic_results) |>
-      # Remove the estimate, uncertainty, and gradient columns, as they
+      # Remove fitted values, uncertainty, gradients and likelihoods, as they
       # may change between runs
       dplyr::select(
         -estimated, -expected, -uncertainty, -gradient,
-        -likelihood, -log_like_cv
+        -likelihood, -log_like_cv, -lpdf
       )
 
     estimates_snapshot_lines <- capture.output(
@@ -96,11 +96,11 @@ test_that("`get_estimates()` works with estimation run", {
     # Read the first RDS file, get estimates, and print a snapshot
     estimates_snapshot <- readRDS(fit_files[[1]]) |>
       get_estimates() |>
-      # Remove the estimated, uncertainty, and gradient columns, as they
+      # Remove fitted values, uncertainty, gradients and likelihoods, as they
       # may change between runs
       dplyr::select(
         -estimated, -expected, -uncertainty, -gradient,
-        -likelihood, -log_like_cv
+        -likelihood, -log_like_cv, -lpdf
       )
 
     estimates_snapshot_lines <- capture.output(

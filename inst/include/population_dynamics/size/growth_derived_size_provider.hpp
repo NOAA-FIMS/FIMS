@@ -11,6 +11,8 @@
 
 #include <cstddef>
 #include <memory>
+#include <map>
+#include <tuple>
 #include <stdexcept>
 
 #include "../growth/growth_model_adapter.hpp"
@@ -52,6 +54,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
   void SetPopulationSizeGrid(const SizeGrid* population_size_grid) override {
     population_size_grid_ = population_size_grid;
     size_products_prepared_ = false;
+    timed_rows_.clear();
     plus_group_warning_emitted_ = false;
   }
 
@@ -60,10 +63,12 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     n_years_ = n_years;
     n_ages_ = n_ages;
     size_products_prepared_ = false;
+    timed_rows_.clear();
     plus_group_warning_emitted_ = false;
   }
 
   void PrepareSizeProducts() override {
+    timed_rows_.clear();
     if (!population_size_grid_) {
       throw std::runtime_error(
           "GrowthDerivedSizeProvider requires a population biological size "
@@ -160,6 +165,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
 
   void InvalidatePreparedSizeProducts() override {
     size_products_prepared_ = false;
+    timed_rows_.clear();
   }
 
   const Type& MeanLAA(std::size_t year_index,
@@ -190,8 +196,38 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
   void SetGrowth(std::shared_ptr<GrowthDerivedObservationBase<Type>> growth) {
     growth_observation_ = growth;
     size_products_prepared_ = false;
+    timed_rows_.clear();
     plus_group_warning_emitted_ = false;
   }
+
+  // Only requested dates/ages allocate and compute a size-distribution row.
+  const Type& ProbSizeAtTime(std::size_t year, std::size_t age,
+                            std::size_t bin, double fraction) const override {
+    if (fraction == 0.0) return ProbSize(year, age, bin);
+    const auto key = std::make_tuple(year, age, fraction);
+    auto found = timed_rows_.find(key);
+    if (found == timed_rows_.end()) {
+      Type mean, sd, weight;
+      growth_observation_->EvaluateAtAge(
+          double(age) + min_age_ + fraction, mean, sd, weight);
+      GrowthProducts<Type> products;
+      products.Resize(1, 1, 1);
+      products.MeanLAA(0, 0, 0) = mean;
+      products.SdLAA(0, 0, 0) = sd;
+      fims::Vector<Type> row(population_size_grid_->n_bins);
+      Type sum = Type(0);
+      for (std::size_t b = 0; b < row.size(); ++b) {
+        row[b] = PopulationSizeBinProb(products, 0, 0, b) + Type(1e-12);
+        sum += row[b];
+      }
+      for (std::size_t b = 0; b < row.size(); ++b) row[b] /= sum;
+      found = timed_rows_.emplace(key, row).first;
+    }
+    return found->second[bin];
+  }
+
+  void SetMinimumAge(double age) { min_age_ = age; timed_rows_.clear(); }
+  std::size_t TimedSizeRows() const { return timed_rows_.size(); }
 
  private:
   Type PopulationSizeBinProb(const GrowthProducts<Type>& growth_products,
@@ -250,6 +286,9 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     return *growth_products;
   }
 
+  double min_age_ = 0.0;
+  mutable std::map<std::tuple<std::size_t, std::size_t, double>,
+                   fims::Vector<Type>> timed_rows_;
   std::shared_ptr<GrowthDerivedObservationBase<Type>> growth_observation_;
   const SizeGrid* population_size_grid_ = nullptr;
   std::size_t n_years_ = 0;

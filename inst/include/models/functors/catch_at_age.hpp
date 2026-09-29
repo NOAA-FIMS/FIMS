@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <cmath>
 #include <set>
+#include <map>
+#include <tuple>
 #include <regex>
 #include <stdexcept>
 
@@ -61,6 +63,65 @@ class CatchAtAge : public FisheryModelBase<Type> {
    *
    */
   std::string name_m;
+
+  // Reused across fleets and data types, but never across parameter evaluations.
+  std::map<std::tuple<uint32_t, size_t, size_t, double>, Type> timed_numbers;
+
+  Type NumbersAtTime(const std::shared_ptr<Population<Type>>& population,
+                     size_t year, size_t age, double fraction) {
+    auto& dq = this->GetPopulationDerivedQuantities(population->GetId());
+    const size_t i = year * population->n_ages + age;
+    if (fraction == 0.0) return dq["numbers_at_age"][i];
+    const auto key = std::make_tuple(population->GetId(), year, age, fraction);
+    auto found = timed_numbers.find(key);
+    if (found == timed_numbers.end()) {
+      const Type z = dq["mortality_Z"][i];
+      using std::expm1;
+      // A fraction of -1 requests the exact annual average.
+      const Type survival = fraction == -1.0
+          ? Type(-expm1(-z) / z) : fims_math::exp(-z * Type(fraction));
+      found = timed_numbers.emplace(key, dq["numbers_at_age"][i] * survival).first;
+    }
+    return found->second;
+  }
+
+  // Eight-point Gauss-Legendre quadrature on [0, 1], used only for
+  // annual observations whose weight or length distribution changes with growth.
+  inline static constexpr double annual_nodes[8] = {
+      0.0198550717512319, 0.101666761293187, 0.237233795041836, 0.408282678752175,
+      0.591717321247825, 0.762766204958164, 0.898333238706813, 0.980144928248768};
+  inline static constexpr double annual_weights[8] = {
+      0.0506142681451881, 0.111190517226687, 0.156853322938944, 0.181341891689181,
+      0.181341891689181, 0.156853322938944, 0.111190517226687, 0.0506142681451881};
+
+  // A fraction of -1 requests the exact annual average of selected numbers.
+  Type SampleNumbers(const std::shared_ptr<Fleet<Type>>& fleet,
+                     size_t year, size_t age, double fraction,
+                     bool index = false) {
+    Type result = Type(0);
+    for (const auto& population : this->populations) {
+      for (const auto& member : population->fleets) {
+        if (member->GetId() != fleet->GetId()) continue;
+        const Type scale = index || fleet->fleet_observed_catch_data_id_m == -999
+            ? fleet->q.get_force_scalar(year)
+            : fleet->Fmort[year] * population->f_multiplier[year];
+        result += scale * fleet->selectivity->evaluate(population->ages[age], year) *
+                  NumbersAtTime(population, year, age, fraction);
+      }
+    }
+    return result;
+  }
+
+  Type WeightAtTime(const std::shared_ptr<Population<Type>>& population,
+                    size_t year, size_t age, double fraction) {
+    auto growth = std::dynamic_pointer_cast<GrowthDerivedObservationBase<Type>>(
+        population->growth);
+    if (fraction == 0.0 || !growth) return PopulationMeanWeightAA(population, year, age);
+    Type mean, sd, weight;
+    growth->EvaluateAtAge(population->ages[age] + fraction, mean, sd, weight);
+    return weight;
+  }
+
 
   /**
    * @brief Iterate the derived quantities.
@@ -200,6 +261,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * fleet to a given value.
    */
   virtual void Prepare() {
+    timed_numbers.clear();
     for (size_t p = 0; p < this->populations.size(); p++) {
       std::shared_ptr<fims_popdy::Population<Type>> &population =
           this->populations[p];
@@ -865,7 +927,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
           (population->fleets[fleet_]->q.get_force_scalar(year) *
            population->fleets[fleet_]->selectivity->evaluate(
                population->ages[age], year)) *
-          pdq_["numbers_at_age"][i_age_year];
+          NumbersAtTime(population, year, age,
+              population->fleets[fleet_]->IsAnnualSample(
+                  population->fleets[fleet_]->index_time_id, year) ? -1.0 :
+              population->fleets[fleet_]->ObservationFraction(
+                  population->fleets[fleet_]->index_time_id, year));
     }
   }
 
@@ -903,7 +969,21 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(fleet->GetId());
 
-      Type mean_weight_at_age = PopulationMeanWeightAA(population, year, age);
+      if (fleet->IsAnnualSample(fleet->index_time_id, year) &&
+          std::dynamic_pointer_cast<GrowthDerivedObservationBase<Type>>(population->growth)) {
+        Type biomass = Type(0);
+        for (size_t k = 0; k < 8; ++k) {
+          biomass += Type(annual_weights[k]) *
+              NumbersAtTime(population, year, age, annual_nodes[k]) *
+              WeightAtTime(population, year, age, annual_nodes[k]);
+        }
+        fdq_["index_weight_at_age"][i_age_year] = biomass *
+            fleet->q.get_force_scalar(year) *
+            fleet->selectivity->evaluate(population->ages[age], year);
+        continue;
+      }
+      Type mean_weight_at_age = WeightAtTime(population, year, age,
+          fleet->ObservationFraction(fleet->index_time_id, year));
 
       fdq_["index_weight_at_age"][i_age_year] =
           fdq_["index_numbers_at_age"][i_age_year] * mean_weight_at_age;
@@ -933,15 +1013,15 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
         for (size_t a = 0; a < fleet->n_ages; a++) {
           size_t i_age_year = y * fleet->n_ages + a;
-          // Here we have a check to determine if the age comp
-          // should be calculated from the retained catch or
-          // the total population. These values are slightly different.
-          // In the future this will have more impact as we implement
-          // timing rather than everything occurring at the start of
-          // the year.
-          if (fleet->fleet_observed_catch_data_id_m == -999) {
+          // Dated compositions sample surviving fish; annual fisheries
+          // use catches and annual surveys use mean selected abundance.
+          if (fleet->IsDatedSample(fleet->age_comp_time_id, y)) {
+            fdq_["agecomp_expected"][i_age_year] = SampleNumbers(
+                fleet, y, a, fleet->ObservationFraction(fleet->age_comp_time_id, y));
+          } else if (fleet->fleet_observed_catch_data_id_m == -999) {
             fdq_["agecomp_expected"][i_age_year] =
-                fdq_["index_numbers_at_age"][i_age_year];
+                (fleet->IsAnnualSample(fleet->age_comp_time_id, y)
+                    ? SampleNumbers(fleet, y, a, -1.0) : fdq_["index_numbers_at_age"][i_age_year]);
           } else {
             fdq_["agecomp_expected"][i_age_year] =
                 fdq_["catch_numbers_at_age"][i_age_year];
@@ -1302,9 +1382,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
         for (size_t a = 0; a < fleet->n_ages; a++) {
           size_t i_age_year = y * fleet->n_ages + a;
           fims::Vector<Type> age_to_length_conversion_row;
+          const double fraction = fleet->ObservationFraction(fleet->length_comp_time_id, y);
           if (!fleet->age_to_length_conversion_model
-                   ->BuildAgeToLengthConversionRow(
-                       y, a, age_to_length_conversion_row)) {
+                   ->BuildAgeToLengthConversionRowAtTime(
+                       y, a, fraction, age_to_length_conversion_row)) {
             std::stringstream ss;
             ss << "Failed to build age-to-length conversion row for fleet id "
                << fleet->GetId() << ", year " << y << ", age " << a << ".";
@@ -1312,21 +1393,61 @@ class CatchAtAge : public FisheryModelBase<Type> {
             throw std::runtime_error(ss.str());
           }
 
+          fims::Vector<Type> annual_row = age_to_length_conversion_row;
+          if (fraction != 0.0) {
+            fleet->age_to_length_conversion_model->BuildAgeToLengthConversionRow(y, a, annual_row);
+          }
+          fims::Vector<Type> index_row = annual_row;
+          const double index_fraction = fleet->ObservationFraction(fleet->index_time_id, y);
+          if (index_fraction != 0.0) {
+            fleet->age_to_length_conversion_model->BuildAgeToLengthConversionRowAtTime(
+                y, a, index_fraction, index_row);
+          }
+          const bool annual_length = fleet->IsAnnualSample(fleet->length_comp_time_id, y);
+          // Expected age counts are zero when age observations are missing.
+          // Use unscaled proportions only for the path without sample timing;
+          // timed length samples must keep their own abundance calculation.
+          const Type sample_numbers = fleet->length_comp_time_id.size() == 0
+              ? fdq_["agecomp_proportion"][i_age_year]
+              : SampleNumbers(fleet, y, a, annual_length ? -1.0 : fraction);
+          const bool annual_index = fleet->IsAnnualSample(fleet->index_time_id, y);
+          const bool varying = fleet->age_to_length_conversion_model->VariesWithinYear();
+          fims::Vector<Type> integrated_length(
+              annual_length && varying ? fleet->n_lengths : 0, Type(0));
+          fims::Vector<Type> integrated_index(
+              annual_index && varying ? fleet->n_lengths : 0, Type(0));
+          if (varying && (annual_length || annual_index)) {
+            for (size_t k = 0; k < 8; ++k) {
+              fims::Vector<Type> row;
+              if (!fleet->age_to_length_conversion_model->BuildAgeToLengthConversionRowAtTime(
+                      y, a, annual_nodes[k], row)) {
+                throw std::runtime_error("Unable to integrate annual length composition");
+              }
+              if (annual_length) {
+                const Type numbers = SampleNumbers(fleet, y, a, annual_nodes[k]);
+                for (size_t l = 0; l < fleet->n_lengths; ++l) {
+                  integrated_length[l] += Type(annual_weights[k]) * numbers * row[l];
+                }
+              }
+              if (annual_index) {
+                const Type numbers = SampleNumbers(fleet, y, a, annual_nodes[k], true);
+                for (size_t l = 0; l < fleet->n_lengths; ++l) {
+                  integrated_index[l] += Type(annual_weights[k]) * numbers * row[l];
+                }
+              }
+            }
+          }
           for (size_t l = 0; l < fleet->n_lengths; l++) {
             size_t i_length_year = y * fleet->n_lengths + l;
             const Type age_to_length_prob = age_to_length_conversion_row[l];
-            // Use agecomp_proportion rather than agecomp_expected, which is
-            // rescaled to the observed age-composition sample size and is
-            // therefore 0 in years without age-composition data. The scale
-            // cancels when the length composition is normalized below.
             fdq_["lengthcomp_expected"][i_length_year] +=
-                fdq_["agecomp_proportion"][i_age_year] * age_to_length_prob;
+                (annual_length && varying) ? integrated_length[l] : sample_numbers * age_to_length_prob;
 
             fdq_["catch_numbers_at_length"][i_length_year] +=
-                fdq_["catch_numbers_at_age"][i_age_year] * age_to_length_prob;
+                fdq_["catch_numbers_at_age"][i_age_year] * annual_row[l];
 
             fdq_["index_numbers_at_length"][i_length_year] +=
-                fdq_["index_numbers_at_age"][i_age_year] * age_to_length_prob;
+                (annual_index && varying) ? integrated_index[l] : fdq_["index_numbers_at_age"][i_age_year] * index_row[l];
           }
         }
 

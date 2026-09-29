@@ -150,11 +150,13 @@ run_FIMS_projection_scenario <- function(om_input,
   # Repeat similar setup for the survey fleet (e.g., index, age comp, and length comp)
   # This includes initializing logistic selectivity, observed data modules, and distribution links.
   survey_index <- em_input[["surveyB.obs"]][["survey1"]]
-  survey_fleet_index <- methods::new(Index, om_input[["nyr"]] + n_projection_years)
+  # These OM surveys sample on January 1; omitted dates mean annual averages.
+  survey_dates <- sprintf("%04d-01-01", seq_len(om_input[["nyr"]] + n_projection_years))
+  survey_fleet_index <- methods::new(Index, om_input[["nyr"]] + n_projection_years, survey_dates)
   survey_fleet_index$index_data[] <- c(survey_index, projected_index)
 
 
-  survey_fleet_age_comp <- methods::new(AgeComp, (om_input[["nyr"]] + n_projection_years), om_input[["nages"]])
+  survey_fleet_age_comp <- methods::new(AgeComp, (om_input[["nyr"]] + n_projection_years), om_input[["nages"]], survey_dates)
 
   projected_survey_age_comps <- em_input[["survey.age.obs"]][["survey1"]] * em_input[["n.survey"]][["survey1"]]
   projected_survey_age_comps <- rbind(
@@ -164,7 +166,7 @@ run_FIMS_projection_scenario <- function(om_input,
   survey_fleet_age_comp$age_comp_data[] <- c(t(projected_survey_age_comps))
 
 
-  survey_fleet_length_comp <- methods::new(LengthComp, (om_input[["nyr"]] + n_projection_years), om_input[["nlengths"]])
+  survey_fleet_length_comp <- methods::new(LengthComp, (om_input[["nyr"]] + n_projection_years), om_input[["nlengths"]], survey_dates)
 
   projected_survey_length_comps <- em_input[["survey.length.obs"]][["survey1"]] * em_input[["n.survey.lengthcomp"]][["survey1"]]
   projected_survey_length_comps <- rbind(
@@ -648,11 +650,11 @@ estimation_error <- max(abs(sdr_fixed_5_year_project_catch_high[-c(33:37), "Esti
 
 sd_error <- max(abs(sdr_fixed_5_year_project_catch_high[-c(33:37), "Std. Error"] - sdr_fixed_no_project[, "Std. Error"]) / abs(sdr_fixed_no_project[, "Std. Error"]))
 
-test_that("projections with high catch data achieve same estimates and no projection model run", {
-  #' @description Test that the maximum parameter estimate difference between a low catch projection run and no projection run is less than 10%.
+test_that("high catch projections substantially alter historical estimates", {
+  #' @description Test that high projected catches change at least one historical parameter estimate by more than 70% relative to no projection.
   expect_gt(estimation_error, 0.7)
 
-  #' @description Test that the maximum parameter standard deviation estimate difference between a low catch projection run and no projection run is less than 10%.
+  #' @description Test that high projected catches change at least one historical parameter standard error by more than 70% relative to no projection.
   expect_gt(sd_error, 0.7)
 })
 # Compare fixed parameter estimates between control and estimated F runs with high catch targets (overfishing)

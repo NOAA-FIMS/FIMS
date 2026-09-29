@@ -115,6 +115,11 @@ seconds as a \code{difftime} object.
 the model.
 
 \code{\link[=get_model_output]{get_model_output()}} returns the finalized FIMS output as a JSON list.
+The JSON includes named date axes and bindings to output quantities.
+\code{get_estimates()} resolves these to a single \code{timing} column of class
+\code{Date}: December 31 for annual observations, actual dates for instantaneous
+samples, January 1 for beginning-of-year population states, and \code{NA} for
+quantities without a time dimension.
 }
 \description{
 There is an accessor function for each slot in the S4 class \code{FIMSFit}, where

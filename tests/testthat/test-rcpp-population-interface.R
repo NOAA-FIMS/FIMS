@@ -94,3 +94,12 @@ test_that("rcpp population interface works with correct inputs", {
 
 ## Error handling ----
 # No built in errors or warnings to test for now.
+
+
+test_that("population timing is not a public configuration setting", {
+  #' @description The population exposes no timing setter or date vectors; dates are supplied with data.
+  population <- methods::new(Population)
+  expect_false("SetTiming" %in% names(population$.refClassDef@refMethods))
+  expect_false(any(c("observation_year", "observation_fraction") %in% names(Population@fields)))
+  clear()
+})

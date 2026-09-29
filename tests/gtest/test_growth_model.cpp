@@ -197,3 +197,25 @@ TEST(GrowthModel, SingleAgeRejectsCoincidentReferenceAges) {
 }
 
 }  // namespace
+
+TEST(GrowthTiming, FractionalAgeUsesGrowthCurveAndExistingVariability) {
+  // April 14 in leap year 1996 is 104 elapsed days, not a month approximation.
+  fims_popdy::GrowthModel<double> model(2, 12, 1);
+  model.SetVonBertalanffySchnuteParameters(275, 725, 0.18, 1, 12);
+  model.SetLengthWeightParameters(2.5e-11, 3);
+  model.SetLengthSdParams(28, 73);
+  model.SetAgeOffset(1);
+  model.Prepare();
+  double mean, sd, weight;
+  model.EvaluateAtAge(3, mean, sd, weight);
+  EXPECT_DOUBLE_EQ(mean, model.GetProducts().MeanLAA(0, 2, 0));
+  EXPECT_DOUBLE_EQ(sd, model.GetProducts().SdLAA(0, 2, 0));
+  EXPECT_DOUBLE_EQ(weight, model.GetProducts().MeanWAA(0, 2, 0));
+  const double age = 3 + 104.0 / 366.0;
+  model.EvaluateAtAge(age, mean, sd, weight);
+  const double expected = 275 + 450 * (1 - std::exp(-0.18 * (age - 1))) /
+      fims_math::ad_max(fims_math::ad_fabs(1 - std::exp(-0.18 * 11)), 1e-8);
+  EXPECT_NEAR(mean, expected, 1e-10);
+  EXPECT_GT(mean, model.GetProducts().MeanLAA(0, 2, 0));
+  EXPECT_NEAR(weight, 2.5e-11 * std::pow(mean, 3), 1e-12);
+}

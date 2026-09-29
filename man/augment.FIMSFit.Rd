@@ -38,7 +38,7 @@ The returned tibble follows the conventions expected by every
    \code{fleet} \tab Fleet name for fleet rows, otherwise \code{NA} \cr
    \code{module_id} \tab Unique module identifier \cr
    \code{distribution} \tab Likelihood distribution used for this data stream \cr
-   \code{year_i} \tab Year index (present when available in the estimates) \cr
+   \code{timing} \tab Date (actual sample date or December 31 for annual observations) \cr
    \code{age_i} \tab Age index  (present when available in the estimates) \cr
 }
 }

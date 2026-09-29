@@ -68,7 +68,7 @@ In the future, we will integrate more of the process below coded below into wrap
 data_big_with_extra_year <- dplyr::add_row(
   data_big,
   type = "catch",
-  timing = get_end_year(data_4_model) + years_of_projection,
+  timing = as.character(get_end_year(data_4_model) + years_of_projection),
   fleet = "fleet1",
   observed = -999,
   unit = "mt"
@@ -82,11 +82,14 @@ data_4_projections <- data_big_with_extra_year |>
     dplyr::filter(
       data_big,
       type == "weight_at_age",
-      timing == 1
+      timing == as.character(get_start_year(data_4_model))
     ) |>
       dplyr::select(-timing) |>
       merge(
-        data.frame(timing = max(data_big[["timing"]], na.rm = TRUE):(max(data_big[["timing"]], na.rm = TRUE) + years_of_projection - 1))
+        data.frame(timing = as.character(seq.int(
+          from = get_end_year(data_4_model) + 1L,
+          length.out = years_of_projection
+        )))
       )
   ) |>
   # Make a FIMSFrame object out of this data frame with the extra row to add all
@@ -271,7 +274,7 @@ stockplotr::plot_biomass(
     "age" = get_estimates(projection_fit) |>
       dplyr::mutate(
         uncertainty_label = "se",
-        year = year_i,
+        year = as.integer(format(timing, "%Y")),
         estimate = estimated
       )
   )
