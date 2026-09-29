@@ -154,9 +154,13 @@ run_fims_likelihood <- function(
     cli::cli_warn("Inputs min and max don't span 0. Are you sure this is right?")
   }
 
-  init <- FIMS::get_estimates(model) |>
-    dplyr::filter(.data[["label"]] == parameter_name) |>
-    dplyr::pull(.data[["estimated"]]) # NOTE: input and estimated value are slightly different (even though its fixed) input = 13.8155, estimated = 13.857
+  init_rows <- FIMS::get_estimates(model) |>
+    dplyr::filter(.data[["label"]] == parameter_name)
+  if (!is.null(module_name)) {
+    init_rows <- init_rows |>
+      dplyr::filter(.data[["module_name"]] == .env$module_name)
+  }
+  init <- dplyr::pull(init_rows, .data[["estimated"]]) # NOTE: input and estimated value are slightly different (even though its fixed) input = 13.8155, estimated = 13.857
 
   if (!is.null(module_name)) {
     module_names <- parameters |>
@@ -166,7 +170,7 @@ run_fims_likelihood <- function(
       cli::cli_abort("Input module_name not found in parameters tibble.")
     }
     parameter_row <- parameters |>
-      dplyr::filter(.data[["module_name"]] == module_name & .data[["label"]] == parameter_name)
+      dplyr::filter(.data[["module_name"]] == .env$module_name & .data[["label"]] == parameter_name)
   } else {
     parameter_row <- parameters |>
       dplyr::filter(.data[["label"]] == parameter_name)
@@ -177,7 +181,7 @@ run_fims_likelihood <- function(
   }
 
   if (nrow(parameter_row) > 1) {
-    cli::cli_abort("Input parameter_name matched too many rows in parameter tibble: {length(parameter_row)}. Try adding a module_name.")
+    cli::cli_abort("Input parameter_name matched too many rows in parameter tibble: {nrow(parameter_row)}. Try adding a module_name.")
   }
 
   vec <- values + init

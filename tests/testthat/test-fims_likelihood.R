@@ -220,6 +220,20 @@ test_that("run_fims_likelihood() returns correct error messages", {
     regexp = "module_name not found"
   )
 
+  #' @description Test that run_fims_likelihood uses module_name to select the parameter, so a label from a different module is not found.
+  expect_error(
+    object = run_fims_likelihood(
+      model = base_model,
+      parameters = parameters,
+      data = data_big,
+      module_name = "Recruitment",
+      parameter_name = "inflection_point",
+      n_cores = 1,
+      length = 3
+    ),
+    regexp = "did not match any rows"
+  )
+
   #' @description Test that run_fims_likelihood errors with invalid parameter_name.
   expect_error(
     object = run_fims_likelihood(

@@ -58,12 +58,17 @@ run_modified_pars_fims <- function(
   if (!is.null(module_name)) {
     parameter_row <- parameters_to_use |>
       dplyr::filter(
-        .data[["module_name"]] == module_name &
+        .data[["module_name"]] == .env$module_name &
           .data[["label"]] == parameter_name
       )
     if (nrow(parameter_row) == 0) {
       cli::cli_abort(
         "Parameter with module name {module_name} and label {parameter_name} not found in parameters object"
+      )
+    }
+    if (nrow(parameter_row) > 1) {
+      cli::cli_abort(
+        "Multiple parameters with module name {module_name} and label {parameter_name} found in parameters object"
       )
     }
   } else {
