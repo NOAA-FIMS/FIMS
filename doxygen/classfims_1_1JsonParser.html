@@ -236,6 +236,8 @@ Public Member Functions</h2></td></tr>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:aa376edce137153ad7db370db5f0750d4" id="r_aa376edce137153ad7db370db5f0750d4"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1JsonParser.html#aa376edce137153ad7db370db5f0750d4">removeWhitespace</a> (const std::string &amp;input)</td></tr>
 <tr class="separator:aa376edce137153ad7db370db5f0750d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ababcc9acff3e23ee507b875cd9793343" id="r_ababcc9acff3e23ee507b875cd9793343"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1JsonParser.html#ababcc9acff3e23ee507b875cd9793343">EscapeString</a> (const std::string &amp;input)</td></tr>
+<tr class="separator:ababcc9acff3e23ee507b875cd9793343"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5dc54b2cbbf6e2089d91fc696d8e1ab2" id="r_a5dc54b2cbbf6e2089d91fc696d8e1ab2"><td class="memItemLeft" align="right" valign="top">static std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classfims_1_1JsonParser.html#a5dc54b2cbbf6e2089d91fc696d8e1ab2">PrettyFormatJSON</a> (const std::string &amp;json)</td></tr>
 <tr class="memdesc:a5dc54b2cbbf6e2089d91fc696d8e1ab2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Formats a JSON string.  <br /></td></tr>
 <tr class="separator:a5dc54b2cbbf6e2089d91fc696d8e1ab2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -243,6 +245,33 @@ Static Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Parses JSON strings and generates JSON values. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="ababcc9acff3e23ee507b875cd9793343" name="ababcc9acff3e23ee507b875cd9793343"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ababcc9acff3e23ee507b875cd9793343">&#9670;&#160;</a></span>EscapeString()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static std::string fims::JsonParser::EscapeString </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Escape a string so it can be written as a JSON string value. </p>
+
+</div>
+</div>
 <a id="a7b1ee7df3bdbac4c23a282e308ab4f9f" name="a7b1ee7df3bdbac4c23a282e308ab4f9f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7b1ee7df3bdbac4c23a282e308ab4f9f">&#9670;&#160;</a></span>Parse()</h2>
 
@@ -327,7 +356,7 @@ Static Public Member Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Remove whitespace in JSON. </p>
+<p>Remove whitespace in JSON, except inside strings. </p>
 
 </div>
 </div>
