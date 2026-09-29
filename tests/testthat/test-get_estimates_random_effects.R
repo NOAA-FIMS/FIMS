@@ -9,31 +9,57 @@
 
 # get_estimates_random_effects ----
 ## Setup ----
-# The default data_big model estimates recruitment deviations as random effects
-data("data_big")
-data_4_model <- FIMSFrame(data_big)
-fit <- setup_default_parameters(data = data_4_model) |>
-  initialize_fims(data = data_4_model) |>
-  fit_fims(optimize = TRUE)
-random_effects <- get_estimates(fit) |>
-  dplyr::filter(estimation_type == "random_effects")
-random_summary <- summary(get_sdreport(fit), "random")
-clear()
+# Load or prepare any necessary data for testing
+if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
+  prepare_test_data()
+}
 
 ## IO correctness ----
 test_that("get_estimates() reports the uncertainty of random effects", {
-  #' @description Test that every random effect in get_estimates() has the standard error computed by the sdreport.
+  # This fixture estimates the recruitment deviations as random effects
+  fit <- readRDS(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))
+  random_effects <- get_estimates(fit) |>
+    dplyr::filter(estimation_type == "random_effects")
+  random_summary <- summary(get_sdreport(fit), "random")
+  # Row names of the sdreport summary end in the parameter id
+  summary_row <- match(
+    random_effects[["parameter_id"]],
+    as.integer(sub(".*\\.", "", rownames(random_summary)))
+  )
+
+  #' @description Test that every random effect in get_estimates() has a finite standard error.
   expect_equal(
     object = nrow(random_effects),
     expected = nrow(random_summary)
   )
   expect_true(all(is.finite(random_effects[["uncertainty"]])))
-  # Row names of the sdreport summary end in the parameter id
-  summary_id <- as.integer(sub(".*\\.", "", rownames(random_summary)))
+
+  #' @description Test that each random effect's standard error and estimate come from the same sdreport row.
   expect_equal(
     object = unname(random_effects[["uncertainty"]]),
-    expected = unname(
-      random_summary[match(random_effects[["parameter_id"]], summary_id), "Std. Error"]
-    )
+    expected = unname(random_summary[summary_row, "Std. Error"])
   )
+  expect_equal(
+    object = random_effects[["estimated"]],
+    expected = unname(random_summary[summary_row, "Estimate"]),
+    tolerance = 1e-5
+  )
+})
+
+## Edge handling ----
+test_that("get_estimates() works for a model without random effects", {
+  fit <- readRDS(
+    testthat::test_path("fixtures", "fit_age_length_comp_fixed_effects.RDS")
+  )
+  estimates <- get_estimates(fit)
+
+  #' @description Test that a model without random effects fits and reports standard errors for its fixed effects.
+  expect_s4_class(fit, "FIMSFit")
+  expect_equal(
+    object = sum(estimates[["estimation_type"]] == "random_effects", na.rm = TRUE),
+    expected = 0
+  )
+  expect_true(any(is.finite(
+    estimates[["uncertainty"]][estimates[["estimation_type"]] == "fixed_effects"]
+  )))
 })
