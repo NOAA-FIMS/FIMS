@@ -35,7 +35,7 @@ The returned tibble follows the conventions expected by every
    \code{.pred} \tab Model-expected value (maps from \code{expected}) \cr
    \code{.weight} \tab Inverse-variance weight from \code{uncertainty} (optional) \cr
    \code{label} \tab Parameter / quantity label, e.g. \code{"catch_expected"} \cr
-   \code{fleet} \tab Fleet identifier (integer) \cr
+   \code{fleet} \tab Fleet name for fleet rows, otherwise \code{NA} \cr
    \code{module_id} \tab Unique module identifier \cr
    \code{distribution} \tab Likelihood distribution used for this data stream \cr
    \code{year_i} \tab Year index (present when available in the estimates) \cr

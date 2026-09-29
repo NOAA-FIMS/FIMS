@@ -14,6 +14,20 @@ if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }
 
+# Models built in these tests estimate the recruitment deviations as fixed
+# effects; the random-effect density join matches rows by value, and the
+# default deviations are all zero
+fixed_effect_parameters <- function(data) {
+  setup_default_parameters(data = data) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$estimation_type == "random_effects",
+        "fixed_effects",
+        .data$estimation_type
+      )
+    )
+}
+
 ## IO correctness ----
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
@@ -97,6 +111,56 @@ test_that("`get_estimates()` works with estimation run", {
 })
 
 ## Edge handling ----
+test_that("`get_estimates()` keeps fleet names with spaces and quotes", {
+  fleet_names <- c(fleet1 = "fleet one", survey1 = 'survey "A"')
+  data_4_model <- data_big |>
+    dplyr::mutate(fleet = unname(fleet_names[.data$fleet])) |>
+    FIMSFrame()
+  fit <- fixed_effect_parameters(data_4_model) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  estimates <- get_estimates(fit)
+  #' @description Test that `get_estimates()` returns fleet names with spaces and quotes exactly as given in the data.
+  expect_setequal(
+    object = unique(estimates[["fleet"]][estimates[["module_name"]] == "Fleet"]),
+    expected = unname(fleet_names)
+  )
+  selectivity_rows <- estimates[["module_name"]] == "Selectivity"
+  # Each fleet gets its own selectivity module, created in fleet order
+  #' @description Test that `get_estimates()` gives each selectivity row the name of its own fleet.
+  expect_equal(
+    object = estimates[["fleet"]][selectivity_rows],
+    expected = unname(fleet_names)[estimates[["module_id"]][selectivity_rows]]
+  )
+  clear()
+})
+
+
+test_that("`get_estimates()` handles non-finite derived quantities", {
+  data_4_model <- FIMSFrame(data_big)
+  parameters <- fixed_effect_parameters(data_4_model)
+  # exp(-1000) is exactly zero in double precision, so the expected catch in
+  # the first year is zero and its log is -Inf
+  first_log_fmort <- which(
+    parameters[["fleet"]] == "fleet1" & parameters[["label"]] == "log_Fmort"
+  )[1]
+  parameters[["value"]][first_log_fmort] <- -1000
+  parameters[["estimation_type"]][first_log_fmort] <- "constant"
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  #' @description Test that `get_estimates()` works when a derived quantity is infinite.
+  expect_no_error(estimates <- get_estimates(fit))
+  log_catch_expected <- estimates |>
+    dplyr::filter(
+      .data$label == "log_catch_expected",
+      .data$fleet == "fleet1"
+    )
+  #' @description Test that `get_estimates()` reports an infinite derived quantity as -999, like other missing values.
+  expect_equal(object = log_catch_expected[["estimated"]][1], expected = -999)
+  clear()
+})
+
 test_that("`get_estimates()` returns correct outputs for edge cases", {
   #' @description Test that an error occurs if the input is not a valid model fit object.
   expect_error(

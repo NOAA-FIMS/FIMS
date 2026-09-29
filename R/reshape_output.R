@@ -102,7 +102,21 @@ reshape_json_estimates <- function(model_output) {
     dplyr::mutate(join_by = dplyr::row_number()) |>
     dplyr::ungroup()
 
+  # Selectivity is written separately from its fleet, so the fleet section
+  # records which selectivity module each fleet uses. A selectivity module
+  # shared by more than one fleet is left without a fleet name.
+  # Output saved before the link was written has no selectivity_id.
+  selectivity_fleets <- NULL
+  if ("selectivity_id" %in% names(read_list[["fleets"]])) {
+    selectivity_fleets <- read_list[["fleets"]] |>
+      dplyr::select(dplyr::all_of(c("selectivity_id", "fleet"))) |>
+      dplyr::add_count(.data$selectivity_id) |>
+      dplyr::filter(.data$n == 1) |>
+      dplyr::select(-dplyr::all_of("n"))
+  }
+
   fleet_information <- read_list[["fleets"]] |>
+    dplyr::select(-dplyr::any_of("selectivity_id")) |>
     tidyr::pivot_longer(
       cols = dplyr::all_of(c("parameters", "derived_quantities")),
       names_to = "delete_me",
@@ -175,6 +189,20 @@ reshape_json_estimates <- function(model_output) {
       lpdf = "lpdf_value", dplyr::all_of("likelihood"),
       "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
+    )
+  if (is.null(selectivity_fleets)) {
+    return(out)
+  }
+  selectivity_fleet <- selectivity_fleets[["fleet"]][
+    match(out[["module_id"]], selectivity_fleets[["selectivity_id"]])
+  ]
+  out |>
+    dplyr::mutate(
+      fleet = dplyr::if_else(
+        .data$module_name == "Selectivity",
+        selectivity_fleet,
+        .data$fleet
+      )
     )
 }
 
@@ -450,6 +478,7 @@ dimensions_to_tibble <- function(data) {
 #' density_to_tibble(dummy_density)
 #' @noRd
 density_to_tibble <- function(data) {
+  data <- json_infinity_to_numeric(data)
   # Check that each list element is of length-one or the same length otherwise
   # the resulting tibble will not be the correct dimensions
   element_lengths <- purrr::map_int(data, length)
@@ -471,4 +500,30 @@ density_to_tibble <- function(data) {
     tibble::as_tibble() |>
     tidyr::unnest(dplyr::contains("value")) |>
     dplyr::rename(likelihood = dplyr::all_of("value"))
+}
+
+#' Convert infinite values written as JSON strings back to numbers
+#'
+#' @description
+#' JSON has no representation for infinity, so the C++ `value_to_string()`
+#' writes infinite density values, e.g., the log-likelihood of an observation
+#' with an expected value of zero, as the strings `"Infinity"` and
+#' `"-Infinity"`. This turns them back into `Inf` and `-Inf` so numeric columns
+#' stay numeric.
+#'
+#' @param x A value or a list of values read with `jsonlite::fromJSON()` and
+#'   `simplifyVector = FALSE`.
+#' @return `x` with the same structure, where the strings `"Infinity"` and
+#'   `"-Infinity"` are replaced with `Inf` and `-Inf`.
+#' @noRd
+json_infinity_to_numeric <- function(x) {
+  if (is.list(x)) {
+    return(purrr::map(x, json_infinity_to_numeric))
+  }
+  is_infinity <- is.character(x) && length(x) > 0 &&
+    all(x %in% c("Infinity", "-Infinity"))
+  if (is_infinity) {
+    return(dplyr::if_else(x == "Infinity", Inf, -Inf))
+  }
+  x
 }
