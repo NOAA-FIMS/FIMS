@@ -110,6 +110,39 @@ test_that("`get_estimates()` works with estimation run", {
   })
 })
 
+test_that("`get_estimates()` reports distribution parameters by id", {
+  data_4_model <- FIMSFrame(data_big)
+  parameters <- fixed_effect_parameters(data_4_model) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$module_name == "Recruitment" & .data$label == "log_sd",
+        "fixed_effects",
+        .data$estimation_type
+      )
+    )
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  estimates <- get_estimates(fit)
+  log_sd_id <- names(get_parameter_names(get_obj(fit)[["par"]])) |>
+    grep(pattern = "^dnorm\\..*\\.log_sd\\.", value = TRUE) |>
+    sub(pattern = ".*\\.", replacement = "") |>
+    as.integer()
+  log_sd_rows <- dplyr::filter(estimates, .data$parameter_id %in% log_sd_id)
+  #' @description Test that `get_estimates()` returns one row for the estimated recruitment `log_sd`.
+  expect_equal(object = nrow(log_sd_rows), expected = 1)
+  #' @description Test that `get_estimates()` labels the recruitment `log_sd` row with its distribution and estimation type.
+  expect_equal(
+    object = unlist(log_sd_rows[c("module_name", "label", "estimation_type")]),
+    expected = c(
+      module_name = "density",
+      label = "log_sd",
+      estimation_type = "fixed_effects"
+    )
+  )
+  clear()
+})
+
 ## Edge handling ----
 test_that("`get_estimates()` keeps fleet names with spaces and quotes", {
   fleet_names <- c(fleet1 = "fleet one", survey1 = 'survey "A"')
