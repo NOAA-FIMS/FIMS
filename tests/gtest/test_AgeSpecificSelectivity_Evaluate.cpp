@@ -39,8 +39,7 @@ TEST(AgeSpecificSelectivity_Evaluate, HandlesCorrectInput) {
 }
 
 // Edge handling
-// Test the use of get_force_scalar_wrap across multiple timesteps with single
-// age.
+// Test that 1 value is used for every timestep with a single age.
 TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeTimeSteps) {
   // Setup
   // Load or prepare any necessary data for testing
@@ -49,8 +48,6 @@ TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeTimeSteps) {
   fishery_selectivity.logit_sel_at_age[0] = 1;
   fishery_selectivity.min_age = 1;
   fishery_selectivity.n_ages = 1;
-  // Uses get_force_scalar_wrap internally to have the same logit_sel_at_age
-  // for all 3 values
   double fishery_x = 1.0;
   // Expected values identical for all positions:
   // pos = 0/1/2: 1.0/(1.0+exp(-1)) = 0.7310586
@@ -64,8 +61,7 @@ TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeTimeSteps) {
 }
 
 // Edge handling
-// Test the use of get_force_scalar_wrap across multiple ages for a single
-// timestep.
+// Test multiple ages for a single timestep.
 TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeAges) {
   // Setup
   // Load or prepare any necessary data for testing
@@ -86,7 +82,7 @@ TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeAges) {
 }
 
 // Edge handling
-// Test the use of get_force_scalar_wrap across multiple ages and timesteps.
+// Test that n_ages values are used for every timestep.
 TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeAgesAndTimeSteps) {
   // Setup
   // Load or prepare any necessary data for testing
@@ -97,8 +93,6 @@ TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeAgesAndTimeSteps) {
   fishery_selectivity.logit_sel_at_age[2] = 1;
   fishery_selectivity.min_age = 1;
   fishery_selectivity.n_ages = 3;
-  // Uses get_force_scalar_wrap internally to have the same logit_sel_at_age
-  // for all 3 timesteps for each age
   // Expected values by age:
   // age = 1: -1.0/(-1.0+exp(1)) = 0.2689414
   // age = 2: 0/(0+exp(0)) = 0.5
@@ -114,6 +108,45 @@ TEST(AgeSpecificSelectivity_Evaluate, HandlesThreeAgesAndTimeSteps) {
   }
 }
 
+// IO correctness
+// Test that n_ages values per year are used by year when the vector is
+// time-varying.
+TEST(AgeSpecificSelectivity_Evaluate, HandlesTimeVaryingValues) {
+  fims_popdy::AgeSpecificSelectivity<double> fishery_selectivity;
+  fishery_selectivity.logit_sel_at_age.resize(4);
+  // year 1: ages 1 and 2; year 2: ages 1 and 2
+  fishery_selectivity.logit_sel_at_age[0] = -1;
+  fishery_selectivity.logit_sel_at_age[1] = 0;
+  fishery_selectivity.logit_sel_at_age[2] = 1;
+  fishery_selectivity.logit_sel_at_age[3] = 2;
+  fishery_selectivity.min_age = 1;
+  fishery_selectivity.n_ages = 2;
+
+  // 1 / (1 + exp(-2)) = 0.8807971
+  EXPECT_NEAR(fishery_selectivity.evaluate(2.0, 1), 0.8807971, 0.0001);
+  EXPECT_NEAR(fishery_selectivity.evaluate(1.0, 0), 0.2689414, 0.0001);
+}
+
 // Error handling
-// No built-in errors/warnings.
+// Test that a logit_sel_at_age length that is not 1 or a multiple of n_ages
+// throws instead of reusing values for the wrong ages.
+TEST(AgeSpecificSelectivity_Evaluate, ThrowsForWrongLength) {
+  fims_popdy::AgeSpecificSelectivity<double> fishery_selectivity;
+  fishery_selectivity.logit_sel_at_age.resize(3);
+  fishery_selectivity.min_age = 1;
+  fishery_selectivity.n_ages = 2;
+
+  EXPECT_THROW(fishery_selectivity.evaluate(1.0, 0), std::invalid_argument);
+}
+
+// Error handling
+// Test that a year beyond the time-varying values throws.
+TEST(AgeSpecificSelectivity_Evaluate, ThrowsForYearBeyondValues) {
+  fims_popdy::AgeSpecificSelectivity<double> fishery_selectivity;
+  fishery_selectivity.logit_sel_at_age.resize(4);
+  fishery_selectivity.min_age = 1;
+  fishery_selectivity.n_ages = 2;
+
+  EXPECT_THROW(fishery_selectivity.evaluate(1.0, 2), std::invalid_argument);
+}
 }  // namespace
