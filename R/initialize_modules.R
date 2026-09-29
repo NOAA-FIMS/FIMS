@@ -100,13 +100,17 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       "observed_index_units",
       "observed_catch_units",
       "catch_numbers_at_age",
+      "catch_numbers_at_age_by_partition",
       "catch_weight_at_age",
+      "catch_weight_at_age_by_partition",
       "catch_numbers_at_length",
       "catch_weight",
       "catch_numbers",
       "lengthcomp_proportion",
       "index_numbers_at_age",
+      "index_numbers_at_age_by_partition",
       "index_weight_at_age",
+      "index_weight_at_age_by_partition",
       "index_numbers_at_length",
       "index_weight",
       "index_numbers",
@@ -400,6 +404,11 @@ initialize_population <- function(parameters, data, linked_ids) {
   for (i in which(grepl("fleet", names(linked_ids)))) {
     module$AddFleet(linked_ids[[i]])
   }
+
+  # Partition demand defaults to pooled (empty). To request sex-specific
+  # catch/index at age, call module$SetPartitionDemand(...) after this
+  # returns, e.g. list(sex = "female"). There is no create_default_parameters
+  # entry yet; high-level FIMSFrame wiring is deferred.
 
   return(module)
 }
