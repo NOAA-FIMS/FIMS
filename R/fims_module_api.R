@@ -675,6 +675,16 @@ set_growth_n_years <- function(growth, n_years) {
   invisible(growth)
 }
 
+#' @export
+#' @rdname set_selectivity_ages
+set_selectivity_ages <- function(selectivity, n_ages = -999,
+                                 ages = numeric(0), min_age = -999) {
+  check_module(selectivity, "Selectivity", "selectivity")
+  set_selectivity_ages_(selectivity[["pointer"]], as.integer(n_ages),
+                        as.integer(ages), as.integer(min_age))
+  invisible(selectivity)
+}
+
 #' Evaluate a process module at a point
 #'
 #' @description

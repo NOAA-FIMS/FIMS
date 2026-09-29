@@ -27,7 +27,8 @@
  */
 enum class SelectivityType : uint8_t {
   logistic = 0,
-  double_logistic = 1
+  double_logistic = 1,
+  age_specific_selectivity = 2
 };
 
 /**
@@ -36,9 +37,10 @@ enum class SelectivityType : uint8_t {
 inline SelectivityType SelectivityTypeFromString(const std::string &name) {
   if (name == "Logistic") return SelectivityType::logistic;
   if (name == "DoubleLogistic") return SelectivityType::double_logistic;
+  if (name == "AgeSpecific") return SelectivityType::age_specific_selectivity;
   throw std::invalid_argument(
       "Invalid type: '" + name +
-      "'. Valid options are: Logistic, DoubleLogistic.");
+      "'. Valid options are: Logistic, DoubleLogistic, AgeSpecific.");
 }
 
 /**
@@ -72,6 +74,11 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
    */
   virtual ~SelectivityInterfaceBase() {}
 
+  virtual void set_selectivity_ages(int n_ages,
+                                   Rcpp::NumericVector& ages,
+                                   int min_age) {
+    Rcpp::stop("This selectivity type does not support age-specific values.");
+  }
     
   /**
    * @brief A method for each child selectivity interface object to inherit so
@@ -537,15 +544,15 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
   /**
    * @brief The number of age bins.
    */
-  SharedInt n_ages = 1;
+  int n_ages = 1;
   /**
    * @brief Vector of ages.
    */
-  RealVector ages;
+  fims::Vector<double> ages;
   /**
    * @brief Minimum observed age
    */
-  SharedInt min_age = 1;
+  int min_age = 1;
   /**
    * @brief Age-specific selectivity parameter values.
    */
@@ -554,24 +561,14 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
   /**
    * @brief The constructor.
    */
-  AgeSpecificSelectivityInterface() : SelectivityInterfaceBase() {
-    SelectivityInterfaceBase::live_objects[this->id] =
-        std::make_shared<AgeSpecificSelectivityInterface>(*this);
-    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
-        SelectivityInterfaceBase::live_objects[this->id]);
-  }
+  AgeSpecificSelectivityInterface() : SelectivityInterfaceBase() {}
 
-  /**
-   * @brief Construct a new Selectivity-at-age Interface object
-   *
-   * @param other
+   /**
+   * @brief Interface objects are not copyable.
    */
-  AgeSpecificSelectivityInterface(const AgeSpecificSelectivityInterface &other)
-      : SelectivityInterfaceBase(other),
-        n_ages(other.n_ages),
-        ages(other.ages),
-        min_age(other.min_age),
-        logit_sel_at_age(other.logit_sel_at_age) {}
+  AgeSpecificSelectivityInterface(const LogisticSelectivityInterface &) = delete;
+  AgeSpecificSelectivityInterface &operator=(const LogisticSelectivityInterface &) = delete;
+
 
   /**
    * @brief The destructor.
@@ -584,6 +581,25 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
    */
   virtual uint32_t get_id() { return this->id; }
 
+   /**
+   * @copydoc FIMSRcppInterfaceBase::get_variable_vector
+   */
+  virtual VariableVector *get_variable_vector(const std::string &name) {
+    if (name == "logit_sel_at_age") return &this->logit_sel_at_age;
+    return nullptr;
+  }
+
+  void set_selectivity_ages(int n_ages_,
+                            Rcpp::NumericVector& ages_,
+                            int min_age_) override {
+    this->n_ages = n_ages_;
+    this->ages.resize(ages_.size());
+    for (int i = 0; i < ages_.size(); i ++) {
+      this->ages[i] = ages_[i]; 
+    }
+    this->min_age = min_age_;
+  }
+
   /**
    * @brief Evaluate selectivity using fims_math::inv_logit.
    * @param x The independent variable in the logistic function (e.g., age or
@@ -591,12 +607,12 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
    */
   virtual double evaluate(double x) {
     fims_popdy::AgeSpecificSelectivity<double> AgeSpecificSel;
-    AgeSpecificSel.n_ages = this->n_ages.get();
+    AgeSpecificSel.n_ages = this->n_ages;
     if (this->ages.size() > 0) {
       AgeSpecificSel.min_age = static_cast<size_t>(*std::min_element(
-          this->ages.storage_m->begin(), this->ages.storage_m->end()));
+          this->ages.begin(), this->ages.end()));
     } else {
-      AgeSpecificSel.min_age = static_cast<size_t>(this->min_age.get());
+      AgeSpecificSel.min_age = static_cast<size_t>(this->min_age);
     }
     AgeSpecificSel.logit_sel_at_age.resize(this->logit_sel_at_age.size());
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
@@ -636,12 +652,8 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
           std::dynamic_pointer_cast<fims_popdy::AgeSpecificSelectivity<double>>(
               it->second);
       for (size_t i = 0; i < logit_sel_at_age.size(); i++) {
-        if (this->logit_sel_at_age[i].estimation_type_m.get() == "constant") {
-          this->logit_sel_at_age[i].final_value_m =
-              this->logit_sel_at_age[i].initial_value_m;
-        } else {
-          this->logit_sel_at_age[i].final_value_m = sel->logit_sel_at_age[i];
-        }
+        set_final_value_by_estimation_status(this->logit_sel_at_age[i],
+                                             sel->logit_sel_at_age[i]);
       }
     }
   }
@@ -666,7 +678,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
     ss << "  \"header\": [\"n_ages\"],\n";
-    ss << "  \"dimensions\": [" << this->n_ages.get() << "]\n},\n";
+    ss << "  \"dimensions\": [" << this->n_ages << "]\n},\n";
     ss << "   \"values\":" << this->logit_sel_at_age << "}]\n";
 
     ss << "}";
@@ -686,29 +698,27 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     std::stringstream ss;
     // set relative info
     selectivity->id = this->id;
-    selectivity->n_ages = this->n_ages.get();
-    selectivity->min_age = *std::min_element(this->ages.storage_m->begin(),
-                                             this->ages.storage_m->end());
+    selectivity->n_ages = this->n_ages;
+    if (this-> min_age == -999 & this->ages.size() == 0) {
+      Rcpp::stop("AgeSpecific Selectivity requires either `min_age` or `ages` "
+      "vector specified in the parameters tibble.");
+    }
+    if (this-> min_age == -999) {
+      selectivity->min_age = *std::min_element(this->ages.begin(),
+                                              this->ages.end());
+    } else {
+      selectivity->min_age = this->min_age;
+    }
     selectivity->logit_sel_at_age.resize(this->logit_sel_at_age.size());
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
       selectivity->logit_sel_at_age[i] =
           this->logit_sel_at_age[i].initial_value_m;
-      if (this->logit_sel_at_age[i].estimation_type_m.get() ==
-          "fixed_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".logit_sel_at_age."
-           << this->logit_sel_at_age[i].id_m;
-        info->RegisterParameterName(ss.str());
-        info->RegisterParameter(selectivity->logit_sel_at_age[i]);
-      }
-      if (this->logit_sel_at_age[i].estimation_type_m.get() ==
-          "random_effects") {
-        ss.str("");
-        ss << "Selectivity." << this->id << ".logit_sel_at_age."
-           << this->logit_sel_at_age[i].id_m;
-        info->RegisterRandomEffect(selectivity->logit_sel_at_age[i]);
-        info->RegisterRandomEffectName(ss.str());
-      }
+      ss.str("");
+      ss << "Selectivity." << this->id << ".logit_sel_at_age."
+         << this->logit_sel_at_age[i].id_m;
+      register_parameter_if_estimable(
+          selectivity->logit_sel_at_age[i],
+          this->logit_sel_at_age[i].estimation_status_m, ss.str());
     }
     info->variable_map[this->logit_sel_at_age.id_m] =
         &(selectivity)->logit_sel_at_age;

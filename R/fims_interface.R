@@ -206,7 +206,7 @@ print.fims_module <- function(x, ...) {
 # are snake_case because they come from the data's own type column.
 .fims_module_types <- list(
   Data = c("age_comp", "length_comp", "index", "catch"),
-  Selectivity = c("Logistic", "DoubleLogistic"),
+  Selectivity = c("Logistic", "DoubleLogistic", "AgeSpecific"),
   Recruitment = c("BevertonHolt", "log_devs", "log_r"),
   Distribution = c("dnorm", "dlnorm", "dmultinom"),
   Growth = "EWAA",

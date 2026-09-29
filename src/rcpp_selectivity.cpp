@@ -44,9 +44,45 @@ Rcpp::XPtr<SharedSelectivity> create_selectivity_(std::string type) {
       selectivity_interface =
           std::make_shared<DoubleLogisticSelectivityInterface>();
       break;
+    case SelectivityType::age_specific_selectivity:
+      selectivity_interface =
+          std::make_shared<AgeSpecificSelectivityInterface>();
+      break;
   }
   return Rcpp::XPtr<SharedSelectivity>(
       new SharedSelectivity(selectivity_interface), true);
+}
+
+void set_selectivity_ages_(Rcpp::XPtr<SharedSelectivity> xp, int n_ages = -999,
+                           Rcpp::NumericVector ages = Rcpp::NumericVector(),
+                           int min_age = -999) {
+  bool has_n_ages = n_ages != -999;
+  bool has_ages = ages.size() > 0;
+  bool has_min_age = min_age != -999;
+
+  if (!has_ages && !has_min_age) {
+    Rcpp::stop("AgeSpecific Selectivity requires either `min_age` or `ages` "
+      "vector specified in the parameters tibble.");
+  }
+
+  if (has_min_age && !has_n_ages) {
+    Rcpp::stop(
+        "AgeSpecific Selectivity requires `n_ages` when an `ages` vector is "
+        "not provided to the parameters tibble.");
+  }
+
+  if (has_ages && has_n_ages && n_ages != ages.size()) {
+    Rcpp::stop(
+        "AgeSpecific Selectivity requires `n_ages` to equal the length of "
+        "`ages` when both are provided in the parameters tibble.");
+  }
+
+  if (has_ages && !has_n_ages) {
+    n_ages = ages.size();
+  }
+
+  // function defined in rcpp_selectivity.hpp
+  (*xp)->set_selectivity_ages(n_ages, ages, min_age);
 }
 
 /**
@@ -115,6 +151,7 @@ void release_selectivity_(Rcpp::XPtr<SharedSelectivity> xp) { xp.release(); }
  */
 void register_selectivity(Rcpp::Module& m) {
   Rcpp::function("create_selectivity_", &create_selectivity_);
+  Rcpp::function("set_selectivity_ages_", &set_selectivity_ages_);
   Rcpp::function("evaluate_selectivity_", &evaluate_selectivity_);
   Rcpp::function("selectivity_to_fims_xptr_", &selectivity_to_fims_xptr_);
   Rcpp::function("release_selectivity_", &release_selectivity_);

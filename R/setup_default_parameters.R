@@ -483,7 +483,7 @@ setup_default_DoubleLogistic <- function() {
 #' Following recommended practices for age-specific selectivity, default
 #' realized selectivity at ages >= 10 is functionally equal to 1.
 #' The default estimation type for the max age selectivity parameter
-#' is also set to "constant".
+#' is also set to "assumed_known".
 #' @return
 #' A tibble containing the default age-specific parameters on the logit scale.
 #' Number of parameters is equal to the number of age classes
@@ -503,9 +503,9 @@ setup_default_AgeSpecific <- function(
       label = "logit_sel_at_age",
       age = get_ages(data),
       value = qlogis(1 / (1 + (exp(-1 * (get_ages(data) - 2))))),
-      estimation_type = c(
+      estimation_status = c(
         rep("fixed_effects", length(get_ages(data)) - 1),
-        "constant"
+        "assumed_known"
       )
     )
 }

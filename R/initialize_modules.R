@@ -231,14 +231,38 @@ initialize_population <- function(parameters, data,
 #' @return
 #' The initialized selectivity module, as a [fims_module].
 #' @noRd
-initialize_selectivity <- function(parameters, data, fleet) {
-  module_name <- "Selectivity"
+initialize_selectivity <- function(parameters, data, fleet_) {
+  module_name_ <- "Selectivity"
   module <- initialize_module(
     parameters = parameters,
     data = data,
-    module_name = module_name,
-    fleet = fleet
+    module_name = module_name_,
+    fleet = fleet_
   )
+
+  module_type <- parameters |>
+    dplyr::filter(module_name == module_name_ & fleet == fleet_) |>
+    dplyr::pull(module_type) |>
+    unique()
+
+  if (module_type == "Age_Specific") {
+    input_parameter_tibble <- parameters |>
+      dplyr::filter(label == "logit_sel_at_age")
+    if (input_parameter_tibble |> nrow() == 0) {
+      cli::cli_abort("logit_sel_at_age needs to be defined in the 
+        parameter tibble")
+    }
+
+    input_ages <- input_parameter_tibble |> dplyr::pull(age)
+    if (anyNA(input_ages)) {
+      cli::cli_abort("The ages column in the parameter tibble
+        needs to be defined for Selectivity parameter, 
+        logit_sel_at_age")
+    }
+
+    set_selectivity_ages(module, ages = input_ages)
+  }
+
   return(module)
 }
 
