@@ -152,7 +152,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
   std::shared_ptr<DimensionInfoMap> population_dimension_info;
 
 #ifdef TMB_MODEL
-  ::objective_function<Type> *of;
+  ::objective_function<Type> *of = nullptr;
 #endif
   /**
    * @brief Construct a new Fishery Model Base object.
