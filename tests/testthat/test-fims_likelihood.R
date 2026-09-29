@@ -75,6 +75,29 @@ test_that("fims_likelihood() works with correct inputs", {
   )
 })
 
+test_that("run_fims_likelihood() profiles a label shared across modules", {
+  #' @description Test that run_fims_likelihood() uses module_name to profile inflection_point in the Maturity module only.
+  like_fit <- run_fims_likelihood(
+    model = base_model,
+    parameters = parameters,
+    data = data_big,
+    module_name = "Maturity",
+    parameter_name = "inflection_point",
+    n_cores = 1,
+    min = 0,
+    max = 1,
+    length = 1
+  )
+  expect_equal(
+    object = like_fit[["vec"]],
+    expected = dplyr::filter(
+      parameters,
+      module_name == "Maturity",
+      label == "inflection_point"
+    )[["value"]]
+  )
+})
+
 ## Edge handling ----
 
 cli::test_that_cli("run_fims_likelihood() shows warning when min and max don't span 0", {
@@ -220,7 +243,7 @@ test_that("run_fims_likelihood() returns correct error messages", {
     regexp = "module_name not found"
   )
 
-  #' @description Test that run_fims_likelihood uses module_name to select the parameter, so a label from a different module is not found.
+  #' @description Test that run_fims_likelihood errors when parameter_name is not in module_name.
   expect_error(
     object = run_fims_likelihood(
       model = base_model,

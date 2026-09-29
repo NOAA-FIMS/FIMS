@@ -59,7 +59,7 @@ run_modified_pars_fims <- function(
     parameter_row <- parameters_to_use |>
       dplyr::filter(
         .data[["module_name"]] == .env$module_name &
-          .data[["label"]] == parameter_name
+          .data[["label"]] == .env$parameter_name
       )
     if (nrow(parameter_row) == 0) {
       cli::cli_abort(
@@ -68,12 +68,14 @@ run_modified_pars_fims <- function(
     }
     if (nrow(parameter_row) > 1) {
       cli::cli_abort(
-        "Multiple parameters with module name {module_name} and label {parameter_name} found in parameters object"
+        "{nrow(parameter_row)} parameters in module {.val {module_name}} have
+        label {.val {parameter_name}} (for example, 1 per fleet or year);
+        select a single parameter."
       )
     }
   } else {
     parameter_row <- parameters_to_use |>
-      dplyr::filter(.data[["label"]] == parameter_name)
+      dplyr::filter(.data[["label"]] == .env$parameter_name)
     if (nrow(parameter_row) == 0) {
       cli::cli_abort(
         "Parameter with label {parameter_name} not found in parameters object"

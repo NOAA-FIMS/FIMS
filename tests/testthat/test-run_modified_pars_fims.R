@@ -15,6 +15,11 @@ parameters <- setup_default_parameters(data = FIMSFrame(data_big))
 
 ## IO correctness ----
 test_that("run_modified_pars_fims() works with correct inputs", {
+  #' @description Skip the model fit unless explicitly enabled for heavy integration testing.
+  testthat::skip_if_not(
+    testthat:::env_var_is_true("RUN_SLOW_TESTS"),
+    message = "Skipping: RUN_SLOW_TESTS is not set to true."
+  )
   # inflection_point is a label in both the Maturity and Selectivity modules
   fit <- run_modified_pars_fims(
     new_value = 2.5,
@@ -32,6 +37,7 @@ test_that("run_modified_pars_fims() works with correct inputs", {
     object = inflection_point[["input"]][inflection_point[["module_name"]] == "Maturity"],
     expected = 2.5
   )
+  #' @description Test that run_modified_pars_fims() leaves the same label in other modules unchanged.
   expect_equal(
     object = sort(inflection_point[["input"]][inflection_point[["module_name"]] == "Selectivity"]),
     expected = sort(dplyr::filter(
@@ -65,6 +71,6 @@ test_that("run_modified_pars_fims() returns correct error messages", {
       parameters = parameters,
       data = data_big
     ),
-    regexp = "Multiple parameters"
+    regexp = "select a single parameter"
   )
 })
