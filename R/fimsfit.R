@@ -465,6 +465,7 @@ FIMSFit <- function(
     # rename the sdreport
     names(sdreport[["par.fixed"]]) <- parameter_names
     dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
+    names(sdreport[["par.random"]]) <- random_effects_names
   }
 
   model_output <- input[["model"]]$get_output()
