@@ -43,6 +43,13 @@ test_that("`get_sdreport()` works with correct inputs", {
       expected = fit_data@sdreport
     )
 
+    #' @description Test that the full covariance of derived quantities is not stored while their standard errors are.
+    expect_true(all(is.na(sdreport[["cov"]])))
+    expect_equal(
+      object = length(sdreport[["sd"]]),
+      expected = length(sdreport[["value"]])
+    )
+
     if (any(grepl("fixed_effects", fit_file))) {
       #' @description Test that `get_sdreport()` returns correct names for the `sdreport` slot.
       expect_equal(

@@ -496,7 +496,9 @@ FIMSFit <- function(
 #'
 #' @param input Input list as returned by [initialize_fims()].
 #' @param get_sd A boolean specifying if the [TMB::sdreport()] should be
-#'   calculated?
+#'   calculated? Standard errors are calculated for all parameters and derived
+#'   quantities, but the full covariance matrix of the derived quantities is
+#'   not (`getReportCovariance = FALSE`), so `cov` in the `sdreport` is `NA`.
 #' @param save_sd A logical, with the default `TRUE`, indicating whether the
 #'   sdreport is returned in the output. If `FALSE`, the slot for the report
 #'   will be empty.
@@ -647,7 +649,8 @@ fit_fims <- function(input,
   time_sdreport <- NA
   if (get_sd) {
     t2 <- Sys.time()
-    sdreport <- TMB::sdreport(obj)
+    # The full derived-quantity covariance is unused and costs GBs of memory
+    sdreport <- TMB::sdreport(obj, getReportCovariance = FALSE)
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
     check_sdreport_convergence(input, obj, opt, sdreport)
