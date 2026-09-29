@@ -144,16 +144,11 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
     data_mod <- data_to_use
   } else {
     # exclude weight-at-age from the calculation of the max year of data
-    max_timing <- data_to_use |>
-      dplyr::filter(.data[["type"]] != "weight_at_age") |>
-      dplyr::pull(.data[["timing"]]) |>
-      max(na.rm = TRUE)
-    data_mod <- data_to_use |>
-      dplyr::filter(
-        (.data[["type"]] %in%
-          c("catch", "age_to_length_conversion", "weight_at_age")) |
-          .data[["timing"]] <= max_timing - years_to_remove
-      )
+    years <- as.integer(format(normalize_timing(data_to_use$timing), "%Y"))
+    max_year <- max(years[!data_to_use$type %in% c("weight_at_age", "age_to_length_conversion")], na.rm = TRUE)
+    keep <- data_to_use$type %in% c("catch", "age_to_length_conversion", "weight_at_age") |
+      (!is.na(years) & years <= max_year - years_to_remove)
+    data_mod <- data_to_use[keep, ]
   }
   # convert to FIMSFrame format
   data_model <- FIMS::FIMSFrame(data_mod)

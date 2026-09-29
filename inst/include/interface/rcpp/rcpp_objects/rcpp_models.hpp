@@ -693,6 +693,120 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     return ss.str();
   }
 
+  // Date axes and explicit quantity bindings make output independent of input R data.
+  std::string TimingMetadata(
+      const std::shared_ptr<fims_popdy::CatchAtAge<double>>& model) {
+    using Dates = std::vector<std::string>;
+    std::map<std::string, Dates> axes;
+    struct Binding {
+      std::string section;
+      uint32_t id;
+      std::string annual;
+      std::map<std::string, std::string> quantities;
+    };
+    std::map<std::pair<std::string, uint32_t>, Binding> bindings;
+    const auto bind = [&](const std::string& section, uint32_t id,
+                          const std::string& axis) -> Binding& {
+      auto key = std::make_pair(section, id);
+      auto found = bindings.find(key);
+      if (found != bindings.end() && axes[found->second.annual] != axes[axis]) {
+        throw std::invalid_argument("Shared modules must have matching reporting dates");
+      }
+      if (found == bindings.end()) {
+        bindings.emplace(key, Binding{section, id, axis, {}});
+      }
+      return bindings.at(key);
+    };
+    for (const auto& population : model->populations) {
+      if (population->annual_dates.size() != population->n_years + 1) {
+        throw std::invalid_argument("Population timing was not initialized from its data");
+      }
+      const std::string annual = "population_" +
+          std::to_string(population->GetId()) + "_annual";
+      axes[annual] = population->annual_dates;
+      bind("populations", population->GetId(), annual);
+      bind("growth", population->growth_id, annual);
+      bind("maturity", population->maturity_id, annual);
+      bind("recruitment", population->recruitment_id, annual);
+      for (const auto& fleet : population->fleets) {
+        auto& binding = bind("fleets", fleet->GetId(), annual);
+        bind("selectivity", fleet->fleet_selectivity_id_m, annual);
+        const auto sample_axis = [&](const std::string& type,
+                                     const fims::Vector<int>& ids) {
+          const std::string axis = "fleet_" + std::to_string(fleet->GetId()) + "_" + type;
+          Dates dates(population->annual_dates.begin(),
+                      population->annual_dates.begin() + fleet->n_years);
+          for (size_t y = 0; y < ids.size(); ++y) {
+            if (ids[y] >= 0) dates[y] = population->observation_times->at(ids[y]).date;
+            if (ids[y] < 0) dates[y] = dates[y].substr(0, 4) + "-12-31";
+          }
+          axes[axis] = dates;
+          return axis;
+        };
+        const std::string catch_axis = "fleet_" + std::to_string(fleet->GetId()) + "_catch";
+        Dates catch_years;
+        for (size_t y = 0; y < fleet->n_years; ++y) {
+          catch_years.push_back(population->annual_dates[y].substr(0, 4) + "-12-31");
+        }
+        axes[catch_axis] = catch_years;
+        for (const auto& name : {"catch_expected", "log_catch_expected", "catch_numbers",
+                                 "catch_weight", "catch_numbers_at_age", "catch_weight_at_age",
+                                 "catch_numbers_at_length"}) binding.quantities[name] = catch_axis;
+        const auto index = sample_axis("index", fleet->index_time_id);
+        const auto age = sample_axis("age_comp", fleet->age_comp_time_id);
+        const auto length = sample_axis("length_comp", fleet->length_comp_time_id);
+        for (const auto& name : {"index_expected", "log_index_expected", "index_numbers",
+                                 "index_weight", "index_numbers_at_age", "index_weight_at_age",
+                                 "index_numbers_at_length"}) binding.quantities[name] = index;
+        for (const auto& name : {"agecomp_expected", "agecomp_proportion"}) {
+          binding.quantities[name] = age;
+        }
+        for (const auto& name : {"lengthcomp_expected", "lengthcomp_proportion"}) {
+          binding.quantities[name] = length;
+        }
+        if (fleet->fleet_observed_catch_data_id_m != -999)
+          bind("data", fleet->fleet_observed_catch_data_id_m, catch_axis);
+        if (fleet->fleet_observed_index_data_id_m != -999)
+          bind("data", fleet->fleet_observed_index_data_id_m, index);
+        if (fleet->fleet_observed_agecomp_data_id_m != -999)
+          bind("data", fleet->fleet_observed_agecomp_data_id_m, age);
+        if (fleet->fleet_observed_lengthcomp_data_id_m != -999)
+          bind("data", fleet->fleet_observed_lengthcomp_data_id_m, length);
+      }
+    }
+    std::stringstream ss;
+    ss << "\"time_axes\":{";
+    bool first = true;
+    for (const auto& axis : axes) {
+      if (!first) ss << ',';
+      first = false;
+      ss << '"' << axis.first << "\":[";
+      for (size_t i = 0; i < axis.second.size(); ++i) {
+        if (i) ss << ',';
+        ss << '"' << axis.second[i] << '"';
+      }
+      ss << ']';
+    }
+    ss << "},\"time_bindings\":[";
+    first = true;
+    for (const auto& item : bindings) {
+      if (!first) ss << ',';
+      first = false;
+      const auto& b = item.second;
+      ss << "{\"section\":\"" << b.section << "\",\"id\":" << b.id
+         << ",\"default_axis\":\"" << b.annual << "\",\"quantities\":{";
+      bool first_quantity = true;
+      for (const auto& q : b.quantities) {
+        if (!first_quantity) ss << ',';
+        first_quantity = false;
+        ss << '"' << q.first << "\":\"" << q.second << '"';
+      }
+      ss << "}}";
+    }
+    ss << "],\n";
+    return ss.str();
+  }
+
   /**
    * @copydoc FisheryModelInterfaceBase::to_json
    */
@@ -763,6 +877,7 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 #endif
     ss << " \"id\": " << this->get_id() << ",\n";
     ss << " \"objective_function_value\": " << sanitize_val(value) << ",\n";
+    ss << TimingMetadata(model);
     ss << "\"growth\":[\n";
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end();
          module_id_it++) {

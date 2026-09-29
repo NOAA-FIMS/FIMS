@@ -98,36 +98,42 @@ calculate_mohns_rho <- function(retro_fit, quantity) {
   # Initialize vector to store relative differences
   mohn_values <- numeric()
 
-  # Calculate vector of ending year for each model
-  end_year <- max(retro_estimates$year_i, na.rm = TRUE) - retro_fit$years_to_remove
+  # Catch is retained in retrospective runs, so the model's annual time axis
+  # is unchanged. Locate the comparison date by the number of years peeled.
+  reference_dates <- retro_estimates |>
+    dplyr::filter(.data$retrospective_peel == 0) |>
+    dplyr::pull(.data$timing) |>
+    unique() |>
+    sort()
 
   # Calculate relative differences for each peel (excluding reference model)
-  for (i in 2:length(retro_fit$years_to_remove)) {
+  for (i in seq_along(retro_fit$years_to_remove)[-1]) {
+    end_timing <- reference_dates[length(reference_dates) - retro_fit$years_to_remove[i]]
     # Get value for ending year of peeled model
     peel_value <- retro_estimates |>
-      dplyr::filter(.data$year_i == end_year[i]) |>
+      dplyr::filter(.data$timing == end_timing) |>
       dplyr::filter(.data$retrospective_peel == retro_fit$years_to_remove[i]) |>
       dplyr::pull(.data$estimated)
 
     # Get value from the same year for the reference model
     ref_value <- retro_estimates |>
-      dplyr::filter(.data$year_i == end_year[i]) |>
+      dplyr::filter(.data$timing == end_timing) |>
       dplyr::filter(.data$retrospective_peel == retro_fit$years_to_remove[1]) |>
       dplyr::pull(.data$estimated)
 
     # Check for missing or invalid values
     if (length(peel_value) == 0 || length(ref_value) == 0) {
-      cli::cli_warn("Missing value for peel {i-1} at year {end_year[i]}, skipping this peel")
+      cli::cli_warn("Missing value for peel {i-1} at year {end_timing}, skipping this peel")
       next
     }
 
     if (is.na(peel_value) || is.na(ref_value)) {
-      cli::cli_warn("NA value encountered for peel {i-1} at year {end_year[i]}, skipping this peel")
+      cli::cli_warn("NA value encountered for peel {i-1} at year {end_timing}, skipping this peel")
       next
     }
 
     if (ref_value == 0) {
-      cli::cli_warn("Reference value is zero for peel {i-1} at year {end_year[i]}, skipping this peel")
+      cli::cli_warn("Reference value is zero for peel {i-1} at year {end_timing}, skipping this peel")
       next
     }
 

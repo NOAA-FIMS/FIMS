@@ -865,6 +865,7 @@ class Information {
 
     size_provider->SetGrowth(growth_observation);
     size_provider->SetPopulationDimensions(p->n_years, p->n_ages);
+    if (p->ages.size() > 0) size_provider->SetMinimumAge(p->ages[0]);
     size_provider->SetPopulationSizeGrid(&(p->size_grid));
 
     p->size_distribution_provider = size_provider;
@@ -1085,6 +1086,8 @@ class Information {
                          fims::to_string(p->id) + "\". ");
         }
       }
+
+      p->InitializeTiming();
 
       // set information dimensions
       this->n_years = std::max(this->n_years, p->n_years);

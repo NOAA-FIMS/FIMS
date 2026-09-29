@@ -1,3 +1,11 @@
+# The comparison operating model sampled surveys on January 1 and fisheries
+# throughout the year. Encode that distinction explicitly in its test inputs.
+comparison_timing <- function(data) {
+  data$timing <- ifelse(data$fleet == "survey1" & !is.na(data$timing),
+    sprintf("%04d-01-01", as.integer(data$timing)), as.character(data$timing))
+  data
+}
+
 # Helper file for FIMS R tests----
 # This file contains multiple functions that are used to set up and run
 # FIMS models with or without wrapper functions. The functions are sourced by
@@ -181,16 +189,17 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
   # Repeat similar setup for the survey fleet (e.g., index, age comp, and length comp)
   # This includes initializing logistic selectivity, observed data modules, and distribution links.
   survey_index <- em_input[["surveyB.obs"]][["survey1"]]
-  survey_fleet_index <- methods::new(Index, om_input[["nyr"]])
+  survey_dates <- sprintf("%04d-01-01", seq_len(om_input[["nyr"]]))
+  survey_fleet_index <- methods::new(Index, om_input[["nyr"]], survey_dates)
   survey_fleet_index$index_data[] <- survey_index
 
 
-  survey_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]])
+  survey_fleet_age_comp <- methods::new(AgeComp, om_input[["nyr"]], om_input[["nages"]], survey_dates)
   survey_fleet_age_comp$age_comp_data[] <- c(t(em_input[["survey.age.obs"]][["survey1"]])) * em_input[["n.survey"]][["survey1"]]
 
 
   survey_lengthcomp <- em_input[["survey.length.obs"]][["survey1"]]
-  survey_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]])
+  survey_fleet_length_comp <- methods::new(LengthComp, om_input[["nyr"]], om_input[["nlengths"]], survey_dates)
   survey_fleet_length_comp$length_comp_data[] <- c(t(em_input[["survey.length.obs"]][["survey1"]])) * em_input[["n.survey.lengthcomp"]][["survey1"]]
 
   # Fleet
@@ -528,7 +537,7 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   # Clear any previous FIMS settings
   clear()
 
-  data <- FIMS::FIMSFrame(data_big)
+  data <- FIMS::FIMSFrame(comparison_timing(data_big))
   if (tibble::is_tibble(modified_parameters)) {
     parameters <- modified_parameters
   } else {

@@ -30,7 +30,7 @@ prepare_test_data <- function() {
     age_data,
     weight_at_age_data
   )
-  data_age_comp <- FIMS::FIMSFrame(data_age_comp_raw)
+  data_age_comp <- FIMS::FIMSFrame(comparison_timing(data_age_comp_raw))
   saveRDS(
     data_age_comp,
     file = testthat::test_path("fixtures", "data_age_comp.RDS"),
@@ -44,7 +44,7 @@ prepare_test_data <- function() {
       .after = "age"
     ) |>
     rbind(length_comp_data, length_age_data)
-  data_length_comp <- FIMS::FIMSFrame(data_length_comp_raw)
+  data_length_comp <- FIMS::FIMSFrame(comparison_timing(data_length_comp_raw))
   saveRDS(
     data_length_comp,
     file = testthat::test_path("fixtures", "data_length_comp.RDS"),
@@ -57,6 +57,7 @@ prepare_test_data <- function() {
   # Generate dataset with missing age composition for fleet1
   data_age_comp_na <- data_age_comp_raw |>
     dplyr::filter(!(fleet == "fleet1" & type == "age_comp" & timing == na_index)) |>
+    comparison_timing() |>
     FIMS::FIMSFrame()
   saveRDS(
     data_age_comp_na,
@@ -73,6 +74,7 @@ prepare_test_data <- function() {
         timing == na_index
       )
     ) |>
+    comparison_timing() |>
     FIMS::FIMSFrame()
   saveRDS(
     data_length_comp_na,
@@ -99,6 +101,7 @@ prepare_test_data <- function() {
         timing == length_na_index
       )
     ) |>
+    comparison_timing() |>
     FIMS::FIMSFrame()
   saveRDS(
     data_age_length_comp_na,
@@ -122,7 +125,7 @@ prepare_test_data <- function() {
   om_output <- om_output_list[[iter_id]]
   em_input <- em_input_list[[iter_id]]
 
-  data_age_length_comp <- FIMSFrame(data_big)
+  data_age_length_comp <- FIMSFrame(comparison_timing(data_big))
   default_parameters <- setup_default_parameters(
     data = data_age_length_comp
   )
@@ -265,6 +268,7 @@ prepare_test_data <- function() {
       !(type == "age_comp" & fleet == "fleet1" & timing == 3),
       !(type == "age_comp" & fleet == "survey1" & timing == 5)
     ) |>
+    comparison_timing() |>
     FIMSFrame()
   # Uses the same parameters as deterministic_age_length_comp so the expected
   # length compositions can be compared between the 2 runs.

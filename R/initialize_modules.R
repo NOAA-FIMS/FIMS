@@ -602,7 +602,7 @@ initialize_catch <- function(data, fleet) {
     dplyr::pull(.data$type)
 
   if ("catch" %in% fleet_type) {
-    module <- methods::new(Catch, get_n_years(data))
+    module <- methods::new(Catch, get_n_years(data), data_timing(data, fleet, "catch"))
     module$catch_data[] <- model_catch(data, fleet)
 
     return(module)
@@ -636,7 +636,7 @@ initialize_index <- function(data, fleet) {
     dplyr::pull(.data$type)
 
   if ("index" %in% fleet_type) {
-    module <- methods::new(Index, get_n_years(data))
+    module <- methods::new(Index, get_n_years(data), data_timing(data, fleet, "index"))
     module$index_data[] <- model_index(data, fleet)
 
     return(module)
@@ -682,6 +682,7 @@ initialize_comp <- function(data,
 
   type <- match.arg(type)
   comp <- comp_types[[type]]
+  timing <- data_timing(data, fleet, comp[["name"]])
 
   fleet_exists <- fleet %in% get_fleets(data)
   if (!fleet_exists) {
@@ -728,7 +729,8 @@ initialize_comp <- function(data,
   module <- methods::new(
     comp[["comp_object"]],
     get_n_years(data),
-    expected_n
+    expected_n,
+    timing
   )
 
   comp_data <- comp[["m_comp"]](data, fleet)

@@ -19,6 +19,7 @@ void register_data(Rcpp::Module& m) {
                                      "https://noaa-fims.github.io/FIMS/doxygen/"
                                      "classAgeCompDataInterface.html.")
       .constructor<int, int>()
+      .constructor<int, int, std::vector<std::string>>()
       .field("age_comp_data", &AgeCompDataInterface::age_comp_data)
       .method("get_id", &AgeCompDataInterface::get_id);
 
@@ -28,6 +29,7 @@ void register_data(Rcpp::Module& m) {
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classLengthCompDataInterface.html.")
       .constructor<int, int>()
+      .constructor<int, int, std::vector<std::string>>()
       .field("length_comp_data", &LengthCompDataInterface::length_comp_data)
       .method("get_id", &LengthCompDataInterface::get_id);
 
@@ -36,6 +38,7 @@ void register_data(Rcpp::Module& m) {
                                    "https://noaa-fims.github.io/FIMS/doxygen/"
                                    "classCatchDataInterface.html.")
       .constructor<int>()
+      .constructor<int, std::vector<std::string>>()
       .field("catch_data", &CatchDataInterface::catch_data)
       .method("get_id", &CatchDataInterface::get_id);
 
@@ -44,6 +47,7 @@ void register_data(Rcpp::Module& m) {
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/classIndexDataInterface.html.")
       .constructor<int>()
+      .constructor<int, std::vector<std::string>>()
       .field("index_data", &IndexDataInterface::index_data)
       .method("get_id", &IndexDataInterface::get_id);
 }

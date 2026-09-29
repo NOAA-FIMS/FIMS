@@ -1,3 +1,41 @@
+# Resolve C++ date-axis bindings before expanding any flattened values.
+# All information comes from JSON; the original FIMSFrame is not needed.
+resolve_output_timing <- function(output) {
+  axes <- output[["time_axes"]]
+  if (is.null(axes) || is.null(output[["time_bindings"]])) {
+    cli::cli_abort("Model output is missing timing metadata.")
+  }
+  for (binding in output[["time_bindings"]]) {
+    section <- binding[["section"]]
+    modules <- output[[section]]
+    for (i in seq_along(modules)) {
+      module <- modules[[i]]
+      id <- if (section == "data") module[["id"]] else module[["module_id"]]
+      if (!identical(id, binding[["id"]])) next
+      add_dates <- function(quantity) {
+        axis <- binding[["quantities"]][[quantity[["name"]]]]
+        if (is.null(axis)) axis <- binding[["default_axis"]]
+        dates <- axes[[axis]]
+        if (is.null(dates)) cli::cli_abort("Unknown output timing axis {.val {axis}}.")
+        quantity[["dimensionality"]][["timing"]] <- dates
+        quantity
+      }
+      if (section == "data") {
+        module <- add_dates(module)
+      } else {
+        for (component in c("parameters", "derived_quantities")) {
+          if (!is.null(module[[component]])) {
+            module[[component]] <- lapply(module[[component]], add_dates)
+          }
+        }
+      }
+      modules[[i]] <- module
+    }
+    output[[section]] <- modules
+  }
+  output
+}
+
 # This file contains many functions to reshape output from get_output()
 
 #' Reshape JSON estimates
@@ -29,12 +67,13 @@ reshape_json_estimates <- function(model_output) {
     )
   }
 
-  json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE)
+  json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE) |>
+    resolve_output_timing()
   read_list <- purrr::map(
     json_list[!names(json_list) %in% c(
       "name", "type", "estimation_framework", "id", "objective_function_value",
       "max_gradient_component", "gradient",
-      "population_ids", "fleet_ids", "log"
+      "population_ids", "fleet_ids", "log", "time_axes", "time_bindings"
     )],
     \(x) tidyr::unnest_wider(tibble::tibble(json = x), dplyr::all_of("json"))
   )
@@ -180,7 +219,7 @@ reshape_json_estimates <- function(model_output) {
       dplyr::all_of(c("module_name", "module_id", "module_type")),
       "label" = dplyr::all_of("name"),
       dplyr::all_of(c("type", "type_id")), "parameter_id" = dplyr::all_of("id"),
-      dplyr::all_of("fleet"), dplyr::ends_with("_i"),
+      dplyr::all_of(c("fleet", "timing")), dplyr::ends_with("_i"),
       "input" = dplyr::all_of("value"),
       estimated = "estimated_value",
       "expected" = expected_values,
@@ -373,12 +412,9 @@ dimension_folded_to_tibble <- function(section) {
 #' folded into a single vector in the json output.
 #'
 #' @details
-#' The dimension index is returned not the actual year of the model. For
-#' example, if the model starts in year 1900, then year_i of 1, which is what
-#' is returned from this function will need to map to 1900 and that will need
-#' to be done externally.
-#' This function will accommodate dimensions of year-1 and year+1 where the
-#' indexing of the former will start at 2 instead of 1.
+#' Time dimensions use the explicit ISO dates supplied in `timing`. Other
+#' dimensions remain indices. Population states use January 1, including terminal
+#' years; annual observations use December 31 and dated samples use their dates.
 #' @param data A list containing the header and dimensions information from a
 #'   FIMS json output object.
 #' @return
@@ -387,30 +423,31 @@ dimension_folded_to_tibble <- function(section) {
 #' @examples
 #' dummy_dimensions <- list(
 #'   header = list("n_years", "n_ages"),
-#'   dimensions = list(30L, 12L)
+#'   dimensions = list(30L, 12L),
+#'   timing = sprintf("%04d-01-01", 1900:1929)
 #' )
 #' dimensions_to_tibble(dummy_dimensions)
 #' # Example with n_years+1
 #' dummy_dimensions <- list(
 #'   header = list("n_years+1", "n_ages"),
-#'   dimensions = list(31L, 12L)
+#'   dimensions = list(31L, 12L),
+#'   timing = sprintf("%04d-01-01", 1900:1930)
 #' )
 #' dimensions_to_tibble(dummy_dimensions)
 dimensions_to_tibble <- function(data) {
-  #' Replace headers like "n_years" with "year_i".
-  #' Example: "n_ages+1" with "age_i"
-  #' This matches names starting with 'n' (with or without an underscore)
-  #' and shortens them to a simple indexed form.
-  better_names <- unlist(data[["header"]]) |>
-    gsub(pattern = "^n_?(.+?)s([-\\+]\\d+)?$", replacement = "\\1_i")
+  # Expand indices in storage order, then resolve the time coordinate to Date.
+  headers <- unlist(data[["header"]])
+  temporal <- grepl("^n_years([-+][0-9]+)?$", headers)
+  better_names <- gsub("^n_?(.+?)s([-+][0-9]+)?$", "\\1_i", headers)
+  better_names[temporal] <- "timing"
   names(data[["dimensions"]]) <- better_names
   if (length(better_names) == 0) {
     # When the header is NULL
-    return(tibble::add_row(tibble::tibble()))
+    return(tibble::tibble(timing = as.Date(NA)))
   }
   if ("na" %in% better_names && length(better_names) == 1) {
     # When the dimensions are na because there is no associated indexing
-    return(tibble::add_row(tibble::tibble()))
+    return(tibble::tibble(timing = as.Date(NA)))
   }
   # Accommodate any -1 by creating a different start value
   test <- grepl("-\\d", data[["header"]])
@@ -420,11 +457,21 @@ dimensions_to_tibble <- function(data) {
   data[["dimensions"]][test] <- as.numeric(data[["dimensions"]][test]) +
     as.numeric(addition)
   # Create the returned tibble by first sequencing from 1:n for each dimension
-  purrr::map2(start, data[["dimensions"]], seq) |>
+  out <- purrr::map2(start, data[["dimensions"]], seq) |>
     purrr::set_names(names(data[["dimensions"]])) |>
     expand.grid() |>
     tibble::as_tibble() |>
     dplyr::arrange(!!!rlang::syms(better_names))
+  if (any(temporal)) {
+    dates <- as.Date(unlist(data[["timing"]]))
+    if (length(dates) < max(out$timing) || anyNA(dates)) {
+      cli::cli_abort("Output time dimensions require valid explicit timing dates.")
+    }
+    out$timing <- dates[out$timing]
+  } else {
+    out$timing <- as.Date(NA)
+  }
+  out
 }
 
 #' Convert the density component information into a tibble

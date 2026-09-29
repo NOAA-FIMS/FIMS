@@ -12,6 +12,7 @@
 
 #include <exception>
 #include <vector>
+#include <string>
 
 #include "model_object.hpp"
 #include "fims_vector.hpp"
@@ -24,6 +25,7 @@ namespace fims_data_object {
 template <typename Type>
 struct DataObject : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g;                    /**< id of the Data Object >*/
+  std::vector<std::string> timing; /**< Dates for the first (annual) dimension. >*/
   fims::Vector<Type> data;                 /**< vector of the data >*/
   fims::Vector<Type> uncertainty;          /**< vector of the data >*/
   size_t dimensions;                       /**< dimension of the Data object >*/

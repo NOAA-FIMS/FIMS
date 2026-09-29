@@ -172,6 +172,20 @@ class GrowthModel : public GrowthModelBase<Type> {
     needs_update_ = false;
   }
 
+  // Evaluate the same growth and variability model at a fractional age.
+  void EvaluateAtAge(const Type& age, Type& mean, Type& sd, Type& weight) const {
+    const Type young = vb_.length_at_age(vb_.reference_age_for_length_young);
+    const Type old = vb_.length_at_age(vb_.reference_age_for_length_old);
+    const Type slope = n_ages_ > 1
+        ? (length_at_age_sd_at_reference_age_old_ -
+           length_at_age_sd_at_reference_age_young_) /
+              fims_math::ad_max(fims_math::ad_fabs(old - young), Type(1e-8))
+        : Type(0);
+    mean = vb_.length_at_age(age);
+    sd = ComputeLengthSdAtAge(age, mean, young, slope);
+    weight = vb_.weight_at_age(age);
+  }
+
   const GrowthProducts<Type>& GetProducts() const override { return products_; }
 
  private:

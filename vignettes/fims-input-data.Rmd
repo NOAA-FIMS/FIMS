@@ -39,6 +39,33 @@ The currently available values for the `type` column are `r glue::glue_collapse(
 
 The individual data types are described in more detail below after introducing the example data set that is included in the package.
 
+## Observation timing
+
+`FIMSFrame()` stores `timing` as an R `Date`. Supply ISO dates such as
+`"2025-06-10"`, or integer years of one to four digits: `2025` becomes
+`2025-12-31` and `3` becomes `0003-12-31`. A character column can mix years
+and dates, for example `c("2025", "2026-06-10")`. Use `NA` for data items
+without an associated time, such as length-bin definitions.
+
+December 31 is reserved for annual observations, whether entered as a year
+or as an explicit date. Year-only fishery compositions represent annual
+catch; year-only surveys represent annual averages. All other dates,
+including January 1, represent instantaneous samples. An instantaneous
+December 31 sample cannot be represented. Catch remains an annual amount.
+Growth-derived annual weight and length predictions integrate survival and
+growth over the year.
+
+Model initialization obtains the calendar from these data automatically;
+there is no timing setting on the Population module. Index, age-composition,
+and length-composition samples can have different dates, with at most one
+sample per fleet, data type, and year.
+
+`get_estimates()` also returns a single `timing` Date column. Annual
+observations are labeled December 31, beginning-of-year population quantities
+are labeled January 1, and instantaneous predictions carry their sample dates.
+When a plotting package requires a numeric `year` column, create it explicitly
+with `as.integer(format(timing, "%Y"))`.
+
 ## `data_big`
 
 A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data_big`. This data set is based on data that was used in [Li et al. (2021)](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data_big.R) based on an age--length conversion matrix. To see how this example data frame was created, see the R script here [R/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_big.R).

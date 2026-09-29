@@ -17,8 +17,7 @@ retro_fit <- list(
   years_to_remove = c(0, 1, 2),
   estimates = tibble::tibble(
     label = "spawning_biomass",
-    year_i = rep(1:10, 3),
-    timing = rep(2001:2010, 3),
+    timing = rep(as.Date(sprintf("%04d-01-01", 2001:2010)), 3),
     retrospective_peel = rep(0:2, each = 10),
     estimated = c(
       rep(100, 10),

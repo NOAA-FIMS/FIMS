@@ -308,6 +308,9 @@ methods::setMethod("get_version", "FIMSFit", function(x) x@version)
 
 #' @return
 #' [get_model_output()] returns the finalized FIMS output as a JSON list.
+#' Timing metadata uses December 31 for annual observations and the actual
+#' date for instantaneous samples. [get_estimates()] returns these in a single
+#' `timing` Date column. Beginning-of-year population states retain January 1.
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims

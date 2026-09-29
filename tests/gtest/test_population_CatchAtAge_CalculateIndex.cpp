@@ -51,3 +51,296 @@ TEST_F(CAAEvaluateTestFixture, HandlesCorrectInput_CatchAtAge_CalculateIndex) {
   }
 }
 }  // namespace
+TEST_F(CAAEvaluateTestFixture, ObservationTimingSurvivalIsSparseAndShared) {
+  // Only requested nonzero fractions create cached survival calculations.
+  auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
+  const size_t i = year * population->n_ages + age;
+  dq["numbers_at_age"][i] = 1000;
+  dq["mortality_Z"][i] = 0.8;
+  EXPECT_DOUBLE_EQ(catch_at_age_model->NumbersAtTime(population, year, age, 0), 1000);
+  EXPECT_TRUE(catch_at_age_model->timed_numbers.empty());
+  const double fraction = 104.0 / 366.0;
+  const double expected = 1000 * std::exp(-0.8 * fraction);
+  EXPECT_NEAR(catch_at_age_model->NumbersAtTime(population, year, age, fraction), expected, 1e-10);
+  EXPECT_EQ(catch_at_age_model->timed_numbers.size(), 1u);
+  EXPECT_NEAR(catch_at_age_model->NumbersAtTime(population, year, age, fraction), expected, 1e-10);
+  EXPECT_EQ(catch_at_age_model->timed_numbers.size(), 1u);
+  catch_at_age_model->Prepare();
+  EXPECT_TRUE(catch_at_age_model->timed_numbers.empty());
+  dq["numbers_at_age"][i] = 1000;
+  dq["mortality_Z"][i] = 1.2;
+  EXPECT_NEAR(catch_at_age_model->NumbersAtTime(population, year, age, fraction),
+              1000 * std::exp(-1.2 * fraction), 1e-10);
+}
+
+TEST_F(CAAEvaluateTestFixture, IndexTimingDoesNotChangeAnnualCatch) {
+  auto fleet = population->fleets[0];
+  population->observation_times->push_back({static_cast<size_t>(year), 0.5});
+  fleet->index_time_id = fims::Vector<int>(fleet->n_years, -1);
+  fleet->index_time_id[year] = 0;
+  fleet->BindObservationTimes(population->observation_times);
+  auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
+  const size_t i = year * population->n_ages + age;
+  dq["numbers_at_age"][i] = 1000;
+  dq["mortality_Z"][i] = 0.8;
+  catch_at_age_model->CalculateIndexNumbersAA(population, i, year, age);
+  auto& fdq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
+  EXPECT_NEAR(fdq["index_numbers_at_age"][i], 1000 * std::exp(-0.4) *
+      fleet->q.get_force_scalar(year) * fleet->selectivity->evaluate(population->ages[age], year), 1e-10);
+  catch_at_age_model->CalculateCatchNumbersAA(population, i, year, age);
+  EXPECT_NEAR(fdq["catch_numbers_at_age"][i], 1000 * (1 - std::exp(-0.8)) / 0.8 *
+      fleet->Fmort[year] * population->f_multiplier[year] *
+      fleet->selectivity->evaluate(population->ages[age], year), 1e-10);
+}
+
+TEST_F(CAAEvaluateTestFixture, CompositionsUseTheirOwnDatesAndInstantaneousSamples) {
+  auto fleet = population->fleets[0];
+  catch_at_age_model->fleets.clear();
+  catch_at_age_model->fleets[fleet->GetId()] = fleet;
+  fleet->requires_age_length_mapping = true;
+  fleet->age_to_length_conversion.resize(fleet->n_ages * fleet->n_lengths);
+  for (size_t a = 0; a < fleet->n_ages; ++a) {
+    for (size_t l = 0; l < fleet->n_lengths; ++l) {
+      fleet->age_to_length_conversion[a * fleet->n_lengths + l] =
+          l == a ? 1.0 : 0.0;
+    }
+  }
+  fleet->age_to_length_conversion_model =
+      std::make_shared<fims_popdy::AgeToLengthConversionFixed<double>>(fleet);
+  fleet->fleet_observed_catch_data_id_m = 123;
+  population->observation_times->push_back({static_cast<size_t>(year), 0.2});
+  population->observation_times->push_back({static_cast<size_t>(year), 0.7});
+  fleet->age_comp_time_id = fims::Vector<int>(fleet->n_years, -1);
+  fleet->length_comp_time_id = fims::Vector<int>(fleet->n_years, -1);
+  fleet->age_comp_time_id[year] = 0;
+  fleet->length_comp_time_id[year] = 1;
+  fleet->BindObservationTimes(population->observation_times);
+  auto& pdq = catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
+  for (size_t y = 0; y < fleet->n_years; ++y) {
+    for (size_t a = 0; a < fleet->n_ages; ++a) {
+      pdq["numbers_at_age"][y * fleet->n_ages + a] = 1000;
+      pdq["mortality_Z"][y * fleet->n_ages + a] = 0.1 + 0.05 * a;
+    }
+  }
+  catch_at_age_model->evaluate_age_comp();
+  catch_at_age_model->evaluate_length_comp();
+  auto& fdq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
+  double age_total = 0, length_total = 0;
+  std::vector<double> expected(fleet->n_lengths, 0.0);
+  for (size_t a = 0; a < fleet->n_ages; ++a) {
+    const double sel = fleet->selectivity->evaluate(population->ages[a], year);
+    age_total += sel * std::exp(-(0.1 + 0.05 * a) * 0.2);
+    fims::Vector<double> row;
+    ASSERT_TRUE(fleet->age_to_length_conversion_model->BuildAgeToLengthConversionRow(year, a, row));
+    for (size_t l = 0; l < fleet->n_lengths; ++l) {
+      const double value = sel * std::exp(-(0.1 + 0.05 * a) * 0.7) * row[l];
+      expected[l] += value;
+      length_total += value;
+    }
+  }
+  for (size_t a = 0; a < fleet->n_ages; ++a) {
+    EXPECT_NEAR(fdq["agecomp_proportion"][year * fleet->n_ages + a],
+        fleet->selectivity->evaluate(population->ages[a], year) *
+        std::exp(-(0.1 + 0.05 * a) * 0.2) / age_total, 1e-12);
+  }
+  for (size_t l = 0; l < fleet->n_lengths; ++l) {
+    EXPECT_NEAR(fdq["lengthcomp_proportion"][year * fleet->n_lengths + l],
+                expected[l] / length_total, 1e-12);
+  }
+  EXPECT_EQ(catch_at_age_model->timed_numbers.size(), 2 * fleet->n_ages);
+}
+
+TEST_F(CAAEvaluateTestFixture, SharedTimeReferencesReuseSurvivalAcrossFleets) {
+  // Two types and two fleets refer to one population date and one cached result.
+  population->observation_times->push_back({static_cast<size_t>(year), 0.5});
+  auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
+  dq["numbers_at_age"][i_age_year] = 1000;
+  dq["mortality_Z"][i_age_year] = 0.8;
+  for (auto& fleet : population->fleets) {
+    fleet->index_time_id = fims::Vector<int>(fleet->n_years, -1);
+    fleet->index_time_id[year] = 0;
+    fleet->age_comp_time_id = fleet->index_time_id;
+    fleet->BindObservationTimes(population->observation_times);
+    EXPECT_EQ(fleet->observation_times.get(), population->observation_times.get());
+    catch_at_age_model->SampleNumbers(fleet, year, age,
+        fleet->ObservationFraction(fleet->age_comp_time_id, year));
+  }
+  catch_at_age_model->CalculateIndexNumbersAA(population, i_age_year, year, age);
+  EXPECT_EQ(catch_at_age_model->timed_numbers.size(), 1u);
+}
+
+TEST(ObservationTimes, RejectsInvalidTablesAndAnnualReferences) {
+  // Validate dimensions, date uniqueness, fractions, and the year of each sample.
+  using fims_popdy::ObservationTime;
+  using fims_popdy::ValidateObservationTimes;
+  EXPECT_THROW(ValidateObservationTimes({{0, 0.5}, {0, 0.5}}, 2), std::invalid_argument);
+  EXPECT_THROW(ValidateObservationTimes({{1, 0}, {0, 0}}, 2), std::invalid_argument);
+  EXPECT_THROW(ValidateObservationTimes({{2, 0}}, 2), std::invalid_argument);
+  EXPECT_THROW(ValidateObservationTimes({{0, 1}}, 2), std::invalid_argument);
+  EXPECT_THROW(ValidateObservationTimes({{0, NAN}}, 2), std::invalid_argument);
+  auto times = std::make_shared<std::vector<ObservationTime>>(
+      std::initializer_list<ObservationTime>{{0, 0}, {1, 0.5}});
+  EXPECT_NO_THROW(ValidateObservationTimes(*times, 2));
+  fims_popdy::Fleet<double> fleet;
+  fleet.n_years = 2;
+  fleet.index_time_id = fims::Vector<int>(2, -1);
+  fleet.index_time_id[0] = 0;
+  EXPECT_NO_THROW(fleet.BindObservationTimes(times));
+  EXPECT_DOUBLE_EQ(fleet.ObservationFraction(fleet.index_time_id, 0), 0);
+  EXPECT_DOUBLE_EQ(fleet.ObservationFraction(fleet.index_time_id, 1), 0);
+  auto different_dates = std::make_shared<std::vector<ObservationTime>>(*times);
+  (*different_dates)[0].date = "1996-01-01";
+  EXPECT_THROW(fleet.BindObservationTimes(different_dates), std::invalid_argument);
+  fleet.index_time_id[0] = 1;
+  EXPECT_THROW(fleet.BindObservationTimes(times), std::invalid_argument);
+  fleet.index_time_id[0] = 2;
+  EXPECT_THROW(fleet.BindObservationTimes(times), std::invalid_argument);
+  fleet.index_time_id[0] = -3;
+  EXPECT_THROW(fleet.BindObservationTimes(times), std::invalid_argument);
+  fleet.index_time_id.resize(1);
+  EXPECT_THROW(fleet.BindObservationTimes(times), std::invalid_argument);
+}
+
+
+TEST(ObservationTimes, BuildsSharedCalendarFromDataWithoutPopulationSettings) {
+  // Catch anchors the calendar but creates no sample slots. Missing data do not
+  // create slots, and different fleets/types reuse the same observed date.
+  fims_popdy::Population<double> population;
+  population.n_years = 3;
+  auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
+  fleet->n_years = 3;
+  auto catch_data = std::make_shared<fims_data_object::DataObject<double>>(3);
+  catch_data->timing = {"1995-01-01", "1996-01-01", "1997-01-01"};
+  fleet->observed_catch_data = catch_data;
+  auto index = std::make_shared<fims_data_object::DataObject<double>>(3);
+  index->timing = {"1995-01-01", "1996-04-14", "1997-11-20"};
+  index->data = fims::Vector<double>{100, 100, -999};
+  fleet->observed_index_data = index;
+  auto other = std::make_shared<fims_popdy::Fleet<double>>();
+  other->n_years = 3;
+  auto age = std::make_shared<fims_data_object::DataObject<double>>(3, 2);
+  age->timing = index->timing;
+  age->data = fims::Vector<double>{10, 20, 10, 20, -999, -999};
+  other->observed_agecomp_data = age;
+  population.fleets = {fleet, other};
+  population.InitializeTiming();
+  EXPECT_EQ(population.annual_dates,
+            (std::vector<std::string>{"1995-01-01", "1996-01-01", "1997-01-01", "1998-01-01"}));
+  ASSERT_EQ(population.observation_times->size(), 2u);
+  EXPECT_EQ(population.observation_times->at(1).date, "1996-04-14");
+  EXPECT_DOUBLE_EQ(population.observation_times->at(1).fraction, 104.0 / 366.0);
+  EXPECT_EQ(fleet->index_time_id[1], other->age_comp_time_id[1]);
+  EXPECT_EQ(fleet->index_time_id[2], -1);
+  EXPECT_EQ(other->age_comp_time_id[2], -1);
+  EXPECT_EQ(fleet->observation_times.get(), other->observation_times.get());
+}
+
+TEST(ObservationTimes, UndatedDataUseAnnualRowsWithoutAnExtraSetting) {
+  // Existing low-level constructors need no new calendar configuration.
+  fims_popdy::Population<double> population;
+  population.n_years = 2;
+  auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
+  fleet->n_years = 2;
+  fleet->observed_index_data = std::make_shared<fims_data_object::DataObject<double>>(2);
+  population.fleets = {fleet};
+  population.InitializeTiming();
+  EXPECT_EQ(population.annual_dates,
+            (std::vector<std::string>{"0001-01-01", "0002-01-01", "0003-01-01"}));
+  EXPECT_DOUBLE_EQ(fleet->ObservationFraction(fleet->index_time_id, 1), 0.0);
+  EXPECT_TRUE(fleet->IsAnnualSample(fleet->index_time_id, 1));
+  EXPECT_TRUE(population.observation_times->empty());
+  // Undated rows inherit the calendar when another data object supplies it.
+  auto catch_data = std::make_shared<fims_data_object::DataObject<double>>(2);
+  catch_data->timing = {"2025-01-01", "2026-01-01"};
+  fleet->observed_catch_data = catch_data;
+  population.InitializeTiming();
+  EXPECT_EQ(population.annual_dates[0], "2025-01-01");
+}
+
+TEST(ObservationTimes, RejectsMisalignedYearsAndInvalidCalendarDates) {
+  // Preserve one sample per annual row and reject inconsistent calendars.
+  fims_popdy::Population<double> population;
+  population.n_years = 2;
+  auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
+  fleet->n_years = 2;
+  auto index = std::make_shared<fims_data_object::DataObject<double>>(2);
+  fleet->observed_index_data = index;
+  population.fleets = {fleet};
+  index->timing = {"1996-01-01", "1996-06-10"};
+  EXPECT_THROW(population.InitializeTiming(), std::invalid_argument);
+  index->timing = {"1996-01-01"};
+  EXPECT_THROW(population.InitializeTiming(), std::invalid_argument);
+  index->timing = {"1996-01-01", "1997-02-29"};
+  EXPECT_THROW(population.InitializeTiming(), std::invalid_argument);
+  EXPECT_THROW(fims_popdy::ParseObservationDate("1996-13-01"), std::invalid_argument);
+  EXPECT_THROW(fims_popdy::ParseObservationDate("1996-00-01"), std::invalid_argument);
+  EXPECT_THROW(fims_popdy::ParseObservationDate("1996-02-30"), std::invalid_argument);
+  EXPECT_THROW(fims_popdy::ParseObservationDate("199x-01-01"), std::invalid_argument);
+  EXPECT_DOUBLE_EQ(fims_popdy::ParseObservationDate("0003-01-01").fraction, 0.0);
+  EXPECT_TRUE(fims_popdy::IsAnnualTiming("0003-12-31"));
+  EXPECT_FALSE(fims_popdy::IsAnnualTiming("0003-01-01"));
+}
+
+TEST_F(CAAEvaluateTestFixture, AnnualSurvivalUsesIntegralAndReusesIt) {
+  auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
+  const size_t i = year * population->n_ages + age;
+  dq["numbers_at_age"][i] = 1000;
+  dq["mortality_Z"][i] = 0.8;
+  EXPECT_NEAR(catch_at_age_model->NumbersAtTime(population, year, age, -1),
+              1000 * (1 - std::exp(-0.8)) / 0.8, 1e-10);
+  EXPECT_EQ(catch_at_age_model->timed_numbers.size(), 1u);
+  catch_at_age_model->NumbersAtTime(population, year, age, -1);
+  EXPECT_EQ(catch_at_age_model->timed_numbers.size(), 1u);
+  double integral = 0;
+  for (size_t k = 0; k < 8; ++k) {
+    const double t = catch_at_age_model->annual_nodes[k];
+    integral += catch_at_age_model->annual_weights[k] * std::exp(-0.8 * t) * (1 + t);
+  }
+  EXPECT_NEAR(integral, (1 - std::exp(-0.8)) / 0.8 +
+              (1 - 1.8 * std::exp(-0.8)) / (0.8 * 0.8), 1e-12);
+}
+
+TEST(ObservationTimes, YearsAndExplicitJanuaryDatesRemainDistinct) {
+  fims_popdy::Population<double> population;
+  population.n_years = 2;
+  auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
+  fleet->n_years = 2;
+  auto data = std::make_shared<fims_data_object::DataObject<double>>(2);
+  data->timing = {"0003-12-31", "0004-01-01"};
+  data->data = fims::Vector<double>{10, 20};
+  fleet->observed_index_data = data;
+  population.fleets = {fleet};
+  population.InitializeTiming();
+  ASSERT_EQ(population.observation_times->size(), 1u);
+  EXPECT_EQ(population.annual_dates[0], "0003-01-01");
+  EXPECT_TRUE(fleet->IsAnnualSample(fleet->index_time_id, 0));
+  EXPECT_TRUE(fleet->IsDatedSample(fleet->index_time_id, 1));
+  EXPECT_DOUBLE_EQ(fleet->ObservationFraction(fleet->index_time_id, 1), 0.0);
+}
+
+TEST_F(CAAEvaluateTestFixture, LengthCompositionDoesNotRequireAgeSampleCounts) {
+  // Missing age observations zero the expected counts, not the proportions.
+  auto fleet = population->fleets[0];
+  catch_at_age_model->fleets.clear();
+  catch_at_age_model->fleets[fleet->GetId()] = fleet;
+  fleet->requires_age_length_mapping = true;
+  fleet->length_comp_time_id.resize(0);
+  fleet->age_to_length_conversion.resize(fleet->n_ages * fleet->n_lengths);
+  for (size_t a = 0; a < fleet->n_ages; ++a) {
+    for (size_t l = 0; l < fleet->n_lengths; ++l) {
+      fleet->age_to_length_conversion[a * fleet->n_lengths + l] =
+          1.0 / fleet->n_lengths;
+    }
+  }
+  fleet->age_to_length_conversion_model =
+      std::make_shared<fims_popdy::AgeToLengthConversionFixed<double>>(fleet);
+  auto& dq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
+  for (size_t i = 0; i < fleet->n_years * fleet->n_ages; ++i) {
+    dq["agecomp_expected"][i] = 0.0;
+    dq["agecomp_proportion"][i] = 1.0 / fleet->n_ages;
+  }
+  catch_at_age_model->evaluate_length_comp();
+  for (size_t i = 0; i < fleet->n_years * fleet->n_lengths; ++i) {
+    ASSERT_NEAR(dq["lengthcomp_proportion"][i], 1.0 / fleet->n_lengths, 1e-12);
+  }
+}

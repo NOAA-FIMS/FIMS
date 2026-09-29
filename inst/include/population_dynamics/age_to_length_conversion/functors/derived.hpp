@@ -139,6 +139,16 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
     return fleet_ptr != nullptr && out_row.size() == fleet_ptr->n_lengths;
   }
 
+  bool VariesWithinYear() const override { return true; }
+
+  bool BuildAgeToLengthConversionRowAtTime(
+      size_t year, size_t age, double fraction,
+      fims::Vector<Type>& out_row) const override {
+    out_row = BuildMappedFleetAgeToLengthConversionRow(year, age, fraction);
+    auto fleet = fleet_.lock();
+    return fleet && out_row.size() == fleet->n_lengths;
+  }
+
  protected:
   /**
    * @brief Read one prepared age-to-size row from the linked population size
@@ -148,7 +158,7 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
    * @return Population-grid probability row for the requested year and age.
    */
   fims::Vector<Type> BuildPopulationProbSizeRow(std::size_t year_index,
-                                                std::size_t age_index) const {
+                                                std::size_t age_index, double fraction = 0.0) const {
     std::shared_ptr<SizeDistributionProviderBase<Type>> size_provider_ptr =
         TryGetSizeProvider();
 
@@ -168,7 +178,7 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
     for (std::size_t size_bin_index = 0;
          size_bin_index < population_size_grid->n_bins; ++size_bin_index) {
       prob_size_row[size_bin_index] =
-          size_provider_ptr->ProbSize(year_index, age_index, size_bin_index);
+          size_provider_ptr->ProbSizeAtTime(year_index, age_index, size_bin_index, fraction);
     }
 
     return prob_size_row;
@@ -211,7 +221,7 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
    * @return Normalized fleet observation-bin probability row.
    */
   fims::Vector<Type> BuildMappedFleetAgeToLengthConversionRow(
-      std::size_t year_index, std::size_t age_index) const {
+      std::size_t year_index, std::size_t age_index, double fraction = 0.0) const {
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
     std::shared_ptr<SizeDistributionProviderBase<Type>> size_provider_ptr =
         TryGetSizeProvider();
@@ -237,7 +247,7 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
     }
 
     const fims::Vector<Type> population_prob_size =
-        BuildPopulationProbSizeRow(year_index, age_index);
+        BuildPopulationProbSizeRow(year_index, age_index, fraction);
     if (population_prob_size.size() != population_size_grid->n_bins) {
       return fims::Vector<Type>();
     }

@@ -22,6 +22,8 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The vector of data that is being passed from R.
    */
   Rcpp::NumericVector observed_data;
+  // Immutable dates are copied when the interface is registered.
+  std::vector<std::string> timing;
   /**
    * @brief The vector of uncertainty that is being passed from R.
    */
@@ -45,7 +47,13 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief The constructor.
    */
-  DataInterfaceBase() {
+  DataInterfaceBase(int ymax = 0, std::vector<std::string> dates = {}) {
+    if (!dates.empty() && dates.size() != static_cast<size_t>(ymax)) {
+      throw std::invalid_argument("Data timing must have one date per annual row");
+    }
+    for (const auto& date : dates) fims_popdy::ParseObservationDate(date);
+    timing = std::move(dates);
+
     this->id = DataInterfaceBase::id_g++;
     /* Create instance of map: key is id and value is pointer to
     DataInterfaceBase */
@@ -60,6 +68,7 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
   DataInterfaceBase(const DataInterfaceBase &other)
       : observed_data(other.observed_data),
         uncertainty(other.uncertainty),
+        timing(other.timing),
         id(other.id) {}
 
   /**
@@ -107,7 +116,9 @@ class AgeCompDataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  AgeCompDataInterface(int ymax = 0, int amax = 0) : DataInterfaceBase() {
+  AgeCompDataInterface(int ymax = 0, int amax = 0,
+                       std::vector<std::string> dates = {})
+      : DataInterfaceBase(ymax, std::move(dates)) {
     this->amax = amax;
     this->ymax = ymax;
     this->age_comp_data.resize(amax * ymax);
@@ -181,6 +192,7 @@ class AgeCompDataInterface : public DataInterfaceBase {
                                                              this->amax);
 
     age_comp_data->id = this->id;
+    age_comp_data->timing = timing;
     for (int y = 0; y < ymax; y++) {
       for (int a = 0; a < amax; a++) {
         int i_age_year = y * amax + a;
@@ -240,7 +252,9 @@ class LengthCompDataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  LengthCompDataInterface(int ymax = 0, int lmax = 0) : DataInterfaceBase() {
+  LengthCompDataInterface(int ymax = 0, int lmax = 0,
+                       std::vector<std::string> dates = {})
+      : DataInterfaceBase(ymax, std::move(dates)) {
     this->lmax = lmax;
     this->ymax = ymax;
     this->length_comp_data.resize(lmax * ymax);
@@ -312,6 +326,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
                                                              this->lmax);
     length_comp_data->id = this->id;
+    length_comp_data->timing = timing;
     for (int y = 0; y < ymax; y++) {
       for (int l = 0; l < lmax; l++) {
         int i_length_year = y * lmax + l;
@@ -362,7 +377,9 @@ class IndexDataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  IndexDataInterface(int ymax = 0) : DataInterfaceBase() {
+  IndexDataInterface(int ymax = 0,
+                       std::vector<std::string> dates = {})
+      : DataInterfaceBase(ymax, std::move(dates)) {
     this->ymax = ymax;
     this->index_data.resize(ymax);
     this->uncertainty.resize(ymax);
@@ -433,6 +450,7 @@ class IndexDataInterface : public DataInterfaceBase {
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
 
     data->id = this->id;
+    data->timing = timing;
 
     for (int y = 0; y < ymax; y++) {
       data->at(y) = this->index_data[y];
@@ -483,7 +501,9 @@ class CatchDataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  CatchDataInterface(int ymax = 0) : DataInterfaceBase() {
+  CatchDataInterface(int ymax = 0,
+                     std::vector<std::string> dates = {})
+      : DataInterfaceBase(ymax, std::move(dates)) {
     this->ymax = ymax;
     this->catch_data.resize(ymax);
     this->uncertainty.resize(ymax);
@@ -554,6 +574,7 @@ class CatchDataInterface : public DataInterfaceBase {
         std::make_shared<fims_data_object::DataObject<Type>>(this->ymax);
 
     data->id = this->id;
+    data->timing = timing;
 
     for (int y = 0; y < ymax; y++) {
       data->at(y) = this->catch_data[y];

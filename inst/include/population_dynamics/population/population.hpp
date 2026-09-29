@@ -8,6 +8,7 @@
 #ifndef FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 #define FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 
+#include <map>
 #include "../../common/model_object.hpp"
 #include "../fleet/fleet.hpp"
 #include "../growth/growth.hpp"
@@ -29,6 +30,12 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   size_t n_years;       /*!< total number of years in the fishery*/
   size_t n_ages;        /*!< total number of ages in the population*/
   size_t n_fleets;      /*!< total number of fleets in the fishery*/
+
+  std::vector<std::string> annual_dates; /*!< January 1, including terminal year. */
+
+  // All fleets and sample types reference this single table of observed dates.
+  std::shared_ptr<std::vector<ObservationTime>> observation_times =
+      std::make_shared<std::vector<ObservationTime>>();
 
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
@@ -76,6 +83,81 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
   std::set<uint32_t> fleet_ids; /*!< id of fleet model object*/
   std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
       fleets; /*!< shared pointer to fleet module */
+
+  /** @brief Resolve the annual calendar and shared sample times from data. */
+  void InitializeTiming() {
+    using Data = std::shared_ptr<fims_data_object::DataObject<Type>>;
+    int first_year = 1;
+    bool dated = false;
+    for (const auto& fleet : fleets) {
+      if (fleet->n_years != n_years) {
+        throw std::invalid_argument("Fleet and population year dimensions must agree");
+      }
+      for (const auto& data : {fleet->observed_catch_data, fleet->observed_index_data,
+                               fleet->observed_agecomp_data, fleet->observed_lengthcomp_data}) {
+        if (!data) continue;
+        if (data->imax != n_years ||
+            (!data->timing.empty() && data->timing.size() != n_years)) {
+          throw std::invalid_argument("Data timing must have one date per annual row");
+        }
+        for (size_t y = 0; y < data->timing.size(); ++y) {
+          const int start = ParseObservationDate(data->timing[y]).year - static_cast<int>(y);
+          if (dated && start != first_year) {
+            throw std::invalid_argument(
+                "Data dates must align by year, with one sample per fleet/type/year");
+          }
+          first_year = start;
+          dated = true;
+        }
+      }
+    }
+    annual_dates.clear();
+    for (size_t y = 0; y <= n_years; ++y) {
+      annual_dates.push_back(JanuaryFirst(first_year + static_cast<int>(y)));
+    }
+    const auto active = [](const Data& data, size_t year) {
+      const size_t bins = data->data.size() / data->imax;
+      for (size_t b = 0; b < bins; ++b) {
+        const auto& value = data->data[year * bins + b];
+        if (value == value && value != data->na_value) return true;
+      }
+      return false;
+    };
+    const auto annual = [](const Data& data, size_t year) {
+      return data->timing.empty() || IsAnnualTiming(data->timing[year]);
+    };
+    std::map<std::string, int> time_ids;
+    for (const auto& fleet : fleets) {
+      for (const auto& data : {fleet->observed_index_data, fleet->observed_agecomp_data,
+                               fleet->observed_lengthcomp_data}) {
+        if (!data) continue;
+        for (size_t y = 0; y < n_years; ++y) {
+          if (active(data, y) && !annual(data, y)) time_ids.emplace(data->timing[y], 0);
+        }
+      }
+    }
+    observation_times->clear();
+    for (auto& entry : time_ids) {
+      const auto calendar = ParseObservationDate(entry.first);
+      entry.second = static_cast<int>(observation_times->size());
+      observation_times->push_back({static_cast<size_t>(calendar.year - first_year),
+                                     calendar.fraction, entry.first});
+    }
+    ValidateObservationTimes(*observation_times, n_years);
+    const auto assign = [&](const Data& data, fims::Vector<int>& ids) {
+      ids.resize(data ? n_years : 0);
+      if (!data) return;
+      for (size_t y = 0; y < n_years; ++y) {
+        ids[y] = !active(data, y) ? -1 : annual(data, y) ? -2 : time_ids.at(data->timing[y]);
+      }
+    };
+    for (const auto& fleet : fleets) {
+      assign(fleet->observed_index_data, fleet->index_time_id);
+      assign(fleet->observed_agecomp_data, fleet->age_comp_time_id);
+      assign(fleet->observed_lengthcomp_data, fleet->length_comp_time_id);
+      fleet->BindObservationTimes(observation_times);
+    }
+  }
 
   /**
    * @brief Constructor.

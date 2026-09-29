@@ -8,6 +8,8 @@
 
 #include <cmath>
 #include <memory>
+#include <map>
+#include <array>
 #include <stdexcept>
 
 #include "../../common/fims_vector.hpp"
@@ -68,6 +70,12 @@ class GrowthDerivedObservationBase : public GrowthBase<Type> {
    * @return Weight on the natural scale.
    */
   virtual Type EvaluateWeightAtLength(const Type& length) const = 0;
+
+  virtual void EvaluateAtAge(double age, Type& mean, Type& sd,
+                            Type& weight) const {
+    throw std::runtime_error("Growth model does not support fractional ages");
+  }
+
 };
 
 /**
@@ -298,6 +306,23 @@ class VonBertalanffySchnuteGrowthModelAdapter
     return mean_length_old_growth_coefficient_logit_corr_vector_;
   }
 
+  // Share fractional-age growth products across observation types and fleets.
+  void EvaluateAtAge(double age, Type& mean, Type& sd,
+                     Type& weight) const override {
+    if (!growth_products_prepared_ || !model_) {
+      throw std::runtime_error("Prepare growth before evaluating a dated observation");
+    }
+    auto found = timed_growth_.find(age);
+    if (found == timed_growth_.end()) {
+      std::array<Type, 3> values;
+      model_->EvaluateAtAge(Type(age), values[0], values[1], values[2]);
+      found = timed_growth_.emplace(age, values).first;
+    }
+    mean = found->second[0];
+    sd = found->second[1];
+    weight = found->second[2];
+  }
+
   /**
    * @brief Set the minimum modeled age used by cached growth products.
    * @param min_age Minimum age on the natural scale.
@@ -391,6 +416,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @brief Prepare growth products for the current model state.
    */
   void PrepareGrowthProducts() override {
+    timed_growth_.clear();
     growth_products_prepared_ = false;
     if (!model_) {
       if (n_ages_ == 0) {
@@ -432,7 +458,10 @@ class VonBertalanffySchnuteGrowthModelAdapter
            fims_math::pow(length_safe, CurrentLengthWeightB());
   }
 
+  std::size_t TimedGrowthAges() const { return timed_growth_.size(); }
+
  private:
+  mutable std::map<double, std::array<Type, 3>> timed_growth_;
   // Stored parameter vectors on their working scales. Positive parameters
   // use log scale, reference ages stay on the natural scale, and
   // correlation terms use transformed working-scale values.
