@@ -21,7 +21,9 @@ fit_fims(
 \item{get_sd}{A boolean specifying if the \code{\link[TMB:sdreport]{TMB::sdreport()}} should be
 calculated? Standard errors are calculated for all parameters and derived
 quantities, but the full covariance matrix of the derived quantities is
-not (\code{getReportCovariance = FALSE}), so \code{cov} in the \code{sdreport} is \code{NA}.}
+not (\code{getReportCovariance = FALSE}), so \code{cov} in the \code{sdreport} is \code{NA}.
+If the full covariance is needed, call \code{TMB::sdreport(get_obj(fit))}
+before \code{\link[=clear]{clear()}}.}
 
 \item{save_sd}{A logical, with the default \code{TRUE}, indicating whether the
 sdreport is returned in the output. If \code{FALSE}, the slot for the report
