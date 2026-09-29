@@ -23,8 +23,9 @@
 #' Mohn's rho for (e.g., "spawning_biomass", "expected_recruitment")
 #'
 #' @return A numeric value representing Mohn's rho. Values close to zero indicate
-#' minimal retrospective bias. Positive values suggest the model retrospectively
-#' underestimates the quantity, while negative values suggest overestimation.
+#' minimal retrospective bias. Positive values mean peels with less data
+#' estimate higher values than the full model (retrospective overestimation),
+#' while negative values mean retrospective underestimation.
 #'
 #' @references
 #' Mohn (1999). The retrospective problem in sequential population analysis:
