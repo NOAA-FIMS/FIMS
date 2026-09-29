@@ -111,12 +111,11 @@ retain (e.g., <code>1</code> for the first fishing fleet, <code>2</code> for the
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>In the FIMS output the <code>fleet</code> column is <code>NA</code> for derived-quantity rows
-(which is where all observed/expected pairs live). Use <code>module_id</code> instead
-to distinguish fleets and surveys - this matches the convention used in the
-FIMS vignettes, where <code>module_id == 1</code> is the first fishing fleet and
-<code>module_id == 2</code> is the first survey.  To discover which <code>module_id</code> values
-are present in your fit, inspect <code>augment(fit)</code> directly.</p>
+    <p>Fleets and surveys can be told apart by the <code>fleet</code> column, which holds the
+fleet name from the data, or by <code>module_id</code>, where, e.g., <code>module_id == 1</code>
+is the first fishing fleet and <code>module_id == 2</code> is the first survey in the
+FIMS vignettes. To discover which values are present in your fit, inspect
+<code>augment(fit)</code> directly.</p>
     </div>
 
     <div class="section level2">

@@ -44,13 +44,11 @@ subset of the augmented data.
 
 ## Details
 
-In the FIMS output the `fleet` column is `NA` for derived-quantity rows
-(which is where all observed/expected pairs live). Use `module_id`
-instead to distinguish fleets and surveys - this matches the convention
-used in the FIMS vignettes, where `module_id == 1` is the first fishing
-fleet and `module_id == 2` is the first survey. To discover which
-`module_id` values are present in your fit, inspect `augment(fit)`
-directly.
+Fleets and surveys can be told apart by the `fleet` column, which holds
+the fleet name from the data, or by `module_id`, where, e.g.,
+`module_id == 1` is the first fishing fleet and `module_id == 2` is the
+first survey in the FIMS vignettes. To discover which values are present
+in your fit, inspect `augment(fit)` directly.
 
 ## Examples
 

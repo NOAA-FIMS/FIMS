@@ -53,7 +53,7 @@ metric function:
 | `.pred`        | Model-expected value (maps from `expected`)           |
 | `.weight`      | Inverse-variance weight from `uncertainty` (optional) |
 | `label`        | Parameter / quantity label, e.g. `"catch_expected"`   |
-| `fleet`        | Fleet identifier (integer)                            |
+| `fleet`        | Fleet name for fleet rows, otherwise `NA`             |
 | `module_id`    | Unique module identifier                              |
 | `distribution` | Likelihood distribution used for this data stream     |
 | `year_i`       | Year index (present when available in the estimates)  |
