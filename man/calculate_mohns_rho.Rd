@@ -16,8 +16,10 @@ Mohn's rho for (e.g., "spawning_biomass", "expected_recruitment")}
 }
 \value{
 A numeric value representing Mohn's rho. Values close to zero indicate
-minimal retrospective bias. Positive values suggest the model retrospectively
-underestimates the quantity, while negative values suggest overestimation.
+minimal retrospective bias. Positive values mean that, on average, each
+peel's terminal-year estimate is higher than the reference model's estimate
+for the same year (retrospective overestimation), while negative values mean
+retrospective underestimation.
 }
 \description{
 Calculates Mohn's rho, a diagnostic statistic that summarizes the bias in
