@@ -182,7 +182,62 @@ test_that("`reshape_json_estimates()` output matches TMB for an estimation run",
   result <- purrr::map(fit_files, compare_tmb_and_json_outputs)
 })
 ## Edge handling ----
-# No edge cases are being tested.
+test_that("`reshape_json_estimates()` links selectivity to fleets by id", {
+  data_4_model <- FIMSFrame(data_big)
+  # Fixed-effect recruitment deviations avoid the random-effect density join,
+  # which matches rows by value and the default deviations are all zero
+  fit <- setup_default_parameters(data = data_4_model) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$estimation_type == "random_effects",
+        "fixed_effects",
+        .data$estimation_type
+      )
+    ) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  model_output <- get_model_output(fit)
+  clear()
+  selectivity_fleets <- function(json) {
+    FIMS:::reshape_json_estimates(json) |>
+      dplyr::filter(.data$module_name == "Selectivity") |>
+      dplyr::distinct(.data$module_id, .data$fleet) |>
+      dplyr::arrange(.data$module_id) |>
+      dplyr::pull(.data$fleet)
+  }
+  # fleet1 uses selectivity 1 and survey1 uses selectivity 2, in the same order
+  # as the fleets, so swap the ids to check the link follows selectivity_id
+  swapped_output <- model_output |>
+    gsub(
+      pattern = '"selectivity_id": 1,',
+      replacement = '"selectivity_id": 0,',
+      fixed = TRUE
+    ) |>
+    gsub(
+      pattern = '"selectivity_id": 2,',
+      replacement = '"selectivity_id": 1,',
+      fixed = TRUE
+    ) |>
+    gsub(
+      pattern = '"selectivity_id": 0,',
+      replacement = '"selectivity_id": 2,',
+      fixed = TRUE
+    )
+  #' @description Test that `reshape_json_estimates()` names the fleet of each selectivity module from the fleet's selectivity id, not the fleet order.
+  expect_equal(
+    object = selectivity_fleets(swapped_output),
+    expected = c("survey1", "fleet1")
+  )
+  shared_output <- gsub(
+    pattern = '"selectivity_id": 2,',
+    replacement = '"selectivity_id": 1,',
+    x = model_output,
+    fixed = TRUE
+  )
+  #' @description Test that `reshape_json_estimates()` leaves the fleet missing for a selectivity module used by more than one fleet.
+  expect_true(all(is.na(selectivity_fleets(shared_output))))
+})
+
 
 ## Error handling ----
 # Please remove/comment out the test template below if there are no built-in errors/warnings.
