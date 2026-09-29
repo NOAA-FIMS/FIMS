@@ -125,6 +125,13 @@ test_that("`get_estimates()` keeps fleet names with spaces and quotes", {
     object = unique(estimates[["fleet"]][estimates[["module_name"]] == "Fleet"]),
     expected = unname(fleet_names)
   )
+  selectivity_rows <- estimates[["module_name"]] == "Selectivity"
+  # Each fleet gets its own selectivity module, created in fleet order
+  #' @description Test that `get_estimates()` gives each selectivity row the name of its own fleet.
+  expect_equal(
+    object = estimates[["fleet"]][selectivity_rows],
+    expected = unname(fleet_names)[estimates[["module_id"]][selectivity_rows]]
+  )
   clear()
 })
 

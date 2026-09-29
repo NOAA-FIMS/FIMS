@@ -102,7 +102,21 @@ reshape_json_estimates <- function(model_output) {
     dplyr::mutate(join_by = dplyr::row_number()) |>
     dplyr::ungroup()
 
+  # Selectivity is written separately from its fleet, so the fleet section
+  # records which selectivity module each fleet uses. A selectivity module
+  # shared by more than one fleet is left without a fleet name.
+  # Output saved before the link was written has no selectivity_id.
+  selectivity_fleets <- NULL
+  if ("selectivity_id" %in% names(read_list[["fleets"]])) {
+    selectivity_fleets <- read_list[["fleets"]] |>
+      dplyr::select(dplyr::all_of(c("selectivity_id", "fleet"))) |>
+      dplyr::add_count(.data$selectivity_id) |>
+      dplyr::filter(.data$n == 1) |>
+      dplyr::select(-dplyr::all_of("n"))
+  }
+
   fleet_information <- read_list[["fleets"]] |>
+    dplyr::select(-dplyr::any_of("selectivity_id")) |>
     tidyr::pivot_longer(
       cols = dplyr::all_of(c("parameters", "derived_quantities")),
       names_to = "delete_me",
@@ -175,6 +189,20 @@ reshape_json_estimates <- function(model_output) {
       lpdf = "lpdf_value", dplyr::all_of("likelihood"),
       "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
+    )
+  if (is.null(selectivity_fleets)) {
+    return(out)
+  }
+  selectivity_fleet <- selectivity_fleets[["fleet"]][
+    match(out[["module_id"]], selectivity_fleets[["selectivity_id"]])
+  ]
+  out |>
+    dplyr::mutate(
+      fleet = dplyr::if_else(
+        .data$module_name == "Selectivity",
+        selectivity_fleet,
+        .data$fleet
+      )
     )
 }
 

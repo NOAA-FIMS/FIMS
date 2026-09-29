@@ -630,6 +630,10 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
          << fims::JsonParser::EscapeString(fleet_interface->name.get())
          << "\",\n";
       ss << " \"module_id\": " << fleet_interface->id << ",\n";
+      // Selectivity is written in its own section, so this is what links a
+      // selectivity module to its fleet; an unset id is written as -999
+      ss << " \"selectivity_id\": "
+         << static_cast<int>(fleet_interface->GetSelectivityID()) << ",\n";
       ss << " \"n_ages\": " << fleet_interface->n_ages.get() << ",\n";
       ss << " \"n_years\": " << fleet_interface->n_years.get() << ",\n";
       ss << " \"n_lengths\": " << fleet_interface->n_lengths.get() << ",\n";
