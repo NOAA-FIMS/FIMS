@@ -235,7 +235,10 @@ test_that("`reshape_json_estimates()` links selectivity to fleets by id", {
     fixed = TRUE
   )
   #' @description Test that `reshape_json_estimates()` leaves the fleet missing for a selectivity module used by more than one fleet.
-  expect_true(all(is.na(selectivity_fleets(shared_output))))
+  expect_equal(
+    object = selectivity_fleets(shared_output),
+    expected = c(NA_character_, NA_character_)
+  )
 })
 
 
