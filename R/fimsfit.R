@@ -465,6 +465,11 @@ FIMSFit <- function(
     # rename the sdreport
     names(sdreport[["par.fixed"]]) <- parameter_names
     dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
+    # Skipped when there are no random effects or some are mapped off
+    if (length(sdreport[["par.random"]]) > 0 &&
+      length(random_effects_names) == length(sdreport[["par.random"]])) {
+      names(sdreport[["par.random"]]) <- random_effects_names
+    }
   }
 
   model_output <- input[["model"]]$get_output()
