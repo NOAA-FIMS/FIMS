@@ -419,14 +419,12 @@ TEST(AgeToLengthConversionRuntime,
                    73.0);
   growth->SetAgeOffset(1.0);
   growth->Initialize(1, 3, 1);
-  ASSERT_NO_THROW(growth->PrepareGrowthProducts());
 
   const fims_popdy::SizeGrid population_size_grid =
       fims_popdy::SizeGridBuilder::BuildRegularGrid(0.0, 1500.0, 1.0);
   std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
       size_provider =
           MakeConfiguredSizeProvider(growth, &population_size_grid, 1, 3);
-  ASSERT_NO_THROW(size_provider->PrepareSizeProducts());
 
   population->growth = growth;
   population->size_distribution_provider = size_provider;
@@ -436,11 +434,12 @@ TEST(AgeToLengthConversionRuntime,
   population->ages[0] = 1.0;
   population->ages[1] = 2.0;
   population->ages[2] = 3.0;
+  model.populations.push_back(population);
 
-  const double expected =
-      std::dynamic_pointer_cast<fims_popdy::GrowthDerivedSizeProvider<double>>(
-          size_provider)
-          ->MeanWeightAtAge(0, 1);
+  // Prepares the growth products and then the population size products.
+  ASSERT_NO_THROW(model.PreparePopulationGrowthProducts());
+
+  const double expected = size_provider->MeanWeightAtAge(0, 1);
   const double weight_at_mean_length =
       growth->TryGetPreparedGrowthProducts()->MeanWAA(0, 1, 0);
 
