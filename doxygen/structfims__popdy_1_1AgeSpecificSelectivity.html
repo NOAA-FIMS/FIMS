@@ -411,10 +411,11 @@ template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pos</td><td>Position index, e.g., which year. </td></tr>
+    <tr><td class="paramname">pos</td><td>Position index, e.g., which year.</td></tr>
   </table>
   </dd>
 </dl>
+<p><code>logit_sel_at_age</code> can hold 1 value for all ages and years, <code>n_ages</code> values used in every year, or <code>n_ages</code> values per year (age within year). Any other length is an input error and throws <code>std::invalid_argument</code>, rather than silently reusing values for the wrong ages. </p>
 
 <p>Implements <a class="el" href="structfims__popdy_1_1SelectivityBase.html#a0301114a39dc669b995569293e6a7e5f">fims_popdy::SelectivityBase&lt; Type &gt;</a>.</p>
 
