@@ -279,9 +279,19 @@ fit <- parameters_4_model |>
   fit_fims(optimize = TRUE)
 ```
 
-### Logging system
+### Oh no! My model didn't converge! HELP!
 
-You can look at the log file in R or write it to the disk but you must run `get_log()` before you run clear to obtain information about the model because clear removes everything from memory, including the log. `get_log()` returns the log information as a string. This string can be manipulated into a data frame using `jsonlite::fromJSON()`. There are three logging levels, "info", "warning", and "error". The log below will not have any error messages but if you were to have error messages and you want to know immediately upon the first error that there are problems, you can run `set_log_throw_on_error(TRUE)` prior to running your model. See the vignette on [FIMS logging](fims-logging.html) or the [doxygen documentation](https://noaa-fims.github.io/FIMS/doxygen/classfims_1_1FIMSLog.html) for more information.
+If you find yourself in the unfortunate situation where your model didn't converge, there are several things that you can look at.
+
+#### Getting the non-converged fit output
+
+One of the things you can do is to inspect the fit output. You can start with the NLL (We are sorry these aren't named yet, it's in the list of things to add) by running `get_report(fit)$nll_components` which will give you a clue as to which part of these components might have caused your model to not converge.
+
+You can then do `names(get_report(fit))` to see the names of all the information you can look into specifically and then look at that. You can also look in `View(get_estimates(fit))` to look through the tibble and identify problem data. Also, see the [Viewing results](#viewing-results) section for more information on how to view and filter the results.
+
+#### Logging system
+
+Another thing is that you can look at the log file in R or write it to the disk but you must run `get_log()` before you run clear to obtain information about the model because clear removes everything from memory, including the log. `get_log()` returns the log information as a string. This string can be manipulated into a data frame using `jsonlite::fromJSON()`. There are three logging levels, "info", "warning", and "error". The log below will not have any error messages but if you were to have error messages and you want to know immediately upon the first error that there are problems, you can run `set_log_throw_on_error(TRUE)` prior to running your model. See the vignette on [FIMS logging](fims-logging.html) or the [doxygen documentation](https://noaa-fims.github.io/FIMS/doxygen/classfims_1_1FIMSLog.html) for more information.
 
 ```{r example-log, eval = TRUE}
 log_json_string <- get_log()
@@ -295,6 +305,8 @@ log_data_frame |> dplyr::filter(level == "warning")
 
 clear()
 ```
+
+### Viewing results
 
 The results can be plotted with either base R, {ggplot2}, or {stockplotr}. Where, we recommend using {stockplotr} where possible.
 
