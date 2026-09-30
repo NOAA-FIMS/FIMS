@@ -80,6 +80,9 @@ class Model {  // may need singleton
     // Create vector for reporting out nll components
     fims::Vector<Type> nll_vec(
         this->fims_information->density_components.size(), 0.0);
+    // Create a vector of strings with a pre-defined size for the nll component names
+    std::vector<std::string> nll_component_names(
+        this->fims_information->density_components.size());
 
     for (m_it = this->fims_information->models_map.begin();
          m_it != this->fims_information->models_map.end(); ++m_it) {
@@ -89,10 +92,13 @@ class Model {  // may need singleton
       m->Evaluate();
     }
 
-    // Loop over densities and evaluate joint negative log densities for priors
+    // Loop over all density components once, evaluating and categorizing them
+    // to preserve reporting order.
     typename fims_info::Information<Type>::density_components_iterator d_it;
-    int nll_vec_idx = 0;
-    size_t n_priors = 0;
+    std::vector<std::pair<Type, std::string>> prior_components;
+    std::vector<std::pair<Type, std::string>> re_components;
+    std::vector<std::pair<Type, std::string>> data_components;
+
     for (d_it = this->fims_information->density_components.begin();
          d_it != this->fims_information->density_components.end(); ++d_it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
@@ -100,66 +106,43 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
       d->of = this->of;
 #endif
+      Type nll_val = -d->evaluate();
+      jnll += nll_val;
+
       if (d->input_type == "prior") {
-        nll_vec[nll_vec_idx] = -d->evaluate();
-        jnll += nll_vec[nll_vec_idx];
-        n_priors += 1;
-        nll_vec_idx += 1;
+        prior_components.push_back(
+            {nll_val, "prior_" + fims::to_string(d->id)});
+      } else if (d->input_type == "random_effects") {
+        re_components.push_back(
+            {nll_val, "random_effects_" + fims::to_string(d->id)});
+      } else if (d->input_type == "data") {
+        data_components.push_back(
+            {nll_val, "data_" + fims::to_string(d->id)});
       }
     }
 
-    FIMS_INFO_LOG(
-        "Model: Finished evaluating prior distributions. The jnll after "
-        "evaluating " +
-        fims::to_string(n_priors) + " priors is: " + fims::to_string(jnll));
+    FIMS_INFO_LOG("Model: Finished evaluating " +
+                  fims::to_string(prior_components.size()) + " priors, " +
+                  fims::to_string(re_components.size()) +
+                  " random effects, and " +
+                  fims::to_string(data_components.size()) +
+                  " data likelihoods. The total jnll is: " +
+                  fims::to_string(jnll));
 
-    // Loop over densities and evaluate joint negative log-likelihoods for
-    // random effects
-    size_t n_random_effects = 0;
-    for (d_it = this->fims_information->density_components.begin();
-         d_it != this->fims_information->density_components.end(); ++d_it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*d_it).second;
-#ifdef TMB_MODEL
-      d->of = this->of;
-#endif
-      if (d->input_type == "random_effects") {
-        nll_vec[nll_vec_idx] = -d->evaluate();
-        jnll += nll_vec[nll_vec_idx];
-        n_random_effects += 1;
-        nll_vec_idx += 1;
-      }
-    }
+    // Assemble the final report vectors in the desired order (priors, re, data)
+    int nll_vec_idx = 0;
+    auto copy_components =
+        [&](const std::vector<std::pair<Type, std::string>>& comps) {
+          for (const auto& comp : comps) {
+            nll_vec[nll_vec_idx] = comp.first;
+            nll_component_names[nll_vec_idx] = comp.second;
+            nll_vec_idx++;
+          }
+        };
 
-    FIMS_INFO_LOG(
-        "Model: Finished evaluating random effect distributions. The jnll "
-        "after evaluating priors and " +
-        fims::to_string(n_random_effects) +
-        " random_effects is: " + fims::to_string(jnll));
-
-    // Loop over and evaluate data joint negative log-likelihoods
-    int n_data = 0;
-    for (d_it = this->fims_information->density_components.begin();
-         d_it != this->fims_information->density_components.end(); ++d_it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*d_it).second;
-#ifdef TMB_MODEL
-      d->of = this->of;
-      // d->keep = this->keep;
-#endif
-      if (d->input_type == "data") {
-        nll_vec[nll_vec_idx] = -d->evaluate();
-        jnll += nll_vec[nll_vec_idx];
-        n_data += 1;
-        nll_vec_idx += 1;
-      }
-    }
-
-    FIMS_INFO_LOG(
-        "Model: Finished evaluating data likelihoods. The jnll after "
-        "evaluating priors, random effects, and " +
-        fims::to_string(n_data) +
-        " data likelihoods is: " + fims::to_string(jnll));
+    copy_components(prior_components);
+    copy_components(re_components);
+    copy_components(data_components);
 
     // report out nll components
 
@@ -167,6 +150,7 @@ class Model {  // may need singleton
 
     vector<Type> nll_components = nll_vec.to_tmb();
     FIMS_REPORT_F(nll_components, this->of);
+    FIMS_REPORT_F(nll_component_names, this->of);
     FIMS_REPORT_F(jnll, this->of);
 
 #endif
