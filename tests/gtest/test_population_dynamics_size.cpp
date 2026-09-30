@@ -321,4 +321,103 @@ TEST(GrowthDerivedSizeProvider,
   EXPECT_GT(higher_expected_size, lower_expected_size);
 }
 
+// Normal CDF written out here so the expected values do not reuse the
+// provider's own probabilities.
+double NormalCdf(double x, double mean, double sd) {
+  return 0.5 * (1.0 + std::erf((x - mean) / (sd * std::sqrt(2.0))));
+}
+
+TEST(GrowthDerivedSizeProvider,
+     MeanWeightAtAgeAveragesWeightAtBinCentersOverProbSize) {
+  // The fake growth object has weight equal to length.
+  const auto growth = MakePreparedGrowth(2.5, 0.4);
+  const fims_popdy::SizeGrid grid =
+      fims_popdy::SizeGridBuilder::BuildFromEdges({0.0, 1.0, 2.0, 3.0, 4.0});
+
+  fims_popdy::GrowthDerivedSizeProvider<double> provider(growth);
+  provider.SetPopulationSizeGrid(&grid);
+  provider.SetPopulationDimensions(1, 1);
+  provider.PrepareSizeProducts();
+
+  // The first and last bins hold the lower and upper tails.
+  const double p0 = NormalCdf(1.0, 2.5, 0.4);
+  const double p1 = NormalCdf(2.0, 2.5, 0.4) - NormalCdf(1.0, 2.5, 0.4);
+  const double p2 = NormalCdf(3.0, 2.5, 0.4) - NormalCdf(2.0, 2.5, 0.4);
+  const double p3 = 1.0 - NormalCdf(3.0, 2.5, 0.4);
+  const double expected = p0 * 0.5 + p1 * 1.5 + p2 * 2.5 + p3 * 3.5;
+
+  // The provider floors the SD with a smooth ad_max, which raises an SD of
+  // 0.4 by about 6e-6, so the tolerance is looser than machine precision but
+  // still far tighter than the 9e-5 gap to weight at the mean length.
+  EXPECT_NEAR(provider.MeanWeightAtAge(0, 0), expected, 1e-6);
+}
+
+TEST(GrowthDerivedSizeProvider,
+     MeanWeightAtAgeWeightsUpperTailAtTerminalBinCenter) {
+  const auto growth = MakePreparedGrowth(10.0, 0.2);
+  const fims_popdy::SizeGrid grid =
+      fims_popdy::SizeGridBuilder::BuildFromEdges({0.0, 1.0, 2.0, 3.0});
+
+  fims_popdy::GrowthDerivedSizeProvider<double> provider(growth);
+  provider.SetPopulationSizeGrid(&grid);
+  provider.SetPopulationDimensions(1, 1);
+  provider.PrepareSizeProducts();
+
+  // All fish are above the grid, so the mean weight is the weight at the
+  // terminal bin center rather than at the mean length of 10.
+  EXPECT_NEAR(provider.MeanWeightAtAge(0, 0), 2.5, 1e-8);
+}
+
+TEST(GrowthDerivedSizeProvider,
+     MeanWeightAtAgeMatchesNormalThirdMomentOnWideGrid) {
+  auto growth = std::make_shared<
+      fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
+  ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
+                   73.0);
+  growth->SetAgeOffset(1.0);
+  growth->Initialize(1, 12, 1);
+  ASSERT_NO_THROW(growth->PrepareGrowthProducts());
+
+  // 1-unit bins covering well beyond every age's length distribution.
+  const fims_popdy::SizeGrid grid =
+      fims_popdy::SizeGridBuilder::BuildRegularGrid(0.0, 1500.0, 1.0);
+
+  fims_popdy::GrowthDerivedSizeProvider<double> provider(growth);
+  provider.SetPopulationSizeGrid(&grid);
+  provider.SetPopulationDimensions(1, 12);
+  ASSERT_NO_THROW(provider.PrepareSizeProducts());
+
+  const fims_popdy::GrowthProducts<double>* products =
+      growth->TryGetPreparedGrowthProducts();
+  ASSERT_NE(products, nullptr);
+
+  for (std::size_t age_index = 0; age_index < 12; ++age_index) {
+    const double mean = products->MeanLAA(0, age_index, 0);
+    const double sd = products->SdLAA(0, age_index, 0);
+    // For normal lengths and b = 3, E[a L^3] = a (mu^3 + 3 mu sd^2), which is
+    // larger than weight at the mean length, a mu^3.
+    const double expected =
+        2.5e-11 * (std::pow(mean, 3.0) + 3.0 * mean * sd * sd);
+    const double observed = provider.MeanWeightAtAge(0, age_index);
+
+    EXPECT_NEAR(observed / expected, 1.0, 1e-4);
+    EXPECT_GT(observed, products->MeanWAA(0, age_index, 0));
+  }
+}
+
+TEST(GrowthDerivedSizeProvider, MeanWeightAtAgeRequiresPreparedSizeProducts) {
+  const auto growth = MakePreparedGrowth(2.5, 0.4);
+  const fims_popdy::SizeGrid grid =
+      fims_popdy::SizeGridBuilder::BuildFromEdges({0.0, 1.0, 2.0, 3.0, 4.0});
+
+  fims_popdy::GrowthDerivedSizeProvider<double> provider(growth);
+  provider.SetPopulationSizeGrid(&grid);
+  provider.SetPopulationDimensions(1, 1);
+
+  EXPECT_THROW(provider.MeanWeightAtAge(0, 0), std::runtime_error);
+
+  provider.PrepareSizeProducts();
+  EXPECT_THROW(provider.MeanWeightAtAge(1, 0), std::out_of_range);
+}
+
 }  // namespace
