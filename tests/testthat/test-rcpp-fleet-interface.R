@@ -59,8 +59,8 @@ test_that("rcpp fleet log_q can have a prior", {
   log_q_prior$log_sd[1]$value <- log(0.2)
   log_q_prior$set_distribution_links("prior", fleet$log_q$get_id())
 
-  # The prior is linked to log_q through variable_map, so creating the model
-  # fails if the fleet does not register log_q there
+  # CreateTMBModel() finds the parameter a prior is linked to by its id in
+  # variable_map
   CreateTMBModel()
   parameters <- list(p = get_fixed(), re = get_random())
   obj <- TMB::MakeADFun(
