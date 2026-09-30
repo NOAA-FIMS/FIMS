@@ -408,6 +408,48 @@ TEST(AgeToLengthConversionRuntime,
   EXPECT_DOUBLE_EQ(mean_weight, 2.5);
 }
 
+TEST(AgeToLengthConversionRuntime,
+     PopulationMeanWeightAAUsesSizeProviderWhenPopulationHasSizeGrid) {
+  fims_popdy::CatchAtAge<double> model;
+  auto population = std::make_shared<fims_popdy::Population<double>>();
+
+  auto growth = std::make_shared<
+      fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
+  ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
+                   73.0);
+  growth->SetAgeOffset(1.0);
+  growth->Initialize(1, 3, 1);
+  ASSERT_NO_THROW(growth->PrepareGrowthProducts());
+
+  const fims_popdy::SizeGrid population_size_grid =
+      fims_popdy::SizeGridBuilder::BuildRegularGrid(0.0, 1500.0, 1.0);
+  std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
+      size_provider =
+          MakeConfiguredSizeProvider(growth, &population_size_grid, 1, 3);
+  ASSERT_NO_THROW(size_provider->PrepareSizeProducts());
+
+  population->growth = growth;
+  population->size_distribution_provider = size_provider;
+  population->n_years = 1;
+  population->n_ages = 3;
+  population->ages.resize(3);
+  population->ages[0] = 1.0;
+  population->ages[1] = 2.0;
+  population->ages[2] = 3.0;
+
+  const double expected =
+      std::dynamic_pointer_cast<fims_popdy::GrowthDerivedSizeProvider<double>>(
+          size_provider)
+          ->MeanWeightAtAge(0, 1);
+  const double weight_at_mean_length =
+      growth->TryGetPreparedGrowthProducts()->MeanWAA(0, 1, 0);
+
+  // The loop over years reaches n_years, which reads the last year.
+  EXPECT_DOUBLE_EQ(model.PopulationMeanWeightAA(population, 0, 1), expected);
+  EXPECT_DOUBLE_EQ(model.PopulationMeanWeightAA(population, 1, 1), expected);
+  EXPECT_GT(expected, weight_at_mean_length);
+}
+
 TEST(AgeToLengthConversionDerived,
      IsInactiveWithoutPreparedFleetObservationGeometry) {
   auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
