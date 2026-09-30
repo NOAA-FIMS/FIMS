@@ -15,11 +15,14 @@
 #error "Include interface/rcpp/rcpp_include.hpp instead of <Rcpp.h>."
 #endif
 
-// Rcpp calls abort() on a failed type conversion unless NDEBUG is defined.
-// R defines NDEBUG for installed builds; defining it here makes debug builds
-// (e.g., devtools::load_all()) raise an R error too. TMB.hpp sets NDEBUG
-// itself before Eigen and CppAD, so Eigen bounds checks are unaffected.
 #undef NDEBUG
+/**
+ * @brief Makes Rcpp raise an R error instead of calling abort() on a failed
+ * type conversion. R defines NDEBUG for installed builds; defining it here
+ * makes debug builds (e.g., devtools::load_all()) behave the same. TMB.hpp
+ * sets NDEBUG itself before Eigen and CppAD, so Eigen bounds checks are
+ * unaffected.
+ */
 #define NDEBUG 1
 #include <Rcpp.h>
 
