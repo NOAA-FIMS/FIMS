@@ -181,6 +181,51 @@ test_that("`reshape_json_estimates()` output matches TMB for an estimation run",
   #' @description Test that `reshape_json_estimates()` produces output matching TMB.
   result <- purrr::map(fit_files, compare_tmb_and_json_outputs)
 })
+
+test_that("`reshape_json_estimates()` reports the ages and lengths from the data", {
+  # Shift the ages and scale the length bins so the values differ from their
+  # positions, i.e., the first age is 3 and the second length bin is 500
+  shifted_data <- data_big |>
+    dplyr::mutate(age = .data$age + 2, length = .data$length * 10)
+  data_4_model <- FIMSFrame(shifted_data)
+  fit <- setup_default_parameters(data = data_4_model) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$estimation_type == "random_effects",
+        "fixed_effects",
+        .data$estimation_type
+      )
+    ) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  estimates <- FIMS:::reshape_json_estimates(get_model_output(fit))
+  clear()
+  ages <- 3:14
+  lengths <- seq(0, 11000, by = 500)
+  length_rows <- dplyr::filter(estimates, !is.na(.data$length))
+  log_rzero <- dplyr::filter(estimates, .data$label == "log_rzero")
+
+  #' @description Test that `reshape_json_estimates()` gives the initial numbers at age the ages from the data, in order.
+  expect_equal(
+    object = dplyr::filter(estimates, .data$label == "log_init_naa")[["age"]],
+    expected = ages
+  )
+  #' @description Test that `reshape_json_estimates()` only reports ages from the data.
+  expect_true(all(stats::na.omit(estimates[["age"]]) %in% ages))
+  #' @description Test that `reshape_json_estimates()` gives each fleet the length bins from the data.
+  expect_equal(
+    object = purrr::map(
+      split(length_rows[["length"]], length_rows[["fleet"]]),
+      \(x) sort(unique(x))
+    ),
+    expected = list(fleet1 = lengths, survey1 = lengths)
+  )
+  #' @description Test that `reshape_json_estimates()` leaves age and length missing for a parameter without either dimension.
+  expect_true(all(is.na(c(log_rzero[["age"]], log_rzero[["length"]]))))
+  #' @description Test that `reshape_json_estimates()` replaces the age_i and length_i positions with age and length.
+  expect_false(any(c("age_i", "length_i") %in% names(estimates)))
+})
+
 ## Edge handling ----
 test_that("`reshape_json_estimates()` links random effects to densities by id", {
   data_4_model <- FIMSFrame(data_big)
