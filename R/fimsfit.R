@@ -769,10 +769,10 @@ return_failed_nlminb <- function(object) {
     "i" = "The resulting coefficients, probability values, or predictions are
     not accurate or stable and should not be used for management.",
     "i" = "A {.cls FIMSFit} object containing partial results is returned.",
-    "i" = "Type the name of the variable you assigned it (e.g., 
+    "i" = "Type the name of the variable you assigned it (e.g.,
            {.code fit <- ...}) to inspect the model inputs and configuration.
-           Additionally, try running {.code FIMS::fit_fims(optimize = FALSE)} 
-           and inspecting the output through {.code get_report(fit)} or by 
+           Additionally, try running {.code FIMS::fit_fims(optimize = FALSE)}
+           and inspecting the output through {.code get_report(fit)} or by
            viewing the tabular output from {.code View(get_estimates(fit))}."
   )
   cli::cli_warn(message = failed_nlminb_message)
