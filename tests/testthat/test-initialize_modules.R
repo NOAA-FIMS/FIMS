@@ -15,7 +15,10 @@ default_parameters <- setup_default_parameters(data = data)
 
 ## IO correctness ----
 test_that("`initialize_fims()` works with correct inputs", {
-  result <- initialize_fims(parameters = default_parameters, data = data)
+  #' @description Test that `initialize_fims()` does not warn when all recruitment process values are estimated.
+  expect_no_warning(
+    result <- initialize_fims(parameters = default_parameters, data = data)
+  )
   #' @description Test that `initialize_fims()` returns a list.
   expect_type(result, "list")
   #' @description Test that `initialize_fims()` returns an output with correct names.
@@ -65,9 +68,13 @@ test_that("`initialize_fims()` works with edge cases", {
     parameters = default_parameters,
     data = data
   )
-  init_parm_multiple_types <- initialize_fims(
-    parameters = parameters_multiple_types,
-    data = data
+  #' @description Test that `initialize_fims()` warns when some process values are constant but still included in the process distribution.
+  expect_warning(
+    init_parm_multiple_types <- initialize_fims(
+      parameters = parameters_multiple_types,
+      data = data
+    ),
+    regexp = "10 of the 29"
   )
   #' @description Test that `initialize_fims()` works with multiple estimation types.
   expect_equal(
@@ -75,6 +82,21 @@ test_that("`initialize_fims()` works with edge cases", {
       length(init_parm_multiple_types$parameters$re),
     length(init_parm_default$parameters$p) +
       length(init_parm_default$parameters$re) - 10
+  )
+  clear()
+
+  parameters_na_types <- parameters_multiple_types |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        label == "log_devs" & estimation_type == "constant",
+        NA_character_,
+        estimation_type
+      )
+    )
+  #' @description Test that `initialize_fims()` treats an NA estimation_type in `log_devs` as constant and warns instead of erroring.
+  expect_warning(
+    initialize_fims(parameters = parameters_na_types, data = data),
+    regexp = "10 of the 29"
   )
   clear()
 
@@ -616,7 +638,11 @@ test_that("`initialize_fims()` works with edge cases", {
     dplyr::filter(label != "log_devs" | is.na(label)) |>
     dplyr::bind_rows(modified_log_devs)
   init_parm_default <- initialize_fims(parameters = default_parameters, data = data)
-  init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data)
+  #' @description Test that `initialize_fims()` warns when some `log_devs` are constant but still included in the process distribution.
+  expect_warning(
+    init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data),
+    regexp = "10 of the 29"
+  )
   #' @description Test that `initialize_fims()` works with multiple estimation types.
   expect_equal(length(unlist(init_parm_multiple_types$parameters)), length(unlist(init_parm_default$parameters)) - 10)
 })
