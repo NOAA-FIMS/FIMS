@@ -524,6 +524,8 @@ class FleetInterface : public FleetInterfaceBase {
         info->RegisterRandomEffect(fleet->log_q[i]);
       }
     }
+    // add to variable_map
+    info->variable_map[this->log_q.id_m] = &(fleet)->log_q;
 
     if (this->log_Fmort.size() != static_cast<size_t>(this->n_years.get())) {
       FIMS_ERROR_LOG("The size of `log_Fmort` does not match `n_years`: " +
