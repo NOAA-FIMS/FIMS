@@ -5,7 +5,7 @@
  */
 #include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 
 /**
  * Function to register functions with the Rcpp module system.

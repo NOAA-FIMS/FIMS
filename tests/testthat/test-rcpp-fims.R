@@ -57,6 +57,12 @@ test_that("Rcpp interface returns correct error messages", {
     methods::new(Variable, "a"),
     regexp = "Not compatible with requested type"
   )
+  #' @description Test that assigning a character to the numeric `value` field of a `Variable` returns an error instead of ending the R session.
+  variable <- methods::new(Variable)
+  expect_error(
+    variable$value <- "a",
+    regexp = "Not compatible with requested type"
+  )
   #' @description Test that `BevertonHoltRecruitment` module returns an error when given incorrect input.
   expect_error(
     methods::new(BevertonHoltRecruitment, "a"),

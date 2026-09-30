@@ -3,7 +3,7 @@
  * \brief Implementation of Rcpp recruitment interfaces for the FIMS framework.
  */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 // static id of the RecruitmentInterfaceBase object
 uint32_t RecruitmentInterfaceBase::id_g = 1;
 // local id of the RecruitmentInterfaceBase object map relating the ID of the
