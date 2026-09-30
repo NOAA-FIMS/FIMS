@@ -181,6 +181,42 @@ test_that("`reshape_json_estimates()` output matches TMB for an estimation run",
   #' @description Test that `reshape_json_estimates()` produces output matching TMB.
   result <- purrr::map(fit_files, compare_tmb_and_json_outputs)
 })
+
+test_that("`reshape_json_estimates()` adds the ages and lengths that age_i and length_i index", {
+  # Shift the ages and scale the length bins so the values differ from their
+  # positions, i.e., age_i of 1 is age 3 and length_i of 2 is length 500
+  shifted_data <- data_big |>
+    dplyr::mutate(age = .data$age + 2, length = .data$length * 10)
+  data_4_model <- FIMSFrame(shifted_data)
+  fit <- setup_default_parameters(data = data_4_model) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$estimation_type == "random_effects",
+        "fixed_effects",
+        .data$estimation_type
+      )
+    ) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  estimates <- FIMS:::reshape_json_estimates(get_model_output(fit))
+  clear()
+  ages <- 3:14
+  lengths <- seq(0, 11000, by = 500)
+  age_rows <- dplyr::filter(estimates, !is.na(.data$age_i))
+  length_rows <- dplyr::filter(estimates, !is.na(.data$length_i))
+
+  #' @description Test that `reshape_json_estimates()` gives every row with an age index the age from the data.
+  expect_equal(object = age_rows[["age"]], expected = ages[age_rows[["age_i"]]])
+  #' @description Test that `reshape_json_estimates()` gives every row with a length index the fleet's length bin from the data.
+  expect_equal(object = length_rows[["length"]], expected = lengths[length_rows[["length_i"]]])
+  #' @description Test that `reshape_json_estimates()` fills in lengths for both fleets.
+  expect_equal(object = sort(unique(length_rows[["fleet"]])), expected = c("fleet1", "survey1"))
+  #' @description Test that `reshape_json_estimates()` leaves age missing for rows without an age index.
+  expect_true(all(is.na(estimates[["age"]][is.na(estimates[["age_i"]])])))
+  #' @description Test that `reshape_json_estimates()` leaves length missing for rows without a length index.
+  expect_true(all(is.na(estimates[["length"]][is.na(estimates[["length_i"]])])))
+})
+
 ## Edge handling ----
 test_that("`reshape_json_estimates()` links selectivity to fleets by id", {
   data_4_model <- FIMSFrame(data_big)
@@ -238,6 +274,40 @@ test_that("`reshape_json_estimates()` links selectivity to fleets by id", {
   expect_equal(
     object = selectivity_fleets(shared_output),
     expected = c(NA_character_, NA_character_)
+  )
+})
+
+test_that("`reshape_json_estimates()` reads output saved without ages and lengths", {
+  data_4_model <- FIMSFrame(data_big)
+  fit <- setup_default_parameters(data = data_4_model) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$estimation_type == "random_effects",
+        "fixed_effects",
+        .data$estimation_type
+      )
+    ) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  model_output <- get_model_output(fit)
+  clear()
+  estimates <- FIMS:::reshape_json_estimates(model_output)
+  # Output from before the ages and lengths were written
+  older_output <- gsub(
+    pattern = '"(ages|lengths)": \\[[^]]*\\],',
+    replacement = "",
+    x = model_output
+  )
+  older_estimates <- FIMS:::reshape_json_estimates(older_output)
+
+  #' @description Test that `reshape_json_estimates()` leaves age missing for output without ages.
+  expect_true(all(is.na(older_estimates[["age"]])))
+  #' @description Test that `reshape_json_estimates()` leaves length missing for output without lengths.
+  expect_true(all(is.na(older_estimates[["length"]])))
+  #' @description Test that `reshape_json_estimates()` returns the same rows and other columns with or without ages and lengths.
+  expect_equal(
+    object = dplyr::select(older_estimates, -dplyr::all_of(c("age", "length"))),
+    expected = dplyr::select(estimates, -dplyr::all_of(c("age", "length")))
   )
 })
 

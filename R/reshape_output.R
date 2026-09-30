@@ -10,7 +10,9 @@
 #' @param model_output A JSON object containing the finalized FIMS output as
 #'   returned from `get_output()`, which is an internal function to each model
 #'   family.
-#' @return A tibble containing the reshaped parameter estimates.
+#' @return A tibble containing the reshaped parameter estimates. The `age` and
+#'   `length` columns are the ages and length bins that `age_i` and `length_i`
+#'   index, and are `NA` when the output does not include them.
 reshape_json_estimates <- function(model_output) {
   # Helper functions
   join_density_information <- function(x, density_tibble) {
@@ -115,8 +117,28 @@ reshape_json_estimates <- function(model_output) {
       dplyr::select(-dplyr::all_of("n"))
   }
 
+  # Dimensions are written as positions, e.g., length_i is 1 for the first
+  # length bin, so each fleet also writes its length bins. Output saved before
+  # the length bins were written leaves length as NA.
+  fleet_lengths <- tibble::tibble(
+    module_name = character(),
+    module_id = integer(),
+    length_i = integer(),
+    length = numeric()
+  )
+  if ("lengths" %in% names(read_list[["fleets"]])) {
+    fleet_lengths <- read_list[["fleets"]] |>
+      dplyr::select(dplyr::all_of(c("module_name", "module_id", "lengths"))) |>
+      dplyr::mutate(lengths = purrr::map(.data$lengths, \(x) as.numeric(unlist(x)))) |>
+      tidyr::unnest_longer(
+        dplyr::all_of("lengths"),
+        values_to = "length",
+        indices_to = "length_i"
+      )
+  }
+
   fleet_information <- read_list[["fleets"]] |>
-    dplyr::select(-dplyr::any_of("selectivity_id")) |>
+    dplyr::select(-dplyr::any_of(c("selectivity_id", "lengths"))) |>
     tidyr::pivot_longer(
       cols = dplyr::all_of(c("parameters", "derived_quantities")),
       names_to = "delete_me",
@@ -151,6 +173,16 @@ reshape_json_estimates <- function(model_output) {
     tidyr::unnest(dplyr::all_of(c("dimensionality", "value", "uncertainty"))) |>
     dplyr::mutate(value = unlist(.data$value), uncertainty = unlist(.data$uncertainty))
 
+  # Ages are written with each population. Fleet and module rows are not
+  # linked to a population, so ages are only filled in when every population
+  # has the same ages. Output saved before the ages were written leaves age as
+  # NA.
+  ages <- numeric()
+  population_ages <- unique(read_list[["populations"]][["ages"]])
+  if (length(population_ages) == 1) {
+    ages <- as.numeric(unlist(population_ages[[1]]))
+  }
+
   # Process the population data
   population_information <- read_list[["populations"]] |>
     tidyr::pivot_longer(
@@ -159,7 +191,7 @@ reshape_json_estimates <- function(model_output) {
       values_to = "parameters"
     ) |>
     # TODO: Think about these ids when we have more than one population
-    dplyr::select(-dplyr::all_of("delete_me"), -dplyr::ends_with("_id"), -dplyr::all_of("population")) |>
+    dplyr::select(-dplyr::all_of("delete_me"), -dplyr::ends_with("_id"), -dplyr::any_of(c("population", "ages"))) |>
     dplyr::mutate(
       parameters = purrr::map(
         .data$parameters,
@@ -189,7 +221,13 @@ reshape_json_estimates <- function(model_output) {
       lpdf = "lpdf_value", dplyr::all_of("likelihood"),
       "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
-    )
+    ) |>
+    # age_i and length_i are positions, so add the ages and lengths they index.
+    # Every age dimension starts at the first age today; a dimension that
+    # starts later, e.g., "n_ages-1", would need its own offset here.
+    dplyr::left_join(fleet_lengths, by = c("module_name", "module_id", "length_i")) |>
+    dplyr::mutate(age = .env$ages[.data$age_i]) |>
+    dplyr::relocate(dplyr::all_of(c("age", "length")), .after = dplyr::all_of("length_i"))
   if (is.null(selectivity_fleets)) {
     return(out)
   }
