@@ -279,7 +279,7 @@ fit <- parameters_4_model |>
   fit_fims(optimize = TRUE)
 ```
 
-### Oh no! My model didn't converge! HELP!
+### Oh no! My model didn't converge! 😨 HELP‼️
 
 If you find yourself in the unfortunate situation where your model didn't converge, there are several things that you can look at.
 
