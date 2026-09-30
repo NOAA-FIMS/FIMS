@@ -380,25 +380,18 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   )
 
   #' @description Test that biological mean WAA is weight averaged over the length-at-age distribution, a (mu^3 + 3 mu sd^2) for b = 3, not weight at the mean length.
-  length_weight <- ctx$parameters |>
-    dplyr::filter(
-      .data[["module_name"]] == "Growth",
-      .data[["label"]] %in% c("length_weight_a", "length_weight_b")
-    )
-  length_weight_a <- length_weight |>
+  length_weight_a <- growth_estimates |>
     dplyr::filter(.data[["label"]] == "length_weight_a") |>
-    dplyr::pull(.data[["value"]])
-  length_weight_b <- length_weight |>
+    dplyr::pull(.data[["estimated"]])
+  length_weight_b <- growth_estimates |>
     dplyr::filter(.data[["label"]] == "length_weight_b") |>
-    dplyr::pull(.data[["value"]])
+    dplyr::pull(.data[["estimated"]])
   expect_equal(length_weight_b, 3)
   mean_laa <- report[["growth_mean_LAA"]][[1]]
   sd_laa <- report[["growth_sd_LAA"]][[1]]
-  expect_equal(
-    population_mean_waa,
-    length_weight_a * (mean_laa^3 + 3 * mean_laa * sd_laa^2),
-    tolerance = 1e-3
-  )
+  expected_mean_waa <- length_weight_a *
+    (mean_laa^3 + 3 * mean_laa * sd_laa^2)
+  expect_lt(max(abs(population_mean_waa / expected_mean_waa - 1)), 1e-3)
   expect_true(all(population_mean_waa > length_weight_a * mean_laa^3))
 
   realized_age_to_length_conversion <- report[["age_to_length_conversion_derived"]][[1]]

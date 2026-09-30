@@ -16,7 +16,6 @@
 
 #include "fishery_model_base.hpp"
 #include "population_dynamics/age_to_length_conversion/functors/runtime.hpp"
-#include "population_dynamics/size/growth_derived_size_provider.hpp"
 
 /* Dictionary block for shared parameter snippet documentations.
  * Referenced in function docs via @snippet{doc} this snippet_id.
@@ -1122,12 +1121,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       if (growth_observation != nullptr) {
         growth_observation->PrepareGrowthProducts();
-      }
 
-      // Prepared on every evaluation because nothing marks the size products
-      // stale when growth parameters change.
-      if (population->size_distribution_provider != nullptr) {
-        population->size_distribution_provider->PrepareSizeProducts();
+        // Prepared on every evaluation because nothing marks the size
+        // products stale when growth parameters change.
+        if (population->size_distribution_provider != nullptr) {
+          population->size_distribution_provider->PrepareSizeProducts();
+        }
       }
     }
   }
@@ -1270,13 +1269,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       return population->growth->evaluate(year, population->ages[age]);
     }
 
-    // With a population size grid, average weight over the length-at-age
-    // distribution; otherwise use weight at the mean length.
-    std::shared_ptr<fims_popdy::GrowthDerivedSizeProvider<Type>> size_provider =
-        std::dynamic_pointer_cast<fims_popdy::GrowthDerivedSizeProvider<Type>>(
-            population->size_distribution_provider);
-    if (size_provider != nullptr) {
-      return size_provider->MeanWeightAtAge(
+    if (population->size_distribution_provider != nullptr) {
+      return population->size_distribution_provider->MeanWeightAtAge(
           (std::min)(year, population->n_years - 1), age);
     }
 

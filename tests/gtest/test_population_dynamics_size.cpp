@@ -91,6 +91,12 @@ void ConfigureAdapter(
       fims_math::log(length_at_age_sd_at_reference_age_old);
 }
 
+// Normal CDF written out here so the expected values do not reuse the
+// provider's own probabilities.
+double NormalCdf(double x, double mean, double sd) {
+  return 0.5 * (1.0 + std::erf((x - mean) / (sd * std::sqrt(2.0))));
+}
+
 TEST(SizeGridBuilder, BuildObservationEdgesFromCentersUsesAdjacentMidpoints) {
   fims::Vector<double> centers = {1.0, 2.0, 4.0};
 
@@ -321,12 +327,6 @@ TEST(GrowthDerivedSizeProvider,
   EXPECT_GT(higher_expected_size, lower_expected_size);
 }
 
-// Normal CDF written out here so the expected values do not reuse the
-// provider's own probabilities.
-double NormalCdf(double x, double mean, double sd) {
-  return 0.5 * (1.0 + std::erf((x - mean) / (sd * std::sqrt(2.0))));
-}
-
 TEST(GrowthDerivedSizeProvider,
      MeanWeightAtAgeAveragesWeightAtBinCentersOverProbSize) {
   // The fake growth object has weight equal to length.
@@ -347,9 +347,9 @@ TEST(GrowthDerivedSizeProvider,
   const double expected = p0 * 0.5 + p1 * 1.5 + p2 * 2.5 + p3 * 3.5;
 
   // The provider floors the SD with a smooth ad_max, which raises an SD of
-  // 0.4 by about 6e-6, so the tolerance is looser than machine precision but
-  // still far tighter than the 9e-5 gap to weight at the mean length.
-  EXPECT_NEAR(provider.MeanWeightAtAge(0, 0), expected, 1e-6);
+  // 0.4 by about 6e-6 and the mean weight by about 2e-8, well below the
+  // 9e-5 gap to weight at the mean length.
+  EXPECT_NEAR(provider.MeanWeightAtAge(0, 0), expected, 1e-7);
 }
 
 TEST(GrowthDerivedSizeProvider,
