@@ -162,15 +162,16 @@ run_fims_likelihood <- function(
     if (!module_name %in% module_names) {
       cli::cli_abort("Input module_name not found in parameters tibble.")
     }
-    parameter_row <- parameters |>
-      dplyr::filter(
-        .data[["module_name"]] == .env$module_name &
-          .data[["label"]] == .env$parameter_name
-      )
-  } else {
-    parameter_row <- parameters |>
-      dplyr::filter(.data[["label"]] == .env$parameter_name)
   }
+
+  # `%in%` rather than `==` because `x == NULL` has length 0, which `filter()`
+  # rejects, so a NULL module_name matches every module
+  parameter_row <- parameters |>
+    dplyr::filter(
+      .data[["label"]] == .env$parameter_name,
+      is.null(.env$module_name) |
+        .data[["module_name"]] %in% .env$module_name
+    )
 
   if (nrow(parameter_row) == 0) {
     cli::cli_abort("Input parameter_name did not match any rows in parameter tibble.")
@@ -189,13 +190,13 @@ run_fims_likelihood <- function(
 
   # NOTE: input and estimated value are slightly different (even though its
   # fixed) input = 13.8155, estimated = 13.857
-  init_rows <- FIMS::get_estimates(model) |>
-    dplyr::filter(.data[["label"]] == .env$parameter_name)
-  if (!is.null(module_name)) {
-    init_rows <- init_rows |>
-      dplyr::filter(.data[["module_name"]] == .env$module_name)
-  }
-  init <- dplyr::pull(init_rows, .data[["estimated"]])
+  init <- FIMS::get_estimates(model) |>
+    dplyr::filter(
+      .data[["label"]] == .env$parameter_name,
+      is.null(.env$module_name) |
+        .data[["module_name"]] %in% .env$module_name
+    ) |>
+    dplyr::pull(.data[["estimated"]])
   if (length(init) != 1) {
     cli::cli_abort(
       "Found {length(init)} estimates of {.val {parameter_name}} in the model;
