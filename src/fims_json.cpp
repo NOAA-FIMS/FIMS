@@ -6,7 +6,7 @@
 
 #include "../inst/include/utilities/fims_json.hpp"
 #ifdef TMB_MODEL
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 #endif
 
 namespace fims {

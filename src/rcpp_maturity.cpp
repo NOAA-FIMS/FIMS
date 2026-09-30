@@ -10,7 +10,7 @@ uint32_t MaturityInterfaceBase::id_g = 1;
 std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
     MaturityInterfaceBase::live_objects;
 
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 
 /**
  * Function to register maturity classes with the Rcpp module system.
