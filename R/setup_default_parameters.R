@@ -241,7 +241,8 @@ setup_default_log_init_naa <- function(
 
   m <- rep(exp(log_M), length.out = n_ages)
   log_init_naa <- log_rzero - c(0, cumsum(m))[seq_len(n_ages)]
-  log_init_naa[n_ages] <- log_init_naa[n_ages] - log(1 - exp(-m[n_ages]))
+  # -expm1(-m) is 1 - exp(-m) without losing precision when m is small
+  log_init_naa[n_ages] <- log_init_naa[n_ages] - log(-expm1(-m[n_ages]))
   log_init_naa
 }
 
@@ -468,7 +469,14 @@ setup_default_Growth <- function(
 #' @param log_M A numeric value or vector (length equal to the number of ages *
 #' number of years) specifying the log natural mortality rate. Default is `log(0.2)`.
 #' @param log_init_naa A numeric value or vector (length equal to the number of
-#' ages) specifying the log initial numbers at age. Default is `NA_real_`.
+#' ages) specifying the log initial numbers at age. Default is `NA_real_`, in
+#' which case [setup_default_parameters()] fills it with the unfished
+#' equilibrium implied by unfished recruitment \eqn{R_0} and natural mortality
+#' \eqn{M}:
+#' \deqn{N_a = R_0 \exp\left(-\sum_{j < a} M_j\right)}
+#' for ages below the plus group, and for the plus group \eqn{A}, which
+#' accumulates survivors each year,
+#' \deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}
 #' @param proportion_female A numeric value between 0 and 1 specifying the
 #' proportion of females. Default is `0.5`.
 #' @inheritParams setup_default_parameters

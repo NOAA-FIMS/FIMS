@@ -313,6 +313,25 @@ test_that("`setup_default_log_init_naa()` handles scalar and vector `log_M`", {
   clear()
 })
 
+test_that("`setup_default_log_init_naa()` keeps a finite plus group for small M", {
+  n_ages <- get_n_ages(data)
+  log_rzero <- log(1e+06)
+
+  result <- FIMS:::setup_default_log_init_naa(
+    n_ages = n_ages,
+    log_rzero = log_rzero,
+    log_M = -40
+  )
+
+  #' @description Test that a very small M gives a finite plus group of about R0 / M, where 1 - exp(-M) would round to 0.
+  expect_equal(
+    result[n_ages],
+    log_rzero - (n_ages - 1) * exp(-40) + 40
+  )
+
+  clear()
+})
+
 ## Error handling ----
 test_that("`setup_default_parameters()` returns correct error messages", {
   #' @description Test that invalid `data` class triggers an informative error.

@@ -19,7 +19,14 @@ your long input data.}
 number of years) specifying the log natural mortality rate. Default is \code{log(0.2)}.}
 
 \item{log_init_naa}{A numeric value or vector (length equal to the number of
-ages) specifying the log initial numbers at age. Default is \code{NA_real_}.}
+ages) specifying the log initial numbers at age. Default is \code{NA_real_}, in
+which case \code{\link[=setup_default_parameters]{setup_default_parameters()}} fills it with the unfished
+equilibrium implied by unfished recruitment \eqn{R_0} and natural mortality
+\eqn{M}:
+\deqn{N_a = R_0 \exp\left(-\sum_{j < a} M_j\right)}
+for ages below the plus group, and for the plus group \eqn{A}, which
+accumulates survivors each year,
+\deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}}
 
 \item{proportion_female}{A numeric value between 0 and 1 specifying the
 proportion of females. Default is \code{0.5}.}
