@@ -14,6 +14,16 @@
 
 #include "information.hpp"
 
+#ifdef TMB_MODEL
+#include <Rcpp.h>
+// TMB's asSEXP doesn't have an overload for std::vector<std::string>,
+// which causes an ambiguous call error. This wrapper uses Rcpp::wrap
+// to handle the conversion, resolving the ambiguity.
+inline SEXP asSEXP(const std::vector<std::string>& v) {
+  return Rcpp::wrap(v);
+}
+#endif
+
 namespace fims_model {
 
 /**
@@ -92,17 +102,12 @@ class Model {  // may need singleton
       m->Evaluate();
     }
 
-    // Loop over all density components once, evaluating and categorizing them
-    // to preserve reporting order.
-    typename fims_info::Information<Type>::density_components_iterator d_it;
+    // Evaluate all density components once, and store nll and name.
     std::vector<std::pair<Type, std::string>> prior_components;
     std::vector<std::pair<Type, std::string>> re_components;
     std::vector<std::pair<Type, std::string>> data_components;
 
-    for (d_it = this->fims_information->density_components.begin();
-         d_it != this->fims_information->density_components.end(); ++d_it) {
-      std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
-          (*d_it).second;
+    for (auto const& [id, d] : this->fims_information->density_components) {
 #ifdef TMB_MODEL
       d->of = this->of;
 #endif
@@ -110,14 +115,12 @@ class Model {  // may need singleton
       jnll += nll_val;
 
       if (d->input_type == "prior") {
-        prior_components.push_back(
-            {nll_val, "prior_" + fims::to_string(d->id)});
+        prior_components.emplace_back(nll_val, "prior_" + fims::to_string(id));
       } else if (d->input_type == "random_effects") {
-        re_components.push_back(
-            {nll_val, "random_effects_" + fims::to_string(d->id)});
+        re_components.emplace_back(nll_val,
+                                   "random_effects_" + fims::to_string(id));
       } else if (d->input_type == "data") {
-        data_components.push_back(
-            {nll_val, "data_" + fims::to_string(d->id)});
+        data_components.emplace_back(nll_val, "data_" + fims::to_string(id));
       }
     }
 
@@ -131,18 +134,18 @@ class Model {  // may need singleton
 
     // Assemble the final report vectors in the desired order (priors, re, data)
     int nll_vec_idx = 0;
-    auto copy_components =
-        [&](const std::vector<std::pair<Type, std::string>>& comps) {
-          for (const auto& comp : comps) {
-            nll_vec[nll_vec_idx] = comp.first;
-            nll_component_names[nll_vec_idx] = comp.second;
-            nll_vec_idx++;
-          }
-        };
-
-    copy_components(prior_components);
-    copy_components(re_components);
-    copy_components(data_components);
+    for (const auto& comp : prior_components) {
+      nll_vec[nll_vec_idx] = comp.first;
+      nll_component_names[nll_vec_idx++] = comp.second;
+    }
+    for (const auto& comp : re_components) {
+      nll_vec[nll_vec_idx] = comp.first;
+      nll_component_names[nll_vec_idx++] = comp.second;
+    }
+    for (const auto& comp : data_components) {
+      nll_vec[nll_vec_idx] = comp.first;
+      nll_component_names[nll_vec_idx++] = comp.second;
+    }
 
     // report out nll components
 
