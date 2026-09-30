@@ -218,14 +218,16 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
    * where \f$c_l\f$ is the center of population size bin \f$l\f$ and \f$W\f$
    * is the length-weight relationship. Unlike the growth products' `MeanWAA`,
    * which is weight at the mean length, this includes the effect of the
-   * spread of lengths at age on mean weight.
+   * spread of lengths at age on mean weight. Values are from the last call to
+   * PrepareSizeProducts(), which the catch-at-age model makes on every
+   * evaluation.
    *
    * @param year_index Year index.
    * @param age_index Age index.
    * @return Mean weight-at-age on the natural scale.
    */
   const Type& MeanWeightAtAge(std::size_t year_index,
-                              std::size_t age_index) const {
+                              std::size_t age_index) const override {
     if (!size_products_prepared_) {
       throw std::runtime_error(
           "GrowthDerivedSizeProvider requires prepared size products");
