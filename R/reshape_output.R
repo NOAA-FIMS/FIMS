@@ -55,8 +55,8 @@ reshape_json_estimates <- function(model_output) {
     distribution_information <- density_components |>
       # Only random-effect distributions for now. The log_sd of a data
       # distribution is set from the data uncertainty, held constant, and
-      # already reported next to each observation, and the parameters of a
-      # prior are fixed inputs.
+      # already reported next to each observation, and a prior's parameters
+      # are fixed inputs.
       dplyr::filter(
         .data$input_type == "random_effects",
         purrr::map_lgl(.data$parameters, \(x) length(x) > 0)
