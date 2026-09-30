@@ -241,7 +241,7 @@ setup_default_log_init_naa <- function(
 
   m <- rep(exp(log_M), length.out = n_ages)
   log_init_naa <- log_rzero - c(0, cumsum(m))[seq_len(n_ages)]
-  log_init_naa[n_ages] <- log_init_naa[n_ages] - log(m[n_ages])
+  log_init_naa[n_ages] <- log_init_naa[n_ages] - log(1 - exp(-m[n_ages]))
   log_init_naa
 }
 
