@@ -131,14 +131,34 @@ test_that("`get_estimates()` reports distribution parameters by id", {
   log_sd_rows <- dplyr::filter(estimates, .data$parameter_id %in% log_sd_id)
   #' @description Test that `get_estimates()` returns one row for the estimated recruitment `log_sd`.
   expect_equal(object = nrow(log_sd_rows), expected = 1)
-  #' @description Test that `get_estimates()` labels the recruitment `log_sd` row with its distribution and estimation type.
+  #' @description Test that `get_estimates()` reports the recruitment `log_sd` under the module that owns the recruitment deviations.
+  log_devs_module_id <- estimates |>
+    dplyr::filter(
+      .data$module_name == "Recruitment",
+      .data$label == "log_devs"
+    ) |>
+    dplyr::pull(.data$module_id) |>
+    unique()
   expect_equal(
-    object = unlist(log_sd_rows[c("module_name", "label", "estimation_type")]),
+    object = unlist(log_sd_rows[c(
+      "module_name", "module_id", "label", "distribution", "estimation_type"
+    )]),
     expected = c(
-      module_name = "density",
+      module_name = "Recruitment",
+      module_id = as.character(log_devs_module_id),
       label = "log_sd",
+      distribution = "normal",
       estimation_type = "fixed_effects"
     )
+  )
+  #' @description Test that `get_estimates()` does not report the fixed `log_sd` of the landings and index distributions as parameters.
+  expect_equal(
+    object = sum(
+      estimates[["label"]] == "log_sd" &
+        estimates[["module_name"]] != "Recruitment",
+      na.rm = TRUE
+    ),
+    expected = 0
   )
   clear()
 })

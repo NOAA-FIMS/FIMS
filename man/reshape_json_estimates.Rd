@@ -13,8 +13,9 @@ family.}
 }
 \value{
 A tibble containing the reshaped parameter estimates. Parameters of
-distributions, e.g., \code{log_sd}, are included with one row per parameter id
-and \code{module_name} \code{"density"}.
+distributions for random effects, e.g., \code{log_sd} of the recruitment
+deviations, are included with one row per parameter id under the module
+that owns the vector they apply to.
 }
 \description{
 This function processes the finalized FIMS JSON output and reshapes the

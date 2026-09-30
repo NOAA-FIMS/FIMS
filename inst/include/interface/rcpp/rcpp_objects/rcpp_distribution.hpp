@@ -211,6 +211,26 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
     ss << "\n ],\n";
     return ss.str();
   }
+
+  /**
+   * @brief Writes the ids of the vectors this distribution is linked to as a
+   * JSON "linked_ids" member.
+   *
+   * @details The first id is the vector the distribution applies to, e.g.,
+   * recruitment deviations or a fleet's expected index, so its parameters
+   * can be reported under the module that owns that vector.
+   *
+   * @return The JSON member followed by a comma and a newline.
+   */
+  std::string linked_ids_to_json() {
+    std::stringstream ss;
+    ss << " \"linked_ids\": [";
+    for (size_t i = 0; i < this->key_m->size(); i++) {
+      ss << (i == 0 ? "" : ", ") << this->key_m->at(i);
+    }
+    ss << "],\n";
+    return ss.str();
+  }
 };
 
 /**
@@ -439,6 +459,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m
        << ",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
+    ss << this->linked_ids_to_json();
     ss << this->parameters_to_json({{"log_sd", &this->log_sd}});
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
@@ -780,6 +801,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     ss << " \"observed_data_id\" : " << this->interface_observed_data_id_m
        << ",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
+    ss << this->linked_ids_to_json();
     ss << this->parameters_to_json({{"log_sd", &this->log_sd}});
     ss << " \"density_component\": {\n";
     ss << "  \"lpdf_value\": " << sanitize_val(this->lpdf_value) << ",\n";
