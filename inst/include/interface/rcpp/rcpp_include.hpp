@@ -15,15 +15,16 @@
 #error "Include interface/rcpp/rcpp_include.hpp instead of <Rcpp.h>."
 #endif
 
+// Rcpp is included with NDEBUG defined so a failed type conversion raises an
+// R error instead of calling abort(). R defines NDEBUG for installed builds;
+// defining it here makes debug builds (e.g., devtools::load_all()) behave the
+// same. push_macro and pop_macro restore the build's NDEBUG afterward, and
+// <cassert> is included again so assert() in FIMS code follows that setting.
+#pragma push_macro("NDEBUG")
 #undef NDEBUG
-/**
- * @brief Makes Rcpp raise an R error instead of calling abort() on a failed
- * type conversion. R defines NDEBUG for installed builds; defining it here
- * makes debug builds (e.g., devtools::load_all()) behave the same. TMB.hpp
- * sets NDEBUG itself before Eigen and CppAD, so Eigen bounds checks are
- * unaffected.
- */
 #define NDEBUG 1
 #include <Rcpp.h>
+#pragma pop_macro("NDEBUG")
+#include <cassert>
 
 #endif  // FIMS_INTERFACE_RCPP_RCPP_INCLUDE_HPP
