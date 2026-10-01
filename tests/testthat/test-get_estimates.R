@@ -247,11 +247,17 @@ test_that("`get_estimates()` works with time-varying age-specific selectivity", 
     fleet = "survey1",
     module_type = "AgeSpecific"
   )
-  # 1 set of values per year, in year-major order
+  # 1 set of values per year, in year-major order, with a different value for
+  # each year and age so the labels can be checked against the values
   age_specific_by_year <- age_specific[
     rep(seq_len(nrow(age_specific)), times = n_years),
-  ]
-  parameters <- fixed_effect_parameters(data_4_model) |>
+  ] |>
+    dplyr::mutate(
+      value = rep(seq_len(n_years), each = n_ages) / 10 +
+        rep(seq_len(n_ages), times = n_years) / 100,
+      estimation_type = "constant"
+    )
+  parameters <- setup_default_parameters(data = data_4_model) |>
     dplyr::filter(
       !(.data$fleet == "survey1" & .data$module_name == "Selectivity")
     ) |>
@@ -269,8 +275,14 @@ test_that("`get_estimates()` works with time-varying age-specific selectivity", 
     expected = rep(seq_len(n_years), each = n_ages)
   )
   expect_equal(
-    object = selectivity[["age_i"]],
-    expected = rep(seq_len(n_ages), times = n_years)
+    object = selectivity[["age"]],
+    expected = rep(get_ages(data_4_model), times = n_years)
+  )
+  #' @description Test that each time-varying age-specific selectivity value is reported with the year and age it was given for.
+  expect_equal(
+    object = selectivity[["input"]],
+    expected = selectivity[["year_i"]] / 10 +
+      match(selectivity[["age"]], get_ages(data_4_model)) / 100
   )
   clear()
 })
