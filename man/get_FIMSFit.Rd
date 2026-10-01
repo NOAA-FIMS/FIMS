@@ -102,11 +102,10 @@ from a stored R vector rather than the compiled C++ objective function.
 \code{\link[=get_sdreport]{get_sdreport()}} returns the list from \code{\link[TMB:sdreport]{TMB::sdreport()}}.
 
 \code{\link[=get_estimates]{get_estimates()}} returns a tibble of parameter values and their
-uncertainties from a fitted model. The \code{year_i}, \code{age_i}, and \code{length_i}
-columns are positions that start at 1, and the \code{age} and \code{length} columns
-are the ages and length bins from the data that \code{age_i} and \code{length_i}
-refer to. \code{age} is \code{NA} if populations have different ages, and both are
-\code{NA} for fits saved before they were added to the output.
+uncertainties from a fitted model. The \code{year_i} column is a position that
+starts at 1, and the \code{age} and \code{length} columns are the ages and length bins
+from the data. \code{age} is \code{NA} if populations have different ages, and both
+are \code{NA} for fits saved before they were added to the output.
 
 \code{\link[=get_number_of_parameters]{get_number_of_parameters()}} returns a vector of integers specifying the
 number of fixed-effect parameters and the number of random-effect parameters

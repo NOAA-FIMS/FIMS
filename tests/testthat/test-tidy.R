@@ -114,6 +114,10 @@ test_that("augment() works with correct inputs", {
 
   #' @description Test that generics::augment(fit, include_weights = FALSE) still returns .truth and .pred.
   expect_true(all(c(".truth", ".pred") %in% names(generics::augment(fit, include_weights = FALSE))))
+
+  #' @description Test that generics::augment(fit) carries the age and length columns instead of the age_i and length_i positions.
+  expect_true(all(c("age", "length") %in% names(generics::augment(fit))))
+  expect_false(any(c("age_i", "length_i") %in% names(generics::augment(fit))))
 })
 
 ## Edge handling ----

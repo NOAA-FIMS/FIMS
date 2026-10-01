@@ -13,8 +13,8 @@ family.}
 }
 \value{
 A tibble containing the reshaped parameter estimates. The \code{age} and
-\code{length} columns are the ages and length bins that \code{age_i} and \code{length_i}
-index, and are \code{NA} when the output does not include them.
+\code{length} columns are the ages and length bins from the data, and are \code{NA}
+when the output does not include them.
 }
 \description{
 This function processes the finalized FIMS JSON output and reshapes the

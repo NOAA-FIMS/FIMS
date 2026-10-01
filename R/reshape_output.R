@@ -11,8 +11,8 @@
 #'   returned from `get_output()`, which is an internal function to each model
 #'   family.
 #' @return A tibble containing the reshaped parameter estimates. The `age` and
-#'   `length` columns are the ages and length bins that `age_i` and `length_i`
-#'   index, and are `NA` when the output does not include them.
+#'   `length` columns are the ages and length bins from the data, and are `NA`
+#'   when the output does not include them.
 reshape_json_estimates <- function(model_output) {
   # Helper functions
   join_density_information <- function(x, density_tibble) {
@@ -222,12 +222,14 @@ reshape_json_estimates <- function(model_output) {
       "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
     ) |>
-    # age_i and length_i are positions, so add the ages and lengths they index.
-    # Every age dimension starts at the first age today; a dimension that
-    # starts later, e.g., "n_ages-1", would need its own offset here.
+    # age_i and length_i are positions, so replace them with the ages and
+    # lengths they index. Every age dimension starts at the first age today; a
+    # dimension that starts later, e.g., "n_ages-1", would need its own offset
+    # here.
     dplyr::left_join(fleet_lengths, by = c("module_name", "module_id", "length_i")) |>
     dplyr::mutate(age = .env$ages[.data$age_i]) |>
-    dplyr::relocate(dplyr::all_of(c("age", "length")), .after = dplyr::all_of("length_i"))
+    dplyr::relocate(dplyr::all_of(c("age", "length")), .after = dplyr::all_of("length_i")) |>
+    dplyr::select(-dplyr::all_of(c("age_i", "length_i")))
   if (is.null(selectivity_fleets)) {
     return(out)
   }

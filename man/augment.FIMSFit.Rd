@@ -39,7 +39,8 @@ The returned tibble follows the conventions expected by every
    \code{module_id} \tab Unique module identifier \cr
    \code{distribution} \tab Likelihood distribution used for this data stream \cr
    \code{year_i} \tab Year index (present when available in the estimates) \cr
-   \code{age_i} \tab Age index  (present when available in the estimates) \cr
+   \code{age} \tab Age from the data, \code{NA} for rows without an age \cr
+   \code{length} \tab Length bin from the data, \code{NA} for rows without a length \cr
 }
 }
 \examples{
