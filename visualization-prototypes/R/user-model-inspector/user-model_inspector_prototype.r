@@ -1,14 +1,9 @@
 # -------------------------------------------------------------------------
 # 0. Setup
 # -------------------------------------------------------------------------
-# Purpose:
-# Build a model-specific FIMS explorer with a compact overview graph and a
-# persistent inspector panel. This prototype is meant to be easier to read
-# than the full Graphviz blueprint because detailed text lives in the panel,
-# not inside every graph node.
-#
-# This is a prototype script. It does not modify FIMS source code.
-# Run from the FIMS repository root.
+# Build a model-specific FIMS overview graph with an interactive inspector.
+# Source from the FIMS repository root, then call inspect_fims_model(data, parameters).
+# See user-model_inspector_workflow_examples.r for complete examples.
 
 if (!file.exists("DESCRIPTION") ||
     !file.exists(file.path("R", "Rcpp_exports.R")) ||
@@ -35,20 +30,6 @@ coalesce_empty <- function(x, replacement = "None detected") {
   }
 
   x
-}
-
-short_list <- function(x, max_items = 5) {
-  x <- unique(stats::na.omit(x))
-
-  if (length(x) == 0) {
-    return("None detected")
-  }
-
-  if (length(x) > max_items) {
-    x <- c(x[seq_len(max_items)], paste0("+ ", length(x) - max_items, " more"))
-  }
-
-  paste(x, collapse = ", ")
 }
 
 safe_file_name <- function(x) {
@@ -715,11 +696,8 @@ format_assumptions_for_component <- function(component_name) {
 }
 
 # -------------------------------------------------------------------------
-# 4. Define one example configured model
+# 4. Input preparation and module selection
 # -------------------------------------------------------------------------
-# This is the only section that should need to change for a different model.
-# A future parser could build the same structure from a FIMS model object or
-# from model configuration JSON.
 
 module_id <- function(model_role) {
   paste0("module_", model_role)
@@ -1043,6 +1021,10 @@ display_module_option <- function(module_type) {
   out[matched] <- labels[module_type[matched]]
   out
 }
+
+# -------------------------------------------------------------------------
+# 5. Fleet and composition summaries
+# -------------------------------------------------------------------------
 
 clean_fleet_names <- function(fleets) {
   fleets <- as.character(fleets)
@@ -1454,6 +1436,10 @@ fleet_groups_for_selectivity <- function(parameter_rows) {
   })
 }
 
+# -------------------------------------------------------------------------
+# 6. Module parameter tables and default comparisons
+# -------------------------------------------------------------------------
+
 empty_module_spec <- function() {
   data.frame(
     id = character(),
@@ -1781,6 +1767,10 @@ make_module_spec_row <- function(
   row
 }
 
+# -------------------------------------------------------------------------
+# 7. Component metadata catalog
+# -------------------------------------------------------------------------
+
 registration_for_component <- function(component_name) {
   registration_row <- rcpp_registration[
     match(component_name, rcpp_registration$r_name),
@@ -1909,6 +1899,10 @@ write_inspector_metadata_catalog <- function(
 
   normalizePath(output)
 }
+
+# -------------------------------------------------------------------------
+# 8. Model graph construction
+# -------------------------------------------------------------------------
 
 build_input_spec <- function(data, module_spec = NULL) {
   data_frame <- extract_fims_data_frame(data)
@@ -2071,11 +2065,10 @@ build_module_spec <- function(parameters, data) {
 
   for (model_role in model_roles) {
     if (identical(model_role, "Observation")) {
-      has_observation_data <- any(vapply(
-        c("catch", "age_comp", "length_comp", "index"),
-        function(data_type) has_data_type(data_frame, data_type),
-        logical(1)
-      ))
+      has_observation_data <- has_data_type(
+        data_frame,
+        c("catch", "age_comp", "length_comp", "index")
+      )
 
       if (has_observation_data) {
         module_rows[[length(module_rows) + 1]] <- make_module_spec_row(
@@ -2368,12 +2361,8 @@ build_model_inspector_spec <- function(
     title = "FIMS User Model Explorer Prototype",
     model_label = "User model",
     setup_default_if_missing = TRUE) {
-  if (is.null(parameters) && is.null(data)) {
-    return(example_model_spec)
-  }
-
   if (is.null(data)) {
-    stop("Provide `data`, or provide neither `parameters` nor `data` to use the example.")
+    stop("Provide `data` to build a model inspector specification.")
   }
 
   model_graph <- build_model_graph(
@@ -2389,172 +2378,8 @@ build_model_inspector_spec <- function(
   )
 }
 
-example_model_spec <- list(
-  metadata = list(
-    title = "FIMS User Model Explorer Prototype",
-    model_label = "Example model",
-    initial_focus_id = module_id("Growth")
-  ),
-  inputs = data.frame(
-    id = c(
-      "data_catch",
-      "data_age_comp",
-      "data_length_comp",
-      "data_index"
-    ),
-    label = c(
-      "Catch data",
-      "Age composition",
-      "Length composition",
-      "Index data"
-    ),
-    subtitle = rep("Observed data stream", 4),
-    description = c(
-      "Catch data provided by the user and routed into the observation model.",
-      "Age-composition data provided by the user and routed into the observation model.",
-      "Length-composition data provided by the user and routed into the growth model.",
-      "Index data provided by the user and routed into the selectivity model."
-    ),
-    assumptions = rep(
-      "Input validation and dimensional checks depend on the FIMSFrame setup.",
-      4
-    ),
-    stringsAsFactors = FALSE
-  ),
-  modules = data.frame(
-    id = module_id(c(
-      "Growth",
-      "Maturity",
-      "Observation",
-      "Selectivity",
-      "Recruitment"
-    )),
-    model_role = c(
-      "Growth",
-      "Maturity",
-      "Observation",
-      "Selectivity",
-      "Recruitment"
-    ),
-    component = c(
-      "VonBertalanffySchnuteGrowth",
-      "LogisticMaturity",
-      "CatchAtAge",
-      "LogisticSelectivity",
-      "BevertonHoltRecruitment"
-    ),
-    field_strategy = c(
-      "growth_linear_interpolation",
-      "",
-      "",
-      "",
-      ""
-    ),
-    stringsAsFactors = FALSE
-  ),
-  derived = data.frame(
-    id = "derived_spawning_biomass",
-    label = "Spawning biomass",
-    subtitle = "Derived quantity",
-    description = "A model-derived quantity connecting growth, maturity, and recruitment.",
-    assumptions = "Derived from selected biological processes and model state.",
-    stringsAsFactors = FALSE
-  ),
-  outputs = data.frame(
-    id = c(
-      "output_expected_catch",
-      "output_total_nll",
-      "output_growth_curve",
-      "output_expected_index",
-      "output_spawning_biomass",
-      "output_expected_recruits"
-    ),
-    label = c(
-      "Expected catch",
-      "Total NLL",
-      "Growth curve",
-      "Expected index",
-      "Spawning biomass",
-      "Expected recruits"
-    ),
-    subtitle = rep("Model-derived result", 6),
-    description = c(
-      "Expected catch is produced by the observation model.",
-      "Total NLL collects likelihood contributions for the configured model.",
-      "The growth curve is produced by the selected growth component.",
-      "Expected index is produced from selectivity and survey-index structure.",
-      "Spawning biomass is a derived model quantity used by recruitment.",
-      "Expected recruits are produced by the selected recruitment relationship."
-    ),
-    assumptions = rep(
-      "Output interpretation depends on the selected module configuration.",
-      6
-    ),
-    stringsAsFactors = FALSE
-  ),
-  connections = data.frame(
-    from = c(
-      "data_catch",
-      "data_age_comp",
-      "data_length_comp",
-      "data_index",
-      module_id("Growth"),
-      module_id("Maturity"),
-      "derived_spawning_biomass",
-      module_id("Growth"),
-      module_id("Selectivity"),
-      module_id("Observation"),
-      module_id("Observation"),
-      module_id("Growth"),
-      module_id("Selectivity"),
-      "derived_spawning_biomass",
-      module_id("Recruitment")
-    ),
-    to = c(
-      module_id("Observation"),
-      module_id("Observation"),
-      module_id("Growth"),
-      module_id("Selectivity"),
-      "derived_spawning_biomass",
-      "derived_spawning_biomass",
-      module_id("Recruitment"),
-      module_id("Observation"),
-      module_id("Observation"),
-      "output_expected_catch",
-      "output_total_nll",
-      "output_growth_curve",
-      "output_expected_index",
-      "output_spawning_biomass",
-      "output_expected_recruits"
-    ),
-    label = c(
-      "observed catch",
-      "composition",
-      "length data",
-      "survey index",
-      "length/weight",
-      "maturity",
-      "stock-recruit",
-      "age-length mapping",
-      "selectivity",
-      "prediction",
-      "likelihood",
-      "growth output",
-      "prediction",
-      "derived quantity",
-      "stock-recruit"
-    ),
-    kind = c(
-      rep("data", 4),
-      rep("process", 5),
-      rep("output", 6)
-    ),
-    stringsAsFactors = FALSE
-  )
-)
-
 # -------------------------------------------------------------------------
-# 5. Build node and edge data
+# 9. Build node and edge data
 # -------------------------------------------------------------------------
 
 make_input_node <- function(input_row) {
@@ -2744,11 +2569,9 @@ make_module_node <- function(module_row) {
     column_name = "fleet_count_label",
     default = fleet_group_count_label(fleet_groups)
   )
-  registration_row <- rcpp_registration[
-    match(component_name, rcpp_registration$r_name),
-  ]
+  registration_row <- registration_for_component(component_name)
 
-  if (nrow(registration_row) == 0 || is.na(registration_row$r_name)) {
+  if (is.null(registration_row)) {
     fields <- character()
     methods <- character()
     source_file <- ""
@@ -2949,7 +2772,7 @@ build_model_inspector_graph_data <- function(model_spec) {
 }
 
 # -------------------------------------------------------------------------
-# 6. Render HTML
+# 10. Render HTML
 # -------------------------------------------------------------------------
 
 render_node_card <- function(node) {
@@ -3059,7 +2882,7 @@ html <- paste0(
   "box-shadow:0 4px 12px rgba(33,63,75,.06);transition:.16s ease transform,.16s ease opacity,.16s ease border-color}",
   ".node-card:hover{transform:translateY(-1px);border-color:var(--teal)}",
   ".node-card.active{border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,104,118,.14),0 8px 20px rgba(33,63,75,.12)}",
-  ".node-card.dimmed{opacity:.2}.node-card.filtered-dim{opacity:.16}",
+  ".node-card.dimmed{opacity:.2}",
   ".node-card.related{border-color:#8db3bd}",
   ".node-role{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:4px}",
   ".node-card strong{display:block;font-size:17px;line-height:1.12;color:var(--ink);overflow-wrap:anywhere}",
@@ -3078,7 +2901,6 @@ html <- paste0(
   ".edge-path.output,.edge-path.process{stroke:var(--green)}",
   ".edge-path.data{stroke:#6c8fa0}",
   ".edge-path.dimmed{opacity:.08}.edge-path.active{stroke-width:2.15;opacity:.95}",
-  ".edge-label{display:none}",
   ".port-dot{stroke:#fff;stroke-width:2px}.port-dot.data{fill:#6c8fa0}.port-dot.process,.port-dot.output{fill:var(--green)}",
   ".inspector{min-height:760px;display:flex;flex-direction:column;overflow:hidden}",
   ".inspector-header{padding:18px;border-bottom:1px solid #e1e7ea;background:#fbfcfd}",
@@ -3177,20 +2999,9 @@ html <- paste0(
   "font-size:12px;color:var(--ink);overflow-wrap:anywhere}",
   ".field-box-definition{color:var(--muted);font-size:12px;line-height:1.4;",
   "margin-top:6px}",
-  ".definition-list{display:grid;gap:8px;margin-top:10px}",
-  ".definition-list[hidden]{display:none}",
-  ".definition-item{border:1px solid #e1e7ea;background:#fbfcfd;border-radius:7px;",
-  "padding:8px 10px}",
-  ".definition-term{font-weight:700;color:var(--ink);font-size:12px;margin-bottom:3px}",
-  ".definition-text{color:var(--muted);font-size:12px;line-height:1.4}",
   ".equation-box{font-family:Consolas,Menlo,monospace;font-size:12px;line-height:1.35;",
   "background:#f6faf8;border:1px solid #d6e6d1;border-radius:7px;padding:10px;",
   "white-space:pre-wrap;overflow:auto;color:#213f4b;margin-bottom:8px}",
-  ".connection-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}",
-  ".connection-list li{border:1px solid #e1e7ea;border-radius:7px;padding:7px 8px;",
-  "background:#fbfcfd;font-size:13px;color:var(--ink)}",
-  ".connection-list button{border:0;background:none;color:var(--teal);font:inherit;",
-  "padding:0;cursor:pointer;text-decoration:underline}",
   ".assumption-list{margin:0;padding-left:18px;display:grid;gap:7px}",
   ".assumption-list li{line-height:1.38}",
   ".empty{color:var(--muted);font-style:italic}",
@@ -3266,7 +3077,6 @@ html <- paste0(
   "function esc(value){return String(value ?? '').replace(/[&<>\\\"]/g,(char)=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\\"':'&quot;'}[char]));}\n",
   "function arrayValue(value){if(!value){return [];} return Array.isArray(value) ? value : [value];}\n",
   "function neighbors(id){const ids = new Set([id]); edges.forEach((edge)=>{if(edge.from===id){ids.add(edge.to);} if(edge.to===id){ids.add(edge.from);}}); return ids;}\n",
-  "function isVisibleInView(node){return true;}\n",
   "function populateSelect(){nodes.forEach((node)=>{const option=document.createElement('option'); option.value=node.id; option.textContent=`${node.role}: ${node.label}`; focusSelect.appendChild(option);}); focusSelect.value=selectedNodeId;}\n",
   "function renderList(values, emptyText='None detected'){values=arrayValue(values).filter(Boolean); if(values.length===0){return `<span class='empty'>${esc(emptyText)}</span>`;} return `<div class='chip-list'>${values.map((value)=>`<span class='chip'>${esc(value)}</span>`).join('')}</div>`;}\n",
   "function fieldDefinitionMap(node){const labels=arrayValue(node.field_definition_labels); const text=arrayValue(node.field_definition_text); const definitions={}; labels.forEach((label,index)=>{if(label){definitions[label]=text[index] || 'No definition found yet.';}}); return definitions;}\n",
@@ -3300,7 +3110,7 @@ html <- paste0(
   "function renderTabContent(node){if(activeInspectorTab==='values'){return renderValuesTab(node);} if(activeInspectorTab==='documentation'){return renderDocumentationTab(node);} if(activeInspectorTab==='developer'){return renderDeveloperTab(node);} return renderOverviewTab(node);}\n",
   "function renderTabButtons(){const tabs=[['overview','Overview'],['values','Values'],['documentation','Documentation'],['developer','Power User']]; return `<div class='inspector-tabs'>${tabs.map(([id,label])=>`<button type='button' class='tab-button ${activeInspectorTab===id ? 'active' : ''}' data-inspector-tab='${id}'>${label}</button>`).join('')}</div>`;}\n",
   "function updateInspector(node){document.getElementById('inspectorRole').textContent=node.role; document.getElementById('inspectorTitle').textContent=node.label; document.getElementById('inspectorSubtitle').textContent=node.subtitle || node.component || ''; const body=document.getElementById('inspectorBody'); body.innerHTML = `${renderTabButtons()}<div class='tab-content'>${renderTabContent(node)}</div>`; body.querySelectorAll('[data-inspector-tab]').forEach((button)=>button.addEventListener('click',()=>{activeInspectorTab=button.dataset.inspectorTab; updateInspector(node);})); body.querySelectorAll('[data-related-node]').forEach((button)=>button.addEventListener('click',()=>{activeInspectorTab=button.dataset.relatedTab || 'values'; selectNode(button.dataset.relatedNode);})); body.querySelectorAll('[data-composition-open]').forEach((button)=>button.addEventListener('click',()=>{const open=button.dataset.compositionOpen==='true'; body.querySelectorAll('.composition-summary').forEach((summary)=>{summary.open=open;});})); const definitionButton=body.querySelector('[data-toggle-definitions]'); if(definitionButton){definitionButton.addEventListener('click',()=>{const definitions=Array.from(body.querySelectorAll('[data-field-definition]')); const opening=definitions.some((definition)=>definition.hasAttribute('hidden')); definitions.forEach((definition)=>{if(opening){definition.removeAttribute('hidden');} else {definition.setAttribute('hidden','');}}); definitionButton.textContent=opening ? 'Hide definitions' : 'Show definitions';});}}\n",
-  "function updateNodeClasses(){const near=neighbors(selectedNodeId); document.querySelectorAll('.node-card').forEach((card)=>{const node=nodeById[card.dataset.nodeId]; card.classList.toggle('active', card.dataset.nodeId===selectedNodeId); card.classList.toggle('related', near.has(card.dataset.nodeId) && card.dataset.nodeId!==selectedNodeId); card.classList.toggle('dimmed', !near.has(card.dataset.nodeId)); card.classList.toggle('filtered-dim', !isVisibleInView(node));});}\n",
+  "function updateNodeClasses(){const near=neighbors(selectedNodeId); document.querySelectorAll('.node-card').forEach((card)=>{card.classList.toggle('active', card.dataset.nodeId===selectedNodeId); card.classList.toggle('related', near.has(card.dataset.nodeId) && card.dataset.nodeId!==selectedNodeId); card.classList.toggle('dimmed', !near.has(card.dataset.nodeId));});}\n",
   "function selectNode(id){selectedNodeId=id; focusSelect.value=id; updateInspector(nodeById[id]); updateNodeClasses(); drawEdges();}\n",
   "function cardRect(card){const wrap=graphWrap.getBoundingClientRect(); const box=card.getBoundingClientRect(); const scrollX=graphWrap.scrollLeft; const scrollY=graphWrap.scrollTop; return {left:box.left-wrap.left+scrollX,right:box.right-wrap.left+scrollX,top:box.top-wrap.top+scrollY,bottom:box.bottom-wrap.top+scrollY,width:box.width,height:box.height};}\n",
   "function cardCenter(card){const rect=cardRect(card); return {x:rect.left+rect.width/2,y:rect.top+rect.height/2};}\n",
@@ -3311,11 +3121,11 @@ html <- paste0(
   "function curvePath(p1,p2,fromSide,toSide){const span=Math.hypot(p2.x-p1.x,p2.y-p1.y); const distance=Math.max(42, Math.min(130, span*0.38)); const c1=controlPoint(p1,fromSide,distance); const c2=controlPoint(p2,toSide,distance); return `M ${p1.x} ${p1.y} C ${c1.x} ${c1.y}, ${c2.x} ${c2.y}, ${p2.x} ${p2.y}`;}\n",
   "function cardFor(id){return document.querySelector(`[data-node-id='${id}']`);}\n",
   "function addPortDot(point, kind){const dot=document.createElementNS('http://www.w3.org/2000/svg','circle'); dot.setAttribute('cx',point.x); dot.setAttribute('cy',point.y); dot.setAttribute('r',4.5); dot.classList.add('port-dot', kind); edgePaths.appendChild(dot);}\n",
-  "function drawPath(p1,p2,fromSide,toSide,kind,withArrow,label){const path=document.createElementNS('http://www.w3.org/2000/svg','path'); path.setAttribute('d',curvePath(p1,p2,fromSide,toSide)); if(withArrow){path.setAttribute('marker-end','url(#arrow)');} path.classList.add('edge-path', kind, 'active'); const title=document.createElementNS('http://www.w3.org/2000/svg','title'); title.textContent=label || ''; path.appendChild(title); edgePaths.appendChild(path);}\n",
+  "function drawPath(p1,p2,fromSide,toSide,kind,label){const path=document.createElementNS('http://www.w3.org/2000/svg','path'); path.setAttribute('d',curvePath(p1,p2,fromSide,toSide)); path.setAttribute('marker-end','url(#arrow)'); path.classList.add('edge-path', kind, 'active'); const title=document.createElementNS('http://www.w3.org/2000/svg','title'); title.textContent=label || ''; path.appendChild(title); edgePaths.appendChild(path);}\n",
   "function edgeSpacing(side, edgeCount){if(side==='top' || side==='bottom'){return 42;} return edgeCount > 1 ? 44 : 28;}\n",
   "function edgeSortValue(edge,side){const selectedIsSource=edge.from===selectedNodeId; const otherCard=cardFor(selectedIsSource ? edge.to : edge.from); if(!otherCard){return 0;} const center=cardCenter(otherCard); return (side==='left' || side==='right') ? center.y : center.x;}\n",
   "function orderedEdges(edgesForSide,side){return [...edgesForSide].sort((a,b)=>edgeSortValue(a,side)-edgeSortValue(b,side));}\n",
-  "function drawEdges(){edgePaths.innerHTML=''; const relatedEdges=edges.filter((edge)=>edge.from===selectedNodeId || edge.to===selectedNodeId).filter((edge)=>{const fromNode=nodeById[edge.from]; const toNode=nodeById[edge.to]; return isVisibleInView(fromNode) || isVisibleInView(toNode);}); const grouped={left:[],right:[],top:[],bottom:[]}; relatedEdges.forEach((edge)=>grouped[selectedSideFor(edge)].push(edge)); ['left','right','top','bottom'].forEach((side)=>{const edgesForSide=orderedEdges(grouped[side],side); edgesForSide.forEach((edge,index)=>{const fromCard=cardFor(edge.from); const toCard=cardFor(edge.to); if(!fromCard || !toCard){return;} const spacing=edgeSpacing(side,edgesForSide.length); const offset=(index-(edgesForSide.length-1)/2)*spacing; const selectedIsSource=edge.from===selectedNodeId; const fromSide=selectedIsSource ? side : oppositeSide(side); const toSide=selectedIsSource ? oppositeSide(side) : side; const p1=selectedIsSource ? sidePoint(fromCard,fromSide,offset) : sidePoint(fromCard,fromSide,0); const p2=selectedIsSource ? sidePoint(toCard,toSide,0) : sidePoint(toCard,toSide,offset); const selectedPort=selectedIsSource ? p1 : p2; drawPath(p1,p2,fromSide,toSide,edge.kind,true,edge.label); addPortDot(selectedPort, edge.kind);});});}\n",
+  "function drawEdges(){edgePaths.innerHTML=''; const relatedEdges=edges.filter((edge)=>edge.from===selectedNodeId || edge.to===selectedNodeId); const grouped={left:[],right:[],top:[],bottom:[]}; relatedEdges.forEach((edge)=>grouped[selectedSideFor(edge)].push(edge)); ['left','right','top','bottom'].forEach((side)=>{const edgesForSide=orderedEdges(grouped[side],side); edgesForSide.forEach((edge,index)=>{const fromCard=cardFor(edge.from); const toCard=cardFor(edge.to); if(!fromCard || !toCard){return;} const spacing=edgeSpacing(side,edgesForSide.length); const offset=(index-(edgesForSide.length-1)/2)*spacing; const selectedIsSource=edge.from===selectedNodeId; const fromSide=selectedIsSource ? side : oppositeSide(side); const toSide=selectedIsSource ? oppositeSide(side) : side; const p1=selectedIsSource ? sidePoint(fromCard,fromSide,offset) : sidePoint(fromCard,fromSide,0); const p2=selectedIsSource ? sidePoint(toCard,toSide,0) : sidePoint(toCard,toSide,offset); const selectedPort=selectedIsSource ? p1 : p2; drawPath(p1,p2,fromSide,toSide,edge.kind,edge.label); addPortDot(selectedPort, edge.kind);});});}\n",
   "document.querySelectorAll('.node-card').forEach((card)=>card.addEventListener('click',()=>selectNode(card.dataset.nodeId)));\n",
   "focusSelect.addEventListener('change',(event)=>selectNode(event.target.value));\n",
   "populateSelect();\n",
@@ -3347,6 +3157,10 @@ html <- paste0(
     output = output_path
   )
 }
+
+# -------------------------------------------------------------------------
+# 11. Public inspector entry functions
+# -------------------------------------------------------------------------
 
 create_model_inspector <- function(
     parameters = NULL,
@@ -3416,231 +3230,4 @@ inspect_fims_model <- function(
     setup_default_if_missing = setup_default_if_missing,
     field_definition_mode = field_definition_mode
   )
-}
-
-make_demo_parameters <- function(
-    growth_type = "VonBertalanffySchnute",
-    include_growth = TRUE,
-    include_maturity = TRUE,
-    include_recruitment = TRUE,
-    include_selectivity = TRUE) {
-  module_names <- c("Growth", "Maturity", "Recruitment", "Selectivity")
-  module_types <- c(growth_type, "Logistic", "BevertonHolt", "Logistic")
-  include_module <- c(
-    include_growth,
-    include_maturity,
-    include_recruitment,
-    include_selectivity
-  )
-
-  data.frame(
-    module_name = module_names[include_module],
-    module_type = module_types[include_module],
-    stringsAsFactors = FALSE
-  )
-}
-
-make_demo_data <- function(data_types) {
-  data.frame(
-    type = data_types,
-    stringsAsFactors = FALSE
-  )
-}
-
-model_inspector_demo_configurations <- function() {
-  list(
-    full_age_length_index = list(
-      label = "Full age-length-index example",
-      file = "01_full_age_length_index.html",
-      description = paste(
-        "Includes catch, age composition, length composition, and index data.",
-        "This shows the broadest current prototype graph."
-      ),
-      parameters = make_demo_parameters(),
-      data = make_demo_data(c("catch", "age_comp", "length_comp", "index"))
-    ),
-    no_index_age_length = list(
-      label = "No-index age-length example",
-      file = "02_no_index_age_length.html",
-      description = paste(
-        "Removes the index data stream while keeping the main biological",
-        "and observation modules."
-      ),
-      parameters = make_demo_parameters(),
-      data = make_demo_data(c("catch", "age_comp", "length_comp"))
-    ),
-    empirical_weight_at_age = list(
-      label = "Empirical weight-at-age example",
-      file = "03_empirical_weight_at_age.html",
-      description = paste(
-        "Switches Growth to EWAA and uses empirical weight-at-age data",
-        "instead of length-composition-driven growth."
-      ),
-      parameters = make_demo_parameters(growth_type = "EWAA"),
-      data = make_demo_data(c("catch", "age_comp", "weight_at_age"))
-    ),
-    growth_only = list(
-      label = "Growth-only example",
-      file = "04_growth_only.html",
-      description = paste(
-        "Keeps only a growth component and its empirical weight-at-age input.",
-        "This is the smallest example for showing how the graph shrinks."
-      ),
-      parameters = make_demo_parameters(
-        growth_type = "EWAA",
-        include_maturity = FALSE,
-        include_recruitment = FALSE,
-        include_selectivity = FALSE
-      ),
-      data = make_demo_data("weight_at_age")
-    )
-  )
-}
-
-write_model_inspector_example_index <- function(example_summary, output) {
-  cards <- vapply(seq_len(nrow(example_summary)), function(i) {
-    paste0(
-      "<article class='example-card'>",
-      "<h2><a href='", html_escape(example_summary$file[[i]]), "'>",
-      html_escape(example_summary$label[[i]]),
-      "</a></h2>",
-      "<p>", html_escape(example_summary$description[[i]]), "</p>",
-      "<dl>",
-      "<dt>Data</dt><dd>", html_escape(example_summary$data_types[[i]]), "</dd>",
-      "<dt>Modules</dt><dd>", html_escape(example_summary$modules[[i]]), "</dd>",
-      "<dt>Graph size</dt><dd>",
-      html_escape(example_summary$n_nodes[[i]]),
-      " nodes, ",
-      html_escape(example_summary$n_edges[[i]]),
-      " edges</dd>",
-      "</dl>",
-      "</article>"
-    )
-  }, character(1))
-
-  html <- paste0(
-    "<!doctype html>\n",
-    "<html lang='en'>\n",
-    "<head>\n",
-    "<meta charset='utf-8'>\n",
-    "<meta name='viewport' content='width=device-width, initial-scale=1'>\n",
-    "<title>FIMS model inspector examples</title>\n",
-    "<style>\n",
-    ":root{color-scheme:light;--ink:#153847;--muted:#637985;",
-    "--line:#d6e1e6;--teal:#0c7280;--wash:#f6fafb;}\n",
-    "body{margin:0;font-family:Segoe UI,Arial,sans-serif;color:var(--ink);",
-    "background:linear-gradient(180deg,#f8fbfc,#eef6f8);}\n",
-    "main{max-width:1180px;margin:0 auto;padding:40px 28px;}\n",
-    "h1{margin:0 0 8px;font-size:42px;color:var(--teal);}\n",
-    ".lead{margin:0 0 28px;color:var(--muted);font-size:19px;line-height:1.45;}\n",
-    ".grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;}\n",
-    ".example-card{background:white;border:1px solid var(--line);border-radius:10px;",
-    "padding:22px;box-shadow:0 14px 34px rgba(21,56,71,.07);}\n",
-    ".example-card h2{margin:0 0 10px;font-size:22px;line-height:1.2;}\n",
-    "a{color:var(--teal);text-decoration-thickness:2px;text-underline-offset:3px;}\n",
-    "p{color:var(--muted);line-height:1.45;}\n",
-    "dl{display:grid;grid-template-columns:82px 1fr;gap:8px 12px;margin:18px 0 0;}\n",
-    "dt{font-weight:700;color:#4f6874;}dd{margin:0;color:var(--ink);}\n",
-    "</style>\n",
-    "</head>\n",
-    "<body>\n",
-    "<main>\n",
-    "<h1>FIMS model inspector examples</h1>\n",
-    "<p class='lead'>These examples use the same prototype inspector with different ",
-    "mock model configurations so the graph can be compared across scenarios.</p>\n",
-    "<section class='grid'>\n",
-    paste(cards, collapse = "\n"),
-    "\n</section>\n",
-    "</main>\n",
-    "</body>\n",
-    "</html>\n"
-  )
-
-  writeLines(html, output, useBytes = TRUE)
-  normalizePath(output)
-}
-
-create_model_inspector_demo_examples <- function(
-    output_dir = file.path(
-      "visualization-prototypes",
-      "examples",
-      "user-model-inspector"
-    ),
-    open_index = interactive()) {
-  dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
-  configurations <- model_inspector_demo_configurations()
-  configuration_names <- names(configurations)
-
-  example_summary <- do.call(rbind, lapply(configuration_names, function(name) {
-    configuration <- configurations[[name]]
-    output_path <- file.path(output_dir, configuration$file)
-    inspector_summary <- create_model_inspector(
-      parameters = configuration$parameters,
-      data = configuration$data,
-      output = output_path,
-      open = FALSE,
-      model_label = configuration$label
-    )
-
-    data.frame(
-      name = name,
-      label = configuration$label,
-      description = configuration$description,
-      data_types = paste(configuration$data$type, collapse = ", "),
-      modules = paste(
-        paste(
-          configuration$parameters$module_name,
-          configuration$parameters$module_type,
-          sep = ": "
-        ),
-        collapse = ", "
-      ),
-      n_nodes = inspector_summary$n_nodes,
-      n_edges = inspector_summary$n_edges,
-      file = configuration$file,
-      output = inspector_summary$output,
-      stringsAsFactors = FALSE
-    )
-  }))
-
-  index_path <- write_model_inspector_example_index(
-    example_summary = example_summary,
-    output = file.path(output_dir, "index.html")
-  )
-
-  if (isTRUE(open_index)) {
-    utils::browseURL(index_path)
-  }
-
-  list(
-    index = index_path,
-    examples = example_summary
-  )
-}
-
-script_was_sourced <- function() {
-  any(vapply(sys.calls(), function(call) {
-    if (!is.call(call)) {
-      return(FALSE)
-    }
-
-    identical(as.character(call[[1]])[[1]], "source")
-  }, logical(1)))
-}
-
-if (!script_was_sourced()) {
-  inspector_summary <- create_model_inspector(
-    spec = example_model_spec,
-    output = file.path(
-      "visualization-prototypes",
-      "examples",
-      "user-model-inspector",
-      "fims_user_model_inspector_example.html"
-    ),
-    open = FALSE
-  )
-
-  print(inspector_summary)
-
-  invisible(inspector_summary)
 }
