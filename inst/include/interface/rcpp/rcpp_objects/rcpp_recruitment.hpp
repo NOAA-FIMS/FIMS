@@ -469,9 +469,12 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
    * @param pos Position index, e.g., which year.
    */
   virtual double evaluate_process(size_t pos) {
-    fims_popdy::LogDevs<double> LogDevs;
-
-    return LogDevs.evaluate_process(pos);
+    // The process adds to the expected recruitment of a recruitment module,
+    // which only exists inside a model, so there is nothing to evaluate here
+    Rcpp::stop(
+        "evaluate_process() is not available from R: the recruitment process "
+        "needs the expected recruitment computed during a model run.");
+    return 0;
   }
 
 #ifdef TMB_MODEL
@@ -542,9 +545,12 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
    * @param pos Position index, e.g., which year.
    */
   virtual double evaluate_process(size_t pos) {
-    fims_popdy::LogR<double> LogR;
-
-    return LogR.evaluate_process(pos);
+    // The process adds to the expected recruitment of a recruitment module,
+    // which only exists inside a model, so there is nothing to evaluate here
+    Rcpp::stop(
+        "evaluate_process() is not available from R: the recruitment process "
+        "needs the expected recruitment computed during a model run.");
+    return 0;
   }
 
 #ifdef TMB_MODEL
