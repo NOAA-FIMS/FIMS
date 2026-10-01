@@ -21,9 +21,10 @@
 #' spans from 2 units below to 2 units above the estimated value. The profiled
 #' values are evenly spaced on the parameter scale (not log scale).
 #'
-#' Models are run in parallel for computational efficiency. The function
-#' automatically handles parameter identification using module names when needed
-#' to distinguish between multiple instances of the same parameter type.
+#' Models are run in parallel for computational efficiency. Use `module_name`
+#' when the same parameter label exists in more than 1 module. Parameters with
+#' more than 1 row in a module (for example, 1 per fleet, year, or age) cannot
+#' be profiled yet.
 #'
 #' @param model A FIMSFit object returned by [FIMS::fit_fims()]. Used to extract
 #'   the estimated value of the parameter being profiled.
@@ -33,9 +34,9 @@
 #' @param data A data frame, tibble, or FIMSFrame object containing the model
 #'   data. This should include all data types required by FIMS.
 #' @param module_name A character string specifying the module containing the
-#'   parameter to profile. Default is `NULL`. Required when the parameter name
-#'   exists in multiple modules (e.g., multiple fleets). Examples include
-#'   `"fleet1"`, `"survey1"`, or `"recruitment"`.
+#'   parameter to profile, as in the `module_name` column of `parameters`.
+#'   Default is `NULL`. Required when the parameter label exists in more than 1
+#'   module, e.g., `"Maturity"` or `"Selectivity"` for `inflection_point`.
 #' @param parameter_name A character string specifying the parameter to profile.
 #'   Default is `"log_rzero"`. Must match a parameter name in the FIMS model.
 #'   Common options include `"log_rzero"`, `"log_sigma_recruit"`, `"logit_steep"`,
@@ -154,10 +155,6 @@ run_fims_likelihood <- function(
     cli::cli_warn("Inputs min and max don't span 0. Are you sure this is right?")
   }
 
-  init <- FIMS::get_estimates(model) |>
-    dplyr::filter(.data[["label"]] == parameter_name) |>
-    dplyr::pull(.data[["estimated"]]) # NOTE: input and estimated value are slightly different (even though its fixed) input = 13.8155, estimated = 13.857
-
   if (!is.null(module_name)) {
     module_names <- parameters |>
       dplyr::pull(.data[["module_name"]]) |>
@@ -165,19 +162,46 @@ run_fims_likelihood <- function(
     if (!module_name %in% module_names) {
       cli::cli_abort("Input module_name not found in parameters tibble.")
     }
-    parameter_row <- parameters |>
-      dplyr::filter(.data[["module_name"]] == module_name & .data[["label"]] == parameter_name)
-  } else {
-    parameter_row <- parameters |>
-      dplyr::filter(.data[["label"]] == parameter_name)
   }
+
+  # `%in%` rather than `==` because `x == NULL` has length 0, which `filter()`
+  # rejects, so a NULL module_name matches every module
+  parameter_row <- parameters |>
+    dplyr::filter(
+      .data[["label"]] == .env$parameter_name,
+      is.null(.env$module_name) |
+        .data[["module_name"]] %in% .env$module_name
+    )
 
   if (nrow(parameter_row) == 0) {
     cli::cli_abort("Input parameter_name did not match any rows in parameter tibble.")
   }
 
   if (nrow(parameter_row) > 1) {
-    cli::cli_abort("Input parameter_name matched too many rows in parameter tibble: {length(parameter_row)}. Try adding a module_name.")
+    if (is.null(module_name)) {
+      cli::cli_abort("Input parameter_name matched too many rows in parameter tibble: {nrow(parameter_row)}. Try adding a module_name.")
+    }
+    cli::cli_abort(
+      "{nrow(parameter_row)} parameters in module {.val {module_name}} have
+      label {.val {parameter_name}} (for example, 1 per fleet or year);
+      {.fn run_fims_likelihood} cannot select one of them."
+    )
+  }
+
+  # NOTE: input and estimated value are slightly different (even though its
+  # fixed) input = 13.8155, estimated = 13.857
+  init <- FIMS::get_estimates(model) |>
+    dplyr::filter(
+      .data[["label"]] == .env$parameter_name,
+      is.null(.env$module_name) |
+        .data[["module_name"]] %in% .env$module_name
+    ) |>
+    dplyr::pull(.data[["estimated"]])
+  if (length(init) != 1) {
+    cli::cli_abort(
+      "Found {length(init)} estimates of {.val {parameter_name}} in the model;
+      expected 1."
+    )
   }
 
   vec <- values + init

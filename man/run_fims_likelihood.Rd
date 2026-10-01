@@ -28,9 +28,9 @@ and initial parameter values,}
 data. This should include all data types required by FIMS.}
 
 \item{module_name}{A character string specifying the module containing the
-parameter to profile. Default is \code{NULL}. Required when the parameter name
-exists in multiple modules (e.g., multiple fleets). Examples include
-\code{"fleet1"}, \code{"survey1"}, or \code{"recruitment"}.}
+parameter to profile, as in the \code{module_name} column of \code{parameters}.
+Default is \code{NULL}. Required when the parameter label exists in more than 1
+module, e.g., \code{"Maturity"} or \code{"Selectivity"} for \code{inflection_point}.}
 
 \item{parameter_name}{A character string specifying the parameter to profile.
 Default is \code{"log_rzero"}. Must match a parameter name in the FIMS model.
@@ -91,9 +91,10 @@ from the base model. For example, with \code{min = -2} and \code{max = 2}, the p
 spans from 2 units below to 2 units above the estimated value. The profiled
 values are evenly spaced on the parameter scale (not log scale).
 
-Models are run in parallel for computational efficiency. The function
-automatically handles parameter identification using module names when needed
-to distinguish between multiple instances of the same parameter type.
+Models are run in parallel for computational efficiency. Use \code{module_name}
+when the same parameter label exists in more than 1 module. Parameters with
+more than 1 row in a module (for example, 1 per fleet, year, or age) cannot
+be profiled yet.
 }
 \examples{
 \dontrun{
