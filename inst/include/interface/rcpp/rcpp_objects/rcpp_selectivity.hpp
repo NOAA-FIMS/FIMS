@@ -81,8 +81,10 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    */
   VariableVector inflection_point;
   /**
-   * @brief The rate at which the response changes with the index value;
-   * larger values give a steeper curve at the inflection point.
+   * @brief The rate parameter of the logistic curve, in units of 1 / index
+   * value. The curve's slope at the inflection point is slope / 4, so larger
+   * absolute values give a steeper curve; negative values give a descending
+   * curve.
    */
   VariableVector slope;
 
@@ -300,12 +302,12 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   VariableVector inflection_point_asc; /**< the index value at which the
                                      ascending limb reaches 0.5 */
-  VariableVector slope_asc; /**< the rate at which the ascending limb rises;
-                               larger values give a steeper limb */
+  VariableVector slope_asc; /**< the rate parameter of the ascending limb;
+                               larger absolute values give a steeper limb */
   VariableVector inflection_point_desc; /**< the index value at which the
                                       descending limb reaches 0.5 */
-  VariableVector slope_desc; /**< the rate at which the descending limb falls;
-                                larger values give a steeper limb */
+  VariableVector slope_desc; /**< the rate parameter of the descending limb;
+                                larger absolute values give a steeper limb */
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {
     SelectivityInterfaceBase::live_objects[this->id] =
