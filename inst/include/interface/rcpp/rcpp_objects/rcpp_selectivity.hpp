@@ -738,16 +738,17 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     ss << "   \"id\":" << this->logit_sel_at_age.id_m << ",\n";
     ss << "   \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
-    // With 1 set of values per year, the values are year-major, as for log_M
-    const size_t n_ages = static_cast<size_t>(this->n_ages.get());
+    // With 1 set of values per year the values are year-major, as for log_M.
+    // Selectivity does not store n_years, so it comes from the length.
+    const size_t ages = static_cast<size_t>(this->n_ages.get());
     const size_t n_values = this->logit_sel_at_age.size();
-    if (n_ages > 0 && n_values > n_ages) {
+    if (ages > 0 && n_values > ages) {
       ss << "  \"header\": [\"n_years\", \"n_ages\"],\n";
-      ss << "  \"dimensions\": [" << n_values / n_ages << ", " << n_ages
+      ss << "  \"dimensions\": [" << n_values / ages << ", " << ages
          << "]\n},\n";
     } else {
       ss << "  \"header\": [\"n_ages\"],\n";
-      ss << "  \"dimensions\": [" << n_ages << "]\n},\n";
+      ss << "  \"dimensions\": [" << ages << "]\n},\n";
     }
     ss << "   \"values\":" << this->logit_sel_at_age << "}]\n";
 
