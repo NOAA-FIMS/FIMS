@@ -21,15 +21,15 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
-  fims::Vector<Type> inflection_point_asc; /**< value of the quantity of
-             interest (x) at which the ascending limb is 0.5; selectivity
-             there is below 0.5 because it is the product of both limbs */
+  fims::Vector<Type> inflection_point_asc; /**< age or length at which the
+             ascending limb is 0.5; selectivity there is below 0.5 because it
+             is the product of both limbs */
   fims::Vector<Type> slope_asc; /**<scalar multiplier of difference between
             quantity of interest   value (x) and inflection_point on the
             ascending limb of the double   logistic   curve*/
-  fims::Vector<Type> inflection_point_desc; /**< value of the quantity of
-             interest (x) at which the descending limb is 0.5; selectivity
-             there is below 0.5 because it is the product of both limbs */
+  fims::Vector<Type> inflection_point_desc; /**< age or length at which the
+             descending limb is 0.5; selectivity there is below 0.5 because it
+             is the product of both limbs */
   fims::Vector<Type> slope_desc; /**<scalar multiplier of difference between
             quantity of interest  value (x) and inflection_point on the
             descending limb of the double  logistic  curve */
