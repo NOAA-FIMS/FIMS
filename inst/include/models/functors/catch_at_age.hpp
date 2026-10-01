@@ -666,10 +666,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
   /**
    * @brief Calculates maturity at age, in proportion, for a population.
    *
-   * This function evaluates the maturity ogive at the specified age to estimate
-   * the proportion of individuals that are mature:
+   * This function evaluates the maturity ogive at the specified age and year
+   * to estimate the proportion of individuals that are mature:
    * \f[
-   * p_{mature,a} = \text{maturity}(a)
+   * p_{mature,a,y} = \text{maturity}(a, \min(y, n_{years} - 1))
    * \f]
    *
    * @snippet{doc} this param_population
@@ -683,8 +683,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    // The year loop reaches n_years for the start of the year after the last
-    // data year, which uses the last data year's maturity
+    // Year n_years is the start-of-year state after the last data year, so it
+    // reuses that year's maturity.
     dq_["proportion_mature_at_age"][i_age_year] =
         population->maturity->evaluate(
             population->ages[age], (std::min)(year, population->n_years - 1));
