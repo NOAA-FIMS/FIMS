@@ -34,7 +34,8 @@ TEST_F(CAAEvaluateTestFixture,
   for (size_t year = 0; year < n_years; year++) {
     for (size_t age = 0; age < n_ages; age++) {
       int i_age_year = year * population->n_ages + age;
-      catch_at_age_model->CalculateMaturityAA(population, i_age_year, age);
+      catch_at_age_model->CalculateMaturityAA(population, i_age_year, year,
+                                              age);
     }
   }
   catch_at_age_model->CalculateSpawningBiomass(population, sb_i_age_year,
