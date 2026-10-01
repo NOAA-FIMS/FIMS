@@ -52,36 +52,41 @@ reshape_json_estimates <- function(model_output) {
   density_components <- read_list[["density_components"]]
   distribution_information <- NULL
   if ("parameters" %in% names(density_components)) {
-    distribution_information <- density_components |>
-      # Only random-effect distributions for now. The log_sd of a data
-      # distribution is set from the data uncertainty, held constant, and
-      # already reported next to each observation, and a prior's parameters
-      # are fixed inputs.
+    # Only random-effect distributions for now. The log_sd of a data
+    # distribution is set from the data uncertainty, held constant, and
+    # already reported next to each observation, and a prior's parameters are
+    # fixed inputs.
+    random_effect_distributions <- density_components |>
       dplyr::filter(
         .data$input_type == "random_effects",
         purrr::map_lgl(.data$parameters, \(x) length(x) > 0)
-      ) |>
-      dplyr::mutate(
-        distribution = .data$module_type,
-        # The first linked id is the vector the distribution applies to
-        linked_id = purrr::map_int(
-          .data$linked_ids,
-          \(x) purrr::pluck(x, 1, .default = NA_integer_)
-        ),
-        parameters = purrr::map(
-          .data$parameters,
-          \(x) purrr::map_df(x, dimension_folded_to_tibble)
-        )
-      ) |>
-      dplyr::select(
-        dplyr::all_of(c(
-          "module_name", "module_id", "module_type", "distribution",
-          "linked_id", "parameters"
-        ))
-      ) |>
-      tidyr::unnest(dplyr::all_of("parameters")) |>
-      # A single log_sd is copied to every element with the same id
-      dplyr::distinct(.data$id, .keep_all = TRUE)
+      )
+    # A model without random effects has no distribution parameters, and
+    # unnesting zero rows would leave no id column to work with
+    if (nrow(random_effect_distributions) > 0) {
+      distribution_information <- random_effect_distributions |>
+        dplyr::mutate(
+          distribution = .data$module_type,
+          # The first linked id is the vector the distribution applies to
+          linked_id = purrr::map_int(
+            .data$linked_ids,
+            \(x) purrr::pluck(x, 1, .default = NA_integer_)
+          ),
+          parameters = purrr::map(
+            .data$parameters,
+            \(x) purrr::map_df(x, dimension_folded_to_tibble)
+          )
+        ) |>
+        dplyr::select(
+          dplyr::all_of(c(
+            "module_name", "module_id", "module_type", "distribution",
+            "linked_id", "parameters"
+          ))
+        ) |>
+        tidyr::unnest(dplyr::all_of("parameters")) |>
+        # A single log_sd is copied to every element with the same id
+        dplyr::distinct(.data$id, .keep_all = TRUE)
+    }
     density_components <- density_components |>
       dplyr::select(-dplyr::all_of(c("parameters", "linked_ids")))
   }
