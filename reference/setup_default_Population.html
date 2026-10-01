@@ -94,7 +94,14 @@ number of years) specifying the log natural mortality rate. Default is <code>log
 
 <dt id="arg-log-init-naa">log_init_naa<a class="anchor" aria-label="anchor" href="#arg-log-init-naa"></a></dt>
 <dd><p>A numeric value or vector (length equal to the number of
-ages) specifying the log initial numbers at age. Default is <code>NA_real_</code>.</p></dd>
+ages) specifying the log initial numbers at age. Default is <code>NA_real_</code>, in
+which case <code><a href="setup_default_parameters.html">setup_default_parameters()</a></code> fills it with the unfished
+equilibrium implied by unfished recruitment \(R_0\) and natural mortality
+\(M\):
+$$N_a = R_0 \exp\left(-\sum_{j &lt; a} M_j\right)$$
+for ages below the plus group, and for the plus group \(A\), which
+accumulates survivors each year,
+$$N_A = \frac{R_0 \exp\left(-\sum_{j &lt; A} M_j\right)}{1 - \exp(-M_A)}.$$</p></dd>
 
 
 <dt id="arg-proportion-female">proportion_female<a class="anchor" aria-label="anchor" href="#arg-proportion-female"></a></dt>

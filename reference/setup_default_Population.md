@@ -30,7 +30,14 @@ setup_default_Population(
 - log_init_naa:
 
   A numeric value or vector (length equal to the number of ages)
-  specifying the log initial numbers at age. Default is `NA_real_`.
+  specifying the log initial numbers at age. Default is `NA_real_`, in
+  which case
+  [`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)
+  fills it with the unfished equilibrium implied by unfished recruitment
+  \\R_0\\ and natural mortality \\M\\: \$\$N_a = R_0 \exp\left(-\sum\_{j
+  \< a} M_j\right)\$\$ for ages below the plus group, and for the plus
+  group \\A\\, which accumulates survivors each year, \$\$N_A =
+  \frac{R_0 \exp\left(-\sum\_{j \< A} M_j\right)}{1 - \exp(-M_A)}.\$\$
 
 - proportion_female:
 
