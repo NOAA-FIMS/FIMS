@@ -142,7 +142,9 @@ class Vector {
    */
   inline Type &operator[](size_t pos) {
     if (pos >= this->size()) {
-      throw std::invalid_argument("fims::Vector out of bounds");
+      throw std::invalid_argument(
+          "fims::Vector out of bounds: index " + std::to_string(pos) +
+          ", size " + std::to_string(this->size()));
     }
     return this->vec_m[pos];
   }
@@ -153,7 +155,9 @@ class Vector {
    */
   inline const Type &operator[](size_t n) const {
     if (n >= this->size()) {
-      throw std::invalid_argument("fims::Vector out of bounds");
+      throw std::invalid_argument(
+          "fims::Vector out of bounds: index " + std::to_string(n) +
+          ", size " + std::to_string(this->size()));
     }
     return this->vec_m[n];
   }

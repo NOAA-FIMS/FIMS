@@ -13,7 +13,9 @@
  */
 void register_functions(Rcpp::Module &m) {
   Rcpp::function(
-      "CreateTMBModel", &CreateTMBModel,
+      // Trailing underscore: the R wrapper in R/fims_interface.R owns the
+      // clean name and supplies the registry list.
+      "CreateTMBModel_", &CreateTMBModel,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
@@ -45,7 +47,8 @@ void register_functions(Rcpp::Module &m) {
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function(
-      "clear", clear,
+      // Trailing underscore: the R wrapper also empties the R-side registry.
+      "clear_", clear,
       "See "
       "https://noaa-fims.github.io/FIMS/doxygen/rcpp__interface_8hpp.html.");
   Rcpp::function("test_clear_with_leak_check", test_clear_with_leak_check, "Test-only variant of clear(). Not part of the public API.");

@@ -32,7 +32,13 @@ struct LogR : public RecruitmentBase<Type> {
    * @param pos Position index, e.g., which year.
    */
   virtual const Type evaluate_process(size_t pos) {
-    return this->recruitment->log_r[pos];
+    std::shared_ptr<RecruitmentBase<Type>> recruitment =
+        this->recruitment.lock();
+    if (!recruitment) {
+      throw std::runtime_error(
+          "LogR recruitment process has no recruitment model.");
+    }
+    return recruitment->log_r[pos];
   }
 
   /** @copydoc RecruitmentBase::evaluate_mean */

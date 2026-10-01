@@ -23,7 +23,7 @@ test_that("`setup_default_parameters()` works with correct inputs", {
     colnames(result),
     c(
       "module_name", "fleet", "module_type", "label",
-      "age", "length", "timing", "value", "estimation_type",
+      "age", "length", "timing", "value", "estimation_status",
       "distribution_type", "distribution"
     )
   )
@@ -199,13 +199,13 @@ test_that("`setup_default_parameters()` works with edge cases", {
 
   expect_equal(log_sd_value, numeric(0))
 
-  #' @description Test that `log_devs` estimation_type is constant when distribution is not specified.
+  #' @description Test that `log_devs` estimation_status is assumed known when distribution is not specified.
   log_devs_value <- recruitment_without_distribution |>
     dplyr::filter(.data[["label"]] == "log_devs") |>
-    dplyr::pull(.data[["estimation_type"]]) |>
+    dplyr::pull(.data[["estimation_status"]]) |>
     unique()
 
-  expect_equal(log_devs_value, "constant")
+  expect_equal(log_devs_value, "assumed_known")
 
   #' @description Test that `log_devs` distribution_type is `NA` when distribution is not specified.
   log_devs_distribution_type <- recruitment_without_distribution |>

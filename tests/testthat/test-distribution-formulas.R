@@ -22,33 +22,32 @@ clear()
 # Set up recruitment module to test initialize_process_distribution
 # create new module in the recruitment class (specifically Beverton--Holt,
 # when there are other options, this would be where the option would be chosen)
-recruitment <- methods::new(BevertonHoltRecruitment)
+recruitment <- create_recruitment("BevertonHolt")
 
 # set up log_rzero (equilibrium recruitment)
-recruitment$log_rzero[1]$value <- log(om_input$R0)
-recruitment$log_rzero[1]$estimation_type$set("fixed_effects")
+set_variable_vector(recruitment, "log_rzero", log(om_input$R0), "fixed_effects")
 # set up logit_steep
-recruitment$logit_steep[1]$value <- -log(1.0 - om_input$h) +
-  log(om_input$h - 0.2)
-recruitment$logit_steep[1]$estimation_type$set("constant")
+set_variable_vector(
+  recruitment, "logit_steep",
+  -log(1.0 - om_input$h) + log(om_input$h - 0.2),
+  "assumed_known"
+)
 # turn on estimation of deviations recruit deviations should enter the model in
 # normal space. The log is taken in the likelihood calculations alternative
 # setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
-recruitment$log_devs$resize(om_input$nyr - 1)
-recruitment$log_devs$set_estimation_types(c("fixed_effects"))
-recruitment$log_r$resize(om_input$nyr - 1)
-recruitment$log_r$set_estimation_types(c("random_effects"))
-
 logR_resid <- om_input$logR.resid[-1]
-recruitment$log_devs[] <- logR_resid
+set_variable_vector(recruitment, "log_devs", logR_resid, "fixed_effects")
+set_variable_vector(
+  recruitment, "log_r", rep(0, om_input$nyr - 1), "random_effects"
+)
 
 
 # set up logR_sd using the normal log_sd parameter
 recruitment_distribution <- initialize_process_distribution(
   module = recruitment,
   par = "log_devs",
-  family = gaussian(),
-  sd = list(value = om_input$logR_sd, estimation_type = "constant")
+  family = "dnorm",
+  sd = list(value = om_input$logR_sd, estimation_status = "assumed_known")
 )
 
 # Set up fishing fleet modules to test initialize_data_distribution
@@ -56,18 +55,16 @@ catch <- em_input$L.obs$fleet1
 # set fishing fleet catch data, need to set dimensions of data index currently
 # FIMS only has a fleet module that takes index for both survey index and
 # fishery catch
-fishing_fleet_index <- methods::new(Index, om_input$nyr)
-fishing_fleet_index$index_data[] <- catch
+fishing_fleet_index <- create_data("index", om_input$nyr)
+set_data(fishing_fleet_index, catch)
 
-fishing_fleet <- methods::new(Fleet)
-fishing_fleet$n_ages$set(om_input$nages)
-fishing_fleet$n_years$set(om_input$nyr)
-fishing_fleet$log_Fmort[] <- log(om_output$f)
-
-fishing_fleet$log_Fmort$set_estimation_types(c("fixed_effects"))
-fishing_fleet$log_q[1]$value <- log(1.0)
-fishing_fleet$log_q$set_estimation_types(c("constant"))
-fishing_fleet$SetObservedIndexDataID(fishing_fleet_index$get_id())
+fishing_fleet <- create_fleet()
+set_fleet_constants(fishing_fleet, om_input$nyr, om_input$nages, 0)
+set_variable_vector(
+  fishing_fleet, "log_Fmort", log(om_output$f), "fixed_effects"
+)
+set_variable_vector(fishing_fleet, "log_q", log(1.0), "assumed_known")
+set_fleet_observed_data(fishing_fleet, index = fishing_fleet_index)
 
 # Set up fishery index data using the lognormal
 fleet_sd <- rep(sqrt(log(em_input$cv.L$fleet1^2 + 1)), om_input$nyr)
@@ -83,15 +80,21 @@ fishing_fleet_index_distribution1 <- initialize_data_distribution(
 ## IO correctness ----
 test_that("`initialize_process_distribution()` works with correct inputs", {
   #' @description Test that `initialize_process_distribution()` returns the correct log sd values when scalar.
-  expect_equal(log(om_input$logR_sd), recruitment_distribution$log_sd[1]$value)
+  expect_equal(
+    log(om_input$logR_sd),
+    get_variable_vector(recruitment_distribution, "log_sd")[["values"]]
+  )
 
   #' @description Test that `initialize_process_distribution()` returns the correct dimension for x values.
-  expect_equal(length(recruitment$log_devs), length(recruitment_distribution$observed_values))
+  expect_length(
+    get_variable_vector(recruitment_distribution, "observed_values")[["values"]],
+    length(logR_resid)
+  )
 
   #' @description Test that `initialize_process_distribution()` matches the dimensions of x and expected values.
   expect_equal(
-    length(recruitment_distribution$observed_values),
-    length(recruitment_distribution$expected_values)
+    length(get_variable_vector(recruitment_distribution, "observed_values")[["values"]]),
+    length(get_variable_vector(recruitment_distribution, "expected_values")[["values"]])
   )
 })
 
@@ -99,21 +102,26 @@ test_that("`initialize_data_distribution()` works with correct inputs", {
   #' @description Test that `initialize_data_distribution()` returns the correct log sd values when given a vector.
   expect_equal(
     log(fleet_sd[1]),
-    fishing_fleet_index_distribution1$log_sd[1]$value
+    get_variable_vector(fishing_fleet_index_distribution1, "log_sd")[["values"]][1]
   )
-  #' @description Test that `initialize_data_distribution()` returns the correct log sd estimation type.
+  #' @description Test that `initialize_data_distribution()` returns the correct log sd estimation status.
   expect_equal(
-    "constant",
-    fishing_fleet_index_distribution1$log_sd[1]$estimation_type$get()
+    "assumed_known",
+    get_variable_vector(fishing_fleet_index_distribution1, "log_sd")[["estimation_status"]][1]
   )
   #' @description Test that `initialize_data_distribution()` returns the correct log sd values when scalar.
   expect_equal(
     log(fleet_sd[1]),
-    initialize_data_distribution(
-      fishing_fleet,
-      data_type = "index",
-      glue::glue("~dlnorm(meanlog = log_index_expected, sdlog = {fleet_sd[1]})")
-    )$log_sd[1]$value
+    get_variable_vector(
+      initialize_data_distribution(
+        fishing_fleet,
+        data_type = "index",
+        glue::glue(
+          "~dlnorm(meanlog = log_index_expected, sdlog = {fleet_sd[1]})"
+        )
+      ),
+      "log_sd"
+    )[["values"]]
   )
 })
 
@@ -125,7 +133,7 @@ test_that("`sd` value from `initialize_process_distribution()` must be greater t
       module = recruitment,
       par = "log_devs",
       family = gaussian(),
-      sd = list(value = -1, estimation_type = "constant")
+      sd = list(value = -1, estimation_status = "assumed_known")
     ),
     "are out of bounds"
   )
@@ -140,7 +148,7 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       module = recruitment,
       par = "log_devs",
       family = multinomial(),
-      sd = list(value = om_input$logR_sd, estimation_type = "constant")
+      sd = list(value = om_input$logR_sd, estimation_status = "assumed_known")
     ),
     "FIMS currently does not allow the family"
   )
@@ -151,12 +159,12 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       module = recruitment,
       par = "log_devs",
       family = binomial(),
-      sd = list(value = om_input$logR_sd, estimation_type = "constant")
+      sd = list(value = om_input$logR_sd, estimation_status = "assumed_known")
     ),
     "FIMS currently does not allow the family"
   )
 
-  #' @description Test that error is thrown when vector size of `sd` `value` and `estimation_type` do not match.
+  #' @description Test that error is thrown when vector size of `sd` `value` and `estimation_status` do not match.
   expect_error(
     initialize_process_distribution(
       module = recruitment,
@@ -164,7 +172,7 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       family = gaussian(),
       sd = list(
         value = rep(om_input$logR_sd, 3),
-        estimation_type = rep("constant", 2)
+        estimation_status = rep("assumed_known", 2)
       )
     ),
     "must match"
@@ -178,13 +186,13 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       family = "normal",
       sd = list(
         value = rep(om_input$logR_sd, 3),
-        estimation_type = "constant"
+        estimation_status = "assumed_known"
       )
     ),
-    "should be an object of class"
+    "does not allow the family"
   )
 
-  #' @description Test that error is thrown when `sd` `estimation_type` is missing.
+  #' @description Test that error is thrown when `sd` `estimation_status` is missing.
   expect_error(
     initialize_process_distribution(
       module = recruitment,

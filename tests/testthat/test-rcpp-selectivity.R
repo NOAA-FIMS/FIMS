@@ -14,84 +14,90 @@
 ## IO correctness ----
 test_that("rcpp logistic selectivity works with correct inputs", {
   # Create selectivity1
-  selectivity1 <- methods::new(LogisticSelectivity)
+  selectivity1 <- create_selectivity("Logistic")
 
-  selectivity1$inflection_point[1]$value <- 10.0
-  selectivity1$inflection_point[1]$estimation_type$set("random_effects")
-  selectivity1$slope[1]$value <- 0.2
+  set_variable_vector(selectivity1, "inflection_point", 10.0, "random_effects")
+  set_variable_vector(selectivity1, "slope", 0.2, "assumed_known")
   #' @description Test that `get_id()` for `LogisticSelectivity` works.
-  expect_equal(selectivity1$get_id(), 1)
+  expect_equal(get_module_id(selectivity1), 1)
   #' @description Test that the `inflection_point` value is set to 10.0.
-  expect_equal(selectivity1$inflection_point[1]$value, 10.0)
-  #' @description Test that the `inflection_point` estimation type is set to "random_effects".
-  expect_equal(selectivity1$inflection_point[1]$estimation_type$get(), "random_effects")
+  expect_equal(get_variable_vector(selectivity1, "inflection_point")[["values"]], 10.0)
+  #' @description Test that the `inflection_point` estimation status is set to "random_effects".
+  expect_equal(get_variable_vector(selectivity1, "inflection_point")[["estimation_status"]], "random_effects")
   #' @description Test that the `slope` value is set to 0.2.
-  expect_equal(selectivity1$slope[1]$value, 0.2)
+  expect_equal(get_variable_vector(selectivity1, "slope")[["values"]], 0.2)
   #' @description Test that the `evaluate()` works for `LogisticSelectivity`.
-  expect_equal(selectivity1$evaluate(10.0), 0.5)
+  expect_equal(evaluate_selectivity(selectivity1, 10.0), 0.5)
 
   # Create selectivity2
-  selectivity2 <- methods::new(LogisticSelectivity)
+  selectivity2 <- create_selectivity("Logistic")
   #' @description Test that `get_id()` for `LogisticSelectivity` works when a second object is created.
-  expect_equal((selectivity2$get_id()), 2)
+  expect_equal(get_module_id(selectivity2), 2)
 
   clear()
 })
 
 test_that("rcpp double logistic selectivity works with correct inputs", {
   # Create selectivity1
-  selectivity1 <- methods::new(DoubleLogisticSelectivity)
+  selectivity1 <- create_selectivity("DoubleLogistic")
 
-  selectivity1$inflection_point_asc[1]$value <- 10.5
-  selectivity1$slope_asc[1]$value <- 0.2
-  selectivity1$slope_asc[1]$estimation_type$set("fixed_effects")
-  selectivity1$inflection_point_desc[1]$value <- 15.0
-  selectivity1$slope_desc[1]$value <- 0.05
+  set_variable_vector(
+    selectivity1, "inflection_point_asc",
+    10.5, "assumed_known"
+  )
+  set_variable_vector(selectivity1, "slope_asc", 0.2, "fixed_effects")
+  set_variable_vector(
+    selectivity1, "inflection_point_desc",
+    15.0, "assumed_known"
+  )
+  set_variable_vector(selectivity1, "slope_desc", 0.05, "assumed_known")
 
   #' @description Test that `get_id()` for `DoubleLogisticSelectivity` works.
-  expect_equal(selectivity1$get_id(), 1)
+  expect_equal(get_module_id(selectivity1), 1)
   #' @description Test that the `inflection_point_asc` value is set to 10.5.
-  expect_equal(selectivity1$inflection_point_asc[1]$value, 10.5)
+  expect_equal(get_variable_vector(selectivity1, "inflection_point_asc")[["values"]], 10.5)
   #' @description Test that the `slope_asc` value is set to 0.2.
-  expect_equal(selectivity1$slope_asc[1]$value, 0.2)
+  expect_equal(get_variable_vector(selectivity1, "slope_asc")[["values"]], 0.2)
   #' @description Test that `evaluate()` works for `DoubleLogisticSelectivity`.
   expect_equal(
-    selectivity1$evaluate(34.5),
+    evaluate_selectivity(selectivity1, 34.5),
     # Line below equals 0.2716494
     1.0 / (1.0 + exp(-(34.5 - 10.5) * 0.2)) * (1.0 - 1.0 / (1.0 + exp(-(34.5 - 15) * 0.05))),
     tolerance = 0.0000001
   )
 
   # Create selectivity2
-  selectivity2 <- methods::new(DoubleLogisticSelectivity)
+  selectivity2 <- create_selectivity("DoubleLogistic")
 
-  selectivity2$inflection_point_asc[1]$value <- 10.5
-  selectivity2$slope_asc[1]$value <- 0.2
-  selectivity2$inflection_point_desc[1]$value <- 15.0
-  selectivity2$slope_desc[1]$value <- 0.05
+  set_variable_vector(
+    selectivity2, "inflection_point_asc",
+    10.5, "random_effects"
+  )
+  set_variable_vector(selectivity2, "slope_asc", 0.2, "random_effects")
+  set_variable_vector(
+    selectivity2, "inflection_point_desc",
+    15.0, "random_effects"
+  )
+  set_variable_vector(selectivity2, "slope_desc", 0.05, "random_effects")
 
-  selectivity2$inflection_point_asc[1]$estimation_type$set("random_effects")
-  selectivity2$inflection_point_desc[1]$estimation_type$set("random_effects")
-  selectivity2$slope_asc[1]$estimation_type$set("random_effects")
-  selectivity2$slope_desc[1]$estimation_type$set("random_effects")
 
   #' @description Test that `get_id()` for `DoubleLogisticSelectivity` works when a second object is created.
-  expect_equal(selectivity2$get_id(), 2)
+  expect_equal(get_module_id(selectivity2), 2)
   #' @description Test that the `inflection_point_asc` value is set to 10.5.
-  expect_equal(selectivity2$inflection_point_asc[1]$value, 10.5)
+  expect_equal(get_variable_vector(selectivity2, "inflection_point_asc")[["values"]], 10.5)
   #' @description Test that the `slope_asc` value is set to 0.2.
-  expect_equal(selectivity2$slope_asc[1]$value, 0.2)
-  #' @description Test that the `inflection_point_asc` estimation type is set to "random_effects".
-  expect_equal(selectivity2$inflection_point_asc[1]$estimation_type$get(), "random_effects")
-  #' @description Test that the `inflection_point_desc` estimation type is set to "random_effects".
-  expect_equal(selectivity2$inflection_point_desc[1]$estimation_type$get(), "random_effects")
-  #' @description Test that the `slope_asc` estimation type is set to "random_effects".
-  expect_equal(selectivity2$slope_asc[1]$estimation_type$get(), "random_effects")
-  #' @description Test that the `slope_desc` estimation type is set to "random_effects".
-  expect_equal(selectivity2$slope_desc[1]$estimation_type$get(), "random_effects")
+  expect_equal(get_variable_vector(selectivity2, "slope_asc")[["values"]], 0.2)
+  #' @description Test that the `inflection_point_asc` estimation status is set to "random_effects".
+  expect_equal(get_variable_vector(selectivity2, "inflection_point_asc")[["estimation_status"]], "random_effects")
+  #' @description Test that the `inflection_point_desc` estimation status is set to "random_effects".
+  expect_equal(get_variable_vector(selectivity2, "inflection_point_desc")[["estimation_status"]], "random_effects")
+  #' @description Test that the `slope_asc` estimation status is set to "random_effects".
+  expect_equal(get_variable_vector(selectivity2, "slope_asc")[["estimation_status"]], "random_effects")
+  #' @description Test that the `slope_desc` estimation status is set to "random_effects".
+  expect_equal(get_variable_vector(selectivity2, "slope_desc")[["estimation_status"]], "random_effects")
   #' @description Test that `evaluate()` works for `DoubleLogisticSelectivity` when all parameters are set to "random_effects".
   expect_equal(
-    selectivity2$evaluate(34.5),
+    evaluate_selectivity(selectivity2, 34.5),
     # Line below equals 0.2716494
     1.0 / (1.0 + exp(-(34.5 - 10.5) * 0.2)) * (1.0 - 1.0 / (1.0 + exp(-(34.5 - 15) * 0.05))),
     tolerance = 0.0000001
@@ -101,55 +107,53 @@ test_that("rcpp double logistic selectivity works with correct inputs", {
 
 test_that("rcpp age specific selectivity works with correct inputs", {
   # Create selectivity1
-  selectivity1 <- methods::new(AgeSpecificSelectivity)
-  selectivity1$logit_sel_at_age$resize(2) # create vector of two
-  selectivity1$logit_sel_at_age[1]$value <- 1
-  selectivity1$logit_sel_at_age[1]$estimation_type$set("fixed_effects")
-  selectivity1$logit_sel_at_age[2]$value <- 2
-  selectivity1$logit_sel_at_age[2]$estimation_type$set("fixed_effects")
+  selectivity1 <- create_selectivity("AgeSpecific")
+  set_variable_vector(
+    selectivity1, "logit_sel_at_age",
+    c(1, 2), rep("fixed_effects", 2)
+  )
 
-  selectivity1$ages$resize(2)
-  selectivity1$ages$set(0, 2) # set first age to 2, to test min_age != 1
-  selectivity1$ages$set(1, 3)
-  # No need to specify min_age or n_ages here if we specify ages
+  set_selectivity_ages(selectivity1, ages = c(2, 3))
 
-  #' @description Test that `get_id()` for `AgeSpecificSelectivity` works.
-  expect_equal(selectivity1$get_id(), 1)
+  #' @description Test that `get_id()` for `AgeSpecific` works.
+  expect_equal(get_module_id(selectivity1), 1)
   #' @description Test that the first `logit_sel_at_age` value is set to 1.
-  expect_equal(selectivity1$logit_sel_at_age[1]$value, 1)
-  #' @description Test that `evaluate()` works for `AgeSpecificSelectivity` (age=2).
   expect_equal(
-    selectivity1$evaluate(2.0),
+    get_variable_vector(selectivity1, "logit_sel_at_age")[["values"]][1], 1
+  )
+  #' @description Test that `evaluate()` works for `AgeSpecific` (age=2).
+  expect_equal(
+    evaluate_selectivity(selectivity1, 2.0),
     1.0 / (1.0 + exp(-1.0)), # inverse logit equation
     tolerance = 0.0000001
   )
-  #' @description Test that `evaluate()` works for `AgeSpecificSelectivity` (age=3).
+  #' @description Test that `evaluate()` works for `AgeSpecific` (age=3).
   expect_equal(
-    selectivity1$evaluate(3.0),
+    evaluate_selectivity(selectivity1, 3.0),
     1.0 / (1.0 + exp(-2.0)), # inverse logit equation
     tolerance = 0.0000001
   )
   #' @description Test that out-of-range ages throw an informative error.
-  expect_error(selectivity1$evaluate(10), "out of bounds")
+  expect_error(evaluate_selectivity(selectivity1, 10), "out of bounds")
 
   # Create selectivity2
-  selectivity2 <- methods::new(AgeSpecificSelectivity)
+  selectivity2 <- create_selectivity("AgeSpecific")
+  set_variable_vector(selectivity2, "logit_sel_at_age",
+                      1, "random_effects")
+  set_selectivity_ages(selectivity2, ages = 1)
 
-  selectivity2$logit_sel_at_age$resize(1)
-  selectivity2$logit_sel_at_age[1]$value <- 1
-  selectivity2$logit_sel_at_age[1]$estimation_type$set("random_effects")
-  selectivity2$ages$resize(1)
-  selectivity2$ages$set(0, 1)
-
-  #' @description Test that `get_id()` for `AgeSpecificSelectivity` works when a second object is created.
-  expect_equal(selectivity2$get_id(), 2)
+  #' @description Test that `get_id()` for `AgeSpecific` works when a second object is created.
+  expect_equal(get_module_id(selectivity2), 2)
   #' @description Test that the `logit_sel_at_age` value is set to 1.
-  expect_equal(selectivity2$logit_sel_at_age[1]$value, 1.0)
-  #' @description Test that the `logit_sel_at_age` estimation type is set to "random_effects".
-  expect_equal(selectivity2$logit_sel_at_age[1]$estimation_type$get(), "random_effects")
-  #' @description Test that `evaluate()` works for `AgeSpecificSelectivity` with "random_effects".
   expect_equal(
-    selectivity2$evaluate(1),
+    get_variable_vector(selectivity2, "logit_sel_at_age")[["values"]][1], 1.0)
+  #' @description Test that the `logit_sel_at_age` estimation type is set to "random_effects".
+  expect_equal(
+    get_variable_vector(selectivity2, "logit_sel_at_age")[["estimation_status"]][1],
+                        "random_effects")
+  #' @description Test that `evaluate()` works for `AgeSpecific` with "random_effects".
+  expect_equal(
+    evaluate_selectivity(selectivity2, 1),
     # Line below equals 0.2716494
     1.0 / (1.0 + exp(-1.0)), # inverse logit equation
     tolerance = 0.0000001
@@ -160,25 +164,47 @@ test_that("rcpp age specific selectivity works with correct inputs", {
 ## Edge handling ----
 test_that("rcpp selectivity returns correct outputs for edge cases", {
   # emptyLogistic
-  emptyLogistic <- methods::new(LogisticSelectivity)
+  emptyLogistic <- create_selectivity("Logistic")
   #' @description Test that rcpp selectivity returns default values when no parameters are set for input values of 20.
   expect_equal(
-    object = emptyLogistic$evaluate(20),
+    object = evaluate_selectivity(emptyLogistic, 20),
     expected = 0.5
   )
 
   # emptyDoubleLogistic
-  emptyDoubleLogistic <- methods::new(DoubleLogisticSelectivity)
+  emptyDoubleLogistic <- create_selectivity("DoubleLogistic")
   #' @description Test that rcpp double selectivity returns default values when no parameters are set for input values of 20.
   expect_equal(
-    object = emptyDoubleLogistic$evaluate(20),
+    object = evaluate_selectivity(emptyDoubleLogistic, 20),
     expected = 0.25
   )
 
-  # Did not specify a default value test for AgeSpecificSelectivity
+  # Did not specify a default value test for AgeSpecific
   # This test is not appropriate: inputs are used in indices and not calculation
   # Test of 'out of bounds', above, is already supplied above
 })
 
 ## Error handling ----
-# No built-in errors to test.
+test_that("rcpp age specific selectivity validates age inputs", {
+  selectivity <- create_selectivity("AgeSpecific")
+
+  #' @description Test that `set_selectivity_ages()` requires either `min_age` or `ages`.
+  expect_error(
+    set_selectivity_ages(selectivity),
+    "requires either `min_age` or `ages`"
+  )
+
+  #' @description Test that `set_selectivity_ages()` requires `n_ages` when `min_age` is provided.
+  expect_error(
+    set_selectivity_ages(selectivity, min_age = 1),
+    "requires `n_ages` when an `ages` vector"
+  )
+
+  #' @description Test that `set_selectivity_ages()` rejects mismatched `n_ages` and `ages` lengths.
+  expect_error(
+    set_selectivity_ages(selectivity, n_ages = 2, ages = c(1, 2, 3)),
+    "requires `n_ages` to equal the length of `ages`"
+  )
+
+  clear()
+})
