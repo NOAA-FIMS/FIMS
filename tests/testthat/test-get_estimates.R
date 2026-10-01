@@ -214,6 +214,45 @@ test_that("`get_estimates()` handles non-finite derived quantities", {
   clear()
 })
 
+test_that("`get_estimates()` works for a model without random effects", {
+  data_4_model <- FIMSFrame(data_big)
+  # Without a distribution on the recruitment deviations, the model has no
+  # random-effect distribution and so no distribution parameters to report.
+  # initialize_fims() requires the deviations to be constant in that case.
+  recruitment_deviations <- c("log_devs", "log_sd")
+  parameters <- fixed_effect_parameters(data_4_model) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$module_name == "Recruitment" & .data$label == "log_devs",
+        "constant",
+        .data$estimation_type
+      ),
+      distribution_type = dplyr::if_else(
+        .data$module_name == "Recruitment" &
+          .data$label %in% recruitment_deviations,
+        NA_character_,
+        .data$distribution_type
+      ),
+      distribution = dplyr::if_else(
+        .data$module_name == "Recruitment" &
+          .data$label %in% recruitment_deviations,
+        NA_character_,
+        .data$distribution
+      )
+    )
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  #' @description Test that `get_estimates()` works when the model has no random-effect distribution.
+  expect_no_error(estimates <- get_estimates(fit))
+  #' @description Test that `get_estimates()` reports no `log_sd` row when no random-effect distribution has one.
+  expect_equal(
+    object = sum(estimates[["label"]] == "log_sd", na.rm = TRUE),
+    expected = 0
+  )
+  clear()
+})
+
 test_that("`get_estimates()` returns correct outputs for edge cases", {
   #' @description Test that an error occurs if the input is not a valid model fit object.
   expect_error(
