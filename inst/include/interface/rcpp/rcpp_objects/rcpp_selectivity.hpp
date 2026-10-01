@@ -81,7 +81,8 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    */
   VariableVector inflection_point;
   /**
-   * @brief The width of the curve at the inflection point.
+   * @brief The rate at which the response changes with the index value;
+   * larger values give a steeper curve at the inflection point.
    */
   VariableVector slope;
 
@@ -298,13 +299,13 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   VariableVector inflection_point_asc; /**< the index value at which the
-                                     response reaches .5 */
-  VariableVector
-      slope_asc; /**< the width of the curve at the inflection_point */
+                                     ascending limb reaches 0.5 */
+  VariableVector slope_asc; /**< the rate at which the ascending limb rises;
+                               larger values give a steeper limb */
   VariableVector inflection_point_desc; /**< the index value at which the
-                                      response reaches .5 */
-  VariableVector
-      slope_desc; /**< the width of the curve at the inflection_point */
+                                      descending limb reaches 0.5 */
+  VariableVector slope_desc; /**< the rate at which the descending limb falls;
+                                larger values give a steeper limb */
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {
     SelectivityInterfaceBase::live_objects[this->id] =
