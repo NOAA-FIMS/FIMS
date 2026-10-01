@@ -281,8 +281,10 @@ inline const Type inv_logit(const Type &a, const Type &b, const Type &logit_x) {
  * @brief The general double logistic function
  *
  * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - inflection_point_{asc}))}
- * \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x -
- * inflection_point_{desc}))} \right)\f$
+ * \frac{1.0}{ 1.0 + exp(slope_{desc} (x - inflection_point_{desc}))}\f$
+ *
+ * The descending limb is written as 1 / (1 + exp(z)) so it stays above 0 for
+ * large z in double precision.
  *
  * @param inflection_point_asc the inflection point of the ascending limb of the
  * double logistic function
@@ -305,10 +307,9 @@ inline const Type double_logistic(const Type &inflection_point_asc,
   return (static_cast<Type>(1.0)) /
          (static_cast<Type>(1.0) +
           exp(Type(-1.0) * slope_asc * (x - inflection_point_asc))) *
-         (static_cast<Type>(1.0) -
-          (static_cast<Type>(1.0)) /
-              (static_cast<Type>(1.0) +
-               exp(Type(-1.0) * slope_desc * (x - inflection_point_desc))));
+         (static_cast<Type>(1.0) /
+          (static_cast<Type>(1.0) +
+           exp(slope_desc * (x - inflection_point_desc))));
 }
 
 /**
