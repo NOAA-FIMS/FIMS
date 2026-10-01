@@ -44,7 +44,7 @@ class Model {  // may need singleton
    */
 #ifdef TMB_MODEL
   // nullptr outside of a TMB call because TMB owns the objective function.
-  ::objective_function<Type> *of = nullptr;
+  ::objective_function<Type>* of = nullptr;
 #endif
 
   /**
@@ -80,7 +80,8 @@ class Model {  // may need singleton
     // Create vector for reporting out nll components
     fims::Vector<Type> nll_vec(
         this->fims_information->density_components.size(), 0.0);
-    // Create a vector of strings with a pre-defined size for the nll component names
+    // Create a vector of strings with a pre-defined size for the nll component
+    // names
     std::vector<std::string> nll_component_names(
         this->fims_information->density_components.size());
 
@@ -114,13 +115,12 @@ class Model {  // may need singleton
       }
     }
 
-    FIMS_INFO_LOG("Model: Finished evaluating " +
-                  fims::to_string(prior_components.size()) + " priors, " +
-                  fims::to_string(re_components.size()) +
-                  " random effects, and " +
-                  fims::to_string(data_components.size()) +
-                  " data likelihoods. The total jnll is: " +
-                  fims::to_string(jnll));
+    FIMS_INFO_LOG(
+        "Model: Finished evaluating " +
+        fims::to_string(prior_components.size()) + " priors, " +
+        fims::to_string(re_components.size()) + " random effects, and " +
+        fims::to_string(data_components.size()) +
+        " data likelihoods. The total jnll is: " + fims::to_string(jnll));
 
     // Assemble the final report vectors in the desired order (priors, re, data)
     int nll_vec_idx = 0;
