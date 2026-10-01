@@ -77,14 +77,14 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   /**
-   * @brief The index value at which the response reaches 0.5.
+   * @brief The age or length at which 50% of fish are selected.
    */
   VariableVector inflection_point;
   /**
-   * @brief The rate parameter of the logistic curve, in units of 1 / index
-   * value. The curve's slope at the inflection point is slope / 4, so larger
-   * absolute values give a steeper curve; negative values give a descending
-   * curve.
+   * @brief How quickly selectivity changes with age or length around the
+   * inflection point, per year of age or unit of length. Larger absolute
+   * values give a steeper, more knife-edge curve; negative values give a
+   * curve that declines with age or length.
    */
   VariableVector slope;
 
@@ -300,14 +300,24 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  */
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
-  VariableVector inflection_point_asc; /**< the index value at which the
-                                     ascending limb reaches 0.5 */
-  VariableVector slope_asc; /**< the rate parameter of the ascending limb;
-                               larger absolute values give a steeper limb */
-  VariableVector inflection_point_desc; /**< the index value at which the
-                                      descending limb reaches 0.5 */
-  VariableVector slope_desc; /**< the rate parameter of the descending limb;
-                                larger absolute values give a steeper limb */
+  /**
+   * @brief The age or length at which the ascending limb is 0.5.
+   */
+  VariableVector inflection_point_asc;
+  /**
+   * @brief How quickly selectivity rises on the ascending limb; larger values
+   * give a steeper, more knife-edge rise.
+   */
+  VariableVector slope_asc;
+  /**
+   * @brief The age or length at which the descending limb is 0.5.
+   */
+  VariableVector inflection_point_desc;
+  /**
+   * @brief How quickly selectivity falls on the descending limb; larger values
+   * give a steeper decline.
+   */
+  VariableVector slope_desc;
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {
     SelectivityInterfaceBase::live_objects[this->id] =
