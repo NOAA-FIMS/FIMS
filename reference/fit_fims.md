@@ -13,7 +13,8 @@ fit_fims(
   optimize = TRUE,
   number_of_newton_steps = 0,
   control = list(eval.max = 10000, iter.max = 10000, trace = 0),
-  filename = NULL
+  filename = NULL,
+  getReportCovariance = FALSE
 )
 ```
 
@@ -65,6 +66,17 @@ fit_fims(
   RDS object. Defaults to 'fit.RDS', and a value of NULL indicates not
   to save it. If specified, it must end in .RDS. The file is written to
   folder given by `input[["path"]]`. Not yet implemented.
+
+- getReportCovariance:
+
+  A logical passed to
+  [`TMB::sdreport()`](https://rdrr.io/pkg/TMB/man/sdreport.html), with
+  the default `FALSE`. Standard errors of all parameters and derived
+  quantities are calculated either way. If `TRUE`, the full covariance
+  matrix of the derived quantities is also calculated and stored as
+  `cov` in the `sdreport`; it grows with the square of the number of
+  derived quantities and can use several GB of memory. If `FALSE`, `cov`
+  is `NA`.
 
 ## Value
 

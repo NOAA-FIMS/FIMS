@@ -78,7 +78,8 @@
 <span>  optimize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  number_of_newton_steps <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  control <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>eval.max <span class="op">=</span> <span class="fl">10000</span>, iter.max <span class="op">=</span> <span class="fl">10000</span>, trace <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>,</span>
-<span>  filename <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  filename <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  getReportCovariance <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -128,6 +129,15 @@ the default is a list of length three with <code>eval.max = 1000</code>,
 object as an RDS object. Defaults to 'fit.RDS', and a value of NULL
 indicates not to save it. If specified, it must end in .RDS. The file is
 written to folder given by <code>input[["path"]]</code>. Not yet implemented.</p></dd>
+
+
+<dt id="arg-getreportcovariance">getReportCovariance<a class="anchor" aria-label="anchor" href="#arg-getreportcovariance"></a></dt>
+<dd><p>A logical passed to <code><a href="https://rdrr.io/pkg/TMB/man/sdreport.html" class="external-link">TMB::sdreport()</a></code>, with the
+default <code>FALSE</code>. Standard errors of all parameters and derived quantities
+are calculated either way. If <code>TRUE</code>, the full covariance matrix of the
+derived quantities is also calculated and stored as <code>cov</code> in the
+<code>sdreport</code>; it grows with the square of the number of derived quantities
+and can use several GB of memory. If <code>FALSE</code>, <code>cov</code> is <code>NA</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

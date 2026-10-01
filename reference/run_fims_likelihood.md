@@ -43,9 +43,9 @@ run_fims_likelihood(
 - module_name:
 
   A character string specifying the module containing the parameter to
-  profile. Default is `NULL`. Required when the parameter name exists in
-  multiple modules (e.g., multiple fleets). Examples include `"fleet1"`,
-  `"survey1"`, or `"recruitment"`.
+  profile, as in the `module_name` column of `parameters`. Default is
+  `NULL`. Required when the parameter label exists in more than 1
+  module, e.g., `"Maturity"` or `"Selectivity"` for `inflection_point`.
 
 - parameter_name:
 
@@ -120,10 +120,10 @@ the profile spans from 2 units below to 2 units above the estimated
 value. The profiled values are evenly spaced on the parameter scale (not
 log scale).
 
-Models are run in parallel for computational efficiency. The function
-automatically handles parameter identification using module names when
-needed to distinguish between multiple instances of the same parameter
-type.
+Models are run in parallel for computational efficiency. Use
+`module_name` when the same parameter label exists in more than 1
+module. Parameters with more than 1 row in a module (for example, 1 per
+fleet, year, or age) cannot be profiled yet.
 
 ## References
 
