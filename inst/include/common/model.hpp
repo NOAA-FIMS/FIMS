@@ -14,16 +14,6 @@
 
 #include "information.hpp"
 
-#ifdef TMB_MODEL
-#include <Rcpp.h>
-// TMB's asSEXP doesn't have an overload for std::vector<std::string>,
-// which causes an ambiguous call error. This wrapper uses Rcpp::wrap
-// to handle the conversion, resolving the ambiguity.
-inline SEXP asSEXP(const std::vector<std::string>& v) {
-  return Rcpp::wrap(v);
-}
-#endif
-
 namespace fims_model {
 
 /**
@@ -151,9 +141,21 @@ class Model {  // may need singleton
 
 #ifdef TMB_MODEL
 
-    vector<Type> nll_components = nll_vec.to_tmb();
-    FIMS_REPORT_F(nll_components, this->of);
-    FIMS_REPORT_F(nll_component_names, this->of);
+    if (isDouble<Type>::value && this->of != nullptr &&
+        this->of->current_parallel_region < static_cast<Type>(0)) {
+      vector<Type> nll_components = nll_vec.to_tmb();
+      SEXP nll_sexp;
+      PROTECT(nll_sexp = asSEXP(nll_components));
+      SEXP names_sexp;
+      PROTECT(names_sexp = Rf_allocVector(STRSXP, nll_component_names.size()));
+      for (size_t i = 0; i < nll_component_names.size(); ++i) {
+        SET_STRING_ELT(names_sexp, i,
+                       Rf_mkChar(nll_component_names[i].c_str()));
+      }
+      Rf_setAttrib(nll_sexp, R_NamesSymbol, names_sexp);
+      Rf_defineVar(Rf_install("nll_components"), nll_sexp, this->of->report);
+      UNPROTECT(2);
+    }
     FIMS_REPORT_F(jnll, this->of);
 
 #endif
