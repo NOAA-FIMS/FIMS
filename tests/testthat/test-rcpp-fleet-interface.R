@@ -53,6 +53,7 @@ test_that("rcpp fleet log_q can have a prior", {
   fleet$log_q[1]$estimation_type$set("fixed_effects")
 
   log_q_prior <- methods::new(DnormDistribution)
+  log_q_prior$set_nll_component_name("log_q_prior")
   log_q_prior$expected_values$resize(1)
   log_q_prior$expected_values[1]$value <- log(0.8)
   log_q_prior$log_sd$resize(1)

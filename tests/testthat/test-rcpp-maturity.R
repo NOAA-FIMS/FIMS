@@ -47,6 +47,7 @@ test_that("rcpp maturity parameters can have a prior", {
   maturity$slope[1]$estimation_type$set("fixed_effects")
 
   maturity_prior <- methods::new(DnormDistribution)
+  maturity_prior$set_nll_component_name("maturity_prior")
   maturity_prior$expected_values$resize(2)
   maturity_prior$expected_values[1]$value <- 3.5
   maturity_prior$expected_values[2]$value <- 1.2

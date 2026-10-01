@@ -29,6 +29,8 @@ void register_distributions(Rcpp::Module& m) {
               &DnormDistributionsInterface::set_observed_data)
       .method("set_nll_component_name",
               &DnormDistributionsInterface::set_nll_component_name)
+      .method("get_nll_component_name",
+              &DnormDistributionsInterface::get_nll_component_name)
       .method("set_distribution_mean",
               &DnormDistributionsInterface::set_distribution_mean)
       .method("set_distribution_links",
@@ -50,6 +52,8 @@ void register_distributions(Rcpp::Module& m) {
               &DlnormDistributionsInterface::set_observed_data)
       .method("set_nll_component_name",
               &DlnormDistributionsInterface::set_nll_component_name)
+      .method("get_nll_component_name",
+              &DlnormDistributionsInterface::get_nll_component_name)
       .method("set_distribution_links",
               &DlnormDistributionsInterface::set_distribution_links)
       .field("observed_values", &DlnormDistributionsInterface::observed_values)
@@ -68,6 +72,8 @@ void register_distributions(Rcpp::Module& m) {
               &DmultinomDistributionsInterface::set_observed_data)
       .method("set_nll_component_name",
               &DmultinomDistributionsInterface::set_nll_component_name)
+      .method("get_nll_component_name",
+              &DmultinomDistributionsInterface::get_nll_component_name)
       .method("set_distribution_links",
               &DmultinomDistributionsInterface::set_distribution_links)
       .method("set_note", &DmultinomDistributionsInterface::set_note)

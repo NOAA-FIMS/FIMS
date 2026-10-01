@@ -131,6 +131,7 @@ test_that("posterior equals prior with no data", {
   slope_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]], om_input[["sel_survey"]][["survey1"]][["slope.sel1"]]))
   slope_sd <- 3
   slope_prior <- methods::new(DnormDistribution)
+  slope_prior$set_nll_component_name("slope_prior")
   slope_prior$expected_values$resize(2)
   slope_prior$expected_values[1]$value <- slope_mean
   slope_prior$expected_values[2]$value <- slope_mean
@@ -141,6 +142,7 @@ test_that("posterior equals prior with no data", {
   inflection_point_mean <- mean(c(om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]], om_input[["sel_survey"]][["survey1"]][["A50.sel1"]]))
   inflection_point_sd <- 3
   inflection_point_prior <- methods::new(DnormDistribution)
+  inflection_point_prior$set_nll_component_name("inflection_point_prior")
   inflection_point_prior$expected_values$resize(2)
   inflection_point_prior$expected_values[1]$value <- inflection_point_mean
   inflection_point_prior$expected_values[2]$value <- inflection_point_mean

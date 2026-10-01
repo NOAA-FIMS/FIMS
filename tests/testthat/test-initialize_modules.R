@@ -129,6 +129,26 @@ test_that("`initialize_fims()` works with edge cases", {
   expect_true(all(names(nll_components) %in% c("catch", "index", "age_comp", "length_comp")))
 
   clear()
+
+  # Test that recruitment process distribution contribution is named "recruitment"
+  init_parm_with_rec <- initialize_fims(
+    parameters = default_parameters,
+    data = data
+  )
+  obj_rec <- TMB::MakeADFun(
+    data = list(),
+    parameters = list(
+      p = init_parm_with_rec$parameters$p,
+      re = init_parm_with_rec$parameters$re
+    ),
+    random = "re",
+    DLL = "FIMS"
+  )
+  nll_components_rec <- obj_rec$report()[["nll_components"]]
+  expect_equal(names(nll_components_rec)[1], "recruitment")
+  expect_true(all(names(nll_components_rec) %in% c("recruitment", "catch", "index", "age_comp", "length_comp")))
+
+  clear()
 })
 
 ## Error handling ----

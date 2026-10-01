@@ -543,6 +543,11 @@ verify_fims_nll <- function(report,
 
   expected_jnll <- rec_nll + catch_nll + index_nll + age_comp_nll + lengthcomp_nll
   jnll <- report[["jnll"]]
+  #' @description Test that the likelihood report components have expected semantic names.
+  expect_equal(
+    names(report[["nll_components"]]),
+    c("recruitment", "catch", "age_comp", "length_comp", "index", "age_comp", "length_comp")
+  )
   #' @description Test that the recruitment jnll is equal to the expected jnll.
   expect_equal(unname(report[["nll_components"]][1]), rec_nll)
   #' @description Test that the catch jnll is equal to the expected jnll.

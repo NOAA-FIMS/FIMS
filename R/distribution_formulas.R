@@ -228,6 +228,8 @@ initialize_data_distribution <- function(
 #' @param par A string specifying the parameter name the distribution applies
 #'   to. Parameters must be members of the specified module. Use
 #'   `methods::show(module)` to obtain names of parameters within the module.
+#' @param name A string specifying the name used for this contribution in the
+#'   reported `nll_components` vector. Defaults to `"recruitment"`.
 #' @return
 #' A reference class. is returned. Use [methods::show()] to view the various
 #' Rcpp class fields, methods, and documentation.
@@ -257,7 +259,8 @@ initialize_process_distribution <- function(
   sd = tibble::tibble(
     value = 1,
     estimation_type = "fixed_effects"
-  )
+  ),
+  name = "recruitment"
 ) {
   # validity check on user input
   args <- list(family = family, sd = sd)
@@ -326,6 +329,8 @@ initialize_process_distribution <- function(
     new_module$observed_values[i]$value <- 0
     new_module$expected_values[i]$value <- 0
   }
+
+  new_module$set_nll_component_name(name)
 
   # setup links to parameter
   if (is.null(expected)) {

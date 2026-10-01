@@ -346,6 +346,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
     }
   }
   recruitment_distribution <- methods::new(DnormDistribution)
+  recruitment_distribution$set_nll_component_name("recruitment")
   # set up logR_sd using the normal log_sd parameter
   # logR_sd is NOT logged. It needs to enter the model logged b/c the exp() is
   # taken before the likelihood calculation

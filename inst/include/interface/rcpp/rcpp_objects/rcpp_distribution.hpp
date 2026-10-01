@@ -164,6 +164,13 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
   }
 
   /**
+   * @brief Get the semantic name used for the reported likelihood component.
+   */
+  virtual std::string get_nll_component_name() {
+    return this->nll_component_name_m.get();
+  }
+
+  /**
    * @brief A method for each child distribution interface object to inherit so
    * each distribution can have an evaluate() function.
    */
@@ -246,6 +253,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
 
   virtual bool set_nll_component_name(std::string name) {
     return DistributionsInterfaceBase::set_nll_component_name(name);
+  }
+
+  virtual std::string get_nll_component_name() {
+    return DistributionsInterfaceBase::get_nll_component_name();
   }
 
   /**
@@ -613,6 +624,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     return DistributionsInterfaceBase::set_nll_component_name(name);
   }
 
+  virtual std::string get_nll_component_name() {
+    return DistributionsInterfaceBase::get_nll_component_name();
+  }
+
   /**
    * @brief Sets pointers for data observations, random effects, or priors.
    *
@@ -941,6 +956,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
 
   virtual bool set_nll_component_name(std::string name) {
     return DistributionsInterfaceBase::set_nll_component_name(name);
+  }
+
+  virtual std::string get_nll_component_name() {
+    return DistributionsInterfaceBase::get_nll_component_name();
   }
 
   /**
