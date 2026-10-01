@@ -161,6 +161,43 @@ test_that("`get_estimates()` handles non-finite derived quantities", {
   clear()
 })
 
+test_that("`get_estimates()` works with time-varying age-specific selectivity", {
+  data_4_model <- FIMSFrame(data_big)
+  n_years <- get_n_years(data_4_model)
+  n_ages <- get_n_ages(data_4_model)
+  age_specific <- setup_default_Selectivity(
+    data = data_4_model,
+    fleet = "survey1",
+    module_type = "AgeSpecific"
+  )
+  # 1 set of values per year, in year-major order
+  age_specific_by_year <- age_specific[
+    rep(seq_len(nrow(age_specific)), times = n_years),
+  ]
+  parameters <- fixed_effect_parameters(data_4_model) |>
+    dplyr::filter(
+      !(.data$fleet == "survey1" & .data$module_name == "Selectivity")
+    ) |>
+    dplyr::bind_rows(age_specific_by_year)
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  #' @description Test that `get_estimates()` works when age-specific selectivity has 1 set of values per year.
+  expect_no_error(estimates <- get_estimates(fit))
+  selectivity <- estimates |>
+    dplyr::filter(.data$label == "logit_sel_at_age")
+  #' @description Test that each time-varying age-specific selectivity value is labelled with its year and age.
+  expect_equal(
+    object = selectivity[["year_i"]],
+    expected = rep(seq_len(n_years), each = n_ages)
+  )
+  expect_equal(
+    object = selectivity[["age_i"]],
+    expected = rep(seq_len(n_ages), times = n_years)
+  )
+  clear()
+})
+
 test_that("`get_estimates()` returns correct outputs for edge cases", {
   #' @description Test that an error occurs if the input is not a valid model fit object.
   expect_error(
