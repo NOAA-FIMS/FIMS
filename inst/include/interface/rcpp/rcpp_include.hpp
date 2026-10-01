@@ -22,11 +22,9 @@
 // <cassert> is included again so assert() in FIMS code follows that setting.
 #pragma push_macro("NDEBUG")
 #undef NDEBUG
-/**
- * @brief Makes Rcpp raise an R error instead of calling abort() on a failed
- * type conversion. Defined only while Rcpp is included.
- */
+/// @cond INTERNAL
 #define NDEBUG 1
+/// @endcond
 #include <Rcpp.h>
 #pragma pop_macro("NDEBUG")
 #include <cassert>
