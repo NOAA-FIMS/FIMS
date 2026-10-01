@@ -41,6 +41,30 @@ test_that("`is.FIMSFit()` works with correct inputs", {
   )
 })
 
+test_that("`fit_fims()` passes `getReportCovariance` to `TMB::sdreport()`", {
+  # The first 5 years of data_big keep the covariance matrix small; weight at
+  # age needs 1 more year than the other data
+  yearly_types <- c("catch", "index", "age_comp", "length_comp")
+  data_5_years <- data_big |>
+    dplyr::filter(
+      !(.data[["type"]] %in% c(yearly_types, "weight_at_age")) |
+        (.data[["type"]] %in% yearly_types & .data[["timing"]] <= 5) |
+        (.data[["type"]] == "weight_at_age" & .data[["timing"]] <= 6)
+    ) |>
+    FIMSFrame()
+  fit_with_covariance <- setup_default_parameters(data_5_years) |>
+    initialize_fims(data = data_5_years) |>
+    fit_fims(number_of_loops = 1, getReportCovariance = TRUE)
+  sdreport <- get_sdreport(fit_with_covariance)
+  #' @description Test that `getReportCovariance = TRUE` stores the full covariance of the derived quantities.
+  expect_equal(
+    object = dim(sdreport[["cov"]]),
+    expected = rep(length(sdreport[["value"]]), 2)
+  )
+  expect_true(all(is.finite(diag(sdreport[["cov"]]))))
+  clear()
+})
+
 ## Edge handling ----
 test_that("`is.FIMSFit()` returns correct outputs for edge cases", {
   #' @description Test that `is.FIMSFit("not_a_FIMSFit")` returns FALSE.

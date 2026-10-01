@@ -514,6 +514,12 @@ FIMSFit <- function(
 #'   object as an RDS object. Defaults to 'fit.RDS', and a value of NULL
 #'   indicates not to save it. If specified, it must end in .RDS. The file is
 #'   written to folder given by `input[["path"]]`. Not yet implemented.
+#' @param getReportCovariance A logical passed to [TMB::sdreport()], with the
+#'   default `FALSE`. Standard errors of all parameters and derived quantities
+#'   are calculated either way. If `TRUE`, the full covariance matrix of the
+#'   derived quantities is also calculated and stored as `cov` in the
+#'   `sdreport`; it grows with the square of the number of derived quantities
+#'   and can use several GB of memory. If `FALSE`, `cov` is `NA`.
 #' @return
 #' An object of class `FIMSFit` is returned, where the structure is the same
 #' regardless if `optimize = TRUE` or not. Uncertainty information is only
@@ -535,7 +541,8 @@ fit_fims <- function(input,
                        iter.max = 10000,
                        trace = 0
                      ),
-                     filename = NULL) {
+                     filename = NULL,
+                     getReportCovariance = FALSE) {
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
   # NOTE: When we add implementation for newton step we need to
@@ -647,7 +654,10 @@ fit_fims <- function(input,
   time_sdreport <- NA
   if (get_sd) {
     t2 <- Sys.time()
-    sdreport <- TMB::sdreport(obj)
+    sdreport <- TMB::sdreport(
+      obj,
+      getReportCovariance = getReportCovariance
+    )
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
     check_sdreport_convergence(input, obj, opt, sdreport)
