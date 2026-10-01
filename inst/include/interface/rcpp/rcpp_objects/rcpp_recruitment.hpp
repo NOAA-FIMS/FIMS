@@ -466,15 +466,16 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
 
   /**
    * @brief Evaluate recruitment process using the Log--Devs approach.
+   * @details Not available from R: stops with an error.
    * @param pos Position index, e.g., which year.
    */
   virtual double evaluate_process(size_t pos) {
-    // The process adds to the expected recruitment of a recruitment module,
-    // which only exists inside a model, so there is nothing to evaluate here
+    // The process returns expected recruitment plus deviations from the
+    // recruitment module it is linked to inside a model, so there is nothing to
+    // evaluate here.
     Rcpp::stop(
         "evaluate_process() is not available from R: the recruitment process "
-        "needs the expected recruitment computed during a model run.");
-    return 0;
+        "reads values from the recruitment module it is linked to in a model.");
   }
 
 #ifdef TMB_MODEL
@@ -542,15 +543,15 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
 
   /**
    * @brief Evaluate recruitment process using the Log--R approach.
+   * @details Not available from R: stops with an error.
    * @param pos Position index, e.g., which year.
    */
   virtual double evaluate_process(size_t pos) {
-    // The process adds to the expected recruitment of a recruitment module,
-    // which only exists inside a model, so there is nothing to evaluate here
+    // The process returns log recruitment from the recruitment module it is
+    // linked to inside a model, so there is nothing to evaluate here.
     Rcpp::stop(
         "evaluate_process() is not available from R: the recruitment process "
-        "needs the expected recruitment computed during a model run.");
-    return 0;
+        "reads values from the recruitment module it is linked to in a model.");
   }
 
 #ifdef TMB_MODEL
