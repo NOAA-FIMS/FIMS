@@ -568,16 +568,16 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::map<std::string, fims::Vector<double>> &dqs,
       std::map<std::string, fims_popdy::DimensionInfo> &dim_info) {
     std::stringstream ss;
+    // Stepping back from end() of an empty map is undefined, and there is no
+    // last element to write without a trailing comma
+    if (dqs.empty()) {
+      return ss.str();
+    }
     std::map<std::string, fims_popdy::DimensionInfo>::iterator dim_info_it;
     std::map<std::string, fims::Vector<double>>::iterator it;
-    std::map<std::string, fims::Vector<double>>::iterator end_it;
-    end_it = dqs.end();
     typename std::map<std::string, fims::Vector<double>>::iterator
-        second_to_last;
-    second_to_last = dqs.end();
-    if (it != end_it) {
-      second_to_last--;
-    }
+        second_to_last = dqs.end();
+    second_to_last--;
 
     it = dqs.begin();
     for (; it != second_to_last; ++it) {

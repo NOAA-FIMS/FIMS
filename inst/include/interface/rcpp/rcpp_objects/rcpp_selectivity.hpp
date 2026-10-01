@@ -760,8 +760,12 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     // set relative info
     selectivity->id = this->id;
     selectivity->n_ages = this->n_ages.get();
-    selectivity->min_age = *std::min_element(this->ages.storage_m->begin(),
-                                             this->ages.storage_m->end());
+    if (this->ages.size() > 0) {
+      selectivity->min_age = static_cast<size_t>(*std::min_element(
+          this->ages.storage_m->begin(), this->ages.storage_m->end()));
+    } else {
+      selectivity->min_age = static_cast<size_t>(this->min_age.get());
+    }
     selectivity->logit_sel_at_age.resize(this->logit_sel_at_age.size());
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
       selectivity->logit_sel_at_age[i] =
