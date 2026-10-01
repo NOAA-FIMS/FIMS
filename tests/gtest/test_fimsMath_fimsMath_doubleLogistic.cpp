@@ -50,8 +50,9 @@ TEST(fimsMath_doubleLogistic, HandlesSteepDescendingLimb) {
 
   const double value = fims_math::double_logistic(
       inflection_point_asc, slope_asc, inflection_point_desc, slope_desc, x);
-  const double ascending = 1.0 / (1.0 + std::exp(-slope_asc * (x - 2.0)));
-  const double descending = std::exp(-slope_desc * (x - 4.0));
+  const double ascending =
+      1.0 / (1.0 + std::exp(-slope_asc * (x - inflection_point_asc)));
+  const double descending = std::exp(-slope_desc * (x - inflection_point_desc));
 
   EXPECT_GT(value, 0.0);
   EXPECT_NEAR(value / (ascending * descending), 1.0, 1e-12);
