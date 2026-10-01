@@ -39,6 +39,40 @@ test_that("rcpp maturity works with correct inputs", {
   clear()
 })
 
+test_that("rcpp maturity parameters can have a prior", {
+  maturity <- methods::new(LogisticMaturity)
+  maturity$inflection_point[1]$value <- 3.0
+  maturity$inflection_point[1]$estimation_type$set("fixed_effects")
+  maturity$slope[1]$value <- 1.0
+  maturity$slope[1]$estimation_type$set("fixed_effects")
+
+  maturity_prior <- methods::new(DnormDistribution)
+  maturity_prior$expected_values$resize(2)
+  maturity_prior$expected_values[1]$value <- 3.5
+  maturity_prior$expected_values[2]$value <- 1.2
+  maturity_prior$log_sd$resize(1)
+  maturity_prior$log_sd[1]$value <- log(0.5)
+  maturity_prior$set_distribution_links(
+    "prior",
+    c(maturity$inflection_point$get_id(), maturity$slope$get_id())
+  )
+
+  # CreateTMBModel() finds the parameters a prior is linked to by their ids in
+  # variable_map
+  CreateTMBModel()
+  parameters <- list(p = get_fixed(), re = get_random())
+  obj <- TMB::MakeADFun(
+    data = list(), parameters, DLL = "FIMS", silent = TRUE
+  )
+  #' @description Test that a normal prior on maturity inflection_point and slope returns their summed negative log density.
+  expect_equal(
+    obj[["report"]]()[["nll_components"]],
+    -sum(dnorm(c(3.0, 1.0), mean = c(3.5, 1.2), sd = 0.5, log = TRUE))
+  )
+
+  clear()
+})
+
 ## Edge handling ----
 # No edge cases to test for this interface.
 
