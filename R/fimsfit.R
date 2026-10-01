@@ -496,11 +496,7 @@ FIMSFit <- function(
 #'
 #' @param input Input list as returned by [initialize_fims()].
 #' @param get_sd A boolean specifying if the [TMB::sdreport()] should be
-#'   calculated? Standard errors are calculated for all parameters and derived
-#'   quantities, but the full covariance matrix of the derived quantities is
-#'   not (`getReportCovariance = FALSE`), so `cov` in the `sdreport` is `NA`.
-#'   If the full covariance is needed, call `TMB::sdreport(get_obj(fit))`
-#'   before [clear()].
+#'   calculated?
 #' @param save_sd A logical, with the default `TRUE`, indicating whether the
 #'   sdreport is returned in the output. If `FALSE`, the slot for the report
 #'   will be empty.
@@ -518,6 +514,12 @@ FIMSFit <- function(
 #'   object as an RDS object. Defaults to 'fit.RDS', and a value of NULL
 #'   indicates not to save it. If specified, it must end in .RDS. The file is
 #'   written to folder given by `input[["path"]]`. Not yet implemented.
+#' @param getReportCovariance A logical passed to [TMB::sdreport()], with the
+#'   default `FALSE`. Standard errors of all parameters and derived quantities
+#'   are calculated either way. If `TRUE`, the full covariance matrix of the
+#'   derived quantities is also calculated and stored as `cov` in the
+#'   `sdreport`; it grows with the square of the number of derived quantities
+#'   and can use several GB of memory. If `FALSE`, `cov` is `NA`.
 #' @return
 #' An object of class `FIMSFit` is returned, where the structure is the same
 #' regardless if `optimize = TRUE` or not. Uncertainty information is only
@@ -539,7 +541,8 @@ fit_fims <- function(input,
                        iter.max = 10000,
                        trace = 0
                      ),
-                     filename = NULL) {
+                     filename = NULL,
+                     getReportCovariance = FALSE) {
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
   # NOTE: When we add implementation for newton step we need to
@@ -651,9 +654,10 @@ fit_fims <- function(input,
   time_sdreport <- NA
   if (get_sd) {
     t2 <- Sys.time()
-    # Only the standard errors of derived quantities are used; their full
-    # covariance grows with the square of the number of reported values
-    sdreport <- TMB::sdreport(obj, getReportCovariance = FALSE)
+    sdreport <- TMB::sdreport(
+      obj,
+      getReportCovariance = getReportCovariance
+    )
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
     check_sdreport_convergence(input, obj, opt, sdreport)
