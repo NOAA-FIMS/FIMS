@@ -79,7 +79,8 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    */
   VariableVector inflection_point;
   /**
-   * @brief The width of the curve at the inflection point.
+   * @brief The rate at which the response changes with the index value;
+   * larger values give a steeper curve at the inflection point.
    */
   VariableVector slope;
 
