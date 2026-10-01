@@ -219,11 +219,11 @@ test_that("posterior equals prior with no data", {
   slope_input <- c(om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]], om_input[["sel_survey"]][["survey1"]][["slope.sel1"]])
   #' @description Test the slope nll
   expect_equal(
-    report_nll[1], -sum(dnorm(slope_input, mean = slope_mean, sd = 3, log = TRUE))
+    unname(report_nll[1]), -sum(dnorm(slope_input, mean = slope_mean, sd = 3, log = TRUE))
   )
   #' @description Test the inflection point nll
   expect_equal(
-    report_nll[2], -sum(dnorm(inflection_point_input, mean = inflection_point_mean, sd = 3, log = TRUE))
+    unname(report_nll[2]), -sum(dnorm(inflection_point_input, mean = inflection_point_mean, sd = 3, log = TRUE))
   )
 
   # Fit MCMC using SparseNUTS

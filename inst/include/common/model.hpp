@@ -11,6 +11,8 @@
 
 #include <future>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "information.hpp"
 
@@ -80,6 +82,9 @@ class Model {  // may need singleton
     // Create vector for reporting out nll components
     fims::Vector<Type> nll_vec(
         this->fims_information->density_components.size(), 0.0);
+    std::vector<std::string> nll_component_names;
+    nll_component_names.reserve(
+        this->fims_information->density_components.size());
 
     for (m_it = this->fims_information->models_map.begin();
          m_it != this->fims_information->models_map.end(); ++m_it) {
@@ -102,6 +107,10 @@ class Model {  // may need singleton
 #endif
       if (d->input_type == "prior") {
         nll_vec[nll_vec_idx] = -d->evaluate();
+        nll_component_names.push_back(
+            d->nll_component_name.empty()
+                ? "prior_" + fims::to_string(d->id)
+                : d->nll_component_name);
         jnll += nll_vec[nll_vec_idx];
         n_priors += 1;
         nll_vec_idx += 1;
@@ -125,6 +134,10 @@ class Model {  // may need singleton
 #endif
       if (d->input_type == "random_effects") {
         nll_vec[nll_vec_idx] = -d->evaluate();
+        nll_component_names.push_back(
+            d->nll_component_name.empty()
+                ? "random_effects_" + fims::to_string(d->id)
+                : d->nll_component_name);
         jnll += nll_vec[nll_vec_idx];
         n_random_effects += 1;
         nll_vec_idx += 1;
@@ -149,6 +162,10 @@ class Model {  // may need singleton
 #endif
       if (d->input_type == "data") {
         nll_vec[nll_vec_idx] = -d->evaluate();
+        nll_component_names.push_back(
+            d->nll_component_name.empty()
+                ? "data_" + fims::to_string(d->id)
+                : d->nll_component_name);
         jnll += nll_vec[nll_vec_idx];
         n_data += 1;
         nll_vec_idx += 1;
@@ -166,7 +183,21 @@ class Model {  // may need singleton
 #ifdef TMB_MODEL
 
     vector<Type> nll_components = nll_vec.to_tmb();
-    FIMS_REPORT_F(nll_components, this->of);
+    if (isDouble<Type>::value && this->of != nullptr &&
+        this->of->current_parallel_region < static_cast<Type>(0)) {
+      SEXP nll_components_sexp = PROTECT(asSEXP(nll_components));
+      SEXP nll_component_names_sexp =
+          PROTECT(Rf_allocVector(STRSXP, nll_component_names.size()));
+      for (size_t i = 0; i < nll_component_names.size(); ++i) {
+        SET_STRING_ELT(nll_component_names_sexp, i,
+                       Rf_mkChar(nll_component_names[i].c_str()));
+      }
+      Rf_setAttrib(nll_components_sexp, R_NamesSymbol,
+                   nll_component_names_sexp);
+      Rf_defineVar(Rf_install("nll_components"), nll_components_sexp,
+                   this->of->report);
+      UNPROTECT(2);
+    }
     FIMS_REPORT_F(jnll, this->of);
 
 #endif

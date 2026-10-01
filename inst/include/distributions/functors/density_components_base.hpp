@@ -37,6 +37,9 @@ struct DensityComponentBase : public fims_model_object::FIMSObject<Type> {
    */
   std::string input_type;
 
+  /** @brief Semantic data category for this likelihood contribution. */
+  std::string nll_component_name;
+
   /** @brief Observed data. */
   std::shared_ptr<fims_data_object::DataObject<Type>> data_observed_values;
 

@@ -66,7 +66,7 @@ test_that("rcpp maturity parameters can have a prior", {
   )
   #' @description Test that a normal prior on maturity inflection_point and slope returns their summed negative log density.
   expect_equal(
-    obj[["report"]]()[["nll_components"]],
+    unname(obj[["report"]]()[["nll_components"]]),
     -sum(dnorm(c(3.0, 1.0), mean = c(3.5, 1.2), sd = 0.5, log = TRUE))
   )
 

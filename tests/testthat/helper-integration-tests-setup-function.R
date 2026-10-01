@@ -145,6 +145,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # Set up fishery index data using the lognormal
   fishing_fleet_catch_distribution <- methods::new(DlnormDistribution)
+  fishing_fleet_catch_distribution$set_nll_component_name("catch")
   # lognormal observation error transformed on the log scale
   fishing_fleet_catch_distribution$log_sd$resize(om_input[["nyr"]])
   for (y in 1:om_input[["nyr"]]) {
@@ -158,11 +159,13 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # Set up fishery age composition data using the multinomial
   fishing_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
+  fishing_fleet_agecomp_distribution$set_nll_component_name("age_comp")
   fishing_fleet_agecomp_distribution$set_observed_data(fishing_fleet$GetObservedAgeCompDataID())
   fishing_fleet_agecomp_distribution$set_distribution_links("data", fishing_fleet$agecomp_proportion$get_id())
 
   # Set up fishery length composition data using the multinomial
   fishing_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
+  fishing_fleet_lengthcomp_distribution$set_nll_component_name("length_comp")
   fishing_fleet_lengthcomp_distribution$set_observed_data(fishing_fleet$GetObservedLengthCompDataID())
   fishing_fleet_lengthcomp_distribution$set_distribution_links("data", fishing_fleet$lengthcomp_proportion$get_id())
   fishing_fleet_lengthcomp_distribution$set_note("fishing_fleet_lengthcomp_distribution")
@@ -226,6 +229,7 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # Set up survey index data using the lognormal
   survey_fleet_index_distribution <- methods::new(DlnormDistribution)
+  survey_fleet_index_distribution$set_nll_component_name("index")
 
   # lognormal observation error transformed on the log scale
   # sd = sqrt(log(cv^2 + 1)), sd is log transformed
@@ -240,11 +244,13 @@ setup_and_run_FIMS_without_wrappers <- function(iter_id,
 
   # Age composition distribution
   survey_fleet_agecomp_distribution <- methods::new(DmultinomDistribution)
+  survey_fleet_agecomp_distribution$set_nll_component_name("age_comp")
   survey_fleet_agecomp_distribution$set_observed_data(survey_fleet$GetObservedAgeCompDataID())
   survey_fleet_agecomp_distribution$set_distribution_links("data", survey_fleet$agecomp_proportion$get_id())
 
   # Length composition distribution
   survey_fleet_lengthcomp_distribution <- methods::new(DmultinomDistribution)
+  survey_fleet_lengthcomp_distribution$set_nll_component_name("length_comp")
   survey_fleet_lengthcomp_distribution$set_observed_data(survey_fleet$GetObservedLengthCompDataID())
   survey_fleet_lengthcomp_distribution$set_distribution_links("data", survey_fleet$lengthcomp_proportion$get_id()) # Set age to length conversion matrix
   survey_fleet$age_to_length_conversion$resize(om_input[["nages"]] * om_input[["nlengths"]])

@@ -124,6 +124,8 @@ check_distribution_validity <- function(args) {
 #'   `r glue::glue_collapse(sprintf('"%s"', eval(formals(initialize_data_distribution)[["data_type"]])), sep = ", ", last = ", and ")`
 #'   and the default is
 #'   `r eval(formals(initialize_data_distribution)[["data_type"]])[1]`.
+#'   This type is also used as the name of its contribution in the reported
+#'   `nll_components` vector.
 #' @param uncertainty A vector of strings specifying formulas for each data
 #'   point. See [FIMSFrame()] for more information on what the formula should
 #'   look like.
@@ -193,6 +195,7 @@ initialize_data_distribution <- function(
     ))
   }
   new_module$set_observed_data(getter_function())
+  new_module$set_nll_component_name(data_type)
   # setup link to expected values
   new_module$set_distribution_links(
     "data",

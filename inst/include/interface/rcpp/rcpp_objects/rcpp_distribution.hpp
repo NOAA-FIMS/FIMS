@@ -34,6 +34,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief The type of density input. The options are prior, re, or data.
    */
   SharedString input_type_m;
+  SharedString nll_component_name_m = fims::to_string("");
   /**
    * @brief Control flag indicating whether to use the expected mean in the
    * distribution calculations.
@@ -94,6 +95,7 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
       : id_m(other.id_m),
         key_m(other.key_m),
         input_type_m(other.input_type_m),
+        nll_component_name_m(other.nll_component_name_m),
         use_mean_m(other.use_mean_m),
         interface_observed_data_id_m(other.interface_observed_data_id_m) {}
 
@@ -152,6 +154,14 @@ class DistributionsInterfaceBase : public FIMSRcppInterfaceBase {
    * object
    */
   virtual bool set_observed_data(int observed_data_id) { return false; }
+
+  /**
+   * @brief Set the semantic name used for the reported likelihood component.
+   */
+  virtual bool set_nll_component_name(std::string name) {
+    this->nll_component_name_m.set(name);
+    return true;
+  }
 
   /**
    * @brief A method for each child distribution interface object to inherit so
@@ -232,6 +242,10 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_observed_data(int observed_data_id) {
     this->interface_observed_data_id_m.set(observed_data_id);
     return true;
+  }
+
+  virtual bool set_nll_component_name(std::string name) {
+    return DistributionsInterfaceBase::set_nll_component_name(name);
   }
 
   /**
@@ -455,6 +469,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
     distribution->observed_data_id_m = interface_observed_data_id_m;
     std::stringstream ss;
     distribution->input_type = this->input_type_m;
+    distribution->nll_component_name = this->nll_component_name_m.get();
     distribution->key.resize(this->key_m->size());
     for (size_t i = 0; i < this->key_m->size(); i++) {
       distribution->key[i] = this->key_m->at(i);
@@ -592,6 +607,10 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_observed_data(int observed_data_id) {
     this->interface_observed_data_id_m.set(observed_data_id);
     return true;
+  }
+
+  virtual bool set_nll_component_name(std::string name) {
+    return DistributionsInterfaceBase::set_nll_component_name(name);
   }
 
   /**
@@ -795,6 +814,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
     std::stringstream ss;
     distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
+    distribution->nll_component_name = this->nll_component_name_m.get();
     distribution->key.resize(this->key_m->size());
     for (size_t i = 0; i < this->key_m->size(); i++) {
       distribution->key[i] = this->key_m->at(i);
@@ -917,6 +937,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   virtual bool set_observed_data(int observed_data_id) {
     this->interface_observed_data_id_m.set(observed_data_id);
     return true;
+  }
+
+  virtual bool set_nll_component_name(std::string name) {
+    return DistributionsInterfaceBase::set_nll_component_name(name);
   }
 
   /**
@@ -1099,6 +1123,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     distribution->id = this->id_m;
     distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;
+    distribution->nll_component_name = this->nll_component_name_m.get();
     distribution->key.resize(this->key_m->size());
     for (size_t i = 0; i < this->key_m->size(); i++) {
       distribution->key[i] = this->key_m->at(i);

@@ -123,6 +123,10 @@ test_that("`initialize_fims()` works with edge cases", {
   expect_equal(
     obj$report()[["nll_components"]] |> length(), 6
   )
+  nll_components <- obj$report()[["nll_components"]]
+  #' @description Test that the likelihood report has meaningful names for each data type.
+  expect_length(names(nll_components), length(nll_components))
+  expect_true(all(names(nll_components) %in% c("catch", "index", "age_comp", "length_comp")))
 
   clear()
 })

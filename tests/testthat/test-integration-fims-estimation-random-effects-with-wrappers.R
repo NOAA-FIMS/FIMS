@@ -293,19 +293,19 @@ test_that("nll test of fims", {
   jnll <- report[["jnll"]]
 
   #' @description Test that the recruitment negative log-likelihood from FIMS matches the expected value calculated from the operating model.
-  expect_equal(report[["nll_components"]][1], rec_nll)
+  expect_equal(unname(report[["nll_components"]][1]), rec_nll)
   #' @description Test that the fishing fleet index negative log-likelihood from FIMS matches the expected value calculated from the operating model.
-  expect_equal(report[["nll_components"]][2], index_nll_fleet)
+  expect_equal(unname(report[["nll_components"]][2]), index_nll_fleet)
   #' @description Test that the fishing fleet age composition negative log-likelihood from FIMS matches the expected value calculated from the operating model.
-  expect_equal(report[["nll_components"]][3], age_comp_nll_fleet)
+  expect_equal(unname(report[["nll_components"]][3]), age_comp_nll_fleet)
   #' @description Test that the fishing fleet length composition negative log-likelihood from FIMS matches the expected value calculated from the operating model.
-  expect_equal(report[["nll_components"]][4], lengthcomp_nll_fleet)
+  expect_equal(unname(report[["nll_components"]][4]), lengthcomp_nll_fleet)
   #' @description Test that the survey index negative log-likelihood from FIMS matches the expected value calculated from the operating model.
-  expect_equal(report[["nll_components"]][5], index_nll_survey)
+  expect_equal(unname(report[["nll_components"]][5]), index_nll_survey)
   #' @description Test that the survey age composition negative log-likelihood from FIMS matches the expected value calculated from the operating model.
-  expect_equal(report[["nll_components"]][6], age_comp_nll_survey)
+  expect_equal(unname(report[["nll_components"]][6]), age_comp_nll_survey)
   #' @description Test that the survey length composition negative log-likelihood from FIMS matches the expected value calculated from the operating model.
-  expect_equal(report[["nll_components"]][7], lengthcomp_nll_survey)
+  expect_equal(unname(report[["nll_components"]][7]), lengthcomp_nll_survey)
   #' @description Test that the total negative log-likelihood from FIMS matches the expected value calculated from the operating model.
   expect_equal(jnll, expected_jnll)
 })
@@ -498,7 +498,11 @@ test_that("estimation test with recruitment re on logr", {
   fit_log_devs <- fit_fims(parameter_list, optimize = TRUE)
 
   #' @description Test that the `nll_components` from both `fit_log_r` and `fit_log_devs` runs are approximately equal within a tolerance of 0.001.
-  expect_equal(fit_log_r@report[["nll_components"]], fit_log_devs@report[["nll_components"]], tolerance = .001)
+  expect_equal(
+    unname(fit_log_r@report[["nll_components"]]),
+    unname(fit_log_devs@report[["nll_components"]]),
+    tolerance = .001
+  )
   #' @description Test that the `expected_recruitment` from both `fit_log_r` and `fit_log_devs` runs are approximately equal within a tolerance of 0.001.
   expect_equal(fit_log_r@report[["expected_recruitment"]], fit_log_devs@report[["expected_recruitment"]], tolerance = .001)
   #' @description Test that the `time_optimization` from `fit_log_r` is less than or equal to that from `fit_log_devs`.

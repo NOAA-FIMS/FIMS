@@ -68,7 +68,7 @@ test_that("rcpp fleet log_q can have a prior", {
   )
   #' @description Test that a normal prior on fleet log_q returns the negative log density of log_q.
   expect_equal(
-    obj[["report"]]()[["nll_components"]],
+    unname(obj[["report"]]()[["nll_components"]]),
     -dnorm(log(0.5), mean = log(0.8), sd = 0.2, log = TRUE)
   )
 

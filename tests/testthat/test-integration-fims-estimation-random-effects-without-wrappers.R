@@ -115,7 +115,11 @@ test_that("estimation test with recruitment re on logr", {
   )
 
   #' @description Verify the log_devs and log_r approach result in comparable negative log-likelihoods.
-  expect_equal(result_log_r$report[["nll_components"]], result_log_devs$report[["nll_components"]], tolerance = 1e-4)
+  expect_equal(
+    unname(result_log_r$report[["nll_components"]]),
+    unname(result_log_devs$report[["nll_components"]]),
+    tolerance = 1e-4
+  )
   #' @description Verify the log_devs and log_r approach result in comparable expected recruitment.
   expect_equal(result_log_r$report[["recruitment"]], result_log_devs$report[["recruitment"]], tolerance = 1e-4)
 
