@@ -62,6 +62,10 @@ test_that("empirical maturity equal to the logistic ogive matches Logistic", {
     dplyr::bind_rows(data_big, maturity_rows())
   )
 
+  #' @description Test that the empirical run used the Empirical maturity module.
+  expect_true(
+    any(empirical_run[["estimates"]][["label"]] == "maturity_at_age")
+  )
   #' @description Test that proportion mature at age matches the logistic model.
   expect_equal(
     get_by_year(empirical_run[["estimates"]], "proportion_mature_at_age"),
@@ -85,18 +89,45 @@ test_that("empirical maturity equal to the logistic ogive matches Logistic", {
 test_that("time-varying maturity scales spawning biomass in its year", {
   scale <- 0.5
   changed_year <- 10
+  last_year_scale <- 0.8
   varying_run <- run_at_initial_values(dplyr::bind_rows(
     data_big,
     maturity_rows(),
     maturity_rows(
       timing = years[changed_year],
       observed = scale * logistic_maturity
+    ),
+    maturity_rows(
+      timing = max(years),
+      observed = last_year_scale * logistic_maturity
     )
   ))
-  spawning_biomass <- get_by_year(
-    varying_run[["estimates"]],
-    "spawning_biomass"
+  estimates <- varying_run[["estimates"]]
+
+  #' @description Test that maturity_at_age output is labeled by year and age in the same order as the input.
+  maturity_output <- estimates |>
+    dplyr::filter(.data[["label"]] == "maturity_at_age") |>
+    dplyr::filter(.data[["year_i"]] == changed_year) |>
+    dplyr::arrange(.data[["age_i"]])
+  # Module parameters are written to the output JSON with 6 significant digits.
+  expect_equal(
+    maturity_output[["estimated"]],
+    scale * logistic_maturity,
+    tolerance = 1e-5
   )
+
+  #' @description Test that the year after the last model year uses the last year's maturity.
+  proportion_mature <- estimates |>
+    dplyr::filter(.data[["label"]] == "proportion_mature_at_age") |>
+    dplyr::filter(.data[["year_i"]] == length(years) + 1) |>
+    dplyr::arrange(.data[["age_i"]])
+  expect_equal(
+    proportion_mature[["estimated"]],
+    last_year_scale * logistic_maturity,
+    tolerance = 1e-8
+  )
+
+  spawning_biomass <- get_by_year(estimates, "spawning_biomass")
   logistic_spawning_biomass <- get_by_year(
     logistic_run[["estimates"]],
     "spawning_biomass"
@@ -178,6 +209,15 @@ test_that("initialize_fims() errors for bad empirical maturity", {
   expect_error(
     initialize_fims(parameters = above_one, data = data_with_maturity),
     "between 0 and 1"
+  )
+  clear()
+
+  #' @description Test that zero maturity at every age in a year returns an error.
+  all_zero <- parameters
+  all_zero[["value"]][is_maturity] <- 0
+  expect_error(
+    initialize_fims(parameters = all_zero, data = data_with_maturity),
+    "0 at every age"
   )
   clear()
 
