@@ -287,4 +287,188 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
 #endif
 };
 
+/**
+ * @brief Rcpp interface for empirical maturity to instantiate the object from
+ * R: empirical_maturity <- methods::new(EmpiricalMaturity).
+ */
+class EmpiricalMaturityInterface : public MaturityInterfaceBase {
+ public:
+  /**
+   * @brief The number of ages.
+   */
+  SharedInt n_ages = 1;
+  /**
+   * @brief The number of years.
+   */
+  SharedInt n_years = 1;
+  /**
+   * @brief The minimum age.
+   */
+  SharedInt min_age = 1;
+  /**
+   * @brief Proportion mature at age, with 1 value, n_ages values, or n_ages
+   * values per year (age changing fastest).
+   */
+  VariableVector maturity_at_age;
+
+  /**
+   * @brief The constructor.
+   */
+  EmpiricalMaturityInterface() : MaturityInterfaceBase() {
+    MaturityInterfaceBase::live_objects[this->id] =
+        std::make_shared<EmpiricalMaturityInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        MaturityInterfaceBase::live_objects[this->id]);
+  }
+
+  /**
+   * @brief Construct a new Empirical Maturity Interface object
+   *
+   * @param other
+   */
+  EmpiricalMaturityInterface(const EmpiricalMaturityInterface& other)
+      : MaturityInterfaceBase(other),
+        n_ages(other.n_ages),
+        n_years(other.n_years),
+        min_age(other.min_age),
+        maturity_at_age(other.maturity_at_age) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~EmpiricalMaturityInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Evaluate maturity at age in the first year.
+   * @param x The age at which maturity is evaluated.
+   */
+  virtual double evaluate(double x) {
+    fims_popdy::EmpiricalMaturity<double> EmpiricalMat;
+    EmpiricalMat.n_ages = this->n_ages.get();
+    EmpiricalMat.min_age = this->min_age.get();
+    EmpiricalMat.maturity_at_age.resize(this->maturity_at_age.size());
+    for (size_t i = 0; i < this->maturity_at_age.size(); i++) {
+      EmpiricalMat.maturity_at_age[i] =
+          this->maturity_at_age[i].initial_value_m;
+    }
+    return EmpiricalMat.evaluate(x, 0);
+  }
+
+  /**
+   * @brief Extracts derived quantities back to the Rcpp interface object from
+   * the Information object. Values are constant, so the final values are the
+   * initial values.
+   */
+  virtual void finalize() {
+    if (this->finalized) {
+      // log warning that finalize has been called more than once.
+      FIMS_WARNING_LOG("Empirical Maturity " + fims::to_string(this->id) +
+                       " has been finalized already.");
+    }
+
+    this->finalized = true;  // indicate this has been called already
+
+    for (size_t i = 0; i < maturity_at_age.size(); i++) {
+      this->maturity_at_age[i].final_value_m =
+          this->maturity_at_age[i].initial_value_m;
+    }
+  }
+
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * maturity interface with empirical maturity. It also returns the ID and the
+   * parameters. This string is formatted for a json file.
+   */
+  virtual std::string to_json() {
+    size_t n_values = this->maturity_at_age.size();
+    size_t n_age_values = this->n_ages.get();
+    size_t n_year_age_values = this->n_ages.get() * this->n_years.get();
+
+    std::stringstream ss;
+    ss << "{\n";
+    ss << " \"module_name\": \"Maturity\",\n";
+    ss << " \"module_type\": \"Empirical\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
+
+    ss << " \"parameters\": [\n{\n";
+    ss << "   \"name\": \"maturity_at_age\",\n";
+    ss << "   \"id\":" << this->maturity_at_age.id_m << ",\n";
+    ss << "   \"type\": \"vector\",\n";
+    ss << " \"dimensionality\": {\n";
+    // The header must match the vector length so the output is labeled by
+    // age, or by year and age, when it is reshaped in R.
+    if (n_values == n_age_values) {
+      ss << "  \"header\": [\"n_ages\"],\n";
+      ss << "  \"dimensions\": [" << this->n_ages.get() << "]\n},\n";
+    } else if (n_values == n_year_age_values) {
+      ss << "  \"header\": [\"n_years\", \"n_ages\"],\n";
+      ss << "  \"dimensions\": [" << this->n_years.get() << ", "
+         << this->n_ages.get() << "]\n},\n";
+    } else {
+      ss << "  \"header\": [null],\n";
+      ss << "  \"dimensions\": [" << n_values << "]\n},\n";
+    }
+    ss << "   \"values\":" << this->maturity_at_age << "}]\n";
+
+    ss << "}";
+
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    std::shared_ptr<fims_popdy::EmpiricalMaturity<Type>> maturity =
+        std::make_shared<fims_popdy::EmpiricalMaturity<Type>>();
+
+    // set relative info
+    maturity->id = this->id;
+    maturity->n_ages = this->n_ages.get();
+    maturity->min_age = this->min_age.get();
+    maturity->maturity_at_age.resize(this->maturity_at_age.size());
+    for (size_t i = 0; i < this->maturity_at_age.size(); i++) {
+      // Values are proportions used without a transformation, so estimating
+      // them could move them outside [0, 1]. An estimated form would need its
+      // own logit-scale parameter.
+      if (this->maturity_at_age[i].estimation_type_m.get() != "constant") {
+        Rcpp::stop(
+            "EmpiricalMaturity: maturity_at_age must be constant; estimating "
+            "empirical maturity is not supported.");
+      }
+      maturity->maturity_at_age[i] = this->maturity_at_age[i].initial_value_m;
+    }
+    info->variable_map[this->maturity_at_age.id_m] =
+        &(maturity)->maturity_at_age;
+
+    // add to Information
+    info->maturity_models[maturity->id] = maturity;
+
+    return true;
+  }
+
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+
+    return true;
+  }
+
+#endif
+};
+
 #endif

@@ -289,6 +289,9 @@ void clear_impl(bool get_error_msg) {
   LogisticMaturityInterface::id_g = 1;
   LogisticMaturityInterface::live_objects.clear();
 
+  EmpiricalMaturityInterface::id_g = 1;
+  EmpiricalMaturityInterface::live_objects.clear();
+
   // rcpp_population.hpp
   PopulationInterfaceBase::id_g = 1;
   PopulationInterfaceBase::live_objects.clear();
