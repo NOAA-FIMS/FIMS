@@ -10,6 +10,30 @@
 # setup_default_Maturity ----
 ## Setup ----
 data <- FIMS::FIMSFrame(data_big)
+ages <- get_ages(data)
+years <- get_start_year(data):get_end_year(data)
+
+maturity_rows <- function(timing = NA_real_,
+                          observed = stats::plogis(ages - 2)) {
+  tibble::tibble(
+    type = "maturity_at_age",
+    fleet = NA_character_,
+    age = ages,
+    length = NA_real_,
+    timing = timing,
+    observed = observed,
+    unit = "proportion",
+    uncertainty = NA_character_
+  )
+}
+data_constant_maturity <- FIMS::FIMSFrame(
+  dplyr::bind_rows(data_big, maturity_rows())
+)
+data_varying_maturity <- FIMS::FIMSFrame(dplyr::bind_rows(
+  data_big,
+  maturity_rows(),
+  maturity_rows(timing = years[2], observed = stats::plogis(ages - 3))
+))
 
 ## IO correctness ----
 test_that("`setup_default_Maturity()` works with correct inputs", {
@@ -24,9 +48,57 @@ test_that("`setup_default_Maturity()` works with correct inputs", {
   clear()
 })
 
+test_that("`setup_default_Maturity()` builds empirical maturity from data", {
+  result <- setup_default_Maturity(
+    data = data_constant_maturity,
+    module_type = "Empirical"
+  )
+
+  #' @description Test that timing = NA rows give one constant value per age.
+  expect_true(all(result[["module_type"]] == "Empirical"))
+  expect_true(all(result[["label"]] == "maturity_at_age"))
+  expect_true(all(result[["estimation_type"]] == "constant"))
+  expect_true(all(is.na(result[["timing"]])))
+  expect_equal(result[["age"]], ages)
+  expect_equal(result[["value"]], stats::plogis(ages - 2))
+
+  clear()
+})
+
+test_that("`setup_default_parameters()` picks Empirical with maturity data", {
+  #' @description Test that maturity_at_age data switch the default to Empirical.
+  maturity <- setup_default_parameters(data = data_constant_maturity) |>
+    dplyr::filter(.data[["module_name"]] == "Maturity")
+  expect_true(all(maturity[["module_type"]] == "Empirical"))
+
+  #' @description Test that the default stays Logistic without maturity_at_age data.
+  maturity <- setup_default_parameters(data = data) |>
+    dplyr::filter(.data[["module_name"]] == "Maturity")
+  expect_true(all(maturity[["module_type"]] == "Logistic"))
+
+  clear()
+})
+
 ## Edge handling ----
-# Please remove/comment out the test template below if no edge cases are being tested.
-# No additional edge cases to test.
+test_that("`setup_default_Maturity()` fills years from the default", {
+  result <- setup_default_Maturity(
+    data = data_varying_maturity,
+    module_type = "Empirical"
+  )
+
+  #' @description Test that one year of overrides gives one value per age and year, ordered by year then age.
+  expect_equal(NROW(result), length(ages) * length(years))
+  expect_equal(result[["timing"]], rep(years, each = length(ages)))
+  expect_equal(result[["age"]], rep(ages, times = length(years)))
+
+  #' @description Test that the overridden year uses its own values and other years use the default.
+  override_year <- dplyr::filter(result, .data[["timing"]] == years[2])
+  expect_equal(override_year[["value"]], stats::plogis(ages - 3))
+  other_year <- dplyr::filter(result, .data[["timing"]] == years[1])
+  expect_equal(other_year[["value"]], stats::plogis(ages - 2))
+
+  clear()
+})
 
 ## Error handling ----
 test_that("`setup_default_Maturity()` returns correct error messages", {
@@ -34,6 +106,12 @@ test_that("`setup_default_Maturity()` returns correct error messages", {
   expect_error(
     object = setup_default_Maturity(data = "not_a_fimsframe"),
     regexp = "FIMSFrame"
+  )
+
+  #' @description Test that Empirical maturity without maturity_at_age data returns an error.
+  expect_error(
+    object = setup_default_Maturity(data = data, module_type = "Empirical"),
+    regexp = "maturity_at_age"
   )
 
   clear()
