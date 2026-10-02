@@ -1315,8 +1315,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
           for (size_t l = 0; l < fleet->n_lengths; l++) {
             size_t i_length_year = y * fleet->n_lengths + l;
             const Type age_to_length_prob = age_to_length_conversion_row[l];
+            // Use agecomp_proportion rather than agecomp_expected, which is
+            // rescaled to the observed age-composition sample size and is
+            // therefore 0 in years without age-composition data. The scale
+            // cancels when the length composition is normalized below.
             fdq_["lengthcomp_expected"][i_length_year] +=
-                fdq_["agecomp_expected"][i_age_year] * age_to_length_prob;
+                fdq_["agecomp_proportion"][i_age_year] * age_to_length_prob;
 
             fdq_["catch_numbers_at_length"][i_length_year] +=
                 fdq_["catch_numbers_at_age"][i_age_year] * age_to_length_prob;

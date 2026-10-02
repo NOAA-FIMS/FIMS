@@ -255,6 +255,31 @@ prepare_test_data <- function() {
     compress = FALSE
   )
 
+  ## Deterministic run with 1 year of age comp missing for each fleet ----
+  # Drop the age composition for 1 year of each fleet, leaving age compositions
+  # in every other year. fleet1 has catch data, so its age composition comes
+  # from catch at age; survey1 has no catch data, so its age composition comes
+  # from index numbers at age. Both fleets also have length compositions.
+  data_missing_agecomp <- data_big |>
+    dplyr::filter(
+      !(type == "age_comp" & fleet == "fleet1" & timing == 3),
+      !(type == "age_comp" & fleet == "survey1" & timing == 5)
+    ) |>
+    FIMSFrame()
+  # Uses the same parameters as deterministic_age_length_comp so the expected
+  # length compositions can be compared between the 2 runs.
+  deterministic_missing_agecomp <- modified_parameters |>
+    initialize_fims(data = data_missing_agecomp) |>
+    fit_fims(optimize = FALSE)
+  clear()
+
+  # Save FIMS results as a test fixture for additional fimsfit tests
+  saveRDS(
+    deterministic_missing_agecomp,
+    file = testthat::test_path("fixtures", "deterministic_missing_agecomp.RDS"),
+    compress = FALSE
+  )
+
   ## Estimation run with age and length comp using wrappers ----
   # Run FIMS model
   fit_age_length_comp_fixed_effects <- modified_parameters_fixed_effects |>
