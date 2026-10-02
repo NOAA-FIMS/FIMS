@@ -129,6 +129,26 @@ test_that("validate_maturity_at_age() returns correct error messages", {
     "one row for each model age"
   )
 
+  #' @description Test that zero maturity at every age in one year returns an error because spawning biomass would be 0.
+  expect_error(
+    validate_maturity_at_age(
+      dplyr::bind_rows(
+        maturity_rows(),
+        maturity_rows(timing = years[2], observed = 0)
+      ),
+      ages,
+      years
+    ),
+    "0 at every age"
+  )
+
+  #' @description Test that zero maturity at only some ages is valid.
+  expect_true(validate_maturity_at_age(
+    maturity_rows(observed = c(0, 0, stats::plogis(ages[-(1:2)] - 2))),
+    ages,
+    years
+  ))
+
   #' @description Test that missing years without a timing = NA default return an error.
   expect_error(
     validate_maturity_at_age(maturity_rows(timing = years[2]), ages, years),

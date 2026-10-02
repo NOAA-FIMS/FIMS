@@ -929,6 +929,24 @@ validate_maturity_at_age <- function(data, ages, years) {
     ))
   }
 
+  # Zero maturity at every age gives zero spawning biomass, which makes
+  # recruitment and the objective function undefined (NaN).
+  all_zero_timings <- data |>
+    dplyr::summarize(
+      all_zero = all(.data$observed == 0),
+      .by = dplyr::all_of("timing")
+    ) |>
+    dplyr::filter(.data$all_zero) |>
+    dplyr::pull(.data$timing)
+  if (length(all_zero_timings) > 0) {
+    cli::cli_abort(c(
+      "{.var maturity_at_age} is 0 at every age for these timings:
+      {all_zero_timings}.",
+      "i" = "Spawning biomass would be 0, which makes recruitment and the
+      objective function undefined."
+    ))
+  }
+
   if (!any(is.na(data[["timing"]]))) {
     missing_years <- setdiff(years, data[["timing"]])
     if (length(missing_years) > 0) {
