@@ -18,6 +18,7 @@ Bertalanffy
 Beverton
 Bigg
 bindenv
+binline
 Bjarne
 bookdown
 byrow
@@ -71,6 +72,7 @@ furrr
 gdbsource
 geeksforgeeks
 ggplot
+ggridges
 ggtitle
 GMACS
 googletest
@@ -183,6 +185,7 @@ recruitments
 reportvector
 retape
 Ricker
+ridgeline
 rlang
 rlib
 rmarkdown
