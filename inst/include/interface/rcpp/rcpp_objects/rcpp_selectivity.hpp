@@ -77,11 +77,14 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   /**
-   * @brief The index value at which the response reaches 0.5.
+   * @brief The age or length at which 50% of fish are selected.
    */
   VariableVector inflection_point;
   /**
-   * @brief The width of the curve at the inflection point.
+   * @brief How quickly selectivity changes with age or length around the
+   * inflection point, per year of age or unit of length. Larger absolute
+   * values give a steeper, more knife-edge curve; negative values give a
+   * curve that declines with age or length.
    */
   VariableVector slope;
 
@@ -297,14 +300,24 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  */
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
-  VariableVector inflection_point_asc; /**< the index value at which the
-                                     response reaches .5 */
-  VariableVector
-      slope_asc; /**< the width of the curve at the inflection_point */
-  VariableVector inflection_point_desc; /**< the index value at which the
-                                      response reaches .5 */
-  VariableVector
-      slope_desc; /**< the width of the curve at the inflection_point */
+  /**
+   * @brief The age or length at which the ascending limb is 0.5.
+   */
+  VariableVector inflection_point_asc;
+  /**
+   * @brief How quickly selectivity rises on the ascending limb; larger values
+   * give a steeper, more knife-edge rise.
+   */
+  VariableVector slope_asc;
+  /**
+   * @brief The age or length at which the descending limb is 0.5.
+   */
+  VariableVector inflection_point_desc;
+  /**
+   * @brief How quickly selectivity falls on the descending limb; larger values
+   * give a steeper decline.
+   */
+  VariableVector slope_desc;
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {
     SelectivityInterfaceBase::live_objects[this->id] =
