@@ -32,7 +32,8 @@
 #'     units for each data type are as follows. `mt` is used for `index`,
 #'     `catch`, and `weight_at_age` data. `number` or `proportion` are each
 #'     viable units for the composition data, where the former is the preferred
-#'     unit of measurement.}
+#'     unit of measurement. `proportion` is used for `maturity_at_age` data,
+#'     which give the proportion mature at age and have a `fleet` of `NA`.}
 #'   \item{uncertainty}{A right-handed formula specifying the distributional
 #'     assumptions for the entry in `observed`. See [FIMSFrame()] for more
 #'     information about this column.
