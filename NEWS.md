@@ -1,6 +1,7 @@
 # FIMS 0.11.0
 
 *
+* Adds empirical maturity at age, optionally by year, as the `"Empirical"` maturity module using `maturity_at_age` rows in the input data
 
 # FIMS 0.10.0
 
