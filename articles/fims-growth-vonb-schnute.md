@@ -531,16 +531,16 @@ fit <- FIMS::fit_fims(
 )
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 5 times to improve gradient.
-#> ℹ Maximum gradient went from 5e-04 to 5e-05 after 5 steps.
+#> ℹ Maximum gradient went from 0.00148 to 0.00013 after 5 steps.
 #> ✔ Finished optimization
 #> ℹ FIMS model version: 0.10.0.9000
-#> ℹ Total run time was 2.79617 seconds
+#> ℹ Total run time was 2.39624 seconds
 #> ℹ Number of parameters: fixed_effects=39, random_effects=1, and total=40
-#> ℹ Maximum gradient= 5e-05
+#> ℹ Maximum gradient= 0.00013
 #> ℹ Negative log likelihood (NLL):
 #> • Marginal NLL= 187.51982
-#> • Total NLL= 63.85833
-#> ℹ Terminal SB= 33979.72656
+#> • Total NLL= 63.46846
+#> ℹ Terminal SB= 34069.92268
 
 # Keep only the core VonBertalanffySchnute Growth estimates.
 growth_estimates <- FIMS::get_estimates(fit) |>
@@ -585,7 +585,7 @@ tibble::tibble(
 #> # A tibble: 1 × 2
 #>   convergence max_gradient
 #>         <int>        <dbl>
-#> 1           0    0.0000545
+#> 1           0     0.000129
 ```
 
 A convergence code of `0` indicates normal optimizer convergence. The
