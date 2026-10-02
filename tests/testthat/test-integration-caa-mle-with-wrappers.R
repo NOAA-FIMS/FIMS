@@ -11,7 +11,7 @@
 ## Setup ----
 # Load necessary data for the integration test
 if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS")) ||
-  !file.exists(testthat::test_path("fixtures", "fit_missing_agecomp.RDS"))) {
+  !file.exists(testthat::test_path("fixtures", "deterministic_missing_agecomp.RDS"))) {
   prepare_test_data()
 }
 
@@ -229,14 +229,6 @@ test_that("catch-at-age model (estimation MLE with wrappers) works with age and 
     use_fimsfit = TRUE,
     initial_value_scale = initial_value_scale
   )
-})
-
-test_that("catch-at-age model (estimation MLE with wrappers) works with 1 year of age comp missing", {
-  # Load the test data from an RDS file containing the model fit
-  fit_missing_agecomp <- readRDS(testthat::test_path("fixtures", "fit_missing_agecomp.RDS"))
-
-  #' @description Test that removing 1 year of age-composition data from fishery and survey fleets with length-composition data keeps every gradient element finite.
-  expect_true(all(is.finite(get_gradient(fit_missing_agecomp))))
 })
 
 test_that("catch-at-age model (estimation MLE with wrappers) works with mixed estimation types", {
