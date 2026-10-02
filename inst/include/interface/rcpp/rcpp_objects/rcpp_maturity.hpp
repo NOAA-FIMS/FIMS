@@ -439,8 +439,7 @@ class EmpiricalMaturityInterface : public MaturityInterfaceBase {
     maturity->maturity_at_age.resize(this->maturity_at_age.size());
     for (size_t i = 0; i < this->maturity_at_age.size(); i++) {
       // Values are proportions used without a transformation, so estimating
-      // them could move them outside [0, 1]. An estimated form would need its
-      // own logit-scale parameter.
+      // them could move them outside [0, 1].
       if (this->maturity_at_age[i].estimation_type_m.get() != "constant") {
         Rcpp::stop(
             "EmpiricalMaturity: maturity_at_age must be constant; estimating "
