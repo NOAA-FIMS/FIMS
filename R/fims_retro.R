@@ -46,7 +46,7 @@
 #'   runs, with the following key columns:
 #'   * `label` - Type of estimate (e.g., "spawning_biomass")
 #'   * `year_i` - Year index for the estimate
-#'   * `age_i` - Age index (if applicable)
+#'   * `age` - Age from the data (if applicable)
 #'   * `estimated` - Point estimate value
 #'   * `uncertainty` - Standard error of the estimate
 #'   * `retrospective_peel` - Number of years removed for this peel
