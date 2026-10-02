@@ -392,7 +392,7 @@ initialize_maturity <- function(parameters, data) {
 
     ages <- get_ages(data)
     years <- get_start_year(data):get_end_year(data)
-    expected_keys <- if (NROW(maturity_rows) == length(ages)) {
+    expected_keys <- if (all(is.na(maturity_rows[["timing"]]))) {
       paste(NA, ages)
     } else {
       paste(rep(years, each = length(ages)), rep(ages, times = length(years)))
@@ -408,6 +408,21 @@ initialize_maturity <- function(parameters, data) {
         but found {NROW(maturity_rows)}.",
         "i" = "Use {.fn setup_default_Maturity} with
         {.code module_type = \"Empirical\"} to build these rows from data."
+      ))
+    }
+
+    has_all_zero_year <- maturity_rows |>
+      dplyr::summarize(
+        all_zero = all(.data$value == 0),
+        .by = dplyr::all_of("timing")
+      ) |>
+      dplyr::pull(.data$all_zero) |>
+      any()
+    if (has_all_zero_year) {
+      cli::cli_abort(c(
+        "Empirical maturity is 0 at every age in at least one year.",
+        "i" = "Spawning biomass would be 0, which makes recruitment and the
+        objective function undefined."
       ))
     }
 
