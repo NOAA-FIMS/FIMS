@@ -602,6 +602,13 @@ jobs:
           EOF
           }
 
+          # Pull requests build main on this runner so install times are
+          # compared on the same hardware rather than across runners.
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            build_baseline_metrics_from_main
+            exit 0
+          fi
+
           BASELINE_ARTIFACT_ID=$(gh api \
             "repos/${BASELINE_REPOSITORY}/actions/artifacts?per_page=100" \
             --jq ".artifacts[] | select(.expired == false and .workflow_run.head_sha == \"$BASELINE_COMMIT\" and (.name == \"build-metrics-main\" or .name == \"build-metrics-$BASELINE_COMMIT\")) | .id" | head -1)
