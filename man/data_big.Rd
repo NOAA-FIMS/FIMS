@@ -9,7 +9,7 @@ A data frame with 2808 observations of 8
 variables:
 \describe{
 \item{type}{The type of input the row contains. Allowed types include
-age_comp, age_to_length_conversion, index, catch, length_bin, length_comp, and weight_at_age.}
+age_comp, age_to_length_conversion, index, catch, length_bin, length_comp, maturity_at_age, and weight_at_age.}
 \item{fleet}{A character string providing the name of the information
 source that the input was collected from, e.g., \code{"Trawl fishery"} or
 \code{"age_zero_survey"}. Entries can be \code{NA} for information that is not
@@ -28,7 +28,8 @@ for age-to-length conversion.}
 units for each data type are as follows. \code{mt} is used for \code{index},
 \code{catch}, and \code{weight_at_age} data. \code{number} or \code{proportion} are each
 viable units for the composition data, where the former is the preferred
-unit of measurement.}
+unit of measurement. \code{proportion} is used for \code{maturity_at_age} data,
+which give the proportion mature at age and have a \code{fleet} of \code{NA}.}
 \item{uncertainty}{A right-handed formula specifying the distributional
 assumptions for the entry in \code{observed}. See \code{\link[=FIMSFrame]{FIMSFrame()}} for more
 information about this column.
