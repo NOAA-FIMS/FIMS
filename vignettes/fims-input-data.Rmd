@@ -240,7 +240,7 @@ Maturity can be constant or vary by year:
   2. rows with a `timing` replace those values for that year, and
   3. without any `timing = NA` rows, every model year needs its own rows.
 
-Maturity in the first model year also sets unfished spawning biomass per recruit, so it affects the stock--recruitment curve and the spawning biomass ratio in every year. Maturity in later years only changes spawning biomass in those years.
+Maturity in the first model year also sets unfished spawning biomass per recruit, so it affects the stock--recruitment curve and the spawning biomass ratio in every year. Maturity in a later year changes spawning biomass in that year and, through the stock--recruitment relationship, recruitment in the following year.
 
 Every model age needs a value for each `timing` that is used. Unlike weight-at-age data, rows are not needed for the year after the last model year because that year uses the maturity from the last model year. For projections, either add rows for the projection years or use `timing = NA` rows.
 
@@ -253,7 +253,10 @@ maturity_at_age <- tibble::tibble(
   fleet = NA_character_,
   age = rep(maturity_ages, times = 2),
   length = NA_real_,
-  timing = rep(c(NA, get_start_year(data_4_model) + 1), each = length(maturity_ages)),
+  timing = rep(
+    c(NA, get_start_year(data_4_model) + 1),
+    each = length(maturity_ages)
+  ),
   observed = c(plogis(maturity_ages - 2), plogis(maturity_ages - 3)),
   unit = "proportion",
   uncertainty = NA_character_

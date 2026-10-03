@@ -73,8 +73,11 @@ struct EmpiricalMaturity : public MaturityBase<Type> {
   }
 
   /**
-   * @copydoc EmpiricalMaturity::evaluate(const Type &x)
+   * @brief Returns the proportion mature at age in a year.
+   *
+   * @param x The age at which maturity is evaluated.
    * @param pos Position index, e.g., which year.
+   * @return The proportion mature at age `x` in year `pos`.
    * @throws std::invalid_argument if `x` is outside the modeled ages, if the
    * length of `maturity_at_age` is not 1 or a multiple of `n_ages`, or if
    * `pos` is beyond the years in `maturity_at_age`.

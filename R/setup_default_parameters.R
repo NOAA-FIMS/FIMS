@@ -807,6 +807,8 @@ setup_default_Fleet <- function(
 #' This function sets up default parameters for a maturity module.
 #' @param module_type A string specifying the type of maturity module. The
 #'   available options are `r toString(eval(formals(setup_default_Maturity)[["module_type"]]))`.
+#'   `"Empirical"` uses the proportion mature at age from `maturity_at_age`
+#'   rows in `data`.
 #' @inherit setup_default_parameters
 #' @return
 #' A tibble containing default maturity parameters. See \code{\link{setup_default_parameters}}

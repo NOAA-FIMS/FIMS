@@ -11,7 +11,9 @@ setup_default_Maturity(data, module_type = c("Logistic", "Empirical"))
 your long input data.}
 
 \item{module_type}{A string specifying the type of maturity module. The
-available options are Logistic, Empirical.}
+available options are Logistic, Empirical.
+\code{"Empirical"} uses the proportion mature at age from \code{maturity_at_age}
+rows in \code{data}.}
 }
 \value{
 A tibble containing default maturity parameters. See \code{\link{setup_default_parameters}}
