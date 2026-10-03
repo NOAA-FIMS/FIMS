@@ -80,6 +80,24 @@ test_that("`setup_default_parameters()` picks Empirical with maturity data", {
 })
 
 ## Edge handling ----
+test_that("`setup_default_Maturity()` works with rows for every year and no default", {
+  every_year <- purrr::map(
+    years,
+    \(year) maturity_rows(timing = year, observed = stats::plogis(ages - 2))
+  ) |>
+    dplyr::bind_rows()
+  result <- setup_default_Maturity(
+    data = FIMS::FIMSFrame(dplyr::bind_rows(data_big, every_year)),
+    module_type = "Empirical"
+  )
+
+  #' @description Test that rows for every year without a timing = NA default give one value per age and year.
+  expect_equal(result[["timing"]], rep(years, each = length(ages)))
+  expect_equal(result[["value"]], rep(stats::plogis(ages - 2), length(years)))
+
+  clear()
+})
+
 test_that("`setup_default_Maturity()` fills years from the default", {
   result <- setup_default_Maturity(
     data = data_varying_maturity,

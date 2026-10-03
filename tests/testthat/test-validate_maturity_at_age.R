@@ -45,6 +45,13 @@ test_that("validate_maturity_at_age() works with correct inputs", {
     dplyr::bind_rows()
   expect_true(validate_maturity_at_age(all_years, ages, years))
 
+  #' @description Test that zero maturity at only some ages is valid.
+  expect_true(validate_maturity_at_age(
+    maturity_rows(observed = c(0, 0, stats::plogis(ages[-(1:2)] - 2))),
+    ages,
+    years
+  ))
+
   #' @description Test that no maturity_at_age rows is valid.
   expect_true(validate_maturity_at_age(maturity_rows()[0, ], ages, years))
 })
@@ -141,13 +148,6 @@ test_that("validate_maturity_at_age() returns correct error messages", {
     ),
     "0 at every age"
   )
-
-  #' @description Test that zero maturity at only some ages is valid.
-  expect_true(validate_maturity_at_age(
-    maturity_rows(observed = c(0, 0, stats::plogis(ages[-(1:2)] - 2))),
-    ages,
-    years
-  ))
 
   #' @description Test that missing years without a timing = NA default return an error.
   expect_error(

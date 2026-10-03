@@ -160,7 +160,28 @@ test_that("time-varying maturity scales spawning biomass in its year", {
 })
 
 ## Edge handling ----
-test_that("retrospective runs keep year-specific maturity_at_age rows", {
+test_that("initialize_maturity() works for a one-year model with year rows", {
+  one_year <- dplyr::filter(
+    data_big,
+    is.na(timing) | timing <= years[1] |
+      (type == "weight_at_age" & timing <= years[1] + 1)
+  )
+  data_one_year <- FIMSFrame(dplyr::bind_rows(
+    one_year,
+    maturity_rows(timing = years[1])
+  ))
+  parameters <- setup_default_Maturity(data_one_year, module_type = "Empirical")
+  maturity <- initialize_maturity(parameters, data_one_year)
+
+  #' @description Test that one year of year-specific rows gives one value per age.
+  expect_equal(maturity$maturity_at_age$size(), length(ages))
+  #' @description Test that the value for the first age is the input proportion mature.
+  expect_equal(maturity$evaluate(min(ages)), logistic_maturity[1])
+  clear()
+})
+
+
+test_that("retrospective runs work with year-specific maturity_at_age rows", {
   #' @description Skip the test unless explicitly enabled for heavy integration testing.
   testthat::skip_if_not(
     testthat:::env_var_is_true("RUN_SLOW_TESTS"),
@@ -175,7 +196,7 @@ test_that("retrospective runs keep year-specific maturity_at_age rows", {
     setup_default_parameters(FIMSFrame(data_with_maturity))
   )
 
-  #' @description Test that removing a year of data keeps the maturity rows for that year.
+  #' @description Test that a retrospective run with year-specific maturity_at_age rows completes.
   expect_no_error(
     fit <- run_modified_data_fims(
       years_to_remove = 1,
