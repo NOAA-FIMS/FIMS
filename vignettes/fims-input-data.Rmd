@@ -242,7 +242,7 @@ Maturity can be constant or vary by year:
 
 Maturity in the first model year also sets unfished spawning biomass per recruit, so it affects the stock--recruitment curve and the spawning biomass ratio in every year. Maturity in a later year changes spawning biomass in that year and, through the stock--recruitment relationship, recruitment in the following year.
 
-Every model age needs a value for each `timing` that is used. Unlike weight-at-age data, rows are not needed for the year after the last model year because that year uses the maturity from the last model year. For projections, either add rows for the projection years or use `timing = NA` rows.
+Every model age needs a value for each `timing` that is used. Unlike weight-at-age data, rows are not needed for the year after the last model year because that year uses the maturity from the last model year. Projection years are model years, so they use their own rows or the `timing = NA` rows, not the maturity from the last data year.
 
 `data_big` does not include maturity-at-age data. The example below adds a constant maturity ogive and a different ogive for the second year.
 
