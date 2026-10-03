@@ -14,20 +14,6 @@ if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }
 
-# Models built in these tests estimate the recruitment deviations as fixed
-# effects; the random-effect density join matches rows by value, and the
-# default deviations are all zero
-fixed_effect_parameters <- function(data) {
-  setup_default_parameters(data = data) |>
-    dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        .data$estimation_type == "random_effects",
-        "fixed_effects",
-        .data$estimation_type
-      )
-    )
-}
-
 ## IO correctness ----
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
@@ -112,7 +98,7 @@ test_that("`get_estimates()` works with estimation run", {
 
 test_that("`get_estimates()` reports distribution parameters by id", {
   data_4_model <- FIMSFrame(data_big)
-  parameters <- fixed_effect_parameters(data_4_model) |>
+  parameters <- setup_default_parameters(data = data_4_model) |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(
         .data$module_name == "Recruitment" & .data$label == "log_sd",
@@ -169,7 +155,7 @@ test_that("`get_estimates()` keeps fleet names with spaces and quotes", {
   data_4_model <- data_big |>
     dplyr::mutate(fleet = unname(fleet_names[.data$fleet])) |>
     FIMSFrame()
-  fit <- fixed_effect_parameters(data_4_model) |>
+  fit <- setup_default_parameters(data = data_4_model) |>
     initialize_fims(data = data_4_model) |>
     fit_fims(optimize = FALSE)
   estimates <- get_estimates(fit)
@@ -191,7 +177,7 @@ test_that("`get_estimates()` keeps fleet names with spaces and quotes", {
 
 test_that("`get_estimates()` handles non-finite derived quantities", {
   data_4_model <- FIMSFrame(data_big)
-  parameters <- fixed_effect_parameters(data_4_model)
+  parameters <- setup_default_parameters(data = data_4_model)
   # exp(-1000) is exactly zero in double precision, so the expected catch in
   # the first year is zero and its log is -Inf
   first_log_fmort <- which(
@@ -220,7 +206,7 @@ test_that("`get_estimates()` works for a model without random effects", {
   # random-effect distribution and so no distribution parameters to report.
   # initialize_fims() requires the deviations to be constant in that case.
   recruitment_deviations <- c("log_devs", "log_sd")
-  parameters <- fixed_effect_parameters(data_4_model) |>
+  parameters <- setup_default_parameters(data = data_4_model) |>
     dplyr::mutate(
       estimation_type = dplyr::if_else(
         .data$module_name == "Recruitment" & .data$label == "log_devs",
