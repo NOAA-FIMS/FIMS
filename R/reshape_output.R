@@ -10,23 +10,50 @@
 #' @param model_output A JSON object containing the finalized FIMS output as
 #'   returned from `get_output()`, which is an internal function to each model
 #'   family.
-#' @return A tibble containing the reshaped parameter estimates.
+#' @return A tibble containing the reshaped parameter estimates. Parameters of
+#' distributions for random effects, e.g., `log_sd` of the recruitment
+#' deviations, are included with one row per parameter id under the module
+#' that owns the vector they apply to.
 reshape_json_estimates <- function(model_output) {
   # Helper functions
+  # Match each random-effect density value to its parameter by the vector the
+  # distribution applies to, i.e., its first linked id, and the position within
+  # that vector, because parameter values can be tied.
   join_density_information <- function(x, density_tibble) {
-    dplyr::left_join(x,
-      y = dplyr::filter(
-        density_tibble,
-        .data$input_type == "random_effects"
+    vector_lengths <- dplyr::count(x, .data$type_id, name = "n_values")
+    random_effects <- density_tibble |>
+      dplyr::filter(.data$input_type == "random_effects") |>
+      dplyr::group_by(.data$module_id) |>
+      dplyr::group_modify(\(rows, key) {
+        id <- purrr::pluck(rows, "linked_ids", 1, 1, .default = NA_integer_)
+        n_values <- vector_lengths[["n_values"]][
+          match(id, vector_lengths[["type_id"]])
+        ]
+        # Leave the density unmatched rather than guess at its parameters.
+        if (is.na(id) || is.na(n_values) || n_values != NROW(rows)) {
+          return(dplyr::mutate(rows, type_id = NA, density_position = NA))
+        }
+        dplyr::mutate(rows, type_id = id, density_position = seq_len(n_values))
+      }) |>
+      dplyr::ungroup() |>
+      dplyr::select(-dplyr::any_of(c(
+        "module_name", "module_id", "module_type", "observed_data_id",
+        "linked_ids", "observed_values"
+      )))
+
+    x |>
+      dplyr::mutate(
+        density_position = dplyr::row_number(),
+        .by = dplyr::all_of("type_id")
       ) |>
-        dplyr::select(
-          -dplyr::all_of(c("module_name", "module_id", "module_type", "observed_data_id"))
+      dplyr::left_join(
+        y = random_effects,
+        by = c(
+          "estimation_type" = "input_type", "type_id", "density_position"
         ),
-      by = c(
-        "estimation_type" = "input_type",
-        "estimated_value" = "observed_values"
-      )
-    )
+        na_matches = "never"
+      ) |>
+      dplyr::select(-dplyr::all_of("density_position"))
   }
 
   json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE)
@@ -40,10 +67,56 @@ reshape_json_estimates <- function(model_output) {
   )
 
 
+  # Distribution parameters, e.g., log_sd, are written with their parameter
+  # ids so they can be reported like module parameters. Any parameter a
+  # random-effect distribution writes is handled the same way, so new ones
+  # need no change here. They are split off before the density components are
+  # joined to other rows, because the joins keep every density column and
+  # would add them to every row.
+  density_components <- read_list[["density_components"]]
+  distribution_information <- NULL
+  if ("parameters" %in% names(density_components)) {
+    # Only random-effect distributions for now. The log_sd of a data
+    # distribution is set from the data uncertainty, held constant, and
+    # already reported next to each observation, and a prior's parameters are
+    # fixed inputs.
+    random_effect_distributions <- density_components |>
+      dplyr::filter(
+        .data$input_type == "random_effects",
+        purrr::map_lgl(.data$parameters, \(x) length(x) > 0)
+      )
+    # A model without random effects has no distribution parameters, and
+    # unnesting zero rows would leave no id column to work with
+    if (nrow(random_effect_distributions) > 0) {
+      distribution_information <- random_effect_distributions |>
+        dplyr::mutate(
+          distribution = .data$module_type,
+          # The first linked id is the vector the distribution applies to
+          linked_id = purrr::map_int(
+            .data$linked_ids,
+            \(x) purrr::pluck(x, 1, .default = NA_integer_)
+          ),
+          parameters = purrr::map(
+            .data$parameters,
+            \(x) purrr::map_df(x, dimension_folded_to_tibble)
+          )
+        ) |>
+        dplyr::select(
+          dplyr::all_of(c(
+            "module_name", "module_id", "module_type", "distribution",
+            "linked_id", "parameters"
+          ))
+        ) |>
+        tidyr::unnest(dplyr::all_of("parameters")) |>
+        # A single log_sd is copied to every element with the same id
+        dplyr::distinct(.data$id, .keep_all = TRUE)
+    }
+    density_components <- density_components |>
+      dplyr::select(-dplyr::all_of("parameters"))
+  }
+
   # Process the density components
-  # TODO: Still need links to the parameter id because we are just joining by
-  #       parameter values, which is fragile
-  density_information <- read_list[["density_components"]] |>
+  density_information <- density_components |>
     dplyr::mutate(
       density_component = purrr::map(.data$density_component, density_to_tibble)
     ) |>
@@ -85,12 +158,15 @@ reshape_json_estimates <- function(model_output) {
       name = paste(.data$data_type, "expected", sep = "_")
     ) |>
     dplyr::left_join(
-      y = read_list[["density_components"]] |>
+      y = density_components |>
         dplyr::filter(
           .data$observed_data_id != -999
         ) |>
         dplyr::rename(distribution = "module_type") |>
-        dplyr::select(-dplyr::starts_with("module")),
+        dplyr::select(
+          -dplyr::starts_with("module"),
+          -dplyr::any_of("linked_ids")
+        ),
       by = c("data_id" = "observed_data_id")
     ) |>
     dplyr::mutate(
@@ -169,12 +245,35 @@ reshape_json_estimates <- function(model_output) {
     tidyr::unnest(dplyr::all_of("parameters")) |>
     join_density_information(density_information)
 
+  # Report each distribution parameter under the module that owns the vector
+  # it applies to, e.g., the recruitment log_sd next to the recruitment
+  # deviations, so users do not have to look up what a density is linked to
+  if (!is.null(distribution_information)) {
+    linked_modules <- dplyr::bind_rows(
+      fleet_information,
+      module_information,
+      population_information
+    ) |>
+      dplyr::select(dplyr::all_of(c(
+        "type_id", "module_name", "module_id", "module_type"
+      ))) |>
+      dplyr::filter(!is.na(.data$type_id)) |>
+      dplyr::distinct()
+    distribution_information <- distribution_information |>
+      dplyr::select(
+        -dplyr::all_of(c("module_name", "module_id", "module_type"))
+      ) |>
+      dplyr::left_join(linked_modules, by = c("linked_id" = "type_id")) |>
+      dplyr::select(-dplyr::all_of("linked_id"))
+  }
+
   # TODO: Change some column names
   # Bring everything together
   out <- dplyr::bind_rows(
     fleet_information,
     module_information,
-    population_information
+    population_information,
+    distribution_information
   ) |>
     dplyr::select(
       dplyr::all_of(c("module_name", "module_id", "module_type")),
