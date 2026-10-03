@@ -16,20 +16,44 @@
 #' that owns the vector they apply to.
 reshape_json_estimates <- function(model_output) {
   # Helper functions
+  # Match each random-effect density value to its parameter by the vector the
+  # distribution applies to, i.e., its first linked id, and the position within
+  # that vector, because parameter values can be tied.
   join_density_information <- function(x, density_tibble) {
-    dplyr::left_join(x,
-      y = dplyr::filter(
-        density_tibble,
-        .data$input_type == "random_effects"
+    vector_lengths <- dplyr::count(x, .data$type_id, name = "n_values")
+    random_effects <- density_tibble |>
+      dplyr::filter(.data$input_type == "random_effects") |>
+      dplyr::group_by(.data$module_id) |>
+      dplyr::group_modify(\(rows, key) {
+        id <- purrr::pluck(rows, "linked_ids", 1, 1, .default = NA_integer_)
+        n_values <- vector_lengths[["n_values"]][
+          match(id, vector_lengths[["type_id"]])
+        ]
+        # Leave the density unmatched rather than guess at its parameters.
+        if (is.na(id) || is.na(n_values) || n_values != NROW(rows)) {
+          return(dplyr::mutate(rows, type_id = NA, density_position = NA))
+        }
+        dplyr::mutate(rows, type_id = id, density_position = seq_len(n_values))
+      }) |>
+      dplyr::ungroup() |>
+      dplyr::select(-dplyr::any_of(c(
+        "module_name", "module_id", "module_type", "observed_data_id",
+        "linked_ids", "observed_values"
+      )))
+
+    x |>
+      dplyr::mutate(
+        density_position = dplyr::row_number(),
+        .by = dplyr::all_of("type_id")
       ) |>
-        dplyr::select(
-          -dplyr::all_of(c("module_name", "module_id", "module_type", "observed_data_id"))
+      dplyr::left_join(
+        y = random_effects,
+        by = c(
+          "estimation_type" = "input_type", "type_id", "density_position"
         ),
-      by = c(
-        "estimation_type" = "input_type",
-        "estimated_value" = "observed_values"
-      )
-    )
+        na_matches = "never"
+      ) |>
+      dplyr::select(-dplyr::all_of("density_position"))
   }
 
   json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE)
@@ -88,12 +112,10 @@ reshape_json_estimates <- function(model_output) {
         dplyr::distinct(.data$id, .keep_all = TRUE)
     }
     density_components <- density_components |>
-      dplyr::select(-dplyr::all_of(c("parameters", "linked_ids")))
+      dplyr::select(-dplyr::all_of("parameters"))
   }
 
   # Process the density components
-  # TODO: Join by the density's linked_ids instead of by parameter values,
-  #       which is fragile
   density_information <- density_components |>
     dplyr::mutate(
       density_component = purrr::map(.data$density_component, density_to_tibble)
@@ -141,7 +163,10 @@ reshape_json_estimates <- function(model_output) {
           .data$observed_data_id != -999
         ) |>
         dplyr::rename(distribution = "module_type") |>
-        dplyr::select(-dplyr::starts_with("module")),
+        dplyr::select(
+          -dplyr::starts_with("module"),
+          -dplyr::any_of("linked_ids")
+        ),
       by = c("data_id" = "observed_data_id")
     ) |>
     dplyr::mutate(
