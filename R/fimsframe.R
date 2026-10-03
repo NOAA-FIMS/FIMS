@@ -1149,6 +1149,35 @@ FIMSFrame <- function(data) {
       n_timings = n_years
     )
 
+  # model_weight_at_age() reads weights by position, so each fleet, timing,
+  # and age needs exactly one row, ending at the year after the last model year.
+  if ("age" %in% colnames(data)) {
+    weight_data <- dplyr::filter(data, .data$type == "weight_at_age")
+    duplicated_weight_timings <- weight_data |>
+      dplyr::count(.data$fleet, .data$timing, .data$age) |>
+      dplyr::filter(.data$n > 1) |>
+      dplyr::pull(.data$timing) |>
+      unique()
+    if (length(duplicated_weight_timings) > 0) {
+      cli::cli_abort(
+        "{.var weight_at_age} has more than one row for the same fleet, timing,
+        and age at these timings: {duplicated_weight_timings}."
+      )
+    }
+    late_weight_timings <- weight_data |>
+      dplyr::filter(.data$timing > end_year + 1) |>
+      dplyr::pull(.data$timing) |>
+      unique()
+    if (length(late_weight_timings) > 0) {
+      cli::cli_abort(c(
+        "{.var weight_at_age} has rows after {end_year + 1}, the year after
+        the last model year, for these timings: {late_weight_timings}.",
+        "i" = "Remove these rows, or add a catch row in a later year to
+        extend the model years."
+      ))
+    }
+  }
+
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with model_*() are correct.
   formatted_data <- data |>
