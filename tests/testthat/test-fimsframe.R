@@ -155,6 +155,38 @@ test_that("`fims_frame()` works with the correct inputs", {
   )
 })
 
+test_that("`model_weight_at_age()` works with projection years", {
+  years_of_projection <- 2
+  first_year_weight <- dplyr::filter(
+    data_big,
+    type == "weight_at_age",
+    timing == 1
+  )
+  data_with_projection <- data_big |>
+    dplyr::add_row(
+      type = "catch",
+      timing = get_end_year(fims_frame) + years_of_projection,
+      fleet = "fleet1",
+      observed = -999,
+      unit = "mt"
+    ) |>
+    dplyr::bind_rows(
+      dplyr::select(first_year_weight, -timing) |>
+        merge(data.frame(
+          timing = max(data_big[["timing"]], na.rm = TRUE) +
+            1:years_of_projection
+        ))
+    )
+  #' @description Test that `model_weight_at_age()` returns the data weights followed by the weights supplied for each projection year.
+  expect_equal(
+    model_weight_at_age(data_with_projection),
+    c(
+      model_weight_at_age(fims_frame),
+      rep(first_year_weight[["observed"]], years_of_projection)
+    )
+  )
+})
+
 ## Edge handling ----
 test_that("`FIMSFrame()` returns correct outputs for edge cases", {
   #' @description Test that `get_data()` retrieves the data slot as a data frame when passed a data frame rather than a FIMSFrame object.
@@ -264,6 +296,26 @@ test_that("`FIMSFrame()` returns correct error messages", {
       fleet = ifelse(type == "age_to_length_conversion", "fleet3", fleet)
     )),
     regexp = "no catch, index, or composition\\s+data:\\s+\"fleet3\""
+  )
+
+  terminal_weight <- dplyr::filter(
+    data_big,
+    type == "weight_at_age",
+    timing == max(timing, na.rm = TRUE)
+  )
+  #' @description Test that `FIMSFrame()` returns an error when weight-at-age data repeat a timing.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(data_big, terminal_weight)),
+    regexp = "more than one row of weight-at-age data: 31"
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when weight-at-age data have a timing after the year following the last model year.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      dplyr::filter(data_big, !(type == "weight_at_age" & timing == 31)),
+      dplyr::mutate(terminal_weight, timing = 32)
+    )),
+    regexp = "the following timings: 32"
   )
 
   #' @description Test that `FIMSFrame` validators pick up on a missing age in age-composition data.
