@@ -182,18 +182,58 @@ test_that("`reshape_json_estimates()` output matches TMB for an estimation run",
   result <- purrr::map(fit_files, compare_tmb_and_json_outputs)
 })
 ## Edge handling ----
+test_that("`reshape_json_estimates()` links random effects to densities by id", {
+  data_4_model <- FIMSFrame(data_big)
+  parameters <- setup_default_parameters(data = data_4_model)
+  is_log_devs <- parameters[["label"]] %in% "log_devs"
+  # Distinct deviations show whether each density value lands on its own
+  # deviation; tied deviations, e.g., all zero, cannot.
+  parameters[["value"]][is_log_devs] <- seq(-1, 1, length.out = sum(is_log_devs))
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  model_output <- get_model_output(fit)
+  log_devs <- get_estimates(fit) |>
+    dplyr::filter(.data$label == "log_devs")
+  clear()
+
+  #' @description Test that random effects give one row per recruitment deviation.
+  expect_equal(object = NROW(log_devs), expected = sum(is_log_devs))
+  #' @description Test that each recruitment deviation has the normal log density of its own value.
+  expect_equal(
+    object = log_devs[["likelihood"]],
+    expected = stats::dnorm(
+      log_devs[["estimated"]],
+      mean = log_devs[["expected"]],
+      sd = exp(log_devs[["log_sd"]]),
+      log = TRUE
+    ),
+    # Parameter values are written to the output with 6 significant digits
+    tolerance = 1e-6
+  )
+
+  # A density linked to an id that is not in the output, e.g., a vector that
+  # was not written, has no parameters to match
+  unknown_id_output <- sub(
+    pattern = paste0(
+      '"linked_ids"\\s*:\\s*\\[\\s*', unique(log_devs[["type_id"]])
+    ),
+    replacement = '"linked_ids": [999999',
+    x = model_output
+  )
+  #' @description Test that the linked id was replaced.
+  expect_false(identical(unknown_id_output, model_output))
+  unmatched_log_devs <- FIMS:::reshape_json_estimates(unknown_id_output) |>
+    dplyr::filter(.data$label == "log_devs")
+  #' @description Test that a density with an unknown linked id keeps one row per deviation.
+  expect_equal(object = NROW(unmatched_log_devs), expected = sum(is_log_devs))
+  #' @description Test that a density with an unknown linked id is left unmatched rather than guessed.
+  expect_true(all(is.na(unmatched_log_devs[["likelihood"]])))
+})
+
 test_that("`reshape_json_estimates()` links selectivity to fleets by id", {
   data_4_model <- FIMSFrame(data_big)
-  # Fixed-effect recruitment deviations avoid the random-effect density join,
-  # which matches rows by value and the default deviations are all zero
   fit <- setup_default_parameters(data = data_4_model) |>
-    dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        .data$estimation_type == "random_effects",
-        "fixed_effects",
-        .data$estimation_type
-      )
-    ) |>
     initialize_fims(data = data_4_model) |>
     fit_fims(optimize = FALSE)
   model_output <- get_model_output(fit)
