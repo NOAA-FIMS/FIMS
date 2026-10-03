@@ -152,6 +152,6 @@ test_that("validate_maturity_at_age() returns correct error messages", {
   #' @description Test that missing years without a timing = NA default return an error.
   expect_error(
     validate_maturity_at_age(maturity_rows(timing = years[2]), ages, years),
-    "missing year"
+    "missing these years"
   )
 })

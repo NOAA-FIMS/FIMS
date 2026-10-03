@@ -180,7 +180,6 @@ test_that("initialize_maturity() works for a one-year model with year rows", {
   clear()
 })
 
-
 test_that("retrospective runs work with year-specific maturity_at_age rows", {
   #' @description Skip the test unless explicitly enabled for heavy integration testing.
   testthat::skip_if_not(
@@ -208,6 +207,27 @@ test_that("retrospective runs work with year-specific maturity_at_age rows", {
 })
 
 ## Error handling ----
+test_that("initialize_fims() errors when maturity years do not match the data", {
+  data_varying <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    maturity_rows(),
+    maturity_rows(timing = years[2], observed = 0.5 * logistic_maturity)
+  ))
+  parameters <- suppressMessages(setup_default_parameters(data_varying))
+  fewer_years <- dplyr::filter(
+    parameters,
+    !(.data[["label"]] %in% "maturity_at_age" &
+      .data[["timing"]] %in% max(years))
+  )
+
+  #' @description Test that maturity values for fewer years than the data, e.g., parameters reused after adding projection years, return an error.
+  expect_error(
+    initialize_fims(parameters = fewer_years, data = data_varying),
+    "one .*maturity_at_age.* value per age, or"
+  )
+  clear()
+})
+
 test_that("initialize_fims() errors for bad empirical maturity", {
   data_with_maturity <- FIMSFrame(
     dplyr::bind_rows(data_big, maturity_rows())
