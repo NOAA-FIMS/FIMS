@@ -925,7 +925,7 @@ validate_maturity_at_age <- function(data, ages, years) {
     cli::cli_abort(c(
       "{.var maturity_at_age} must have exactly one row for each model age
       ({min(ages)}-{max(ages)}) for each timing it uses.",
-      "x" = "Check the rows for timing{?s}: {incomplete_timings}."
+      "x" = "Check the rows for these timings: {incomplete_timings}."
     ))
   }
 
