@@ -19,4 +19,7 @@ reshape_json_estimates(model_output)
 
 ## Value
 
-A tibble containing the reshaped parameter estimates.
+A tibble containing the reshaped parameter estimates. Parameters of
+distributions for random effects, e.g., `log_sd` of the recruitment
+deviations, are included with one row per parameter id under the module
+that owns the vector they apply to.

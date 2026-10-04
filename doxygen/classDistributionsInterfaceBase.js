@@ -5,6 +5,8 @@ var classDistributionsInterfaceBase =
     [ "~DistributionsInterfaceBase", "classDistributionsInterfaceBase.html#a058951fc7d22a7a9a1e6f61bf287d7a9", null ],
     [ "evaluate", "classDistributionsInterfaceBase.html#a09877510b57140479092bcacb0843703", null ],
     [ "get_id", "classDistributionsInterfaceBase.html#ac2c9fafbff23443ff4b5d9a9bee56c08", null ],
+    [ "linked_ids_to_json", "classDistributionsInterfaceBase.html#a1fea86564189ca08ffeb841a3960ee65", null ],
+    [ "parameters_to_json", "classDistributionsInterfaceBase.html#a1e25f65a02a7a10c97aa9be7d5e0a90b", null ],
     [ "set_distribution_links", "classDistributionsInterfaceBase.html#ae8e42238a8b6e6cffbfbd9ac5a04d821", null ],
     [ "set_distribution_mean", "classDistributionsInterfaceBase.html#ae5ee1ee2b9d117aecc7396e442b48b2f", null ],
     [ "set_observed_data", "classDistributionsInterfaceBase.html#a0071e40d5d56d8b1a2e5bf3c65edb45f", null ],

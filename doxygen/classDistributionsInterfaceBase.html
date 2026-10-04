@@ -267,6 +267,12 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~DistributionsInte
 <tr class="memitem:a09877510b57140479092bcacb0843703" id="r_a09877510b57140479092bcacb0843703"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDistributionsInterfaceBase.html#a09877510b57140479092bcacb0843703">evaluate</a> ()=0</td></tr>
 <tr class="memdesc:a09877510b57140479092bcacb0843703"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method for each child distribution interface object to inherit so each distribution can have an <a class="el" href="classDistributionsInterfaceBase.html#a09877510b57140479092bcacb0843703" title="A method for each child distribution interface object to inherit so each distribution can have an eva...">evaluate()</a> function.  <br /></td></tr>
 <tr class="separator:a09877510b57140479092bcacb0843703"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e25f65a02a7a10c97aa9be7d5e0a90b" id="r_a1e25f65a02a7a10c97aa9be7d5e0a90b"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDistributionsInterfaceBase.html#a1e25f65a02a7a10c97aa9be7d5e0a90b">parameters_to_json</a> (const std::vector&lt; std::pair&lt; std::string, <a class="el" href="classVariableVector.html">VariableVector</a> * &gt; &gt; &amp;parameters)</td></tr>
+<tr class="memdesc:a1e25f65a02a7a10c97aa9be7d5e0a90b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the parameters of a distribution as a JSON "parameters" member, in the same shape the modules use, so each element keeps its parameter id in the model output.  <br /></td></tr>
+<tr class="separator:a1e25f65a02a7a10c97aa9be7d5e0a90b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fea86564189ca08ffeb841a3960ee65" id="r_a1fea86564189ca08ffeb841a3960ee65"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDistributionsInterfaceBase.html#a1fea86564189ca08ffeb841a3960ee65">linked_ids_to_json</a> ()</td></tr>
+<tr class="memdesc:a1fea86564189ca08ffeb841a3960ee65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the ids of the vectors this distribution is linked to as a JSON "linked_ids" member.  <br /></td></tr>
+<tr class="separator:a1fea86564189ca08ffeb841a3960ee65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
 <tr class="memitem:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a9183d9379777d8be70ab66af1a07f94c"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a9183d9379777d8be70ab66af1a07f94c">add_to_fims_tmb</a> ()</td></tr>
 <tr class="memdesc:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A virtual method to inherit to add objects to the TMB model.  <br /></td></tr>
@@ -425,6 +431,71 @@ static std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInte
 <p>Get the ID for the child distribution interface objects to inherit. </p>
 
 <p>Implemented in <a class="el" href="classDnormDistributionsInterface.html#af9d46a592495997817ca5eb2276aac29">DnormDistributionsInterface</a>, <a class="el" href="classDlnormDistributionsInterface.html#a411957c11ce877c2ed02cc4819e90275">DlnormDistributionsInterface</a>, and <a class="el" href="classDmultinomDistributionsInterface.html#a40dc05d944bab718c046a56b8496fc48">DmultinomDistributionsInterface</a>.</p>
+
+</div>
+</div>
+<a id="a1fea86564189ca08ffeb841a3960ee65" name="a1fea86564189ca08ffeb841a3960ee65"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fea86564189ca08ffeb841a3960ee65">&#9670;&#160;</a></span>linked_ids_to_json()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string DistributionsInterfaceBase::linked_ids_to_json </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Writes the ids of the vectors this distribution is linked to as a JSON "linked_ids" member. </p>
+<p>The first id is the vector the distribution applies to, e.g., recruitment deviations or a fleet's expected index, so its parameters can be reported under the module that owns that vector.</p>
+<dl class="section return"><dt>Returns</dt><dd>The JSON member followed by a comma and a newline. </dd></dl>
+
+</div>
+</div>
+<a id="a1e25f65a02a7a10c97aa9be7d5e0a90b" name="a1e25f65a02a7a10c97aa9be7d5e0a90b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e25f65a02a7a10c97aa9be7d5e0a90b">&#9670;&#160;</a></span>parameters_to_json()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string DistributionsInterfaceBase::parameters_to_json </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; std::pair&lt; std::string, <a class="el" href="classVariableVector.html">VariableVector</a> * &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>parameters</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Writes the parameters of a distribution as a JSON "parameters" member, in the same shape the modules use, so each element keeps its parameter id in the model output. </p>
+<p>Each distribution passes the parameter vectors it owns, e.g., <code>{{"log_sd", &amp;this-&gt;log_sd}}</code>, so any process that uses the distribution reports its parameters, and a distribution with other parameters only needs to add them to its list. Empty vectors are skipped because the <a class="el" href="classVariableVector.html" title="An Rcpp interface class that defines the VariableVector class.">VariableVector</a> stream operator does not handle a size of zero.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parameters</td><td>Pairs of parameter names and pointers to the vectors. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The JSON member followed by a comma and a newline, or an empty string when no vector has elements. </dd></dl>
 
 </div>
 </div>
