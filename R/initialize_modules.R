@@ -357,6 +357,82 @@ initialize_growth <- function(parameters, data) {
 #' The initialized maturity module as an object.
 #' @noRd
 initialize_maturity <- function(parameters, data) {
+  maturity_type <- parameters |>
+    dplyr::filter(.data$module_name == "Maturity") |>
+    dplyr::pull(.data$module_type) |>
+    unique() |>
+    stats::na.omit()
+
+  if (length(maturity_type) == 1 &&
+    identical(maturity_type[[1]], "Empirical")) {
+    # set_param_vector() fills maturity_at_age in row order, so sort the rows
+    # by year then age to match how the values are indexed in C++.
+    maturity_rows <- parameters |>
+      dplyr::filter(
+        .data$module_name == "Maturity",
+        .data$label == "maturity_at_age"
+      ) |>
+      dplyr::arrange(.data$timing, .data$age)
+
+    if (any(maturity_rows[["estimation_type"]] != "constant")) {
+      cli::cli_abort(c(
+        "Empirical maturity values must have
+        {.code estimation_type = \"constant\"}.",
+        "i" = "FIMS does not fit maturity to data, so empirical maturity cannot
+        be estimated."
+      ))
+    }
+    maturity_values <- maturity_rows[["value"]]
+    if (any(is.na(maturity_values) | maturity_values < 0 |
+      maturity_values > 1)) {
+      cli::cli_abort(
+        "Empirical maturity values must be proportions between 0 and 1."
+      )
+    }
+
+    ages <- get_ages(data)
+    years <- get_start_year(data):get_end_year(data)
+    expected_keys <- if (all(is.na(maturity_rows[["timing"]]))) {
+      paste(NA, ages)
+    } else {
+      paste(rep(years, each = length(ages)), rep(ages, times = length(years)))
+    }
+    maturity_keys <- paste(maturity_rows[["timing"]], maturity_rows[["age"]])
+    if (length(maturity_keys) != length(expected_keys) ||
+      !setequal(maturity_keys, expected_keys)) {
+      cli::cli_abort(c(
+        "Empirical maturity needs one {.var maturity_at_age} value per age, or
+        one per age and year.",
+        "i" = "Expected {length(ages)} rows with {.code timing = NA} or
+        {length(ages) * length(years)} rows for years {min(years)}-{max(years)},
+        but found {NROW(maturity_rows)}.",
+        "i" = "Use {.fn setup_default_Maturity} with
+        {.code module_type = \"Empirical\"} to build these rows from data."
+      ))
+    }
+
+    has_all_zero_year <- maturity_rows |>
+      dplyr::summarize(
+        all_zero = all(.data$value == 0),
+        .by = dplyr::all_of("timing")
+      ) |>
+      dplyr::pull(.data$all_zero) |>
+      any()
+    if (has_all_zero_year) {
+      cli::cli_abort(c(
+        "Empirical maturity is 0 at every age in at least one year.",
+        "i" = "Spawning biomass would be 0, which makes recruitment and the
+        objective function undefined."
+      ))
+    }
+
+    parameters <- parameters |>
+      dplyr::filter(!(
+        .data$module_name == "Maturity" & .data$label == "maturity_at_age"
+      )) |>
+      dplyr::bind_rows(maturity_rows)
+  }
+
   module <- initialize_module(
     parameters = parameters,
     data = data,

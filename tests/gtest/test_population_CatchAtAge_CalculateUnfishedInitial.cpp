@@ -134,7 +134,8 @@ TEST_F(
                 -fims_math::exp(population->log_M[i_agem1_yearm1 + 1]));
       }
 
-      catch_at_age_model->CalculateMaturityAA(population, i_age_year, age);
+      catch_at_age_model->CalculateMaturityAA(population, i_age_year, year,
+                                              age);
       catch_at_age_model->CalculateUnfishedSpawningBiomass(
           population, i_age_year, year, age);
 

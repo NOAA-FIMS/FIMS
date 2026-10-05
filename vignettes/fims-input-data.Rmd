@@ -35,7 +35,7 @@ The input data for a FIMS model is a single long data frame with the following c
 
 Two drawbacks of the long format are (1) some information is duplicated, and (2) the long format is harder to read and understand by looking at the raw data frame. To meet this second challenge, the FIMS team is working on functions to summarize, visualize, and check for errors in the input data.
 
-The currently available values for the `type` column are `r glue::glue_collapse(glue::glue('\"{FIMS::fims_input_types}\"'), sep = ", ", last = ", and ")`. The "weight_at_age" and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
+The currently available values for the `type` column are `r glue::glue_collapse(glue::glue('\"{FIMS::fims_input_types}\"'), sep = ", ", last = ", and ")`. The "weight_at_age", "maturity_at_age", and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
 
 The individual data types are described in more detail below after introducing the example data set that is included in the package.
 
@@ -226,6 +226,44 @@ FIMS::data_big |>
   ggplot2::scale_x_continuous(breaks = get_ages(data_4_model)) +
   geom_hline(yintercept = 0) +
   ggtitle("Weight-at-age by time step in data_big example data set")
+```
+
+## Maturity-at-age data (`type == "maturity_at_age"`)
+
+Maturity-at-age data are optional. When they are present, `setup_default_parameters()` uses them in place of the default logistic maturity curve, and they are used as the proportion mature at age when calculating spawning biomass. Like weight-at-age data, they are not included in the likelihood.
+
+Each row gives the proportion mature (between 0 and 1) in the `observed` column for one age. The `unit` column should be `proportion`, the `uncertainty` should be `NA`, and the `fleet` should be `NA` because maturity applies to the population rather than to a fleet.
+
+Maturity can be constant or vary by year:
+
+  1. rows with `timing = NA` apply to every year,
+  2. rows with a `timing` replace those values for that year, and
+  3. without any `timing = NA` rows, every model year needs its own rows.
+
+Maturity in the first model year also sets unfished spawning biomass per recruit, so it affects the stock--recruitment curve and the spawning biomass ratio in every year. Maturity in a later year changes spawning biomass in that year and, through the stock--recruitment relationship, recruitment in the following year.
+
+Every model age needs a value for each `timing` that is used. Unlike weight-at-age data, rows are not needed for the year after the last model year because that year uses the maturity from the last model year. Projection years are model years, so they use their own rows or the `timing = NA` rows, not the maturity from the last data year.
+
+`data_big` does not include maturity-at-age data. The example below adds a constant maturity ogive and a different ogive for the second year.
+
+```{r data_big-maturity_at_age}
+maturity_ages <- get_ages(data_4_model)
+maturity_at_age <- tibble::tibble(
+  type = "maturity_at_age",
+  fleet = NA_character_,
+  age = rep(maturity_ages, times = 2),
+  length = NA_real_,
+  timing = rep(
+    c(NA, get_start_year(data_4_model) + 1),
+    each = length(maturity_ages)
+  ),
+  observed = c(plogis(maturity_ages - 2), plogis(maturity_ages - 3)),
+  unit = "proportion",
+  uncertainty = NA_character_
+)
+data_with_maturity <- FIMSFrame(dplyr::bind_rows(data_big, maturity_at_age))
+setup_default_Maturity(data_with_maturity, module_type = "Empirical") |>
+  head(3)
 ```
 
 ## Age-to-length conversion (`type == "age_to_length_conversion"`)

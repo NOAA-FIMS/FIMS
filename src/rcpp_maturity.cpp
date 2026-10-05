@@ -27,4 +27,17 @@ void register_maturity(Rcpp::Module& m) {
       .field("slope", &LogisticMaturityInterface::slope)
       .method("get_id", &LogisticMaturityInterface::get_id)
       .method("evaluate", &LogisticMaturityInterface::evaluate);
+
+  Rcpp::class_<EmpiricalMaturityInterface>(
+      "EmpiricalMaturity",
+      "See "
+      "https://noaa-fims.github.io/FIMS/doxygen/"
+      "classEmpiricalMaturityInterface.html.")
+      .constructor()
+      .field("n_ages", &EmpiricalMaturityInterface::n_ages)
+      .field("n_years", &EmpiricalMaturityInterface::n_years)
+      .field("min_age", &EmpiricalMaturityInterface::min_age)
+      .field("maturity_at_age", &EmpiricalMaturityInterface::maturity_at_age)
+      .method("get_id", &EmpiricalMaturityInterface::get_id)
+      .method("evaluate", &EmpiricalMaturityInterface::evaluate);
 }

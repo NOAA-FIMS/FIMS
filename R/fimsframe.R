@@ -870,6 +870,96 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
   }
 }
 
+# Maturity is a population-level input that is not fit to data, so a missing
+# age or year would silently change spawning biomass rather than add a -999
+# observation. Rows with timing = NA are the default for every year, and rows
+# with a timing replace that default for that year.
+validate_maturity_at_age <- function(data, ages, years) {
+  if (NROW(data) == 0) {
+    return(invisible(TRUE))
+  }
+  observed <- data[["observed"]]
+  if (any(is.na(observed) | observed < 0 | observed > 1)) {
+    cli::cli_abort(c(
+      "{.var maturity_at_age} values in {.var observed} must be proportions
+      between 0 and 1.",
+      "i" = "Missing values, including -999, are not allowed."
+    ))
+  }
+  if (any(is.na(data[["unit"]]) | data[["unit"]] != "proportion")) {
+    cli::cli_abort(
+      "{.var maturity_at_age} rows must have {.code unit = \"proportion\"}."
+    )
+  }
+  if (any(!is.na(data[["fleet"]]))) {
+    cli::cli_abort(c(
+      "{.var maturity_at_age} rows must have {.code fleet = NA}.",
+      "i" = "Maturity applies to the population, not to a fleet."
+    ))
+  }
+  if (!"age" %in% colnames(data) || any(is.na(data[["age"]]))) {
+    cli::cli_abort("{.var maturity_at_age} rows must have an {.var age}.")
+  }
+
+  bad_timings <- setdiff(stats::na.omit(unique(data[["timing"]])), years)
+  if (length(bad_timings) > 0) {
+    cli::cli_abort(c(
+      "{.var maturity_at_age} has timings outside the model years
+      ({min(years)}-{max(years)}): {bad_timings}.",
+      "i" = "The year after the last model year reuses the last year's
+      maturity, so it does not need rows.",
+      "i" = "For projections, add rows for the projection years or use
+      {.code timing = NA} rows as the default for every year."
+    ))
+  }
+
+  incomplete_timings <- data |>
+    dplyr::summarize(
+      complete = length(.data$age) == length(ages) &&
+        setequal(.data$age, ages),
+      .by = dplyr::all_of("timing")
+    ) |>
+    dplyr::filter(!.data$complete) |>
+    dplyr::pull(.data$timing)
+  if (length(incomplete_timings) > 0) {
+    cli::cli_abort(c(
+      "{.var maturity_at_age} must have exactly one row for each model age
+      ({min(ages)}-{max(ages)}) for each timing it uses.",
+      "x" = "Check the rows for these timings: {incomplete_timings}."
+    ))
+  }
+
+  # Zero maturity at every age gives zero spawning biomass, which makes
+  # recruitment and the objective function undefined (NaN).
+  all_zero_timings <- data |>
+    dplyr::summarize(
+      all_zero = all(.data$observed == 0),
+      .by = dplyr::all_of("timing")
+    ) |>
+    dplyr::filter(.data$all_zero) |>
+    dplyr::pull(.data$timing)
+  if (length(all_zero_timings) > 0) {
+    cli::cli_abort(c(
+      "{.var maturity_at_age} is 0 at every age for these timings:
+      {all_zero_timings}.",
+      "i" = "Spawning biomass would be 0, which makes recruitment and the
+      objective function undefined."
+    ))
+  }
+
+  if (!any(is.na(data[["timing"]]))) {
+    missing_years <- setdiff(years, data[["timing"]])
+    if (length(missing_years) > 0) {
+      cli::cli_abort(c(
+        "{.var maturity_at_age} is missing these years: {missing_years}.",
+        "i" = "Add rows for the missing years, or add {.code timing = NA} rows
+        to use as the default for any year without its own rows."
+      ))
+    }
+  }
+  invisible(TRUE)
+}
+
 # Keep fleet-bin resolution explicit by default. Fixed age-to-length rows are
 # only treated as bin geometry when a caller intentionally opts into that path.
 resolve_fleet_length_bins <- function(
@@ -1059,7 +1149,9 @@ FIMSFrame <- function(data) {
   # Get the earliest and latest year formatted as integers
   data_to_use_4_timing <- dplyr::filter(
     data,
-    !.data$type %in% c("age_to_length_conversion", "weight_at_age")
+    !.data$type %in% c(
+      "age_to_length_conversion", "weight_at_age", "maturity_at_age"
+    )
   ) |>
     dplyr::pull(.data$timing)
   start_year <- as.integer(floor(min(data_to_use_4_timing, na.rm = TRUE)))
@@ -1148,6 +1240,12 @@ FIMSFrame <- function(data) {
       n_groups = n_ages,
       n_timings = n_years
     )
+
+  validate_maturity_at_age(
+    dplyr::filter(data, .data$type == "maturity_at_age"),
+    ages = ages,
+    years = years
+  )
 
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with model_*() are correct.

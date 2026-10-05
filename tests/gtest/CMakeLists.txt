@@ -459,3 +459,17 @@ target_link_libraries(information_Information_Clear
 )
 
 gtest_discover_tests(information_Information_Clear)
+
+
+# test_maturityEmpirical_EmpiricalMaturity_evaluate.cpp
+add_executable(maturityEmpirical_EmpiricalMaturity_evaluate
+  test_maturityEmpirical_EmpiricalMaturity_evaluate.cpp
+)
+add_as_invoker_manifest(maturityEmpirical_EmpiricalMaturity_evaluate)
+
+target_link_libraries(maturityEmpirical_EmpiricalMaturity_evaluate
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(maturityEmpirical_EmpiricalMaturity_evaluate)
