@@ -291,6 +291,25 @@ TEST_F(CAAEvaluateTestFixture, AnnualSurvivalUsesIntegralAndReusesIt) {
   EXPECT_EQ(catch_at_age_model->timed_numbers.size(), 1u);
   catch_at_age_model->NumbersAtTime(population, year, age, -1);
   EXPECT_EQ(catch_at_age_model->timed_numbers.size(), 1u);
+
+  // Annual survival has a removable singularity at Z = 0. Its limiting
+  // value is 1, so annual-average abundance equals beginning-of-year
+  // abundance when there is no mortality.
+  catch_at_age_model->timed_numbers.clear();
+  dq["mortality_Z"][i] = 0.0;
+  const double zero_mortality =
+      catch_at_age_model->NumbersAtTime(population, year, age, -1);
+  EXPECT_TRUE(std::isfinite(zero_mortality));
+  EXPECT_DOUBLE_EQ(zero_mortality, 1000.0);
+
+  // expm1 remains stable for very small, nonzero mortality.
+  catch_at_age_model->timed_numbers.clear();
+  dq["mortality_Z"][i] = 1e-12;
+  const double tiny_mortality =
+      catch_at_age_model->NumbersAtTime(population, year, age, -1);
+  EXPECT_TRUE(std::isfinite(tiny_mortality));
+  EXPECT_NEAR(tiny_mortality, 1000.0, 1e-8);
+
   double integral = 0;
   for (size_t k = 0; k < 8; ++k) {
     const double t = catch_at_age_model->annual_nodes[k];
@@ -298,6 +317,20 @@ TEST_F(CAAEvaluateTestFixture, AnnualSurvivalUsesIntegralAndReusesIt) {
   }
   EXPECT_NEAR(integral, (1 - std::exp(-0.8)) / 0.8 +
               (1 - 1.8 * std::exp(-0.8)) / (0.8 * 0.8), 1e-12);
+}
+
+TEST_F(CAAEvaluateTestFixture, ObservationTimingHandlesZeroMortality) {
+  auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
+  const size_t i = year * population->n_ages + age;
+  dq["numbers_at_age"][i] = 1000;
+  dq["mortality_Z"][i] = 0.0;
+
+  EXPECT_DOUBLE_EQ(
+      catch_at_age_model->NumbersAtTime(population, year, age, 0.0), 1000.0);
+  EXPECT_DOUBLE_EQ(
+      catch_at_age_model->NumbersAtTime(population, year, age, 0.5), 1000.0);
+  EXPECT_DOUBLE_EQ(
+      catch_at_age_model->NumbersAtTime(population, year, age, -1.0), 1000.0);
 }
 
 TEST(ObservationTimes, YearsAndExplicitJanuaryDatesRemainDistinct) {

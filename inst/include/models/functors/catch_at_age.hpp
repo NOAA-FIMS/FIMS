@@ -77,9 +77,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
     if (found == timed_numbers.end()) {
       const Type z = dq["mortality_Z"][i];
       using std::expm1;
-      // A fraction of -1 requests the exact annual average.
-      const Type survival = fraction == -1.0
-          ? Type(-expm1(-z) / z) : fims_math::exp(-z * Type(fraction));
+      // A fraction of -1 requests the exact annual average. The annual
+      // survival factor has a removable singularity at Z = 0, where its
+      // limiting value is 1. expm1 provides stable evaluation for small,
+      // nonzero Z.
+      Type survival;
+      if (fraction == -1.0) {
+        survival = (z == Type(0.0)) ? Type(1.0) : Type(-expm1(-z) / z);
+      } else {
+        survival = fims_math::exp(-z * Type(fraction));
+      }
       found = timed_numbers.emplace(key, dq["numbers_at_age"][i] * survival).first;
     }
     return found->second;
