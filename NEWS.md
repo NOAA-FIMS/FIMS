@@ -1,6 +1,64 @@
 # FIMS 0.11.0
 
-*
+## Bug Fixes
+
+* *(CatchAtAge)* Build expected length comps from age comp proportions (#1751)
+* *(devcontainer)* Add missing comma
+* *(fims_likelihood)* Use module_name when selecting the profiled parameter (#1774)
+* *(fimsfit)* Name random effects in the sdreport so their standard errors reach get_estimates() (#1773)
+* *(get_estimates)* Adds random effect distribution parameters (#1771)
+* *(information)* Drop density component links
+* *(interface)* Register fleet log_q and maturity parameters in variable_map (#1793)
+* *(json)* Keep whitespace inside strings and decode escapes
+* *(model)* Clear the TMB objective function pointer after each evaluation (#1766)
+* *(output)* Write fleet names and keep infinite values readable (#1770)
+* *(selectivity)* Error on a logit_sel_at_age length that does not fit n_ages
+* *(setup_default_parameters)* Use the geometric plus group for default initial numbers (#1787)
+* *(test)* Update initial values for estimation tests
+* *(No Category)* Docs: fix broken relative URLs in adding-new-module vignette
+* *(No Category)* File paths were too long for windows
+
+## Documentation
+
+* *(mohns_rho)* Fix sign of Mohn's rho in documentation (#1772)
+* *(No Category)* Adds more exploration/explanation to demo
+
+## Features
+
+* *(growth)* Size and growth infrastructure (#1697)
+* *(selelectivity)* Selectivity at age
+
+## Performance
+
+* *(fit_fims)* Skip the derived-quantity covariance in sdreport (#1775)
+
+## New Contributors
+
+* @grantdadams made their first contribution in [#1771](https://github.com/NOAA-FIMS/FIMS/pull/1771)
+* @VedantMadane made their first contribution in [#1703](https://github.com/NOAA-FIMS/FIMS/pull/1703)
+
+## Commit Statistics
+
+- 20 commit(s) contributed to the release.
+- 38 day(s) passed between the first and last commit.
+- 20 commit(s) parsed as conventional.
+- 15 linked issue/PR reference(s) detected in commits.
+  - [#1748](https://github.com/NOAA-FIMS/FIMS/issues/1748) (referenced 3 time(s))
+  - [#1764](https://github.com/NOAA-FIMS/FIMS/issues/1764) (referenced 2 time(s))
+  - [#1556](https://github.com/NOAA-FIMS/FIMS/issues/1556) (referenced 1 time(s))
+  - [#1697](https://github.com/NOAA-FIMS/FIMS/issues/1697) (referenced 1 time(s))
+  - [#1739](https://github.com/NOAA-FIMS/FIMS/issues/1739) (referenced 1 time(s))
+  - [#1751](https://github.com/NOAA-FIMS/FIMS/issues/1751) (referenced 1 time(s))
+  - [#1766](https://github.com/NOAA-FIMS/FIMS/issues/1766) (referenced 1 time(s))
+  - [#1770](https://github.com/NOAA-FIMS/FIMS/issues/1770) (referenced 1 time(s))
+  - [#1771](https://github.com/NOAA-FIMS/FIMS/issues/1771) (referenced 1 time(s))
+  - [#1772](https://github.com/NOAA-FIMS/FIMS/issues/1772) (referenced 1 time(s))
+  - [#1773](https://github.com/NOAA-FIMS/FIMS/issues/1773) (referenced 1 time(s))
+  - [#1774](https://github.com/NOAA-FIMS/FIMS/issues/1774) (referenced 1 time(s))
+  - [#1775](https://github.com/NOAA-FIMS/FIMS/issues/1775) (referenced 1 time(s))
+  - [#1787](https://github.com/NOAA-FIMS/FIMS/issues/1787) (referenced 1 time(s))
+  - [#1793](https://github.com/NOAA-FIMS/FIMS/issues/1793) (referenced 1 time(s))
+- 53 day(s) passed between releases.
 
 # FIMS 0.10.0
 
