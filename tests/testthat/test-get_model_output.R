@@ -27,7 +27,7 @@ test_that("`get_model_output()` works with correct inputs", {
 
   expected_names <- c(
     "name", "type", "estimation_framework", "id", "objective_function_value",
-    "growth", "recruitment", "maturity",
+    "time_axes", "time_bindings", "growth", "recruitment", "maturity",
     "selectivity", "population_ids", "fleet_ids", "populations", "fleets",
     "density_components", "data"
   )

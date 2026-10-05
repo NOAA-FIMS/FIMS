@@ -58,7 +58,7 @@ make_vonb_explicit_length_bin_context <- function() {
     length = survey1_short_bins,
     observed = NA_real_,
     unit = unique(data_big$unit[which(data_big$fleet == "survey1")])[1],
-    timing = NA_real_,
+    timing = NA_character_,
     uncertainty = NA_character_
   )
 
@@ -102,7 +102,7 @@ make_two_fleet_length_context <- function() {
     length = survey1_short_bins,
     observed = NA_real_,
     unit = unique(data_big$unit[which(data_big$fleet == "survey1")])[1],
-    timing = NA_real_,
+    timing = NA_character_,
     uncertainty = NA_character_
   )
 
@@ -173,7 +173,7 @@ make_vonb_length_bin_only_context <- function() {
     length = fleet1_bins,
     observed = NA_real_,
     unit = unique(data_big$unit[which(data_big$fleet == "fleet1")])[1],
-    timing = NA_real_,
+    timing = NA_character_,
     uncertainty = NA_character_
   )
 

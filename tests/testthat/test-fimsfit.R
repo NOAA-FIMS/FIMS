@@ -45,7 +45,7 @@ test_that("`fit_fims()` passes `getReportCovariance` to `TMB::sdreport()`", {
   # The first 5 years of data_big keep the covariance matrix small; weight at
   # age needs 1 more year than the other data
   yearly_types <- c("catch", "index", "age_comp", "length_comp")
-  data_5_years <- data_big |>
+  data_5_years <- annual_test_data() |>
     dplyr::filter(
       !(.data[["type"]] %in% c(yearly_types, "weight_at_age")) |
         (.data[["type"]] %in% yearly_types & .data[["timing"]] <= 5) |

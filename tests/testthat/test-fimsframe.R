@@ -472,7 +472,7 @@ test_that("`get_n_fleets()` works with correct inputs", {
 
 test_that("FIMSFrame normalizes calendar timing and preserves annual data", {
   #' @description Years and explicit dates share calendar labels but preserve their distinct sampling interpretations.
-  calendar <- dplyr::mutate(data_big, timing = timing + 2000)
+  calendar <- dplyr::mutate(annual_test_data(), timing = timing + 2000)
   numeric_frame <- FIMSFrame(calendar)
   character_frame <- FIMSFrame(dplyr::mutate(calendar, timing = as.character(timing)))
   date_frame <- FIMSFrame(dplyr::mutate(
@@ -511,7 +511,7 @@ test_that("FIMSFrame preserves observation dates and fills only absent years", {
   expect_identical(FIMSFrame(get_data(frame)), frame)
 
   #' @description Partial composition bins on an observation date still fail validation.
-  dated <- dplyr::mutate(data_big, timing = ifelse(
+  dated <- dplyr::mutate(annual_test_data(), timing = ifelse(
     is.na(timing), NA_character_, paste0(timing + 2000, "-06-10")
   ))
   expect_equal(nrow(get_data(FIMSFrame(dated))), nrow(get_data(fims_frame)))
@@ -536,7 +536,7 @@ test_that("FIMSFrame rejects invalid calendar timing", {
     )
   }
   #' @description Missing timing in time-invariant biological data remains missing.
-  dated <- dplyr::mutate(data_big, timing = ifelse(
+  dated <- dplyr::mutate(annual_test_data(), timing = ifelse(
     type == "age_to_length_conversion", NA_character_, paste0(timing + 2000, "-01-01")
   ))
   result <- get_data(FIMSFrame(dated))

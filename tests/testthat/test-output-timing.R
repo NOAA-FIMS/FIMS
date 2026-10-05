@@ -26,7 +26,7 @@ test_that("Mohn's rho compares matching terminal dates", {
 
 test_that("short calendar years and missing samples are reported as dates", {
   #' @description The model exports exact early dates; missing samples retain annual December 31 labels.
-  x <- dplyr::filter(data_big, is.na(timing) | timing <= 3 | (type == "weight_at_age" & timing == 4))
+  x <- dplyr::filter(annual_test_data(), is.na(timing) | timing <= 3 | (type == "weight_at_age" & timing == 4))
   x$timing <- as.Date(ifelse(is.na(x$timing), NA_character_, sprintf("%04d-01-01", x$timing)))
   selected <- x$fleet == "survey1" & x$type == "index" & !is.na(x$timing)
   x$observed[selected & format(x$timing, "%Y") == "0002"] <- -999
@@ -46,7 +46,7 @@ test_that("short calendar years and missing samples are reported as dates", {
 
 test_that("retrospective removal uses calendar years rather than elapsed days", {
   #' @description Peeling a year removes all samples in that calendar year while retaining annual catch.
-  x <- dplyr::filter(data_big, is.na(timing) | timing <= 3 | (type == "weight_at_age" & timing == 4))
+  x <- dplyr::filter(annual_test_data(), is.na(timing) | timing <= 3 | (type == "weight_at_age" & timing == 4))
   x$timing <- as.Date(ifelse(is.na(x$timing), NA_character_, sprintf("%04d-01-01", x$timing + 1994L)))
   selected <- x$type == "index" & !is.na(x$timing) & format(x$timing, "%Y") == "1997"
   x$timing[selected] <- as.Date("1997-06-10")

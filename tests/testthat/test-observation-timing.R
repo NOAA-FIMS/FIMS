@@ -1,6 +1,6 @@
 test_that("dates are prepared alongside each data object's annual rows", {
   #' @description Data dates preserve leap-day and early-year values, with December 31 for padded years.
-  x <- dplyr::filter(data_big, type == "index", fleet == "survey1") |>
+  x <- dplyr::filter(annual_test_data(), type == "index", fleet == "survey1") |>
     dplyr::select(-age)
   x$timing <- as.Date(sprintf("%04d-01-01", x$timing + 1994L))
   x$timing[2] <- as.Date("1996-04-14")
@@ -13,7 +13,7 @@ test_that("dates are prepared alongside each data object's annual rows", {
 
 test_that("ambiguous observation dimensions fail before reaching C++", {
   #' @description Multiple samples in one annual likelihood cell and missing sample dates are rejected.
-  x <- dplyr::filter(data_big, type == "index", fleet == "survey1") |>
+  x <- dplyr::filter(annual_test_data(), type == "index", fleet == "survey1") |>
     dplyr::select(-age)
   x$timing <- as.Date(sprintf("%04d-01-01", x$timing + 1994L))
   extra <- x[1, ]
@@ -37,7 +37,7 @@ test_that("ambiguous observation dimensions fail before reaching C++", {
 test_that("composition samples retain annual and unique-bin limits", {
   #' @description Both composition types reject a second annual sample and duplicate bins on the same date.
   for (type in c("age_comp", "length_comp")) {
-    x <- data_big
+    x <- annual_test_data()
     x$timing <- as.Date(ifelse(is.na(x$timing), NA_character_,
       sprintf("%04d-01-01", x$timing + 1994L)
     ))
@@ -63,7 +63,7 @@ test_that("composition samples retain annual and unique-bin limits", {
 test_that("dated observations reach TMB with independent survival and growth", {
   #' @description Dates change only the matching sample predictions, leave annual dynamics unchanged, and retain correct AD gradients.
   x <- dplyr::filter(
-    data_big,
+    annual_test_data(),
     is.na(timing) | timing <= 3 | (type == "weight_at_age" & timing == 4)
   )
   x$timing <- as.Date(ifelse(is.na(x$timing), NA_character_,
@@ -155,7 +155,7 @@ test_that("dated observations reach TMB with independent survival and growth", {
 
 test_that("year-only observations average the year and retain their interpretation", {
   #' @description Annual fishery compositions use catch and surveys use mean surviving numbers, with dates preserved through JSON.
-  x <- dplyr::filter(data_big, is.na(timing) | timing <= 3 | (type == "weight_at_age" & timing == 4))
+  x <- dplyr::filter(annual_test_data(), is.na(timing) | timing <= 3 | (type == "weight_at_age" & timing == 4))
   frame <- FIMSFrame(x)
   expect_identical(FIMSFrame(get_data(frame)), frame)
   expect_equal(FIMS:::data_timing(frame, "survey1", "index"), c("0001-12-31", "0002-12-31", "0003-12-31"))
@@ -193,7 +193,7 @@ test_that("year-only observations average the year and retain their interpretati
 
 test_that("annual growth averages agree with independently sampled dates", {
   #' @description Annual weight and length predictions approximate a dense midpoint integral and retain AD gradients.
-  x <- dplyr::filter(data_big, is.na(timing) | timing <= 2 | (type == "weight_at_age" & timing == 3))
+  x <- dplyr::filter(annual_test_data(), is.na(timing) | timing <= 2 | (type == "weight_at_age" & timing == 3))
   x$timing <- as.character(x$timing + 1995L)
   run <- function(input) {
     clear()
