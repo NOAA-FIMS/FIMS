@@ -6,7 +6,7 @@
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
     <img class="navlogo" src="https://noaa-fims.github.io/images/FIMS_logo3.png" alt="FIMS logo with a fish" width="60" align="left"><a class="navbar-brand me-2" href="../index.html">FIMS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.11.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,8 +65,98 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.11.0" id="fims-0110">FIMS 0.11.0<a class="anchor" aria-label="anchor" href="#fims-0110"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-11-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-11-0"></a></h3>
 <ul><li>
-</li></ul></div>
+<em>(CatchAtAge)</em> Build expected length comps from age comp proportions (<a href="https://github.com/noaa-fims/fims/issues/1751" class="external-link">#1751</a>)</li>
+<li>
+<em>(devcontainer)</em> Add missing comma</li>
+<li>
+<em>(fims_likelihood)</em> Use module_name when selecting the profiled parameter (<a href="https://github.com/noaa-fims/fims/issues/1774" class="external-link">#1774</a>)</li>
+<li>
+<em>(fimsfit)</em> Name random effects in the sdreport so their standard errors reach get_estimates() (<a href="https://github.com/noaa-fims/fims/issues/1773" class="external-link">#1773</a>)</li>
+<li>
+<em>(get_estimates)</em> Adds random effect distribution parameters (<a href="https://github.com/noaa-fims/fims/issues/1771" class="external-link">#1771</a>)</li>
+<li>
+<em>(information)</em> Drop density component links</li>
+<li>
+<em>(interface)</em> Register fleet log_q and maturity parameters in variable_map (<a href="https://github.com/noaa-fims/fims/issues/1793" class="external-link">#1793</a>)</li>
+<li>
+<em>(json)</em> Keep whitespace inside strings and decode escapes</li>
+<li>
+<em>(model)</em> Clear the TMB objective function pointer after each evaluation (<a href="https://github.com/noaa-fims/fims/issues/1766" class="external-link">#1766</a>)</li>
+<li>
+<em>(output)</em> Write fleet names and keep infinite values readable (<a href="https://github.com/noaa-fims/fims/issues/1770" class="external-link">#1770</a>)</li>
+<li>
+<em>(selectivity)</em> Error on a logit_sel_at_age length that does not fit n_ages</li>
+<li>
+<em>(setup_default_parameters)</em> Use the geometric plus group for default initial numbers (<a href="https://github.com/noaa-fims/fims/issues/1787" class="external-link">#1787</a>)</li>
+<li>
+<em>(test)</em> Update initial values for estimation tests</li>
+<li>
+<em>(No Category)</em> Docs: fix broken relative URLs in adding-new-module vignette</li>
+<li>
+<em>(No Category)</em> File paths were too long for windows</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-11-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-11-0"></a></h3>
+<ul><li>
+<em>(mohns_rho)</em> Fix sign of Mohn’s rho in documentation (<a href="https://github.com/noaa-fims/fims/issues/1772" class="external-link">#1772</a>)</li>
+<li>
+<em>(No Category)</em> Adds more exploration/explanation to demo</li>
+</ul></div>
+<div class="section level3">
+<h3 id="features-0-11-0">Features<a class="anchor" aria-label="anchor" href="#features-0-11-0"></a></h3>
+<ul><li>
+<em>(growth)</em> Size and growth infrastructure (<a href="https://github.com/noaa-fims/fims/issues/1697" class="external-link">#1697</a>)</li>
+<li>
+<em>(selectivity)</em> Selectivity at age</li>
+</ul></div>
+<div class="section level3">
+<h3 id="performance-0-11-0">Performance<a class="anchor" aria-label="anchor" href="#performance-0-11-0"></a></h3>
+<ul><li>
+<em>(fit_fims)</em> Skip the derived-quantity covariance in sdreport (<a href="https://github.com/noaa-fims/fims/issues/1775" class="external-link">#1775</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="commit-statistics-0-11-0">Commit Statistics<a class="anchor" aria-label="anchor" href="#commit-statistics-0-11-0"></a></h3>
+<ul><li>20 commit(s) contributed to the release.</li>
+<li>38 day(s) passed between the first and last commit.</li>
+<li>20 commit(s) parsed as conventional.</li>
+<li>15 linked issue/PR reference(s) detected in commits.
+<ul><li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1748" class="external-link">#1748</a> (referenced 3 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1764" class="external-link">#1764</a> (referenced 2 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1556" class="external-link">#1556</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1697" class="external-link">#1697</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1739" class="external-link">#1739</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1751" class="external-link">#1751</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1766" class="external-link">#1766</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1770" class="external-link">#1770</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1771" class="external-link">#1771</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1772" class="external-link">#1772</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1773" class="external-link">#1773</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1774" class="external-link">#1774</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1775" class="external-link">#1775</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1787" class="external-link">#1787</a> (referenced 1 time(s))</li>
+<li>
+<a href="https://github.com/NOAA-FIMS/FIMS/issues/1793" class="external-link">#1793</a> (referenced 1 time(s))</li>
+</ul></li>
+<li>53 day(s) passed between releases.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.10.0" id="fims-0100">FIMS 0.10.0<a class="anchor" aria-label="anchor" href="#fims-0100"></a></h2>
 <ul><li>Use <code><a href="../reference/setup_default_parameters.html">setup_default_parameters()</a></code> to set up a model</li>
@@ -261,7 +351,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams, Adrianne T. Wilson.</p>
+  <p>Developed by Kelli F. Johnson, Grant D. Adams, Jon K. T. Brodziak, Kathryn L. Doering, Daniel R. Goethel, Andrea M. Havron, Alex Jensen, Ronald Klasky, Peter T. Kuriyama, Emily M. Liljestrand, Christopher M. Legault, Bai Li, Timothy J. Miller, Cole C. Monnahan, Elizabeth F. Perl, Megumi C. Oshima, Kyle W. Shertzer, Christine C. Stawitz, Jane Y. Sullivan, Matthew Supernaw, Ian G. Taylor, Nathan R. Vaughan, Erik H. Williams, Adrianne T. Wilson.</p>
 </div>
 
 <div class="pkgdown-footer-right">
