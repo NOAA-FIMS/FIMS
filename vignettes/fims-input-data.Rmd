@@ -45,7 +45,7 @@ A sample data frame for a catch-at-age model with both ages and lengths is store
 
 ## `FIMSFrame()`
 
-`FIMSFrame()` must be used to create a data object that can be passed to a FIMS model. This function returns an object that has the `FIMSFrame` class. This class contains a data slot that stores the input data frame and several other slots that store summary information about the object, e.g., the fleet names, the number of age bins, etc. All of this information can be accessed using `get_*()` functions, e.g., `get_n_years()`, `get_fleets()`.
+`FIMSFrame()` must be used to create a data object that can be passed to a FIMS model. This function returns an object that has the `FIMSFrame` class. This class contains a data slot that stores the input data frame and several other slots that store summary information about the object, e.g., the fleet names, the number of age bins, etc. All of this information can be accessed using `get_*()` functions, e.g., `get_n_years()`, `get_fleets()`. Every fleet named in the data must have catch, index, or composition data. `FIMSFrame()` returns an error otherwise, so a misspelled fleet name in other rows does not add a fleet to the model.
 
 When you execute `FIMSFrame()` on a long data frame, such as `data_big`, the function executes several error checks to help ensure that your data is ready for a FIMS model. For example, until the internal estimation of growth is possible, all catch-at-age models require weight-at-age data. If your data frame does not have weight-at-age data, then `FIMSFrame()` will error and return helpful information on what you are missing.
 
@@ -188,7 +188,7 @@ The weight-at-age data are not currently included in the likelihood and are just
 Two key features of the weight-at-age data are 
 
   1. these data are required for the one additional time step (final observation for timing + 1), and
-  2. the observations are currently shared among fleets and throughout the dynamics (so only need to be provided once).
+  2. the observations are currently shared among fleets and throughout the dynamics (so only need to be provided once). The `fleet` column must name a fleet that has catch, index, or composition data.
 
 The final timing + 1 observations are required because FIMS reports spawning biomass at the beginning of the year for every year, including the year after the last catches are removed from the population.
 
