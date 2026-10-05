@@ -29,8 +29,8 @@ test_that("short calendar years and missing samples are reported as dates", {
   x <- dplyr::filter(annual_test_data(), is.na(timing) | timing <= 3 | (type == "weight_at_age" & timing == 4))
   x$timing <- as.Date(ifelse(is.na(x$timing), NA_character_, sprintf("%04d-01-01", x$timing)))
   selected <- x$fleet == "survey1" & x$type == "index" & !is.na(x$timing)
-  x$observed[selected & format(x$timing, "%Y") == "0002"] <- -999
-  x$timing[selected & format(x$timing, "%Y") == "0003"] <- as.Date("0003-06-10")
+  x$observed[selected & as.integer(format(x$timing, "%Y")) == 2L] <- -999
+  x$timing[selected & as.integer(format(x$timing, "%Y")) == 3L] <- as.Date("0003-06-10")
   frame <- FIMSFrame(x)
   fit <- fit_fims(initialize_fims(setup_default_parameters(frame), frame), optimize = FALSE, get_sd = FALSE)
   estimates <- get_estimates(fit)

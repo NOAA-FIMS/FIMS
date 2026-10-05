@@ -587,3 +587,24 @@ test_that("December 31 is annual while explicit January 1 remains dated", {
   expect_false("timing_type" %in% names(get_data(frame)))
   expect_identical(FIMSFrame(get_data(frame)), frame)
 })
+
+
+test_that("timing dates do not depend on platform year padding", {
+  #' @description Short years remain valid ISO dates when the platform omits leading zeros from %Y.
+  # R's internal formatter honors this setting; Linux already omits padding.
+  withr::local_envvar(c(R_PAD_YEARS_BY_ZERO = "no"))
+  text <- c("0001-01-01", "0004-02-29", "0025-06-10", "0125-12-31", "2025-06-10", NA)
+  expect_identical(FIMS:::format_timing(as.Date(text)), text)
+  expect_identical(FIMS:::normalize_timing(text), as.Date(text))
+  expect_identical(
+    FIMS:::normalize_timing(c("1", "25", "125", NA)),
+    as.Date(c("0001-12-31", "0025-12-31", "0125-12-31", NA))
+  )
+  expect_error(FIMS:::normalize_timing("0003-02-29"), "valid YYYY-MM-DD")
+  frame <- FIMSFrame(data_big)
+  expect_identical(get_start_year(frame), 1L)
+  expect_identical(
+    FIMS:::data_timing(frame, "survey1", "index"),
+    sprintf("%04d-01-01", seq_len(get_n_years(frame)))
+  )
+})

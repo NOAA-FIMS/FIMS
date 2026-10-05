@@ -1307,6 +1307,17 @@ FIMSFrame <- function(data) {
 }
 
 # Unexported functions ----
+# Format ISO dates without relying on platform-specific padding of %Y.
+format_timing <- function(dates) {
+  result <- sprintf(
+    "%04d-%s",
+    as.integer(format(dates, "%Y")),
+    format(dates, "%m-%d")
+  )
+  result[is.na(dates)] <- NA_character_
+  result
+}
+
 # Normalize years and dates to Date, preserving missing timing values.
 normalize_timing <- function(timing) {
   if (inherits(timing, "Date")) {
@@ -1325,7 +1336,7 @@ normalize_timing <- function(timing) {
   dates <- as.Date(text, format = "%Y-%m-%d")
   invalid <- !is.na(text) & (
     !grepl("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", text) |
-      is.na(dates) | format(dates, "%Y-%m-%d") != text
+      is.na(dates) | format_timing(dates) != text
   )
   if (any(invalid)) {
     cli::cli_abort(
@@ -1417,5 +1428,5 @@ data_timing <- function(data, fleet, type) {
     )
   }
   # FIMSFrame has already normalized and padded every annual observation row.
-  format(dates$date[order(dates$year)], "%Y-%m-%d")
+  format_timing(dates$date[order(dates$year)])
 }
