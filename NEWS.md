@@ -26,16 +26,11 @@
 ## Features
 
 * *(growth)* Size and growth infrastructure (#1697)
-* *(selelectivity)* Selectivity at age
+* *(selectivity)* Selectivity at age
 
 ## Performance
 
 * *(fit_fims)* Skip the derived-quantity covariance in sdreport (#1775)
-
-## New Contributors
-
-* @grantdadams made their first contribution in [#1771](https://github.com/NOAA-FIMS/FIMS/pull/1771)
-* @VedantMadane made their first contribution in [#1703](https://github.com/NOAA-FIMS/FIMS/pull/1703)
 
 ## Commit Statistics
 
