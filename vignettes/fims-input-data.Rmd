@@ -188,7 +188,7 @@ The weight-at-age data are not currently included in the likelihood and are just
 Two key features of the weight-at-age data are 
 
   1. these data are required for the one additional time step (final observation for timing + 1), and
-  2. the observations are currently shared among fleets and throughout the dynamics (so only need to be provided once). The `fleet` column must name a fleet that has catch, index, or composition data.
+  2. the observations are currently shared among fleets and throughout the dynamics (so only need to be provided once).
 
 The final timing + 1 observations are required because FIMS reports spawning biomass at the beginning of the year for every year, including the year after the last catches are removed from the population.
 
