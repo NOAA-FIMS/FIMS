@@ -64,6 +64,12 @@ The generated data include:
 - explicit fleet length-bin rows
 - the true mean length-at-age and standard deviation of length-at-age
 
+The generated compositions describe fish at integer ages at the beginning of
+each year, so they use explicit January 1 dates. Year-only composition timing
+would instead request annual catch compositions, including mortality and growth
+throughout the year. Catch inputs remain annual. For real data, use the actual
+sampling dates; see the [observation timing guide](fims-input-data.html#observation-timing).
+
 It also generates a small set of noisy length-at-age observations for the comparison plot. Those plotting observations are retained separately and are not passed to FIMS as model inputs.
 
 ```{r setup}
@@ -181,7 +187,7 @@ make_vonb_demo_data <- function(
   # data give the model age-structure information without adding extra
   # year-specific variation.
   age_comp_rows <- tidyr::expand_grid(
-    timing = years,
+    timing = sprintf("%04d-01-01", years),
     age = ages
   ) |>
     dplyr::mutate(
@@ -233,7 +239,7 @@ make_vonb_demo_data <- function(
       observed = sum(age_probability * conditional_probability),
       .groups = "drop"
     ) |>
-    tidyr::crossing(timing = years) |>
+    tidyr::crossing(timing = sprintf("%04d-01-01", years)) |>
     dplyr::mutate(
       type = "length_comp",
       fleet = fleet,
@@ -263,7 +269,7 @@ make_vonb_demo_data <- function(
       fleet = fleet,
       age = age,
       length = NA_real_,
-      timing = min(years),
+      timing = as.character(min(years)),
       observed = true_weight_at_age,
       unit = "mt",
       uncertainty = NA_character_
@@ -276,7 +282,7 @@ make_vonb_demo_data <- function(
     fleet = fleet,
     age = NA_real_,
     length = NA_real_,
-    timing = years,
+    timing = as.character(years),
     observed = rep(2500, length(years)),
     unit = "mt",
     uncertainty = "~dlnorm(meanlog = log_catch_expected, sdlog = 0.2)"
@@ -288,7 +294,7 @@ make_vonb_demo_data <- function(
     fleet = fleet,
     age = NA_real_,
     length = lengths,
-    timing = NA_real_,
+    timing = NA_character_,
     observed = NA_real_,
     unit = "proportion",
     uncertainty = NA_character_

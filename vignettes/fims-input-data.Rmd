@@ -66,15 +66,68 @@ are labeled January 1, and instantaneous predictions carry their sample dates.
 When a plotting package requires a numeric `year` column, create it explicitly
 with `as.integer(format(timing, "%Y"))`.
 
+### Give each observation type its sampling date
+
+Keep `timing` as character while combining year-only observations and dates.
+The example below moves the sample data to calendar years 2001--2031 and
+assigns separate survey dates. All bins of a composition sample receive the
+same date. Fishery observations retain year-only timing and therefore represent
+annual catch.
+
+```{r observation-dates}
+dated_input <- FIMS::data_big |>
+  dplyr::mutate(
+    year = as.integer(sub("-.*$", "", timing)) + 2000L,
+    timing = dplyr::case_when(
+      is.na(year) ~ NA_character_,
+      fleet == "survey1" & type == "index" ~ sprintf("%04d-06-10", year),
+      fleet == "survey1" & type == "age_comp" ~ sprintf("%04d-09-01", year),
+      fleet == "survey1" & type == "length_comp" ~ sprintf("%04d-04-14", year),
+      TRUE ~ as.character(year)
+    )
+  ) |>
+  dplyr::select(-year)
+dated_frame <- FIMSFrame(dated_input)
+get_data(dated_frame) |>
+  dplyr::filter(fleet == "survey1", format(timing, "%Y") == "2001") |>
+  dplyr::distinct(type, timing)
+```
+
+A second sample of the same type in the same fleet and year is not supported,
+even if its date differs. Each composition sample must include all of its age
+or length bins. When an entire annual sample is absent, `FIMSFrame()` fills
+its observations with `-999` and labels it December 31; those rows do not
+create an instantaneous sample.
+
+### Filter by calendar year
+
+Extract the year before doing year arithmetic or comparisons. Comparing raw
+character timing to a number can sort years lexicographically, and adding a
+number to an R `Date` adds days. Keep the original dates when filtering so
+that the sampling interpretation is preserved. Empirical weight-at-age data
+that vary by year also need the year after the last modeled observation.
+
+```{r filter-calendar-years}
+short_input <- get_data(dated_frame) |>
+  dplyr::mutate(year = as.integer(format(timing, "%Y"))) |>
+  dplyr::filter(
+    is.na(year) | year <= 2003L |
+      (type == "weight_at_age" & year == 2004L)
+  ) |>
+  dplyr::select(-year)
+short_frame <- FIMSFrame(short_input)
+get_n_years(short_frame)
+```
+
 ## `data_big`
 
-A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data_big`. This data set is based on data that was used in [Li et al. (2021)](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data_big.R) based on an age--length conversion matrix. To see how this example data frame was created, see the R script here [R/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_big.R).
+A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data_big`. This data set is based on data that was used in [Li et al. (2021)](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data_big.R) based on an age--length conversion matrix. The raw `timing` column mixes year strings and explicit dates. Use `get_data(FIMSFrame(data_big))` to obtain normalized dates.
 
 ## `FIMSFrame()`
 
 `FIMSFrame()` must be used to create a data object that can be passed to a FIMS model. This function returns an object that has the `FIMSFrame` class. This class contains a data slot that stores the input data frame and several other slots that store summary information about the object, e.g., the fleet names, the number of age bins, etc. All of this information can be accessed using `get_*()` functions, e.g., `get_n_years()`, `get_fleets()`.
 
-When you execute `FIMSFrame()` on a long data frame, such as `data_big`, the function executes several error checks to help ensure that your data is ready for a FIMS model. For example, until the internal estimation of growth is possible, all catch-at-age models require weight-at-age data. If your data frame does not have weight-at-age data, then `FIMSFrame()` will error and return helpful information on what you are missing.
+When you execute `FIMSFrame()` on a long data frame, such as `data_big`, the function executes several error checks to help ensure that your data is ready for a FIMS model. For example, composition samples must contain complete sets of bins. Models using empirical growth need weight-at-age inputs; models using estimated growth can use the VonBertalanffySchnute module described in the [growth vignette](fims-growth-vonb-schnute.html).
 
 The output of `FIMSFrame()` also contains summary information about your data and has an internal plotting function. See the [FIMS overview vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo.html) for more information.
 
@@ -99,7 +152,7 @@ FIMS::data_big |>
 #|   Barplot shows an increase in catch over the timing values 1 to 8, then noisy but stable values until the final bar at timing equals 30.
 # time series plot of catch data
 library(ggplot2)
-FIMS::data_big |>
+get_data(data_4_model) |>
   dplyr::filter(type == "catch") |>
   ggplot(aes(x = timing, y = observed)) +
   geom_bar(stat = "identity") +
@@ -121,7 +174,7 @@ FIMS::data_big |>
 #| fig.alt: >
 #|   Points with uncertainty shows a steadily decreasing index over time steps 1 to 30 with increasing precision for the later observations.
 # time series plot of index data
-FIMS::data_big |>
+get_data(data_4_model) |>
   dplyr::filter(type == "index") |>
   ggplot2::ggplot(ggplot2::aes(x = timing, y = observed)) +
   ggplot2::geom_point() +
@@ -206,7 +259,7 @@ FIMS::data_big |>
 
 The `length_bin` data type defines length bins without providing length-composition observations. These rows are useful when a model needs length-bin geometry for a growth-derived age-to-length conversion, but the user is not fitting length-composition data for that fleet.
 
-For `length_bin` rows, the `length` column contains the length-bin values. The `observed`, `age`, and `uncertainty` columns should usually be `NA`. The `fleet` column identifies which fleet or survey the length bins apply to, and `timing` can be `NA` unless fleet-specific timing is needed.
+For `length_bin` rows, the `length` column contains the length-bin values. The `observed`, `age`, and `uncertainty` columns should usually be `NA`. The `fleet` column identifies which fleet or survey the length bins apply to, and `timing` should be `NA` for these time-invariant definitions. Set sampling dates on the composition or index rows.
 
 ## Weight-at-age data (`type == "weight_at_age"`)
 
@@ -214,10 +267,10 @@ The weight-at-age data are not currently included in the likelihood and are just
 
 Two key features of the weight-at-age data are 
 
-  1. these data are required for the one additional time step (final observation for timing + 1), and
+  1. these data are required for the one additional time step (the calendar year after the final modeled observation), and
   2. the observations are currently shared among fleets and throughout the dynamics (so only need to be provided once).
 
-The final timing + 1 observations are required because FIMS reports spawning biomass at the beginning of the year for every year, including the year after the last catches are removed from the population.
+The weight-at-age inputs for the extra terminal year are required because FIMS reports spawning biomass at the beginning of the year for every year, including the year after the last catches are removed from the population.
 
 The weight-at-age observations for the `data_big` are identical across time steps, and are provided for timing = 1 to 31 and associated with name = "fleet1".
 

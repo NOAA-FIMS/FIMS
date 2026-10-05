@@ -46,6 +46,8 @@ The code below uses the built-in data within FIMS and sets up a simple catch-at-
 data("data_big")
 # Prepare the package data for being used in a FIMS model
 data_4_model <- FIMSFrame(data_big)
+# Work with normalized dates when extending the calendar.
+projection_input <- get_data(data_4_model)
 ```
 
 ## Projections
@@ -58,6 +60,11 @@ years_of_projection <- 10
 
 ### Data
 
+Preserve the historical sampling dates when extending the data. The new catch
+row uses December 31 because catch is annual. Weight-at-age inputs already
+include the year after the historical observations; copy that final set through
+the year after the projection period, without duplicating the existing year.
+
 Below, we show how you can update your data to include `r years_of_projection` years of projections by extending the terminal year. Second, `FIMS::FIMSFrame()` will fill in missing years of data for each data type based on your new maximum year in your data. These missing years use a observation of -999 for each data type but users must provide the uncertainty level associated with the missing data because by default it will be filled with `NA`.
 
 In the future, we will integrate more of the process below coded below into wrapper functions but as of FIMS version 0.8.0 some manipulation of the data is needed.
@@ -66,9 +73,11 @@ In the future, we will integrate more of the process below coded below into wrap
 # Add a single row of catch to the original data for the maximum year you
 # want to project to
 data_big_with_extra_year <- dplyr::add_row(
-  data_big,
+  projection_input,
   type = "catch",
-  timing = as.character(get_end_year(data_4_model) + years_of_projection),
+  timing = as.Date(sprintf(
+    "%04d-12-31", get_end_year(data_4_model) + years_of_projection
+  )),
   fleet = "fleet1",
   observed = -999,
   unit = "mt"
@@ -80,16 +89,16 @@ data_4_projections <- data_big_with_extra_year |>
   # Add on weight_at_age because you don't want these filled with -999
   dplyr::bind_rows(
     dplyr::filter(
-      data_big,
+      projection_input,
       type == "weight_at_age",
-      timing == as.character(get_start_year(data_4_model))
+      as.integer(format(timing, "%Y")) == get_end_year(data_4_model) + 1L
     ) |>
       dplyr::select(-timing) |>
       merge(
-        data.frame(timing = as.character(seq.int(
-          from = get_end_year(data_4_model) + 1L,
+        data.frame(timing = as.Date(sprintf("%04d-12-31", seq.int(
+          from = get_end_year(data_4_model) + 2L,
           length.out = years_of_projection
-        )))
+        ))))
       )
   ) |>
   # Make a FIMSFrame object out of this data frame with the extra row to add all

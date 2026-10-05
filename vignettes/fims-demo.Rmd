@@ -74,6 +74,12 @@ data("data_big")
 data_4_model <- FIMSFrame(data_big)
 ```
 
+`get_data(data_4_model)$timing` contains calendar dates. Year-only inputs
+become December 31 and represent annual observations; other dates represent
+instantaneous index or composition samples. Catch remains annual. See the
+[input-data vignette](fims-input-data.html#observation-timing) for examples
+of different survey dates and filtering by year.
+
 There are helper functions for working with objects that have the `FIMSFrame` class, e.g., `get_data()`, `get_n_years()`, `get_*()`. Additionally, there are helper functions for pulling data out of the class in the format needed for a module, i.e., a vector, but these `m_*()` functions. These `m_*()` functions will not be explored in this vignette because they are largely meant to be used by power users to manually set up FIMS modules.
 
 The `data_4_model` object contains many slots (i.e., named components of the object that can be accessed) but perhaps the most interesting one is the long data frame stored in the "data" slot. This tibble can be accessed using `get_data()`.
@@ -161,6 +167,10 @@ Other constant parameters will likely be fine at the default values for most mod
 
 Users can modify any of the default parameters as needed, including the initial values and the choice of which parameters are constant or estimated. Functions (e.g., `rows_*()`) from `{dplyr}` can be used to make these updates.
 
+Parameter-table `timing` values are integer calendar years, whereas observation
+and estimate tables use dates. Use `get_start_year()` and `get_end_year()`
+when constructing parameter updates.
+
 In the code below, `rows_update()` is used to adjust the fishing mortality, selectivity, maturity, and population parameters from their default values.
 
 ```{r parameters-update}
@@ -170,7 +180,7 @@ parameters_4_model <- default_parameters |>
     tibble::tibble(
       fleet = "fleet1",
       label = "log_Fmort",
-      timing = seq(FIMS::get_n_years(data_4_model)),
+      timing = seq.int(get_start_year(data_4_model), get_end_year(data_4_model)),
       value = log(c(
         0.009459165, 0.027288858, 0.045063639,
         0.061017825, 0.048600752, 0.087420554,
@@ -199,7 +209,7 @@ parameters_4_model <- default_parameters |>
   dplyr::rows_update(
     tibble::tibble(
       label = "log_devs",
-      timing = 2:FIMS::get_n_years(data_4_model),
+      timing = seq.int(get_start_year(data_4_model) + 1L, get_end_year(data_4_model)),
       value = c(
         0.43787763, -0.13299042, -0.43251973, 0.64861200, 0.50640852,
         -0.06958319, 0.30246260, -0.08257384, 0.20740372, 0.15289604,
