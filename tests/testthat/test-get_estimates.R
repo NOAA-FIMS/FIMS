@@ -42,7 +42,9 @@ expected_colnames <- c(
 test_that("`get_estimates()` works with deterministic run", {
   # Read the RDS file containing the deterministic run results
   deterministic_results <- readRDS(testthat::test_path("fixtures", "deterministic_age_length_comp.RDS"))
-  deterministic_colnames <- get_estimates(deterministic_results) |> colnames()
+  deterministic_estimates <- get_estimates(deterministic_results)
+  expect_s3_class(deterministic_estimates$timing, "Date")
+  deterministic_colnames <- colnames(deterministic_estimates)
   #' @description Test that `get_estimates()` returns correct colnames from a deterministic run.
   expect_equal(
     object = deterministic_colnames,
@@ -57,7 +59,10 @@ test_that("`get_estimates()` works with deterministic run", {
       dplyr::select(
         -estimated, -expected, -uncertainty, -gradient,
         -likelihood, -log_like_cv, -lpdf
-      )
+      ) |>
+      # Snapshot ISO strings so platform-specific Date printing cannot alter
+      # the dates or the tibble column layout.
+      dplyr::mutate(timing = FIMS:::format_timing(timing))
 
     estimates_snapshot_lines <- capture.output(
       print(estimates_snapshot, n = 320, width = Inf)
@@ -79,6 +84,7 @@ test_that("`get_estimates()` works with estimation run", {
   check_estimates_colnames <- function(fit_file) {
     fit_data <- readRDS(fit_file)
     estimates <- get_estimates(fit_data)
+    expect_s3_class(estimates$timing, "Date")
     estimates_colnames <- colnames(estimates)
 
     #' @description Test that `get_estimates()` returns correct colnames from a estimation run.
@@ -101,7 +107,10 @@ test_that("`get_estimates()` works with estimation run", {
       dplyr::select(
         -estimated, -expected, -uncertainty, -gradient,
         -likelihood, -log_like_cv, -lpdf
-      )
+      ) |>
+      # Snapshot ISO strings so platform-specific Date printing cannot alter
+      # the dates or the tibble column layout.
+      dplyr::mutate(timing = FIMS:::format_timing(timing))
 
     estimates_snapshot_lines <- capture.output(
       print(estimates_snapshot, n = 320, width = Inf)

@@ -1,9 +1,9 @@
 # `get_estimates()` works with deterministic run
 
     Code
-      estimates_snapshot <- dplyr::select(get_estimates(deterministic_results),
-      -estimated, -expected, -uncertainty, -gradient, -likelihood, -log_like_cv,
-      -lpdf)
+      estimates_snapshot <- dplyr::mutate(dplyr::select(get_estimates(
+        deterministic_results), -estimated, -expected, -uncertainty, -gradient,
+      -likelihood, -log_like_cv, -lpdf), timing = FIMS:::format_timing(timing))
       estimates_snapshot_lines <- capture.output(print(estimates_snapshot, n = 320,
         width = Inf))
       cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
@@ -332,7 +332,7 @@
       319 Fleet               1 <NA>        agecomp_expected <NA>        NA
       320 Fleet               1 <NA>        agecomp_expected <NA>        NA
           parameter_id fleet  timing     age_i length_i  input observed
-                 <int> <chr>  <date>     <int>    <int>  <dbl>    <dbl>
+                 <int> <chr>  <chr>      <int>    <int>  <dbl>    <dbl>
         1            4 fleet1 0001-01-01    NA       NA -4.66        NA
         2           24 fleet1 0002-01-01    NA       NA -3.60        NA
         3           25 fleet1 0003-01-01    NA       NA -3.10        NA
@@ -363,7 +363,7 @@
        28           50 fleet1 0028-01-01    NA       NA -0.840       NA
        29           51 fleet1 0029-01-01    NA       NA -1.11        NA
        30           52 fleet1 0030-01-01    NA       NA -0.694       NA
-       31            3 fleet1 NA            NA       NA  0           NA
+       31            3 fleet1 <NA>          NA       NA  0           NA
        32           NA fleet1 0001-12-31     1       NA NA           14
        33           NA fleet1 0001-12-31     2       NA NA           20
        34           NA fleet1 0001-12-31     3       NA NA           23
@@ -980,9 +980,9 @@
 # `get_estimates()` works with estimation run
 
     Code
-      estimates_snapshot <- dplyr::select(get_estimates(readRDS(fit_files[[1]])),
-      -estimated, -expected, -uncertainty, -gradient, -likelihood, -log_like_cv,
-      -lpdf)
+      estimates_snapshot <- dplyr::mutate(dplyr::select(get_estimates(readRDS(
+        fit_files[[1]])), -estimated, -expected, -uncertainty, -gradient, -likelihood,
+      -log_like_cv, -lpdf), timing = FIMS:::format_timing(timing))
       estimates_snapshot_lines <- capture.output(print(estimates_snapshot, n = 320,
         width = Inf))
       cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
@@ -1311,7 +1311,7 @@
       319 Fleet               1 <NA>        agecomp_expected <NA>        NA
       320 Fleet               1 <NA>        agecomp_expected <NA>        NA
           parameter_id fleet  timing     age_i length_i input observed
-                 <int> <chr>  <date>     <int>    <int> <dbl>    <dbl>
+                 <int> <chr>  <chr>      <int>    <int> <dbl>    <dbl>
         1            4 fleet1 0001-01-01    NA       NA -6.99       NA
         2           24 fleet1 0002-01-01    NA       NA -5.40       NA
         3           25 fleet1 0003-01-01    NA       NA -4.65       NA
@@ -1342,7 +1342,7 @@
        28           50 fleet1 0028-01-01    NA       NA -1.26       NA
        29           51 fleet1 0029-01-01    NA       NA -1.67       NA
        30           52 fleet1 0030-01-01    NA       NA -1.04       NA
-       31            3 fleet1 NA            NA       NA  0          NA
+       31            3 fleet1 <NA>          NA       NA  0          NA
        32           NA fleet1 0001-12-31     1       NA NA          14
        33           NA fleet1 0001-12-31     2       NA NA          20
        34           NA fleet1 0001-12-31     3       NA NA          23
