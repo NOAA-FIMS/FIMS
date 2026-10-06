@@ -61,7 +61,7 @@ The long format does lead to some information being duplicated. For example, the
 
 A sample data frame for a catch-at-age model with both ages and lengths is stored in the package as `data_big`. This data set is based on data that was used in [Li et al.](https://www.doi.org/10.7755/FB.119.2-3.5) for the Model Comparison Project ([github site](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)). The length data have since been added [data-raw/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data_big.R) based on an age-length conversion matrix.
 
-To see how this example data frame was created, see the R script here [R/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/data_big.R). To find out more about the columns that are present use `?data_big`.
+To see how this example data frame was created, see the R script here [data-raw/data_big.R](https://github.com/NOAA-FIMS/FIMS/blob/main/data-raw/data_big.R). To find out more about the columns that are present use `?data_big`.
 
 ### `FIMSFrame()`
 
