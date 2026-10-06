@@ -656,7 +656,10 @@ fit_fims <- function(input,
     names(get_random_names(obj[["env"]]$parList()[["re"]]))
   }
   check_mle_convergence(
-    input, obj, opt, maxgrad,
+    input,
+    obj,
+    opt,
+    maxgrad,
     gradient = gradient,
     parameter_names = parameter_names
   )
@@ -673,7 +676,10 @@ fit_fims <- function(input,
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
     check_sdreport_convergence(
-      input, obj, opt, sdreport,
+      input,
+      obj,
+      opt,
+      sdreport,
       parameter_names = parameter_names,
       random_effects_names = random_effects_names
     )
