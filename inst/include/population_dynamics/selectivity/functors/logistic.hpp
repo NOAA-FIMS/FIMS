@@ -28,17 +28,17 @@ namespace fims_popdy {
 template <typename Type>
 struct LogisticSelectivity : public SelectivityBase<Type> {
   fims::Vector<Type>
-  /**
-   * @brief The age at which 50% of fish are selected for models that start at
-   * age zero and each age bin represents one year.
-   * @details The 50% quantile of the value of the quantity of interest (x).
-   */
-  inflection_point;
+      /**
+       * @brief The age at which 50% of fish are selected for models that start
+       * at age zero and each age bin represents one year.
+       * @details The 50% quantile of the value of the quantity of interest (x).
+       */
+          inflection_point;
   /**
    * @brief How quickly selectivity changes with age around the inflection
    * point, per year of age. Larger absolute values give a steeper, more
    * knife-edge curve; negative values give a curve that declines with age.
-   */  
+   */
   fims::Vector<Type> slope;
 
   LogisticSelectivity() : SelectivityBase<Type>() {}
