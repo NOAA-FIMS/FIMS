@@ -77,14 +77,11 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   /**
-   * @brief The age or length at which 50% of fish are selected.
+   * @copydoc fims_popdy::LogisticSelectivity::inflection_point
    */
   VariableVector inflection_point;
   /**
-   * @brief How quickly selectivity changes with age or length around the
-   * inflection point, per year of age or unit of length. Larger absolute
-   * values give a steeper, more knife-edge curve; negative values give a
-   * curve that declines with age or length.
+   * @copydoc fims_popdy::LogisticSelectivity::slope
    */
   VariableVector slope;
 
@@ -301,21 +298,19 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   /**
-   * @brief The age or length at which the ascending limb is 0.5.
+   * @copydoc fims_popdy::DoubleLogisticSelectivity::inflection_point_asc
    */
   VariableVector inflection_point_asc;
   /**
-   * @brief How quickly selectivity rises on the ascending limb; larger values
-   * give a steeper, more knife-edge rise.
+   * @copydoc fims_popdy::DoubleLogisticSelectivity::slope_asc
    */
   VariableVector slope_asc;
   /**
-   * @brief The age or length at which the descending limb is 0.5.
+   * @copydoc fims_popdy::DoubleLogisticSelectivity::inflection_point_desc
    */
   VariableVector inflection_point_desc;
   /**
-   * @brief How quickly selectivity falls on the descending limb; larger values
-   * give a steeper decline.
+   * @copydoc fims_popdy::DoubleLogisticSelectivity::slope_desc
    */
   VariableVector slope_desc;
 

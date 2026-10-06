@@ -75,13 +75,11 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 class LogisticMaturityInterface : public MaturityInterfaceBase {
  public:
   /**
-   * @brief The age at which 50% of fish are mature.
+   * @copydoc fims_popdy::LogisticMaturity::inflection_point
    */
   VariableVector inflection_point;
   /**
-   * @brief How quickly the proportion mature changes with age around the
-   * inflection point, per year of age. Larger absolute values give a steeper,
-   * more knife-edge maturity curve.
+   * @copydoc fims_popdy::LogisticMaturity::slope
    */
   VariableVector slope;
 
