@@ -375,7 +375,8 @@ setup_default_Growth <- function(
     ) |>
       dplyr::mutate(
         module_name = "Growth",
-        module_type = .env$module_type
+        module_type = .env$module_type,
+        label = "weight_at_age"
       )
 
     return(default)
