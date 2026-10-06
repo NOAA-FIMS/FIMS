@@ -666,24 +666,28 @@ class CatchAtAge : public FisheryModelBase<Type> {
   /**
    * @brief Calculates maturity at age, in proportion, for a population.
    *
-   * This function evaluates the maturity ogive at the specified age to estimate
-   * the proportion of individuals that are mature:
+   * This function evaluates the maturity ogive at the specified age and year
+   * to estimate the proportion of individuals that are mature:
    * \f[
-   * p_{mature,a} = \text{maturity}(a)
+   * p_{mature,a,y} = \text{maturity}(a, \min(y, n_{years} - 1))
    * \f]
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_year
    * @snippet{doc} this param_age
    */
   void CalculateMaturityAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_age_year, size_t age) {
+      size_t i_age_year, size_t year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
+    // Year n_years is the start-of-year state after the last data year, so it
+    // reuses that year's maturity.
     dq_["proportion_mature_at_age"][i_age_year] =
-        population->maturity->evaluate(population->ages[age]);
+        population->maturity->evaluate(
+            population->ages[age], (std::min)(year, population->n_years - 1));
   }
 
   /**
@@ -1460,7 +1464,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
              */
             CalculateMortality(population, i_age_year, y, a);
           }
-          CalculateMaturityAA(population, i_age_year, a);
+          CalculateMaturityAA(population, i_age_year, y, a);
           /* if statements needed because some quantities are only needed
           for the first year and/or age, so these steps are included here.
            */
