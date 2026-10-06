@@ -1,4 +1,5 @@
-name: "Spelling Check"
+name: call-spell-check
+
 on:
   push:
     branches:
@@ -8,21 +9,6 @@ on:
       - main
   workflow_dispatch:
 
-# Cancel runs happening simultaneously on the same branch.
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-  
 jobs:
-  spelling:
-    name: Check Spelling
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Run CSpell
-        uses: streetsidesoftware/cspell-action@v9
-        with:
-          files: "**/*.{cpp,hpp,h,R,Rmd,md}"
-          incremental_files_only: true
-          config: "cspell.json"
+  cspell:
+    uses: noaa-fims/.github/.github/workflows/cspell.yml@main
