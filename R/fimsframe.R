@@ -884,10 +884,15 @@ validate_fleets_have_observations <- function(data) {
   )
   if (length(fleets_without_observations) > 0) {
     cli::cli_abort(c(
-      "These fleets have no catch, index, or composition data:
+      "x" = "The following fleets have no catch, index, or composition data:
       {.val {fleets_without_observations}}.",
+      "i" = "Every fleet present in your data must have at least catch, index,
+      or composition data, e.g., a fleet with just age_to_length_conversion data
+      is not allowed.",
       "i" = "Check the {.var fleet} and {.var type} values in the rows for
-      these fleets."
+      the following fleets: {.val {fleets_without_observations}}, where
+      {.code dplyr::count(data, fleet, type)} is helpful for investigating data
+      types by fleet."
     ))
   }
   invisible(TRUE)
