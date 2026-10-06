@@ -1,0 +1,191 @@
+---
+title: "SPR and MSY From a Biological Snapshot"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SPR and MSY From a Biological Snapshot}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(FIMS)
+```
+
+`calculate_reference_points()` computes equilibrium reference points from a
+fixed biological snapshot. This makes it possible to explore assumptions
+without creating or fitting a population model. To obtain a snapshot from a
+live model, see [Reference Points From a CatchAtAge Model](fims-reference-points-model.html).
+
+The examples use invented biological values to demonstrate the calculations.
+They are not reference-point recommendations for a stock.
+
+## Define the biology and fishing pattern
+
+Each biological vector contains one entry per annual age, youngest first. One
+recruit enters the first age each year, and the last age is a plus group.
+Natural mortality is an instantaneous annual rate. Weights use a consistent
+biomass unit throughout the calculation.
+
+```{r inputs}
+ages <- 1:6
+inputs <- list(
+  natural_mortality = rep(0.2, length(ages)),
+  weight = c(0.2, 0.5, 1, 1.5, 2, 2.5),
+  maturity = c(0, 0.1, 0.5, 0.9, 1, 1),
+  proportion_female = rep(0.5, length(ages)),
+  fleets = list(list(
+    share = 1,
+    selectivity = c(0.1, 0.3, 0.7, 1, 1, 1),
+    weight = c(0.2, 0.5, 1, 1.5, 2, 2.5)
+  ))
+)
+```
+
+Fleet shares must sum to one. At age $a$, total fishing mortality is
+
+$$F_a = F \sum_f \mathrm{share}_f\,\mathrm{selectivity}_{f,a}.$$
+
+The reported $F$ is the coefficient in this expression. Selectivity is used
+exactly as supplied, so $F$ need not equal the maximum mortality at age. Here,
+one fleet has maximum selectivity one, making the interpretation direct.
+Catch weights may differ from population weights in a standalone snapshot.
+
+## Find fishing mortality at an SPR target
+
+Spawning potential ratio is spawning biomass per recruit under fishing divided
+by its unfished value:
+
+$$\mathrm{SPR}(F) = \mathrm{SBPR}(F) / \mathrm{SBPR}(0).$$
+
+Both biomass quantities are measured at the start of the year. SPR is an
+equilibrium per-recruit ratio; it is different from the annual spawning biomass
+ratio in a fitted population trajectory.
+
+```{r spr}
+spr_result <- calculate_reference_points(
+  inputs,
+  spr_targets = c(0.5, 0.4, 0.35),
+  msy = FALSE
+)
+knitr::kable(spr_result$spr, digits = 6)
+```
+
+A target of `0.4` means 40% of unfished spawning biomass per recruit. Check the
+`status` column before using its fishing mortality. The residual is achieved
+SPR minus the requested target. SPR calculations do not require a
+stock-recruitment relationship.
+
+```{r check-spr, include=FALSE}
+stopifnot(
+  all(spr_result$spr$status == "converged"),
+  all(abs(spr_result$spr$residual) <= spr_result$settings$tolerance)
+)
+```
+
+## Add Beverton-Holt recruitment and calculate MSY
+
+MSY combines yield per recruit with equilibrium recruitment. Supply unfished
+recruitment (`rzero`), steepness, and the unfished spawning biomass per recruit
+that defines the stock-recruitment baseline (`phi0`). For this example, that
+baseline uses the same biology as the snapshot.
+
+```{r msy}
+inputs$recruitment <- list(
+  type = "beverton_holt",
+  rzero = 1000,
+  steepness = 0.75,
+  phi0 = spr_result$unfished_per_recruit$spawning_biomass
+)
+result <- calculate_reference_points(inputs, spr_targets = c(0.4, 0.35))
+unlist(result$msy[c(
+  "fishing_mortality", "yield", "biomass", "spawning_biomass",
+  "recruitment", "status"
+)])
+```
+
+`yield` is the MSY candidate: annual catch weight at the reported fishing
+mortality. `biomass`, `spawning_biomass`, and `recruitment` describe that
+equilibrium, while `fleet_yield` partitions catch among fleets. Recruitment
+deviations are excluded. Nonpositive recruitment equilibria represent collapse
+and have zero biomass and yield.
+
+Currently, MSY supports Beverton-Holt recruitment with steepness strictly
+between 0.2 and 1. Calculations use fixed biology and fleet shares and do not
+provide uncertainty estimates.
+
+## Inspect bounds and convergence
+
+A search bound is a numerical setting, not a biological reference point. This
+intentionally small bound illustrates two different outcomes:
+
+```{r restricted-bounds}
+restricted <- calculate_reference_points(inputs, max_f = 0.001)
+restricted$spr[, c("target", "fishing_mortality", "status")]
+restricted$msy[c("fishing_mortality", "status")]
+```
+
+`not_bracketed` means the SPR target was not reached within `[0, max_f]`.
+`upper_bound` means the best MSY candidate was the largest allowed F; it is not
+an interior optimum. Increase the bound and check the result again.
+
+```{r wider-search}
+wider <- calculate_reference_points(inputs, max_f = 10, grid_intervals = 200)
+comparison <- data.frame(
+  max_f = c(result$settings$max_f, wider$settings$max_f),
+  F_MSY = c(result$msy$fishing_mortality, wider$msy$fishing_mortality),
+  MSY = c(result$msy$yield, wider$msy$yield),
+  status = c(result$msy$status, wider$msy$status)
+)
+knitr::kable(comparison, digits = 6)
+```
+
+An `iteration_limit` status means refinement stopped before meeting tolerance.
+For SPR, `tolerance` controls the absolute SPR residual; for MSY, it controls
+the width of the refined F interval. `no_positive_yield` means the MSY search
+found no positive yield at its search resolution.
+
+The MSY solver first samples a grid, then refines the best sampled region.
+Convergence does not guarantee a global maximum for every possible fishing
+pattern. Compare bounds and grid resolution when assessing unusual patterns.
+
+```{r check-bounds, include=FALSE}
+stopifnot(
+  restricted$spr$status == "not_bracketed",
+  restricted$msy$status == "upper_bound",
+  result$msy$status == "converged",
+  wider$msy$status == "converged",
+  abs(result$msy$yield - wider$msy$yield) < 1e-5
+)
+```
+
+## Compare fleet allocations
+
+Fleet allocation is an assumption in the reference-point calculation. Add a
+second fleet that selects younger fish, then compare fixed allocations while
+keeping the same recruitment baseline.
+
+```{r fleet-allocations}
+allocation_results <- lapply(c(0.25, 0.5, 0.75), function(first_share) {
+  scenario <- inputs
+  scenario$fleets[[1]]$share <- first_share
+  scenario$fleets[[2]] <- list(
+    share = 1 - first_share,
+    selectivity = c(0.7, 1, 0.8, 0.4, 0.2, 0.1),
+    weight = inputs$weight
+  )
+  reference <- calculate_reference_points(scenario)
+  stopifnot(reference$spr$status == "converged", reference$msy$status == "converged")
+  data.frame(
+    first_fleet_share = first_share,
+    F_40 = reference$spr$fishing_mortality,
+    F_MSY = reference$msy$fishing_mortality,
+    MSY = reference$msy$yield
+  )
+})
+knitr::kable(do.call(rbind, allocation_results), digits = 4)
+```
+
+The returned `inputs` and `settings` make each calculation reproducible. Save
+those with the results when comparing scenarios. Changing a snapshot does not
+change a live population model.

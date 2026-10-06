@@ -1,0 +1,209 @@
+---
+title: "Reference Points From a CatchAtAge Model"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Reference Points From a CatchAtAge Model}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(FIMS)
+```
+
+`get_reference_points()` extracts a biological snapshot from a live `CatchAtAge`
+model and calculates SPR targets and Beverton-Holt MSY. This vignette builds a
+small configured model so every step can run without an assessment data set.
+It does not fit that model. See [SPR and MSY From a Biological Snapshot](fims-reference-points.html)
+for the equations, conventions, and solver diagnostics.
+
+## Build a small model
+
+Run this example in a fresh R session. `clear()` resets the FIMS object registry.
+The example has two modeled years, three annual ages, and two fishing fleets.
+The final age is a plus group.
+
+```{r growth-maturity}
+clear()
+
+growth <- methods::new(EWAAGrowth)
+growth$n_years$set(2L)
+growth$ages[] <- 1:3
+# Include weights for the beginning of the year after the terminal year.
+growth$weights[] <- c(1, 2, 3, 2, 3, 4, 2, 3, 4)
+
+maturity <- methods::new(LogisticMaturity)
+maturity$inflection_point[] <- 2
+maturity$slope[] <- 1
+```
+
+Use Beverton-Holt recruitment with zero recruitment deviations. Reference
+points use the mean stock-recruitment relationship, not the deviations.
+
+```{r recruitment}
+recruitment <- methods::new(BevertonHoltRecruitment)
+process <- methods::new(LogDevsRecruitmentProcess)
+recruitment$SetRecruitmentProcessID(process$get_id())
+recruitment$n_years$set(2L)
+recruitment$log_rzero[] <- log(1000)
+recruitment$logit_steep[] <- log((0.75 - 0.2) / (1 - 0.75))
+recruitment$log_devs[] <- 0
+```
+
+Natural mortality and weight change between the two years, allowing us to
+examine the effect of choosing a reference year.
+
+```{r population}
+population <- methods::new(Population)
+population$n_years$set(2L)
+population$n_ages$set(3L)
+population$n_fleets$set(2L)
+population$ages[] <- 1:3
+population$log_M[] <- log(c(0.2, 0.2, 0.2, 0.3, 0.4, 0.5))
+population$log_init_naa[] <- log(c(1000, 500, 500))
+population$proportion_female[] <- 0.5
+population$SetGrowthID(growth$get_id())
+population$SetMaturityID(maturity$get_id())
+population$SetRecruitmentID(recruitment$get_id())
+```
+
+The fleets have the same selectivity here. Their annual F coefficients imply
+a 25%/75% allocation. No observations or likelihoods are needed for this example.
+
+```{r fleets-model}
+selectivity <- methods::new(LogisticSelectivity)
+selectivity$inflection_point[] <- 2
+selectivity$slope[] <- 1
+
+for (share in c(0.25, 0.75)) {
+  fleet <- methods::new(Fleet)
+  fleet$n_years$set(2L)
+  fleet$n_ages$set(3L)
+  fleet$n_lengths$set(0L)
+  fleet$log_Fmort[] <- log(c(0.2, 0.4) * share)
+  fleet$log_q[] <- 0
+  fleet$SetSelectivityID(selectivity$get_id())
+  population$AddFleet(fleet$get_id())
+}
+
+model <- methods::new(CatchAtAge)
+model$AddPopulation(population$get_id())
+CreateTMBModel()
+```
+
+## Select the reference year
+
+`year` is a **one-based index into the modeled years**, not a calendar year.
+The population argument is its FIMS object ID. Use `population$get_id()` rather
+than assuming that ID equals its position in a list.
+
+```{r reference-year}
+reference <- get_reference_points(
+  model, population$get_id(), year = 2L,
+  spr_targets = c(0.4, 0.35)
+)
+knitr::kable(reference$spr, digits = 6)
+reference$msy[c("fishing_mortality", "yield", "spawning_biomass", "status")]
+```
+
+The call refreshes derived quantities from the current internal double
+parameters, as `model$get_output()` does. For a fitted model, first synchronize
+its fitted fixed effects with `set_fixed()` and its fitted random effects with
+`set_random()`, in the respective parameter orders returned by `get_fixed()`
+and `get_random()`. Passing a live model does not automatically retrieve
+estimates from a saved `FIMSFit`. The calculation does not refit the model or
+change its parameters.
+
+Inspect the returned snapshot before interpreting a result:
+
+```{r inspect-snapshot}
+reference$inputs[c("population_id", "year_index", "ages", "fleet_ids")]
+knitr::kable(data.frame(
+  age = reference$inputs$ages,
+  natural_mortality = reference$inputs$natural_mortality,
+  weight = reference$inputs$weight,
+  maturity = reference$inputs$maturity
+), digits = 4)
+vapply(reference$inputs$fleets, `[[`, numeric(1), "share")
+```
+
+The adapter copies mortality, maturity, female proportions, biological weight,
+and fleet selectivity for the selected year. Catch weights follow the
+population weights used by `CatchAtAge`. The live adapter requires at least
+two consecutive annual ages.
+
+## Preserve the recruitment baseline
+
+SPR uses the selected year's unfished spawning biomass per recruit. For MSY,
+the Beverton-Holt relationship retains the model's initial `phi0` baseline.
+Choosing a later reference year does not redefine the fitted recruitment
+relationship.
+
+```{r compare-years}
+first_year <- get_reference_points(model, population$get_id(), year = 1L)
+knitr::kable(data.frame(
+  year_index = c(1L, 2L),
+  reference_year_SBPR0 = c(
+    first_year$unfished_per_recruit$spawning_biomass,
+    reference$unfished_per_recruit$spawning_biomass
+  ),
+  recruitment_phi0 = c(
+    first_year$inputs$recruitment$phi0,
+    reference$inputs$recruitment$phi0
+  )
+), digits = 4)
+```
+
+Because biology differs between years, the second year's unfished equilibrium
+recruitment need not equal the original R0. This distinction matters when
+comparing reference years or changing assumptions in a saved snapshot.
+
+## Override the fishing allocation
+
+Default fleet shares are the reference year's F coefficients normalized to sum
+to one. To prescribe shares, supply one per fleet in ascending fleet ID order,
+as recorded in `inputs$fleet_ids`. Use zero for fleets to exclude, such as
+surveys. If all fitted F coefficients are zero, explicit shares are required.
+
+```{r allocation}
+first_fleet_only <- get_reference_points(
+  model, population$get_id(), year = 2L,
+  fleet_shares = c(1, 0)
+)
+first_fleet_only$msy$fleet_yield
+```
+
+Since these two example fleets have identical selectivities and weights,
+changing their allocation changes the partition of yield but leaves the total
+reference points unchanged. Different fishing patterns can change both SPR
+and MSY reference points.
+
+## Reuse a snapshot after clearing the live model
+
+The result holds ordinary R data. Save the entire result with `saveRDS()` to
+retain both inputs and solver settings. Recalculation needs no live FIMS objects.
+
+```{r reuse-snapshot}
+snapshot <- reference$inputs
+clear()
+recalculated <- calculate_reference_points(snapshot, spr_targets = c(0.4, 0.35))
+isTRUE(all.equal(reference, recalculated))
+```
+
+```{r validate-workflow, include=FALSE}
+stopifnot(
+  all(reference$spr$status == "converged"),
+  reference$msy$status == "converged",
+  isTRUE(all.equal(reference$inputs$natural_mortality, c(0.3, 0.4, 0.5))),
+  first_year$inputs$recruitment$phi0 == reference$inputs$recruitment$phi0,
+  first_fleet_only$msy$fleet_yield[2] == 0,
+  isTRUE(all.equal(first_fleet_only$msy$yield, reference$msy$yield)),
+  isTRUE(all.equal(reference, recalculated))
+)
+```
+
+Inspect solver status for every calculation. A converged bounded MSY search
+still requires sensible biological assumptions and checks of the search bounds.
+The current implementation supports Beverton-Holt MSY and does not calculate
+standard errors; use `msy = FALSE` when only SPR targets are needed.

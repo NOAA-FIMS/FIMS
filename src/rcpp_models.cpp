@@ -25,6 +25,8 @@ void register_fishery_models(Rcpp::Module& m) {
       .constructor()
       .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
       .method("get_output", &CatchAtAgeInterface::to_json)
+      .method("reference_point_inputs",
+              &CatchAtAgeInterface::reference_point_inputs)
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)
       .method("IsReporting", &CatchAtAgeInterface::IsReporting)

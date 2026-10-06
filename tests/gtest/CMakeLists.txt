@@ -459,3 +459,9 @@ target_link_libraries(information_Information_Clear
 )
 
 gtest_discover_tests(information_Information_Clear)
+
+# Equilibrium per-recruit calculations and SPR reference points.
+add_executable(reference_points test_reference_points.cpp)
+add_as_invoker_manifest(reference_points)
+target_link_libraries(reference_points gtest_main fims_test)
+gtest_discover_tests(reference_points)

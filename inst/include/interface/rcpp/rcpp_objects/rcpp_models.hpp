@@ -23,6 +23,8 @@
 #include "rcpp_maturity.hpp"
 #include "rcpp_recruitment.hpp"
 #include "rcpp_selectivity.hpp"
+#include "rcpp_reference_points.hpp"
+#include "../../../population_dynamics/reference_points/catch_at_age_adapter.hpp"
 #include <valarray>
 #include <cmath>
 #include <mutex>
@@ -216,8 +218,68 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
 class CatchAtAgeInterface : public FisheryModelInterfaceBase {
  public:
   /**
-   * @brief The constructor.
+   * @brief Refresh model outputs and return one reference-year input snapshot.
+   * @details Uses current internal double parameters, as get_output() does.
+   * R callers supply a one-based year index. Explicit shares follow fleet IDs
+   * in ascending order. Refreshes derived quantities without changing
+   * parameters.
    */
+  Rcpp::List reference_point_inputs(int population_id, int year,
+                                    Rcpp::NumericVector shares) {
+    auto info = fims_info::Information<double>::GetInstance();
+    auto found = info->models_map.find(this->get_id());
+    if (found == info->models_map.end()) {
+      Rcpp::stop("Create the model before requesting reference points");
+    }
+    auto model = std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>(
+        found->second);
+    if (!model) Rcpp::stop("Reference points require a CatchAtAge model");
+    std::shared_ptr<fims_popdy::Population<double>> population;
+    for (const auto& candidate : model->populations) {
+      if (candidate->GetId() == static_cast<uint32_t>(population_id))
+        population = candidate;
+    }
+    if (!population || year < 1 ||
+        static_cast<size_t>(year) > population->n_years ||
+        population->n_ages < 2) {
+      Rcpp::stop("Invalid population ID or reference year (one-based index)");
+    }
+    // Evaluate the same double model used by get_output(), with reporting off.
+    const bool reporting = model->do_reporting;
+    model->do_reporting = false;
+    try {
+      fims_model::Model<double>::GetInstance()->Evaluate();
+    } catch (...) {
+      model->do_reporting = reporting;
+      throw;
+    }
+    model->do_reporting = reporting;
+    const auto inputs = fims_popdy::MakeReferencePointInputs(
+        *model, population, year - 1, Rcpp::as<std::vector<double>>(shares));
+    Rcpp::List snapshot = ReferencePointInputsToR(inputs);
+    Rcpp::IntegerVector fleet_ids;
+    for (const auto& fleet : population->fleets)
+      fleet_ids.push_back(fleet->GetId());
+    snapshot["population_id"] = population_id;
+    snapshot["year_index"] = year;
+    snapshot["fleet_ids"] = fleet_ids;
+    snapshot["ages"] =
+        Rcpp::wrap(population->ages.begin(), population->ages.end());
+    snapshot["recruitment"] = R_NilValue;
+    auto bh = std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double>>(
+        population->recruitment);
+    if (bh) {
+      snapshot["recruitment"] = Rcpp::List::create(
+          Rcpp::Named("type") = "beverton_holt",
+          Rcpp::Named("rzero") = std::exp(bh->log_rzero[0]),
+          Rcpp::Named("steepness") =
+              fims_math::inv_logit(0.2, 1.0, bh->logit_steep[0]),
+          Rcpp::Named("phi0") = model->CalculateSBPR0(population));
+    }
+    return snapshot;
+  }
+
+  /** @brief Construct a CatchAtAge interface. */
   CatchAtAgeInterface() : FisheryModelInterfaceBase() {
     std::shared_ptr<CatchAtAgeInterface> caa =
         std::make_shared<CatchAtAgeInterface>(*this);

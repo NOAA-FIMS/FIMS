@@ -25,6 +25,8 @@
 
 ## Features
 
+* *(reference_points)* Add per-recruit, SPR, and Beverton-Holt MSY calculations with reusable R input snapshots and live CatchAtAge integration.
+
 * *(growth)* Size and growth infrastructure (#1697)
 * *(selectivity)* Selectivity at age
 

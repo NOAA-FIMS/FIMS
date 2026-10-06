@@ -6,12 +6,14 @@
 #include "../inst/include/interface/rcpp/rcpp_interface.hpp"
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_math.hpp"
 #include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_reference_points.hpp"
 
 /**
  * Function to register functions with the Rcpp module system.
  *
  */
 void register_functions(Rcpp::Module &m) {
+  Rcpp::function("calculate_reference_points_cpp", &CalculateReferencePointsR);
   Rcpp::function(
       "CreateTMBModel", &CreateTMBModel,
       "See "
