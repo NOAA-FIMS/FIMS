@@ -33,7 +33,7 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
        * at age zero and each age bin represents one year.
        * @details The 50% quantile of the value of the quantity of interest (x).
        */
-          inflection_point;
+      inflection_point;
   /**
    * @brief How quickly selectivity changes with age around the inflection
    * point, per year of age. Larger absolute values give a steeper, more
