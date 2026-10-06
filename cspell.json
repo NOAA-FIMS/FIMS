@@ -1,27 +1,4 @@
 {
   "version": "0.2",
-  "language": "en",
-  "dictionaryDefinitions": [
-    {
-      "name": "fims-wordlist",
-      "path": "./inst/WORDLIST",
-      "addWords": true
-    }
-  ],
-  "dictionaries": [
-    "fims-wordlist",
-    "cpp",
-    "r",
-    "softwareTerms"
-  ],
-  "ignorePaths": [
-    "**/node_modules/**",
-    "*.Rproj",
-    ".github/workflows/**",
-    "build/**",
-    "man/**"
-  ],
-  "ignoreRegExpList": [
-    "/[a-z0-9]{32,}/g"
-  ]
+  "import": [ "https://raw.githubusercontent.com/NOAA-FIMS/.github/main/cspell.json" ] // Add repository-specific overrides below if needed
 }
