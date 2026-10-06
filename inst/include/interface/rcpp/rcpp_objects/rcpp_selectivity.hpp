@@ -77,11 +77,11 @@ class SelectivityInterfaceBase : public FIMSRcppInterfaceBase {
 class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
   /**
-   * @brief The index value at which the response reaches 0.5.
+   * @copydoc fims_popdy::LogisticSelectivity::inflection_point
    */
   VariableVector inflection_point;
   /**
-   * @brief The width of the curve at the inflection point.
+   * @copydoc fims_popdy::LogisticSelectivity::slope
    */
   VariableVector slope;
 
@@ -297,14 +297,22 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
  */
 class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
  public:
-  VariableVector inflection_point_asc; /**< the index value at which the
-                                     response reaches .5 */
-  VariableVector
-      slope_asc; /**< the width of the curve at the inflection_point */
-  VariableVector inflection_point_desc; /**< the index value at which the
-                                      response reaches .5 */
-  VariableVector
-      slope_desc; /**< the width of the curve at the inflection_point */
+  /**
+   * @copydoc fims_popdy::DoubleLogisticSelectivity::inflection_point_asc
+   */
+  VariableVector inflection_point_asc;
+  /**
+   * @copydoc fims_popdy::DoubleLogisticSelectivity::slope_asc
+   */
+  VariableVector slope_asc;
+  /**
+   * @copydoc fims_popdy::DoubleLogisticSelectivity::inflection_point_desc
+   */
+  VariableVector inflection_point_desc;
+  /**
+   * @copydoc fims_popdy::DoubleLogisticSelectivity::slope_desc
+   */
+  VariableVector slope_desc;
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {
     SelectivityInterfaceBase::live_objects[this->id] =

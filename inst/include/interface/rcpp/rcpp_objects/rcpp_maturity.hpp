@@ -75,11 +75,11 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 class LogisticMaturityInterface : public MaturityInterfaceBase {
  public:
   /**
-   * @brief The index value at which the response reaches 0.5.
+   * @copydoc fims_popdy::LogisticMaturity::inflection_point
    */
   VariableVector inflection_point;
   /**
-   * @brief The width of the curve at the inflection point.
+   * @copydoc fims_popdy::LogisticMaturity::slope
    */
   VariableVector slope;
 
