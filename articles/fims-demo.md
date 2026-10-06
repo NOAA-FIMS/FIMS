@@ -322,7 +322,7 @@ dplyr::count(default_parameters, module_name, label)
     ##    <chr>       <chr>             <int>
     ##  1 Fleet       log_Fmort            60
     ##  2 Fleet       log_q                 2
-    ##  3 Growth      <NA>                  1
+    ##  3 Growth      weight_at_age         1
     ##  4 Maturity    inflection_point      1
     ##  5 Maturity    slope                 1
     ##  6 Population  log_M               360
@@ -563,7 +563,7 @@ fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 20.00139 seconds
+    ## ℹ Total run time was 57.89643 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00036
     ## ℹ Negative log likelihood (NLL):
@@ -571,10 +571,30 @@ fit <- parameters_4_model |>
     ## • Total NLL= 3164.83637
     ## ℹ Terminal SB= 1791.58068
 
-### Logging system
+### Oh no! My model didn’t converge! 😨 HELP‼️
 
-You can look at the log file in R or write it to the disk but you must
-run
+If you find yourself in the unfortunate situation where your model
+didn’t converge, there are several things that you can look at.
+
+#### Getting the non-converged fit output
+
+One of the things you can do is to inspect the fit output. You can start
+with the NLL (We are sorry these aren’t named yet, it’s in the list of
+things to add) by running `get_report(fit)$nll_components` which will
+give you a clue as to which part of these components might have caused
+your model to not converge.
+
+You can then do `names(get_report(fit))` to see the names of all the
+information you can look into specifically and then look at that. You
+can also look in `View(get_estimates(fit))` to look through the tibble
+and identify problem data. Also, see the [Viewing
+results](#viewing-results) section for more information on how to view
+and filter the results.
+
+#### Logging system
+
+Another thing is that you can look at the log file in R or write it to
+the disk but you must run
 [`get_log()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
 before you run clear to obtain information about the model because clear
 removes everything from memory, including the log.
@@ -600,7 +620,7 @@ log_data_frame[1, ]
 ```
 
     ##                  timestamp   level
-    ## 1 Tue Oct  6 20:39:26 2026 warning
+    ## 1 Tue Oct  6 22:44:15 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ##     user                                    wd
@@ -636,8 +656,8 @@ log_data_frame |> dplyr::filter(level == "warning")
 ```
 
     ##                  timestamp   level
-    ## 1 Tue Oct  6 20:39:26 2026 warning
-    ## 2 Tue Oct  6 20:39:26 2026 warning
+    ## 1 Tue Oct  6 22:44:15 2026 warning
+    ## 2 Tue Oct  6 22:44:15 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1
@@ -658,6 +678,8 @@ log_data_frame |> dplyr::filter(level == "warning")
 
 clear()
 ```
+
+### Viewing results
 
 The results can be plotted with either base R, {ggplot2}, or
 {stockplotr}. Where, we recommend using {stockplotr} where possible.
@@ -802,7 +824,7 @@ high_slope_fit <- parameters_high_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 19.09845 seconds
+    ## ℹ Total run time was 55.79231 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00025
     ## ℹ Negative log likelihood (NLL):
@@ -825,7 +847,7 @@ low_slope_fit <- parameters_low_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 20.07852 seconds
+    ## ℹ Total run time was 57.62823 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00034
     ## ℹ Negative log likelihood (NLL):
@@ -936,7 +958,7 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 20.08255 seconds
+    ## ℹ Total run time was 56.67864 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00033
     ## ℹ Negative log likelihood (NLL):
@@ -1035,7 +1057,7 @@ age_only_fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 3.90989 seconds
+    ## ℹ Total run time was 9.46581 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00048
     ## ℹ Negative log likelihood (NLL):
@@ -1071,7 +1093,7 @@ length_only_fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 25.48195 seconds
+    ## ℹ Total run time was 1.26441 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00018
     ## ℹ Negative log likelihood (NLL):

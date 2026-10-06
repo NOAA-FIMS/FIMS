@@ -371,7 +371,7 @@ example of how to estimate growth internally.</p>
 <span><span class="co">##    &lt;chr&gt;       &lt;chr&gt;             &lt;int&gt;</span></span>
 <span><span class="co">##  1 Fleet       log_Fmort            60</span></span>
 <span><span class="co">##  2 Fleet       log_q                 2</span></span>
-<span><span class="co">##  3 Growth      &lt;NA&gt;                  1</span></span>
+<span><span class="co">##  3 Growth      weight_at_age         1</span></span>
 <span><span class="co">##  4 Maturity    inflection_point      1</span></span>
 <span><span class="co">##  5 Maturity    slope                 1</span></span>
 <span><span class="co">##  6 Population  log_M               360</span></span>
@@ -588,7 +588,7 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 20.00139 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 57.89643 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00036</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -597,12 +597,32 @@ model. When <code>optimize = TRUE</code>, the model will be fit using
 <span><span class="co">## ℹ Terminal SB= 1791.58068</span></span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="logging-system">Logging system<a class="anchor" aria-label="anchor" href="#logging-system"></a>
+<h3 id="oh-no-my-model-didnt-converge-help">Oh no! My model didn’t converge! 😨 HELP‼️<a class="anchor" aria-label="anchor" href="#oh-no-my-model-didnt-converge-help"></a>
 </h3>
-<p>You can look at the log file in R or write it to the disk but you
-must run <code><a href="../reference/Cpp_functions.html">get_log()</a></code> before you run clear to obtain
-information about the model because clear removes everything from
-memory, including the log. <code><a href="../reference/Cpp_functions.html">get_log()</a></code> returns the log
+<p>If you find yourself in the unfortunate situation where your model
+didn’t converge, there are several things that you can look at.</p>
+<div class="section level4">
+<h4 id="getting-the-non-converged-fit-output">Getting the non-converged fit output<a class="anchor" aria-label="anchor" href="#getting-the-non-converged-fit-output"></a>
+</h4>
+<p>One of the things you can do is to inspect the fit output. You can
+start with the NLL (We are sorry these aren’t named yet, it’s in the
+list of things to add) by running
+<code>get_report(fit)$nll_components</code> which will give you a clue
+as to which part of these components might have caused your model to not
+converge.</p>
+<p>You can then do <code>names(get_report(fit))</code> to see the names
+of all the information you can look into specifically and then look at
+that. You can also look in <code>View(get_estimates(fit))</code> to look
+through the tibble and identify problem data. Also, see the <a href="#viewing-results">Viewing results</a> section for more information
+on how to view and filter the results.</p>
+</div>
+<div class="section level4">
+<h4 id="logging-system">Logging system<a class="anchor" aria-label="anchor" href="#logging-system"></a>
+</h4>
+<p>Another thing is that you can look at the log file in R or write it
+to the disk but you must run <code><a href="../reference/Cpp_functions.html">get_log()</a></code> before you run clear
+to obtain information about the model because clear removes everything
+from memory, including the log. <code><a href="../reference/Cpp_functions.html">get_log()</a></code> returns the log
 information as a string. This string can be manipulated into a data
 frame using <code><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">jsonlite::fromJSON()</a></code>. There are three logging
 levels, “info”, “warning”, and “error”. The log below will not have any
@@ -617,7 +637,7 @@ documentation</a> for more information.</p>
 <span><span class="va">log_data_frame</span> <span class="op">&lt;-</span> <span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">fromJSON</a></span><span class="op">(</span><span class="va">log_json_string</span><span class="op">)</span></span>
 <span><span class="va">log_data_frame</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span></code></pre></div>
 <pre><code><span><span class="co">##                  timestamp   level</span></span>
-<span><span class="co">## 1 Tue Oct  6 20:39:26 2026 warning</span></span>
+<span><span class="co">## 1 Tue Oct  6 22:44:15 2026 warning</span></span>
 <span><span class="co">##                                                                   message id</span></span>
 <span><span class="co">## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0</span></span>
 <span><span class="co">##     user                                    wd</span></span>
@@ -641,8 +661,8 @@ documentation</a> for more information.</p>
 <code class="sourceCode R"><span><span class="co"># Subset for just the warnings</span></span>
 <span><span class="va">log_data_frame</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">level</span> <span class="op">==</span> <span class="st">"warning"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                  timestamp   level</span></span>
-<span><span class="co">## 1 Tue Oct  6 20:39:26 2026 warning</span></span>
-<span><span class="co">## 2 Tue Oct  6 20:39:26 2026 warning</span></span>
+<span><span class="co">## 1 Tue Oct  6 22:44:15 2026 warning</span></span>
+<span><span class="co">## 2 Tue Oct  6 22:44:15 2026 warning</span></span>
 <span><span class="co">##                                                                   message id</span></span>
 <span><span class="co">## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0</span></span>
 <span><span class="co">## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1</span></span>
@@ -660,6 +680,11 @@ documentation</a> for more information.</p>
 <span><span class="co">## 2  456</span></span></code></pre>
 <div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level3">
+<h3 id="viewing-results">Viewing results<a class="anchor" aria-label="anchor" href="#viewing-results"></a>
+</h3>
 <p>The results can be plotted with either base R, {ggplot2}, or
 {stockplotr}. Where, we recommend using {stockplotr} where possible.</p>
 <div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
@@ -773,7 +798,7 @@ changes due to changes to the initial value.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 19.09845 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 55.79231 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00025</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -792,7 +817,7 @@ changes due to changes to the initial value.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 20.07852 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 57.62823 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00034</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -889,7 +914,7 @@ estimate a small number of age-specific parameter values.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 20.08255 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 56.67864 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00033</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -958,7 +983,7 @@ length-composition configurations.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 3.90989 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 9.46581 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00048</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -986,7 +1011,7 @@ age-composition configurations.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 25.48195 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 1.26441 minutes</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00018</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
