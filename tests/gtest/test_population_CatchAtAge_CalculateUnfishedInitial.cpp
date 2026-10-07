@@ -173,7 +173,7 @@ TEST_F(
       catch_at_age_model->CalculateUnfishedInitialNumbersAA(population, age,
                                                             age);
     }
-    catch_at_age_model->CalculateMaturityAA(population, age, age);
+    catch_at_age_model->CalculateMaturityAA(population, age, 0, age);
     catch_at_age_model->CalculateUnfishedSpawningBiomass(population, age, 0,
                                                          age);
   }
