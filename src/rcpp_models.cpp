@@ -11,7 +11,7 @@ uint32_t FisheryModelInterfaceBase::id_g = 1;
 std::map<uint32_t, std::shared_ptr<FisheryModelInterfaceBase>>
     FisheryModelInterfaceBase::live_objects;
 
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 
 /**
  * Function to register fishery model classes with the Rcpp module system.

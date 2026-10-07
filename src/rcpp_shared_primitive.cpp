@@ -5,7 +5,7 @@
  */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_shared_primitive.hpp"
 
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 
 /**
  * Function to register shared primitive classes with the Rcpp module system.

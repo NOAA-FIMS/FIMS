@@ -49,6 +49,7 @@ dotdash
 dontrun
 dplyr
 DTMB
+Eigen
 emph
 endcond
 envir
@@ -132,6 +133,7 @@ multisession
 mymap
 Nages
 ncases
+NDEBUG
 ndims
 newit
 ninput
