@@ -288,7 +288,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
   #' @description Test that `FIMSFrame()` returns an error when weight-at-age data repeat a timing.
   expect_error(
     FIMSFrame(dplyr::bind_rows(data_big, terminal_weight)),
-    regexp = "at these timings: 31"
+    regexp = "more than one row of weight-at-age data: 31"
   )
 
   #' @description Test that `FIMSFrame()` returns an error when weight-at-age data have a timing after the year following the last model year.
@@ -297,7 +297,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
       dplyr::filter(data_big, !(type == "weight_at_age" & timing == 31)),
       dplyr::mutate(terminal_weight, timing = 32)
     )),
-    regexp = "for these timings: 32"
+    regexp = "the following timings: 32"
   )
 
   #' @description Test that `FIMSFrame` validators pick up on a missing age in age-composition data.

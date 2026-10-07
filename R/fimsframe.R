@@ -1151,7 +1151,7 @@ FIMSFrame <- function(data) {
 
   # model_weight_at_age() reads weights by position, so each fleet, timing,
   # and age needs exactly one row, ending at the year after the last model year.
-  if ("age" %in% colnames(data)) {
+  if ("age" %in% colnames(data) && "weight_at_age" %in% unique(data[["type"]]) {
     weight_data <- dplyr::filter(data, .data$type == "weight_at_age")
     duplicated_weight_timings <- weight_data |>
       dplyr::count(.data$fleet, .data$timing, .data$age) |>
@@ -1159,10 +1159,14 @@ FIMSFrame <- function(data) {
       dplyr::pull(.data$timing) |>
       unique()
     if (length(duplicated_weight_timings) > 0) {
-      cli::cli_abort(
-        "{.var weight_at_age} has more than one row for the same fleet, timing,
-        and age at these timings: {duplicated_weight_timings}."
-      )
+      cli::cli_abort(c(
+        "x" = "Only one row of weight_at_age data per fleet, timing, and age
+        are allowed in the input data for a FIMS model.",
+        "i" = "The following timings have more than one row of
+        weight-at-age data: {duplicated_weight_timings}.",
+        "i" = "Use {.code dplyr::filter(dplyr::count(data, type, timing, fleet,
+        age), type == 'weight_at_age', n > 1)} to investigate the problem."
+      ))
     }
     late_weight_timings <- weight_data |>
       dplyr::filter(.data$timing > end_year + 1) |>
@@ -1170,10 +1174,17 @@ FIMSFrame <- function(data) {
       unique()
     if (length(late_weight_timings) > 0) {
       cli::cli_abort(c(
-        "{.var weight_at_age} has rows after {end_year + 1}, the year after
-        the last model year, for these timings: {late_weight_timings}.",
-        "i" = "Remove these rows, or add a catch row in a later year to
-        extend the model years."
+        "x" = "The {.var weight_at_age} type in your input data contains
+        information for years after {end_year + 1}, i.e., the year after
+        the last model year, which is not allowed.",
+        "i" = "The invalid weight-at-age data occurs in the following timings:
+        {late_weight_timings}.",
+        "i" = "Remove these rows of weight-at-age data, or extend the modeled
+        years by adding a row of catches row for invalid years.",
+        "i" = "Remember that you only need additional weight-at-age data for
+        one year beyond which you have other data so you can estimate the
+        biomass on January 01 after all catches have been removed from the
+        previous year."
       ))
     }
   }
