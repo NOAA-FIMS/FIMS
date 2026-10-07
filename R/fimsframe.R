@@ -1151,7 +1151,7 @@ FIMSFrame <- function(data) {
 
   # model_weight_at_age() reads weights by position, so each fleet, timing,
   # and age needs exactly one row, ending at the year after the last model year.
-  if ("age" %in% colnames(data) && "weight_at_age" %in% unique(data[["type"]]) {
+  if ("age" %in% colnames(data) && "weight_at_age" %in% unique(data[["type"]])) {
     weight_data <- dplyr::filter(data, .data$type == "weight_at_age")
     duplicated_weight_timings <- weight_data |>
       dplyr::count(.data$fleet, .data$timing, .data$age) |>
