@@ -136,7 +136,7 @@ plot_likelihood <- function(like_fit, group = "label") {
     dplyr::distinct(.data$lpdf) |>
     dplyr::summarize(total_like = sum(.data$lpdf, na.rm = TRUE), .groups = "drop") |>
     dplyr::mutate(label = "Total") |>
-    dplyr::select(dplyr::all_of(column_name), "label", "total_like")
+    dplyr::select(.data[[column_name]], .data$label, .data$total_like)
 
   # group the data type totals and the overall total and then
   # for each vector of sums, subtract the maximum across within that vector
