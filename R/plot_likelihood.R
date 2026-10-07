@@ -200,7 +200,8 @@ plot_likelihood <- function(like_fit, group = "label") {
       ggplot2::aes(
         colour = .data$group_clean,
         linetype = .data$group_clean
-    ), linewidth = 1.2) +
+      ), linewidth = 1.2
+    ) +
     stockplotr::theme_noaa(discrete = TRUE) +
     ggplot2::scale_color_manual(
       values = color_values,
