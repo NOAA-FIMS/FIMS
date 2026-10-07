@@ -202,7 +202,7 @@ reshape_json_estimates <- function(model_output) {
   )
   if ("lengths" %in% names(read_list[["fleets"]])) {
     fleet_lengths <- read_list[["fleets"]] |>
-      dplyr::select(dplyr::all_of(c("module_name", "module_id", "lengths")))|>
+      dplyr::select(dplyr::all_of(c("module_name", "module_id", "lengths"))) |>
       tidyr::unnest_longer(lengths, indices_to = "length_i")
   }
 
