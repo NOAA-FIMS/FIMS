@@ -299,6 +299,23 @@ test_that("`FIMSFrame()` returns correct error messages", {
     )),
     regexp = "the following timings: 32"
   )
+  #' @description Test that `FIMSFrame()` errors when a fleet appears only in weight-at-age data rather than adding a fleet.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      fleet = ifelse(type == "weight_at_age", "fleet_1", fleet)
+    )),
+    regexp = "no catch, index, or composition\\s+data:\\s+\"fleet_1\""
+  )
+
+  #' @description Test that `FIMSFrame()` errors when a fleet appears only in age-to-length conversion data.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      fleet = ifelse(type == "age_to_length_conversion", "fleet3", fleet)
+    )),
+    regexp = "no catch, index, or composition\\s+data:\\s+\"fleet3\""
+  )
 
   #' @description Test that `FIMSFrame` validators pick up on a missing age in age-composition data.
   expect_error(

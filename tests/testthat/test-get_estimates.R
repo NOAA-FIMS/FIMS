@@ -110,6 +110,59 @@ test_that("`get_estimates()` works with estimation run", {
   })
 })
 
+test_that("`get_estimates()` reports distribution parameters by id", {
+  data_4_model <- FIMSFrame(data_big)
+  parameters <- fixed_effect_parameters(data_4_model) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$module_name == "Recruitment" & .data$label == "log_sd",
+        "fixed_effects",
+        .data$estimation_type
+      )
+    )
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  estimates <- get_estimates(fit)
+  log_sd_id <- names(get_parameter_names(get_obj(fit)[["par"]])) |>
+    grep(pattern = "^dnorm\\..*\\.log_sd\\.", value = TRUE) |>
+    sub(pattern = ".*\\.", replacement = "") |>
+    as.integer()
+  log_sd_rows <- dplyr::filter(estimates, .data$parameter_id %in% log_sd_id)
+  #' @description Test that `get_estimates()` returns one row for the estimated recruitment `log_sd`.
+  expect_equal(object = nrow(log_sd_rows), expected = 1)
+  #' @description Test that `get_estimates()` reports the recruitment `log_sd` under the module that owns the recruitment deviations.
+  log_devs_module_id <- estimates |>
+    dplyr::filter(
+      .data$module_name == "Recruitment",
+      .data$label == "log_devs"
+    ) |>
+    dplyr::pull(.data$module_id) |>
+    unique()
+  expect_equal(
+    object = unlist(log_sd_rows[c(
+      "module_name", "module_id", "label", "distribution", "estimation_type"
+    )]),
+    expected = c(
+      module_name = "Recruitment",
+      module_id = as.character(log_devs_module_id),
+      label = "log_sd",
+      distribution = "normal",
+      estimation_type = "fixed_effects"
+    )
+  )
+  #' @description Test that `get_estimates()` does not report the fixed `log_sd` of the landings and index distributions as parameters.
+  expect_equal(
+    object = sum(
+      estimates[["label"]] == "log_sd" &
+        estimates[["module_name"]] != "Recruitment",
+      na.rm = TRUE
+    ),
+    expected = 0
+  )
+  clear()
+})
+
 ## Edge handling ----
 test_that("`get_estimates()` keeps fleet names with spaces and quotes", {
   fleet_names <- c(fleet1 = "fleet one", survey1 = 'survey "A"')
@@ -158,6 +211,45 @@ test_that("`get_estimates()` handles non-finite derived quantities", {
     )
   #' @description Test that `get_estimates()` reports an infinite derived quantity as -999, like other missing values.
   expect_equal(object = log_catch_expected[["estimated"]][1], expected = -999)
+  clear()
+})
+
+test_that("`get_estimates()` works for a model without random effects", {
+  data_4_model <- FIMSFrame(data_big)
+  # Without a distribution on the recruitment deviations, the model has no
+  # random-effect distribution and so no distribution parameters to report.
+  # initialize_fims() requires the deviations to be constant in that case.
+  recruitment_deviations <- c("log_devs", "log_sd")
+  parameters <- fixed_effect_parameters(data_4_model) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$module_name == "Recruitment" & .data$label == "log_devs",
+        "constant",
+        .data$estimation_type
+      ),
+      distribution_type = dplyr::if_else(
+        .data$module_name == "Recruitment" &
+          .data$label %in% recruitment_deviations,
+        NA_character_,
+        .data$distribution_type
+      ),
+      distribution = dplyr::if_else(
+        .data$module_name == "Recruitment" &
+          .data$label %in% recruitment_deviations,
+        NA_character_,
+        .data$distribution
+      )
+    )
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  #' @description Test that `get_estimates()` works when the model has no random-effect distribution.
+  expect_no_error(estimates <- get_estimates(fit))
+  #' @description Test that `get_estimates()` reports no `log_sd` row when no random-effect distribution has one.
+  expect_equal(
+    object = sum(estimates[["label"]] == "log_sd", na.rm = TRUE),
+    expected = 0
+  )
   clear()
 })
 

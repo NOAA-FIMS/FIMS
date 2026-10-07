@@ -602,7 +602,8 @@ fit_fims <- function(input,
     return(failed_fit)
   }
 
-  maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
+  gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
+  maxgrad0 <- maxgrad <- max(abs(gradient))
   if (number_of_loops > 0) {
     cli::cli_inform(c(
       "i" = "Restarting optimizer {number_of_loops} time{?s} to improve
@@ -635,7 +636,8 @@ fit_fims <- function(input,
         )
         return(failed_fit)
       }
-      maxgrad <- max(abs(obj[["gr"]](opt[["par"]])))
+      gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
+      maxgrad <- max(abs(gradient))
     }
     div_digit <- cli::cli_div(theme = list(.val = list(digits = 5)))
     cli::cli_inform(c(
@@ -647,7 +649,20 @@ fit_fims <- function(input,
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
 
-  check_mle_convergence(input, obj, opt, maxgrad)
+  # Named here while the C++ Information object is still populated; TMB names
+  # every fixed effect "p" and every random effect "re"
+  parameter_names <- names(get_parameter_names(obj[["par"]]))
+  random_effects_names <- if (length(obj[["env"]][["random"]]) > 0) {
+    names(get_random_names(obj[["env"]]$parList()[["re"]]))
+  }
+  check_mle_convergence(
+    input,
+    obj,
+    opt,
+    maxgrad,
+    gradient = gradient,
+    parameter_names = parameter_names
+  )
 
   FIMS::set_fixed(opt[["par"]])
 
@@ -660,7 +675,14 @@ fit_fims <- function(input,
     )
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
-    check_sdreport_convergence(input, obj, opt, sdreport)
+    check_sdreport_convergence(
+      input,
+      obj,
+      opt,
+      sdreport,
+      parameter_names = parameter_names,
+      random_effects_names = random_effects_names
+    )
   } else {
     sdreport <- list()
     time_sdreport <- as.difftime(0, units = "secs")
@@ -746,9 +768,12 @@ return_failed_nlminb <- function(object) {
     "x" = "{.fun fit_fims} did not lead to a converged model.",
     "i" = "The resulting coefficients, probability values, or predictions are
     not accurate or stable and should not be used for management.",
-    "i" = "Partial results are returned as a {.var FIMSFit} object to
-    facilitate checking that the model is appropriately configured for your
-    data."
+    "i" = "A {.cls FIMSFit} object containing partial results is returned.",
+    "i" = "Type the name of the variable you assigned it (e.g.,
+           {.code fit <- ...}) to inspect the model inputs and configuration.
+           Additionally, try running {.code FIMS::fit_fims(optimize = FALSE)}
+           and inspecting the output through {.code get_report(fit)} or by
+           viewing the tabular output from {.code View(get_estimates(fit))}."
   )
   cli::cli_warn(message = failed_nlminb_message)
   # Construct a fallback optimizer result with consistent structure, i.e.,

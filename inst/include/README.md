@@ -32,7 +32,7 @@ The `interface/interface.hpp` is the only file in the interface directory and it
 
 #### inst/include/interface/rcpp
 
-This directory contains the Rcpp module registration layer for FIMS. The files in this directory and its `rcpp_objects` subdirectory define the C++ wrappers, class bindings, helper functions, and registration declarations that expose FIMS C++ objects to R; they live under `inst/include` so the declarations are available both to the package source files in `src/` and to other headers that need to reference the R-facing interface.
+This directory contains the Rcpp module registration layer for FIMS. The files in this directory and its `rcpp_objects` subdirectory define the C++ wrappers, class bindings, helper functions, and registration declarations that expose FIMS C++ objects to R; they live under `inst/include` so the declarations are available both to the package source files in `src/` and to other headers that need to reference the R-facing interface. Include `rcpp_include.hpp` instead of `<Rcpp.h>`; it is the single place FIMS includes Rcpp, so every translation unit gets the same Rcpp configuration.
 
 #### inst/include/interface/TMB
 

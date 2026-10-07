@@ -12,8 +12,7 @@
 #ifndef RCPP_NO_SUGAR
 #define RCPP_NO_SUGAR
 #endif
-#include <RcppCommon.h>
-#include <Rcpp.h>
+#include "../rcpp_include.hpp"
 #include <map>
 #include <vector>
 

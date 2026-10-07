@@ -99,7 +99,7 @@
 "98","Recruitment",NA,"BevertonHolt","log_sd",NA,NA,NA,0.1,"fixed_effects","process","Dnorm"
 "99","Maturity",NA,"Logistic","inflection_point",NA,NA,NA,2,"constant",NA,NA
 "100","Maturity",NA,"Logistic","slope",NA,NA,NA,1,"constant",NA,NA
-"101","Growth",NA,"EWAA",NA,NA,NA,NA,NA,NA,NA,NA
+"101","Growth",NA,"EWAA","weight_at_age",NA,NA,NA,NA,NA,NA,NA
 "102","Population",NA,NA,"log_M",1,NA,1,-1.6094379124341,"constant",NA,NA
 "103","Population",NA,NA,"log_M",2,NA,1,-1.6094379124341,"constant",NA,NA
 "104","Population",NA,NA,"log_M",3,NA,1,-1.6094379124341,"constant",NA,NA

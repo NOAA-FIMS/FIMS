@@ -14,7 +14,7 @@
 #include <sstream>
 #include <string>
 
-#include <Rcpp.h>
+#include "../rcpp_include.hpp"
 
 /**
  * @class SharedInt

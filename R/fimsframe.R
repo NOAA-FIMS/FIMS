@@ -870,6 +870,34 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
   }
 }
 
+# FIMSFrame() takes fleets from every row. A fleet named only in rows such as
+# weight_at_age would be added to the model with default parameters, so every
+# fleet must have observations.
+validate_fleets_have_observations <- function(data) {
+  observation_types <- c("age_comp", "catch", "index", "length_comp")
+  observed_fleets <- data |>
+    dplyr::filter(.data[["type"]] %in% observation_types) |>
+    dplyr::pull(.data[["fleet"]])
+  fleets_without_observations <- setdiff(
+    stats::na.omit(data[["fleet"]]),
+    observed_fleets
+  )
+  if (length(fleets_without_observations) > 0) {
+    cli::cli_abort(c(
+      "x" = "The following fleets have no catch, index, or composition data:
+      {.val {fleets_without_observations}}.",
+      "i" = "Every fleet present in your data must have at least catch, index,
+      or composition data, e.g., a fleet with just age_to_length_conversion data
+      is not allowed.",
+      "i" = "Check the {.var fleet} and {.var type} values in the rows for
+      the following fleets: {.val {fleets_without_observations}}, where
+      {.code dplyr::count(data, fleet, type)} is helpful for investigating data
+      types by fleet."
+    ))
+  }
+  invisible(TRUE)
+}
+
 # Keep fleet-bin resolution explicit by default. Fixed age-to-length rows are
 # only treated as bin geometry when a caller intentionally opts into that path.
 resolve_fleet_length_bins <- function(
@@ -1066,6 +1094,8 @@ FIMSFrame <- function(data) {
   end_year <- as.integer(floor(max(data_to_use_4_timing, na.rm = TRUE)))
   n_years <- as.integer(end_year - start_year + 1)
   years <- start_year:end_year
+
+  validate_fleets_have_observations(data)
 
   # Get the fleets represented in the data
   fleets <- unique(na.omit(data[["fleet"]]))
