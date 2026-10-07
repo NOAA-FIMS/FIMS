@@ -284,8 +284,8 @@ inline const Type inv_logit(const Type &a, const Type &b, const Type &logit_x) {
  * \frac{1.0}{ 1.0 + exp(slope_{desc} (x - inflection_point_{desc}))}\f$
  *
  * The descending limb is written as \f$1 / (1 + exp(z))\f$, with
- * \f$ z = slope_desc (x - inflection_point_desc) \f$, so it stays above 0 in double
- * precision until \f$ exp(z) \f$ overflows.
+ * \f$ z = slope_desc (x - inflection_point_desc) \f$, so it stays above 0 in
+ * double precision until \f$ exp(z) \f$ overflows.
  *
  * @param inflection_point_asc the inflection point of the ascending limb of the
  * double logistic function
