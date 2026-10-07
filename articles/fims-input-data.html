@@ -174,7 +174,10 @@ stores the input data frame and several other slots that store summary
 information about the object, e.g., the fleet names, the number of age
 bins, etc. All of this information can be accessed using
 <code>get_*()</code> functions, e.g., <code><a href="../reference/get_FIMSFrame.html">get_n_years()</a></code>,
-<code><a href="../reference/get_FIMSFrame.html">get_fleets()</a></code>.</p>
+<code><a href="../reference/get_FIMSFrame.html">get_fleets()</a></code>. Every fleet named in the data must have
+catch, index, or composition data. <code><a href="../reference/FIMSFrame.html">FIMSFrame()</a></code> returns an
+error otherwise, so a misspelled fleet name in other rows does not add a
+fleet to the model.</p>
 <p>When you execute <code><a href="../reference/FIMSFrame.html">FIMSFrame()</a></code> on a long data frame, such
 as <code>data_big</code>, the function executes several error checks to
 help ensure that your data is ready for a FIMS model. For example, until

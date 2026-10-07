@@ -81,6 +81,11 @@ fleet names, the number of age bins, etc. All of this information can be
 accessed using `get_*()` functions, e.g.,
 [`get_n_years()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md),
 [`get_fleets()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFrame.md).
+Every fleet named in the data must have catch, index, or composition
+data.
+[`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)
+returns an error otherwise, so a misspelled fleet name in other rows
+does not add a fleet to the model.
 
 When you execute
 [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)

@@ -187,7 +187,7 @@ var searchBox = new SearchBox("searchBox", "search/",'.html');
 </div>
 <script type="text/javascript">
 /* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
-$(document).ready(function(){initNavTree('rcpp__shared__primitive_8cpp.html',''); initResizable(); });
+$(document).ready(function(){initNavTree('rcpp__include_8hpp_source.html',''); initResizable(); });
 /* @license-end */
 </script>
 <div id="doc-content">
@@ -213,53 +213,38 @@ $(document).ready(function(){initNavTree('rcpp__shared__primitive_8cpp.html','')
 </div>
 
 <div class="header">
-  <div class="summary">
-<a href="#func-members">Functions</a>  </div>
-  <div class="headertitle"><div class="title">rcpp_shared_primitive.cpp File Reference</div></div>
+  <div class="headertitle"><div class="title">rcpp_include.hpp</div></div>
 </div><!--header-->
 <div class="contents">
-
-<p>Implementation of Rcpp shared primitive interfaces for the FIMS framework.  
-<a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="rcpp__shared__primitive_8hpp_source.html">../inst/include/interface/rcpp/rcpp_objects/rcpp_shared_primitive.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="rcpp__include_8hpp_source.html">../inst/include/interface/rcpp/rcpp_include.hpp</a>&quot;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a3ac07e427da47af922ccfdf1730d193d" id="r_a3ac07e427da47af922ccfdf1730d193d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rcpp__shared__primitive_8cpp.html#a3ac07e427da47af922ccfdf1730d193d">register_shared</a> (Rcpp::Module &amp;m)</td></tr>
-<tr class="memdesc:a3ac07e427da47af922ccfdf1730d193d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Register the shared module.  <br /></td></tr>
-<tr class="separator:a3ac07e427da47af922ccfdf1730d193d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implementation of Rcpp shared primitive interfaces for the FIMS framework. </p>
-</div><h2 class="groupheader">Function Documentation</h2>
-<a id="a3ac07e427da47af922ccfdf1730d193d" name="a3ac07e427da47af922ccfdf1730d193d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ac07e427da47af922ccfdf1730d193d">&#9670;&#160;</a></span>register_shared()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void register_shared </td>
-          <td>(</td>
-          <td class="paramtype">Rcpp::Module &amp;&#160;</td>
-          <td class="paramname"><em>m</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Register the shared module. </p>
-<p>Function to register shared primitive classes with the Rcpp module system. </p>
-
-</div>
-</div>
-</div><!-- contents -->
+<a href="rcpp__include_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span> </div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#ifndef FIMS_INTERFACE_RCPP_RCPP_INCLUDE_HPP</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#define FIMS_INTERFACE_RCPP_RCPP_INCLUDE_HPP</span></div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// Only the first inclusion of Rcpp in a translation unit sets its</span></div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment">// configuration, so Rcpp must not be included before this header.</span></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="preprocessor">#ifdef Rcpp_hpp</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="preprocessor">#error &quot;Include interface/rcpp/rcpp_include.hpp instead of &lt;Rcpp.h&gt;.&quot;</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment">// Rcpp is included with NDEBUG defined so a failed type conversion raises an</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="comment">// R error instead of calling abort(). R defines NDEBUG for installed builds;</span></div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span><span class="comment">// defining it here makes debug builds (e.g., devtools::load_all()) behave the</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">// same. push_macro and pop_macro restore the build&#39;s NDEBUG afterward, and</span></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><span class="comment">// &lt;cassert&gt; is included again so assert() in FIMS code follows that setting.</span></div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="preprocessor">#pragma push_macro(&quot;NDEBUG&quot;)</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><span class="preprocessor">#undef NDEBUG</span></div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span><span class="preprocessor">#define NDEBUG 1</span></div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="preprocessor">#include &lt;Rcpp.h&gt;</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="preprocessor">#pragma pop_macro(&quot;NDEBUG&quot;)</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><span class="preprocessor">#include &lt;cassert&gt;</span></div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span><span class="preprocessor">#endif  </span><span class="comment">// FIMS_INTERFACE_RCPP_RCPP_INCLUDE_HPP</span></div>
+</div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="rcpp__shared__primitive_8cpp.html">rcpp_shared_primitive.cpp</a></li>
+    <li class="navelem"><a class="el" href="dir_920884c6b3b2f0be94e27d51660adee5.html">inst</a></li><li class="navelem"><a class="el" href="dir_2b5d1a398a9eec011391d543f21db223.html">include</a></li><li class="navelem"><a class="el" href="dir_78bab4de0b210d1f38696a0ee50fd3de.html">interface</a></li><li class="navelem"><a class="el" href="dir_cf9876eeb8486b9ec32ec52ea9e00fbd.html">rcpp</a></li><li class="navelem"><a class="el" href="rcpp__include_8hpp.html">rcpp_include.hpp</a></li>
     <li class="footer">Generated by <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
   </ul>
 </div>

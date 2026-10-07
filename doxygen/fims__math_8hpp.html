@@ -476,8 +476,8 @@ template&lt;class Type &gt; </div>
 
 <p>The general double logistic function. </p>
 <p>\( \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - inflection_point_{asc}))}
-\left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x -
-inflection_point_{desc}))} \right)\)</p>
+\frac{1.0}{ 1.0 + exp(slope_{desc} (x - inflection_point_{desc}))}\)</p>
+<p>The descending limb is written as \(1 / (1 + exp(z))\), with \( z = slope_desc (x - inflection_point_desc) \), so it stays above 0 in double precision until \( exp(z) \) overflows.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">inflection_point_asc</td><td>the inflection point of the ascending limb of the double logistic function </td></tr>

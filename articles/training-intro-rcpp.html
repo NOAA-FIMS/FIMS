@@ -187,7 +187,7 @@ C++ code in <code><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html" class=
 <span><span class="co"># after compiling, add works like a regular R function</span></span>
 <span><span class="va">add</span></span></code></pre></div>
 <pre><code><span><span class="co">## function (x, y, z) </span></span>
-<span><span class="co">## .Call(&lt;pointer: 0x7f52e34913f0&gt;, x, y, z)</span></span></code></pre>
+<span><span class="co">## .Call(&lt;pointer: 0x7f10b8ec83f0&gt;, x, y, z)</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">add</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 6</span></span></code></pre>
@@ -292,9 +292,9 @@ compiled <code>meanC</code> function against the R function
 <span>  <span class="fu">meanC</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Unit: microseconds</span></span>
-<span><span class="co">##      expr     min       lq     mean  median       uq       max neval</span></span>
-<span><span class="co">##   mean(x) 419.062 431.3395 437.4083 434.711 443.1065   520.561   100</span></span>
-<span><span class="co">##  meanC(x)  94.146  94.3555 195.2452  94.617  95.2480 10013.792   100</span></span></code></pre>
+<span><span class="co">##      expr     min      lq     mean  median       uq      max neval</span></span>
+<span><span class="co">##   mean(x) 266.958 267.399 270.5423 268.095 273.5430  317.934   100</span></span>
+<span><span class="co">##  meanC(x)  44.696  44.917 105.0030  44.977  45.1425 6030.946   100</span></span></code></pre>
 </details>
 </div>
 <div class="section level3">
