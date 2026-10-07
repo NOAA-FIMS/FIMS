@@ -113,6 +113,17 @@ target_link_libraries(growth_vonb_schnute
 )
 gtest_discover_tests(growth_vonb_schnute)
 
+# test_growth_vonb_traditional.cpp
+add_executable(growth_vonb_traditional
+  test_growth_vonb_traditional.cpp
+)
+add_as_invoker_manifest(growth_vonb_traditional)
+target_link_libraries(growth_vonb_traditional
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(growth_vonb_traditional)
+
 # test_growth_model.cpp
 add_executable(growth_model
   test_growth_model.cpp

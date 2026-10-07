@@ -79,6 +79,154 @@ TEST(GrowthModel, CanConstructAndPrepare) {
   EXPECT_NEAR(W5, 2.5e-11 * std::pow(expected_length_at_age_5, 3.0), 1e-8);
 }
 
+TEST(GrowthModel,
+     TraditionalVonBertalanffyUsesSharedInterpolationProducts) {
+  fims_popdy::GrowthModel<double> gm(1, 5, 1);
+
+  const double asymptotic_length = 100.0;
+  const double growth_coefficient = 0.2;
+  const double age_at_zero_length = -0.5;
+
+  gm.SetVonBertalanffyTraditionalParameters(
+      asymptotic_length, growth_coefficient, age_at_zero_length);
+  gm.SetLengthWeightParameters(1.0e-5, 3.0);
+  gm.SetLengthSdReferenceAges(1.0, 5.0);
+  gm.SetLengthSdParams(10.0, 20.0);
+  gm.SetAgeOffset(1.0);
+
+  gm.Prepare();
+
+  const auto& p = gm.GetProducts();
+
+  const auto expected_length = [&](double age) {
+    return asymptotic_length *
+           (1.0 -
+            std::exp(-growth_coefficient * (age - age_at_zero_length)));
+  };
+
+  const double expected_length_age_1 = expected_length(1.0);
+  const double expected_length_age_3 = expected_length(3.0);
+  const double expected_length_age_5 = expected_length(5.0);
+
+  EXPECT_NEAR(p.MeanLAA(0, 0, 0), expected_length_age_1, 1e-8);
+  EXPECT_NEAR(p.MeanLAA(0, 2, 0), expected_length_age_3, 1e-8);
+  EXPECT_NEAR(p.MeanLAA(0, 4, 0), expected_length_age_5, 1e-8);
+
+  const double expected_sd_age_3 =
+      10.0 + (20.0 - 10.0) *
+                 (expected_length_age_3 - expected_length_age_1) /
+                 (expected_length_age_5 - expected_length_age_1);
+
+  EXPECT_NEAR(p.SdLAA(0, 0, 0), fims_math::ad_max(10.0, 1e-8), 1e-7);
+  EXPECT_NEAR(p.SdLAA(0, 2, 0), fims_math::ad_max(expected_sd_age_3, 1e-8),
+              1e-7);
+  EXPECT_NEAR(p.SdLAA(0, 4, 0), fims_math::ad_max(20.0, 1e-8), 1e-7);
+
+  EXPECT_NEAR(p.MeanWAA(0, 2, 0),
+              1.0e-5 * std::pow(expected_length_age_3, 3.0), 1e-8);
+}
+
+TEST(GrowthModel, TraditionalDeltaMethodAllowsLowCv) {
+  fims_popdy::GrowthModel<double> gm(1, 5, 1);
+
+  gm.SetVonBertalanffyTraditionalParameters(100.0, 0.2, -0.5);
+  gm.SetLengthWeightParameters(1.0e-5, 3.0);
+  gm.SetTraditionalGrowthParameterCovariance(
+      0.03 * 0.03,  // var(log(Linf))
+      0.0, 0.0,
+      0.0,  // var(log(K))
+      0.0,
+      0.0);  // var(t0)
+  gm.SetAgeOffset(1.0);
+
+  gm.Prepare();
+
+  const auto& p = gm.GetProducts();
+  const double cv_at_age_3 = p.SdLAA(0, 2, 0) / p.MeanLAA(0, 2, 0);
+
+  EXPECT_NEAR(cv_at_age_3, 0.03, 1e-5);
+  EXPECT_LT(cv_at_age_3, 0.04);
+}
+
+TEST(GrowthModel, TraditionalDeltaMethodIncludesT0Covariances) {
+  fims_popdy::GrowthModel<double> gm(1, 5, 1);
+
+  const double asymptotic_length = 100.0;
+  const double growth_coefficient = 0.2;
+  const double age_at_zero_length = -0.5;
+
+  const double sd_log_asymptotic_length = 0.05;
+  const double sd_log_growth_coefficient = 0.10;
+  const double sd_age_at_zero_length = 0.20;
+
+  const double corr_linf_k = -0.5;
+  const double corr_linf_t0 = 0.25;
+  const double corr_k_t0 = -0.3;
+
+  const double var_log_asymptotic_length =
+      sd_log_asymptotic_length * sd_log_asymptotic_length;
+  const double var_log_growth_coefficient =
+      sd_log_growth_coefficient * sd_log_growth_coefficient;
+  const double var_age_at_zero_length =
+      sd_age_at_zero_length * sd_age_at_zero_length;
+
+  const double cov_linf_k =
+      corr_linf_k * sd_log_asymptotic_length * sd_log_growth_coefficient;
+  const double cov_linf_t0 =
+      corr_linf_t0 * sd_log_asymptotic_length * sd_age_at_zero_length;
+  const double cov_k_t0 =
+      corr_k_t0 * sd_log_growth_coefficient * sd_age_at_zero_length;
+
+  gm.SetVonBertalanffyTraditionalParameters(
+      asymptotic_length, growth_coefficient, age_at_zero_length);
+  gm.SetLengthWeightParameters(1.0e-5, 3.0);
+  gm.SetTraditionalGrowthParameterCovariance(
+      var_log_asymptotic_length, cov_linf_k, cov_linf_t0,
+      var_log_growth_coefficient, cov_k_t0, var_age_at_zero_length);
+  gm.SetAgeOffset(1.0);
+
+  gm.Prepare();
+
+  const auto& p = gm.GetProducts();
+
+  const double age = 3.0;
+
+  fims_popdy::VonBertalanffyTraditionalGrowth<double> vb;
+  vb.asymptotic_length = asymptotic_length;
+  vb.growth_coefficient = growth_coefficient;
+  vb.age_at_zero_length = age_at_zero_length;
+
+  double d_log_laa_d_log_asymptotic_length = 0.0;
+  double d_log_laa_d_log_growth_coefficient = 0.0;
+  double d_log_laa_d_age_at_zero_length = 0.0;
+
+  vb.log_length_at_age_working_scale_gradient(
+      age, d_log_laa_d_log_asymptotic_length,
+      d_log_laa_d_log_growth_coefficient,
+      d_log_laa_d_age_at_zero_length);
+
+  const double expected_log_var =
+      d_log_laa_d_log_asymptotic_length *
+          d_log_laa_d_log_asymptotic_length * var_log_asymptotic_length +
+      2.0 * d_log_laa_d_log_asymptotic_length *
+          d_log_laa_d_log_growth_coefficient * cov_linf_k +
+      2.0 * d_log_laa_d_log_asymptotic_length *
+          d_log_laa_d_age_at_zero_length * cov_linf_t0 +
+      d_log_laa_d_log_growth_coefficient *
+          d_log_laa_d_log_growth_coefficient * var_log_growth_coefficient +
+      2.0 * d_log_laa_d_log_growth_coefficient *
+          d_log_laa_d_age_at_zero_length * cov_k_t0 +
+      d_log_laa_d_age_at_zero_length * d_log_laa_d_age_at_zero_length *
+          var_age_at_zero_length;
+
+  const double expected_sd_raw =
+      vb.length_at_age(age) *
+      std::sqrt(fims_math::ad_max(expected_log_var, 0.0, 1e-12));
+  const double expected_sd = fims_math::ad_max(expected_sd_raw, 1e-8);
+
+  EXPECT_NEAR(p.SdLAA(0, 2, 0), expected_sd, 1e-7);
+}
+
 TEST(GrowthModel, UsesDeltaMethodVariabilityAtReferenceAges) {
   fims_popdy::GrowthModel<double> gm(1, 12, 1);
 
