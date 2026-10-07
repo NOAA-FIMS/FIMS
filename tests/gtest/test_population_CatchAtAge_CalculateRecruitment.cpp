@@ -78,4 +78,38 @@ TEST_F(CAAEvaluateTestFixture,
   // testing that population numbers_at_age > 0.0
   EXPECT_GT(dq["numbers_at_age"][r_i_age_year], 0.0);
 }
+
+TEST_F(CAAEvaluateTestFixture,
+       UsesPreviousAgeMortality_CatchAtAge_CalculateSBPR0) {
+  auto& dq =
+      catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
+  std::vector<double> expected_numbers(population->n_ages, 1.0);
+
+  for (size_t age = 0; age < population->n_ages; age++) {
+    population->M[age] = 0.1 * (age + 1);
+    population->proportion_female[age] = 1.0;
+    dq["proportion_mature_at_age"][age] = 1.0;
+  }
+
+  double expected_phi_0 =
+      catch_at_age_model->PopulationMeanWeightAA(population, 0, 0);
+  for (size_t age = 1; age < population->n_ages - 1; age++) {
+    expected_numbers[age] =
+        expected_numbers[age - 1] * fims_math::exp(-population->M[age - 1]);
+    expected_phi_0 +=
+        expected_numbers[age] *
+        catch_at_age_model->PopulationMeanWeightAA(population, 0, age);
+  }
+  expected_numbers[population->n_ages - 1] =
+      (expected_numbers[population->n_ages - 2] *
+       fims_math::exp(-population->M[population->n_ages - 2])) /
+      (1 - fims_math::exp(-population->M[population->n_ages - 1]));
+  expected_phi_0 +=
+      expected_numbers[population->n_ages - 1] *
+      catch_at_age_model->PopulationMeanWeightAA(population, 0,
+                                                 population->n_ages - 1);
+
+  EXPECT_DOUBLE_EQ(catch_at_age_model->CalculateSBPR0(population),
+                   expected_phi_0);
+}
 }  // namespace

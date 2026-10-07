@@ -568,8 +568,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \f]
    *
    * The numbers at age \f$N_a\f$ are calculated recursively with natural
-   * mortality: \f[ N_a = N_{a-1} \times \exp(-M_a) \quad \text{for } a = 1,
-   * \ldots, A-1 \f]
+   * mortality: \f[ N_a = N_{a-1} \times \exp(-M_{a-1}) \quad \text{for } a =
+   * 1, \ldots, A-1 \f]
    *
    * Plus group update:
    * \f[
@@ -591,7 +591,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
              dq_["proportion_mature_at_age"][0] *
              PopulationMeanWeightAA(population, 0, 0);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
-      numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
+      numbers_spr[a] =
+          numbers_spr[a - 1] * fims_math::exp(-population->M[a - 1]);
       phi_0 += numbers_spr[a] *
                population->proportion_female.get_force_scalar(a) *
                dq_["proportion_mature_at_age"][a] *
