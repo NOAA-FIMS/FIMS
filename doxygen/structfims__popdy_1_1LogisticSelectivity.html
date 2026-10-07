@@ -266,8 +266,11 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>GetId</b> () cons
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ac4f5ab8f67acd93af04f1b3c771498c1" id="r_ac4f5ab8f67acd93af04f1b3c771498c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1LogisticSelectivity.html#ac4f5ab8f67acd93af04f1b3c771498c1">inflection_point</a></td></tr>
+<tr class="memdesc:ac4f5ab8f67acd93af04f1b3c771498c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The age at which 50% of fish are selected for models that start at age zero and each age bin represents one year.  <br /></td></tr>
 <tr class="separator:ac4f5ab8f67acd93af04f1b3c771498c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47d008ca4b862abca4f361d68b07d4f0" id="r_a47d008ca4b862abca4f361d68b07d4f0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1LogisticSelectivity.html#a47d008ca4b862abca4f361d68b07d4f0">slope</a></td></tr>
+<tr class="memitem:a47d008ca4b862abca4f361d68b07d4f0" id="r_a47d008ca4b862abca4f361d68b07d4f0"><td class="memItemLeft" align="right" valign="top"><a id="a47d008ca4b862abca4f361d68b07d4f0" name="a47d008ca4b862abca4f361d68b07d4f0"></a>
+<a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>slope</b></td></tr>
+<tr class="memdesc:a47d008ca4b862abca4f361d68b07d4f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">How quickly selectivity changes with age around the inflection point, per year of age. Larger absolute values give a steeper, more knife-edge curve; negative values give a curve that declines with age. <br /></td></tr>
 <tr class="separator:a47d008ca4b862abca4f361d68b07d4f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_structfims__model__object_1_1FIMSObject"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_structfims__model__object_1_1FIMSObject')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject&lt; Type &gt;</a></td></tr>
 <tr class="memitem:a3922946642efc5ec4309149f1e0b188a inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a3922946642efc5ec4309149f1e0b188a"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a3922946642efc5ec4309149f1e0b188a">id</a></td></tr>
@@ -410,24 +413,9 @@ template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750
         </tr>
       </table>
 </div><div class="memdoc">
-<p>50% quantile of the value of the quantity of interest (x); e.g. age at which 50% of the fish are selected </p>
 
-</div>
-</div>
-<a id="a47d008ca4b862abca4f361d68b07d4f0" name="a47d008ca4b862abca4f361d68b07d4f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a47d008ca4b862abca4f361d68b07d4f0">&#9670;&#160;</a></span>slope</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">typename</a> <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a>&gt; <a class="el" href="structfims__popdy_1_1LogisticSelectivity.html">fims_popdy::LogisticSelectivity</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;::slope</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<p>scalar multiplier of difference between quantity of interest value (x) and inflection_point. Positive values create an ascending curve (0 to 1), negative values create a descending curve (1 to 0). </p>
+<p>The age at which 50% of fish are selected for models that start at age zero and each age bin represents one year. </p>
+<p>The 50% quantile of the value of the quantity of interest (x). </p>
 
 </div>
 </div>

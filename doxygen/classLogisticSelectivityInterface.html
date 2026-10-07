@@ -287,13 +287,11 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>make_dimension
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:acfe913ccf31a10fa3835645b26faccd9" id="r_acfe913ccf31a10fa3835645b26faccd9"><td class="memItemLeft" align="right" valign="top"><a id="acfe913ccf31a10fa3835645b26faccd9" name="acfe913ccf31a10fa3835645b26faccd9"></a>
-<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>inflection_point</b></td></tr>
-<tr class="memdesc:acfe913ccf31a10fa3835645b26faccd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The index value at which the response reaches 0.5. <br /></td></tr>
+<tr class="memitem:acfe913ccf31a10fa3835645b26faccd9" id="r_acfe913ccf31a10fa3835645b26faccd9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogisticSelectivityInterface.html#acfe913ccf31a10fa3835645b26faccd9">inflection_point</a></td></tr>
+<tr class="memdesc:acfe913ccf31a10fa3835645b26faccd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The age at which 50% of fish are selected for models that start at age zero and each age bin represents one year.    <br /></td></tr>
 <tr class="separator:acfe913ccf31a10fa3835645b26faccd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a50aaa4e5b7f41ea303fc8051f5fe4e7b" id="r_a50aaa4e5b7f41ea303fc8051f5fe4e7b"><td class="memItemLeft" align="right" valign="top"><a id="a50aaa4e5b7f41ea303fc8051f5fe4e7b" name="a50aaa4e5b7f41ea303fc8051f5fe4e7b"></a>
-<a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>slope</b></td></tr>
-<tr class="memdesc:a50aaa4e5b7f41ea303fc8051f5fe4e7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The width of the curve at the inflection point. <br /></td></tr>
+<tr class="memitem:a50aaa4e5b7f41ea303fc8051f5fe4e7b" id="r_a50aaa4e5b7f41ea303fc8051f5fe4e7b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogisticSelectivityInterface.html#a50aaa4e5b7f41ea303fc8051f5fe4e7b">slope</a></td></tr>
+<tr class="memdesc:a50aaa4e5b7f41ea303fc8051f5fe4e7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">How quickly selectivity changes with age around the inflection point, per year of age. Larger absolute values give a steeper, more knife-edge curve; negative values give a curve that declines with age.    <br /></td></tr>
 <tr class="separator:a50aaa4e5b7f41ea303fc8051f5fe4e7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_classSelectivityInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classSelectivityInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classSelectivityInterfaceBase.html">SelectivityInterfaceBase</a></td></tr>
 <tr class="memitem:ad75482256de49ee97eb312ac8fa6fb17 inherit pub_attribs_classSelectivityInterfaceBase" id="r_ad75482256de49ee97eb312ac8fa6fb17"><td class="memItemLeft" align="right" valign="top">
@@ -483,6 +481,40 @@ static std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInte
 <dl class="section return"><dt>Returns</dt><dd>A string is returned specifying that the module relates to the selectivity interface with logistic selectivity. It also returns the ID and the parameters. This string is formatted for a json file. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classFIMSRcppInterfaceBase.html#aa97acd77c0c4d2e193c67cd0662d803c">FIMSRcppInterfaceBase</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="acfe913ccf31a10fa3835645b26faccd9" name="acfe913ccf31a10fa3835645b26faccd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acfe913ccf31a10fa3835645b26faccd9">&#9670;&#160;</a></span>inflection_point</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classVariableVector.html">VariableVector</a> LogisticSelectivityInterface::inflection_point</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The age at which 50% of fish are selected for models that start at age zero and each age bin represents one year.   </p>
+<p>The 50% quantile of the value of the quantity of interest (x).   </p>
+
+</div>
+</div>
+<a id="a50aaa4e5b7f41ea303fc8051f5fe4e7b" name="a50aaa4e5b7f41ea303fc8051f5fe4e7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50aaa4e5b7f41ea303fc8051f5fe4e7b">&#9670;&#160;</a></span>slope</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classVariableVector.html">VariableVector</a> LogisticSelectivityInterface::slope</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>How quickly selectivity changes with age around the inflection point, per year of age. Larger absolute values give a steeper, more knife-edge curve; negative values give a curve that declines with age.   </p>
 
 </div>
 </div>

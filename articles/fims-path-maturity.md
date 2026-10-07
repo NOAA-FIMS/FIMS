@@ -223,6 +223,12 @@ one child class, i.e., option, for maturity. It is the child classes
 which are referenced from R, the parent classes are just used in Rcpp to
 set the structure.
 
+For most Rcpp code, we try to reuse the documentation from the
+population dynamics rather than trying to keep both sets of
+documentation up to date. This is particularly true for parameters that
+are passed to the population dynamics through Rcpp. For these instances,
+we use `@copydoc`, which we demonstrate below.
+
 ``` cpp
 class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
  public:
@@ -234,12 +240,11 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 class LogisticMaturityInterface : public MaturityInterfaceBase {
  public:
   /**
-   * @brief The value of the dependent variable at which the response reaches
-   * 0.5.
+   * @copydoc fims_popdy::LogisticMaturity::inflection_point
    */
   VariableVector inflection_point;
   /**
-   * @brief The width of the curve at the inflection_point.
+   * @copydoc fims_popdy::LogisticMaturity::slope
    */
   VariableVector slope;
   ...

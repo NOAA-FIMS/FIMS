@@ -316,6 +316,11 @@ class</strong>. Sometimes there are multiple child classes under a
 parent class but as of now, there is only one child class, i.e., option,
 for maturity. It is the child classes which are referenced from R, the
 parent classes are just used in Rcpp to set the structure.</p>
+<p>For most Rcpp code, we try to reuse the documentation from the
+population dynamics rather than trying to keep both sets of
+documentation up to date. This is particularly true for parameters that
+are passed to the population dynamics through Rcpp. For these instances,
+we use <code>@copydoc</code>, which we demonstrate below.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode cpp rcppchunk"><code class="sourceCode cpp"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="kw">class</span> MaturityInterfaceBase <span class="op">:</span> <span class="kw">public</span> FIMSRcppInterfaceBase <span class="op">{</span></span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a> <span class="kw">public</span><span class="op">:</span></span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">static</span> <span class="dt">uint32_t</span> id_g<span class="op">;</span> <span class="co">/**&lt; static id of the maturity interface base */</span></span>
@@ -326,16 +331,15 @@ parent classes are just used in Rcpp to set the structure.</p>
 <span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="kw">class</span> LogisticMaturityInterface <span class="op">:</span> <span class="kw">public</span> MaturityInterfaceBase <span class="op">{</span></span>
 <span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a> <span class="kw">public</span><span class="op">:</span></span>
 <span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="co">/**</span></span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">   * </span><span class="an">@brief</span><span class="co"> The value of the dependent variable at which the response reaches</span></span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">   * 0.5.</span></span>
-<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">   */</span></span>
-<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  VariableVector inflection_point<span class="op">;</span></span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="co">/**</span></span>
-<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">   * </span><span class="an">@brief</span><span class="co"> The width of the curve at the inflection_point.</span></span>
-<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">   */</span></span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  VariableVector slope<span class="op">;</span></span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  <span class="op">...</span></span>
-<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">   * </span><span class="an">@copydoc</span><span class="co"> </span><span class="cv">fims_popdy::LogisticMaturity::inflection_point</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">   */</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>  VariableVector inflection_point<span class="op">;</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  <span class="co">/**</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">   * </span><span class="an">@copydoc</span><span class="co"> </span><span class="cv">fims_popdy::LogisticMaturity::slope</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">   */</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  VariableVector slope<span class="op">;</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="op">...</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 <p><img src="figures/fims-path-maturity-1.png" class="r-plt" alt="The path of the maturity module from R to LogisticMaturity and LogisticMaturityInterface." width="85%"></p>
 <p>All Rcpp interface classes from FIMS define parameters (e.g.,
 <code>inflection_point</code>, <code>slope</code>) using the

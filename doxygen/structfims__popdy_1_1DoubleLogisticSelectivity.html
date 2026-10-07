@@ -266,12 +266,16 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>GetId</b> () cons
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a348cb4cb039f38b306ddbc333f1beeb2" id="r_a348cb4cb039f38b306ddbc333f1beeb2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1DoubleLogisticSelectivity.html#a348cb4cb039f38b306ddbc333f1beeb2">inflection_point_asc</a></td></tr>
+<tr class="memdesc:a348cb4cb039f38b306ddbc333f1beeb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">The age at which the ascending limb is 0.5 for models that start at age zero and each age bin represents one year.  <br /></td></tr>
 <tr class="separator:a348cb4cb039f38b306ddbc333f1beeb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0d98542e054ce41349747abcbedff13" id="r_aa0d98542e054ce41349747abcbedff13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1DoubleLogisticSelectivity.html#aa0d98542e054ce41349747abcbedff13">slope_asc</a></td></tr>
+<tr class="memdesc:aa0d98542e054ce41349747abcbedff13"><td class="mdescLeft">&#160;</td><td class="mdescRight">How quickly selectivity rises on the ascending limb; larger values give a steeper, more knife-edge rise.  <br /></td></tr>
 <tr class="separator:aa0d98542e054ce41349747abcbedff13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3895399f362da4ac9ec11cb33f47b9e" id="r_ad3895399f362da4ac9ec11cb33f47b9e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1DoubleLogisticSelectivity.html#ad3895399f362da4ac9ec11cb33f47b9e">inflection_point_desc</a></td></tr>
+<tr class="memdesc:ad3895399f362da4ac9ec11cb33f47b9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The age at which the descending limb is 0.5 for models that start at age zero and each age bin represents one year.  <br /></td></tr>
 <tr class="separator:ad3895399f362da4ac9ec11cb33f47b9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4c70f550f23d0a4cd97c402f6e3fff3" id="r_ac4c70f550f23d0a4cd97c402f6e3fff3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750cee9acf6fd8">Type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__popdy_1_1DoubleLogisticSelectivity.html#ac4c70f550f23d0a4cd97c402f6e3fff3">slope_desc</a></td></tr>
+<tr class="memdesc:ac4c70f550f23d0a4cd97c402f6e3fff3"><td class="mdescLeft">&#160;</td><td class="mdescRight">How quickly selectivity falls on the descending limb; larger values give a steeper decline.  <br /></td></tr>
 <tr class="separator:ac4c70f550f23d0a4cd97c402f6e3fff3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_structfims__model__object_1_1FIMSObject"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_structfims__model__object_1_1FIMSObject')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="structfims__model__object_1_1FIMSObject.html">fims_model_object::FIMSObject&lt; Type &gt;</a></td></tr>
 <tr class="memitem:a3922946642efc5ec4309149f1e0b188a inherit pub_attribs_structfims__model__object_1_1FIMSObject" id="r_a3922946642efc5ec4309149f1e0b188a"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structfims__model__object_1_1FIMSObject.html#a3922946642efc5ec4309149f1e0b188a">id</a></td></tr>
@@ -405,7 +409,9 @@ template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750
         </tr>
       </table>
 </div><div class="memdoc">
-<p>50% quantile of the value of the quantity of interest (x) on the ascending limb of the double logistic curve; e.g. age at which 50% of the fish are selected </p>
+
+<p>The age at which the ascending limb is 0.5 for models that start at age zero and each age bin represents one year. </p>
+<p>Overall selectivity is below 0.5 at this point because it is the product of both limbs. </p>
 
 </div>
 </div>
@@ -422,7 +428,9 @@ template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750
         </tr>
       </table>
 </div><div class="memdoc">
-<p>50% quantile of the value of the quantity of interest (x) on the descending limb of the double logistic curve; e.g. age at which 50% of the fish are selected </p>
+
+<p>The age at which the descending limb is 0.5 for models that start at age zero and each age bin represents one year. </p>
+<p>Overall selectivity is below 0.5 at this point because it is the product of both limbs. </p>
 
 </div>
 </div>
@@ -439,7 +447,9 @@ template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750
         </tr>
       </table>
 </div><div class="memdoc">
-<p>scalar multiplier of difference between quantity of interest value (x) and inflection_point on the ascending limb of the double logistic curve </p>
+
+<p>How quickly selectivity rises on the ascending limb; larger values give a steeper, more knife-edge rise. </p>
+<p>Scalar multiplier applied to the difference between x and inflection_point_asc on the ascending limb. </p>
 
 </div>
 </div>
@@ -456,7 +466,9 @@ template&lt;<a class="el" href="namespacefims__popdy.html#a5a39b32817ff547732750
         </tr>
       </table>
 </div><div class="memdoc">
-<p>scalar multiplier of difference between quantity of interest value (x) and inflection_point on the descending limb of the double logistic curve </p>
+
+<p>How quickly selectivity falls on the descending limb; larger values give a steeper decline. </p>
+<p>Scalar multiplier applied to the difference between x and inflection_point_desc on the descending limb. </p>
 
 </div>
 </div>

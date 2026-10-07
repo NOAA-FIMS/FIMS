@@ -280,12 +280,16 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>make_dimension
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a6f9f8a2511237c8aa0f9ff63e5914ff1" id="r_a6f9f8a2511237c8aa0f9ff63e5914ff1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDoubleLogisticSelectivityInterface.html#a6f9f8a2511237c8aa0f9ff63e5914ff1">inflection_point_asc</a></td></tr>
+<tr class="memdesc:a6f9f8a2511237c8aa0f9ff63e5914ff1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The age at which the ascending limb is 0.5 for models that start at age zero and each age bin represents one year.    <br /></td></tr>
 <tr class="separator:a6f9f8a2511237c8aa0f9ff63e5914ff1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bd8b8957e79398fc0b7657331a67736" id="r_a6bd8b8957e79398fc0b7657331a67736"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDoubleLogisticSelectivityInterface.html#a6bd8b8957e79398fc0b7657331a67736">slope_asc</a></td></tr>
+<tr class="memdesc:a6bd8b8957e79398fc0b7657331a67736"><td class="mdescLeft">&#160;</td><td class="mdescRight">How quickly selectivity rises on the ascending limb; larger values give a steeper, more knife-edge rise.    <br /></td></tr>
 <tr class="separator:a6bd8b8957e79398fc0b7657331a67736"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a833ad9edbbbdfe656b928918d2baea6b" id="r_a833ad9edbbbdfe656b928918d2baea6b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDoubleLogisticSelectivityInterface.html#a833ad9edbbbdfe656b928918d2baea6b">inflection_point_desc</a></td></tr>
+<tr class="memdesc:a833ad9edbbbdfe656b928918d2baea6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The age at which the descending limb is 0.5 for models that start at age zero and each age bin represents one year.    <br /></td></tr>
 <tr class="separator:a833ad9edbbbdfe656b928918d2baea6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44f546b0fd4b8be36722ec6eefe8f904" id="r_a44f546b0fd4b8be36722ec6eefe8f904"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classVariableVector.html">VariableVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDoubleLogisticSelectivityInterface.html#a44f546b0fd4b8be36722ec6eefe8f904">slope_desc</a></td></tr>
+<tr class="memdesc:a44f546b0fd4b8be36722ec6eefe8f904"><td class="mdescLeft">&#160;</td><td class="mdescRight">How quickly selectivity falls on the descending limb; larger values give a steeper decline.    <br /></td></tr>
 <tr class="separator:a44f546b0fd4b8be36722ec6eefe8f904"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_classSelectivityInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classSelectivityInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classSelectivityInterfaceBase.html">SelectivityInterfaceBase</a></td></tr>
 <tr class="memitem:ad75482256de49ee97eb312ac8fa6fb17 inherit pub_attribs_classSelectivityInterfaceBase" id="r_ad75482256de49ee97eb312ac8fa6fb17"><td class="memItemLeft" align="right" valign="top">
@@ -488,7 +492,9 @@ static std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInte
         </tr>
       </table>
 </div><div class="memdoc">
-<p>the index value at which the response reaches .5 </p>
+
+<p>The age at which the ascending limb is 0.5 for models that start at age zero and each age bin represents one year.   </p>
+<p>Overall selectivity is below 0.5 at this point because it is the product of both limbs.   </p>
 
 </div>
 </div>
@@ -503,7 +509,9 @@ static std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInte
         </tr>
       </table>
 </div><div class="memdoc">
-<p>the index value at which the response reaches .5 </p>
+
+<p>The age at which the descending limb is 0.5 for models that start at age zero and each age bin represents one year.   </p>
+<p>Overall selectivity is below 0.5 at this point because it is the product of both limbs.   </p>
 
 </div>
 </div>
@@ -518,7 +526,9 @@ static std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInte
         </tr>
       </table>
 </div><div class="memdoc">
-<p>the width of the curve at the inflection_point </p>
+
+<p>How quickly selectivity rises on the ascending limb; larger values give a steeper, more knife-edge rise.   </p>
+<p>Scalar multiplier applied to the difference between x and inflection_point_asc on the ascending limb.   </p>
 
 </div>
 </div>
@@ -533,7 +543,9 @@ static std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInte
         </tr>
       </table>
 </div><div class="memdoc">
-<p>the width of the curve at the inflection_point </p>
+
+<p>How quickly selectivity falls on the descending limb; larger values give a steeper decline.   </p>
+<p>Scalar multiplier applied to the difference between x and inflection_point_desc on the descending limb.   </p>
 
 </div>
 </div>
