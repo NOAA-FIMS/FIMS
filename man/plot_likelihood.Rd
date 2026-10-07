@@ -16,7 +16,7 @@ profiled value
 
 \item{group}{A character string or vector specifying the grouping variable(s)
 for likelihood components. Default is \code{"label"} to group by data type.
-Must match column name(s) in the estimates data frame}
+Must match column name(s) in the estimates data frame.}
 }
 \value{
 A ggplot object displaying likelihood profiles. The plot includes:
