@@ -291,10 +291,7 @@ data_with_missing_age_comp <- data_big |>
 data_with_missing_age_comp |> get_data() |>
   dplyr::filter(type == "age_comp" & (timing >= 16 & timing <= 18)) |>
   print(n = 100)
-```
 
-Change observed to -999 to set years to missing data and pass to FIMSFrame
-```{r create_FIMSFrame_with_missing_data}
 data_with_missing_index <- data_big |>
   dplyr::rows_update(
     tidyr::tibble(
