@@ -730,7 +730,9 @@ setup_default_Selectivity <- function(
 #' For fishing fleets, log_q is set to an estimation type of "constant" with a
 #' default value of 0, while log_Fmort is set to "fixed_effects". For survey
 #' fleets, log_q is set to "fixed_effects" and log_Fmort is set to "constant"
-#' with a default value of -200.
+#' with a default value of -200. For a year with a catch of 0, log_Fmort is
+#' also set to "constant" at -200, so fishing mortality is effectively 0 that
+#' year.
 #'
 #' @param fleet A character. Name of the fleet.
 #' @inherit setup_default_parameters
@@ -786,6 +788,26 @@ setup_default_Fleet <- function(
       timing = get_start_year(data):get_end_year(data),
       value = if (has_index) -200 else -3,
       estimation_type = if (has_index) "constant" else "fixed_effects"
+    )
+
+  # A catch of 0 means the fleet did not fish that year. Nothing in the data
+  # informs F then, so F is fixed at effectively 0 with the same -200 used for
+  # fleets without catch, rather than estimated.
+  zero_catch_years <- get_data(data) |>
+    dplyr::filter(
+      .data$fleet == .env$fleet,
+      .data$type == "catch",
+      .data$observed == 0
+    ) |>
+    dplyr::pull(.data$timing)
+  log_Fmort_default <- log_Fmort_default |>
+    dplyr::mutate(
+      value = dplyr::if_else(
+        .data$timing %in% zero_catch_years, -200, .data$value
+      ),
+      estimation_type = dplyr::if_else(
+        .data$timing %in% zero_catch_years, "constant", .data$estimation_type
+      )
     )
   # Compile all default parameters into a single list
   default <- dplyr::bind_rows(
