@@ -13,6 +13,7 @@
 #' @export DoubleLogisticSelectivity
 #' @export EWAAGrowth
 #' @export VonBertalanffySchnuteGrowth
+#' @export VonBertalanffyTraditionalGrowth
 #' @export Fleet
 #' @export set_fixed
 #' @export get_fixed
