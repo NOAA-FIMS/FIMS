@@ -358,6 +358,15 @@ is.FIMSFit <- function(x) {
 
 # Constructors ----
 
+# Restore full vectors, including fixed and shared map entries, from the best
+# joint parameter vector. The named par argument includes random effects;
+# parList's first argument accepts only the reduced fixed effects.
+restore_tmb_parameters <- function(obj) {
+  parameters <- obj[["env"]]$parList(par = obj[["env"]][["last.par.best"]])
+  FIMS::set_fixed(parameters[["p"]])
+  FIMS::set_random(parameters[["re"]])
+}
+
 # Apply TMB's factor map to names from FIMS's full parameter registry.
 # TMB omits NA entries and returns one optimized parameter per factor level.
 tmb_mapped_parameter_names <- function(parameter_names, map = NULL) {
@@ -464,7 +473,7 @@ FIMSFit <- function(
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
-  n_random_effects <- length(obj[["env"]]$parList()[["re"]])
+  n_random_effects <- n_total - n_fixed_effects
   number_of_parameters <- c(
     fixed_effects = n_fixed_effects,
     random_effects = n_random_effects
@@ -686,10 +695,7 @@ fit_fims <- function(input,
 
   check_mle_convergence(input, obj, opt, maxgrad)
 
-  # Expand TMB's reduced optimization vector back to the full FIMS parameter
-  # vector before copying values into the C++ model. This is a no-op when no
-  # TMB map is present and restores fixed/shared entries when one is present.
-  FIMS::set_fixed(obj[["env"]]$parList(opt[["par"]])[["p"]])
+  restore_tmb_parameters(obj)
 
   time_sdreport <- NA
   if (get_sd) {
