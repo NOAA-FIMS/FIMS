@@ -457,6 +457,54 @@ test_that("`initialize_fleet()` works with correct inputs", {
   ))
   #' @description Test that `initialize_fleet()` leaves weight at age empty for a fleet without its own rows, so the population weight is used.
   expect_equal(result$weight_at_age$size(), 0)
+  #' @description Test that `initialize_fleet()` sets catch in mt to be fit as weight.
+  expect_equal(result$observed_catch_units$get(), "weight")
+  clear()
+})
+
+test_that("`initialize_fims()` fits catch and index to the expected quantity matching their units", {
+  get_fleet_report <- function(data) {
+    frame <- FIMSFrame(data)
+    report <- setup_default_parameters(frame) |>
+      initialize_fims(data = frame) |>
+      fit_fims(optimize = FALSE) |>
+      get_report()
+    clear()
+    report
+  }
+  weight_report <- get_fleet_report(data_big)
+  number_report <- get_fleet_report(dplyr::mutate(
+    data_big,
+    unit = dplyr::if_else(type %in% c("catch", "index"), "number", unit)
+  ))
+
+  #' @description Test that catch and index in mt are fit to expected weight.
+  expect_equal(weight_report[["catch_expected"]][[1]], weight_report[["catch_weight"]][[1]])
+  expect_equal(weight_report[["index_expected"]][[2]], weight_report[["index_weight"]][[2]])
+  #' @description Test that catch and index in numbers are fit to expected numbers.
+  expect_equal(number_report[["catch_expected"]][[1]], number_report[["catch_numbers"]][[1]])
+  expect_equal(number_report[["index_expected"]][[2]], number_report[["index_numbers"]][[2]])
+  #' @description Test that expected numbers differ from expected weight, so the checks above can tell the 2 units apart.
+  expect_false(isTRUE(all.equal(
+    number_report[["catch_numbers"]][[1]],
+    number_report[["catch_weight"]][[1]]
+  )))
+  expect_false(isTRUE(all.equal(
+    number_report[["index_numbers"]][[2]],
+    number_report[["index_weight"]][[2]]
+  )))
+})
+
+test_that("`initialize_fims()` errors for a catch unit it cannot map", {
+  #' @description Test that `initialize_fims()` errors rather than fitting a catch unit with no mapping, e.g., one added to FIMSFrame() but not to initialize_fleet().
+  frame <- FIMSFrame(data_big)
+  # FIMSFrame() rejects this unit, so it is set on the stored data directly
+  frame@data[["unit"]][frame@data[["type"]] == "catch"] <- "t"
+  expect_error(
+    object = setup_default_parameters(frame) |>
+      initialize_fims(data = frame),
+    regexp = "has no rule for the catch or index unit"
+  )
   clear()
 })
 
