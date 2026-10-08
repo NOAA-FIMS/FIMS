@@ -248,3 +248,4 @@ test_that("`get_estimates()` returns correct outputs for edge cases", {
 
 ## Error handling ----
 # No built-in errors to test.
+

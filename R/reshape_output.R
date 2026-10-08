@@ -200,15 +200,14 @@ reshape_json_estimates <- function(model_output) {
     length_i = integer(),
     length = numeric()
   )
-  if ("lengths" %in% names(read_list[["fleets"]])) {
+  if ("length" %in% names(read_list[["fleets"]])) {
     fleet_lengths <- read_list[["fleets"]] |>
-      dplyr::select(dplyr::all_of(c("module_name", "module_id", "lengths"))) |>
-      tidyr::unnest_longer(lengths, indices_to = "length_i") |>
-      dplyr::mutate(length = lengths)
+      dplyr::select(dplyr::all_of(c("module_name", "module_id", "length"))) |>
+      tidyr::unnest_longer(length, indices_to = "length_i")
   }
 
   fleet_information <- read_list[["fleets"]] |>
-    dplyr::select(-dplyr::any_of(c("selectivity_id", "lengths"))) |>
+    dplyr::select(-dplyr::any_of(c("selectivity_id", "length"))) |>
     tidyr::pivot_longer(
       cols = dplyr::all_of(c("parameters", "derived_quantities")),
       names_to = "delete_me",
@@ -244,8 +243,7 @@ reshape_json_estimates <- function(model_output) {
     dplyr::mutate(value = unlist(.data$value), uncertainty = unlist(.data$uncertainty))
 
   population_ages <- read_list[["populations"]] |>
-    tidyr::unnest_longer(ages, indices_to = "age_i") |>
-    dplyr::rename(age = ages) |>
+    tidyr::unnest_longer(age, indices_to = "age_i") |>
     # TODO: think about how to join based on population when more than one
     dplyr::select(age, age_i)
   # Process the population data
@@ -256,7 +254,7 @@ reshape_json_estimates <- function(model_output) {
       values_to = "parameters"
     ) |>
     # TODO: Think about these ids when we have more than one population
-    dplyr::select(-dplyr::all_of("delete_me"), -dplyr::ends_with("_id"), -dplyr::any_of(c("population", "ages"))) |>
+    dplyr::select(-dplyr::all_of("delete_me"), -dplyr::ends_with("_id"), -dplyr::any_of(c("population", "age"))) |>
     dplyr::mutate(
       parameters = purrr::map(
         .data$parameters,
@@ -310,8 +308,8 @@ reshape_json_estimates <- function(model_output) {
       "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
     ) |>
-    # age_i and length_i are positions, so replace them with the ages and
-    # lengths they index. Every age dimension starts at the first age today; a
+    # age_i and length_i are positions, so replace them with the age and
+    # length they index. Every age dimension starts at the first age today; a
     # dimension that starts later, e.g., "n_ages-1", would need its own offset
     # here.
     dplyr::left_join(fleet_lengths, by = c("module_name", "module_id", "length_i")) |>
