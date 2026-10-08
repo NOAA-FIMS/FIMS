@@ -97,6 +97,7 @@ lcomp
 ldots
 lengthcomp
 lengthcomps
+lfixed
 libpath
 LIBTMB
 linetype
@@ -109,6 +110,7 @@ logr
 longdash
 LPDF
 LPMF
+lrandom
 maindir
 MAINPAGE
 Makevars
