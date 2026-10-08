@@ -32,7 +32,7 @@
 #'     profiled value
 #' @param group A character string or vector specifying the grouping variable(s)
 #'   for likelihood components. Default is `"label"` to group by data type.
-#'   Must match column name(s) in the estimates data frame
+#'   Must match column name(s) in the estimates data frame.
 #'
 #' @return
 #' A ggplot object displaying likelihood profiles. The plot includes:
@@ -144,11 +144,15 @@ plot_likelihood <- function(like_fit, group = "label") {
     dplyr::bind_rows(total) |>
     dplyr::arrange(.data[[column_name]]) |>
     dplyr::group_by(.data[[group]]) |>
-    dplyr::mutate(total_like_change = max(.data$total_like, na.rm = TRUE) - .data$total_like) |>
+    dplyr::mutate(
+      total_like_change = max(.data$total_like, na.rm = TRUE) -
+        .data$total_like,
+      group_clean = gsub("_expected", "", .data[[group]])
+    ) |>
     dplyr::ungroup()
 
   # Get all unique group values
-  all_groups_clean <- unique(gsub("_expected", "", grouped_like[[group]]))
+  all_groups_clean <- unique(grouped_like$group_clean)
   other_groups_clean <- setdiff(all_groups_clean, "Total")
 
   # Create color vector: black for Total, default ggplot colors for others
@@ -173,31 +177,43 @@ plot_likelihood <- function(like_fit, group = "label") {
     )
   )
 
-  # plot all the lines
+  # plot all the lines: Total in background, other components on top
   p1 <- grouped_like |>
-    dplyr::mutate(
-      group_clean = gsub("_expected", "", .data[[group]])
-    ) |>
-    ggplot2::ggplot() +
-    ggplot2::geom_line(ggplot2::aes(
+    ggplot2::ggplot(ggplot2::aes(
       x = .data[[column_name]],
-      y = .data$total_like_change,
-      colour = .data$group_clean,
-      linetype = .data$group_clean
-    ), linewidth = 1.2) +
+      y = .data$total_like_change
+    )) +
+    # Total likelihood in background
+    ggplot2::geom_line(
+      data = ~ dplyr::filter(.x, .data$group_clean == "Total"),
+      ggplot2::aes(
+        colour = .data$group_clean,
+        linetype = .data$group_clean
+      ),
+      linewidth = 1.4
+    ) +
+    # Individual data components on top
+    ggplot2::geom_line(
+      data = ~ dplyr::filter(.x, .data$group_clean != "Total"),
+      ggplot2::aes(
+        colour = .data$group_clean,
+        linetype = .data$group_clean
+      ), linewidth = 1.2
+    ) +
     stockplotr::theme_noaa(discrete = TRUE) +
     ggplot2::scale_color_manual(
       values = color_values,
+      breaks = c("Total", other_groups_clean),
       name = "Data Type"
     ) +
     ggplot2::scale_linetype_manual(
       values = linetype_values,
+      breaks = c("Total", other_groups_clean),
       name = "Data Type"
     ) +
     ggplot2::labs(
       x = column_name |> gsub("value_", "", x = _), # remove "value_" from label
-      y = "Change in log-likelihood",
-      color = "Data Type"
+      y = "Change in log-likelihood"
     )
 
   return(p1)
