@@ -279,15 +279,48 @@ fit <- parameters_4_model |>
   fit_fims(optimize = TRUE)
 ```
 
+### Model sanity check with `sanity_fims()`
+
+Once a model has been fit, running `sanity_fims()` evaluates whether the model converged and has well-behaved parameter estimates, gradients, negative log-likelihoods, and standard errors before using the results for inference or management. This function performs an automated suite of checks:
+
+- **Optimizer convergence:** Confirms that `nlminb` converged (`convergence = 0`).
+- **Negative log-likelihoods:** Checks that marginal, joint, and named NLL components (e.g., `fleet1_catch`, `fleet1_age_comp`, `survey1_index`) are finite.
+- **Gradients:** Verifies the maximum absolute gradient against a threshold (`gradient_thresh = 0.001`), ranking and displaying the top 2–3 parameters with the largest gradients if elevated.
+- **Hessian & condition number:** Confirms the Hessian is positive definite and evaluates the condition number (`condition_thresh = 1e5`) to detect weak parameter identification.
+- **Standard errors:** Identifies any non-finite (`NA`/`NaN`) standard errors or parameters with excessively large standard errors (`big_se = 1000`).
+
+```{r sanity-check}
+# Run the sanity check on the fitted model
+sanity_fims(fit)
+```
+
 ### Oh no! My model didn't converge! 😨 HELP‼️
 
-If you find yourself in the unfortunate situation where your model didn't converge, there are several things that you can look at.
+If you find yourself in the unfortunate situation where your model didn't converge, `sanity_fims()` works on non-converged models as well to help diagnose what went wrong. It will pinpoint:
+
+- Non-zero optimizer convergence codes and error messages (e.g., `iteration limit reached` or `false convergence`).
+- Non-finite or extreme negative log-likelihood components by name, highlighting which fleet or prior blew up.
+- The top 2–3 parameters with the highest gradients, showing which parameters the optimizer was struggling to estimate.
+- Missing standard error reports or non-positive definite Hessians, indicating flat ridges or saddle points.
 
 #### Getting the non-converged fit output
 
-One of the things you can do is to inspect the fit output. You can start with the NLL (We are sorry these aren't named yet, it's in the list of things to add) by running `get_report(fit)$nll_components` which will give you a clue as to which part of these components might have caused your model to not converge.
+You can inspect the fit output directly from `sanity_fims()` to look at various output that will provide detail about why your model didn't converge. One that we often look at is `nll_components`. For example:
 
-You can then do `names(get_report(fit))` to see the names of all the information you can look into specifically and then look at that. You can also look in `View(get_estimates(fit))` to look through the tibble and identify problem data. Also, see the [Viewing results](#viewing-results) section for more information on how to view and filter the results.
+```{r sanity-nll}
+checks <- sanity_fims(fit)
+
+# Check overall boolean pass/fail status
+checks$all_ok
+
+# Inspect named NLL components
+checks$nll_components
+
+# Inspect the top gradient parameters
+checks$top_gradient_parameters
+```
+
+You can also use `get_report(fit)` where you can do `names(get_report(fit))` to see the names of all the information you can look into specifically and then look at that. You can also look in `View(get_estimates(fit))` to look through the tibble and identify problem data. Also, see the [Viewing results](#viewing-results) section for more information on how to view and filter the results of your fitted model.
 
 #### Logging system
 
