@@ -102,36 +102,6 @@ test_that("`setup_default_Growth()` supports traditional von Bertalanffy interpo
   clear()
 })
 
-  #' @description Test that traditional Von Bertalanffy interpolation defaults match model ages.
-  expect_s3_class(result, "tbl_df")
-  expect_equal(nrow(result), 9)
-  expect_equal(unique(result[["module_name"]]), "Growth")
-  expect_equal(unique(result[["module_type"]]), "VonBertalanffyTraditional")
-  expect_equal(
-    result[["label"]],
-    c(
-      "asymptotic_length",
-      "growth_coefficient",
-      "age_at_zero_length",
-      "length_weight_a",
-      "length_weight_b",
-      "reference_age_for_length_young",
-      "reference_age_for_length_old",
-      "length_at_age_sd_at_reference_ages",
-      "length_at_age_sd_at_reference_ages"
-    )
-  )
-
-  sd_rows <- result |>
-    dplyr::filter(.data[["label"]] == "length_at_age_sd_at_reference_ages")
-
-  expect_equal(result[["value"]][6:7], expected_reference_ages)
-  expect_equal(sd_rows[["age"]], expected_reference_ages)
-  expect_equal(sd_rows[["value"]], c(28, 73))
-
-  clear()
-})
-
 ## Edge handling ----
 # Please remove/comment out the test template below if no edge cases are being tested.
 # No edge cases to test.
