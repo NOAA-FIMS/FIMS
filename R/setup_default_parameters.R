@@ -334,9 +334,16 @@ choose_default_Growth_module_type <- function(data) {
 #' Modeling System (FIMS) model. It generates a tibble with fields for
 #' module name, module type, label, value, and estimation type.
 #' @param data A `FIMSFrame` object returned from running [FIMSFrame()] on
-#'   your long input data. Required when `module_type = "VonBertalanffySchnute"`.
+#'   your long input data. Required when `module_type = "VonBertalanffySchnute"`
+#'   or when `module_type = "VonBertalanffyTraditional"` and
+#'   `variability_type = "interpolation"`.
 #' @param module_type A character string specifying the type of growth module.
 #'   The default is `"EWAA"`.
+#' @param variability_type A character string specifying the variability
+#'   parameterization for growth-derived length-at-age products. Traditional
+#'   Von Bertalanffy growth defaults to `"delta_method"` and also supports
+#'   `"interpolation"`. Schnute growth supports `"interpolation"` only. This
+#'   argument is ignored for `"EWAA"`.
 #' @return
 #' A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
@@ -351,10 +358,18 @@ choose_default_Growth_module_type <- function(data) {
 #' }
 setup_default_Growth <- function(
   data = NULL,
-  module_type = c("EWAA", "VonBertalanffySchnute")
+  module_type = c("EWAA", "VonBertalanffySchnute", "VonBertalanffyTraditional"),
+  variability_type = NULL
 ) {
   # Input check
   module_type <- rlang::arg_match(module_type)
+
+  if (!is.null(variability_type)) {
+    variability_type <- rlang::arg_match(
+      variability_type,
+      c("delta_method", "interpolation")
+    )
+  }
 
   if (identical(module_type, "EWAA")) {
     if (!is.null(data)) {
@@ -365,7 +380,12 @@ setup_default_Growth <- function(
       if (!has_weight_at_age) {
         cli::cli_abort(c(
           "{.val EWAA} Growth requires empirical weight-at-age data.",
-          "i" = "Provide {.val weight_at_age} rows or use {.fn setup_default_Growth} with {.code module_type = \"VonBertalanffySchnute\"}."
+          "i" = paste(
+            "Provide {.val weight_at_age} rows or use",
+            "{.fn setup_default_Growth} with",
+            "{.code module_type = \"VonBertalanffySchnute\"} or",
+            "{.code module_type = \"VonBertalanffyTraditional\"}."
+          )
         ))
       }
     }
@@ -382,80 +402,211 @@ setup_default_Growth <- function(
     return(default)
   }
 
-  if (is.null(data)) {
-    cli::cli_abort(c(
-      "{.fn setup_default_Growth} requires {.var data} when {.code module_type = \"VonBertalanffySchnute\"}.",
-      "i" = "VonBertalanffySchnute defaults use the model ages to choose reference ages."
-    ))
-  }
+  if (identical(module_type, "VonBertalanffySchnute")) {
+    if (!is.null(variability_type) && !identical(variability_type, "interpolation")) {
+      cli::cli_abort(c(
+        "VonBertalanffySchnute growth supports interpolation variability only.",
+        "i" = "Use {.code variability_type = \"interpolation\"} or omit {.var variability_type}."
+      ))
+    }
 
-  is.FIMSFrame(data)
+    if (is.null(data)) {
+      cli::cli_abort(c(
+        "{.fn setup_default_Growth} requires {.var data} when {.code module_type = \"VonBertalanffySchnute\"}.",
+        "i" = "VonBertalanffySchnute defaults use the model ages to choose reference ages."
+      ))
+    }
 
-  ages <- get_ages(data)
-  if (length(ages) == 0 || all(is.na(ages))) {
-    reference_age_for_length_young <- 0
-    n_ages <- get_n_ages(data)
-    reference_age_for_length_old <- if (n_ages > 0) n_ages - 1 else 0
-  } else {
-    reference_age_for_length_young <- min(ages, na.rm = TRUE)
-    reference_age_for_length_old <- max(ages, na.rm = TRUE)
-  }
+    is.FIMSFrame(data)
 
-  # Use interpolation SD anchors as the default von Bertalanffy--Schnute variability path.
-  # The delta-method wiring is retained in the backend, but it is not used
-  # in the default setup until it is re-derived for the traditional Von
-  # Bertalanffy parameterization.
-  default <- setup_default_parameters_template(n_parameters = 9) |>
-    dplyr::mutate(
-      module_name = "Growth",
-      module_type = "VonBertalanffySchnute",
-      label = c(
-        "mean_length_young",
-        "mean_length_old",
-        "growth_coefficient",
-        "reference_age_for_length_young",
-        "reference_age_for_length_old",
-        "length_weight_a",
-        "length_weight_b",
-        "length_at_age_sd_at_reference_ages",
-        "length_at_age_sd_at_reference_ages"
-      ),
-      age = c(
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        reference_age_for_length_young,
-        reference_age_for_length_old
-      ),
-      value = c(
-        275,
-        725,
-        0.18,
-        reference_age_for_length_young,
-        reference_age_for_length_old,
-        2.5e-11,
-        3,
-        28,
-        73
-      ),
-      estimation_type = c(
-        "fixed_effects",
-        "fixed_effects",
-        "fixed_effects",
-        "constant",
-        "constant",
-        "constant",
-        "constant",
-        "constant",
-        "constant"
+    ages <- get_ages(data)
+    if (length(ages) == 0 || all(is.na(ages))) {
+      reference_age_for_length_young <- 0
+      n_ages <- get_n_ages(data)
+      reference_age_for_length_old <- if (n_ages > 0) n_ages - 1 else 0
+    } else {
+      reference_age_for_length_young <- min(ages, na.rm = TRUE)
+      reference_age_for_length_old <- max(ages, na.rm = TRUE)
+    }
+
+    default <- setup_default_parameters_template(n_parameters = 9) |>
+      dplyr::mutate(
+        module_name = "Growth",
+        module_type = "VonBertalanffySchnute",
+        label = c(
+          "mean_length_young",
+          "mean_length_old",
+          "growth_coefficient",
+          "reference_age_for_length_young",
+          "reference_age_for_length_old",
+          "length_weight_a",
+          "length_weight_b",
+          "length_at_age_sd_at_reference_ages",
+          "length_at_age_sd_at_reference_ages"
+        ),
+        age = c(
+          NA_real_,
+          NA_real_,
+          NA_real_,
+          NA_real_,
+          NA_real_,
+          NA_real_,
+          NA_real_,
+          reference_age_for_length_young,
+          reference_age_for_length_old
+        ),
+        value = c(
+          275,
+          725,
+          0.18,
+          reference_age_for_length_young,
+          reference_age_for_length_old,
+          2.5e-11,
+          3,
+          28,
+          73
+        ),
+        estimation_type = c(
+          "fixed_effects",
+          "fixed_effects",
+          "fixed_effects",
+          "constant",
+          "constant",
+          "constant",
+          "constant",
+          "constant",
+          "constant"
+        )
       )
-    )
 
-  return(default)
+    return(default)
+  }
+
+  if (identical(module_type, "VonBertalanffyTraditional")) {
+    if (is.null(variability_type)) {
+      variability_type <- "delta_method"
+    }
+
+    if (identical(variability_type, "interpolation")) {
+      if (is.null(data)) {
+        cli::cli_abort(c(
+          "{.fn setup_default_Growth} requires {.var data} when using traditional Von Bertalanffy interpolation variability.",
+          "i" = "Interpolation defaults use the model ages to choose reference ages."
+        ))
+      }
+
+      is.FIMSFrame(data)
+
+      ages <- get_ages(data)
+      if (length(ages) == 0 || all(is.na(ages))) {
+        reference_age_for_length_young <- 0
+        n_ages <- get_n_ages(data)
+        reference_age_for_length_old <- if (n_ages > 0) n_ages - 1 else 0
+      } else {
+        reference_age_for_length_young <- min(ages, na.rm = TRUE)
+        reference_age_for_length_old <- max(ages, na.rm = TRUE)
+      }
+
+      default <- setup_default_parameters_template(n_parameters = 9) |>
+        dplyr::mutate(
+          module_name = "Growth",
+          module_type = "VonBertalanffyTraditional",
+          label = c(
+            "asymptotic_length",
+            "growth_coefficient",
+            "age_at_zero_length",
+            "length_weight_a",
+            "length_weight_b",
+            "reference_age_for_length_young",
+            "reference_age_for_length_old",
+            "length_at_age_sd_at_reference_ages",
+            "length_at_age_sd_at_reference_ages"
+          ),
+          age = c(
+            NA_real_,
+            NA_real_,
+            NA_real_,
+            NA_real_,
+            NA_real_,
+            NA_real_,
+            NA_real_,
+            reference_age_for_length_young,
+            reference_age_for_length_old
+          ),
+          value = c(
+            725,
+            0.18,
+            -0.5,
+            2.5e-11,
+            3,
+            reference_age_for_length_young,
+            reference_age_for_length_old,
+            28,
+            73
+          ),
+          estimation_type = c(
+            "fixed_effects",
+            "fixed_effects",
+            "fixed_effects",
+            "constant",
+            "constant",
+            "constant",
+            "constant",
+            "constant",
+            "constant"
+          )
+        )
+
+      return(default)
+    }
+
+    default <- setup_default_parameters_template(n_parameters = 11) |>
+      dplyr::mutate(
+        module_name = "Growth",
+        module_type = "VonBertalanffyTraditional",
+        label = c(
+          "asymptotic_length",
+          "growth_coefficient",
+          "age_at_zero_length",
+          "length_weight_a",
+          "length_weight_b",
+          "log_sd_asymptotic_length",
+          "log_sd_growth_coefficient",
+          "log_sd_age_at_zero_length",
+          "asymptotic_length_growth_coefficient_logit_corr",
+          "asymptotic_length_age_at_zero_length_logit_corr",
+          "growth_coefficient_age_at_zero_length_logit_corr"
+        ),
+        value = c(
+          725,
+          0.18,
+          -0.5,
+          2.5e-11,
+          3,
+          log(0.1),
+          log(0.1),
+          log(0.1),
+          0,
+          0,
+          0
+        ),
+        estimation_type = c(
+          "fixed_effects",
+          "fixed_effects",
+          "fixed_effects",
+          "constant",
+          "constant",
+          "constant",
+          "constant",
+          "constant",
+          "constant",
+          "constant",
+          "constant"
+        )
+      )
+
+    return(default)
+  }
 }
 
 #' Set up default population parameters

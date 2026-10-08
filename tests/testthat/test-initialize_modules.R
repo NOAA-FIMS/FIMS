@@ -274,6 +274,40 @@ test_that("`initialize_growth()` works with correct inputs", {
   clear()
 })
 
+test_that("`initialize_growth()` supports traditional von Bertalanffy variability paths", {
+  traditional_delta <- setup_default_Growth(
+    module_type = "VonBertalanffyTraditional"
+  )
+
+  traditional_delta_growth <- initialize_growth(
+    parameters = traditional_delta,
+    data = data
+  )
+
+  #' @description Test that `initialize_growth()` supports traditional Von Bertalanffy delta-method defaults.
+  expect_type(traditional_delta_growth, "S4")
+  expect_true(traditional_delta_growth$add_to_fims_tmb())
+
+  clear()
+
+  traditional_interpolation <- setup_default_Growth(
+    data = data,
+    module_type = "VonBertalanffyTraditional",
+    variability_type = "interpolation"
+  )
+
+  traditional_interpolation_growth <- initialize_growth(
+    parameters = traditional_interpolation,
+    data = data
+  )
+
+  #' @description Test that `initialize_growth()` supports traditional Von Bertalanffy interpolation defaults.
+  expect_type(traditional_interpolation_growth, "S4")
+  expect_true(traditional_interpolation_growth$add_to_fims_tmb())
+
+  clear()
+})
+
 # test_initialize_maturity ----
 ## IO correctness ----
 test_that("`initialize_maturity()` works with correct inputs", {

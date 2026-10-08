@@ -7,7 +7,7 @@
 #' one lines, that will be used in the bookdown report of the results from
 #' {testthat}. This line can be more than 80 characters.
 
-# VonBertalanffySchnute growth convergence ----
+# Von Bertalanffy growth integration ----
 ## Setup ----
 make_vonb_parameters <- function(fims_frame) {
   default_parameters <- FIMS::setup_default_parameters(data = fims_frame)
@@ -27,6 +27,22 @@ make_vonb_convergence_context <- function() {
   fims_frame <- FIMS::FIMSFrame(data_big)
 
   parameters <- make_vonb_parameters(fims_frame)
+
+  list(
+    data = fims_frame,
+    parameters = parameters
+  )
+}
+
+make_vonb_traditional_context <- function() {
+  data("data_big", package = "FIMS")
+  fims_frame <- FIMS::FIMSFrame(data_big)
+
+  parameters <- FIMS::setup_default_parameters(data = fims_frame) |>
+    dplyr::filter(.data[["module_name"]] != "Growth") |>
+    dplyr::bind_rows(
+      FIMS::setup_default_Growth(module_type = "VonBertalanffyTraditional")
+    )
 
   list(
     data = fims_frame,
@@ -519,6 +535,32 @@ test_that("von bertalanffy report defaults to lightweight derived age-to-length 
 
   #' @description Test that default reporting does not materialize the full derived age-to-length conversion tensor.
   expect_equal(length(report[["age_to_length_conversion_derived"]][[1]]), 0)
+})
+
+test_that("traditional von bertalanffy uses the growth-derived age-to-length path", {
+  ctx <- make_vonb_traditional_context()
+  on.exit(
+    {
+      rm(ctx)
+      gc()
+    },
+    add = TRUE
+  )
+
+  fit <- ctx$parameters |>
+    FIMS::initialize_fims(data = ctx$data) |>
+    FIMS::fit_fims(optimize = FALSE, get_sd = FALSE)
+
+  report <- FIMS::get_report(fit)
+
+  #' @description Test that traditional Von Bertalanffy growth selects the growth-derived age-to-length conversion path.
+  expect_equal(report[["age_to_length_conversion_derived_used"]][[1]][1], 1)
+
+  #' @description Test that traditional Von Bertalanffy growth does not fall back to the fixed age-to-length matrix.
+  expect_equal(length(report[["age_to_length_conversion"]][[1]]), 0)
+
+  #' @description Test that traditional Von Bertalanffy growth reports fleet-mapped mean weight-at-age.
+  expect_gt(length(report[["growth_derived_mean_WAA"]][[1]]), 0)
 })
 
 test_that("von bertalanffy uses fleet length-comp bins when fixed fleet age-to-length conversion rows are absent", {
