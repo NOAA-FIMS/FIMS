@@ -26,7 +26,11 @@ namespace fims_popdy {
  * - single sex (n_sexes = 1)
  * - no time variation (n_years = 1)
  * - fixed mean-growth parameters
- * - interpolation or covariance-based delta-method variability
+ *
+ * Supported length-at-age SD methods:
+ * - Von Bertalanffy (Schnute): interpolation
+ * - Von Bertalanffy (traditional): interpolation or covariance-based
+ *   delta method
  */
 template <typename Type>
 class GrowthModel : public GrowthModelBase<Type> {
@@ -101,41 +105,6 @@ class GrowthModel : public GrowthModelBase<Type> {
     needs_update_ = true;
   }
 
-  /// Set the covariance values used by the delta-method growth
-  /// variability path.
-  ///
-  /// The supplied covariance must match the current log-scale FIMS
-  /// VonBertalanffySchnute estimation parameterization in this exact order:
-  /// 1. log(mean_length_young)
-  /// 2. log(mean_length_old)
-  /// 3. log(growth_coefficient)
-  void SetGrowthParameterCovariance(
-      Type mean_length_young_variance,
-      Type mean_length_young_mean_length_old_covariance,
-      Type mean_length_young_growth_coefficient_covariance,
-      Type mean_length_old_variance,
-      Type mean_length_old_growth_coefficient_covariance,
-      Type growth_coefficient_variance) {
-    ValidateGrowthParameterCovariance(
-        mean_length_young_variance,
-        mean_length_young_mean_length_old_covariance,
-        mean_length_young_growth_coefficient_covariance,
-        mean_length_old_variance, mean_length_old_growth_coefficient_covariance,
-        growth_coefficient_variance);
-
-    mean_length_young_variance_ = mean_length_young_variance;
-    mean_length_young_mean_length_old_covariance_ =
-        mean_length_young_mean_length_old_covariance;
-    mean_length_young_growth_coefficient_covariance_ =
-        mean_length_young_growth_coefficient_covariance;
-    mean_length_old_variance_ = mean_length_old_variance;
-    mean_length_old_growth_coefficient_covariance_ =
-        mean_length_old_growth_coefficient_covariance;
-    growth_coefficient_variance_ = growth_coefficient_variance;
-    use_delta_method_variability_ = true;
-    needs_update_ = true;
-  }
-
   /// Set covariance values used by the traditional delta-method growth
   /// variability path.
   ///
@@ -174,12 +143,6 @@ class GrowthModel : public GrowthModelBase<Type> {
   /// Disable the delta-method growth variability path and return to the
   /// reference-point interpolation path.
   void ClearGrowthParameterCovariance() {
-    mean_length_young_variance_ = static_cast<Type>(0.0);
-    mean_length_young_mean_length_old_covariance_ = static_cast<Type>(0.0);
-    mean_length_young_growth_coefficient_covariance_ = static_cast<Type>(0.0);
-    mean_length_old_variance_ = static_cast<Type>(0.0);
-    mean_length_old_growth_coefficient_covariance_ = static_cast<Type>(0.0);
-    growth_coefficient_variance_ = static_cast<Type>(0.0);
     log_asymptotic_length_variance_ = static_cast<Type>(0.0);
     log_asymptotic_length_log_growth_coefficient_covariance_ =
         static_cast<Type>(0.0);
@@ -285,69 +248,6 @@ class GrowthModel : public GrowthModelBase<Type> {
     return vb_.weight_at_age(age);
   }
 
-  /// Validate that the supplied 3-parameter covariance matrix on the
-  /// log-scale FIMS estimation parameterization is usable for the
-  /// delta-method growth variability path.
-  void ValidateGrowthParameterCovariance(
-      Type mean_length_young_variance,
-      Type mean_length_young_mean_length_old_covariance,
-      Type mean_length_young_growth_coefficient_covariance,
-      Type mean_length_old_variance,
-      Type mean_length_old_growth_coefficient_covariance,
-      Type growth_coefficient_variance) const {
-    if (mean_length_young_variance < Type(0.0) ||
-        mean_length_old_variance < Type(0.0) ||
-        growth_coefficient_variance < Type(0.0)) {
-      throw std::runtime_error("Growth parameter variances must be >= 0");
-    }
-
-    if (mean_length_young_mean_length_old_covariance *
-            mean_length_young_mean_length_old_covariance >
-        mean_length_young_variance * mean_length_old_variance) {
-      throw std::runtime_error(
-          "Growth covariance between mean_length_young and "
-          "mean_length_old is inconsistent with the supplied variances");
-    }
-
-    if (mean_length_young_growth_coefficient_covariance *
-            mean_length_young_growth_coefficient_covariance >
-        mean_length_young_variance * growth_coefficient_variance) {
-      throw std::runtime_error(
-          "Growth covariance between mean_length_young and "
-          "growth_coefficient is inconsistent with the supplied variances");
-    }
-
-    if (mean_length_old_growth_coefficient_covariance *
-            mean_length_old_growth_coefficient_covariance >
-        mean_length_old_variance * growth_coefficient_variance) {
-      throw std::runtime_error(
-          "Growth covariance between mean_length_old and "
-          "growth_coefficient is inconsistent with the supplied variances");
-    }
-
-    const Type determinant =
-        mean_length_young_variance *
-            (mean_length_old_variance * growth_coefficient_variance -
-             mean_length_old_growth_coefficient_covariance *
-                 mean_length_old_growth_coefficient_covariance) -
-        mean_length_young_mean_length_old_covariance *
-            (mean_length_young_mean_length_old_covariance *
-                 growth_coefficient_variance -
-             mean_length_young_growth_coefficient_covariance *
-                 mean_length_old_growth_coefficient_covariance) +
-        mean_length_young_growth_coefficient_covariance *
-            (mean_length_young_mean_length_old_covariance *
-                 mean_length_old_growth_coefficient_covariance -
-             mean_length_young_growth_coefficient_covariance *
-                 mean_length_old_variance);
-
-    if (determinant < Type(0.0)) {
-      throw std::runtime_error(
-          "Growth parameter covariance matrix must be positive "
-          "semi-definite");
-    }
-  }
-
   /// Validate covariance for [log(Linf), log(K), t0].
   void ValidateTraditionalGrowthParameterCovariance(
       Type log_asymptotic_length_variance,
@@ -442,38 +342,7 @@ class GrowthModel : public GrowthModelBase<Type> {
   /// Compute delta-method variance of log length at age using the active
   /// parameterization-specific covariance matrix.
   Type ComputeLogLengthVarianceAtAge(const Type& age) const {
-    switch (growth_parameterization_) {
-      case GrowthParameterization::kSchnute:
-        return ComputeSchnuteLogLengthVarianceAtAge(age);
-      case GrowthParameterization::kTraditional:
-        return ComputeTraditionalLogLengthVarianceAtAge(age);
-    }
-
-    return ComputeSchnuteLogLengthVarianceAtAge(age);
-  }
-
-  /// Compute delta-method variance for the Schnute working-scale parameters.
-  Type ComputeSchnuteLogLengthVarianceAtAge(const Type& age) const {
-    Type d_log_laa_d_log_length_young = Type(0.0);
-    Type d_log_laa_d_log_length_old = Type(0.0);
-    Type d_log_laa_d_log_k = Type(0.0);
-
-    vb_.log_length_at_age_logscale_gradient(age, d_log_laa_d_log_length_young,
-                                            d_log_laa_d_log_length_old,
-                                            d_log_laa_d_log_k);
-
-    return d_log_laa_d_log_length_young * d_log_laa_d_log_length_young *
-               mean_length_young_variance_ +
-           Type(2.0) * d_log_laa_d_log_length_young *
-               d_log_laa_d_log_length_old *
-               mean_length_young_mean_length_old_covariance_ +
-           Type(2.0) * d_log_laa_d_log_length_young * d_log_laa_d_log_k *
-               mean_length_young_growth_coefficient_covariance_ +
-           d_log_laa_d_log_length_old * d_log_laa_d_log_length_old *
-               mean_length_old_variance_ +
-           Type(2.0) * d_log_laa_d_log_length_old * d_log_laa_d_log_k *
-               mean_length_old_growth_coefficient_covariance_ +
-           d_log_laa_d_log_k * d_log_laa_d_log_k * growth_coefficient_variance_;
+    return ComputeTraditionalLogLengthVarianceAtAge(age);
   }
 
   /// Compute delta-method variance for [log(Linf), log(K), t0].
@@ -524,14 +393,6 @@ class GrowthModel : public GrowthModelBase<Type> {
   Type length_sd_reference_age_young_ = static_cast<Type>(0.0);
   Type length_sd_reference_age_old_ = static_cast<Type>(1.0);
   bool use_delta_method_variability_ = false;
-
-  Type mean_length_young_variance_ = static_cast<Type>(0.0);
-  Type mean_length_young_mean_length_old_covariance_ = static_cast<Type>(0.0);
-  Type mean_length_young_growth_coefficient_covariance_ =
-      static_cast<Type>(0.0);
-  Type mean_length_old_variance_ = static_cast<Type>(0.0);
-  Type mean_length_old_growth_coefficient_covariance_ = static_cast<Type>(0.0);
-  Type growth_coefficient_variance_ = static_cast<Type>(0.0);
 
   Type log_asymptotic_length_variance_ = static_cast<Type>(0.0);
   Type log_asymptotic_length_log_growth_coefficient_covariance_ =
