@@ -912,7 +912,9 @@ validate_catch_and_index_units <- function(data) {
       "x" = "Catch and index data have the following units that FIMS does not
       use: {.val {unknown_units}}.",
       "i" = "The {.var unit} of catch and index data must be {.val mt} for
-      weight or {.val number} for numbers."
+      weight or {.val number} for numbers.",
+      "i" = "Use {.code dplyr::count(dplyr::filter(data, type %in% c('catch',
+      'index')), fleet, type, unit)} to find the rows with each unit."
     ))
   }
   mixed_units <- fleet_units |>
@@ -924,7 +926,9 @@ validate_catch_and_index_units <- function(data) {
       "x" = "The following fleet and data types have more than one unit:
       {.val {mixed_labels}}.",
       "i" = "Use 1 unit for all catch rows of a fleet and 1 unit for all index
-      rows of a fleet."
+      rows of a fleet.",
+      "i" = "Use {.code dplyr::count(dplyr::filter(data, type %in% c('catch',
+      'index')), fleet, type, unit)} to find the rows with each unit."
     ))
   }
   invisible(TRUE)
