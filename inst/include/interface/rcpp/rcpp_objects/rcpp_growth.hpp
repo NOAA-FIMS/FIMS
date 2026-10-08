@@ -921,5 +921,397 @@ class VonBertalanffySchnuteGrowthInterface
 #endif
 
 };  // end class
+/**
+ * @brief Rcpp-facing traditional Von Bertalanffy growth module.
+ *
+ * This interface exposes the traditional Linf, K, t0 parameterization while
+ * reusing the shared growth-product adapter used by growth-derived outputs.
+ */
+class VonBertalanffyTraditionalGrowthInterface
+    : public GrowthDerivedObservationInterfaceBase {
+ public:
+  /** @brief Asymptotic length, Linf, on the natural length scale. */
+  VariableVector asymptotic_length;
+  /** @brief Brody growth coefficient, K, on the natural scale. */
+  VariableVector growth_coefficient;
+  /** @brief Theoretical age at length zero, t0, on the natural age scale. */
+  VariableVector age_at_zero_length;
+  /** @brief First reference age for interpolation-based variability. */
+  VariableVector reference_age_for_length_young;
+  /** @brief Second reference age for interpolation-based variability. */
+  VariableVector reference_age_for_length_old;
+  /** @brief Coefficient in the length-weight relationship, W = a * L^b. */
+  VariableVector length_weight_a;
+  /** @brief Exponent in the length-weight relationship, W = a * L^b. */
+  VariableVector length_weight_b;
+  /**
+   * @brief Natural-scale SD values at the two reference ages for the
+   * interpolation path.
+   */
+  VariableVector length_at_age_sd_at_reference_ages;
+  /** @brief Working-scale log-SD for log(asymptotic_length). */
+  VariableVector log_sd_asymptotic_length;
+  /** @brief Working-scale log-SD for log(growth_coefficient). */
+  VariableVector log_sd_growth_coefficient;
+  /** @brief Working-scale log-SD for age_at_zero_length. */
+  VariableVector log_sd_age_at_zero_length;
+  /** @brief Logit correlation for log(Linf) and log(K). */
+  VariableVector asymptotic_length_growth_coefficient_logit_corr;
+  /** @brief Logit correlation for log(Linf) and t0. */
+  VariableVector asymptotic_length_age_at_zero_length_logit_corr;
+  /** @brief Logit correlation for log(K) and t0. */
+  VariableVector growth_coefficient_age_at_zero_length_logit_corr;
+  /** @brief Modeled number of ages used for validation. */
+  SharedInt n_ages = 0;
+
+  /**
+   * @brief Construct a new traditional Von Bertalanffy growth interface.
+   */
+  VonBertalanffyTraditionalGrowthInterface()
+      : GrowthDerivedObservationInterfaceBase() {
+    this->reference_age_for_length_young.resize(0);
+    this->reference_age_for_length_old.resize(0);
+    this->length_at_age_sd_at_reference_ages.resize(0);
+    this->log_sd_asymptotic_length.resize(0);
+    this->log_sd_growth_coefficient.resize(0);
+    this->log_sd_age_at_zero_length.resize(0);
+    this->asymptotic_length_growth_coefficient_logit_corr.resize(0);
+    this->asymptotic_length_age_at_zero_length_logit_corr.resize(0);
+    this->growth_coefficient_age_at_zero_length_logit_corr.resize(0);
+
+    GrowthInterfaceBase::live_objects[this->id] =
+        std::make_shared<VonBertalanffyTraditionalGrowthInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        std::make_shared<VonBertalanffyTraditionalGrowthInterface>(*this));
+  }
+
+  /**
+   * @brief Copy constructor.
+   * @param other Source interface object.
+   */
+  VonBertalanffyTraditionalGrowthInterface(
+      const VonBertalanffyTraditionalGrowthInterface& other)
+      : GrowthDerivedObservationInterfaceBase(other),
+        asymptotic_length(other.asymptotic_length),
+        growth_coefficient(other.growth_coefficient),
+        age_at_zero_length(other.age_at_zero_length),
+        reference_age_for_length_young(other.reference_age_for_length_young),
+        reference_age_for_length_old(other.reference_age_for_length_old),
+        length_weight_a(other.length_weight_a),
+        length_weight_b(other.length_weight_b),
+        length_at_age_sd_at_reference_ages(
+            other.length_at_age_sd_at_reference_ages),
+        log_sd_asymptotic_length(other.log_sd_asymptotic_length),
+        log_sd_growth_coefficient(other.log_sd_growth_coefficient),
+        log_sd_age_at_zero_length(other.log_sd_age_at_zero_length),
+        asymptotic_length_growth_coefficient_logit_corr(
+            other.asymptotic_length_growth_coefficient_logit_corr),
+        asymptotic_length_age_at_zero_length_logit_corr(
+            other.asymptotic_length_age_at_zero_length_logit_corr),
+        growth_coefficient_age_at_zero_length_logit_corr(
+            other.growth_coefficient_age_at_zero_length_logit_corr),
+        n_ages(other.n_ages) {}
+
+  virtual ~VonBertalanffyTraditionalGrowthInterface() {}
+
+  // Return stable module ID used for linking this growth object to populations.
+  virtual uint32_t get_id() { return this->id; }
+
+  virtual double evaluate(double age) {
+    ValidateVonBertalanffyTraditionalGrowthInputs(false);
+
+    fims_popdy::VonBertalanffyTraditionalGrowth<double> vb;
+    vb.asymptotic_length = this->asymptotic_length[0].initial_value_m;
+    vb.growth_coefficient = this->growth_coefficient[0].initial_value_m;
+    vb.age_at_zero_length = this->age_at_zero_length[0].initial_value_m;
+    vb.length_weight_a = this->length_weight_a[0].initial_value_m;
+    vb.length_weight_b = this->length_weight_b[0].initial_value_m;
+
+    return vb.evaluate(0, age);
+  }
+
+  virtual std::string to_json() {
+    std::stringstream ss;
+
+    ss << "{\n";
+    ss << " \"module_name\":\"Growth\",\n";
+    ss << " \"module_type\": \"VonBertalanffyTraditional\",\n";
+    ss << " \"module_id\": " << this->id << ",\n";
+    ss << " \"parameters\": [\n";
+
+    bool first_parameter = true;
+    auto append_parameter = [&](const std::string& name, VariableVector& pv) {
+      if (!first_parameter) {
+        ss << ",\n";
+      }
+      first_parameter = false;
+
+      ss << "{\n";
+      ss << "   \"name\": \"" << name << "\",\n";
+      ss << "   \"id\":" << pv.id_m << ",\n";
+      ss << "   \"type\": \"vector\",\n";
+      ss << "   \"dimensionality\": {\n";
+      ss << "    \"header\": [null],\n";
+      ss << "    \"dimensions\": [" << pv.size() << "]\n";
+      ss << "   },\n";
+      ss << "   \"values\":" << pv << "\n";
+      ss << "}";
+    };
+
+    auto append_optional_parameter = [&](const std::string& name,
+                                         VariableVector& pv) {
+      if (pv.size() > 0) {
+        append_parameter(name, pv);
+      }
+    };
+
+    append_parameter("asymptotic_length", this->asymptotic_length);
+    append_parameter("growth_coefficient", this->growth_coefficient);
+    append_parameter("age_at_zero_length", this->age_at_zero_length);
+    append_parameter("length_weight_a", this->length_weight_a);
+    append_parameter("length_weight_b", this->length_weight_b);
+
+    append_optional_parameter("reference_age_for_length_young",
+                              this->reference_age_for_length_young);
+    append_optional_parameter("reference_age_for_length_old",
+                              this->reference_age_for_length_old);
+    append_optional_parameter("length_at_age_sd_at_reference_ages",
+                              this->length_at_age_sd_at_reference_ages);
+    append_optional_parameter("log_sd_asymptotic_length",
+                              this->log_sd_asymptotic_length);
+    append_optional_parameter("log_sd_growth_coefficient",
+                              this->log_sd_growth_coefficient);
+    append_optional_parameter("log_sd_age_at_zero_length",
+                              this->log_sd_age_at_zero_length);
+    append_optional_parameter(
+        "asymptotic_length_growth_coefficient_logit_corr",
+        this->asymptotic_length_growth_coefficient_logit_corr);
+    append_optional_parameter("asymptotic_length_age_at_zero_length_logit_corr",
+                              this->asymptotic_length_age_at_zero_length_logit_corr);
+    append_optional_parameter(
+        "growth_coefficient_age_at_zero_length_logit_corr",
+        this->growth_coefficient_age_at_zero_length_logit_corr);
+
+    ss << "\n]\n";
+    ss << "}";
+
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+        growth_observation =
+            std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>();
+    std::shared_ptr<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>> vb =
+        std::dynamic_pointer_cast<
+            fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>(
+            growth_observation);
+    if (!vb) {
+      Rcpp::stop(
+          "Failed to create VonBertalanffyTraditional growth-derived "
+          "observation model");
+    }
+
+    vb->id = this->id;
+    vb->UseVonBertalanffyTraditional();
+
+    ValidateVonBertalanffyTraditionalGrowthInputs(true);
+
+    std::stringstream ss;
+    auto load_and_register = [&](VariableVector& pv, fims::Vector<Type>& target,
+                                 const std::string& base_name, bool log_scale) {
+      target.resize(pv.size());
+      for (size_t i = 0; i < pv.size(); i++) {
+        double v = pv[i].initial_value_m;
+        if (log_scale) {
+          if (v <= 0.0) {
+            Rcpp::stop((base_name + " must be > 0").c_str());
+          }
+          v = fims_math::log(v);
+        }
+        target[i] = static_cast<Type>(v);
+        if (pv[i].estimation_type_m.get() == "fixed_effects") {
+          ss.str("");
+          ss << "Growth." << this->id << "." << base_name << "." << pv[i].id_m;
+          info->RegisterParameterName(ss.str());
+          info->RegisterParameter(target[i]);
+        }
+        if (pv[i].estimation_type_m.get() == "random_effects") {
+          ss.str("");
+          ss << "Growth." << this->id << "." << base_name << "." << pv[i].id_m;
+          info->RegisterRandomEffectName(ss.str());
+          info->RegisterRandomEffect(target[i]);
+        }
+      }
+      info->variable_map[pv.id_m] = &target;
+    };
+
+    auto load_optional_and_register =
+        [&](VariableVector& pv, fims::Vector<Type>& target,
+            const std::string& base_name, bool log_scale) {
+          if (pv.size() == 0) {
+            target.resize(0);
+            return;
+          }
+          load_and_register(pv, target, base_name, log_scale);
+        };
+
+    load_and_register(this->asymptotic_length, vb->AsymptoticLengthVector(),
+                      "asymptotic_length", true);
+    load_and_register(this->growth_coefficient, vb->GrowthCoefficientVector(),
+                      "growth_coefficient", true);
+    load_and_register(this->age_at_zero_length, vb->AgeAtZeroLengthVector(),
+                      "age_at_zero_length", false);
+    load_and_register(this->length_weight_a, vb->LengthWeightAVector(),
+                      "length_weight_a", true);
+    load_and_register(this->length_weight_b, vb->LengthWeightBVector(),
+                      "length_weight_b", true);
+
+    load_optional_and_register(this->reference_age_for_length_young,
+                               vb->ReferenceAgeForLengthYoungVector(),
+                               "reference_age_for_length_young", false);
+    load_optional_and_register(this->reference_age_for_length_old,
+                               vb->ReferenceAgeForLengthOldVector(),
+                               "reference_age_for_length_old", false);
+    load_optional_and_register(this->length_at_age_sd_at_reference_ages,
+                               vb->LengthAtAgeSdAtRefAgesVector(),
+                               "length_at_age_sd_at_reference_ages", true);
+
+    load_optional_and_register(this->log_sd_asymptotic_length,
+                               vb->LogSdAsymptoticLengthVector(),
+                               "log_sd_asymptotic_length", false);
+    load_optional_and_register(this->log_sd_growth_coefficient,
+                               vb->LogSdGrowthCoefficientVector(),
+                               "log_sd_growth_coefficient", false);
+    load_optional_and_register(this->log_sd_age_at_zero_length,
+                               vb->LogSdAgeAtZeroLengthVector(),
+                               "log_sd_age_at_zero_length", false);
+    load_optional_and_register(
+        this->asymptotic_length_growth_coefficient_logit_corr,
+        vb->LogitCorrAsymptoticLengthGrowthCoefficientVector(),
+        "asymptotic_length_growth_coefficient_logit_corr", false);
+    load_optional_and_register(
+        this->asymptotic_length_age_at_zero_length_logit_corr,
+        vb->LogitCorrAsymptoticLengthAgeAtZeroLengthVector(),
+        "asymptotic_length_age_at_zero_length_logit_corr", false);
+    load_optional_and_register(
+        this->growth_coefficient_age_at_zero_length_logit_corr,
+        vb->LogitCorrGrowthCoefficientAgeAtZeroLengthVector(),
+        "growth_coefficient_age_at_zero_length_logit_corr", false);
+
+    this->RegisterGrowthObservationInInfo<Type>(growth_observation);
+    return true;
+  }
+
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+    return true;
+  }
+#endif
+
+ private:
+  void ValidateVonBertalanffyTraditionalGrowthInputs(
+      bool require_variability) {
+    if (this->asymptotic_length.size() < 1 ||
+        this->growth_coefficient.size() < 1 ||
+        this->age_at_zero_length.size() < 1 ||
+        this->length_weight_a.size() < 1 || this->length_weight_b.size() < 1) {
+      Rcpp::stop("VonBertalanffyTraditionalGrowth parameters not set");
+    }
+
+    const bool has_sd = this->length_at_age_sd_at_reference_ages.size() > 0;
+    const bool has_any_delta =
+        this->log_sd_asymptotic_length.size() > 0 ||
+        this->log_sd_growth_coefficient.size() > 0 ||
+        this->log_sd_age_at_zero_length.size() > 0 ||
+        this->asymptotic_length_growth_coefficient_logit_corr.size() > 0 ||
+        this->asymptotic_length_age_at_zero_length_logit_corr.size() > 0 ||
+        this->growth_coefficient_age_at_zero_length_logit_corr.size() > 0;
+    const bool has_delta =
+        this->log_sd_asymptotic_length.size() > 0 &&
+        this->log_sd_growth_coefficient.size() > 0 &&
+        this->log_sd_age_at_zero_length.size() > 0 &&
+        this->asymptotic_length_growth_coefficient_logit_corr.size() > 0 &&
+        this->asymptotic_length_age_at_zero_length_logit_corr.size() > 0 &&
+        this->growth_coefficient_age_at_zero_length_logit_corr.size() > 0;
+
+    if (require_variability && !has_sd && !has_any_delta) {
+      Rcpp::stop(
+          "VonBertalanffyTraditionalGrowth requires either "
+          "length_at_age_sd_at_reference_ages or traditional delta-method "
+          "growth variability inputs");
+    }
+
+    if (has_any_delta && !has_delta) {
+      Rcpp::stop(
+          "VonBertalanffyTraditionalGrowth requires all six traditional "
+          "delta-method variability inputs when using that path");
+    }
+
+    if (has_sd && has_any_delta) {
+      Rcpp::stop(
+          "VonBertalanffyTraditionalGrowth requires variability inputs for "
+          "exactly one supported path. Supply either "
+          "length_at_age_sd_at_reference_ages or the full traditional "
+          "delta-method variability inputs, but not both");
+    }
+
+    if (has_sd && this->length_at_age_sd_at_reference_ages.size() != 2) {
+      Rcpp::stop("length_at_age_sd_at_reference_ages must have two values");
+    }
+
+    if (has_sd && (this->reference_age_for_length_young.size() < 1 ||
+                   this->reference_age_for_length_old.size() < 1)) {
+      Rcpp::stop(
+          "VonBertalanffyTraditionalGrowth interpolation variability requires "
+          "reference_age_for_length_young and reference_age_for_length_old");
+    }
+
+    if (has_sd && (this->reference_age_for_length_young.size() != 1 ||
+                   this->reference_age_for_length_old.size() != 1)) {
+      Rcpp::stop(
+          "VonBertalanffyTraditionalGrowth currently supports a single "
+          "interpolation variability parameter set; expected size 1 for each "
+          "reference-age input");
+    }
+
+    if (has_delta &&
+        (this->log_sd_asymptotic_length.size() != 1 ||
+         this->log_sd_growth_coefficient.size() != 1 ||
+         this->log_sd_age_at_zero_length.size() != 1 ||
+         this->asymptotic_length_growth_coefficient_logit_corr.size() != 1 ||
+         this->asymptotic_length_age_at_zero_length_logit_corr.size() != 1 ||
+         this->growth_coefficient_age_at_zero_length_logit_corr.size() != 1)) {
+      Rcpp::stop(
+          "VonBertalanffyTraditionalGrowth currently supports a single "
+          "traditional delta-method variability parameter set; expected size 1 "
+          "for each structured uncertainty input");
+    }
+
+    auto check_positive = [](VariableVector& pv, const std::string& base_name) {
+      for (size_t i = 0; i < pv.size(); i++) {
+        if (pv[i].initial_value_m <= 0.0) {
+          Rcpp::stop((base_name + " must be > 0").c_str());
+        }
+      }
+    };
+
+    check_positive(this->asymptotic_length, "asymptotic_length");
+    check_positive(this->growth_coefficient, "growth_coefficient");
+    check_positive(this->length_weight_a, "length_weight_a");
+    check_positive(this->length_weight_b, "length_weight_b");
+
+    if (has_sd) {
+      check_positive(this->length_at_age_sd_at_reference_ages,
+                     "length_at_age_sd_at_reference_ages");
+    }
+  }
+};
 
 #endif

@@ -43,7 +43,7 @@ void ConfigureTraditionalAdapter(
     double reference_age_for_length_old, double length_weight_a,
     double length_weight_b, double length_at_age_sd_at_reference_age_young,
     double length_at_age_sd_at_reference_age_old) {
-  adapter.UseTraditionalVonBertalanffy();
+  adapter.UseVonBertalanffyTraditional();
   adapter.AsymptoticLengthVector().resize(1);
   adapter.GrowthCoefficientVector().resize(1);
   adapter.AgeAtZeroLengthVector().resize(1);
@@ -200,7 +200,7 @@ TEST(VonBertalanffyGrowthModelAdapter,
 TEST(VonBertalanffyGrowthModelAdapter,
      TraditionalVonBertalanffyUsesDeltaMethodProducts) {
   fims_popdy::VonBertalanffyGrowthModelAdapter<double> adapter;
-  adapter.UseTraditionalVonBertalanffy();
+  adapter.UseVonBertalanffyTraditional();
 
   adapter.AsymptoticLengthVector().resize(1);
   adapter.GrowthCoefficientVector().resize(1);

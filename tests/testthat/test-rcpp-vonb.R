@@ -7,9 +7,9 @@
 #' multiple lines, that will be used in the bookdown report of the results from
 #' {testthat}.
 
-# rcpp von bertalanffy growth ----
+# rcpp von Bertalanffy growth ----
 ## Setup ----
-make_vonb_test_context <- function() {
+make_vonb_schnute_test_context <- function() {
   data("data_big", package = "FIMS")
   fims_frame <- FIMS::FIMSFrame(data_big)
 
@@ -38,7 +38,7 @@ make_vonb_test_context <- function() {
 ad_fabs <- function(x, C = 1e-5) sqrt(x * x + C)
 ad_max <- function(a, b, C = 1e-5) 0.5 * (a + b + ad_fabs(a - b, C))
 
-new_vonb <- function(
+new_vonb_schnute <- function(
   ctx,
   mean_length_young_in = ctx$mean_length_young,
   mean_length_old_in = ctx$mean_length_old,
@@ -81,10 +81,94 @@ new_vonb <- function(
   vb
 }
 
+make_vonb_traditional_test_context <- function() {
+  list(
+    asymptotic_length = 100,
+    growth_coefficient = 0.2,
+    age_at_zero_length = -0.5,
+    reference_age_for_length_young = 1,
+    reference_age_for_length_old = 5,
+    length_weight_a = 1e-5,
+    length_weight_b = 3,
+    length_at_age_sd_at_reference_ages = c(5, 10),
+    log_sd_asymptotic_length = log(0.1),
+    log_sd_growth_coefficient = log(0.1),
+    log_sd_age_at_zero_length = log(0.1),
+    asymptotic_length_growth_coefficient_logit_corr = 0,
+    asymptotic_length_age_at_zero_length_logit_corr = 0,
+    growth_coefficient_age_at_zero_length_logit_corr = 0,
+    n_ages = 10
+  )
+}
+
+new_vonb_traditional <- function(
+  ctx,
+  include_interpolation_variability = TRUE,
+  include_delta_method_variability = FALSE
+) {
+  vb <- methods::new(FIMS::VonBertalanffyTraditionalGrowth)
+
+  vb$asymptotic_length$resize(1)
+  vb$asymptotic_length[1]$value <- ctx$asymptotic_length
+
+  vb$growth_coefficient$resize(1)
+  vb$growth_coefficient[1]$value <- ctx$growth_coefficient
+
+  vb$age_at_zero_length$resize(1)
+  vb$age_at_zero_length[1]$value <- ctx$age_at_zero_length
+
+  vb$length_weight_a$resize(1)
+  vb$length_weight_a[1]$value <- ctx$length_weight_a
+
+  vb$length_weight_b$resize(1)
+  vb$length_weight_b[1]$value <- ctx$length_weight_b
+
+  if (include_interpolation_variability) {
+    vb$reference_age_for_length_young$resize(1)
+    vb$reference_age_for_length_young[1]$value <- ctx$reference_age_for_length_young
+
+    vb$reference_age_for_length_old$resize(1)
+    vb$reference_age_for_length_old[1]$value <- ctx$reference_age_for_length_old
+
+    vb$length_at_age_sd_at_reference_ages$resize(2)
+    vb$length_at_age_sd_at_reference_ages[1]$value <-
+      ctx$length_at_age_sd_at_reference_ages[1]
+    vb$length_at_age_sd_at_reference_ages[2]$value <-
+      ctx$length_at_age_sd_at_reference_ages[2]
+  }
+
+  if (include_delta_method_variability) {
+    vb$log_sd_asymptotic_length$resize(1)
+    vb$log_sd_asymptotic_length[1]$value <- ctx$log_sd_asymptotic_length
+
+    vb$log_sd_growth_coefficient$resize(1)
+    vb$log_sd_growth_coefficient[1]$value <- ctx$log_sd_growth_coefficient
+
+    vb$log_sd_age_at_zero_length$resize(1)
+    vb$log_sd_age_at_zero_length[1]$value <- ctx$log_sd_age_at_zero_length
+
+    vb$asymptotic_length_growth_coefficient_logit_corr$resize(1)
+    vb$asymptotic_length_growth_coefficient_logit_corr[1]$value <-
+      ctx$asymptotic_length_growth_coefficient_logit_corr
+
+    vb$asymptotic_length_age_at_zero_length_logit_corr$resize(1)
+    vb$asymptotic_length_age_at_zero_length_logit_corr[1]$value <-
+      ctx$asymptotic_length_age_at_zero_length_logit_corr
+
+    vb$growth_coefficient_age_at_zero_length_logit_corr$resize(1)
+    vb$growth_coefficient_age_at_zero_length_logit_corr[1]$value <-
+      ctx$growth_coefficient_age_at_zero_length_logit_corr
+  }
+
+  vb$n_ages$set(ctx$n_ages)
+
+  vb
+}
+
 ## IO correctness ----
-test_that("rcpp von bertalanffy growth evaluate() works with correct input", {
-  ctx <- make_vonb_test_context()
-  vb <- new_vonb(ctx)
+test_that("rcpp von Bertalanffy Schnute growth evaluate() works with correct input", {
+  ctx <- make_vonb_schnute_test_context()
+  vb <- new_vonb_schnute(ctx)
   on.exit(
     {
       rm(vb, ctx)
@@ -113,8 +197,161 @@ test_that("rcpp von bertalanffy growth evaluate() works with correct input", {
   )
 })
 
-test_that("rcpp von bertalanffy growth requires interpolation variability inputs", {
-  ctx <- make_vonb_test_context()
+test_that("rcpp von Bertalanffy Traditional growth evaluate() works with correct input", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(ctx)
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+    },
+    add = TRUE
+  )
+
+  age <- 5
+  expected_length_at_age <- ctx$asymptotic_length *
+    (1 - exp(-ctx$growth_coefficient * (age - ctx$age_at_zero_length)))
+  expected_weight_at_age <- ctx$length_weight_a *
+    expected_length_at_age^ctx$length_weight_b
+
+  #' @description Test that VonBertalanffyTraditionalGrowth evaluate() returns
+  #' expected weight-at-age from the Linf, K, t0 mean growth curve.
+  expect_equal(
+    object = vb$evaluate(age),
+    expected = expected_weight_at_age,
+    tolerance = 1e-8
+  )
+})
+
+test_that("rcpp von Bertalanffy Traditional growth serializes module type", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(ctx)
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+    },
+    add = TRUE
+  )
+
+  #' @description Test that VonBertalanffyTraditionalGrowth serializes with the
+  #' public module type used by R-side module selection.
+  expect_equal(
+    jsonlite::fromJSON(vb$to_json())[["module_type"]],
+    "VonBertalanffyTraditional"
+  )
+})
+
+test_that("rcpp von Bertalanffy Traditional growth initializes with interpolation variability", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(
+    ctx,
+    include_interpolation_variability = TRUE,
+    include_delta_method_variability = FALSE
+  )
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  #' @description Test that VonBertalanffyTraditionalGrowth can initialize the TMB
+  #' growth object using interpolation-based length-at-age variability.
+  expect_no_error(vb$add_to_fims_tmb())
+})
+
+test_that("rcpp von Bertalanffy Traditional growth initializes with delta-method variability", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(
+    ctx,
+    include_interpolation_variability = FALSE,
+    include_delta_method_variability = TRUE
+  )
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  #' @description Test that VonBertalanffyTraditionalGrowth can initialize the TMB
+  #' growth object using traditional Linf, K, t0 delta-method variability.
+  expect_no_error(vb$add_to_fims_tmb())
+})
+
+## Edge handling ----
+test_that("rcpp von Bertalanffy Schnute growth rejects fractional ages", {
+  ctx <- make_vonb_schnute_test_context()
+  vb <- new_vonb_schnute(ctx)
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+    },
+    add = TRUE
+  )
+
+  #' @description Test that VonBertalanffySchnuteGrowth evaluate() rejects
+  #' non-integer ages.
+  expect_error(
+    vb$evaluate(ctx$reference_age_for_length_young + 0.5),
+    regexp = "Non-integer age"
+  )
+})
+
+test_that("rcpp von Bertalanffy Schnute growth handles below-range ages", {
+  ctx <- make_vonb_schnute_test_context()
+  vb <- new_vonb_schnute(ctx)
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+    },
+    add = TRUE
+  )
+
+  #' @description Test that VonBertalanffySchnuteGrowth evaluate() errors for
+  #' negative ages below the supported model age domain.
+  expect_error(
+    vb$evaluate(-1),
+    regexp = "Negative age"
+  )
+})
+
+test_that("rcpp von Bertalanffy Schnute growth allows above-reference ages", {
+  ctx <- make_vonb_schnute_test_context()
+
+  #' @description Force reference_age_for_length_old to be one age lower so we can test
+  #' an above-reference age that is still inside evaluate() bounds.
+  ctx_shift <- ctx
+  ctx_shift$reference_age_for_length_old <- max(
+    ctx$reference_age_for_length_young + 1,
+    ctx$reference_age_for_length_old - 1
+  )
+
+  vb <- new_vonb_schnute(ctx_shift)
+  on.exit(
+    {
+      rm(vb, ctx_shift, ctx)
+      gc()
+    },
+    add = TRUE
+  )
+
+  age_above_ref <- ctx_shift$reference_age_for_length_old + 1
+  expect_true(age_above_ref <= max(FIMS::get_ages(ctx_shift$fims_frame), na.rm = TRUE))
+
+  expect_true(is.finite(vb$evaluate(age_above_ref)))
+})
+
+## Error handling ----
+test_that("rcpp von Bertalanffy Schnute growth requires interpolation variability inputs", {
+  ctx <- make_vonb_schnute_test_context()
   vb <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
 
   vb$mean_length_young$resize(1)
@@ -144,6 +381,7 @@ test_that("rcpp von bertalanffy growth requires interpolation variability inputs
     {
       rm(vb, ctx)
       gc()
+      FIMS::clear()
     },
     add = TRUE
   )
@@ -155,75 +393,86 @@ test_that("rcpp von bertalanffy growth requires interpolation variability inputs
     regexp = "requires length_at_age_sd_at_reference_ages"
   )
 })
-## Edge handling ----
-test_that("rcpp von bertalanffy growth rejects fractional ages", {
-  ctx <- make_vonb_test_context()
-  vb <- new_vonb(ctx)
+
+test_that("rcpp von Bertalanffy Traditional growth requires variability inputs", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(
+    ctx,
+    include_interpolation_variability = FALSE,
+    include_delta_method_variability = FALSE
+  )
   on.exit(
     {
       rm(vb, ctx)
       gc()
+      FIMS::clear()
     },
     add = TRUE
   )
 
-  #' @description Test that VonBertalanffySchnuteGrowth evaluate() rejects
-  #' non-integer ages.
+  #' @description Test that VonBertalanffyTraditionalGrowth model initialization
+  #' requires either interpolation or delta-method variability inputs.
   expect_error(
-    vb$evaluate(ctx$reference_age_for_length_young + 0.5),
-    regexp = "Non-integer age"
+    vb$add_to_fims_tmb(),
+    regexp = "requires either length_at_age_sd_at_reference_ages"
   )
 })
 
-test_that("rcpp von bertalanffy growth handles below-range ages", {
-  ctx <- make_vonb_test_context()
-  vb <- new_vonb(ctx)
+test_that("rcpp von Bertalanffy Traditional growth rejects both variability paths", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(
+    ctx,
+    include_interpolation_variability = TRUE,
+    include_delta_method_variability = TRUE
+  )
   on.exit(
     {
       rm(vb, ctx)
       gc()
+      FIMS::clear()
     },
     add = TRUE
   )
 
-  #' @description Test that VonBertalanffySchnuteGrowth evaluate() errors for
-  #' negative ages below the supported model age domain.
+  #' @description Test that VonBertalanffyTraditionalGrowth rejects configurations
+  #' that supply both interpolation and delta-method variability inputs.
   expect_error(
-    vb$evaluate(-1),
-    regexp = "Negative age"
+    vb$add_to_fims_tmb(),
+    regexp = "exactly one supported path"
   )
 })
 
-test_that("rcpp von bertalanffy growth allows above-reference ages", {
-  ctx <- make_vonb_test_context()
-
-  #' @description Force reference_age_for_length_old to be one age lower so we can test
-  #' an above-reference age that is still inside evaluate() bounds.
-  ctx_shift <- ctx
-  ctx_shift$reference_age_for_length_old <- max(
-    ctx$reference_age_for_length_young + 1,
-    ctx$reference_age_for_length_old - 1
+test_that("rcpp von Bertalanffy Traditional growth rejects partial delta-method variability inputs", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(
+    ctx,
+    include_interpolation_variability = FALSE,
+    include_delta_method_variability = FALSE
   )
 
-  vb <- new_vonb(ctx_shift)
+  vb$log_sd_asymptotic_length$resize(1)
+  vb$log_sd_asymptotic_length[1]$value <- ctx$log_sd_asymptotic_length
+
   on.exit(
     {
-      rm(vb, ctx_shift, ctx)
+      rm(vb, ctx)
       gc()
+      FIMS::clear()
     },
     add = TRUE
   )
 
-  age_above_ref <- ctx_shift$reference_age_for_length_old + 1
-  expect_true(age_above_ref <= max(FIMS::get_ages(ctx_shift$fims_frame), na.rm = TRUE))
-
-  expect_true(is.finite(vb$evaluate(age_above_ref)))
+  #' @description Test that VonBertalanffyTraditionalGrowth rejects incomplete
+  #' traditional delta-method variability inputs.
+  expect_error(
+    vb$add_to_fims_tmb(),
+    regexp = "requires all six traditional delta-method variability inputs"
+  )
 })
 
-## Error handling ----
-test_that("rcpp von bertalanffy growth rejects reversed reference ages", {
-  ctx <- make_vonb_test_context()
-  vb_bad <- new_vonb(
+test_that("rcpp von Bertalanffy Schnute growth rejects reversed reference ages", {
+  ctx <- make_vonb_schnute_test_context()
+  vb_bad <- new_vonb_schnute(
     ctx = ctx,
     reference_age_for_length_young_in = ctx$reference_age_for_length_old,
     reference_age_for_length_old_in = ctx$reference_age_for_length_young
@@ -244,8 +493,8 @@ test_that("rcpp von bertalanffy growth rejects reversed reference ages", {
   )
 })
 
-test_that("rcpp von bertalanffy growth errors when parameters are missing", {
-  ctx <- make_vonb_test_context()
+test_that("rcpp von Bertalanffy Schnute growth errors when parameters are missing", {
+  ctx <- make_vonb_schnute_test_context()
   vb_missing <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
   vb_missing$n_ages$set(FIMS::get_n_ages(ctx$fims_frame))
   on.exit(

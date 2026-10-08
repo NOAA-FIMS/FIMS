@@ -109,7 +109,7 @@ class VonBertalanffyGrowthModelAdapter
   /**
    * @brief Use the traditional Linf, K, t0 parameterization.
    */
-  void UseTraditionalVonBertalanffy() {
+  void UseVonBertalanffyTraditional() {
     mean_growth_parameterization_ = MeanGrowthParameterization::kTraditional;
     growth_products_prepared_ = false;
   }
