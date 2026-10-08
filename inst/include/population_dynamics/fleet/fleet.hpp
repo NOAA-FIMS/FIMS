@@ -51,14 +51,14 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_catch_data; /*!< observed catch data*/
 
-  std::string observed_catch_units; /*!< is this fleet catch in weight*/
+  std::string observed_catch_units; /*!< "weight" or "number" */
 
   // index data
   int fleet_observed_index_data_id_m = -999; /*!< id of index data */
   std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_index_data; /*!< observed index data*/
 
-  std::string observed_index_units; /*!< is this fleet index in weight*/
+  std::string observed_index_units; /*!< "weight" or "number" */
 
   // age comp data
   int fleet_observed_agecomp_data_id_m = -999; /*!< id of age comp data */
