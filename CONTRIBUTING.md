@@ -8,7 +8,7 @@ Please use [GitHub Discussions](https://github.com/orgs/NOAA-FIMS/discussions) i
 
 ## Found a :bug:
 
-Please use [GitHub Issues](https://github.com/NOAA-FIMS/FIMS/issues/new?template=bug_report.yml) to submit a :bug: report. If you have an idea for a well-defined enhancement to FIMS, please use GitHub to submit a [Feature request](https://github.com/NOAA-FIMS/FIMS/issues/new?template=feature_request.yml). Before submitting either of these tickets, please search the [existing issues](https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue) to see if something identical or similar has already been submitted. Once created, Issues are automatically tagged with the `status: triage_needed` tag and placed on the [Issue Triage Board](https://github.com/orgs/NOAA-FIMS/projects/21) where they will be labeled, given an assignee, and given a milestone by those in charge of the triage process.
+Please use [GitHub Issues](https://github.com/NOAA-FIMS/FIMS/issues/new?template=bug_report.yml) to submit a :bug: report. If you have an idea for a well-defined enhancement to FIMS, please use GitHub to submit a [Feature request](https://github.com/NOAA-FIMS/FIMS/issues/new?template=feature_request.yml). Before submitting either of these tickets, please search the [existing issues](https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue) to see if something identical or similar has already been submitted. Once created, Issues are automatically tagged with the `status: triage_needed` tag.
 
 ## Contributing code
 
