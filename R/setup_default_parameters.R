@@ -478,8 +478,9 @@ setup_default_Growth <- function(
 #' for ages below the plus group, and for the plus group \eqn{A}, which
 #' accumulates survivors each year,
 #' \deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}
-#' @param proportion_female A numeric value between 0 and 1 specifying the
-#' proportion of females. Default is `0.5`.
+#' @param proportion_female A numeric value or vector (length equal to the
+#' number of ages) between 0 and 1 specifying the proportion of each age that
+#' is female, which scales spawning biomass. Default is `0.5`.
 #' @inheritParams setup_default_parameters
 #' @return
 #' A tibble of default population configurations, including initial numbers at
@@ -526,16 +527,23 @@ setup_default_Population <- function(
     requirement = "a single numeric value or a vector of length equal to the number of ages"
   )
 
-  # Check proportion_female is a single numeric value between 0 and 1
-  if (!is.numeric(proportion_female) || length(proportion_female) != 1 || proportion_female < 0 || proportion_female > 1) {
-    local_bullets <- c(
-      "i" = "{.var proportion_female} argument must be a single numeric value between 0 and 1.",
-      "x" = "{.var proportion_female} has a length of {length(proportion_female)}.",
-      "x" = "{.var proportion_female} is of the class {class(proportion_female)}."
-    )
-    names(local_bullets)[2] <- ifelse(length(proportion_female) > 1, "x", "i")
-    names(local_bullets)[3] <- ifelse(inherits(proportion_female, "numeric"), "i", "x")
-    cli::cli_abort(local_bullets)
+  # Check proportion_female is a scalar or a full age vector between 0 and 1.
+  assert_numeric_length(
+    x = proportion_female,
+    x_name = "proportion_female",
+    valid_lengths = c(1, n_ages),
+    requirement = "a single numeric value or a vector of length equal to the number of ages"
+  )
+  invalid_proportion <- is.na(proportion_female) |
+    proportion_female < 0 |
+    proportion_female > 1
+  if (any(invalid_proportion)) {
+    cli::cli_abort(c(
+      "x" = "{.var proportion_female} has values that are missing or outside
+      0 to 1: {.val {proportion_female[invalid_proportion]}}.",
+      "i" = "{.var proportion_female} is the proportion of each age that is
+      female, so every value must be between 0 and 1."
+    ))
   }
 
   # If log_init_naa is NA, print a message to the user and advise them to set it
@@ -566,6 +574,7 @@ setup_default_Population <- function(
     ) |>
     dplyr::add_row(
       label = "proportion_female",
+      age = if (length(proportion_female) == 1) NA else ages,
       value = .env$proportion_female,
       estimation_type = "constant"
     ) |>

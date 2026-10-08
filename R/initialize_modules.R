@@ -145,10 +145,6 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
     "n_years", "min_age"
   )
 
-  boolean_fields <- c(
-    "estimate_prop_female"
-  )
-
   real_vector_fields <- c(
     "ages", "weights"
   )
