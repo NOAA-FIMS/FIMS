@@ -113,44 +113,29 @@ test_that("check_sdreport_convergence() works with correct inputs", {
   register_mock_sdreport_summary()
 
   expect_no_warning(
-    out <- FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport)
+    out <- FIMS:::check_sdreport_convergence(obj, opt, sdreport)
   )
-  expect_null(out)
+  expect_equal(
+    out[["check"]],
+    c("hessian", "standard_errors", "condition_number")
+  )
+  expect_equal(out[["severity"]], c("OK", "OK", "OK"))
 
   #' @description Test early return path when pdHess is FALSE.
   obj <- make_mock_obj()
   opt <- list(par = numeric())
   sdreport <- make_mock_sdreport(pdHess = FALSE)
-  out <- NULL
 
-  testthat::with_mocked_bindings(
-    FIMSFit = function(input, obj, opt, sdreport, run_time) {
-      list(
-        tag = "mock_fit",
-        input = input,
-        obj = obj,
-        opt = opt,
-        sdreport = sdreport,
-        run_time = run_time
-      )
-    },
-    print = function(x, ...) invisible(x),
-    {
-      expect_warning(
-        object = out <- FIMS:::check_sdreport_convergence(
-          list(dummy = TRUE),
-          obj,
-          opt,
-          sdreport
-        ),
-        regexp = "Standard error calculations failed convergence checks"
-      )
-    },
-    .package = "FIMS"
+  expect_warning(
+    object = out <- FIMS:::check_sdreport_convergence(
+      obj,
+      opt,
+      sdreport
+    ),
+    regexp = "Standard error calculations failed convergence checks"
   )
-
-  expect_equal(object = out$tag, expected = "mock_fit")
-  expect_identical(object = out$sdreport, expected = sdreport)
+  expect_equal(out[["check"]], "hessian")
+  expect_equal(out[["severity"]], "FAIL")
 
   #' @description Test that `check_sdreport_convergence()` names fixed effects with NA standard errors using the parameter names.
   obj <- make_mock_obj(random = numeric())
@@ -161,8 +146,7 @@ test_that("check_sdreport_convergence() works with correct inputs", {
     report_se = c(0.4, 0.5)
   )
   expect_warning(
-    object = FIMS:::check_sdreport_convergence(
-      list(),
+    object = out <- FIMS:::check_sdreport_convergence(
       obj,
       opt,
       sdreport,
@@ -171,6 +155,11 @@ test_that("check_sdreport_convergence() works with correct inputs", {
     regexp = "1 fixed effect has NA standard error: \"Fleet.1.log_q.3\".",
     fixed = TRUE
   )
+  #' @description Test that `check_sdreport_convergence()` records NA standard errors as a failed check with the count and parameter name.
+  standard_errors <- dplyr::filter(out, check == "standard_errors")
+  expect_equal(standard_errors[["severity"]], "FAIL")
+  expect_equal(standard_errors[["value"]], 1)
+  expect_equal(standard_errors[["parameter"]], "Fleet.1.log_q.3")
 
   #' @description Test that `check_sdreport_convergence()` names random effects with NA standard errors using the random-effect names.
   obj <- make_mock_obj(random = 1)
@@ -181,7 +170,6 @@ test_that("check_sdreport_convergence() works with correct inputs", {
   )
   expect_warning(
     object = FIMS:::check_sdreport_convergence(
-      list(),
       obj,
       opt,
       sdreport,
@@ -203,7 +191,6 @@ test_that("check_sdreport_convergence() works with correct inputs", {
   )
   warning_text <- expect_warning(
     FIMS:::check_sdreport_convergence(
-      list(),
       obj,
       opt,
       sdreport,
@@ -225,7 +212,6 @@ test_that("check_sdreport_convergence() works with correct inputs", {
   )
   warning_text <- expect_warning(
     FIMS:::check_sdreport_convergence(
-      list(),
       obj,
       opt,
       sdreport,
@@ -253,9 +239,13 @@ test_that("check_sdreport_convergence() returns correct outputs for edge cases",
   register_mock_sdreport_summary()
 
   expect_warning(
-    object = FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport),
+    object = out <- FIMS:::check_sdreport_convergence(obj, opt, sdreport),
     regexp = "Unable to extract summary from sdreport"
   )
+  #' @description Test that `check_sdreport_convergence()` records a failed standard error check with an unknown count when the summary cannot be extracted.
+  standard_errors <- dplyr::filter(out, check == "standard_errors")
+  expect_equal(standard_errors[["severity"]], "FAIL")
+  expect_true(is.na(standard_errors[["value"]]))
 
   #' @description Test that `check_sdreport_convergence()` still reports the condition number, without a ranking, when the summary used for ranking fails.
   obj <- make_mock_obj(random = numeric(), hessian = ill_conditioned_hessian)
@@ -263,7 +253,7 @@ test_that("check_sdreport_convergence() returns correct outputs for edge cases",
   sdreport <- make_mock_sdreport(fail_on = "fixed", random_se = numeric())
   warning_text <- expect_warning(
     expect_warning(
-      FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport),
+      FIMS:::check_sdreport_convergence(obj, opt, sdreport),
       regexp = "Unable to extract summary from sdreport"
     ),
     regexp = "Condition number of Hessian"
@@ -281,8 +271,7 @@ test_that("check_sdreport_convergence() returns correct outputs for edge cases",
   )
   warning_text <- expect_warning(
     expect_warning(
-      FIMS:::check_sdreport_convergence(
-        list(),
+      out <- FIMS:::check_sdreport_convergence(
         obj,
         opt,
         sdreport,
@@ -294,6 +283,11 @@ test_that("check_sdreport_convergence() returns correct outputs for edge cases",
   ) |>
     conditionMessage()
   expect_match(warning_text, "1. \"Fleet.1.log_q.3\"", fixed = TRUE)
+  #' @description Test that `check_sdreport_convergence()` records a large condition number as a WARN row naming the parameter with the largest standard error.
+  condition_number <- dplyr::filter(out, check == "condition_number")
+  expect_equal(condition_number[["severity"]], "WARN")
+  expect_equal(condition_number[["threshold"]], 1e5)
+  expect_equal(condition_number[["parameter"]], "Fleet.1.log_q.3")
   expect_no_match(warning_text, "NaN|\"a\"|\"b\"")
 
   #' @description Test that `check_sdreport_convergence()` does not rank when every standard error is NA.
@@ -304,7 +298,7 @@ test_that("check_sdreport_convergence() returns correct outputs for edge cases",
   )
   warning_text <- expect_warning(
     expect_warning(
-      FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport),
+      FIMS:::check_sdreport_convergence(obj, opt, sdreport),
       regexp = "sdreport convergence issues detected"
     ),
     regexp = "Large condition number"
@@ -322,7 +316,6 @@ test_that("check_sdreport_convergence() returns correct outputs for edge cases",
   )
   warning_text <- expect_warning(
     FIMS:::check_sdreport_convergence(
-      list(),
       obj,
       opt,
       sdreport,
@@ -342,7 +335,7 @@ test_that("check_sdreport_convergence() returns correct outputs for edge cases",
     report_se = c(0.4, NA_real_)
   )
   warning_text <- expect_warning(
-    FIMS:::check_sdreport_convergence(list(), obj, list(par = c(0, 0)), sdreport)
+    FIMS:::check_sdreport_convergence(obj, list(par = c(0, 0)), sdreport)
   ) |>
     conditionMessage()
   expect_match(warning_text, "\"fixed_2\"", fixed = TRUE)
@@ -358,8 +351,13 @@ test_that("check_sdreport_convergence() returns correct error messages", {
   register_mock_sdreport_summary()
 
   expect_warning(
-    object = FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport),
+    object = out <- FIMS:::check_sdreport_convergence(obj, opt, sdreport),
     regexp = "Unable to extract Hessian for condition number check"
+  )
+  #' @description Test that `check_sdreport_convergence()` records the condition number as not checked when the Hessian cannot be extracted.
+  expect_equal(
+    dplyr::filter(out, check == "condition_number")[["severity"]],
+    "NOTE"
   )
 
   #' @description Test that `check_sdreport_convergence()` warns when there are NA standard errors in fixed, random, and derived summaries.
@@ -374,7 +372,7 @@ test_that("check_sdreport_convergence() returns correct error messages", {
   register_mock_sdreport_summary()
 
   expect_warning(
-    object = FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport),
+    object = FIMS:::check_sdreport_convergence(obj, opt, sdreport),
     regexp = "sdreport convergence issues detected"
   )
 
@@ -390,7 +388,7 @@ test_that("check_sdreport_convergence() returns correct error messages", {
   register_mock_sdreport_summary()
 
   expect_warning(
-    object = FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport),
+    object = FIMS:::check_sdreport_convergence(obj, opt, sdreport),
     regexp = "Large condition number detected in Hessian"
   )
 
@@ -404,7 +402,6 @@ test_that("check_sdreport_convergence() returns correct error messages", {
   )
   expect_snapshot(
     FIMS:::check_sdreport_convergence(
-      list(),
       obj,
       opt,
       sdreport,

@@ -20,7 +20,8 @@ fit_fims(
 \item{input}{Input list as returned by \code{\link[=initialize_fims]{initialize_fims()}}.}
 
 \item{get_sd}{A boolean specifying if the \code{\link[TMB:sdreport]{TMB::sdreport()}} should be
-calculated?}
+calculated? It is skipped when the maximum gradient is above 1 or not
+finite, because standard errors far from the optimum are not meaningful.}
 
 \item{save_sd}{A logical, with the default \code{TRUE}, indicating whether the
 sdreport is returned in the output. If \code{FALSE}, the slot for the report
@@ -55,7 +56,9 @@ and can use several GB of memory. If \code{FALSE}, \code{cov} is \code{NA}.}
 \value{
 An object of class \code{FIMSFit} is returned, where the structure is the same
 regardless if \code{optimize = TRUE} or not. Uncertainty information is only
-included in the \code{estimates} slot if \code{get_sd = TRUE}.
+included in the \code{estimates} slot if \code{get_sd = TRUE}. The result of each
+convergence check is stored on the object and returned by
+\code{\link[=get_convergence]{get_convergence()}}.
 }
 \description{
 Fit a FIMS model (BETA)
