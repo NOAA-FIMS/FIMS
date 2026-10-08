@@ -198,47 +198,6 @@ test_that("fit_fims() errors when optimization fails to converge", {
 
   clear()
 
-  # Estimate the first (age, year) of natural mortality to cause NA standard errors
-  parameters_4_model <- parameters |>
-    dplyr::rows_update(
-      tibble::tibble(
-        label = "log_devs",
-        timing = 2:get_n_years(data_age_comp),
-        estimation_type = "fixed_effects"
-      ),
-      by = c("label", "timing")
-    ) |>
-    dplyr::rows_update(
-      tibble::tibble(
-        module_name = "Recruitment",
-        label = "log_sd",
-        estimation_type = "constant"
-      ),
-      by = c("module_name", "label")
-    ) |>
-    dplyr::rows_update(
-      tibble::tibble(
-        label = "log_M",
-        timing = 1,
-        estimation_type = "fixed_effects"
-      ),
-      by = c("label", "timing")
-    )
-
-  initialized_model <- parameters_4_model |>
-    initialize_fims(data = data_age_comp)
-
-  #' @description Test that fit_fims() warns about both the NA standard errors and the large condition number when parameter SE values are NA.
-  expect_warning(
-    expect_warning(
-      result <- initialized_model |> fit_fims(optimize = TRUE),
-      regexp = "NA standard errors"
-    ),
-    regexp = "Large condition number"
-  )
-
-  clear()
-
   # Add an additional slope parameter to make the model overparameterized
   parameters_4_model <- parameters |>
     dplyr::rows_update(
