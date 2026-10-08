@@ -240,7 +240,7 @@ test_that("run_fims_likelihood() returns correct error messages", {
       n_cores = 1,
       length = 3
     ),
-    regexp = "module_name not found"
+    regexp = "\"nonexistent_module\" not found"
   )
 
   #' @description Test that run_fims_likelihood errors when parameter_name is not in module_name.
