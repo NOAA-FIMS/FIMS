@@ -242,6 +242,122 @@ test_that("rcpp von Bertalanffy Traditional growth serializes module type", {
   )
 })
 
+test_that("rcpp von Bertalanffy Traditional growth finalizes JSON values from runtime storage", {
+  data("data_big", package = "FIMS")
+  fims_frame <- FIMS::FIMSFrame(data_big)
+
+  parameters <- FIMS::setup_default_parameters(data = fims_frame) |>
+    dplyr::filter(.data[["module_name"]] != "Growth") |>
+    dplyr::bind_rows(
+      FIMS::setup_default_Growth(module_type = "VonBertalanffyTraditional")
+    )
+
+  input <- parameters |>
+    FIMS::initialize_fims(data = fims_frame)
+
+  on.exit(
+    {
+      rm(input, parameters, fims_frame)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  fixed_effects <- input[["parameters"]][["p"]]
+  names(fixed_effects) <- names(FIMS::get_parameter_names(fixed_effects))
+
+  asymptotic_length_name <- names(fixed_effects)[
+    grepl("\\.asymptotic_length\\.", names(fixed_effects))
+  ]
+  growth_coefficient_name <- names(fixed_effects)[
+    grepl("\\.growth_coefficient\\.", names(fixed_effects))
+  ]
+  age_at_zero_length_name <- names(fixed_effects)[
+    grepl("\\.age_at_zero_length\\.", names(fixed_effects))
+  ]
+
+  expect_length(asymptotic_length_name, 1)
+  expect_length(growth_coefficient_name, 1)
+  expect_length(age_at_zero_length_name, 1)
+
+  fixed_effects[[asymptotic_length_name]] <- log(123)
+  fixed_effects[[growth_coefficient_name]] <- log(0.321)
+  fixed_effects[[age_at_zero_length_name]] <- -1.25
+
+  FIMS::set_fixed(fixed_effects)
+
+  growth_estimates <- FIMS:::reshape_json_estimates(
+    input[["model"]]$get_output()
+  ) |>
+    dplyr::filter(
+      .data[["module_name"]] == "Growth",
+      .data[["module_type"]] == "VonBertalanffyTraditional"
+    )
+
+  expected_fixed_effects <- tibble::tibble(
+    label = c("asymptotic_length", "growth_coefficient", "age_at_zero_length"),
+    expected = c(123, 0.321, -1.25)
+  )
+
+  reported_fixed_effects <- growth_estimates |>
+    dplyr::filter(.data[["label"]] %in% expected_fixed_effects[["label"]]) |>
+    dplyr::select(
+      dplyr::all_of(c("label", "input", "estimated"))
+    ) |>
+    dplyr::left_join(expected_fixed_effects, by = "label") |>
+    dplyr::arrange(match(.data[["label"]], expected_fixed_effects[["label"]]))
+
+  #' @description Test that finalized Traditional growth JSON reports all
+  #' expected runtime fixed-effect values, not stale initial values.
+  expect_equal(
+    reported_fixed_effects[["label"]],
+    expected_fixed_effects[["label"]]
+  )
+  expect_equal(
+    reported_fixed_effects[["estimated"]],
+    reported_fixed_effects[["expected"]],
+    tolerance = 1e-6
+  )
+  expect_true(all(
+    abs(reported_fixed_effects[["estimated"]] -
+      reported_fixed_effects[["input"]]) > 1e-6
+  ))
+
+  expected_delta_constants <- tibble::tibble(
+    label = c(
+      "log_sd_asymptotic_length",
+      "log_sd_growth_coefficient",
+      "log_sd_age_at_zero_length",
+      "asymptotic_length_growth_coefficient_logit_corr",
+      "asymptotic_length_age_at_zero_length_logit_corr",
+      "growth_coefficient_age_at_zero_length_logit_corr"
+    ),
+    expected = c(log(0.1), log(0.1), log(0.1), 0, 0, 0)
+  )
+
+  reported_delta_constants <- growth_estimates |>
+    dplyr::filter(.data[["label"]] %in% expected_delta_constants[["label"]]) |>
+    dplyr::select(dplyr::all_of(c("label", "estimated"))) |>
+    dplyr::left_join(expected_delta_constants, by = "label") |>
+    dplyr::arrange(match(.data[["label"]], expected_delta_constants[["label"]]))
+
+  #' @description Test that finalized Traditional growth JSON reports all active
+  #' delta-method constants exactly on their public scales, including valid
+  #' zero-valued correlation parameters.
+  expect_equal(
+    reported_delta_constants[["label"]],
+    expected_delta_constants[["label"]]
+  )
+  expect_equal(
+    reported_delta_constants[["estimated"]],
+    reported_delta_constants[["expected"]],
+    tolerance = 1e-5
+  )
+
+  expect_false("length_at_age_sd_at_reference_ages" %in% growth_estimates[["label"]])
+})
+
 test_that("rcpp von Bertalanffy Traditional growth initializes with interpolation variability", {
   ctx <- make_vonb_traditional_test_context()
   vb <- new_vonb_traditional(
