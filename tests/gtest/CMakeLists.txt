@@ -465,3 +465,11 @@ add_executable(reference_points test_reference_points.cpp)
 add_as_invoker_manifest(reference_points)
 target_link_libraries(reference_points gtest_main fims_test)
 gtest_discover_tests(reference_points)
+
+# Unfished recruitment baseline with age-varying mortality.
+add_executable(population_CatchAtAge_CalculateSBPR0
+  test_population_CatchAtAge_CalculateSBPR0.cpp
+)
+add_as_invoker_manifest(population_CatchAtAge_CalculateSBPR0)
+target_link_libraries(population_CatchAtAge_CalculateSBPR0 gtest_main fims_test)
+gtest_discover_tests(population_CatchAtAge_CalculateSBPR0)

@@ -2,6 +2,8 @@
 
 ## Bug Fixes
 
+* *(CatchAtAge)* Use preceding-age mortality in unfished spawning biomass per recruit. This corrects the Beverton-Holt recruitment baseline for age-varying natural mortality; constant-mortality results are unchanged. Existing fits with age-varying mortality should be refitted when adopting this correction.
+
 * *(CatchAtAge)* Build expected length comps from age comp proportions (#1751)
 * *(devcontainer)* Add missing comma
 * *(fims_likelihood)* Use module_name when selecting the profiled parameter (#1774)

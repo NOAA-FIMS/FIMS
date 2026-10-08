@@ -75,7 +75,7 @@ make_reference_point_test_model <- function() {
   population$n_ages$set(3L)
   population$n_fleets$set(2L)
   population$ages[] <- 1:3
-  population$log_M[] <- log(c(0.2, 0.2, 0.2, 0.3, 0.4, 0.5))
+  population$log_M[] <- log(c(0.2, 0.4, 0.6, 0.3, 0.4, 0.5))
   population$log_init_naa[] <- log(c(1000, 500, 500))
   population$log_init_naa$set_estimation_types("fixed_effects")
   population$proportion_female[] <- 0.5
@@ -124,6 +124,10 @@ test_that("live population reference points preserve parameters and selected bio
   expect_equal(get_fixed(), parameters + log(2))
   set_fixed(parameters)
   first <- get_reference_points(live$model, live$population$get_id(), 1L)
+  # Independent age-varying survival, including the terminal geometric tail.
+  unfished_numbers <- c(1, exp(-0.2), exp(-0.6) / -expm1(-0.6))
+  expected_phi0 <- sum(unfished_numbers * c(1, 2, 3) * plogis((1:3) - 2) * 0.5)
+  expect_equal(first$inputs$recruitment$phi0, expected_phi0)
   expect_equal(first$inputs$recruitment$phi0, result$inputs$recruitment$phi0)
   expect_equal(first$unfished_per_recruit$spawning_biomass, first$inputs$recruitment$phi0)
   expect_false(isTRUE(all.equal(
