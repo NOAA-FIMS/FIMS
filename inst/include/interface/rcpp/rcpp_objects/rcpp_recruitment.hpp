@@ -69,13 +69,6 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 
   /** @copydoc fims_popdy::RecruitmentBase::evaluate_mean */
   virtual double evaluate_mean(double spawners, double phi_0) = 0;
-
-  /**
-   * @brief A method for each child recruitment process interface object to
-   * inherit so each recruitment process option can have a evaluate_process()
-   * function.
-   */
-  virtual double evaluate_process(size_t pos) = 0;
 };
 
 /**
@@ -187,12 +180,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     return BevHolt.evaluate_mean(spawners, phi_0);
   }
-
-  /**
-   * @brief Evaluate recruitment process - returns 0 in this module.
-   * @param pos Position index, e.g., which year.
-   */
-  virtual double evaluate_process(size_t pos) { return 0; }
 
   /**
    * @brief Extracts derived quantities back to the Rcpp interface object from
@@ -464,16 +451,6 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
    */
   virtual double evaluate_mean(double spawners, double phi_0) { return 0; }
 
-  /**
-   * @brief Evaluate recruitment process using the Log--Devs approach.
-   * @param pos Position index, e.g., which year.
-   */
-  virtual double evaluate_process(size_t pos) {
-    fims_popdy::LogDevs<double> LogDevs;
-
-    return LogDevs.evaluate_process(pos);
-  }
-
 #ifdef TMB_MODEL
 
   template <typename Type>
@@ -536,16 +513,6 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
    * @copydoc RecruitmentInterfaceBase::evaluate_mean
    */
   virtual double evaluate_mean(double spawners, double phi_0) { return 0; }
-
-  /**
-   * @brief Evaluate recruitment process using the Log--R approach.
-   * @param pos Position index, e.g., which year.
-   */
-  virtual double evaluate_process(size_t pos) {
-    fims_popdy::LogR<double> LogR;
-
-    return LogR.evaluate_process(pos);
-  }
 
 #ifdef TMB_MODEL
 
