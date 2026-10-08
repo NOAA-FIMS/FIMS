@@ -281,14 +281,17 @@ Remove rows from index to set years to missing data and pass to FIMSFrame
 data_with_missing_index <- data_big |>
   dplyr::filter(!(type == "index" & timing %in% 15:20)) |>
   FIMSFrame()
-data_with_missing_index |> get_data() |> 
-  dplyr::filter(type == "index") |> print(n = 30)
+data_with_missing_index |>
+  get_data() |>
+  dplyr::filter(type == "index") |>
+  print(n = 30)
 
 data_with_missing_age_comp <- data_big |>
   dplyr::filter(!(type == "age_comp" & timing == 17)) |>
   FIMSFrame()
 
-data_with_missing_age_comp |> get_data() |>
+data_with_missing_age_comp |>
+  get_data() |>
   dplyr::filter(type == "age_comp" & (timing >= 16 & timing <= 18)) |>
   print(n = 100)
 
@@ -302,6 +305,8 @@ data_with_missing_index <- data_big |>
     by = c("type", "timing")
   ) |>
   FIMSFrame()
-data_with_missing_index |> get_data() |> 
-  dplyr::filter(type == "index") |> print(n = 30) 
+data_with_missing_index |>
+  get_data() |>
+  dplyr::filter(type == "index") |>
+  print(n = 30)
 ```
