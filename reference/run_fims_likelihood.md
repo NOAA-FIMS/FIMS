@@ -91,7 +91,7 @@ A list with two named elements:
 
   - `year_i` - Year index for the estimate
 
-  - `age_i` - Age index (if applicable)
+  - `age` - Age from the data (if applicable)
 
   - `estimated` - Point estimate value
 

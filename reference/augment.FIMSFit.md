@@ -46,18 +46,19 @@ The returned tibble follows the conventions expected by every
 [`yardstick::metric_set()`](https://yardstick.tidymodels.org/reference/metric_set.html)
 metric function:
 
-|                |                                                       |
-|----------------|-------------------------------------------------------|
-| Column         | Role                                                  |
-| `.truth`       | Observed data value (maps from `observed`)            |
-| `.pred`        | Model-expected value (maps from `expected`)           |
-| `.weight`      | Inverse-variance weight from `uncertainty` (optional) |
-| `label`        | Parameter / quantity label, e.g. `"catch_expected"`   |
-| `fleet`        | Fleet name for fleet rows, otherwise `NA`             |
-| `module_id`    | Unique module identifier                              |
-| `distribution` | Likelihood distribution used for this data stream     |
-| `year_i`       | Year index (present when available in the estimates)  |
-| `age_i`        | Age index (present when available in the estimates)   |
+|                |                                                          |
+|----------------|----------------------------------------------------------|
+| Column         | Role                                                     |
+| `.truth`       | Observed data value (maps from `observed`)               |
+| `.pred`        | Model-expected value (maps from `expected`)              |
+| `.weight`      | Inverse-variance weight from `uncertainty` (optional)    |
+| `label`        | Parameter / quantity label, e.g. `"catch_expected"`      |
+| `fleet`        | Fleet name for fleet rows, otherwise `NA`                |
+| `module_id`    | Unique module identifier                                 |
+| `distribution` | Likelihood distribution used for this data stream        |
+| `year_i`       | Year index (present when available in the estimates)     |
+| `age`          | Age from the data, `NA` for rows without an age          |
+| `length`       | Length bin from the data, `NA` for rows without a length |
 
 ## See also
 

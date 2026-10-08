@@ -165,7 +165,10 @@ this function is safe to call after <code><a href="Cpp_functions.html">clear()</
 from a stored R vector rather than the compiled C++ objective function.</p>
 <p><code>get_sdreport()</code> returns the list from <code><a href="https://rdrr.io/pkg/TMB/man/sdreport.html" class="external-link">TMB::sdreport()</a></code>.</p>
 <p><code>get_estimates()</code> returns a tibble of parameter values and their
-uncertainties from a fitted model.</p>
+uncertainties from a fitted model. The <code>year_i</code> column is a position that
+starts at 1, and the <code>age</code> and <code>length</code> columns are the ages and length bins
+from the data. <code>age</code> is <code>NA</code> if populations have different ages, and both
+are <code>NA</code> for fits saved before they were added to the output.</p>
 <p><code>get_number_of_parameters()</code> returns a vector of integers specifying the
 number of fixed-effect parameters and the number of random-effect parameters
 in the model.</p>

@@ -258,9 +258,6 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~BevertonHoltRecru
 <tr class="memitem:af3f0a12d062eda9b4082994d0675e5e6" id="r_af3f0a12d062eda9b4082994d0675e5e6"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBevertonHoltRecruitmentInterface.html#af3f0a12d062eda9b4082994d0675e5e6">evaluate_mean</a> (double spawners, double phi_0)</td></tr>
 <tr class="memdesc:af3f0a12d062eda9b4082994d0675e5e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluates expected recruitment from the stock&ndash;recruitment relationship before recruitment-process deviations are applied.      <br /></td></tr>
 <tr class="separator:af3f0a12d062eda9b4082994d0675e5e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96c43dd3f7213fd1e054bf3de2f829d9" id="r_a96c43dd3f7213fd1e054bf3de2f829d9"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBevertonHoltRecruitmentInterface.html#a96c43dd3f7213fd1e054bf3de2f829d9">evaluate_process</a> (size_t pos)</td></tr>
-<tr class="memdesc:a96c43dd3f7213fd1e054bf3de2f829d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate recruitment process - returns 0 in this module.  <br /></td></tr>
-<tr class="separator:a96c43dd3f7213fd1e054bf3de2f829d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e183cccdd0aac1162b621b663b2848a" id="r_a4e183cccdd0aac1162b621b663b2848a"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classBevertonHoltRecruitmentInterface.html#a4e183cccdd0aac1162b621b663b2848a">finalize</a> ()</td></tr>
 <tr class="memdesc:a4e183cccdd0aac1162b621b663b2848a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extracts derived quantities back to the Rcpp interface object from the Information object.  <br /></td></tr>
 <tr class="separator:a4e183cccdd0aac1162b621b663b2848a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -446,42 +443,6 @@ static std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInte
 <dl class="section return"><dt>Returns</dt><dd>Expected recruitment before recruitment-process deviations or random effects are applied.     </dd></dl>
 
 <p>Implements <a class="el" href="classRecruitmentInterfaceBase.html#a4e5d162cdccf2170b58aae94ef6d71de">RecruitmentInterfaceBase</a>.</p>
-
-</div>
-</div>
-<a id="a96c43dd3f7213fd1e054bf3de2f829d9" name="a96c43dd3f7213fd1e054bf3de2f829d9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a96c43dd3f7213fd1e054bf3de2f829d9">&#9670;&#160;</a></span>evaluate_process()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual double BevertonHoltRecruitmentInterface::evaluate_process </td>
-          <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>pos</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Evaluate recruitment process - returns 0 in this module. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">pos</td><td>Position index, e.g., which year. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Implements <a class="el" href="classRecruitmentInterfaceBase.html#a0f093ef54561e11fadb92ca96ab5624e">RecruitmentInterfaceBase</a>.</p>
 
 </div>
 </div>

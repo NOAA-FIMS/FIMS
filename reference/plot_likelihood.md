@@ -28,7 +28,7 @@ plot_likelihood(like_fit, group = "label")
 
   A character string or vector specifying the grouping variable(s) for
   likelihood components. Default is `"label"` to group by data type.
-  Must match column name(s) in the estimates data frame
+  Must match column name(s) in the estimates data frame.
 
 ## Value
 

@@ -258,9 +258,6 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~RecruitmentInterf
 <tr class="memitem:a4e5d162cdccf2170b58aae94ef6d71de" id="r_a4e5d162cdccf2170b58aae94ef6d71de"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRecruitmentInterfaceBase.html#a4e5d162cdccf2170b58aae94ef6d71de">evaluate_mean</a> (double spawners, double phi_0)=0</td></tr>
 <tr class="memdesc:a4e5d162cdccf2170b58aae94ef6d71de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluates expected recruitment from the stock&ndash;recruitment relationship before recruitment-process deviations are applied.    <br /></td></tr>
 <tr class="separator:a4e5d162cdccf2170b58aae94ef6d71de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f093ef54561e11fadb92ca96ab5624e" id="r_a0f093ef54561e11fadb92ca96ab5624e"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRecruitmentInterfaceBase.html#a0f093ef54561e11fadb92ca96ab5624e">evaluate_process</a> (size_t pos)=0</td></tr>
-<tr class="memdesc:a0f093ef54561e11fadb92ca96ab5624e"><td class="mdescLeft">&#160;</td><td class="mdescRight">A method for each child recruitment process interface object to inherit so each recruitment process option can have a <a class="el" href="classRecruitmentInterfaceBase.html#a0f093ef54561e11fadb92ca96ab5624e" title="A method for each child recruitment process interface object to inherit so each recruitment process o...">evaluate_process()</a> function.  <br /></td></tr>
-<tr class="separator:a0f093ef54561e11fadb92ca96ab5624e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classFIMSRcppInterfaceBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classFIMSRcppInterfaceBase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></td></tr>
 <tr class="memitem:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase" id="r_a9183d9379777d8be70ab66af1a07f94c"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFIMSRcppInterfaceBase.html#a9183d9379777d8be70ab66af1a07f94c">add_to_fims_tmb</a> ()</td></tr>
 <tr class="memdesc:a9183d9379777d8be70ab66af1a07f94c inherit pub_methods_classFIMSRcppInterfaceBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">A virtual method to inherit to add objects to the TMB model.  <br /></td></tr>
@@ -396,36 +393,6 @@ static std::vector&lt; std::shared_ptr&lt; <a class="el" href="classFIMSRcppInte
 <dl class="section return"><dt>Returns</dt><dd>Expected recruitment before recruitment-process deviations or random effects are applied.   </dd></dl>
 
 <p>Implemented in <a class="el" href="classBevertonHoltRecruitmentInterface.html#af3f0a12d062eda9b4082994d0675e5e6">BevertonHoltRecruitmentInterface</a>, <a class="el" href="classLogDevsRecruitmentInterface.html#a70f2926d3f7061922e12459dffbfd541">LogDevsRecruitmentInterface</a>, and <a class="el" href="classLogRRecruitmentInterface.html#a9a3ab83ec68ece6090bf6a67542e83c5">LogRRecruitmentInterface</a>.</p>
-
-</div>
-</div>
-<a id="a0f093ef54561e11fadb92ca96ab5624e" name="a0f093ef54561e11fadb92ca96ab5624e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f093ef54561e11fadb92ca96ab5624e">&#9670;&#160;</a></span>evaluate_process()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual double RecruitmentInterfaceBase::evaluate_process </td>
-          <td>(</td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>pos</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">pure virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A method for each child recruitment process interface object to inherit so each recruitment process option can have a <a class="el" href="classRecruitmentInterfaceBase.html#a0f093ef54561e11fadb92ca96ab5624e" title="A method for each child recruitment process interface object to inherit so each recruitment process o...">evaluate_process()</a> function. </p>
-
-<p>Implemented in <a class="el" href="classBevertonHoltRecruitmentInterface.html#a96c43dd3f7213fd1e054bf3de2f829d9">BevertonHoltRecruitmentInterface</a>, <a class="el" href="classLogDevsRecruitmentInterface.html#acff514b8c8a196743bc6dbec6fe5a545">LogDevsRecruitmentInterface</a>, and <a class="el" href="classLogRRecruitmentInterface.html#a5a5bc58cf80f5f18d61046eb633886a3">LogRRecruitmentInterface</a>.</p>
 
 </div>
 </div>

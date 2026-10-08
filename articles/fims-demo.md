@@ -559,17 +559,17 @@ fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.0022 to 5e-04 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00707 to 0.00036 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.12565 minutes
+    ## ℹ Total run time was 22.60338 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 5e-04
+    ## ℹ Maximum gradient= 0.00036
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.58014
+    ## ℹ Terminal SB= 1791.58068
 
 ### Oh no! My model didn’t converge! 😨 HELP‼️
 
@@ -620,7 +620,7 @@ log_data_frame[1, ]
 ```
 
     ##                  timestamp   level
-    ## 1 Wed Oct  7 18:30:06 2026 warning
+    ## 1 Thu Oct  8 13:05:33 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ##     user                                    wd
@@ -656,8 +656,8 @@ log_data_frame |> dplyr::filter(level == "warning")
 ```
 
     ##                  timestamp   level
-    ## 1 Wed Oct  7 18:30:06 2026 warning
-    ## 2 Wed Oct  7 18:30:06 2026 warning
+    ## 1 Thu Oct  8 13:05:33 2026 warning
+    ## 2 Thu Oct  8 13:05:33 2026 warning
     ##                                                                   message id
     ## 1 The log_f_multiplier vector is not of size n_years. Filling with zeros.  0
     ## 2              Setting spawning_biomass_ratio vector to size n_years + 1.  1
@@ -820,17 +820,17 @@ high_slope_fit <- parameters_high_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00435 to 0.00069 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00199 to 0.00025 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.20867 minutes
+    ## ℹ Total run time was 21.49433 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00069
+    ## ℹ Maximum gradient= 0.00025
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.59119
+    ## ℹ Terminal SB= 1791.5912
 
 ``` r
 
@@ -843,17 +843,17 @@ low_slope_fit <- parameters_low_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00635 to 0.00063 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00316 to 0.00034 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.18233 minutes
+    ## ℹ Total run time was 22.6274 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00063
+    ## ℹ Maximum gradient= 0.00034
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.5849
+    ## ℹ Terminal SB= 1791.58086
 
 ``` r
 
@@ -954,17 +954,17 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00376 to 0.00029 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00331 to 0.00033 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.13133 minutes
+    ## ℹ Total run time was 22.61846 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00029
+    ## ℹ Maximum gradient= 0.00033
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.29832
     ## • Total NLL= 3164.88132
-    ## ℹ Terminal SB= 1791.01404
+    ## ℹ Terminal SB= 1791.0122
 
 ``` r
 
@@ -987,7 +987,7 @@ get_estimates(age_specific_selectivity_fit) |>
     ## 10 Selectivity         2 AgeSpecific logit_sel… vect…      31          373 surv…
     ## 11 Selectivity         2 AgeSpecific logit_sel… vect…      31          374 surv…
     ## 12 Selectivity         2 AgeSpecific logit_sel… vect…      31          375 surv…
-    ## # ℹ 16 more variables: year_i <int>, age_i <int>, length_i <int>, input <dbl>,
+    ## # ℹ 16 more variables: year_i <int>, age <dbl>, length <dbl>, input <dbl>,
     ## #   estimated <dbl>, expected <dbl>, observed <dbl>, estimation_type <chr>,
     ## #   uncertainty <dbl>, distribution <chr>, input_type <chr>, lpdf <dbl>,
     ## #   likelihood <dbl>, log_sd <dbl>, log_like_cv <dbl>, gradient <dbl>
@@ -1053,17 +1053,17 @@ age_only_fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.0024 to 0.00021 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00197 to 0.00048 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 12.01721 seconds
+    ## ℹ Total run time was 4.48731 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00021
+    ## ℹ Maximum gradient= 0.00048
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 1627.76704
     ## • Total NLL= 1564.08529
-    ## ℹ Terminal SB= 1740.95134
+    ## ℹ Terminal SB= 1740.95
 
 ``` r
 
@@ -1089,17 +1089,17 @@ length_only_fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.01707 to 2e-04 after 3 steps.
+    ## ℹ Maximum gradient went from 0.01823 to 0.00018 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.51927 minutes
+    ## ℹ Total run time was 28.97699 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 2e-04
+    ## ℹ Maximum gradient= 0.00018
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 1568.32685
     ## • Total NLL= 1518.62643
-    ## ℹ Terminal SB= 1722.35137
+    ## ℹ Terminal SB= 1722.36062
 
 ``` r
 

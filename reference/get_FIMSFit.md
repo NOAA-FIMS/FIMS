@@ -108,7 +108,11 @@ objective function.
 [`TMB::sdreport()`](https://rdrr.io/pkg/TMB/man/sdreport.html).
 
 `get_estimates()` returns a tibble of parameter values and their
-uncertainties from a fitted model.
+uncertainties from a fitted model. The `year_i` column is a position
+that starts at 1, and the `age` and `length` columns are the ages and
+length bins from the data. `age` is `NA` if populations have different
+ages, and both are `NA` for fits saved before they were added to the
+output.
 
 `get_number_of_parameters()` returns a vector of integers specifying the
 number of fixed-effect parameters and the number of random-effect
