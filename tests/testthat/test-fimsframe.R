@@ -546,10 +546,11 @@ test_that("FIMSFrame rejects invalid calendar timing", {
 
 test_that("FIMSFrame treats short integer years as calendar years and retains NA", {
   #' @description One- to four-digit numeric and character years are zero-padded to December 31.
+  annual_data <- annual_test_data()
   for (year in c(3L, 25L, 125L, 2025L)) {
-    input <- dplyr::mutate(data_big, timing = ifelse(is.na(timing), NA, year))
+    input <- dplyr::mutate(annual_data, timing = ifelse(is.na(timing), NA, year))
     # Use a single annual slice to avoid combining composition observations.
-    input <- input[is.na(data_big$timing) | data_big$timing == 1, ]
+    input <- input[is.na(annual_data$timing) | annual_data$timing == 1, ]
     numeric_frame <- FIMSFrame(input)
     input$timing <- as.character(input$timing)
     expect_identical(FIMSFrame(input), numeric_frame)
