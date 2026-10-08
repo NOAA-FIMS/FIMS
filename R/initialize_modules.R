@@ -603,7 +603,11 @@ initialize_catch <- function(data, fleet) {
 
   if ("catch" %in% fleet_type) {
     module <- methods::new(Catch, get_n_years(data))
-    module$catch_data[] <- model_catch(data, fleet)
+    # A catch of 0 is left out of the likelihood (-999): dlnorm is NaN at 0,
+    # and setup_default_Fleet() fixes F at effectively 0 for that year.
+    catch_data <- model_catch(data, fleet)
+    catch_data[catch_data == 0] <- -999
+    module$catch_data[] <- catch_data
 
     return(module)
   } else {
@@ -900,6 +904,33 @@ initialize_fims <- function(parameters, data) {
     cli::cli_abort(c(
       "The `estimation_type` must be one of: {valid_estimation_types}.",
       i = "Invalid values found: {invalid_estimation_types}."
+    ))
+  }
+
+  # A catch of 0 is left out of the likelihood (see initialize_catch()), so an
+  # estimated F in that year has nothing in the data to inform it.
+  zero_catch <- get_data(data) |>
+    dplyr::filter(.data$type == "catch", .data$observed == 0) |>
+    dplyr::select(dplyr::all_of(c("fleet", "timing")))
+  estimated_zero_catch_Fmort <- parameters |>
+    dplyr::filter(
+      .data$label == "log_Fmort",
+      .data$estimation_type != "constant"
+    ) |>
+    dplyr::semi_join(zero_catch, by = c("fleet", "timing"))
+  if (NROW(estimated_zero_catch_Fmort) > 0) {
+    zero_catch_labels <- paste(
+      estimated_zero_catch_Fmort[["fleet"]],
+      estimated_zero_catch_Fmort[["timing"]]
+    )
+    cli::cli_warn(c(
+      "!" = "{.var log_Fmort} is estimated for the following {.var fleet} and
+      {.var timing} combinations with a catch of 0: {.val {zero_catch_labels}}.",
+      "i" = "A catch of 0 is left out of the likelihood, so nothing in the
+      data informs fishing mortality in those years.
+      {.fn setup_default_parameters} fixes {.var log_Fmort} at -200 for them.",
+      "i" = "Use {.code dplyr::filter(parameters, label == 'log_Fmort',
+      estimation_type != 'constant')} to find the rows."
     ))
   }
 

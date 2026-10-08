@@ -465,6 +465,72 @@ test_that("`initialize_catch()` works with correct inputs", {
   clear()
 })
 
+test_that("`initialize_catch()` treats a catch of 0 as a year with no fishing", {
+  zero_catch <- dplyr::mutate(
+    data_big,
+    observed = dplyr::if_else(type == "catch" & timing == 3, 0, observed)
+  )
+  #' @description Test that `initialize_catch()` leaves a catch of 0 out of the likelihood.
+  catch_module <- initialize_catch(data = FIMSFrame(zero_catch), fleet = "fleet1")
+  expect_equal(catch_module$catch_data$get_values()[3], -999)
+  clear()
+
+  get_objective <- function(data, parameters) {
+    fit <- parameters |>
+      initialize_fims(data = data) |>
+      fit_fims(optimize = FALSE)
+    objective <- list(
+      jnll = get_report(fit)[["jnll"]],
+      gradient = get_obj(fit)$gr()
+    )
+    clear()
+    objective
+  }
+  zero_catch_frame <- FIMSFrame(zero_catch)
+  default_objective <- get_objective(
+    zero_catch_frame,
+    setup_default_parameters(zero_catch_frame)
+  )
+  # The manual workaround: catch as missing and F fixed at -200 by hand.
+  missing_catch_frame <- dplyr::mutate(
+    zero_catch,
+    observed = dplyr::if_else(type == "catch" & observed == 0, -999, observed)
+  ) |>
+    FIMSFrame()
+  manual_objective <- get_objective(
+    missing_catch_frame,
+    setup_default_parameters(missing_catch_frame) |>
+      dplyr::mutate(
+        fix_year = .data[["label"]] == "log_Fmort" &
+          .data[["fleet"]] == "fleet1" &
+          .data[["timing"]] == 3,
+        value = dplyr::if_else(.data[["fix_year"]], -200, .data[["value"]]),
+        estimation_type = dplyr::if_else(
+          .data[["fix_year"]],
+          "constant",
+          .data[["estimation_type"]]
+        )
+      ) |>
+      dplyr::select(-"fix_year")
+  )
+
+  #' @description Test that a catch of 0 gives a finite objective and gradient.
+  expect_true(is.finite(default_objective[["jnll"]]))
+  expect_true(all(is.finite(default_objective[["gradient"]])))
+  #' @description Test that a catch of 0 gives the same objective as dropping the catch and fixing F by hand.
+  expect_equal(default_objective[["jnll"]], manual_objective[["jnll"]])
+
+  #' @description Test that `initialize_fims()` warns when F is estimated in a year with a catch of 0.
+  expect_warning(
+    initialize_fims(
+      parameters = setup_default_parameters(data),
+      data = zero_catch_frame
+    ),
+    regexp = "catch of 0:\\s+\"fleet1 3\""
+  )
+  clear()
+})
+
 ## Error handling ----
 test_that("`initialize_catch()` returns correct error messages", {
   #' @description Test that `initialize_catch()` handles unknown fleet correctly.
