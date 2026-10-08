@@ -1,5 +1,7 @@
 var NAVTREEINDEX5 =
 {
+"globals_func.html":[4,1,1],
+"globals_type.html":[4,1,2],
 "glossary.html":[0],
 "glossary.html#autotoc_md0":[0,0],
 "glossary.html#autotoc_md1":[0,1],
@@ -247,7 +249,5 @@ var NAVTREEINDEX5 =
 "structfims__data__object_1_1DataObject.html#a64125aaf71ef4e1ab18ec4a1d6a64b7e":[3,0,1,0,23],
 "structfims__data__object_1_1DataObject.html#a6c63a636143aa724ed44992ff3866464":[3,0,1,0,0],
 "structfims__data__object_1_1DataObject.html#a7056b3ea27c50c5a3e86575bc81b826c":[3,0,1,0,19],
-"structfims__data__object_1_1DataObject.html#a93307f3a1c9995c39a9ca51a03d50b65":[3,0,1,0,3],
-"structfims__data__object_1_1DataObject.html#a9564db3e53b2c512b80342c6ae62c46d":[3,0,1,0,1],
-"structfims__data__object_1_1DataObject.html#aacca2ceb7aebd125c99fb0f1a3bd3944":[3,0,1,0,16]
+"structfims__data__object_1_1DataObject.html#a93307f3a1c9995c39a9ca51a03d50b65":[3,0,1,0,3]
 };

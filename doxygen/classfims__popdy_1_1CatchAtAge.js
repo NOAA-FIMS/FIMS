@@ -29,6 +29,7 @@ var classfims__popdy_1_1CatchAtAge =
     [ "CalculateSpawningBiomass", "classfims__popdy_1_1CatchAtAge.html#a739bfeeb1135d24fda13ea87d7ba7c4c", null ],
     [ "CalculateSpawningBiomassRatio", "classfims__popdy_1_1CatchAtAge.html#a037e412d2183c0a23ad3410f6b222ef1", null ],
     [ "CalculateUnfishedBiomass", "classfims__popdy_1_1CatchAtAge.html#a96fd50ab465e1028eb608d05bf3e5137", null ],
+    [ "CalculateUnfishedInitialNumbersAA", "classfims__popdy_1_1CatchAtAge.html#aa34b2871e3b0c0cf0f7ac8b018bc324f", null ],
     [ "CalculateUnfishedNumbersAA", "classfims__popdy_1_1CatchAtAge.html#a2876a340cab1830aff6110b8739d7e01", null ],
     [ "CalculateUnfishedSpawningBiomass", "classfims__popdy_1_1CatchAtAge.html#a8f410d2daae27b9aaaf7c6a32f57ab49", null ],
     [ "EnsureAllFleetAgeToLengthConversion", "classfims__popdy_1_1CatchAtAge.html#a292f850338c18cf28d1a7181ede45f55", null ],
