@@ -47,3 +47,46 @@ test_that("lower proportion_female reduces spawning biomass", {
   expect_true(all(spawning_biomass_low < spawning_biomass_default))
   expect_true(all(spawning_biomass_default < spawning_biomass_high))
 })
+
+test_that("proportion_female by age reaches spawning biomass", {
+  ages <- get_ages(data_4_model)
+  spawning_biomass_for_age_vector <- function(prop_female) {
+    parameters_4_model <- default_parameters |>
+      dplyr::filter(label != "proportion_female") |>
+      dplyr::bind_rows(
+        # Only the proportion_female rows are used, so the message about
+        # log_init_naa being NA does not apply.
+        suppressMessages(setup_default_Population(
+          data = data_4_model,
+          proportion_female = prop_female
+        )) |>
+          dplyr::filter(label == "proportion_female")
+      )
+    fit <- parameters_4_model |>
+      initialize_fims(data = data_4_model) |>
+      fit_fims(optimize = FALSE)
+    spawning_biomass <- get_report(fit)[["spawning_biomass"]][[1]]
+    clear()
+    spawning_biomass
+  }
+  is_young <- ages <= stats::median(ages)
+  spawning_biomass_scalar <- spawning_biomass_for_age_vector(0.5)
+  spawning_biomass_vector <- spawning_biomass_for_age_vector(
+    rep(0.5, length(ages))
+  )
+  spawning_biomass_young <- spawning_biomass_for_age_vector(as.numeric(is_young))
+  spawning_biomass_old <- spawning_biomass_for_age_vector(as.numeric(!is_young))
+  spawning_biomass_all <- spawning_biomass_for_age_vector(rep(1, length(ages)))
+
+  #' @description Test that a constant proportion_female vector by age gives the same spawning biomass as the scalar.
+  expect_equal(spawning_biomass_vector, spawning_biomass_scalar)
+  # Year-1 numbers at age come from the initial numbers, not from spawning
+  # biomass, so year-1 spawning biomass is additive over ages.
+  #' @description Test that year-1 spawning biomass from young-only and old-only females sums to that from all females.
+  expect_equal(
+    spawning_biomass_young[1] + spawning_biomass_old[1],
+    spawning_biomass_all[1]
+  )
+  #' @description Test that each part of the age vector changes spawning biomass.
+  expect_true(spawning_biomass_young[1] > 0 && spawning_biomass_old[1] > 0)
+})

@@ -39,6 +39,16 @@ test_that("`setup_default_Population()` works with edge cases", {
   #' @description Test that vectorized log_M and log_init_naa are accepted.
   expect_s3_class(result, "tbl_df")
 
+  proportion_female_at_age <- seq(0.4, 0.6, length.out = get_n_ages(data))
+  proportion_female_rows <- setup_default_Population(
+    data = data,
+    proportion_female = proportion_female_at_age
+  ) |>
+    dplyr::filter(.data[["label"]] == "proportion_female")
+  #' @description Test that a proportion_female vector by age gives 1 row per age in age order.
+  expect_equal(proportion_female_rows[["age"]], get_ages(data))
+  expect_equal(proportion_female_rows[["value"]], proportion_female_at_age)
+
   clear()
 })
 
@@ -48,6 +58,12 @@ test_that("`setup_default_Population()` returns correct error messages", {
   expect_error(
     object = setup_default_Population(data = data, proportion_female = 2),
     regexp = "between 0 and 1"
+  )
+
+  #' @description Test that a proportion_female vector not of length 1 or the number of ages returns expected error.
+  expect_error(
+    object = setup_default_Population(data = data, proportion_female = c(0.4, 0.6)),
+    regexp = "proportion_female"
   )
 
   #' @description Test that invalid log_M length returns expected error.
