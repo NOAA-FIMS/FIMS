@@ -898,6 +898,38 @@ validate_fleets_have_observations <- function(data) {
   invisible(TRUE)
 }
 
+# Each fleet fits catch and index to expected weight (mt) or expected numbers,
+# chosen from `unit`. Any other unit would be fit as weight without a message,
+# and the model holds one unit per fleet for catch and one for index.
+validate_catch_and_index_units <- function(data) {
+  fleet_units <- data |>
+    dplyr::filter(.data[["type"]] %in% c("catch", "index")) |>
+    dplyr::select(dplyr::all_of(c("type", "fleet", "unit"))) |>
+    dplyr::distinct()
+  unknown_units <- setdiff(fleet_units[["unit"]], c("mt", "number"))
+  if (length(unknown_units) > 0) {
+    cli::cli_abort(c(
+      "x" = "Catch and index data have the following units that FIMS does not
+      use: {.val {unknown_units}}.",
+      "i" = "The {.var unit} of catch and index data must be {.val mt} for
+      weight or {.val number} for numbers."
+    ))
+  }
+  mixed_units <- fleet_units |>
+    dplyr::filter(dplyr::n() > 1, .by = dplyr::all_of(c("type", "fleet"))) |>
+    dplyr::distinct(.data[["type"]], .data[["fleet"]])
+  if (NROW(mixed_units) > 0) {
+    mixed_labels <- paste(mixed_units[["fleet"]], mixed_units[["type"]])
+    cli::cli_abort(c(
+      "x" = "The following fleet and data types have more than one unit:
+      {.val {mixed_labels}}.",
+      "i" = "Use 1 unit for all catch rows of a fleet and 1 unit for all index
+      rows of a fleet."
+    ))
+  }
+  invisible(TRUE)
+}
+
 # Keep fleet-bin resolution explicit by default. Fixed age-to-length rows are
 # only treated as bin geometry when a caller intentionally opts into that path.
 resolve_fleet_length_bins <- function(
@@ -1096,6 +1128,7 @@ FIMSFrame <- function(data) {
   years <- start_year:end_year
 
   validate_fleets_have_observations(data)
+  validate_catch_and_index_units(data)
 
   # Get the fleets represented in the data
   fleets <- unique(na.omit(data[["fleet"]]))

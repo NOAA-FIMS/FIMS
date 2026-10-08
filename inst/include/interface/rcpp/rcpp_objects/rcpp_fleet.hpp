@@ -124,12 +124,12 @@ class FleetInterface : public FleetInterfaceBase {
   SharedInt n_years = 0;
   /**
    * @brief What units are the observed catch for this fleet measured in.
-   * Options are weight or numbers, default is weight.
+   * Options are "weight" or "number", default is "weight".
    */
   SharedString observed_catch_units = fims::to_string("weight");
   /**
    * @brief What units is the observed index of abundance for this fleet
-   * measured in. Options are weight or numbers, default is weight.
+   * measured in. Options are "weight" or "number", default is "weight".
    */
   SharedString observed_index_units = fims::to_string("weight");
   /**

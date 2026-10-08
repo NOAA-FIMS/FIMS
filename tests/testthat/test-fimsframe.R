@@ -298,6 +298,24 @@ test_that("`FIMSFrame()` returns correct error messages", {
     regexp = "no catch, index, or composition\\s+data:\\s+\"fleet3\""
   )
 
+  #' @description Test that `FIMSFrame()` returns an error when catch or index units are not mt or number.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      unit = ifelse(type == "index", "numbers", unit)
+    )),
+    regexp = "units that FIMS does not\\s+use: \"numbers\""
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when a fleet has more than one catch unit.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      unit = ifelse(type == "catch" & timing == 1, "number", unit)
+    )),
+    regexp = "more than one unit:\\s+\"fleet1 catch\""
+  )
+
   terminal_weight <- dplyr::filter(
     data_big,
     type == "weight_at_age",
