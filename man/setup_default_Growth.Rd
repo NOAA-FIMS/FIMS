@@ -6,15 +6,24 @@
 \usage{
 setup_default_Growth(
   data = NULL,
-  module_type = c("EWAA", "VonBertalanffySchnute")
+  module_type = c("EWAA", "VonBertalanffySchnute", "VonBertalanffyTraditional"),
+  variability_type = NULL
 )
 }
 \arguments{
 \item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
-your long input data. Required when \code{module_type = "VonBertalanffySchnute"}.}
+your long input data. Required when \code{module_type = "VonBertalanffySchnute"}
+or when \code{module_type = "VonBertalanffyTraditional"} and
+\code{variability_type = "interpolation"}.}
 
 \item{module_type}{A character string specifying the type of growth module.
 The default is \code{"EWAA"}.}
+
+\item{variability_type}{A character string specifying the variability
+parameterization for growth-derived length-at-age products. Traditional
+Von Bertalanffy growth defaults to \code{"delta_method"} and also supports
+\code{"interpolation"}. Schnute growth supports \code{"interpolation"} only. This
+argument is ignored for \code{"EWAA"}.}
 }
 \value{
 A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
