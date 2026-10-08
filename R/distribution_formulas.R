@@ -1,3 +1,4 @@
+#' file = R/distribution_formulas.R
 #' Validity checks for distributions
 #'
 #' This function checks the validity of arguments passed to functions that
@@ -369,8 +370,9 @@ initialize_process_structure <- function(module, par) {
 #'
 #' @param link A string specifying the model link function. For example,
 #'   `"identity"` or `"log"` are appropriate names for the [stats::gaussian()]
-#'   distribution. `"log"` and `"logit"` are the defaults for the lognormal and
-#'   the multinomial, respectively.
+#'   distribution. `"log"` is the default for the lognormal distribution;
+#'   `"logit"` is the default for the multinomial and Dirichlet-multinomial
+#'   distributions.
 #' @return
 #' An object of class `family` (which has a concise print method). This
 #' particular family has a truncated length compared to other distributions in
@@ -390,6 +392,8 @@ initialize_process_structure <- function(module, par) {
 #' a_family <- multinomial()
 #' a_family[["family"]]
 #' a_family[["link"]]
+#' dirichlet_family <- dirichlet_multinomial()
+#' dirichlet_family[["family"]]
 lognormal <- function(link = "log") {
   family_class <- c(
     list(family = "lognormal", link = link),
@@ -405,6 +409,18 @@ lognormal <- function(link = "log") {
 multinomial <- function(link = "logit") {
   family_class <- c(
     list(family = "multinomial", link = link),
+    stats::make.link(link)
+  )
+  class(family_class) <- "family"
+  return(family_class)
+}
+
+#' @rdname lognormal
+#' @keywords distribution
+#' @export
+dirichlet_multinomial <- function(link = "logit") {
+  family_class <- c(
+    list(family = "dirichlet_multinomial", link = link),
     stats::make.link(link)
   )
   class(family_class) <- "family"
