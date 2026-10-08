@@ -725,8 +725,9 @@ initialize_comp <- function(data,
   if (is.null(comp_data) || length(comp_data) == 0) {
     cli::cli_abort(c(
       "x" = "Fleet {.val {fleet}} has no {pretty_comp_name} data.",
-      "i" = "Check the {.var type} ({.code {comp[['name']]}}) and
-      {.var fleet} values in those rows."
+      "i" = "Rows for this fleet need {.code type = \"{comp[['name']]}\"}.
+      Check the {.var fleet} and {.var type} columns, for example with
+      {.code dplyr::count(data, fleet, type)}."
     ))
   }
 
@@ -903,8 +904,8 @@ initialize_fims <- function(parameters, data) {
 
   if (length(fleets) == 0) {
     cli::cli_abort(c(
-      "x" = "No fleets found in the provided {.var parameters}: the
-      {.var fleet} column is empty or all {.code NA}.",
+      "x" = "No fleets found in the provided {.var parameters}.",
+      "i" = "The {.var fleet} column is empty or all {.code NA}.",
       "i" = "Create {.var parameters} with {.fn setup_default_parameters},
       which fills in {.var fleet} for each fleet."
     ))

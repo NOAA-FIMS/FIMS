@@ -490,7 +490,7 @@ methods::setMethod(
       cli::cli_abort(c(
         "x" = "The data have no {.code type = \"weight_at_age\"} rows.",
         "i" = "Add weight at age for each model age, either 1 set for all
-        years or 1 set per year plus the year after the last.",
+        years or 1 set per year plus the year after the last model year.",
         "i" = "Types in the data: {.val {unique(x@data[['type']])}}."
       ))
     }
@@ -724,7 +724,7 @@ assert_presence_of_fleet <- function(data, fleet) {
   fleets <- get_fleets(data)
   if (!fleet %in% fleets) {
     cli::cli_abort(c(
-      "x" = "{.var fleet} is not present in the {.var data}.",
+      "x" = "{.var fleet} {.val {fleet}} is not present in {.var data}.",
       "i" = "Available fleet names are: {.val {fleets}}."
     ))
   }
@@ -844,10 +844,10 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
   good_data <- dplyr::filter(data, .data$observed != -999)
   good_type <- unique(data[["type"]])
   if (length(good_type) > 1) {
-    cli::cli_abort(
-      "Only 1 type of data can be checked at a time, but {.var data} has
-      {.val {good_type}}."
-    )
+    cli::cli_abort(c(
+      "x" = "Only 1 type of data can be checked at a time.",
+      "i" = "{.var data} has {.val {good_type}}."
+    ))
   }
   n_rows <- NROW(good_data)
   n_timings <- dplyr::if_else(
@@ -1114,8 +1114,8 @@ FIMSFrame <- function(data) {
         {.code NA}.",
         "i" = "FIMS takes the model ages from the {.code age_comp} and
         {.code weight_at_age} rows, so give those rows an {.var age}.",
-        "i" = "A catch-at-age model needs {.code weight_at_age} by age even
-        without age-composition data."
+        "i" = "Without age-composition data, {.code weight_at_age} rows are
+        the only source of model ages."
       ))
     } else {
       # Forced to use annual age bins because the model has an annual time step

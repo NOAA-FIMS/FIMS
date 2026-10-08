@@ -473,7 +473,7 @@ test_that("`initialize_catch()` returns correct error messages", {
       data = data,
       fleet = "unknown_fleet"
     ),
-    "`fleet` is not present in the `data`"
+    "`fleet` \"unknown_fleet\" is not present in `data`"
   )
   clear()
 })
@@ -515,7 +515,7 @@ test_that("`initialize_index()` returns correct error messages", {
       data = data,
       fleet = "unknown_fleet"
     ),
-    "`fleet` is not present in the `data`"
+    "`fleet` \"unknown_fleet\" is not present in `data`"
   )
   clear()
 })
@@ -632,7 +632,7 @@ test_that("`initialize_comp()` returns correct error messages", {
       fleet = "unknown_fleet",
       type = "AgeComp"
     ),
-    "`fleet` is not present in the `data`"
+    "`fleet` \"unknown_fleet\" is not present in `data`"
   )
   clear()
 
