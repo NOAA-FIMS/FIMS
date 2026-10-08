@@ -69,13 +69,6 @@ class RecruitmentInterfaceBase : public FIMSRcppInterfaceBase {
 
   /** @copydoc fims_popdy::RecruitmentBase::evaluate_mean */
   virtual double evaluate_mean(double spawners, double phi_0) = 0;
-
-  /**
-   * @brief A method for each child recruitment process interface object to
-   * inherit so each recruitment process option can have a evaluate_process()
-   * function.
-   */
-  virtual double evaluate_process(size_t pos) = 0;
 };
 
 /**
@@ -187,12 +180,6 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
 
     return BevHolt.evaluate_mean(spawners, phi_0);
   }
-
-  /**
-   * @brief Evaluate recruitment process - returns 0 in this module.
-   * @param pos Position index, e.g., which year.
-   */
-  virtual double evaluate_process(size_t pos) { return 0; }
 
   /**
    * @brief Extracts derived quantities back to the Rcpp interface object from
@@ -464,20 +451,6 @@ class LogDevsRecruitmentInterface : public RecruitmentInterfaceBase {
    */
   virtual double evaluate_mean(double spawners, double phi_0) { return 0; }
 
-  /**
-   * @brief Evaluate recruitment process using the Log--Devs approach.
-   * @details Not available from R: stops with an error.
-   * @param pos Position index, e.g., which year.
-   */
-  virtual double evaluate_process(size_t pos) {
-    // The process returns expected recruitment plus deviations from the
-    // recruitment module it is linked to inside a model, so there is nothing to
-    // evaluate here.
-    Rcpp::stop(
-        "evaluate_process() is not available from R: the recruitment process "
-        "reads values from the recruitment module it is linked to in a model.");
-  }
-
 #ifdef TMB_MODEL
 
   template <typename Type>
@@ -540,19 +513,6 @@ class LogRRecruitmentInterface : public RecruitmentInterfaceBase {
    * @copydoc RecruitmentInterfaceBase::evaluate_mean
    */
   virtual double evaluate_mean(double spawners, double phi_0) { return 0; }
-
-  /**
-   * @brief Evaluate recruitment process using the Log--R approach.
-   * @details Not available from R: stops with an error.
-   * @param pos Position index, e.g., which year.
-   */
-  virtual double evaluate_process(size_t pos) {
-    // The process returns log recruitment from the recruitment module it is
-    // linked to inside a model, so there is nothing to evaluate here.
-    Rcpp::stop(
-        "evaluate_process() is not available from R: the recruitment process "
-        "reads values from the recruitment module it is linked to in a model.");
-  }
 
 #ifdef TMB_MODEL
 

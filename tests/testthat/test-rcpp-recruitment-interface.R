@@ -89,20 +89,3 @@ test_that("test rcpp recruitment interface returns correct error messages", {
   )
   clear()
 })
-
-test_that("recruitment process `evaluate_process()` returns an error from R", {
-  log_devs_process <- methods::new(LogDevsRecruitmentProcess)
-  log_r_process <- methods::new(LogRRecruitmentProcess)
-
-  #' @description Test that `evaluate_process()` on a log deviations process gives an informative error.
-  expect_error(
-    object = log_devs_process$evaluate_process(0),
-    regexp = "recruitment module it is linked to in a model"
-  )
-  #' @description Test that `evaluate_process()` on a log recruitment process gives an informative error.
-  expect_error(
-    object = log_r_process$evaluate_process(0),
-    regexp = "recruitment module it is linked to in a model"
-  )
-  clear()
-})

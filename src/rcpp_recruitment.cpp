@@ -41,9 +41,7 @@ void register_recruitment(Rcpp::Module& m) {
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classLogDevsRecruitmentInterface.html.")
       .constructor()
-      .method("get_id", &LogDevsRecruitmentInterface::get_id)
-      .method("evaluate_process",
-              &LogDevsRecruitmentInterface::evaluate_process);
+      .method("get_id", &LogDevsRecruitmentInterface::get_id);
 
   Rcpp::class_<LogRRecruitmentInterface>(
       "LogRRecruitmentProcess",
@@ -51,6 +49,5 @@ void register_recruitment(Rcpp::Module& m) {
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classLogRRecruitmentInterface.html.")
       .constructor()
-      .method("get_id", &LogRRecruitmentInterface::get_id)
-      .method("evaluate_process", &LogRRecruitmentInterface::evaluate_process);
+      .method("get_id", &LogRRecruitmentInterface::get_id);
 }
