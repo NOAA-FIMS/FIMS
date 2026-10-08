@@ -182,15 +182,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
     } else {
       if (
         module_class_name == "VonBertalanffySchnuteGrowth" &&
-          field %in% c(
-            "length_at_age_sd_at_reference_ages",
-            "log_sd_mean_length_young",
-            "log_sd_mean_length_old",
-            "log_sd_growth_coefficient",
-            "mean_length_young_mean_length_old_logit_corr",
-            "mean_length_young_growth_coefficient_logit_corr",
-            "mean_length_old_growth_coefficient_logit_corr"
-          ) &&
+          field == "length_at_age_sd_at_reference_ages" &&
           !(field %in% module_input$label)
       ) {
         next
@@ -247,15 +239,6 @@ initialize_growth <- function(parameters, data) {
     stats::na.omit()
 
   if (length(growth_type) == 1 && identical(growth_type[[1]], "VonBertalanffySchnute")) {
-    vonb_delta_method_labels <- c(
-      "log_sd_mean_length_young",
-      "log_sd_mean_length_old",
-      "log_sd_growth_coefficient",
-      "mean_length_young_mean_length_old_logit_corr",
-      "mean_length_young_growth_coefficient_logit_corr",
-      "mean_length_old_growth_coefficient_logit_corr"
-    )
-
     sd_rows <- growth_input |>
       dplyr::filter(.data$label == "length_at_age_sd_at_reference_ages")
 
@@ -290,46 +273,7 @@ initialize_growth <- function(parameters, data) {
       ))
     }
 
-    has_interpolation_sd_inputs <-
-      "length_at_age_sd_at_reference_ages" %in% growth_input$label
-
-    present_vonb_delta_labels <- intersect(
-      vonb_delta_method_labels,
-      growth_input$label
-    )
-
-    missing_vonb_delta_labels <- setdiff(
-      vonb_delta_method_labels,
-      growth_input$label
-    )
-
-    if (length(present_vonb_delta_labels) > 0 &&
-      length(missing_vonb_delta_labels) > 0) {
-      cli::cli_abort(c(
-        "VonBertalanffy delta-method variability inputs must be supplied as a complete set.",
-        "i" = "Provide all of: {toString(vonb_delta_method_labels)}"
-      ))
-    }
-
-    if (has_interpolation_sd_inputs &&
-      length(present_vonb_delta_labels) == length(vonb_delta_method_labels)) {
-      cli::cli_abort(c(
-        "VonBertalanffy growth requires exactly one variability path.",
-        "i" = "The default setup uses interpolation via {.var length_at_age_sd_at_reference_ages}.",
-        "i" = "If you use the delta-method path, supply the full delta block and omit interpolation rows."
-      ))
-    }
-
-    if (!has_interpolation_sd_inputs &&
-      length(present_vonb_delta_labels) == 0) {
-      cli::cli_abort(c(
-        "VonBertalanffy growth requires exactly one variability path.",
-        "i" = "Supply either 2 {.var length_at_age_sd_at_reference_ages} rows or the full delta-method block."
-      ))
-    }
-
-    if (has_interpolation_sd_inputs &&
-      (nrow(sd_rows) != 2 || any(is.na(sd_rows$age)))) {
+    if (nrow(sd_rows) != 2 || any(is.na(sd_rows$age))) {
       cli::cli_abort(c(
         "VonBertalanffySchnute interpolation-based variability inputs are malformed.",
         "i" = "Supply exactly 2 {.var length_at_age_sd_at_reference_ages} rows with non-missing ages.",

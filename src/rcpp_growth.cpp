@@ -51,21 +51,6 @@ void register_growth(Rcpp::Module& m) {
       .field("length_at_age_sd_at_reference_ages",
              &VonBertalanffySchnuteGrowthInterface::
                  length_at_age_sd_at_reference_ages)
-      .field("log_sd_mean_length_young",
-             &VonBertalanffySchnuteGrowthInterface::log_sd_mean_length_young)
-      .field("log_sd_mean_length_old",
-             &VonBertalanffySchnuteGrowthInterface::log_sd_mean_length_old)
-      .field("log_sd_growth_coefficient",
-             &VonBertalanffySchnuteGrowthInterface::log_sd_growth_coefficient)
-      .field("mean_length_young_mean_length_old_logit_corr",
-             &VonBertalanffySchnuteGrowthInterface::
-                 mean_length_young_mean_length_old_logit_corr)
-      .field("mean_length_young_growth_coefficient_logit_corr",
-             &VonBertalanffySchnuteGrowthInterface::
-                 mean_length_young_growth_coefficient_logit_corr)
-      .field("mean_length_old_growth_coefficient_logit_corr",
-             &VonBertalanffySchnuteGrowthInterface::
-                 mean_length_old_growth_coefficient_logit_corr)
       .field("n_ages", &VonBertalanffySchnuteGrowthInterface::n_ages)
       .method("get_id", &VonBertalanffySchnuteGrowthInterface::get_id)
       .method("evaluate", &VonBertalanffySchnuteGrowthInterface::evaluate)
