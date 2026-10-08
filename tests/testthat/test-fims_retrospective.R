@@ -226,7 +226,7 @@ test_that("calculate_mohns_rho() returns correct error messages", {
       retro_fit = retro_fit_invalid,
       quantity = "spawning_biomass"
     ),
-    regexp = "must contain reference year run"
+    regexp = "must contain the reference run"
   )
 
   #' @description Test that calculate_mohns_rho() errors with non-existent quantity.

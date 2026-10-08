@@ -160,7 +160,11 @@ run_fims_likelihood <- function(
       dplyr::pull(.data[["module_name"]]) |>
       unique()
     if (!module_name %in% module_names) {
-      cli::cli_abort("Input module_name not found in parameters tibble.")
+      cli::cli_abort(c(
+        "x" = "{.arg module_name} {.val {module_name}} not found in
+        {.arg parameters}.",
+        "i" = "Module names in {.arg parameters}: {.val {module_names}}."
+      ))
     }
   }
 
@@ -174,7 +178,19 @@ run_fims_likelihood <- function(
     )
 
   if (nrow(parameter_row) == 0) {
-    cli::cli_abort("Input parameter_name did not match any rows in parameter tibble.")
+    available_labels <- parameters |>
+      dplyr::filter(
+        is.null(.env$module_name) |
+          .data[["module_name"]] %in% .env$module_name
+      ) |>
+      dplyr::pull(.data[["label"]]) |>
+      unique()
+    where <- if (is.null(module_name)) "" else paste0(" in ", module_name)
+    cli::cli_abort(c(
+      "x" = "{.arg parameter_name} {.val {parameter_name}} did not match any
+      rows in {.arg parameters}.",
+      "i" = "Labels{where}: {.val {available_labels}}."
+    ))
   }
 
   if (nrow(parameter_row) > 1) {

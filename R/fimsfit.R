@@ -554,7 +554,11 @@ fit_fims <- function(input,
   # the smallest newton gradient solution not matching the smallest
   # likelihood value. This can cause sanity issues in output reporting.
   if (number_of_newton_steps > 0) {
-    cli::cli_abort("Newton steps not implemented yet.")
+    cli::cli_abort(c(
+      "x" = "Newton steps are not implemented yet.",
+      "i" = "Use {.code number_of_newton_steps = 0}. To improve the gradient,
+      increase {.arg number_of_loops} instead."
+    ))
   }
   if (number_of_loops < 0) {
     cli::cli_abort("number_of_loops ({.par {number_of_loops}}) must be >= 0.")

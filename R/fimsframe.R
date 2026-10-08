@@ -487,9 +487,12 @@ methods::setMethod(
       .data[["type"]] == "weight_at_age"
     )
     if (NROW(model_data) == 0) {
-      cli::cli_abort(
-        message = "No weight_at_age data found in FIMSFrame object."
-      )
+      cli::cli_abort(c(
+        "x" = "The data have no {.code type = \"weight_at_age\"} rows.",
+        "i" = "Add weight at age for each model age, either 1 set for all
+        years or 1 set per year plus the year after the last model year.",
+        "i" = "Types in the data: {.val {unique(x@data[['type']])}}."
+      ))
     }
     all_fleets <- unique(model_data[["fleet"]])
     if (length(all_fleets) > 1) {
@@ -721,7 +724,7 @@ assert_presence_of_fleet <- function(data, fleet) {
   fleets <- get_fleets(data)
   if (!fleet %in% fleets) {
     cli::cli_abort(c(
-      "x" = "{.var fleet} is not present in the {.var data}.",
+      "x" = "{.var fleet} {.val {fleet}} is not present in {.var data}.",
       "i" = "Available fleet names are: {.val {fleets}}."
     ))
   }
@@ -841,7 +844,10 @@ validate_dimension_of_conversion <- function(data, n_groups, n_timings) {
   good_data <- dplyr::filter(data, .data$observed != -999)
   good_type <- unique(data[["type"]])
   if (length(good_type) > 1) {
-    cli::cli_abort("Only one type of data can exist in {.var data}.")
+    cli::cli_abort(c(
+      "x" = "Only 1 type of data can be checked at a time.",
+      "i" = "{.var data} has {.val {good_type}}."
+    ))
   }
   n_rows <- NROW(good_data)
   n_timings <- dplyr::if_else(
@@ -1103,9 +1109,14 @@ FIMSFrame <- function(data) {
 
   if ("age" %in% colnames(data)) {
     if (all(is.na(data[["age"]]))) {
-      cli::cli_abort(
-        message = "The `age` column exists in `data` but they are all `NA`."
-      )
+      cli::cli_abort(c(
+        "x" = "The {.var age} column exists in {.var data} but they are all
+        {.code NA}.",
+        "i" = "FIMS takes the model ages from the {.code age_comp} and
+        {.code weight_at_age} rows, so give those rows an {.var age}.",
+        "i" = "Without age-composition data, {.code weight_at_age} rows are
+        the only source of model ages."
+      ))
     } else {
       # Forced to use annual age bins because the model has an annual time step
       # FUTURE: allow for different age bins rather than 1 year increment
