@@ -1533,7 +1533,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
           } else {
             if (a == 0) {
               // Set the nrecruits for age a=0 year y (use pointers instead of
-              // functional returns) assuming fecundity = 1 and 50:50 sex ratio
+              // functional returns)
               CalculateRecruitment(population, i_age_year, y, y);
               pdq_["unfished_numbers_at_age"][i_age_year] =
                   fims_math::exp(population->recruitment->log_rzero[0]);

@@ -28,8 +28,9 @@ for ages below the plus group, and for the plus group \eqn{A}, which
 accumulates survivors each year,
 \deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}}
 
-\item{proportion_female}{A numeric value between 0 and 1 specifying the
-proportion of females. Default is \code{0.5}.}
+\item{proportion_female}{A numeric value or vector (length equal to the
+number of ages) between 0 and 1 specifying the proportion of each age that
+is female, which scales spawning biomass. Default is \code{0.5}.}
 }
 \value{
 A tibble of default population configurations, including initial numbers at
