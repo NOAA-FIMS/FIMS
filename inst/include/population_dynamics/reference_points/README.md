@@ -23,7 +23,10 @@ recruitment and bounded MSY calculations use the same per-recruit engine.
   Fishing mortality at age is `F * sum(share[f] * selectivity[f][age])`.
   Selectivities are used as supplied, without normalization. Thus reported F
   is the sum of fleet coefficients, not necessarily maximum F at age.
-- An empty fleet list is allowed for unfished calculations. Inputs are never
+- Each fleet defaults to `include_in_msy = true`. Setting it to false excludes
+  its yield from the objective while keeping its mortality and catch. Shares
+  are not renormalized, and SPR is unchanged by these flags.
+- An empty fleet list is allowed for unfished and SPR calculations. Inputs are never
   modified, and results hold no references to population state.
 
 Survival into age `a` uses mortality at age `a - 1`. The plus-group abundance
@@ -50,7 +53,9 @@ if (f40.status == fims_popdy::SPRStatus::converged) {
 ```
 
 `CalculatePerRecruit` returns numbers at age, total biomass, spawning biomass,
-and total and fleet-specific annual yield, all per recruit. Its arithmetic is
+and total, objective, and fleet-specific annual yield, all per recruit.
+The C++ `yield` member remains total catch; `objective_yield` sums only included
+fleets. Equilibrium results use the same convention. Its arithmetic is
 templated to follow FIMS conventions. Automatic differentiation integration has
 not yet been validated.
 
@@ -119,7 +124,8 @@ R / R0 = [0.8 h - 0.2 (1-h) phi0 / SBPR(F)] / (h-0.2)
 A nonpositive solution is reported as collapse, with zero recruitment, biomass,
 and yield. Recruitment deviations are excluded. R0 and phi0 must be positive;
 steepness must be strictly between 0.2 and 1. Unsupported recruitment models
-can still calculate SPR by setting `msy = FALSE` in R.
+can still calculate SPR by setting `msy = FALSE` in R. MSY requires at least
+one included fleet; an empty or all-excluded objective throws an error.
 
 `CalculateMSY` evaluates a grid on [0, max_f], then refines the best sampled
 region using golden-section search. If the grid misses a narrow productive
@@ -141,3 +147,31 @@ controls the MSY grid. Returned `settings` record these choices.
 Tests also cover recruitment fixed points, extinction, MSY against a dense
 grid and R's independent optimizer, narrow productive regions, and the live
 Rcpp model lifecycle including parameter synchronization and snapshot reuse.
+
+## Bycatch and objective inclusion
+
+A fleet with positive share and `include_in_msy = false` still produces
+mortality and catch. It remains part of the fixed fishing pattern as F varies.
+Only its catch is omitted from the optimized objective. This does not hold
+bycatch mortality constant as F changes, and is different from a zero share.
+
+```r
+# Names refer to IDs returned in result$inputs$fleet_ids.
+result <- get_reference_points(model, population$get_id(), year = 10,
+                               include_in_msy = c(`1` = TRUE, `2` = FALSE))
+result$msy$objective_yield  # MSY for the included fleets
+result$msy$total_yield     # All fleets' catch at the chosen F
+result$msy$fleet_yield     # Includes catch from the excluded fleet
+```
+
+For standalone snapshots, set `inputs$fleets[[i]]$include_in_msy <- FALSE`.
+Omitted flags default to TRUE, preserving existing calculations. Inclusion
+flags must be logical scalars; numeric weights and missing values are rejected.
+An all-excluded objective is undefined for MSY, but remains valid for SPR.
+
+For compatibility, the R `msy$yield` field remains an alias for `total_yield`.
+When a fleet is excluded, use `objective_yield` for the optimized MSY quantity.
+The snapshot saves all inclusion choices; it can be serialized and reused
+without live model state. Tests cover distinct fleet selectivities and weights
+against independent R equations and optimization, bound/grid sensitivity,
+unchanged biology at fixed F, and fleet ordering and splitting invariance.

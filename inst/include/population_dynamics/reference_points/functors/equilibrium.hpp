@@ -36,10 +36,12 @@ inline void ValidateReferencePointRecruitment(
 /** @brief Equilibrium quantities, including extinction when no positive root
  * exists. */
 struct EquilibriumResult {
-  double recruitment = 0.0;         /*!< Annual recruitment. */
-  double biomass = 0.0;             /*!< Total population biomass. */
-  double spawning_biomass = 0.0;    /*!< Mature female biomass. */
-  double yield = 0.0;               /*!< Total annual catch weight. */
+  double recruitment = 0.0;      /*!< Annual recruitment. */
+  double biomass = 0.0;          /*!< Total population biomass. */
+  double spawning_biomass = 0.0; /*!< Mature female biomass. */
+  double yield = 0.0;            /*!< Total annual catch weight. */
+  double objective_yield =
+      0.0; /*!< Annual catch weight from included fleets. */
   fims::Vector<double> fleet_yield; /*!< Annual catch weight by fleet. */
   bool collapsed = false; /*!< True when there is no positive equilibrium. */
 };
@@ -71,11 +73,13 @@ inline EquilibriumResult CalculateEquilibrium(
   result.biomass = result.recruitment * pr.biomass;
   result.spawning_biomass = result.recruitment * pr.spawning_biomass;
   result.yield = result.recruitment * pr.yield;
+  result.objective_yield = result.recruitment * pr.objective_yield;
   for (size_t f = 0; f < inputs.fleets.size(); ++f) {
     result.fleet_yield[f] = result.recruitment * pr.fleet_yield[f];
   }
   if (!std::isfinite(result.recruitment) || !std::isfinite(result.biomass) ||
-      !std::isfinite(result.spawning_biomass) || !std::isfinite(result.yield)) {
+      !std::isfinite(result.spawning_biomass) || !std::isfinite(result.yield) ||
+      !std::isfinite(result.objective_yield)) {
     throw std::domain_error("Nonfinite equilibrium result");
   }
   return result;

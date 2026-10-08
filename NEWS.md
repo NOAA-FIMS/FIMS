@@ -27,6 +27,8 @@
 
 ## Features
 
+* *(reference_points)* Add `include_in_msy` fleet flags to exclude yield while retaining mortality and catch. Report `objective_yield` and `total_yield`; legacy `yield` remains total catch. Empty or all-excluded MSY objectives now raise an error; SPR-only calculations remain available. Add independent multifleet validation and bycatch examples.
+
 * *(reference_points)* Add per-recruit, SPR, and Beverton-Holt MSY calculations with reusable R input snapshots and live CatchAtAge integration.
 
 * *(growth)* Size and growth infrastructure (#1697)

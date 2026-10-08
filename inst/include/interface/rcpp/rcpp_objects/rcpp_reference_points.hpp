@@ -32,7 +32,8 @@ inline Rcpp::List ReferencePointInputsToR(
     fleets.push_back(Rcpp::List::create(
         Rcpp::Named("share") = fleet.share,
         Rcpp::Named("selectivity") = ReferencePointVectorToR(fleet.selectivity),
-        Rcpp::Named("weight") = ReferencePointVectorToR(fleet.weight)));
+        Rcpp::Named("weight") = ReferencePointVectorToR(fleet.weight),
+        Rcpp::Named("include_in_msy") = fleet.include_in_msy));
   }
   return Rcpp::List::create(
       Rcpp::Named("natural_mortality") =
@@ -63,9 +64,19 @@ inline Rcpp::List CalculateReferencePointsR(
   Rcpp::List fleets = snapshot["fleets"];
   for (SEXP item : fleets) {
     Rcpp::List fleet(item);
+    bool include_in_msy = true;
+    if (fleet.containsElementNamed("include_in_msy")) {
+      SEXP inclusion = fleet["include_in_msy"];
+      if (TYPEOF(inclusion) != LGLSXP || Rf_xlength(inclusion) != 1 ||
+          LOGICAL(inclusion)[0] == NA_LOGICAL) {
+        Rcpp::stop("Each fleet's include_in_msy must be TRUE or FALSE");
+      }
+      include_in_msy = LOGICAL(inclusion)[0];
+    }
     inputs.fleets.push_back({Rcpp::as<double>(fleet["share"]),
                              ReferencePointVector(fleet["selectivity"]),
-                             ReferencePointVector(fleet["weight"])});
+                             ReferencePointVector(fleet["weight"]),
+                             include_in_msy});
   }
   const auto unfished = fims_popdy::CalculatePerRecruit(inputs, 0.0);
   Rcpp::NumericVector f(targets.size()), spr(targets.size()),
@@ -141,7 +152,10 @@ inline Rcpp::List CalculateReferencePointsR(
     }
     output["msy"] = Rcpp::List::create(
         Rcpp::Named("fishing_mortality") = result.fishing_mortality,
+        // Preserve the legacy yield field as total catch from all fleets.
         Rcpp::Named("yield") = result.equilibrium.yield,
+        Rcpp::Named("total_yield") = result.equilibrium.yield,
+        Rcpp::Named("objective_yield") = result.equilibrium.objective_yield,
         Rcpp::Named("biomass") = result.equilibrium.biomass,
         Rcpp::Named("spawning_biomass") = result.equilibrium.spawning_biomass,
         Rcpp::Named("recruitment") = result.equilibrium.recruitment,

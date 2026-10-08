@@ -104,8 +104,10 @@ unlist(result$msy[c(
 )])
 ```
 
-`yield` is the MSY candidate: annual catch weight at the reported fishing
-mortality. `biomass`, `spawning_biomass`, and `recruitment` describe that
+`objective_yield` is the MSY candidate: annual catch weight from included
+fleets at the reported fishing mortality. `total_yield` includes every fleet,
+and the legacy `yield` field retains this total-catch meaning. All fleets are
+included by default, so these values are equal in this example. `biomass`, `spawning_biomass`, and `recruitment` describe that
 equilibrium, while `fleet_yield` partitions catch among fleets. Recruitment
 deviations are excluded. Nonpositive recruitment equilibria represent collapse
 and have zero biomass and yield.
@@ -189,3 +191,55 @@ knitr::kable(do.call(rbind, allocation_results), digits = 4)
 The returned `inputs` and `settings` make each calculation reproducible. Save
 those with the results when comparing scenarios. Changing a snapshot does not
 change a live population model.
+
+## Exclude bycatch yield while retaining its mortality
+
+A fleet can impose mortality on this population without contributing to the
+yield we wish to maximize. Set its `include_in_msy` flag to `FALSE`. Keep its
+positive share: setting the share to zero would remove its fishing mortality
+as well as its catch.
+
+```{r bycatch-objective}
+bycatch_inputs <- inputs
+bycatch_inputs$fleets[[1]]$share <- 0.65
+bycatch_inputs$fleets[[2]] <- list(
+  share = 0.35,
+  selectivity = c(0.8, 1, 0.9, 0.5, 0.2, 0.1),
+  weight = inputs$weight * 1.1
+)
+all_fleets <- calculate_reference_points(bycatch_inputs)
+bycatch_inputs$fleets[[2]]$include_in_msy <- FALSE
+directed_only <- calculate_reference_points(bycatch_inputs)
+knitr::kable(data.frame(
+  objective = c("Both fleets", "First fleet only"),
+  F_MSY = c(all_fleets$msy$fishing_mortality, directed_only$msy$fishing_mortality),
+  objective_yield = c(all_fleets$msy$objective_yield, directed_only$msy$objective_yield),
+  total_yield = c(all_fleets$msy$total_yield, directed_only$msy$total_yield),
+  second_fleet_catch = c(all_fleets$msy$fleet_yield[2], directed_only$msy$fleet_yield[2])
+), digits = 4)
+```
+
+At a fixed F, the flag changes only objective yield. It leaves survival,
+recruitment, biomass, and catches from both fleets unchanged. The maximizing
+F can change, however, so biomass and catches at the two optima can differ.
+Shares are not renormalized: the second fleet still receives 35% of the
+fishing-intensity coefficient. Both fleets' mortality continues to scale
+with F; the excluded fleet does not have a separate, constant mortality rate.
+
+SPR is independent of the objective flags. All-excluded flags therefore remain
+valid for SPR-only calculations, but requesting MSY with no included fleets is
+an error. This distinguishes an undefined objective from an included fishery
+that happens to have no positive yield.
+
+```{r check-bycatch, include=FALSE}
+stopifnot(
+  all_fleets$msy$status == "converged",
+  directed_only$msy$status == "converged",
+  directed_only$inputs$fleets[[2]]$share == 0.35,
+  directed_only$msy$fleet_yield[2] > 0,
+  directed_only$msy$objective_yield == directed_only$msy$fleet_yield[1],
+  isTRUE(all.equal(directed_only$msy$total_yield, sum(directed_only$msy$fleet_yield))),
+  identical(directed_only$msy$yield, directed_only$msy$total_yield),
+  identical(all_fleets$spr, directed_only$spr)
+)
+```

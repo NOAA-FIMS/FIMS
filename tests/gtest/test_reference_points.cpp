@@ -291,9 +291,11 @@ TEST(ReferencePoints, MSYDiagnostics) {
   options.grid_intervals = 1;
   EXPECT_THROW(fims_popdy::CalculateMSY(inputs, sr, options),
                std::invalid_argument);
-  inputs.fleets.clear();
+  inputs.fleets[0].selectivity = {0.0, 0.0, 0.0};
   EXPECT_EQ(fims_popdy::CalculateMSY(inputs, sr).status,
             fims_popdy::MSYStatus::no_positive_yield);
+  inputs.fleets.clear();
+  EXPECT_THROW(fims_popdy::CalculateMSY(inputs, sr), std::invalid_argument);
 }
 
 // Large selectivity can put the entire productive range below the first grid
@@ -311,5 +313,109 @@ TEST(ReferencePoints, MSYFindsNarrowProductiveRegion) {
   EXPECT_NEAR(scaled.fishing_mortality * 10000.0, original.fishing_mortality,
               1e-4);
   EXPECT_NEAR(scaled.equilibrium.yield, original.equilibrium.yield, 1e-4);
+}
+
+ReferencePointInputs<double> MakeMultifleetInputs() {
+  auto inputs = MakeInputs();
+  inputs.fleets[0].share = 0.65;
+  inputs.fleets.push_back({0.35, {0.8, 1.0, 0.4}, {0.8, 3.0, 4.5}});
+  return inputs;
+}
+
+fims_popdy::ReferencePointRecruitment MultifleetRecruitment() {
+  // Independent unfished survival, including the terminal geometric series.
+  const double phi0 =
+      0.5 * std::exp(-0.2) + 1.5 * std::exp(-0.6) / -std::expm1(-0.6);
+  return {1000.0, 0.75, phi0};
+}
+
+// Changing objective inclusion must leave all biological calculations intact.
+TEST(ReferencePoints, ObjectiveExclusionPreservesMortalityAndCatch) {
+  auto inputs = MakeMultifleetInputs();
+  const auto sr = MultifleetRecruitment();
+  const auto both = CalculatePerRecruit(inputs, 0.4);
+  const auto equilibrium = fims_popdy::CalculateEquilibrium(inputs, 0.4, sr);
+  inputs.fleets[1].include_in_msy = false;
+  const auto excluded = CalculatePerRecruit(inputs, 0.4);
+  const auto excluded_equilibrium =
+      fims_popdy::CalculateEquilibrium(inputs, 0.4, sr);
+  EXPECT_EQ(both.numbers, excluded.numbers);
+  EXPECT_DOUBLE_EQ(both.biomass, excluded.biomass);
+  EXPECT_DOUBLE_EQ(both.spawning_biomass, excluded.spawning_biomass);
+  EXPECT_EQ(both.fleet_yield, excluded.fleet_yield);
+  EXPECT_DOUBLE_EQ(both.yield, excluded.yield);
+  EXPECT_DOUBLE_EQ(both.objective_yield, both.yield);
+  EXPECT_DOUBLE_EQ(excluded.objective_yield, excluded.fleet_yield[0]);
+  EXPECT_GT(excluded.fleet_yield[1], 0.0);
+  EXPECT_DOUBLE_EQ(equilibrium.recruitment, excluded_equilibrium.recruitment);
+  EXPECT_DOUBLE_EQ(equilibrium.biomass, excluded_equilibrium.biomass);
+  EXPECT_DOUBLE_EQ(equilibrium.spawning_biomass,
+                   excluded_equilibrium.spawning_biomass);
+  EXPECT_EQ(equilibrium.fleet_yield, excluded_equilibrium.fleet_yield);
+  EXPECT_DOUBLE_EQ(equilibrium.yield, excluded_equilibrium.yield);
+  EXPECT_DOUBLE_EQ(excluded_equilibrium.objective_yield,
+                   excluded_equilibrium.fleet_yield[0]);
+  EXPECT_DOUBLE_EQ(inputs.fleets[1].share, 0.35);
+  const auto without_objective = CalculateSPR(inputs, 0.4);
+  inputs.fleets[1].include_in_msy = true;
+  EXPECT_DOUBLE_EQ(CalculateSPR(inputs, 0.4).fishing_mortality,
+                   without_objective.fishing_mortality);
+}
+
+// A zero-share fleet removes its mortality; that differs from objective
+// exclusion.
+TEST(ReferencePoints, BycatchExclusionIsNotZeroFishingShare) {
+  auto inputs = MakeMultifleetInputs();
+  inputs.fleets[1].include_in_msy = false;
+  const auto bycatch = CalculatePerRecruit(inputs, 0.4);
+  inputs.fleets[0].share = 1.0;
+  inputs.fleets[1].share = 0.0;
+  // Preserve the first fleet's original fishing coefficient for comparison.
+  const auto no_bycatch = CalculatePerRecruit(inputs, 0.4 * 0.65);
+  EXPECT_GT(no_bycatch.spawning_biomass, bycatch.spawning_biomass);
+  EXPECT_DOUBLE_EQ(no_bycatch.fleet_yield[1], 0.0);
+  EXPECT_GT(bycatch.fleet_yield[1], 0.0);
+}
+
+// No included fleets is an undefined MSY objective, but still valid for SPR.
+TEST(ReferencePoints, AllExcludedObjectiveIsRejected) {
+  auto inputs = MakeMultifleetInputs();
+  for (auto& fleet : inputs.fleets) fleet.include_in_msy = false;
+  EXPECT_THROW(fims_popdy::CalculateMSY(inputs, MultifleetRecruitment()),
+               std::invalid_argument);
+  EXPECT_EQ(CalculateSPR(inputs, 0.4).status, SPRStatus::converged);
+  const auto equilibrium =
+      fims_popdy::CalculateEquilibrium(inputs, 0.4, MultifleetRecruitment());
+  EXPECT_DOUBLE_EQ(equilibrium.objective_yield, 0.0);
+  EXPECT_GT(equilibrium.yield, 0.0);
+}
+
+// Permuting fleets or splitting an identical fleet must preserve reference
+// points.
+TEST(ReferencePoints, MultifleetMSYIsInvariantToOrderAndSplitting) {
+  auto inputs = MakeMultifleetInputs();
+  inputs.fleets[1].include_in_msy = false;
+  const auto sr = MultifleetRecruitment();
+  const auto original = fims_popdy::CalculateMSY(inputs, sr);
+  std::swap(inputs.fleets[0], inputs.fleets[1]);
+  const auto reordered = fims_popdy::CalculateMSY(inputs, sr);
+  EXPECT_NEAR(original.fishing_mortality, reordered.fishing_mortality, 1e-7);
+  EXPECT_NEAR(original.equilibrium.objective_yield,
+              reordered.equilibrium.objective_yield, 1e-8);
+  EXPECT_NEAR(original.equilibrium.fleet_yield[0],
+              reordered.equilibrium.fleet_yield[1], 1e-5);
+  for (size_t fleet = 0; fleet < 2; ++fleet) {
+    auto split = inputs;
+    auto additional = split.fleets[fleet];
+    additional.share *= 0.5;
+    split.fleets[fleet].share *= 0.5;
+    split.fleets.push_back(additional);
+    const auto result = fims_popdy::CalculateMSY(split, sr);
+    EXPECT_EQ(result.status, fims_popdy::MSYStatus::converged);
+    EXPECT_NEAR(original.fishing_mortality, result.fishing_mortality, 1e-7);
+    EXPECT_NEAR(original.equilibrium.objective_yield,
+                result.equilibrium.objective_yield, 1e-8);
+    EXPECT_NEAR(original.equilibrium.yield, result.equilibrium.yield, 1e-5);
+  }
 }
 }  // namespace

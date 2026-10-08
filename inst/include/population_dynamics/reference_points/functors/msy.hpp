@@ -38,8 +38,10 @@ struct MSYResult {
 };
 
 /**
- * @brief Search for maximum equilibrium yield within the supplied bounds.
- * @details A grid locates the best sampled region, then golden-section search
+ * @brief Maximize included fleets' equilibrium yield within supplied bounds.
+ * @details Every fleet still contributes mortality and catch. At least one
+ * fleet must be included in the objective; otherwise MSY is undefined.
+ * A grid locates the best sampled region, then golden-section search
  * refines its neighboring interval. Both endpoints remain candidates. This
  * numerical search does not guarantee a global maximum for arbitrary fishing
  * patterns; inspect sensitivity to bounds and grid resolution when needed.
@@ -54,30 +56,39 @@ inline MSYResult CalculateMSY(const ReferencePointInputs<double>& inputs,
   }
   MSYResult result;
   result.equilibrium = CalculateEquilibrium(inputs, 0.0, recruitment);
+  bool has_included_fleet = false;
+  for (const auto& fleet : inputs.fleets) {
+    has_included_fleet = has_included_fleet || fleet.include_in_msy;
+  }
+  if (!has_included_fleet) {
+    throw std::invalid_argument("MSY requires at least one included fleet");
+  }
+
   auto evaluate = [&](double f) {
     const auto equilibrium = CalculateEquilibrium(inputs, f, recruitment);
-    if (equilibrium.yield > result.equilibrium.yield) {
+    if (equilibrium.objective_yield > result.equilibrium.objective_yield) {
       result.fishing_mortality = f;
       result.equilibrium = equilibrium;
     }
-    return equilibrium.yield;
+    return equilibrium.objective_yield;
   };
   size_t best_index = 0;
   for (size_t i = 1; i <= options.grid_intervals; ++i) {
-    const double previous_best = result.equilibrium.yield;
+    const double previous_best = result.equilibrium.objective_yield;
     evaluate(options.max_f * (static_cast<double>(i) / options.grid_intervals));
-    if (result.equilibrium.yield > previous_best) best_index = i;
+    if (result.equilibrium.objective_yield > previous_best) best_index = i;
   }
   // A coarse grid can step past a narrow productive region into collapse.
   // Search below the first grid point before declaring no positive yield.
   double first_positive_f = options.max_f / options.grid_intervals;
-  if (result.equilibrium.yield <= 0.0 && !result.equilibrium.collapsed) {
+  if (result.equilibrium.objective_yield <= 0.0 &&
+      !result.equilibrium.collapsed) {
     while (first_positive_f > options.tolerance) {
       first_positive_f *= 0.5;
       if (evaluate(first_positive_f) > 0.0) break;
     }
   }
-  if (result.equilibrium.yield <= 0.0) {
+  if (result.equilibrium.objective_yield <= 0.0) {
     result.status = MSYStatus::no_positive_yield;
     return result;
   }

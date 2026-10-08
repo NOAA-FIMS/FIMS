@@ -24,6 +24,8 @@ struct ReferencePointFleet {
   fims::Vector<Type>
       selectivity;           /*!< Nonnegative; used without normalization. */
   fims::Vector<Type> weight; /*!< Catch weight at age, in biomass units. */
+  bool include_in_msy =
+      true; /*!< Count yield in the objective, without changing mortality. */
 };
 
 /**
@@ -52,6 +54,8 @@ struct PerRecruitResult {
   Type spawning_biomass = 0.0; /*!< Mature female biomass per recruit. */
   Type biomass = 0.0;          /*!< Total biomass per recruit. */
   Type yield = 0.0;            /*!< Total annual catch weight per recruit. */
+  Type objective_yield =
+      0.0; /*!< Annual yield per recruit from included fleets. */
   fims::Vector<Type> fleet_yield; /*!< Annual catch weight by fleet. */
 };
 
@@ -151,10 +155,14 @@ PerRecruitResult<Type> CalculatePerRecruit(
   }
   for (size_t fleet = 0; fleet < inputs.fleets.size(); ++fleet) {
     result.yield += result.fleet_yield[fleet];
+    if (inputs.fleets[fleet].include_in_msy) {
+      result.objective_yield += result.fleet_yield[fleet];
+    }
   }
   if (!std::isfinite(fims_math::Value(result.biomass)) ||
       !std::isfinite(fims_math::Value(result.spawning_biomass)) ||
-      !std::isfinite(fims_math::Value(result.yield))) {
+      !std::isfinite(fims_math::Value(result.yield)) ||
+      !std::isfinite(fims_math::Value(result.objective_yield))) {
     throw std::domain_error("Nonfinite reference point result");
   }
   return result;

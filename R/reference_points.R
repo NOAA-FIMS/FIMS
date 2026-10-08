@@ -5,7 +5,9 @@
 #'
 #' @param inputs A list containing age-specific `natural_mortality`, `weight`,
 #'   `maturity`, `proportion_female`, and `fleets`. Each fleet is a list with
-#'   `share`, `selectivity`, and `weight`. For MSY, also supply `recruitment`, a
+#'   `share`, `selectivity`, and `weight`, plus optional logical `include_in_msy`
+#'   (default `TRUE`). Excluded fleets still contribute mortality and catch.
+#'   For MSY, also supply `recruitment`, a
 #'   list with `type = "beverton_holt"`, `rzero`, `steepness`, and `phi0`
 #'   (unfished spawning biomass per recruit defining the recruitment baseline).
 #'   The `inputs` returned by [get_reference_points()] can be reused here.
@@ -23,11 +25,18 @@
 #'   `not_bracketed`, or `iteration_limit`. MSY status is `converged`,
 #'   `upper_bound`, `no_positive_yield`, or `iteration_limit`. An upper-bound
 #'   MSY candidate is not an interior optimum; increase `max_f` and reassess.
+#'   Within `msy`, `objective_yield` is the optimized yield from included fleets.
+#'   `total_yield` includes all fleets' catch at that same F. The legacy `yield`
+#'   field remains an alias for `total_yield`, not necessarily the MSY objective.
+#'   `fleet_yield` reports catches for all fleets, including excluded fleets.
 #' @details
 #' Ages are annual and the final age is a plus group. Natural mortality must be
 #' strictly positive. Biomass is measured at the start of the year. Fleet shares
 #' must sum to one; a zero share excludes a survey fleet. An empty fleet list
-#' is allowed. MSY uses mean recruitment without deviations, with steepness
+#' is allowed for per-recruit and SPR calculations. MSY requires at least one
+#' fleet with `include_in_msy = TRUE`; an all-excluded objective is an error.
+#' Inclusion flags do not change or renormalize fleet shares and do not affect
+#' SPR. MSY uses mean recruitment without deviations, with steepness
 #' strictly between 0.2 and 1. Nonpositive recruitment equilibria are extinction.
 #'
 #' MSY uses a grid followed by golden-section refinement of the best sampled
@@ -82,6 +91,10 @@ calculate_reference_points <- function(inputs, spr_targets = 0.4, msy = TRUE,
 #' @param fleet_shares Optional numeric shares in ascending fleet ID order.
 #'   By default, the reference year's fleet fishing mortality coefficients
 #'   determine the shares. If all are zero, supply shares explicitly.
+#' @param include_in_msy Optional logical vector with one flag per fleet.
+#'   Defaults to all `TRUE`. Unnamed flags follow ascending fleet ID order.
+#'   Named flags must use the fleet IDs and may be provided in any order.
+#'   The flags are saved in the returned snapshot; they do not modify live fleets.
 #' @details
 #' `get_reference_points()` refreshes the live model's derived quantities and
 #' copies the chosen year's biology. It uses the current internal double
@@ -96,7 +109,7 @@ calculate_reference_points <- function(inputs, spr_targets = 0.4, msy = TRUE,
 get_reference_points <- function(model, population, year, fleet_shares = NULL,
                                  spr_targets = 0.4, msy = TRUE, max_f = 5,
                                  tolerance = 1e-8, max_iterations = 100L,
-                                 grid_intervals = 100L) {
+                                 grid_intervals = 100L, include_in_msy = NULL) {
   valid_index <- function(x) {
     is.numeric(x) && length(x) == 1L && is.finite(x) &&
       x >= 1 && x <= .Machine$integer.max && x == floor(x)
@@ -114,6 +127,23 @@ get_reference_points <- function(model, population, year, fleet_shares = NULL,
   inputs <- model$reference_point_inputs(
     as.integer(population), as.integer(year), fleet_shares
   )
+  if (!is.null(include_in_msy)) {
+    if (!is.logical(include_in_msy) || anyNA(include_in_msy) ||
+      length(include_in_msy) != length(inputs$fleets)) {
+      stop("include_in_msy must contain one TRUE or FALSE per fleet", call. = FALSE)
+    }
+    if (!is.null(names(include_in_msy))) {
+      ids <- as.character(inputs$fleet_ids)
+      if (anyDuplicated(names(include_in_msy)) ||
+        !setequal(names(include_in_msy), ids)) {
+        stop("include_in_msy names must match the population's fleet IDs", call. = FALSE)
+      }
+      include_in_msy <- include_in_msy[ids]
+    }
+    for (i in seq_along(inputs$fleets)) {
+      inputs$fleets[[i]]$include_in_msy <- unname(include_in_msy[i])
+    }
+  }
   calculate_reference_points(
     inputs, spr_targets, msy, max_f, tolerance, max_iterations, grid_intervals
   )

@@ -179,6 +179,42 @@ changing their allocation changes the partition of yield but leaves the total
 reference points unchanged. Different fishing patterns can change both SPR
 and MSY reference points.
 
+## Exclude yield without removing a fleet's mortality
+
+Use `include_in_msy` to exclude a fleet from the yield objective while keeping
+its original fishing share. Named flags use fleet IDs, so their input order
+does not matter. Unnamed flags follow ascending fleet ID order.
+
+```{r live-objective-inclusion}
+flags <- setNames(c(TRUE, FALSE), reference$inputs$fleet_ids)
+included_first <- get_reference_points(
+  model, population$get_id(), year = 2L, include_in_msy = flags,
+  spr_targets = c(0.4, 0.35)
+)
+included_first$msy[c("objective_yield", "total_yield", "fleet_yield")]
+vapply(included_first$inputs$fleets, `[[`, numeric(1), "share")
+```
+
+The second fleet still causes mortality and has positive catch. Its share
+remains 0.75. Only its yield is omitted from the objective. The snapshot stores
+these flags, and subsequent calls without overrides still include both fleets.
+The legacy `msy$yield` field remains total catch; `msy$objective_yield` is the
+quantity maximized when fleets are excluded.
+
+Because these example fleets have identical fishing patterns, objective
+exclusion simply scales the objective here. Distinct selectivities and weights
+can change the optimizing F, as shown in the standalone vignette.
+
+```{r check-live-inclusion, include=FALSE}
+stopifnot(
+  included_first$inputs$fleets[[2]]$share == 0.75,
+  !included_first$inputs$fleets[[2]]$include_in_msy,
+  included_first$msy$fleet_yield[2] > 0,
+  included_first$msy$objective_yield == included_first$msy$fleet_yield[1],
+  identical(included_first$spr, reference$spr)
+)
+```
+
 ## Reuse a snapshot after clearing the live model
 
 The result holds ordinary R data. Save the entire result with `saveRDS()` to

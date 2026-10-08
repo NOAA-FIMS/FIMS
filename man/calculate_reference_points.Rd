@@ -25,13 +25,16 @@ get_reference_points(
   max_f = 5,
   tolerance = 1e-08,
   max_iterations = 100L,
-  grid_intervals = 100L
+  grid_intervals = 100L,
+  include_in_msy = NULL
 )
 }
 \arguments{
 \item{inputs}{A list containing age-specific \code{natural_mortality}, \code{weight},
 \code{maturity}, \code{proportion_female}, and \code{fleets}. Each fleet is a list with
-\code{share}, \code{selectivity}, and \code{weight}. For MSY, also supply \code{recruitment}, a
+\code{share}, \code{selectivity}, and \code{weight}, plus optional logical \code{include_in_msy}
+(default \code{TRUE}). Excluded fleets still contribute mortality and catch.
+For MSY, also supply \code{recruitment}, a
 list with \code{type = "beverton_holt"}, \code{rzero}, \code{steepness}, and \code{phi0}
 (unfished spawning biomass per recruit defining the recruitment baseline).
 The \code{inputs} returned by \code{\link[=get_reference_points]{get_reference_points()}} can be reused here.}
@@ -59,6 +62,11 @@ and width of the fishing mortality interval for MSY.}
 \item{fleet_shares}{Optional numeric shares in ascending fleet ID order.
 By default, the reference year's fleet fishing mortality coefficients
 determine the shares. If all are zero, supply shares explicitly.}
+
+\item{include_in_msy}{Optional logical vector with one flag per fleet.
+Defaults to all \code{TRUE}. Unnamed flags follow ascending fleet ID order.
+Named flags must use the fleet IDs and may be provided in any order.
+The flags are saved in the returned snapshot; they do not modify live fleets.}
 }
 \value{
 A list with the input snapshot, unfished per-recruit biomass,
@@ -67,6 +75,10 @@ Check \code{status} before using a candidate. SPR status is \code{converged},
 \code{not_bracketed}, or \code{iteration_limit}. MSY status is \code{converged},
 \code{upper_bound}, \code{no_positive_yield}, or \code{iteration_limit}. An upper-bound
 MSY candidate is not an interior optimum; increase \code{max_f} and reassess.
+Within \code{msy}, \code{objective_yield} is the optimized yield from included fleets.
+\code{total_yield} includes all fleets' catch at that same F. The legacy \code{yield}
+field remains an alias for \code{total_yield}, not necessarily the MSY objective.
+\code{fleet_yield} reports catches for all fleets, including excluded fleets.
 }
 \description{
 Calculate spawning potential ratio (SPR) targets and optional Beverton-Holt
@@ -76,7 +88,10 @@ maximum sustainable yield (MSY), with fixed biology and fleet allocation.
 Ages are annual and the final age is a plus group. Natural mortality must be
 strictly positive. Biomass is measured at the start of the year. Fleet shares
 must sum to one; a zero share excludes a survey fleet. An empty fleet list
-is allowed. MSY uses mean recruitment without deviations, with steepness
+is allowed for per-recruit and SPR calculations. MSY requires at least one
+fleet with \code{include_in_msy = TRUE}; an all-excluded objective is an error.
+Inclusion flags do not change or renormalize fleet shares and do not affect
+SPR. MSY uses mean recruitment without deviations, with steepness
 strictly between 0.2 and 1. Nonpositive recruitment equilibria are extinction.
 
 MSY uses a grid followed by golden-section refinement of the best sampled
