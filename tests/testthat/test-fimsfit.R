@@ -87,6 +87,14 @@ test_that("`is.FIMSFit()` returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
+test_that("fit_fims() errors when Newton steps are requested", {
+  #' @description Test that fit_fims() says to use number_of_loops when Newton steps are requested.
+  expect_error(
+    fit_fims(input = NULL, number_of_newton_steps = 1),
+    regexp = "Newton steps are not implemented yet.*number_of_loops"
+  )
+})
+
 test_that("fit_fims() errors when optimization fails to converge", {
   # Create a simple test case that will fail to converge by setting
   # extremely restrictive iteration limits

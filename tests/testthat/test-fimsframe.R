@@ -354,7 +354,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
   #' @description Test that `FIMSFrame()` returns an error when there are no age data.
   expect_error(
     FIMSFrame(dplyr::mutate(data_big, age = NA_integer_)),
-    regexp = "they are all `NA`"
+    regexp = "they are all\\s+`NA`"
   )
 
   #' @description Test that `FIMSFrame()` returns an error when the age column is not present but `age_to_length_conversion` is present in type.
@@ -481,6 +481,14 @@ test_that("`model_*()` returns correct error messages", {
   expect_error(
     model_weight_at_age(fims_frame, fleet_names),
     regexp = "unused argument"
+  )
+
+  #' @description Test that `model_weight_at_age()` says what to add and lists the types when there is no weight-at-age data.
+  expect_error(
+    model_weight_at_age(
+      FIMSFrame(dplyr::filter(data_big, type != "weight_at_age"))
+    ),
+    regexp = "no `type = \"weight_at_age\"` rows.*Types in the data"
   )
 
   #' @description Test that the `model_catch()` returns an error when a fleet is not supplied.

@@ -588,11 +588,7 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
 #' The initialized catch module as an object.
 #' @noRd
 initialize_catch <- function(data, fleet) {
-  # Check if the specified fleet exists in the data
-  fleet_exists <- fleet %in% get_fleets(data)
-  if (!fleet_exists) {
-    cli::cli_abort("Fleet {.var {fleet}} not found in the data object.")
-  }
+  assert_presence_of_fleet(data, fleet)
 
   fleet_type <- dplyr::filter(
     .data = as.data.frame(get_data(data)),
@@ -622,11 +618,7 @@ initialize_catch <- function(data, fleet) {
 #' The initialized index module as an object.
 #' @noRd
 initialize_index <- function(data, fleet) {
-  # Check if the specified fleet exists in the data
-  fleet_exists <- fleet %in% get_fleets(data)
-  if (!fleet_exists) {
-    cli::cli_abort("Fleet {.var {fleet}} not found in the data object.")
-  }
+  assert_presence_of_fleet(data, fleet)
 
   fleet_type <- dplyr::filter(
     .data = as.data.frame(get_data(data)),
@@ -683,10 +675,7 @@ initialize_comp <- function(data,
   type <- match.arg(type)
   comp <- comp_types[[type]]
 
-  fleet_exists <- fleet %in% get_fleets(data)
-  if (!fleet_exists) {
-    cli::cli_abort("Fleet {.var {fleet}} not found in the data object.")
-  }
+  assert_presence_of_fleet(data, fleet)
 
   fleet_length_bins <- NULL
   uses_growth_derived_path <- identical(type, "LengthComp") &&
@@ -735,8 +724,9 @@ initialize_comp <- function(data,
   pretty_comp_name <- gsub("_comp", "-composition", comp[["name"]])
   if (is.null(comp_data) || length(comp_data) == 0) {
     cli::cli_abort(c(
-      "The {pretty_comp_name} data for fleet {.var {fleet}} is
-      unavailable or empty."
+      "x" = "Fleet {.val {fleet}} has no {pretty_comp_name} data.",
+      "i" = "Check the {.var type} ({.code {comp[['name']]}}) and
+      {.var fleet} values in those rows."
     ))
   }
 
@@ -913,7 +903,10 @@ initialize_fims <- function(parameters, data) {
 
   if (length(fleets) == 0) {
     cli::cli_abort(c(
-      "No fleets found in the provided {.var parameters}."
+      "x" = "No fleets found in the provided {.var parameters}: the
+      {.var fleet} column is empty or all {.code NA}.",
+      "i" = "Create {.var parameters} with {.fn setup_default_parameters},
+      which fills in {.var fleet} for each fleet."
     ))
   }
 

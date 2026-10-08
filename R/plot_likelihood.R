@@ -110,7 +110,11 @@ plot_likelihood <- function(like_fit, group = "label") {
     names() |>
     grep(pattern = "value_", value = TRUE)
   if (length(column_name) > 1) {
-    cli::cli_abort("Function doesn't yet support multiple profile parameters")
+    cli::cli_abort(c(
+      "x" = "{.fn plot_likelihood} plots 1 profiled parameter, but
+      {.arg like_fit} has {length(column_name)}: {.val {column_name}}.",
+      "i" = "Run {.fn fims_likelihood} for 1 parameter at a time."
+    ))
   }
   if (length(column_name) == 0) {
     cli::cli_abort(

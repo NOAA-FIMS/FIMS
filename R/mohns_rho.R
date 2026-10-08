@@ -83,7 +83,14 @@ calculate_mohns_rho <- function(retro_fit, quantity) {
 
   # Check that the first model has 0 years peeled (i.e., it's the reference model)
   if (0 != retro_fit[["years_to_remove"]][[1]]) {
-    cli::cli_abort("{.arg retro_fit} must contain reference year run")
+    cli::cli_abort(c(
+      "x" = "{.arg retro_fit} must contain the reference run, with 0 years
+      removed, first.",
+      "i" = "{.code years_to_remove} starts at
+      {retro_fit[['years_to_remove']][[1]]}. Run
+      {.fn run_fims_retrospective} with {.arg years_to_remove} starting at 0,
+      for example {.code years_to_remove = 0:5}."
+    ))
   }
 
   # Filter estimates for the specified quantity
