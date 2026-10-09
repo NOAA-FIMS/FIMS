@@ -26,7 +26,6 @@ expected_colnames <- c(
 )
 
 test_that("`get_estimates()` works with deterministic run", {
-  
   deterministic_colnames <- colnames(FIMS:::estimates_without_optimization_big)
   #' @description Test that `get_estimates()` returns correct colnames from a deterministic run.
   expect_equal(
