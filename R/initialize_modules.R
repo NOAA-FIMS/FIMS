@@ -1150,6 +1150,28 @@ initialize_fims <- function(parameters, data) {
       ))
     }
 
+    # The process density covers every element of the vector, including
+    # elements set to constant (with distribution NA) that were filtered out of
+    # recruitment_process_input above. NA estimation types are treated as
+    # constant, as in initialize_process_distribution().
+    process_estimation_types <- parameters |>
+      dplyr::filter(
+        .data$module_name == "Recruitment" & .data$label %in% par
+      ) |>
+      dplyr::pull(.data$estimation_type)
+    n_constant <- sum(
+      process_estimation_types == "constant" | is.na(process_estimation_types)
+    )
+    if (n_constant > 0) {
+      cli::cli_warn(c(
+        "!" = "{n_constant} of the {length(process_estimation_types)}
+        {.var {par}} values in the recruitment module are constant, but the
+        recruitment process distribution includes all of them.",
+        i = "The constant values still add to the negative log-likelihood and
+        affect the estimate of {.var log_sd} (biased low when they are fixed at
+        0) and, for {.var log_r}, the stock-recruit parameters."
+      ))
+    }
 
     # Initialize_process_distribution
     sd_input <- recruitment_process_input |>
