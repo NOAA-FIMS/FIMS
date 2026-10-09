@@ -185,14 +185,11 @@ For `length_bin` rows, the `length` column contains the length-bin values. The `
 
 The weight-at-age data are not currently included in the likelihood and are just used for converting from numbers to biomass in the population dynamics. The `unit` column should be `mt` and the uncertainty should be `NA`.
 
-Two key features of the weight-at-age data are 
+Weight at age is the population weight at age, so the rows have `fleet = NA`. It is used for biomass, spawning biomass, and the weight of the catch and index for every fleet. Rows with a fleet name are not used yet. Data made before this rule put the weights under 1 fleet, and those rows are still used, with a warning, when there are no `fleet = NA` rows.
 
-  1. these data are required for the one additional time step (final observation for timing + 1), and
-  2. the observations are currently shared among fleets and throughout the dynamics (so only need to be provided once).
+Rows with `timing = NA` are the default for every year, and rows with a `timing` replace that default for that year only. Timings outside the model years and the year after the last are an error. Every timing that is used needs 1 row for each model age, and rows are never averaged. Without `timing = NA` rows, every model year needs its own rows, plus the year after the last model year, because FIMS reports spawning biomass at the beginning of the year for every year, including the year after the last catches are removed from the population.
 
-The final timing + 1 observations are required because FIMS reports spawning biomass at the beginning of the year for every year, including the year after the last catches are removed from the population.
-
-The weight-at-age observations for the `data_big` are identical across time steps, and are provided for timing = 1 to 31 and associated with name = "fleet1".
+The weight-at-age observations for the `data_big` are identical across time steps and are provided for timing = 1 to 31 with `fleet = NA`. The same weights could be given as 1 set of rows with `timing = NA`.
 
 ```{r data_big-weight_at_age}
 # first and last entries  of the weight-at-age data

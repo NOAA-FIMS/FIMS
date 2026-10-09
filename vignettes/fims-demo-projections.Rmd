@@ -77,7 +77,7 @@ data_big_with_extra_year <- dplyr::add_row(
     !(type == "age_to_length_conversion" | type == "length_comp")
   )
 data_4_projections <- data_big_with_extra_year |>
-  # Add on weight_at_age because you don't want these filled with -999
+  # Add weight_at_age for the projection years, which are now model years
   dplyr::bind_rows(
     dplyr::filter(
       data_big,

@@ -187,6 +187,76 @@ test_that("`model_weight_at_age()` works with projection years", {
   )
 })
 
+test_that("`model_weight_at_age()` uses timing = NA rows as the default and timing rows as overrides", {
+  n_ages <- get_n_ages(fims_frame)
+  n_weight_years <- get_n_years(fims_frame) + 1
+  default_weight_rows <- dplyr::filter(
+    data_big,
+    type == "weight_at_age",
+    timing == 1
+  ) |>
+    dplyr::mutate(timing = NA_integer_)
+  data_with_default <- dplyr::bind_rows(
+    dplyr::filter(data_big, type != "weight_at_age"),
+    default_weight_rows
+  )
+  #' @description Test that `model_weight_at_age()` copies `timing = NA` rows to every year, including the year after the last model year.
+  expect_equal(
+    model_weight_at_age(data_with_default),
+    rep(default_weight_rows[["observed"]], n_weight_years)
+  )
+  #' @description Test that `FIMSFrame()` does not add -999 rows for years covered by `timing = NA` weight-at-age rows.
+  expect_false(any(
+    get_data(FIMSFrame(data_with_default)) |>
+      dplyr::filter(type == "weight_at_age") |>
+      dplyr::pull(observed) == -999
+  ))
+
+  year_5_weight_rows <- dplyr::mutate(
+    default_weight_rows,
+    timing = 5L,
+    observed = observed * 2
+  )
+  weight_with_override <- model_weight_at_age(
+    dplyr::bind_rows(data_with_default, year_5_weight_rows)
+  )
+  year_5_index <- 4 * n_ages + seq_len(n_ages)
+  #' @description Test that `model_weight_at_age()` replaces the default with the rows for that timing in that year only.
+  expect_equal(
+    weight_with_override[year_5_index],
+    year_5_weight_rows[["observed"]]
+  )
+  expect_equal(
+    weight_with_override[-year_5_index],
+    rep(default_weight_rows[["observed"]], n_weight_years - 1)
+  )
+
+  legacy_data <- dplyr::mutate(
+    data_big,
+    fleet = dplyr::if_else(type == "weight_at_age", "fleet1", fleet)
+  )
+  #' @description Test that `FIMSFrame()` warns and uses fleet rows as the population weight when there are no `fleet = NA` rows.
+  expect_warning(
+    legacy_frame <- FIMSFrame(legacy_data),
+    regexp = "used as the population weight at\\s+age"
+  )
+  expect_equal(model_weight_at_age(legacy_frame), model_weight_at_age(fims_frame))
+
+  #' @description Test that `FIMSFrame()` warns that fleet rows are not used when there are `fleet = NA` rows.
+  expect_warning(
+    with_fleet_frame <- FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::filter(legacy_data, type == "weight_at_age") |>
+        dplyr::mutate(observed = observed * 2)
+    )),
+    regexp = "not used\\.\\s+Only\\s+rows"
+  )
+  expect_equal(
+    model_weight_at_age(with_fleet_frame),
+    model_weight_at_age(fims_frame)
+  )
+})
+
 ## Edge handling ----
 test_that("`FIMSFrame()` returns correct outputs for edge cases", {
   #' @description Test that `get_data()` retrieves the data slot as a data frame when passed a data frame rather than a FIMSFrame object.
@@ -316,6 +386,54 @@ test_that("`FIMSFrame()` returns correct error messages", {
       dplyr::mutate(terminal_weight, timing = 32)
     )),
     regexp = "the following timings: 32"
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when weight-at-age data are for more than 1 fleet and there are no `fleet = NA` rows.
+  weight_rows <- dplyr::filter(data_big, type == "weight_at_age")
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      dplyr::filter(data_big, type != "weight_at_age"),
+      dplyr::mutate(weight_rows, fleet = "fleet1"),
+      dplyr::mutate(weight_rows, fleet = "survey1")
+    )),
+    regexp = "more than 1 fleet and no\\s+population rows"
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when weight-at-age data have a timing before the first model year.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::mutate(terminal_weight, timing = 0)
+    )),
+    regexp = "the following timings: 0"
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when weight-at-age data skip a year and have no `timing = NA` default.
+  expect_error(
+    FIMSFrame(dplyr::filter(data_big, !(type == "weight_at_age" & timing == 5))),
+    regexp = "missing these years:\\s+5"
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when a weight-at-age timing is missing an age.
+  expect_error(
+    FIMSFrame(dplyr::filter(
+      data_big,
+      !(type == "weight_at_age" & timing == 5 & age == 3)
+    )),
+    regexp = "These timings do\\s+not: 5"
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when weight at age is -999.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      observed = dplyr::if_else(
+        type == "weight_at_age" & timing == 5 & age == 3,
+        -999,
+        observed
+      )
+    )),
+    regexp = "missing or negative"
   )
 
   #' @description Test that `FIMSFrame` validators pick up on a missing age in age-composition data.
