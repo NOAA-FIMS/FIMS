@@ -237,7 +237,8 @@ methods::setGeneric("get_convergence", function(x) standardGeneric("get_converge
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
 methods::setMethod("get_convergence", "FIMSFit", function(x) {
-  # Fits saved before the convergence slot existed have no checks to return
+  # A FIMSFit without a convergence slot, e.g., read from an older saved file,
+  # has no checks to return
   if (!methods::.hasSlot(x, "convergence")) {
     return(convergence_check(character(0), character(0)))
   }
