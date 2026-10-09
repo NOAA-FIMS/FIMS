@@ -34,6 +34,9 @@ check_ASSAMC <- function() {
   return(TRUE)
 }
 
+# Ensure usethis writes generated data to the package root.
+usethis::proj_set(".", force = TRUE)
+
 check_ASSAMC()
 library(dplyr)
 
@@ -225,6 +228,7 @@ for (iter in 1:sim_num) {
 }
 
 # Save all simulations to a single file for {testthat} integration tests
+dir.create(testthat::test_path("fixtures"), recursive = TRUE, showWarnings = FALSE)
 save(
   om_input_list, om_output_list, em_input_list,
   file = testthat::test_path("fixtures", "integration_test_data.RData")
@@ -420,7 +424,95 @@ save(
 # Add the conversion matrix and length composition data to dataframe
 data_big <- rbind(data_big, length_comp_data, length_age_data)
 
-usethis::use_data(data_big, overwrite = TRUE)
+# Fit using current default-parameter setup and operating-model starting values.
+data_frame <- FIMS::FIMSFrame(data_big)
+om_input <- returned_om[["om_input"]]
+om_output <- returned_om[["om_output"]]
+em_input <- returned_om[["em_input"]]
+
+parameters_big <- FIMS::setup_default_parameters(data = data_frame) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      fleet = "fleet1",
+      label = "log_Fmort",
+      timing = seq_len(FIMS::get_n_years(data_frame)),
+      value = log(om_output[["f"]])
+    ),
+    by = c("fleet", "label", "timing")
+  ) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      fleet = "survey1",
+      label = c("inflection_point", "slope", "log_q"),
+      value = c(1.5, 2, log(om_output[["survey_q"]][["survey1"]]))
+    ),
+    by = c("fleet", "label")
+  ) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      label = "log_devs",
+      timing = seq.int(2, FIMS::get_n_years(data_frame)),
+      value = om_input[["logR.resid"]][-1]
+    ),
+    by = c("label", "timing")
+  ) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Recruitment",
+      label = "log_sd",
+      value = log(om_input[["logR_sd"]])
+    ),
+    by = c("module_name", "label")
+  ) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Maturity",
+      label = c("inflection_point", "slope"),
+      value = c(om_input[["A50.mat"]], om_input[["slope.mat"]])
+    ),
+    by = c("module_name", "label")
+  ) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      label = "log_init_naa",
+      age = seq_len(FIMS::get_n_ages(data_frame)),
+      value = log(om_output[["N.age"]][1, ])
+    ),
+    by = c("label", "age")
+  )
+
+fit_without_optimization_big <- parameters_big |>
+  FIMS::initialize_fims(data = data_frame) |>
+  FIMS::fit_fims(optimize = FALSE)
+estimates_without_optimization_big <- FIMS::get_estimates(
+  fit_without_optimization_big
+)
+FIMS::clear()
+
+fit_with_optimization_big <- parameters_big |>
+  FIMS::initialize_fims(data = data_frame) |>
+  FIMS::fit_fims(optimize = TRUE)
+estimates_with_optimization_big <- FIMS::get_estimates(
+  fit_with_optimization_big
+)
+FIMS::clear()
+
+usethis::use_data(
+  data_big,
+  parameters_big,
+  fit_with_optimization_big,
+  estimates_with_optimization_big,
+  overwrite = TRUE,
+  compress = "xz"
+)
+
+usethis::use_data(
+  fit_without_optimization_big,
+  estimates_without_optimization_big,
+  internal = TRUE,
+  overwrite = TRUE,
+  compress = "xz"
+)
 on.exit(unlink(main_dir, recursive = TRUE), add = TRUE)
 on.exit(setwd(working_dir), add = TRUE)
 rm(list = ls())
