@@ -899,8 +899,8 @@ validate_fleets_have_observations <- function(data) {
 }
 
 # Each fleet fits catch and index to expected weight (mt) or expected numbers,
-# chosen from `unit`. Any other unit would be fit as weight without a message,
-# and the model holds one unit per fleet for catch and one for index.
+# chosen from `unit`, and the model holds one unit per fleet for catch and one
+# for index.
 validate_catch_and_index_units <- function(data) {
   fleet_units <- data |>
     dplyr::filter(.data[["type"]] %in% c("catch", "index")) |>
