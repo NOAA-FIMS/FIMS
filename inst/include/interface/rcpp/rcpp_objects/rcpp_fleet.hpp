@@ -578,21 +578,29 @@ class FleetInterface : public FleetInterfaceBase {
       fleet->age_to_length_conversion.resize(
           this->age_to_length_conversion.size());
 
+      // One age x length table for all years, or one table per year.
       const size_t expected_age_to_length_conversion_size =
           static_cast<size_t>(this->n_ages.get() * this->n_lengths.get());
+      const size_t expected_age_to_length_conversion_size_by_year =
+          static_cast<size_t>(this->n_years.get()) *
+          expected_age_to_length_conversion_size;
       const size_t supplied_age_to_length_conversion_size =
           this->age_to_length_conversion.size();
 
       if (supplied_age_to_length_conversion_size != 0 &&
           supplied_age_to_length_conversion_size !=
-              expected_age_to_length_conversion_size) {
+              expected_age_to_length_conversion_size &&
+          supplied_age_to_length_conversion_size !=
+              expected_age_to_length_conversion_size_by_year) {
         FIMS_ERROR_LOG(
             "age_to_length_conversion size mismatch, " +
-            fims::to_string(supplied_age_to_length_conversion_size) +
-            " != " + fims::to_string(expected_age_to_length_conversion_size));
+            fims::to_string(supplied_age_to_length_conversion_size) + " != " +
+            fims::to_string(expected_age_to_length_conversion_size) + " or " +
+            fims::to_string(expected_age_to_length_conversion_size_by_year));
         throw std::invalid_argument(
             "Fleet age_to_length_conversion size mismatch. Expected " +
-            fims::to_string(expected_age_to_length_conversion_size) +
+            fims::to_string(expected_age_to_length_conversion_size) + " or " +
+            fims::to_string(expected_age_to_length_conversion_size_by_year) +
             " values but received " +
             fims::to_string(supplied_age_to_length_conversion_size) + ".");
       }

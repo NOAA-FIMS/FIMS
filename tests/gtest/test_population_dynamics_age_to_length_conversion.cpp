@@ -227,6 +227,57 @@ TEST(AgeToLengthConversionFixed, IsInactiveWithWrongMatrixSize) {
   EXPECT_FALSE(age_to_length_conversion.IsActive());
 }
 
+TEST(AgeToLengthConversionFixed,
+     BuildAgeToLengthConversionRowUsesTheYearTableWhenGivenOnePerYear) {
+  auto fleet = MakeFleet();
+  fleet->n_years = 2;
+  const std::size_t table_size = fleet->n_ages * fleet->n_lengths;
+  fleet->age_to_length_conversion.resize(fleet->n_years * table_size);
+  // Year 0 puts every age in the first length bin and year 1 in the last.
+  for (std::size_t year = 0; year < fleet->n_years; ++year) {
+    for (std::size_t age = 0; age < fleet->n_ages; ++age) {
+      for (std::size_t length = 0; length < fleet->n_lengths; ++length) {
+        const std::size_t full_bin = year == 0 ? 0 : fleet->n_lengths - 1;
+        fleet->age_to_length_conversion[year * table_size +
+                                        age * fleet->n_lengths + length] =
+            length == full_bin ? 1.0 : 0.0;
+      }
+    }
+  }
+
+  fims_popdy::AgeToLengthConversionFixed<double> age_to_length_conversion(
+      fleet);
+  fims::Vector<double> row;
+
+  EXPECT_TRUE(age_to_length_conversion.IsActive());
+  EXPECT_TRUE(
+      age_to_length_conversion.BuildAgeToLengthConversionRow(0, 2, row));
+  EXPECT_DOUBLE_EQ(row[0], 1.0);
+  EXPECT_DOUBLE_EQ(row[3], 0.0);
+  EXPECT_TRUE(
+      age_to_length_conversion.BuildAgeToLengthConversionRow(1, 2, row));
+  EXPECT_DOUBLE_EQ(row[0], 0.0);
+  EXPECT_DOUBLE_EQ(row[3], 1.0);
+  EXPECT_FALSE(
+      age_to_length_conversion.BuildAgeToLengthConversionRow(2, 2, row));
+}
+
+TEST(AgeToLengthConversionFixed,
+     BuildAgeToLengthConversionRowSharesOneTableAcrossYears) {
+  auto fleet = MakeFleet();
+  fleet->n_years = 2;
+  FillFixedMatrix(fleet);
+
+  fims_popdy::AgeToLengthConversionFixed<double> age_to_length_conversion(
+      fleet);
+  fims::Vector<double> row;
+
+  EXPECT_TRUE(
+      age_to_length_conversion.BuildAgeToLengthConversionRow(1, 1, row));
+  EXPECT_DOUBLE_EQ(row[0], 0.4);
+  EXPECT_DOUBLE_EQ(row[3], 0.1);
+}
+
 TEST(AgeToLengthConversionRuntime,
      BuildAgeToLengthConversionFleetReturnsNullWhenGrowthDerivedPrepareFails) {
   auto population = std::make_shared<fims_popdy::Population<double>>();
