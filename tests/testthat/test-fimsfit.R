@@ -32,7 +32,8 @@ test_that("`is.FIMSFit()` works with correct inputs", {
 
   expected_names <- c(
     "input", "obj", "opt", "max_gradient", "gradient", "report", "sdreport",
-    "number_of_parameters", "run_time", "version", "model_output"
+    "number_of_parameters", "run_time", "version", "model_output",
+    "convergence"
   )
   #' @description Test a FIMSFit object has the correct slot names.
   expect_equal(
@@ -63,6 +64,26 @@ test_that("`fit_fims()` passes `getReportCovariance` to `TMB::sdreport()`", {
   )
   expect_true(all(is.finite(diag(sdreport[["cov"]]))))
   clear()
+})
+
+test_that("`get_convergence()` works with correct inputs", {
+  convergence <- get_convergence(fit_age_length_comp)
+  #' @description Test that `get_convergence()` returns 1 row per check run by `fit_fims()` when sdreport is run.
+  expect_equal(
+    object = convergence[["check"]],
+    expected = c(
+      "optimizer", "max_gradient", "hessian", "standard_errors",
+      "condition_number"
+    )
+  )
+  #' @description Test that `get_convergence()` stores the maximum gradient of the fit.
+  expect_equal(
+    object = convergence[["value"]][convergence[["check"]] == "max_gradient"],
+    expected = get_max_gradient(fit_age_length_comp),
+    tolerance = 1e-8
+  )
+  #' @description Test that `get_convergence()` has no failed checks for a converged fit.
+  expect_false(any(convergence[["severity"]] == "FAIL"))
 })
 
 ## Edge handling ----
@@ -128,6 +149,17 @@ test_that("fit_fims() errors when optimization fails to converge", {
       fit_fims(optimize = TRUE, control = bad_control),
     regexp = "Optimization failed convergence checks"
   )
+  #' @description Test that fit_fims() stores a failed optimization check when convergence fails.
+  convergence <- get_convergence(result)
+  expect_true(any(convergence[["severity"]] == "FAIL"))
+  #' @description Test that fit_fims() skips sdreport exactly when the maximum gradient fails.
+  gradient_failed <- convergence[["severity"]][
+    convergence[["check"]] == "max_gradient"
+  ] == "FAIL"
+  expect_equal(
+    object = length(get_sdreport(result)) == 0,
+    expected = gradient_failed
+  )
 
   # Set control parameters that will allow convergence but
   # return large gradient
@@ -155,6 +187,29 @@ test_that("fit_fims() errors when optimization fails to converge", {
     result <- initialized_model |>
       fit_fims(optimize = TRUE, control = bad_control),
     regexp = "Optimization resulted in high gradients"
+  )
+  #' @description Test that fit_fims() keeps sdreport and records a WARN when max gradient is moderately high.
+  convergence <- get_convergence(result)
+  expect_equal(
+    object = convergence[["severity"]][convergence[["check"]] == "max_gradient"],
+    expected = "WARN"
+  )
+  expect_s3_class(get_sdreport(result), "sdreport")
+  #' @description Test that print() shows the convergence status and names the flagged check.
+  withr::with_options(
+    list(rlib_message_verbosity = "default"),
+    expect_message(print(result), "Convergence: \"WARN\" from")
+  )
+
+  #' @description Test that fit_fims() records that the Hessian was not checked when get_sd = FALSE.
+  result <- suppressWarnings(
+    initialized_model |>
+      fit_fims(optimize = TRUE, control = bad_control, get_sd = FALSE)
+  )
+  convergence <- get_convergence(result)
+  expect_equal(
+    object = convergence[["message"]][convergence[["check"]] == "sdreport"],
+    expected = "Hessian not checked because get_sd = FALSE."
   )
 
   clear()
@@ -238,6 +293,11 @@ test_that("fit_fims() errors when optimization fails to converge", {
   ))
   expect_true(inherits(test_results, "FIMSFit"))
   expect_equal(get_opt(test_results)[["convergence"]], 1L)
+  #' @description Test that fit_fims() stores a failed optimizer check and a not-checked Hessian when nlminb fails.
+  expect_equal(
+    object = get_convergence(test_results)[["severity"]],
+    expected = c("FAIL", "NOTE")
+  )
   expect_equal(
     names(get_opt(test_results)),
     c("par", "objective", "convergence", "message")

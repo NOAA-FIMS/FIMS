@@ -1,7 +1,7 @@
 # check_sdreport_convergence() returns correct error messages
 
     Code
-      FIMS:::check_sdreport_convergence(list(), obj, opt, sdreport, parameter_names = c(
+      FIMS:::check_sdreport_convergence(obj, opt, sdreport, parameter_names = c(
         "Recruitment.1.log_rzero.1", "Fleet.1.log_q.3"))
     Condition
       Warning:

@@ -10,7 +10,8 @@ FIMSFit(
   opt = list(),
   sdreport = list(),
   run_time = c(time_total = as.difftime(0, units = "secs")),
-  version = utils::packageVersion("FIMS")
+  version = utils::packageVersion("FIMS"),
+  convergence = convergence_check(character(0), character(0))
 )
 }
 \arguments{
@@ -33,6 +34,10 @@ by subtracting two \code{\link[=Sys.time]{Sys.time()}} objects.}
 \item{version}{The version of FIMS that was used to optimize the model. If
 \code{\link[=fit_fims]{fit_fims()}} was not used to optimize the model, then the default is to
 use the current version of the package that is loaded.}
+
+\item{convergence}{A data frame with one row per convergence check, as
+returned by \code{\link[=get_convergence]{get_convergence()}}. \code{\link[=fit_fims]{fit_fims()}} fills it in. The default has
+no rows, which means no checks were run.}
 }
 \value{
 An object with an S4 class of \code{FIMSFit} is returned. The object will have the
@@ -68,6 +73,10 @@ if you are running this function yourself.
 }
 \item{\code{model_output}:}{
 The FIMS model output as a JSON string.
+}
+\item{\code{convergence}:}{
+A tibble with the result of each convergence check. See
+\code{\link[=get_convergence]{get_convergence()}}.
 }
 }
 }
