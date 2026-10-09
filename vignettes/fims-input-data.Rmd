@@ -35,7 +35,7 @@ The input data for a FIMS model is a single long data frame with the following c
 
 Two drawbacks of the long format are (1) some information is duplicated, and (2) the long format is harder to read and understand by looking at the raw data frame. To meet this second challenge, the FIMS team is working on functions to summarize, visualize, and check for errors in the input data.
 
-The currently available values for the `type` column are `r glue::glue_collapse(glue::glue('\"{FIMS::fims_input_types}\"'), sep = ", ", last = ", and ")`. The "weight_at_age" and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
+The currently available values for the `type` column are `r glue::glue_collapse(glue::glue('\"{FIMS::fims_input_types}\"'), sep = ", ", last = ", and ")`. The "weight_at_age", "spawning_weight_at_age", "fecundity_at_age", and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
 
 The individual data types are described in more detail below after introducing the example data set that is included in the package.
 
@@ -185,7 +185,7 @@ For `length_bin` rows, the `length` column contains the length-bin values. The `
 
 The weight-at-age data are not currently included in the likelihood and are just used for converting from numbers to biomass in the population dynamics. The `unit` column should be `mt` and the uncertainty should be `NA`.
 
-The population weight at age has `fleet = NA`. It is used for biomass and spawning biomass, and for the catch and index weight of any fleet without its own weight at age. Rows with a fleet name are that fleet's weight at age for its catch and index weight, for example from port samples or survey samples. For each year, a fleet uses its own rows for that year, then its own `timing = NA` rows, then the population weight at age, so a fleet only needs rows for the years that differ. If there are no `fleet = NA` rows and only 1 fleet has weight rows, those rows are used as the population weight at age, with a warning.
+The population weight at age has `fleet = NA`. It is used for biomass, for spawning biomass unless `spawning_weight_at_age` rows are given, and for the catch and index weight of any fleet without its own weight at age. Rows with a fleet name are that fleet's weight at age for its catch and index weight, for example from port samples or survey samples. For each year, a fleet uses its own rows for that year, then its own `timing = NA` rows, then the population weight at age, so a fleet only needs rows for the years that differ. If there are no `fleet = NA` rows and only 1 fleet has weight rows, those rows are used as the population weight at age, with a warning.
 
 Rows with `timing = NA` are the default for every year, and rows with a `timing` replace that default for that year only. Timings outside the model years and the year after the last are an error. Every timing that is used needs 1 row for each model age, and rows are never averaged. Without `timing = NA` rows, every model year needs its own rows, plus the year after the last model year, because FIMS reports spawning biomass at the beginning of the year for every year, including the year after the last catches are removed from the population.
 
@@ -224,6 +224,18 @@ FIMS::data_big |>
   geom_hline(yintercept = 0) +
   ggtitle("Weight-at-age by time step in data_big example data set")
 ```
+
+## Spawning weight and fecundity (`type == "spawning_weight_at_age"` and `type == "fecundity_at_age"`)
+
+Spawning output in each year is the sum over ages of numbers at age times proportion female, maturity, spawning weight at age, and fecundity at age. Each of the last 3 has a default, and rows for one replace only that one's default:
+
+- Maturity comes from the maturity module.
+- Spawning weight at age defaults to the population weight at age. It can be given separately, for example weight at the time of spawning.
+- Fecundity at age defaults to 1. It is spawning output per unit of spawning weight, for example eggs per mt.
+
+Without `spawning_weight_at_age` or `fecundity_at_age` rows, spawning output is spawning biomass, as before. Both types are inputs for the population, so their rows need `fleet = NA`, and they use the same `timing` rule as weight at age: rows with `timing = NA` are the default for every year, rows with a `timing` replace that default for that year, and without `timing = NA` rows every model year and the year after the last need rows. The `unit` column describes the input, for example `mt` for spawning weight or `eggs/mt` for fecundity. Unfished spawning output and spawning output per recruit use the same product, with the values for the first model year for spawning output per recruit.
+
+Because the 3 values are multiplied, a combined vector can be put in 1 of them with the others set to 1. For example, the Stock Synthesis empirical input of weight times maturity times eggs per weight can be entered as `fecundity_at_age`, with `spawning_weight_at_age` rows of 1 and maturity set to 1 at every age, e.g., a logistic maturity with `inflection_point = -100`. Stock Synthesis one-sex models (`Ngenders = 1`) count every fish as female, so also set `proportion_female = 1` (or the `female_frac` value for `Ngenders = -1`). The `spawning_biomass` output is then in the units of that vector.
 
 ## Age-to-length conversion (`type == "age_to_length_conversion"`)
 

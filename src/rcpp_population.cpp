@@ -33,6 +33,9 @@ void register_population(Rcpp::Module& m) {
              &PopulationInterface::spawning_biomass_ratio)
       .field("log_init_naa", &PopulationInterface::log_init_naa)
       .field("proportion_female", &PopulationInterface::proportion_female)
+      .field("spawning_weight_at_age",
+             &PopulationInterface::spawning_weight_at_age)
+      .field("fecundity_at_age", &PopulationInterface::fecundity_at_age)
       .field("ages", &PopulationInterface::ages)
       .field("total_catch_weight", &PopulationInterface::total_catch_weight)
       .field("total_catch_numbers", &PopulationInterface::total_catch_numbers)
