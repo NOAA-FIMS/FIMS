@@ -553,14 +553,31 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     module$age_to_length_conversion$resize(0)
   }
 
+  # FIMSFrame() allows only "mt" or "number" as the unit of catch and index,
+  # with 1 unit per fleet for each type. The fleet fits "number" to expected
+  # numbers and "weight" to expected weight.
+  fleet_units <- get_data(data) |>
+    dplyr::filter(
+      .data$fleet == .env$fleet,
+      .data$type %in% c("catch", "index")
+    ) |>
+    dplyr::select(dplyr::all_of(c("type", "unit"))) |>
+    dplyr::distinct()
+  fleet_units <- stats::setNames(
+    dplyr::if_else(fleet_units[["unit"]] == "number", "number", "weight"),
+    fleet_units[["type"]]
+  )
+
   # Link the observed catch data to the fleet module using its associated ID.
   if ("catch" %in% fleet_types) {
     module$SetObservedCatchDataID(linked_ids[["catch"]])
+    module$observed_catch_units$set(fleet_units[["catch"]])
   }
 
   # Link the observed index data to the fleet module using its associated ID
   if ("index" %in% fleet_types) {
     module$SetObservedIndexDataID(linked_ids[["index"]])
+    module$observed_index_units$set(fleet_units[["index"]])
   }
 
   # Link the observed age-composition data to the fleet module using its

@@ -25,10 +25,11 @@ for age-to-length conversion.}
 \item{timing}{The timing, i.e., year the data was collected.}
 \item{observed}{The observed measurement of interest.}
 \item{unit}{A character string specifying the units of \code{observed}. Allowed
-units for each data type are as follows. \code{mt} is used for \code{index},
-\code{catch}, and \code{weight_at_age} data. \code{number} or \code{proportion} are each
-viable units for the composition data, where the former is the preferred
-unit of measurement.}
+units for each data type are as follows. \code{mt} or \code{number} are used for
+\code{index} and \code{catch} data, with 1 unit per fleet for each type. \code{mt} is
+used for \code{weight_at_age} data. \code{number} or \code{proportion} are each viable
+units for the composition data, where the former is the preferred unit
+of measurement.}
 \item{uncertainty}{A right-handed formula specifying the distributional
 assumptions for the entry in \code{observed}. See \code{\link[=FIMSFrame]{FIMSFrame()}} for more
 information about this column.
