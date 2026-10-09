@@ -314,12 +314,15 @@ NULL
 #' conversion data are present in the `FIMSFrame` object.
 #'
 #' ## `model_weight_at_age()`
-#' Returns a numeric vector of the population weight at age (type
-#' `"weight_at_age"` with `fleet = NA`), ordered by year (including the year
-#' after the last model year) and then age. Rows with `timing = NA` apply to
-#' every year and rows with a `timing` replace that default for that year.
-#' When there are no `fleet = NA` rows, the rows for the 1 fleet with weight
-#' at age are used. Nothing is averaged.
+#' Returns a numeric vector of weight at age (type `"weight_at_age"`), ordered
+#' by year and then age. Rows with `timing = NA` apply to every year and rows
+#' with a `timing` replace that default for that year. Nothing is averaged.
+#' With the default `fleet = NA`, it returns the population weight at age from
+#' `fleet = NA` rows, including the year after the last model year. When there
+#' are no `fleet = NA` rows, the rows for the 1 fleet with weight at age are
+#' used. With 1 fleet name, it returns that fleet's weight at age for the
+#' model years: the fleet's rows for that year, then its `timing = NA` rows,
+#' then the population weight at age.
 #'
 #' ## `model_age_to_length_conversion()`
 #' Returns a numeric vector of age-to-length conversion observations.
@@ -476,14 +479,14 @@ methods::setMethod(
 #' @keywords FIMSFrame
 methods::setGeneric(
   "model_weight_at_age",
-  function(x) standardGeneric("model_weight_at_age")
+  function(x, fleet = NA_character_) standardGeneric("model_weight_at_age")
 )
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setMethod(
   "model_weight_at_age",
   "FIMSFrame",
-  function(x) {
+  function(x, fleet = NA_character_) {
     weight_data <- dplyr::filter(
       .data = as.data.frame(x@data),
       .data[["type"]] == "weight_at_age"
@@ -493,28 +496,58 @@ methods::setMethod(
         message = "No weight_at_age data found in FIMSFrame object."
       )
     }
-    weight_data <- population_weight_at_age_rows(weight_data)
     ages <- get_ages(x)
-    # The year after the last model year is needed for spawning biomass at
-    # the start of that year, after the last catches are removed
-    years <- get_start_year(x):(get_end_year(x) + 1)
-    default_weight <- weight_data |>
-      dplyr::filter(is.na(.data[["timing"]])) |>
-      dplyr::select(dplyr::all_of("age"), default_observed = "observed")
-    year_weight <- weight_data |>
-      dplyr::filter(!is.na(.data[["timing"]])) |>
-      dplyr::select(dplyr::all_of(c("timing", "age", "observed")))
-    # Ordered by year then age, as the Growth module reads the weights
+    is_population <- length(fleet) == 1 && is.na(fleet)
+    if (!is_population) {
+      assert_presence_of_fleet(x, fleet)
+    }
+    # The population needs the year after the last model year for spawning
+    # biomass at the start of that year, after the last catches are removed.
+    # A fleet's catch and index weight are only needed in the model years.
+    years <- if (is_population) {
+      get_start_year(x):(get_end_year(x) + 1)
+    } else {
+      get_start_year(x):get_end_year(x)
+    }
+    split_by_timing <- function(rows, prefix) {
+      list(
+        year = rows |>
+          dplyr::filter(!is.na(.data[["timing"]])) |>
+          dplyr::select(dplyr::all_of(c("timing", "age", "observed"))) |>
+          dplyr::rename(!!paste0(prefix, "_year") := "observed"),
+        default = rows |>
+          dplyr::filter(is.na(.data[["timing"]])) |>
+          dplyr::select(dplyr::all_of(c("age", "observed"))) |>
+          dplyr::rename(!!paste0(prefix, "_default") := "observed")
+      )
+    }
+    population <- split_by_timing(
+      population_weight_at_age_rows(weight_data),
+      "population"
+    )
+    fleet_rows <- dplyr::filter(
+      weight_data,
+      !is.na(.data[["fleet"]]),
+      .data[["fleet"]] %in% .env[["fleet"]]
+    )
+    fleet_weight <- split_by_timing(fleet_rows, "fleet")
+    # Ordered by year then age, as the Growth module and the Fleet read the
+    # weights. A fleet uses its own rows for that year, then its own default,
+    # then the population rows for that year, then the population default.
     tibble::tibble(
       timing = rep(years, each = length(ages)),
       age = rep(ages, times = length(years))
     ) |>
-      dplyr::left_join(year_weight, by = c("timing", "age")) |>
-      dplyr::left_join(default_weight, by = "age") |>
+      dplyr::left_join(fleet_weight[["year"]], by = c("timing", "age")) |>
+      dplyr::left_join(fleet_weight[["default"]], by = "age") |>
+      dplyr::left_join(population[["year"]], by = c("timing", "age")) |>
+      dplyr::left_join(population[["default"]], by = "age") |>
       dplyr::mutate(
         observed = dplyr::coalesce(
-          .data[["observed"]],
-          .data[["default_observed"]]
+          .data[["fleet_year"]],
+          .data[["fleet_default"]],
+          .data[["population_year"]],
+          .data[["population_default"]]
         )
       ) |>
       dplyr::pull(.data[["observed"]])
@@ -525,8 +558,8 @@ methods::setMethod(
 methods::setMethod(
   "model_weight_at_age",
   "data.frame",
-  function(x) {
-    model_weight_at_age(FIMSFrame(x))
+  function(x, fleet = NA_character_) {
+    model_weight_at_age(FIMSFrame(x), fleet)
   }
 )
 
@@ -974,37 +1007,40 @@ validate_weight_at_age <- function(data, ages, years) {
       {.code fleet = NA}.",
       "i" = "Set {.code fleet = NA} for population weight at age."
     ))
-  } else if (length(weight_fleets) > 0) {
-    cli::cli_warn(c(
-      "!" = "{.var weight_at_age} rows for fleet{?s} {.val {weight_fleets}}
-      are not used. Only rows with {.code fleet = NA}, the population weight
-      at age, are used.",
-      "i" = "Use {.code dplyr::filter(data, type == 'weight_at_age',
-      !is.na(fleet))} to find the rows."
-    ))
   }
 
-  population_weight <- population_weight_at_age_rows(weight_data)
-  incomplete_timings <- population_weight |>
+  # Fleet rows are checked too, because a fleet uses its own rows for its
+  # catch and index weight
+  incomplete_timings <- weight_data |>
     dplyr::summarize(
       complete = length(.data[["age"]]) == length(ages) &&
         setequal(.data[["age"]], ages),
-      .by = dplyr::all_of("timing")
+      .by = dplyr::all_of(c("fleet", "timing"))
     ) |>
     dplyr::filter(!.data[["complete"]]) |>
-    dplyr::pull(.data[["timing"]])
+    dplyr::mutate(
+      label = dplyr::if_else(
+        is.na(.data[["fleet"]]),
+        as.character(.data[["timing"]]),
+        paste(.data[["fleet"]], .data[["timing"]])
+      )
+    ) |>
+    dplyr::pull(.data[["label"]])
   if (length(incomplete_timings) > 0) {
     cli::cli_abort(c(
       "x" = "{.var weight_at_age} is missing ages for these timings:
       {.val {incomplete_timings}}.",
-      "i" = "Every timing that is used needs 1 row for each model age
-      ({min(ages)}-{max(ages)}).",
+      "i" = "Every timing that is used, for the population or a fleet, needs
+      1 row for each model age ({min(ages)}-{max(ages)}).",
       "i" = "Use {.code dplyr::count(dplyr::filter(data, type ==
       'weight_at_age'), fleet, timing)} to see the number of ages in each
       timing."
     ))
   }
 
+  # Only the population needs every year, because a fleet without rows for a
+  # year uses the population weight for that year
+  population_weight <- population_weight_at_age_rows(weight_data)
   if (!any(is.na(population_weight[["timing"]]))) {
     missing_years <- setdiff(years, population_weight[["timing"]])
     if (length(missing_years) > 0) {

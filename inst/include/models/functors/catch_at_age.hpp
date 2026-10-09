@@ -780,12 +780,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * multiplying the expected catch numbers at age by the corresponding
    * weight at age:
    * \f[
-   * CW_{f,a,y} = C_{f,a,y} \times w_a
+   * CW_{f,a,y} = C_{f,a,y} \times w_{f,a,y}
    * \f]
-   * Weight at age comes from the historical direct growth evaluation path
-   * unless the population growth object exposes the growth-derived
-   * observation interface, in which case the biological population mean
-   * weight-at-age path is used.
+   * Weight at age is the fleet's own weight at age when the fleet has one.
+   * Otherwise it is the population weight at age, which comes from the
+   * historical direct growth evaluation path unless the population growth
+   * object exposes the growth-derived observation interface, in which case
+   * the biological population mean weight-at-age path is used.
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
@@ -807,7 +808,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(fleet->GetId());
 
-      Type mean_weight_at_age = PopulationMeanWeightAA(population, year, age);
+      Type mean_weight_at_age;
+      if (fleet->weight_at_age.size() > 0) {
+        mean_weight_at_age = fleet->weight_at_age[i_age_year];
+      } else {
+        mean_weight_at_age = PopulationMeanWeightAA(population, year, age);
+      }
 
       fdq_["catch_weight_at_age"][i_age_year] =
           fdq_["catch_numbers_at_age"][i_age_year] * mean_weight_at_age;
@@ -925,12 +931,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This function computes the expected index weight at age by multiplying the
    * expected index numbers at age by the corresponding weight at age:
    * \f[
-   * IWAA_{f,a,y} = IN_{f,a,y} \times w_a
+   * IWAA_{f,a,y} = IN_{f,a,y} \times w_{f,a,y}
    * \f]
-   * Weight at age comes from the historical direct growth evaluation path
-   * unless the population growth object exposes the growth-derived
-   * observation interface, in which case the biological population mean
-   * weight-at-age path is used.
+   * Weight at age is the fleet's own weight at age when the fleet has one.
+   * Otherwise it is the population weight at age, which comes from the
+   * historical direct growth evaluation path unless the population growth
+   * object exposes the growth-derived observation interface, in which case
+   * the biological population mean weight-at-age path is used.
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
@@ -952,7 +959,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(fleet->GetId());
 
-      Type mean_weight_at_age = PopulationMeanWeightAA(population, year, age);
+      Type mean_weight_at_age;
+      if (fleet->weight_at_age.size() > 0) {
+        mean_weight_at_age = fleet->weight_at_age[i_age_year];
+      } else {
+        mean_weight_at_age = PopulationMeanWeightAA(population, year, age);
+      }
 
       fdq_["index_weight_at_age"][i_age_year] =
           fdq_["index_numbers_at_age"][i_age_year] * mean_weight_at_age;

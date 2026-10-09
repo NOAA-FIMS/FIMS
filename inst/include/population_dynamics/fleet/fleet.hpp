@@ -83,6 +83,12 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> age_to_length_conversion; /*!< derived quantity age to
                                                 length conversion matrix*/
   /**
+   * @brief Weight at age for this fleet's catch and index weight, ordered by
+   * year and then age. When it is empty, the population weight at age is
+   * used, e.g., when the fleet has no weight-at-age data of its own.
+   */
+  fims::Vector<Type> weight_at_age;
+  /**
    * @brief Constructor.
    */
   Fleet() {
