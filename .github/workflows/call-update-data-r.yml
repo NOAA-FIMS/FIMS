@@ -1,0 +1,21 @@
+# Update package datasets after changes to their source code or model behavior.
+name: call-update-data-r
+
+on:
+  push:
+    paths:
+      - 'R/**'
+      - 'inst/**'
+      - 'data/**'
+      - 'data-raw/**'
+      - 'src/**'
+  workflow_dispatch:
+
+jobs:
+  call-workflow:
+    if: github.repository == 'NOAA-FIMS/FIMS'
+    uses: NOAA-FIMS/ecosystemom/.github/workflows/update-data-r.yml@main
+    secrets:
+      PAT: ${{ secrets.PAT }}
+    with:
+      commit-directly: true
