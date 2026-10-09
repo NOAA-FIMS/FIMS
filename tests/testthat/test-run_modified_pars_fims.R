@@ -16,9 +16,9 @@ parameters <- setup_default_parameters(data = FIMSFrame(data_big))
 ## IO correctness ----
 test_that("run_modified_pars_fims() works with correct inputs", {
   #' @description Skip the model fit unless explicitly enabled for heavy integration testing.
-  testthat::skip_if_not(
-    testthat:::env_var_is_true("RUN_SLOW_TESTS"),
-    message = "Skipping: RUN_SLOW_TESTS is not set to true."
+  testthat::skip_if(
+    Sys.getenv("RUN_SLOW_TESTS") != "true",
+    "Skipping: RUN_SLOW_TESTS is not set to true."
   )
   # inflection_point is a label in both the Maturity and Selectivity modules
   fit <- run_modified_pars_fims(
