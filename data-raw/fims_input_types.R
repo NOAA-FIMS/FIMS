@@ -1,6 +1,7 @@
 fims_input_types <- c(
   "age_comp",
   "age_to_length_conversion",
+  "ageing_error",
   "index",
   "catch",
   "length_bin",

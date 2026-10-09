@@ -1407,6 +1407,48 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
+   * @brief Apply each fleet's ageing error to its expected age composition.
+   *
+   * @details
+   * Moves the expected age composition from true age to the ages readers
+   * assign. Rows sum to 1, so expected numbers keep the observed sample size.
+   * Runs after evaluate_length_comp(), which needs true ages.
+   */
+  void evaluate_ageing_error() {
+    for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end();
+         ++fit) {
+      std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+      if (fleet->ageing_error.size() == 0) {
+        continue;
+      }
+      std::map<std::string, fims::Vector<Type>> &fdq_ =
+          this->GetFleetDerivedQuantities(fleet->GetId());
+
+      fims::Vector<Type> proportion_at_true_age(fleet->n_ages);
+      fims::Vector<Type> expected_at_true_age(fleet->n_ages);
+      for (size_t y = 0; y < fleet->n_years; y++) {
+        for (size_t a = 0; a < fleet->n_ages; a++) {
+          size_t i_age_year = y * fleet->n_ages + a;
+          proportion_at_true_age[a] = fdq_["agecomp_proportion"][i_age_year];
+          expected_at_true_age[a] = fdq_["agecomp_expected"][i_age_year];
+        }
+        fims::Vector<Type> proportion_at_observed_age =
+            fims_math::apply_ageing_error(proportion_at_true_age,
+                                          fleet->ageing_error, y);
+        fims::Vector<Type> expected_at_observed_age =
+            fims_math::apply_ageing_error(expected_at_true_age,
+                                          fleet->ageing_error, y);
+        for (size_t a = 0; a < fleet->n_ages; a++) {
+          size_t i_age_year = y * fleet->n_ages + a;
+          fdq_["agecomp_proportion"][i_age_year] =
+              proportion_at_observed_age[a];
+          fdq_["agecomp_expected"][i_age_year] = expected_at_observed_age[a];
+        }
+      }
+    }
+  }
+
+  /**
    * Evaluate the natural log of the expected index.
    */
   void evaluate_index() {
@@ -1586,6 +1628,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     }
     evaluate_age_comp();
     evaluate_length_comp();
+    evaluate_ageing_error();
     evaluate_index();
     evaluate_catch();
   }
