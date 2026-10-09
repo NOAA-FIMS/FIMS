@@ -239,6 +239,55 @@ test_that("`get_estimates()` works for a model without random effects", {
   clear()
 })
 
+test_that("`get_estimates()` works with time-varying log_q", {
+  data_4_model <- FIMSFrame(data_big)
+  years <- get_start_year(data_4_model):get_end_year(data_4_model)
+  default_parameters <- setup_default_parameters(data = data_4_model)
+  # 1 log_q per year for survey1, in year order, with a different value in each
+  # year so the labels can be checked against the values
+  set_survey_log_q <- function(values) {
+    log_q_rows <- default_parameters |>
+      dplyr::filter(.data$fleet == "survey1", .data$label == "log_q") |>
+      dplyr::slice(rep(1, length(values))) |>
+      dplyr::mutate(timing = years[seq_along(values)], value = values)
+    default_parameters |>
+      dplyr::filter(!(.data$fleet == "survey1" & .data$label == "log_q")) |>
+      dplyr::bind_rows(log_q_rows)
+  }
+  get_survey_index <- function(fit) {
+    get_report(fit)[["index_expected"]][[2]]
+  }
+  constant_fit <- set_survey_log_q(-10) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  constant_index <- get_survey_index(constant_fit)
+  clear()
+  fit <- set_survey_log_q(-10 + years / 100) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  log_q <- get_estimates(fit) |>
+    dplyr::filter(.data$label == "log_q", .data$fleet == "survey1")
+  #' @description Test that time-varying log_q values are labeled with their year.
+  expect_equal(object = log_q[["year_i"]], expected = seq_along(years))
+  #' @description Test that each time-varying log_q value is reported for the year it was given for.
+  expect_equal(object = log_q[["input"]], expected = -10 + years / 100)
+  #' @description Test that the expected index in each year uses that year's log_q.
+  expect_equal(
+    object = get_survey_index(fit) / constant_index,
+    expected = exp(years / 100)
+  )
+  clear()
+
+  #' @description Test that a log_q with neither 1 value nor 1 value per year returns an error.
+  expect_error(
+    set_survey_log_q(c(-10, -10)) |>
+      initialize_fims(data = data_4_model) |>
+      fit_fims(optimize = FALSE),
+    regexp = "log_q size mismatch"
+  )
+  clear()
+})
+
 test_that("`get_estimates()` returns correct outputs for edge cases", {
   #' @description Test that an error occurs if the input is not a valid model fit object.
   expect_error(

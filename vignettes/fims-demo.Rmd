@@ -253,6 +253,36 @@ FIMS:::setup_default_log_init_naa(
 )
 ```
 
+### Time-varying parameters
+
+Catchability (`log_q`) can have 1 value per year instead of 1 value. Give 1 row per year, in year order, because FIMS uses the rows in the order they appear rather than sorting by `timing`. Years without index data for that fleet do not inform `log_q`, so set those rows to `estimation_type = "constant"`. Estimating them would make the Hessian singular, and then no parameter gets a standard error. In the output from `get_estimates()`, each `log_q` value is labeled with its year. Sharing 1 estimated value across a block of years is not yet available.
+
+```{r time-varying-log-q}
+# 1 log_q per year for survey1, estimated only in years with index data
+years <- FIMS::get_start_year(data_4_model):FIMS::get_end_year(data_4_model)
+index_years <- FIMS::get_data(data_4_model) |>
+  dplyr::filter(type == "index", fleet == "survey1", observed != -999) |>
+  dplyr::pull(timing)
+log_q_by_year <- parameters_4_model |>
+  dplyr::filter(fleet == "survey1", label == "log_q") |>
+  dplyr::slice(rep(1, length(years))) |>
+  dplyr::mutate(
+    timing = years,
+    estimation_type = dplyr::if_else(
+      timing %in% index_years, "fixed_effects", "constant"
+    )
+  ) |>
+  dplyr::arrange(timing)
+parameters_time_varying_q <- parameters_4_model |>
+  dplyr::filter(!(fleet == "survey1" & label == "log_q")) |>
+  dplyr::bind_rows(log_q_by_year)
+parameters_time_varying_q |>
+  dplyr::filter(label == "log_q") |>
+  dplyr::count(fleet, estimation_type)
+```
+
+In `data_big` the survey has index data in every year, so every `log_q` for `survey1` is estimated.
+
 ## Fit
 
 With data and parameters in place, we can now initialize modules using `initialize_fims()` and fit the model using `fit_fims()`.
