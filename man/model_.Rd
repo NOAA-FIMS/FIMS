@@ -123,7 +123,8 @@ Returns a numeric vector of age-to-length conversion observations.
 Observations are ordered by age and length in the order defined by
 \code{\link[=FIMSFrame]{FIMSFrame()}}. When multiple observations are present across a single age
 and length, they are averaged because \code{age_to_length_conversion} data cannot
-vary across fleets or time.
+vary across fleets or time. The values for each age are then rescaled to sum
+to 1.
 }
 }
 \keyword{FIMSFrame}
