@@ -82,6 +82,7 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
   fims::Vector<Type> age_to_length_conversion; /*!< derived quantity age to
                                                 length conversion matrix*/
+  fims::Vector<Type> ageing_error; /*!< ageing error matrices; empty for none */
   /**
    * @brief Constructor.
    */

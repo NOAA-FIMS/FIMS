@@ -149,6 +149,13 @@ class FleetInterface : public FleetInterfaceBase {
    */
   VariableVector age_to_length_conversion;
 
+  /**
+   * @brief Ageing error matrices, 1 for all years or 1 per year, with true age
+   * as rows and observed age varying fastest. The default single value means
+   * no ageing error.
+   */
+  VariableVector ageing_error;
+
   // Fleet based derived quantities
   /**
    * @brief Annual catch at age in numbers for a specific fleet.
@@ -269,6 +276,7 @@ class FleetInterface : public FleetInterfaceBase {
         log_q(other.log_q),
         log_Fmort(other.log_Fmort),
         age_to_length_conversion(other.age_to_length_conversion),
+        ageing_error(other.ageing_error),
         catch_numbers_at_age(other.catch_numbers_at_age),
         catch_weight_at_age(other.catch_weight_at_age),
         catch_numbers_at_length(other.catch_numbers_at_length),
@@ -469,6 +477,12 @@ class FleetInterface : public FleetInterfaceBase {
               fleet->age_to_length_conversion[i];
         }
       }
+
+      // Ageing error is always constant, so its final values are its inputs.
+      for (size_t i = 0; i < fleet->ageing_error.size(); i++) {
+        this->ageing_error[i].final_value_m =
+            this->ageing_error[i].initial_value_m;
+      }
     }
   }
 
@@ -618,6 +632,33 @@ class FleetInterface : public FleetInterfaceBase {
 
       info->variable_map[this->age_to_length_conversion.id_m] =
           &(fleet)->age_to_length_conversion;
+    }
+
+    // A single value is the default, or a 1-age model's entry of 1, so it
+    // means no ageing error.
+    if (this->ageing_error.size() > 1) {
+      const size_t matrix_size =
+          static_cast<size_t>(this->n_ages.get() * this->n_ages.get());
+      const size_t supplied_size = this->ageing_error.size();
+      if (supplied_size != matrix_size &&
+          supplied_size !=
+              matrix_size * static_cast<size_t>(this->n_years.get())) {
+        FIMS_ERROR_LOG("ageing_error size mismatch, " +
+                       fims::to_string(supplied_size) +
+                       " is not n_ages^2 or n_years * n_ages^2.");
+        throw std::invalid_argument(
+            "Fleet ageing_error size mismatch. Expected " +
+            fims::to_string(matrix_size) + " or " +
+            fims::to_string(matrix_size * this->n_years.get()) +
+            " values but received " + fims::to_string(supplied_size) + ".");
+      }
+
+      // Ageing error is known, so it is never registered as a parameter.
+      fleet->ageing_error.resize(supplied_size);
+      for (size_t i = 0; i < supplied_size; i++) {
+        fleet->ageing_error[i] = this->ageing_error[i].initial_value_m;
+      }
+      info->variable_map[this->ageing_error.id_m] = &(fleet)->ageing_error;
     }
 
     // add to Information
