@@ -9,39 +9,18 @@
 
 # get_input ----
 ## Setup ----
-# Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS:::fit_without_optimization_big
 
 ## IO correctness ----
 test_that("`get_input()` works with correct inputs", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
-  )
-
-  # Function to read the RDS file and get input
-  check_input <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    input <- get_input(fit_data)
-    #' @description Test that `get_input()` returns correct output for the `input` slot.
-    expect_equal(
-      object = input,
-      expected = fit_data@input
-    )
-    #' @description Test that `get_input()` returns correct names for the `input` slot.
-    expect_equal(
-      object = names(input),
-      expected = c("parameters", "model")
-    )
+  for (fit in list(fit_with_optimization_big, fit_without_optimization_big)) {
+    input <- get_input(fit)
+    #' @description Test that `get_input()` returns the FIMSFit input slot.
+    expect_equal(input, fit@input)
+    #' @description Test that `get_input()` returns parameter and model entries.
+    expect_named(input, c("parameters", "model"))
   }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_input)
 })
 
 ## Edge handling ----

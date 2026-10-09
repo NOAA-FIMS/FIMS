@@ -9,38 +9,20 @@
 
 # get_max_gradient ----
 ## Setup ----
-# Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS:::fit_without_optimization_big
 ## IO correctness ----
 test_that("`get_max_gradient()` works with correct inputs", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
-  )
+  optimized_gradient <- get_max_gradient(fit_with_optimization_big)
+  #' @description Test that `get_max_gradient()` returns the optimized fit slot.
+  expect_equal(optimized_gradient, fit_with_optimization_big@max_gradient)
+  #' @description Test that `get_max_gradient()` returns a numeric value.
+  expect_type(optimized_gradient, "double")
 
-  # Function to read the RDS file and get max gradient
-  check_max_gradient <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    max_gradient <- get_max_gradient(fit_data)
-    #' @description Test that `get_max_gradient()` returns correct output for the `max_gradient` slot.
-    expect_equal(
-      object = max_gradient,
-      expected = fit_data@max_gradient
-    )
-
-    #' @description Test that `get_max_gradient()` returns a numeric value.
-    expect_true(
-      object = is.numeric(max_gradient)
-    )
-  }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_max_gradient)
+  deterministic_gradient <- get_max_gradient(fit_without_optimization_big)
+  #' @description Test that the deterministic fit has no optimized gradient.
+  expect_equal(deterministic_gradient, fit_without_optimization_big@max_gradient)
+  expect_true(is.na(deterministic_gradient))
 })
 
 ## Edge handling ----

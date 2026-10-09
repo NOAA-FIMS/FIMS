@@ -10,11 +10,6 @@
 # Deterministic test ----
 ## Setup ----
 # Load necessary data for the integration test
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS")) ||
-  !file.exists(testthat::test_path("fixtures", "deterministic_missing_agecomp.RDS"))) {
-  prepare_test_data()
-}
-
 load(testthat::test_path("fixtures", "integration_test_data.RData"))
 
 # Set the iteration ID to 1 for accessing specific input/output list
@@ -23,12 +18,12 @@ iter_id <- 1
 ## IO correctness ----
 test_that("catch-at-age model (deterministic MLE with wrappers) works with correct inputs", {
   # Load the test data from an RDS file containing the model fit
-  deterministic_age_length_comp <- readRDS(testthat::test_path("fixtures", "deterministic_age_length_comp.RDS"))
+  deterministic_age_length_comp <- FIMS:::fit_without_optimization_big
 
   #' @description Test that the output from FIMS deterministic run matches the model comparison project OM values.
   verify_fims_deterministic(
     report = get_report(deterministic_age_length_comp),
-    estimates = get_estimates(deterministic_age_length_comp),
+    estimates = FIMS:::estimates_without_optimization_big,
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]],
@@ -43,7 +38,7 @@ test_that("catch-at-age model (deterministic MLE with wrappers) works with corre
     em_input = em_input_list[[iter_id]]
   )
 
-  parameters <- readRDS(testthat::test_path("fixtures", "parameters_model_comparison_project.RDS"))
+  parameters <- FIMS::parameters_big
   number_fixed_effects <- parameters |>
     dplyr::filter(estimation_type == "fixed_effects") |>
     dplyr::pull(estimation_type) |>
@@ -58,6 +53,26 @@ test_that("catch-at-age model (deterministic MLE with wrappers) works with corre
   #' @description Test that the number of random effects are correct.
   expect_equal(get_number_of_parameters(deterministic_age_length_comp)["random_effects"] |> unname(), number_random_effects)
 })
+
+test_that("catch-at-age model (estimation MLE with wrappers) works with packaged fit", {
+  fit_age_length_comp <- FIMS::fit_with_optimization_big
+
+  #' @description Test that the packaged optimized fit matches the model comparison project operating model.
+  validate_fims(
+    report = get_report(fit_age_length_comp),
+    estimates = FIMS::estimates_with_optimization_big,
+    om_input = om_input_list[[iter_id]],
+    om_output = om_output_list[[iter_id]],
+    em_input = em_input_list[[iter_id]],
+    use_fimsfit = TRUE
+  )
+})
+
+if (Sys.getenv("RUN_SLOW_TESTS") == "true") {
+  if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS")) ||
+    !file.exists(testthat::test_path("fixtures", "deterministic_missing_agecomp.RDS"))) {
+    prepare_test_data()
+  }
 
 test_that("catch-at-age model (deterministic MLE with wrappers) recruitment devs fixed effects works with correct inputs", {
   # Load the test data from an RDS file containing the model fit
@@ -436,3 +451,4 @@ test_that("catch-at-age model (estimation MLE with wrappers) returns an error wh
     regexp = "Missing required inputs for recruitment process random or fixed effects."
   )
 })
+}

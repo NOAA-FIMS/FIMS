@@ -9,43 +9,17 @@
 
 # get_obj ----
 ## Setup ----
-# Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS:::fit_without_optimization_big
 ## IO correctness ----
 test_that("`get_obj()` works with correct inputs", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
-  )
-
-  expected_names <- c(
-    "par", "fn", "gr", "he", "hessian", "method", "retape",
-    "env", "report", "simulate"
-  )
-
-  # Function to read the RDS file and get obj
-  check_obj <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    obj <- get_obj(fit_data)
-    #' @description Test that `get_obj()` returns correct output for the `obj` slot.
-    expect_equal(
-      object = obj,
-      expected = fit_data@obj
-    )
-    #' @description Test that `get_obj()` returns correct names for the `obj` slot.
-    expect_equal(
-      object = names(obj),
-      expected = expected_names
-    )
+  for (fit in list(fit_with_optimization_big, fit_without_optimization_big)) {
+    obj <- get_obj(fit)
+    #' @description Test that `get_obj()` returns the FIMSFit object slot.
+    expect_equal(obj, fit@obj)
+    #' @description Test that `get_obj()` preserves the current TMB object structure.
+    expect_named(obj, names(fit@obj))
   }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_obj)
 })
 
 ## Edge handling ----

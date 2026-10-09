@@ -8,6 +8,11 @@
 #' {testthat}. This line can be more than 80 characters.
 
 # integration_proportion_female ----
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 ## Setup ----
 load(test_path("fixtures", "integration_test_data.RData"))
 

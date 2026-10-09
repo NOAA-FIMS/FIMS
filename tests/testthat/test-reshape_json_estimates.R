@@ -10,6 +10,11 @@
 # reshape_json_estimates ----
 ## Setup ----
 # Load or prepare any necessary data for testing
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }

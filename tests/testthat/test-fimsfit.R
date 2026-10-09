@@ -9,25 +9,14 @@
 
 # FIMSFit ----
 ## Setup ----
-# Load the test data from an RDS file containing the fitted model estimates
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  suppressWarnings(
-    suppressMessages(
-      prepare_test_data()
-    )
-  )
-}
-
-fit_age_length_comp <- readRDS(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))
-fit_agecomp <- readRDS(testthat::test_path("fixtures", "fit_agecomp.RDS"))
-fit_list <- list(fit_age_length_comp, fit_agecomp)
-on.exit(rm(fit_list), add = TRUE)
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS:::fit_without_optimization_big
 
 ## IO correctness ----
 test_that("`is.FIMSFit()` works with correct inputs", {
-  #' @description Test that `is.FIMSFit(fit_age_length_comp)` returns TRUE.
+  #' @description Test that `is.FIMSFit(fit_with_optimization_big)` returns TRUE.
   expect_true(
-    object = is.FIMSFit(fit_age_length_comp)
+    object = is.FIMSFit(fit_with_optimization_big)
   )
 
   expected_names <- c(
@@ -36,9 +25,20 @@ test_that("`is.FIMSFit()` works with correct inputs", {
   )
   #' @description Test a FIMSFit object has the correct slot names.
   expect_equal(
-    object = slotNames(fit_age_length_comp),
+    object = slotNames(fit_with_optimization_big),
     expected = expected_names
   )
+})
+
+test_that("`is.FIMSFit()` works with a fit without optimization", {
+  #' @description Test that `is.FIMSFit(fit_without_optimization_big)` returns TRUE.
+  expect_true(is.FIMSFit(fit_without_optimization_big))
+  expect_equal(
+    slotNames(fit_without_optimization_big),
+    slotNames(fit_with_optimization_big)
+  )
+  #' @description Test that a fit without optimization records zero elapsed time.
+  expect_equal(fit_without_optimization_big@run_time[["time_total"]], 0)
 })
 
 test_that("`fit_fims()` passes `getReportCovariance` to `TMB::sdreport()`", {
@@ -71,25 +71,29 @@ test_that("`is.FIMSFit()` returns correct outputs for edge cases", {
   expect_false(is.FIMSFit("not_a_FIMSFit"))
 
   # Modify the total run_time to be more than a day
-  fit_age_length_comp@run_time[["time_total"]] <- 86401 # 60*60*24+1
+  fit_with_optimization_big@run_time[["time_total"]] <- 86401 # 60*60*24+1
   #' @description Test that `print(FIMSFit)` returns no error when the total run_time is more than a day.
-  expect_no_error(print(fit_age_length_comp))
+  expect_no_error(print(fit_with_optimization_big))
 
   # Modify the total run_time to be more than a hour
-  fit_age_length_comp@run_time[["time_total"]] <- 3601 # 60*60+1
+  fit_with_optimization_big@run_time[["time_total"]] <- 3601 # 60*60+1
   #' @description Test that `print(FIMSFit)` returns no error when the total run_time is more than an hour.
-  expect_no_error(print(fit_age_length_comp))
+  expect_no_error(print(fit_with_optimization_big))
 
   # Modify the total run_time to be more than a minute
-  fit_age_length_comp@run_time[["time_total"]] <- 61 # 60+1
+  fit_with_optimization_big@run_time[["time_total"]] <- 61 # 60+1
   #' @description Test that `print(FIMSFit)` returns no error when the total run_time is more than a minute.
-  expect_no_error(print(fit_age_length_comp))
+  expect_no_error(print(fit_with_optimization_big))
 })
 
 ## Error handling ----
 test_that("fit_fims() errors when optimization fails to converge", {
   # Create a simple test case that will fail to converge by setting
   # extremely restrictive iteration limits
+  skip_if(
+    Sys.getenv("RUN_SLOW_TESTS") != "true",
+    "Skipping: RUN_SLOW_TESTS is not set to true."
+  )
 
   # Skip if test fixtures don't exist
   skip_if_not(file.exists(testthat::test_path("fixtures", "integration_test_data.RData")))

@@ -9,44 +9,20 @@
 
 # get_run_time ----
 ## Setup ----
-# Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS:::fit_without_optimization_big
 ## IO correctness ----
 test_that("`get_run_time()` works with correct inputs", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
-  )
+  optimized_runtime <- get_run_time(fit_with_optimization_big)
+  #' @description Test that `get_run_time()` returns the optimized fit slot.
+  expect_equal(optimized_runtime, fit_with_optimization_big@run_time)
+  expect_named(optimized_runtime, names(fit_with_optimization_big@run_time))
+  expect_true(all(optimized_runtime > 0))
 
-  expected_names <- c(
-    "time_optimization", "time_sdreport", "time_total"
-  )
-
-  # Function to read the RDS file and get input
-  check_run_time <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    run_time <- get_run_time(fit_data)
-    #' @description Test that `get_run_time()` returns correct output for the `run_time` slot.
-    expect_equal(
-      object = run_time,
-      expected = fit_data@run_time
-    )
-    #' @description Test that `get_run_time()` returns correct names for the `run_time` slot.
-    expect_equal(
-      object = names(run_time),
-      expected = expected_names
-    )
-    #' @description Test that `get_run_time()` returns > 0 values for the `run_time` slot.
-    expect_true(object = all(run_time > 0))
-  }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_run_time)
+  deterministic_runtime <- get_run_time(fit_without_optimization_big)
+  #' @description Test that `get_run_time()` returns a zero runtime without optimization.
+  expect_equal(deterministic_runtime, fit_without_optimization_big@run_time)
+  expect_equal(as.numeric(deterministic_runtime), 0)
 })
 
 ## Edge handling ----

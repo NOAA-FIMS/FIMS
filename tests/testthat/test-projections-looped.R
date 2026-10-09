@@ -1,4 +1,9 @@
 ## Setup ----
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 # Load necessary data for the integration test
 if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
