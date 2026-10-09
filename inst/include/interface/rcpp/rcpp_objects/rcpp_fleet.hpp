@@ -507,8 +507,7 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
 
-    // The index reads 1 log_q, or 1 per year, so another length would either
-    // ignore values or read past the end
+    // The index reads 1 log_q for all years or 1 log_q per year
     if (this->log_q.size() != 1 &&
         this->log_q.size() != static_cast<size_t>(this->n_years.get())) {
       FIMS_ERROR_LOG("The size of `log_q` is not 1 or `n_years`: " +
