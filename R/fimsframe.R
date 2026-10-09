@@ -881,9 +881,8 @@ validate_fleets_have_observations <- function(data) {
   invisible(TRUE)
 }
 
-# Population weight at age comes from fleet = NA rows. Data made before that
-# rule put the weights under 1 fleet, so those rows are used when there are no
-# fleet = NA rows.
+# Population weight at age comes from fleet = NA rows. Without them, the rows
+# for 1 fleet are used so data with weights under a fleet still run.
 population_weight_at_age_rows <- function(weight_data) {
   if (any(is.na(weight_data[["fleet"]]))) {
     dplyr::filter(weight_data, is.na(.data[["fleet"]]))
@@ -960,8 +959,8 @@ validate_weight_at_age <- function(data, ages, years) {
   if (!any(is.na(weight_data[["fleet"]]))) {
     if (length(weight_fleets) > 1) {
       cli::cli_abort(c(
-        "x" = "{.var weight_at_age} has rows for more than 1 fleet and no
-        population rows: {.val {weight_fleets}}.",
+        "x" = "{.var weight_at_age} has rows for more than 1 fleet,
+        {.val {weight_fleets}}, and no rows with {.code fleet = NA}.",
         "i" = "The population weight at age, which is used for biomass, comes
         from rows with {.code fleet = NA}. Rows for different fleets are not
         averaged.",
@@ -969,25 +968,17 @@ validate_weight_at_age <- function(data, ages, years) {
         'weight_at_age'), fleet)} to see the rows for each fleet."
       ))
     }
-    cli::cli_warn(
-      c(
-        "!" = "{.var weight_at_age} rows for fleet {.val {weight_fleets}} are
-        used as the population weight at age because there are no rows with
-        {.code fleet = NA}.",
-        "i" = "Set {.code fleet = NA} for population weight at age. Rows with
-        a fleet name will be for that fleet's catch and index weight in a
-        future version of FIMS."
-      ),
-      # FIMSFrame() runs for every get_*() and model_*() call on a data
-      # frame, so the warning is not repeated for each call
-      .frequency = "regularly",
-      .frequency_id = "fims_weight_at_age_fleet"
-    )
+    cli::cli_warn(c(
+      "!" = "{.var weight_at_age} rows for fleet {.val {weight_fleets}} are
+      used as the population weight at age because there are no rows with
+      {.code fleet = NA}.",
+      "i" = "Set {.code fleet = NA} for population weight at age."
+    ))
   } else if (length(weight_fleets) > 0) {
     cli::cli_warn(c(
       "!" = "{.var weight_at_age} rows for fleet{?s} {.val {weight_fleets}}
-      {?is/are} not used. Only rows with {.code fleet = NA}, the population
-      weight at age, are used for now.",
+      are not used. Only rows with {.code fleet = NA}, the population weight
+      at age, are used.",
       "i" = "Use {.code dplyr::filter(data, type == 'weight_at_age',
       !is.na(fleet))} to find the rows."
     ))
@@ -1004,9 +995,10 @@ validate_weight_at_age <- function(data, ages, years) {
     dplyr::pull(.data[["timing"]])
   if (length(incomplete_timings) > 0) {
     cli::cli_abort(c(
-      "x" = "{.var weight_at_age} must have 1 row for each model age
-      ({min(ages)}-{max(ages)}) for each timing it uses. These timings do
-      not: {.val {incomplete_timings}}.",
+      "x" = "{.var weight_at_age} is missing ages for these timings:
+      {.val {incomplete_timings}}.",
+      "i" = "Every timing that is used needs 1 row for each model age
+      ({min(ages)}-{max(ages)}).",
       "i" = "Use {.code dplyr::count(dplyr::filter(data, type ==
       'weight_at_age'), fleet, timing)} to see the number of ages in each
       timing."
@@ -1113,7 +1105,8 @@ resolve_fleet_length_bins <- function(
 #' ## data
 #' The input data are both sorted (see the section below on sorting) and
 #' expanded to include -999 observations for all missing rows before returning
-#' them in the data slot.
+#' them in the data slot. Weight-at-age rows are not expanded. See
+#' [model_weight_at_age()].
 #' ### Ages
 #' Currently, ages must be integers, i.e., FIMS cannot accommodate numeric ages
 #' like age 1.5 but we hope that this is something that we will be able to

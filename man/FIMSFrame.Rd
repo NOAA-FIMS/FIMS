@@ -29,7 +29,8 @@ needed for different types of models.
 
 The input data are both sorted (see the section below on sorting) and
 expanded to include -999 observations for all missing rows before returning
-them in the data slot.
+them in the data slot. Weight-at-age rows are not expanded. See
+\code{\link[=model_weight_at_age]{model_weight_at_age()}}.
 \subsection{Ages}{
 
 Currently, ages must be integers, i.e., FIMS cannot accommodate numeric ages
