@@ -524,11 +524,7 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
   if (use_age_to_length_conversion_fixed_path) {
     age_to_length_conversion_fixed_data <- get_data(data) |>
       dplyr::filter(.data$type == "age_to_length_conversion") |>
-      dplyr::group_by(.data$age, .data$length) |>
-      dplyr::summarize(
-        value = mean(as.numeric(.data$observed), na.rm = TRUE),
-        .groups = "drop"
-      ) |>
+      rescale_age_to_length_conversion() |>
       dplyr::filter(.data$length %in% fleet_length_bins) |>
       dplyr::mutate(
         age_order = match(.data$age, get_ages(data)),
