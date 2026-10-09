@@ -30,9 +30,11 @@
 #'   \item{observed}{The observed measurement of interest.}
 #'   \item{unit}{A character string specifying the units of `observed`. Allowed
 #'     units for each data type are as follows. `mt` is used for `index`,
-#'     `catch`, and `weight_at_age` data. `number` or `proportion` are each
-#'     viable units for the composition data, where the former is the preferred
-#'     unit of measurement.}
+#'     `catch`, `weight_at_age`, and `spawning_weight_at_age` data.
+#'     `fecundity_at_age` is spawning output per unit of spawning weight, e.g.,
+#'     `eggs/mt`. `number` or `proportion` are each viable units for the
+#'     composition data, where the former is the preferred unit of
+#'     measurement.}
 #'   \item{uncertainty}{A right-handed formula specifying the distributional
 #'     assumptions for the entry in `observed`. See [FIMSFrame()] for more
 #'     information about this column.

@@ -54,6 +54,8 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       "unfished_biomass",
       "unfished_spawning_biomass",
       "proportion_mature_at_age",
+      "spawning_weight_at_age",
+      "fecundity_at_age",
       "expected_recruitment",
       "sum_selectivity"
     ))
@@ -400,6 +402,22 @@ initialize_population <- function(parameters, data, linked_ids) {
   # Link fleets to module
   for (i in which(grepl("fleet", names(linked_ids)))) {
     module$AddFleet(linked_ids[[i]])
+  }
+
+  # Spawning weight and fecundity at age are only filled when there are rows.
+  # Empty vectors mean spawning weight is the population weight at age and
+  # fecundity is 1.
+  input_data <- get_data(data)
+  spawning_years <- get_start_year(data):(get_end_year(data) + 1)
+  for (field in c("spawning_weight_at_age", "fecundity_at_age")) {
+    field_rows <- dplyr::filter(input_data, .data[["type"]] == .env[["field"]])
+    if (NROW(field_rows) > 0) {
+      module[[field]][] <- at_age_by_year(
+        field_rows,
+        ages = get_ages(data),
+        years = spawning_years
+      )
+    }
   }
 
   return(module)

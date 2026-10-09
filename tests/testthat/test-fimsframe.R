@@ -456,6 +456,29 @@ test_that("`FIMSFrame()` returns correct error messages", {
     regexp = "missing these years:\\s+5"
   )
 
+  fecundity_rows <- dplyr::filter(
+    data_big,
+    type == "weight_at_age",
+    timing == 1
+  ) |>
+    dplyr::mutate(type = "fecundity_at_age", observed = 1, unit = "eggs/mt")
+  #' @description Test that `FIMSFrame()` returns an error when fecundity-at-age rows have a fleet.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::mutate(fecundity_rows, fleet = "fleet1", timing = NA_integer_)
+    )),
+    regexp = "has rows for\\s+fleet\\s+\"fleet1\""
+  )
+  #' @description Test that `FIMSFrame()` returns an error when spawning-weight-at-age rows skip years and have no `timing = NA` default.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::mutate(fecundity_rows, type = "spawning_weight_at_age")
+    )),
+    regexp = "spawning_weight_at_age` is missing these years"
+  )
+
   #' @description Test that `FIMSFrame()` returns an error when a weight-at-age timing is missing an age.
   expect_error(
     FIMSFrame(dplyr::filter(

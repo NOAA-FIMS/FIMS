@@ -38,6 +38,18 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       log_M; /*!< estimated parameter: natural log of Natural Mortality*/
   fims::Vector<Type> proportion_female = fims::Vector<Type>(
       1, static_cast<Type>(0.5));            /*!< proportion female by age */
+  /**
+   * @brief Weight at age used for spawning output, ordered by year and then
+   * age for the model years and the year after. When it is empty, the
+   * population weight at age is used.
+   */
+  fims::Vector<Type> spawning_weight_at_age;
+  /**
+   * @brief Spawning output per unit of spawning weight at age, e.g., eggs per
+   * mt, ordered by year and then age. When it is empty, it is 1, so spawning
+   * output is spawning weight.
+   */
+  fims::Vector<Type> fecundity_at_age;
   fims::Vector<Type> log_f_multiplier;       /*!< estimated parameter: vector of
     annual fishing mortality multipliers to scale total mortality of all fleets*/
   fims::Vector<Type> spawning_biomass_ratio; /*!< estimated parameter: vector of

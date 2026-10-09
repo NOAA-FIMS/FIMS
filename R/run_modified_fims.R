@@ -138,20 +138,25 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
     data_to_use <- data
   }
 
-  # Remove years from data, but leave catch, weight_at_age,
-  # and age_to_length_conversion (if present)
+  # Remove years from data, but leave catch and the inputs that are not fit
+  # to data (weight, spawning weight, and fecundity at age, and
+  # age_to_length_conversion), because the model years do not change
+  inputs_kept <- c(
+    "age_to_length_conversion", "weight_at_age", "spawning_weight_at_age",
+    "fecundity_at_age"
+  )
   if (years_to_remove == 0) {
     data_mod <- data_to_use
   } else {
-    # exclude weight-at-age from the calculation of the max year of data
+    # These inputs can run to the year after the last model year, so they are
+    # left out of the last year of data
     max_timing <- data_to_use |>
-      dplyr::filter(.data[["type"]] != "weight_at_age") |>
+      dplyr::filter(!.data[["type"]] %in% inputs_kept) |>
       dplyr::pull(.data[["timing"]]) |>
       max(na.rm = TRUE)
     data_mod <- data_to_use |>
       dplyr::filter(
-        (.data[["type"]] %in%
-          c("catch", "age_to_length_conversion", "weight_at_age")) |
+        .data[["type"]] %in% c("catch", inputs_kept) |
           .data[["timing"]] <= max_timing - years_to_remove
       )
   }
