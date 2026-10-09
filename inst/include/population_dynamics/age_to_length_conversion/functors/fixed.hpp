@@ -69,10 +69,22 @@ struct AgeToLengthConversionFixed : public AgeToLengthConversionBase<Type> {
     // The fixed age-to-length conversion is active only if:
     // - the fleet has at least one age
     // - the fleet has at least one length bin
-    // - the stored fixed matrix has the expected age x length size
+    // - the stored fixed matrix has one age x length table, or one per year
     return fleet_ptr->n_ages > 0 && fleet_ptr->n_lengths > 0 &&
-           fleet_ptr->age_to_length_conversion.size() ==
-               (fleet_ptr->n_ages * fleet_ptr->n_lengths);
+           HasValidSize(*fleet_ptr);
+  }
+
+  /**
+   * @brief Returns whether the fleet stores one age x length table for all
+   * years or one table per year.
+   * @param fleet_ref Fleet that holds the fixed age-to-length matrix.
+   * @return True if the matrix size matches either layout.
+   */
+  static bool HasValidSize(const Fleet<Type>& fleet_ref) {
+    const size_t table_size = fleet_ref.n_ages * fleet_ref.n_lengths;
+    const size_t matrix_size = fleet_ref.age_to_length_conversion.size();
+    return matrix_size == table_size ||
+           matrix_size == fleet_ref.n_years * table_size;
   }
 
   /**
@@ -84,30 +96,30 @@ struct AgeToLengthConversionFixed : public AgeToLengthConversionBase<Type> {
 
   /**
    * @brief Builds the fixed age-to-length conversion row for a given age.
-   * @param year Year index. Unused for the current fixed-matrix path.
+   * @param year Year index. Used only when the fleet stores one table per year.
    * @param age Age index.
    * @param out_row Output age-to-length probability row.
    * @return True if the age-to-length conversion row was built successfully.
    */
   virtual bool BuildAgeToLengthConversionRow(
       size_t year, size_t age, fims::Vector<Type>& out_row) const override {
-    // The current fixed matrix path does not vary by year, but year stays
-    // in the interface so all age-to-length conversion types share the same
-    // method signature.
-    (void)year;
-
     // Safely access the linked fleet.
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet.lock();
 
     // Stop if:
     // - the fleet no longer exists
     // - dimensions are invalid
-    // - the requested age is out of range
+    // - the requested age or year is out of range
     // - the fixed matrix does not have the expected size
     if (fleet_ptr == nullptr || fleet_ptr->n_ages == 0 ||
         fleet_ptr->n_lengths == 0 || age >= fleet_ptr->n_ages ||
-        fleet_ptr->age_to_length_conversion.size() !=
-            (fleet_ptr->n_ages * fleet_ptr->n_lengths)) {
+        !HasValidSize(*fleet_ptr)) {
+      return false;
+    }
+    const size_t table_size = fleet_ptr->n_ages * fleet_ptr->n_lengths;
+    const bool has_table_per_year =
+        fleet_ptr->age_to_length_conversion.size() != table_size;
+    if (has_table_per_year && year >= fleet_ptr->n_years) {
       return false;
     }
 
@@ -115,8 +127,9 @@ struct AgeToLengthConversionFixed : public AgeToLengthConversionBase<Type> {
     out_row.resize(fleet_ptr->n_lengths);
 
     // Compute the starting position for this age in the flattened
-    // age x length matrix.
-    const size_t row_offset = age * fleet_ptr->n_lengths;
+    // year x age x length matrix. A single table is shared by every year.
+    const size_t year_offset = has_table_per_year ? year * table_size : 0;
+    const size_t row_offset = year_offset + age * fleet_ptr->n_lengths;
 
     // Copy the fixed age-to-length probabilities for this age into out_row.
     for (size_t l = 0; l < fleet_ptr->n_lengths; ++l) {
