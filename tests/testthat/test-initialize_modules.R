@@ -433,7 +433,51 @@ test_that("`initialize_fleet()` works with correct inputs", {
       "GetObservedCatchDataID"
     ) %in% names(result$.refClassDef@refMethods)
   ))
+  #' @description Test that `initialize_fleet()` leaves weight at age empty for a fleet without its own rows, so the population weight is used.
+  expect_equal(result$weight_at_age$size(), 0)
   clear()
+})
+
+test_that("`initialize_fleet()` passes a fleet's own weight at age to the model", {
+  get_fleet_report <- function(data) {
+    frame <- FIMSFrame(data)
+    report <- setup_default_parameters(frame) |>
+      initialize_fims(data = frame) |>
+      fit_fims(optimize = FALSE) |>
+      get_report()
+    clear()
+    report
+  }
+  fleet_default_rows <- dplyr::filter(
+    data_big,
+    type == "weight_at_age",
+    timing == 1
+  ) |>
+    dplyr::mutate(fleet = "fleet1", timing = NA_integer_, observed = observed * 2)
+  fleet_year_5_rows <- dplyr::mutate(
+    fleet_default_rows,
+    timing = 5L,
+    observed = observed / 2 * 3
+  )
+  base_report <- get_fleet_report(data_big)
+  fleet_report <- get_fleet_report(
+    dplyr::bind_rows(data_big, fleet_default_rows, fleet_year_5_rows)
+  )
+  n_ages <- get_n_ages(data)
+  year_5_index <- (5 - get_start_year(data)) * n_ages + seq_len(n_ages)
+  base_catch_weight <- base_report[["catch_weight_at_age"]][[1]]
+  fleet_catch_weight <- fleet_report[["catch_weight_at_age"]][[1]]
+
+  #' @description Test that a fleet's weight at age sets its catch weight at age, with year 5 using that year's rows and other years the fleet default.
+  expect_equal(fleet_catch_weight[year_5_index], 3 * base_catch_weight[year_5_index])
+  expect_equal(fleet_catch_weight[-year_5_index], 2 * base_catch_weight[-year_5_index])
+  #' @description Test that another fleet without its own weight at age keeps the population weight for its index weight.
+  expect_equal(
+    fleet_report[["index_weight_at_age"]][[2]],
+    base_report[["index_weight_at_age"]][[2]]
+  )
+  #' @description Test that a fleet's weight at age does not change population biomass.
+  expect_equal(fleet_report[["biomass"]], base_report[["biomass"]])
 })
 
 # test_initialize_catch ----

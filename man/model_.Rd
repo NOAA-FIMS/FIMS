@@ -46,11 +46,11 @@ model_length_comp(x, fleet)
 
 \S4method{model_length_comp}{data.frame}(x, fleet)
 
-model_weight_at_age(x)
+model_weight_at_age(x, fleet = NA_character_)
 
-\S4method{model_weight_at_age}{FIMSFrame}(x)
+\S4method{model_weight_at_age}{FIMSFrame}(x, fleet = NA_character_)
 
-\S4method{model_weight_at_age}{data.frame}(x)
+\S4method{model_weight_at_age}{data.frame}(x, fleet = NA_character_)
 
 model_age_to_length_conversion(x)
 
@@ -111,12 +111,15 @@ conversion data are present in the \code{FIMSFrame} object.
 
 \subsection{\code{model_weight_at_age()}}{
 
-Returns a numeric vector of the population weight at age (type
-\code{"weight_at_age"} with \code{fleet = NA}), ordered by year (including the year
-after the last model year) and then age. Rows with \code{timing = NA} apply to
-every year and rows with a \code{timing} replace that default for that year.
-When there are no \code{fleet = NA} rows, the rows for the 1 fleet with weight
-at age are used. Nothing is averaged.
+Returns a numeric vector of weight at age (type \code{"weight_at_age"}), ordered
+by year and then age. Rows with \code{timing = NA} apply to every year and rows
+with a \code{timing} replace that default for that year. Nothing is averaged.
+With the default \code{fleet = NA}, it returns the population weight at age from
+\code{fleet = NA} rows, including the year after the last model year. When there
+are no \code{fleet = NA} rows, the rows for the 1 fleet with weight at age are
+used. With 1 fleet name, it returns that fleet's weight at age for the
+model years: the fleet's rows for that year, then its \code{timing = NA} rows,
+then the population weight at age.
 }
 
 \subsection{\code{model_age_to_length_conversion()}}{
