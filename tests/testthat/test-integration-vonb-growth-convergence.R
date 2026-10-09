@@ -9,6 +9,11 @@
 
 # VonBertalanffySchnute growth convergence ----
 ## Setup ----
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 make_vonb_parameters <- function(fims_frame) {
   default_parameters <- FIMS::setup_default_parameters(data = fims_frame)
 

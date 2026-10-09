@@ -19,9 +19,9 @@
 
 ## Setup ----
 #' @description Skip the test unless explicitly enabled for heavy integration testing.
-testthat::skip_if_not(
-  testthat:::env_var_is_true("RUN_SLOW_TESTS"),
-  message = "Skipping: RUN_SLOW_TESTS is not set to true."
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
 )
 
 # Load the model comparison operating model data from the fixtures folder

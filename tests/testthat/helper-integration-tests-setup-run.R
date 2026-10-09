@@ -6,7 +6,7 @@
 #' This function prepares the input data for integration tests by generating
 #' datasets containing only age composition, only length composition data, or
 #' data with missing values. The integration_test_data_components.RData is
-#' generated after running the script R/data_big.R.
+#' generated after running the script data-raw/data_big.R.
 #'
 #' @return None. The function saves the generated datasets as RDS files in the
 #' specified directory.
@@ -19,7 +19,7 @@ prepare_test_data <- function() {
   # The section generates datasets containing only age composition, only length
   # composition data, or data with missing values.
   # The integration_test_data_components.RData is generated after running the
-  # script R/data_big.R.
+  # script data-raw/data_big.R.
   # Load required integration test data components
   load(testthat::test_path("fixtures", "integration_test_data_components.RData"))
 

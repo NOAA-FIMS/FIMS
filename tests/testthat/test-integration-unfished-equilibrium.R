@@ -9,6 +9,11 @@
 
 # integration_unfished_equilibrium ----
 ## Setup ----
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 # data_big has the same natural mortality at every age and year, so unfished
 # numbers at age have a closed form and do not change from year to year.
 data("data_big")
