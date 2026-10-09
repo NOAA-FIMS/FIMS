@@ -91,7 +91,7 @@ get_data(data_4_model) |>
 
 The data contains the following fleets:
 
-- A single fishery fleet with age- and length-composition, weight-at-age, and catch data
+- A single fishery fleet with age- and length-composition and catch data, plus population weight at age
 - A single survey with age- and length-composition and index data
 
 You can use the base R function `plot(data_4_model)` to see the data types (e.g., catch, length composition, age composition, etc.) in the `data_4_model` object by fleet.
