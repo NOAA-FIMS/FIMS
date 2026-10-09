@@ -111,10 +111,12 @@ conversion data are present in the \code{FIMSFrame} object.
 
 \subsection{\code{model_weight_at_age()}}{
 
-Returns a numeric vector of weight-at-age observations (type
-\code{"weight_at_age"}), ordered by age and year (plus one additional year) and
-using \code{-999} to indicate missing observations When multiple fleets are
-present, values are averaged across fleets.
+Returns a numeric vector of the population weight at age (type
+\code{"weight_at_age"} with \code{fleet = NA}), ordered by year (including the year
+after the last model year) and then age. Rows with \code{timing = NA} apply to
+every year and rows with a \code{timing} replace that default for that year.
+When there are no \code{fleet = NA} rows, the rows for the 1 fleet with weight
+at age are used. Nothing is averaged.
 }
 
 \subsection{\code{model_age_to_length_conversion()}}{

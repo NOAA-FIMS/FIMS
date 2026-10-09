@@ -330,9 +330,10 @@ age_data <- rbind(
 timing_fishery <- data.frame(
   timing = returned_om[["om_input"]][["year"]]
 )
+# Population weight at age uses fleet = NA
 weights_fishery <- data.frame(
   type = "weight_at_age",
-  fleet = names(returned_om[["em_input"]][["n.L"]]),
+  fleet = NA_character_,
   age = seq_along(returned_om[["om_input"]][["W.kg"]]),
   observed = returned_om[["om_input"]][["W.mt"]],
   uncertainty = NA,
