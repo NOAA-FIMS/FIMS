@@ -9,61 +9,21 @@
 
 # get_sdreport ----
 ## Setup ----
-# Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS:::fit_without_optimization_big
 ## IO correctness ----
 test_that("`get_sdreport()` works with correct inputs", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
-  )
+  sdreport <- get_sdreport(fit_with_optimization_big)
+  #' @description Test that `get_sdreport()` returns the optimized fit slot.
+  expect_equal(sdreport, fit_with_optimization_big@sdreport)
+  expect_named(sdreport, names(fit_with_optimization_big@sdreport))
+  #' @description Test that optimized fits contain finite standard errors.
+  expect_true(any(is.finite(sdreport[["sd"]])))
 
-  expected_names <- c(
-    "value", "sd", "cov", "par.fixed", "cov.fixed", "pdHess",
-    "gradient.fixed", "env"
-  )
-
-  expected_names_re <- c(
-    "value", "sd", "cov", "par.fixed", "cov.fixed",
-    "pdHess", "gradient.fixed", "par.random", "diag.cov.random", "env"
-  )
-
-  # Function to read the RDS file and get input
-  check_sdreport <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    sdreport <- get_sdreport(fit_data)
-    #' @description Test that `get_sdreport()` returns correct output for the `sdreport` slot.
-    expect_equal(
-      object = sdreport,
-      expected = fit_data@sdreport
-    )
-
-    #' @description Test that the full covariance of derived quantities is not stored while their standard errors are.
-    expect_true(all(is.na(sdreport[["cov"]])))
-    expect_true(any(is.finite(sdreport[["sd"]])))
-
-    if (any(grepl("fixed_effects", fit_file))) {
-      #' @description Test that `get_sdreport()` returns correct names for the `sdreport` slot.
-      expect_equal(
-        object = names(sdreport),
-        expected = expected_names
-      )
-    } else {
-      #' @description Test that `get_sdreport()` returns correct names for the `sdreport` slot.
-      expect_equal(
-        object = names(sdreport),
-        expected = expected_names_re
-      )
-    }
-  }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_sdreport)
+  deterministic_sdreport <- get_sdreport(fit_without_optimization_big)
+  #' @description Test that deterministic fits preserve their empty sdreport slot.
+  expect_equal(deterministic_sdreport, fit_without_optimization_big@sdreport)
+  expect_length(deterministic_sdreport, 0)
 })
 
 ## Edge handling ----

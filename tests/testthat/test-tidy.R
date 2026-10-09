@@ -10,15 +10,7 @@
 # tidy ----
 
 ## Setup ----
-fit <- local({
-  clear()
-  withr::defer(clear(), envir = parent.env(environment()))
-  data("data_big", package = "FIMS")
-  data_4_model <- FIMSFrame(data_big)
-  setup_default_parameters(data = data_4_model) |>
-    initialize_fims(data = data_4_model) |>
-    fit_fims(optimize = TRUE)
-})
+fit <- FIMS::fit_with_optimization_big
 
 ## IO correctness ----
 test_that("tidy() works with correct inputs", {

@@ -95,6 +95,50 @@ test_that("`setup_default_parameters()` errors when neither weight-at-age nor le
   clear()
 })
 
+test_that("`setup_default_parameters()` is invariant to input row order", {
+  reordered_data <- data_big |>
+    dplyr::arrange(
+      dplyr::desc(.data$timing),
+      .data$fleet,
+      .data$type,
+      .data$age,
+      .data$length
+    ) |>
+    FIMS::FIMSFrame()
+
+  reordered_parameters <- setup_default_parameters(data = reordered_data)
+  expected_parameters <- setup_default_parameters(data = data)
+
+  #' @description Test that reordering input rows does not change default parameters.
+  expect_equal(reordered_parameters, expected_parameters)
+
+  clear()
+})
+
+test_that("`setup_default_parameters()` configures an additional fleet", {
+  additional_fleet_data <- data_big |>
+    dplyr::filter(
+      .data$fleet == "fleet1",
+      .data$type %in% c("catch", "age_comp", "length_comp")
+    ) |>
+    dplyr::mutate(fleet = "fleet_mock")
+
+  data_with_additional_fleet <- dplyr::bind_rows(data_big, additional_fleet_data) |>
+    FIMS::FIMSFrame()
+  parameters_with_additional_fleet <- setup_default_parameters(
+    data = data_with_additional_fleet
+  )
+
+  mock_fleet_modules <- parameters_with_additional_fleet |>
+    dplyr::filter(.data$fleet == "fleet_mock") |>
+    dplyr::pull(.data$module_name) |>
+    unique()
+  #' @description Test that the added fleet has Fleet and Selectivity parameters.
+  expect_setequal(mock_fleet_modules, c("Fleet", "Selectivity"))
+
+  clear()
+})
+
 test_that("modular pipeline matches `setup_default_parameters()`", {
   fleet1_name <- "fleet1"
 

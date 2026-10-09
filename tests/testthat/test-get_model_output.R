@@ -9,22 +9,11 @@
 
 # get_model_output ----
 ## Setup ----
-# Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+fit_with_optimization_big <- FIMS::fit_with_optimization_big
+fit_without_optimization_big <- FIMS:::fit_without_optimization_big
 
 ## IO correctness ----
 test_that("`get_model_output()` works with correct inputs", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  # or "deterministic*.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^(fit.*|deterministic.*)\\.RDS$",
-    full.names = TRUE
-  )
-
   expected_names <- c(
     "name", "type", "estimation_framework", "id", "objective_function_value",
     "growth", "recruitment", "maturity",
@@ -32,20 +21,12 @@ test_that("`get_model_output()` works with correct inputs", {
     "density_components", "data"
   )
 
-  # Function to read the RDS file and get obj
-  check_obj <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    model_output <- get_model_output(fit_data)
+  for (fit in list(fit_with_optimization_big, fit_without_optimization_big)) {
+    model_output <- get_model_output(fit)
     json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE)
-    #' @description Test that `get_model_output()` returns correct names for the `model_output` slot.
-    expect_equal(
-      object = names(json_list),
-      expected = expected_names
-    )
+    #' @description Test that `get_model_output()` returns the expected model output fields.
+    expect_equal(names(json_list), expected_names)
   }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_obj)
 })
 
 ## Edge handling ----

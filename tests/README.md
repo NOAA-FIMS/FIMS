@@ -23,7 +23,8 @@ Prepare the test data in the new file or in a separate file if you plan on reusi
     prepare_test_data()
   }
   ```
-- Use pre-existing integration data, e.g., `tests/testthat/fixtures/integration_test_data_components.RData` and `tests/testthat/fixtures/integration_test_data.RData`, by loading them within the `setup` section, e.g., `load(testthat::test_path("fixtures", "integration_test_data.RData"))` or within `prepare_test_data()`, where these data objects can be updated by running `R/data_big.R`.
+- Use pre-existing integration data, e.g., `tests/testthat/fixtures/integration_test_data_components.RData` and `tests/testthat/fixtures/integration_test_data.RData`, by loading them within the `setup` section, e.g., `load(testthat::test_path("fixtures", "integration_test_data.RData"))` or within `prepare_test_data()`, where these data objects can be updated by running `data-raw/data_big.R`.
+- Use pre-existing package data, e.g., `FIMS::data_big`, `FIMS::parameters_big`, `FIMS::fit_with_optimization_big`, and `FIMS::estimates_with_optimization_big`, by referring to them directly in tests. Update these objects by running `source(file.path("data-raw", "data_big.R"))` after changing the model or estimate-generation code.
 
 ### :pencil: Edit the code in the new test file
 
@@ -75,6 +76,7 @@ The following {testthat} functions can be used at the beginning of a test file t
 
 - Add [`testthat::skip_on_ci()`](https://testthat.r-lib.org/reference/skip.html) at the beginning of a test file to skip it during continuous integration runs.
 - Add [`testthat::skip_on_covr()`](https://testthat.r-lib.org/reference/skip.html) at the beginning of a test file to skip it during coverage calculation.
+- Add `testthat::skip_if(Sys.getenv("RUN_SLOW_TESTS") != "true", "Skipping: RUN_SLOW_TESTS is not set to true.")` at the beginning of a test file to run expensive integration tests only when `RUN_SLOW_TESTS=true`. The slow-test GitHub Actions workflow sets this variable; locally, set it before calling `devtools::test()` to run those tests.
 
 #### :mute: Suppressing messages
 
