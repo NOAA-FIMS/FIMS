@@ -666,10 +666,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     std::vector<Type> numbers_spr(population->n_ages, 1.0);
     Type phi_0 = 0.0;
-    phi_0 += numbers_spr[0] *
-             population->proportion_female.get_force_scalar(0) *
-             dq_["proportion_mature_at_age"][0] *
-             SpawningOutputAA(population, 0, 0);
+    phi_0 +=
+        numbers_spr[0] * population->proportion_female.get_force_scalar(0) *
+        dq_["proportion_mature_at_age"][0] * SpawningOutputAA(population, 0, 0);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
       numbers_spr[a] =
           numbers_spr[a - 1] * fims_math::exp(-population->M[a - 1]);
