@@ -148,6 +148,13 @@ class FleetInterface : public FleetInterfaceBase {
    * age-to-length-conversion matrix.
    */
   VariableVector age_to_length_conversion;
+  /**
+   * @brief Weight at age for this fleet's catch and index weight, ordered by
+   * year and then age, with n_years x n_ages values. It is empty when the
+   * fleet uses the population weight at age. It is data, so it is never
+   * registered as a parameter.
+   */
+  RealVector weight_at_age;
 
   // Fleet based derived quantities
   /**
@@ -233,6 +240,9 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief The constructor.
    */
   FleetInterface() : FleetInterfaceBase() {
+    // RealVector starts with 1 value, but an empty weight_at_age is how a
+    // fleet says it uses the population weight at age
+    this->weight_at_age.resize(0);
     std::shared_ptr<FleetInterface> fleet =
         std::make_shared<FleetInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(fleet);
@@ -269,6 +279,7 @@ class FleetInterface : public FleetInterfaceBase {
         log_q(other.log_q),
         log_Fmort(other.log_Fmort),
         age_to_length_conversion(other.age_to_length_conversion),
+        weight_at_age(other.weight_at_age),
         catch_numbers_at_age(other.catch_numbers_at_age),
         catch_weight_at_age(other.catch_weight_at_age),
         catch_numbers_at_length(other.catch_numbers_at_length),
@@ -557,6 +568,25 @@ class FleetInterface : public FleetInterfaceBase {
     }
     // add to variable_map
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
+
+    const size_t expected_weight_at_age_size =
+        static_cast<size_t>(this->n_years.get() * this->n_ages.get());
+    if (this->weight_at_age.size() != 0 &&
+        this->weight_at_age.size() != expected_weight_at_age_size) {
+      FIMS_ERROR_LOG(
+          "The size of `weight_at_age` does not match n_years x "
+          "n_ages: " +
+          fims::to_string(this->weight_at_age.size()) +
+          " != " + fims::to_string(expected_weight_at_age_size));
+      throw std::invalid_argument(
+          "Fleet weight_at_age size mismatch. Expected 0 or " +
+          fims::to_string(expected_weight_at_age_size) + " values, found " +
+          fims::to_string(this->weight_at_age.size()) + ".");
+    }
+    fleet->weight_at_age.resize(this->weight_at_age.size());
+    for (size_t i = 0; i < fleet->weight_at_age.size(); i++) {
+      fleet->weight_at_age[i] = this->weight_at_age[i];
+    }
 
     if (this->n_lengths.get() > 0) {
       if (this->lengths.size() != static_cast<size_t>(this->n_lengths.get())) {
