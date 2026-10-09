@@ -573,10 +573,11 @@ class FleetInterface : public FleetInterfaceBase {
         static_cast<size_t>(this->n_years.get() * this->n_ages.get());
     if (this->weight_at_age.size() != 0 &&
         this->weight_at_age.size() != expected_weight_at_age_size) {
-      FIMS_ERROR_LOG("The size of `weight_at_age` does not match n_years x "
-                     "n_ages: " +
-                     fims::to_string(this->weight_at_age.size()) +
-                     " != " + fims::to_string(expected_weight_at_age_size));
+      FIMS_ERROR_LOG(
+          "The size of `weight_at_age` does not match n_years x "
+          "n_ages: " +
+          fims::to_string(this->weight_at_age.size()) +
+          " != " + fims::to_string(expected_weight_at_age_size));
       throw std::invalid_argument(
           "Fleet weight_at_age size mismatch. Expected 0 or " +
           fims::to_string(expected_weight_at_age_size) + " values, found " +
