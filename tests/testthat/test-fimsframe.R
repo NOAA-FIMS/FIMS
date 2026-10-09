@@ -232,6 +232,60 @@ test_that("`model_weight_at_age()` uses timing = NA rows as the default and timi
   )
 })
 
+test_that("`model_weight_at_age()` returns a fleet's own weight at age with the population as the fallback", {
+  n_ages <- get_n_ages(fims_frame)
+  n_years <- get_n_years(fims_frame)
+  population_weight <- model_weight_at_age(fims_frame)
+  first_year_weight <- dplyr::filter(
+    data_big,
+    type == "weight_at_age",
+    timing == 1
+  )
+  fleet_default_rows <- dplyr::mutate(
+    first_year_weight,
+    fleet = "fleet1",
+    timing = NA_integer_,
+    observed = observed * 2
+  )
+  fleet_year_5_rows <- dplyr::mutate(
+    fleet_default_rows,
+    timing = 5L,
+    observed = observed / 2 * 3
+  )
+  fleet_frame <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    fleet_default_rows,
+    fleet_year_5_rows
+  ))
+  fleet_weight <- model_weight_at_age(fleet_frame, fleet = "fleet1")
+  year_5_index <- (5 - get_start_year(fims_frame)) * n_ages + seq_len(n_ages)
+  #' @description Test that `model_weight_at_age()` returns 1 value per model year and age for a fleet.
+  expect_length(fleet_weight, n_years * n_ages)
+  #' @description Test that a fleet's rows for a year replace its own `timing = NA` rows in that year.
+  expect_equal(fleet_weight[year_5_index], fleet_year_5_rows[["observed"]])
+  expect_equal(
+    fleet_weight[-year_5_index],
+    rep(fleet_default_rows[["observed"]], n_years - 1)
+  )
+  #' @description Test that a fleet without its own rows gets the population weight at age for the model years.
+  expect_equal(
+    model_weight_at_age(fleet_frame, fleet = "survey1"),
+    population_weight[seq_len(n_years * n_ages)]
+  )
+  #' @description Test that fleet rows do not change the population weight at age.
+  expect_equal(model_weight_at_age(fleet_frame), population_weight)
+
+  fleet_year_only_frame <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    fleet_year_5_rows
+  ))
+  #' @description Test that a fleet with rows for 1 year uses the population weight at age in the other years.
+  expect_equal(
+    model_weight_at_age(fleet_year_only_frame, fleet = "fleet1")[-year_5_index],
+    population_weight[seq_len(n_years * n_ages)][-year_5_index]
+  )
+})
+
 ## Edge handling ----
 test_that("`FIMSFrame()` returns correct outputs for edge cases", {
   #' @description Test that `get_data()` retrieves the data slot as a data frame when passed a data frame rather than a FIMSFrame object.
@@ -308,20 +362,6 @@ test_that("`FIMSFrame()` warns about weight-at-age rows for a fleet", {
     regexp = "used as the population weight at\\s+age"
   )
   expect_equal(model_weight_at_age(legacy_frame), model_weight_at_age(fims_frame))
-
-  #' @description Test that `FIMSFrame()` warns that fleet rows are not used when there are `fleet = NA` rows.
-  expect_warning(
-    with_fleet_frame <- FIMSFrame(dplyr::bind_rows(
-      data_big,
-      dplyr::filter(legacy_data, type == "weight_at_age") |>
-        dplyr::mutate(observed = observed * 2)
-    )),
-    regexp = "not used\\.\\s+Only\\s+rows"
-  )
-  expect_equal(
-    model_weight_at_age(with_fleet_frame),
-    model_weight_at_age(fims_frame)
-  )
 })
 
 test_that("`FIMSFrame()` returns correct error messages", {
@@ -422,7 +462,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
       data_big,
       !(type == "weight_at_age" & timing == 5 & age == 3)
     )),
-    regexp = "missing ages for these timings:\\s+5"
+    regexp = "missing ages for these timings:\\s+\"5\""
   )
 
   #' @description Test that `FIMSFrame()` returns an error when weight at age is -999.
@@ -597,10 +637,10 @@ test_that("`model_*()` returns correct error messages", {
     FIMSFrame(dplyr::select(data_big, -age))
   ))
 
-  #' @description Test that the `model_weight_at_age()` returns an error when providing an unused argument.
+  #' @description Test that `model_weight_at_age()` returns an error when more than 1 fleet is supplied.
   expect_error(
-    model_weight_at_age(fims_frame, fleet_names),
-    regexp = "unused argument"
+    model_weight_at_age(fims_frame, c("fleet1", "survey1")),
+    regexp = "single non-missing character string"
   )
 
   #' @description Test that the `model_catch()` returns an error when a fleet is not supplied.

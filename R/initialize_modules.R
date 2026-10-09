@@ -120,6 +120,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
 
     module_fields <- setdiff(module_fields, c(
       "age_to_length_conversion",
+      "weight_at_age",
       "lengthcomp_expected",
       "lengthcomp_proportion",
       "n_lengths",
@@ -517,6 +518,17 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
 
   module$n_lengths$set(length(fleet_length_bins))
   module$lengths[] <- fleet_length_bins
+
+  # A fleet with its own weight-at-age rows uses them for its catch and index
+  # weight. Other fleets keep an empty vector and use the population weight.
+  input_data <- get_data(data)
+  has_fleet_weight_at_age <- any(
+    input_data[["type"]] == "weight_at_age" &
+      input_data[["fleet"]] %in% fleet
+  )
+  if (has_fleet_weight_at_age) {
+    module$weight_at_age[] <- model_weight_at_age(data, fleet = fleet)
+  }
   module$SetRequiresAgeLengthMapping(requires_age_length_mapping)
 
   module$SetSelectivityID(linked_ids[["selectivity"]])

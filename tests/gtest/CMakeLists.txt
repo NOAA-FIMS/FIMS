@@ -459,3 +459,15 @@ target_link_libraries(information_Information_Clear
 )
 
 gtest_discover_tests(information_Information_Clear)
+
+# test_population_CatchAtAge_CalculateCatchWeightAA.cpp
+add_executable(population_CatchAtAge_CalculateCatchWeightAA
+  test_population_CatchAtAge_CalculateCatchWeightAA.cpp
+)
+add_as_invoker_manifest(population_CatchAtAge_CalculateCatchWeightAA)
+target_link_libraries(population_CatchAtAge_CalculateCatchWeightAA
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_CatchAtAge_CalculateCatchWeightAA)
