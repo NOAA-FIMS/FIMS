@@ -236,6 +236,54 @@ test_that("`get_estimates()` works for a model without random effects", {
     object = sum(estimates[["label"]] == "log_sd", na.rm = TRUE),
     expected = 0
   )
+})
+
+test_that("`get_estimates()` works with time-varying age-specific selectivity", {
+  data_4_model <- FIMSFrame(data_big)
+  n_years <- get_n_years(data_4_model)
+  n_ages <- get_n_ages(data_4_model)
+  age_specific <- setup_default_Selectivity(
+    data = data_4_model,
+    fleet = "survey1",
+    module_type = "AgeSpecific"
+  )
+  # 1 set of values per year, in year-major order, with a different value for
+  # each year and age so the labels can be checked against the values
+  age_specific_by_year <- age_specific[
+    rep(seq_len(nrow(age_specific)), times = n_years),
+  ] |>
+    dplyr::mutate(
+      value = rep(seq_len(n_years), each = n_ages) / 10 +
+        rep(seq_len(n_ages), times = n_years) / 100,
+      estimation_type = "constant"
+    )
+  parameters <- setup_default_parameters(data = data_4_model) |>
+    dplyr::filter(
+      !(.data$fleet == "survey1" & .data$module_name == "Selectivity")
+    ) |>
+    dplyr::bind_rows(age_specific_by_year)
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  #' @description Test that `get_estimates()` works when age-specific selectivity has 1 set of values per year.
+  expect_no_error(estimates <- get_estimates(fit))
+  selectivity <- estimates |>
+    dplyr::filter(.data$label == "logit_sel_at_age")
+  #' @description Test that each time-varying age-specific selectivity value is labelled with its year and age.
+  expect_equal(
+    object = selectivity[["year_i"]],
+    expected = rep(seq_len(n_years), each = n_ages)
+  )
+  expect_equal(
+    object = selectivity[["age"]],
+    expected = rep(get_ages(data_4_model), times = n_years)
+  )
+  #' @description Test that each time-varying age-specific selectivity value is reported with the year and age it was given for.
+  expect_equal(
+    object = selectivity[["input"]],
+    expected = selectivity[["year_i"]] / 10 +
+      match(selectivity[["age"]], get_ages(data_4_model)) / 100
+  )
   clear()
 })
 
