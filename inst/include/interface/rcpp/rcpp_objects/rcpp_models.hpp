@@ -691,7 +691,13 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"id\":" << fleet_interface->log_q.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [\"" << "na" << "\"],\n";
+      // With 1 value per year, log_q is labeled by year like log_Fmort, so
+      // get_estimates() can report the year of each value
+      if (fleet->log_q.size() > 1) {
+        ss << "  \"header\": [\"n_years\"],\n";
+      } else {
+        ss << "  \"header\": [\"na\"],\n";
+      }
       ss << "  \"dimensions\": [" << fleet->log_q.size() << "]\n},\n";
 
       ss << " \"values\": " << fleet_interface->log_q << "}\n";
