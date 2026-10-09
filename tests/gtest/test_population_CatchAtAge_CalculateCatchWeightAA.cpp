@@ -50,13 +50,11 @@ TEST_F(CAAEvaluateTestFixture,
 
   // Test that a fleet without its own weight at age uses the population
   // weight at age.
-  EXPECT_DOUBLE_EQ(
-      dq_fleet_without_weight["catch_weight_at_age"][i_age_year],
-      dq_fleet_without_weight["catch_numbers_at_age"][i_age_year] *
-          population_weight);
-  EXPECT_DOUBLE_EQ(
-      dq_fleet_without_weight["index_weight_at_age"][i_age_year],
-      dq_fleet_without_weight["index_numbers_at_age"][i_age_year] *
-          population_weight);
+  EXPECT_DOUBLE_EQ(dq_fleet_without_weight["catch_weight_at_age"][i_age_year],
+                   dq_fleet_without_weight["catch_numbers_at_age"][i_age_year] *
+                       population_weight);
+  EXPECT_DOUBLE_EQ(dq_fleet_without_weight["index_weight_at_age"][i_age_year],
+                   dq_fleet_without_weight["index_numbers_at_age"][i_age_year] *
+                       population_weight);
 }
 }  // namespace
