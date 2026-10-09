@@ -22,6 +22,9 @@
     "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
       "packages": "covr,dplyr,devtools,furrr,ggplot2,graphics,jsonlite,methods,Rcpp,RcppEigen,scales,snowfall,TMB,tibble,tidyr,usethis,yardstick",
       "installSystemRequirements": true
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "24"
     }
   },
   // // if we want quarto cli
@@ -32,7 +35,7 @@
   // "forwardPorts": [],
   "updateContentCommand": "Rscript -e 'options(repos = c(NOAA = \"https://noaa-fisheries-integrated-toolbox.r-universe.dev\", CRAN = \"https://cloud.r-project.org\")); pak::pak(c(\"github::noaa-afsc/SparseNUTS\", \"nmfs-ost/stockplotr\"))' || (echo '' && echo '>>> WARNING: Package installation failed! <<<' && echo 'Please install manually after opening the container.' && echo '')",
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "echo 'options(repos = c(CRAN = \"https://cloud.r-project.org\"))' | sudo sh -c 'cat - >>\"${R_HOME}/etc/Rprofile.site\"'",
+  "postCreateCommand": "echo 'options(repos = c(CRAN = \"https://cloud.r-project.org\"))' | sudo sh -c 'cat - >>\"${R_HOME}/etc/Rprofile.site\"' && npm install --global cspell@8.19.4",
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
@@ -41,6 +44,7 @@
       "extensions": [
         // if we want liveshare.
         "ms-vsliveshare.vsliveshare",
+        "streetsidesoftware.code-spell-checker",
         "ms-vscode.cpptools",
         "ms-vscode.cmake-tools",
         "GitHub.codespaces",
