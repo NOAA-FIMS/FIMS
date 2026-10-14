@@ -9,4 +9,5 @@ fims_input_types <- c(
 )
 
 usethis::use_data(fims_input_types, overwrite = TRUE)
+usethis::use_data(fims_input_types, overwrite = TRUE, internal = TRUE)
 on.exit(rm(fims_input_types), add = TRUE)
