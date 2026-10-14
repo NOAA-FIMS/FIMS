@@ -25,7 +25,8 @@ reference:
   desc: >
       Example datasets used in demonstrations and other package data.
   contents:
-  - data_big
+  - ends_with("_big")
+  - ends_with("_big_optimized")
   - fims_input_types
   - fims_distributions
 
