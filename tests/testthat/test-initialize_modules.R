@@ -438,6 +438,82 @@ test_that("`initialize_fleet()` works with correct inputs", {
   clear()
 })
 
+test_that("`initialize_population()` multiplies spawning output by spawning weight and fecundity", {
+  get_population_report <- function(data) {
+    frame <- FIMSFrame(data)
+    report <- setup_default_parameters(frame) |>
+      initialize_fims(data = frame) |>
+      fit_fims(optimize = FALSE) |>
+      get_report()
+    clear()
+    report
+  }
+  population_weight_rows <- dplyr::filter(data_big, type == "weight_at_age")
+  default_rows <- dplyr::filter(population_weight_rows, timing == 1) |>
+    dplyr::mutate(timing = NA_integer_)
+  base_report <- get_population_report(data_big)
+
+  fecundity_report <- get_population_report(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(default_rows, type = "fecundity_at_age", observed = 2)
+  ))
+  #' @description Test that a fecundity of 2 at every age doubles spawning output and unfished spawning output in every year.
+  expect_equal(
+    fecundity_report[["spawning_biomass"]][[1]],
+    2 * base_report[["spawning_biomass"]][[1]]
+  )
+  expect_equal(
+    fecundity_report[["unfished_spawning_biomass"]][[1]],
+    2 * base_report[["unfished_spawning_biomass"]][[1]]
+  )
+  # Spawning output per recruit doubles too, so recruitment and the spawning
+  # biomass ratio do not change
+  #' @description Test that a constant fecundity does not change the spawning biomass ratio or the objective.
+  expect_equal(
+    fecundity_report[["spawning_biomass_ratio"]],
+    base_report[["spawning_biomass_ratio"]]
+  )
+  expect_equal(fecundity_report[["jnll"]], base_report[["jnll"]])
+
+  year_5_fecundity_report <- get_population_report(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(
+      population_weight_rows,
+      type = "fecundity_at_age",
+      observed = dplyr::if_else(timing == 5, 2, 1)
+    )
+  ))
+  year_5 <- 5 - get_start_year(data) + 1
+  #' @description Test that a fecundity of 2 in year 5 only doubles spawning output in year 5 and leaves earlier years unchanged.
+  expect_equal(
+    year_5_fecundity_report[["spawning_biomass"]][[1]][year_5],
+    2 * base_report[["spawning_biomass"]][[1]][year_5]
+  )
+  expect_equal(
+    year_5_fecundity_report[["spawning_biomass"]][[1]][seq_len(year_5 - 1)],
+    base_report[["spawning_biomass"]][[1]][seq_len(year_5 - 1)]
+  )
+
+  spawning_weight_report <- get_population_report(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(
+      population_weight_rows,
+      type = "spawning_weight_at_age",
+      observed = observed * 2
+    )
+  ))
+  #' @description Test that spawning weight at age sets spawning output but not biomass or catch weight.
+  expect_equal(
+    spawning_weight_report[["spawning_biomass"]][[1]],
+    2 * base_report[["spawning_biomass"]][[1]]
+  )
+  expect_equal(spawning_weight_report[["biomass"]], base_report[["biomass"]])
+  expect_equal(
+    spawning_weight_report[["catch_weight"]],
+    base_report[["catch_weight"]]
+  )
+})
+
 test_that("`initialize_fleet()` passes a fleet's own weight at age to the model", {
   get_fleet_report <- function(data) {
     frame <- FIMSFrame(data)

@@ -509,48 +509,24 @@ methods::setMethod(
     } else {
       get_start_year(x):get_end_year(x)
     }
-    split_by_timing <- function(rows, prefix) {
-      list(
-        year = rows |>
-          dplyr::filter(!is.na(.data[["timing"]])) |>
-          dplyr::select(dplyr::all_of(c("timing", "age", "observed"))) |>
-          dplyr::rename(!!paste0(prefix, "_year") := "observed"),
-        default = rows |>
-          dplyr::filter(is.na(.data[["timing"]])) |>
-          dplyr::select(dplyr::all_of(c("age", "observed"))) |>
-          dplyr::rename(!!paste0(prefix, "_default") := "observed")
-      )
-    }
-    population <- split_by_timing(
+    population_weight <- at_age_by_year(
       population_weight_at_age_rows(weight_data),
-      "population"
+      ages = ages,
+      years = years
     )
+    if (is_population) {
+      return(population_weight)
+    }
     fleet_rows <- dplyr::filter(
       weight_data,
       !is.na(.data[["fleet"]]),
       .data[["fleet"]] %in% .env[["fleet"]]
     )
-    fleet_weight <- split_by_timing(fleet_rows, "fleet")
-    # Ordered by year then age, as the Growth module and the Fleet read the
-    # weights. A fleet uses its own rows for that year, then its own default,
-    # then the population rows for that year, then the population default.
-    tibble::tibble(
-      timing = rep(years, each = length(ages)),
-      age = rep(ages, times = length(years))
-    ) |>
-      dplyr::left_join(fleet_weight[["year"]], by = c("timing", "age")) |>
-      dplyr::left_join(fleet_weight[["default"]], by = "age") |>
-      dplyr::left_join(population[["year"]], by = c("timing", "age")) |>
-      dplyr::left_join(population[["default"]], by = "age") |>
-      dplyr::mutate(
-        observed = dplyr::coalesce(
-          .data[["fleet_year"]],
-          .data[["fleet_default"]],
-          .data[["population_year"]],
-          .data[["population_default"]]
-        )
-      ) |>
-      dplyr::pull(.data[["observed"]])
+    # A fleet uses its own rows, then the population weight at age
+    dplyr::coalesce(
+      at_age_by_year(fleet_rows, ages = ages, years = years),
+      population_weight
+    )
   }
 )
 #' @rdname model_
@@ -914,6 +890,32 @@ validate_fleets_have_observations <- function(data) {
   invisible(TRUE)
 }
 
+# Builds 1 value per year and age, ordered by year then age as the C++ modules
+# read them. Rows with a timing are used for that year and rows with
+# timing = NA for every other year. Year and age combinations without rows are
+# NA.
+at_age_by_year <- function(rows, ages, years) {
+  year_rows <- rows |>
+    dplyr::filter(!is.na(.data[["timing"]])) |>
+    dplyr::select(dplyr::all_of(c("timing", "age", "observed")))
+  default_rows <- rows |>
+    dplyr::filter(is.na(.data[["timing"]])) |>
+    dplyr::select(dplyr::all_of("age"), default_observed = "observed")
+  tibble::tibble(
+    timing = rep(years, each = length(ages)),
+    age = rep(ages, times = length(years))
+  ) |>
+    dplyr::left_join(year_rows, by = c("timing", "age")) |>
+    dplyr::left_join(default_rows, by = "age") |>
+    dplyr::mutate(
+      observed = dplyr::coalesce(
+        .data[["observed"]],
+        .data[["default_observed"]]
+      )
+    ) |>
+    dplyr::pull(.data[["observed"]])
+}
+
 # Population weight at age comes from fleet = NA rows. Without them, the rows
 # for 1 fleet are used so data with weights under a fleet still run.
 population_weight_at_age_rows <- function(weight_data) {
@@ -924,76 +926,89 @@ population_weight_at_age_rows <- function(weight_data) {
   }
 }
 
-# Weight at age is not fit to data, so a missing age or year would change
-# biomass instead of adding a -999 observation. Rows with timing = NA are the
-# default for every year, and rows with a timing replace that default for that
-# year. Nothing is averaged.
-validate_weight_at_age <- function(data, ages, years) {
-  # Without ages there is no age dimension for weight at age to fill
+# Weight, spawning weight, and fecundity at age are not fit to data, so a
+# missing age or year would change biomass or spawning output instead of adding
+# a -999 observation. Rows with timing = NA are the default for every year, and
+# rows with a timing replace that default for that year. Nothing is averaged.
+validate_at_age_input <- function(data, type, ages, years) {
+  # Without ages there is no age dimension to fill
   if (!"age" %in% colnames(data)) {
     return(invisible(TRUE))
   }
-  weight_data <- dplyr::filter(data, .data[["type"]] == "weight_at_age")
-  if (NROW(weight_data) == 0) {
+  input_rows <- dplyr::filter(data, .data[["type"]] == .env[["type"]])
+  if (NROW(input_rows) == 0) {
     return(invisible(TRUE))
   }
+  # e.g., "weight-at-age", for messages
+  type_label <- gsub("_", "-", type)
 
-  outside_weight_timings <- setdiff(
-    stats::na.omit(unique(weight_data[["timing"]])),
+  outside_timings <- setdiff(
+    stats::na.omit(unique(input_rows[["timing"]])),
     years
   )
-  if (length(outside_weight_timings) > 0) {
+  if (length(outside_timings) > 0) {
     cli::cli_abort(c(
-      "x" = "The {.var weight_at_age} type in your input data contains
+      "x" = "The {.var {type}} type in your input data contains
       information for years outside {min(years)}-{max(years)}, i.e., the model
       years and the year after the last model year, which is not allowed.",
-      "i" = "The invalid weight-at-age data occurs in the following timings:
-      {outside_weight_timings}.",
-      "i" = "Remove these rows of weight-at-age data, or extend the modeled
+      "i" = "The invalid {type_label} data occurs in the following timings:
+      {outside_timings}.",
+      "i" = "Remove these rows of {type_label} data, or extend the modeled
       years by adding a row of catches row for invalid years.",
-      "i" = "Remember that you only need additional weight-at-age data for
+      "i" = "Remember that you only need additional {type_label} data for
       one year beyond which you have other data so you can estimate the
       biomass on January 01 after all catches have been removed from the
       previous year."
     ))
   }
 
-  invalid_weights <- weight_data[["observed"]][
-    is.na(weight_data[["observed"]]) | weight_data[["observed"]] < 0
+  invalid_values <- input_rows[["observed"]][
+    is.na(input_rows[["observed"]]) | input_rows[["observed"]] < 0
   ]
-  if (length(invalid_weights) > 0) {
+  if (length(invalid_values) > 0) {
     cli::cli_abort(c(
-      "x" = "{.var weight_at_age} has values that are missing or negative:
-      {.val {unique(invalid_weights)}}.",
-      "i" = "Weight at age is used to calculate biomass, so every row needs
-      a weight of 0 or more. Missing values, including -999, are not allowed.",
-      "i" = "Use {.code dplyr::filter(data, type == 'weight_at_age',
+      "x" = "{.var {type}} has values that are missing or negative:
+      {.val {unique(invalid_values)}}.",
+      "i" = "{.var {type}} is used to calculate biomass or spawning output, so
+      every row needs a value of 0 or more. Missing values, including -999,
+      are not allowed.",
+      "i" = "Use {.code dplyr::filter(data, type == '{type}',
       is.na(observed) | observed < 0)} to find the rows."
     ))
   }
 
-  duplicated_weight_timings <- weight_data |>
+  duplicated_timings <- input_rows |>
     dplyr::count(.data[["fleet"]], .data[["timing"]], .data[["age"]]) |>
     dplyr::filter(.data[["n"]] > 1) |>
     dplyr::pull(.data[["timing"]]) |>
     unique()
-  if (length(duplicated_weight_timings) > 0) {
+  if (length(duplicated_timings) > 0) {
     cli::cli_abort(c(
-      "x" = "Only one row of weight_at_age data per fleet, timing, and age
+      "x" = "Only one row of {type} data per fleet, timing, and age
       are allowed in the input data for a FIMS model.",
       "i" = "The following timings have more than one row of
-      weight-at-age data: {duplicated_weight_timings}.",
+      {type_label} data: {duplicated_timings}.",
       "i" = "Use {.code dplyr::filter(dplyr::count(data, type, timing, fleet,
-      age), type == 'weight_at_age', n > 1)} to investigate the problem."
+      age), type == '{type}', n > 1)} to investigate the problem."
     ))
   }
 
-  weight_fleets <- unique(stats::na.omit(weight_data[["fleet"]]))
-  if (!any(is.na(weight_data[["fleet"]]))) {
-    if (length(weight_fleets) > 1) {
+  input_fleets <- unique(stats::na.omit(input_rows[["fleet"]]))
+  if (type != "weight_at_age" && length(input_fleets) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var {type}} has rows for
+      {cli::qty(length(input_fleets))}fleet{?s} {.val {input_fleets}}.",
+      "i" = "{.var {type}} is an input for the population, so its rows need
+      {.code fleet = NA}.",
+      "i" = "Use {.code dplyr::filter(data, type == '{type}',
+      !is.na(fleet))} to find the rows."
+    ))
+  }
+  if (type == "weight_at_age" && !any(is.na(input_rows[["fleet"]]))) {
+    if (length(input_fleets) > 1) {
       cli::cli_abort(c(
         "x" = "{.var weight_at_age} has rows for more than 1 fleet,
-        {.val {weight_fleets}}, and no rows with {.code fleet = NA}.",
+        {.val {input_fleets}}, and no rows with {.code fleet = NA}.",
         "i" = "The population weight at age, which is used for biomass, comes
         from rows with {.code fleet = NA}. Rows for different fleets are not
         averaged.",
@@ -1002,16 +1017,16 @@ validate_weight_at_age <- function(data, ages, years) {
       ))
     }
     cli::cli_warn(c(
-      "!" = "{.var weight_at_age} rows for fleet {.val {weight_fleets}} are
+      "!" = "{.var weight_at_age} rows for fleet {.val {input_fleets}} are
       used as the population weight at age because there are no rows with
       {.code fleet = NA}.",
       "i" = "Set {.code fleet = NA} for population weight at age."
     ))
   }
 
-  # Fleet rows are checked too, because a fleet uses its own rows for its
-  # catch and index weight
-  incomplete_timings <- weight_data |>
+  # Fleet rows are checked too, because a fleet uses its own weight at age for
+  # its catch and index weight
+  incomplete_timings <- input_rows |>
     dplyr::summarize(
       complete = length(.data[["age"]]) == length(ages) &&
         setequal(.data[["age"]], ages),
@@ -1028,31 +1043,55 @@ validate_weight_at_age <- function(data, ages, years) {
     dplyr::pull(.data[["label"]])
   if (length(incomplete_timings) > 0) {
     cli::cli_abort(c(
-      "x" = "{.var weight_at_age} is missing ages for these timings:
+      "x" = "{.var {type}} is missing ages for these timings:
       {.val {incomplete_timings}}.",
       "i" = "Every timing that is used, for the population or a fleet, needs
       1 row for each model age ({min(ages)}-{max(ages)}).",
       "i" = "Use {.code dplyr::count(dplyr::filter(data, type ==
-      'weight_at_age'), fleet, timing)} to see the number of ages in each
+      '{type}'), fleet, timing)} to see the number of ages in each
       timing."
+    ))
+  }
+
+  # A value of 0 at every age makes spawning output 0 in that year, and then
+  # recruitment and the objective function are undefined (NaN)
+  all_zero_timings <- input_rows |>
+    dplyr::summarize(
+      all_zero = all(.data[["observed"]] == 0),
+      .by = dplyr::all_of(c("fleet", "timing"))
+    ) |>
+    dplyr::filter(.data[["all_zero"]]) |>
+    dplyr::pull(.data[["timing"]])
+  if (length(all_zero_timings) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var {type}} is 0 at every age for these timings:
+      {.val {all_zero_timings}}.",
+      "i" = "Biomass or spawning output would be 0, which makes recruitment
+      and the objective function undefined.",
+      "i" = "Use {.code dplyr::filter(data, type == '{type}', observed == 0)}
+      to find the rows."
     ))
   }
 
   # Only the population needs every year, because a fleet without rows for a
   # year uses the population weight for that year
-  population_weight <- population_weight_at_age_rows(weight_data)
-  if (!any(is.na(population_weight[["timing"]]))) {
-    missing_years <- setdiff(years, population_weight[["timing"]])
+  population_rows <- if (type == "weight_at_age") {
+    population_weight_at_age_rows(input_rows)
+  } else {
+    input_rows
+  }
+  if (!any(is.na(population_rows[["timing"]]))) {
+    missing_years <- setdiff(years, population_rows[["timing"]])
     if (length(missing_years) > 0) {
       cli::cli_abort(c(
-        "x" = "{.var weight_at_age} is missing these years:
+        "x" = "{.var {type}} is missing these years:
         {.val {missing_years}}.",
-        "i" = "Weight at age is needed for every model year and the year
-        after the last one. A {.var timing} applies to that year only. Add
-        rows for the missing years, or set {.code timing = NA} for 1 set of
-        weights that is used for every year without its own rows.",
+        "i" = "{.var {type}} is needed for every model year and the year after
+        the last one. A {.var timing} applies to that year only. Add rows for
+        the missing years, or set {.code timing = NA} for 1 set of values that
+        is used for every year without its own rows.",
         "i" = "Use {.code dplyr::distinct(dplyr::filter(data, type ==
-        'weight_at_age'), timing)} to see the years with rows."
+        '{type}'), timing)} to see the years with rows."
       ))
     }
   }
@@ -1249,7 +1288,10 @@ FIMSFrame <- function(data) {
   # Get the earliest and latest year formatted as integers
   data_to_use_4_timing <- dplyr::filter(
     data,
-    !.data$type %in% c("age_to_length_conversion", "weight_at_age")
+    !.data$type %in% c(
+      "age_to_length_conversion", "weight_at_age", "spawning_weight_at_age",
+      "fecundity_at_age"
+    )
   ) |>
     dplyr::pull(.data$timing)
   start_year <- as.integer(floor(min(data_to_use_4_timing, na.rm = TRUE)))
@@ -1333,11 +1375,16 @@ FIMSFrame <- function(data) {
   }
   n_lengths <- length(lengths)
 
-  validate_weight_at_age(
-    data,
-    ages = ages,
-    years = start_year:(end_year + 1)
-  )
+  for (at_age_type in c(
+    "weight_at_age", "spawning_weight_at_age", "fecundity_at_age"
+  )) {
+    validate_at_age_input(
+      data,
+      type = at_age_type,
+      ages = ages,
+      years = start_year:(end_year + 1)
+    )
+  }
 
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with model_*() are correct.

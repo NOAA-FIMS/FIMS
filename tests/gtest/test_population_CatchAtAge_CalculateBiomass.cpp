@@ -75,4 +75,39 @@ TEST_F(CAAEvaluateTestFixture,
   EXPECT_EQ(dq["spawning_biomass"][year], test_SSB[year]);
   EXPECT_GT(dq["spawning_biomass"][year], 0);
 }
+
+TEST_F(CAAEvaluateTestFixture,
+       HandlesSpawningWeightAndFecundity_CatchAtAge_CalculateSpawningBiomass) {
+  uint32_t pop_id = population->GetId();
+  // The year after the last model year is the largest index these vectors use
+  int year = population->n_years;
+  int age = 6;
+  int i_age_year = year * population->n_ages + age;
+  int i_agem1_yearm1 = (year - 1) * population->n_ages + age - 1;
+  population->spawning_weight_at_age.resize((n_years + 1) * n_ages);
+  population->fecundity_at_age.resize((n_years + 1) * n_ages);
+  for (size_t i = 0; i < population->spawning_weight_at_age.size(); i++) {
+    population->spawning_weight_at_age[i] = 0.01 * static_cast<double>(i + 1);
+    population->fecundity_at_age[i] = 3.0;
+  }
+
+  catch_at_age_model->CalculateMortality(population, i_agem1_yearm1, year - 1,
+                                         age - 1);
+  catch_at_age_model->CalculateMaturityAA(population, i_age_year, year, age);
+  catch_at_age_model->CalculateNumbersAA(population, i_age_year, i_agem1_yearm1,
+                                         age);
+  catch_at_age_model->CalculateSpawningBiomass(population, i_age_year, year,
+                                               age);
+
+  auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
+  double expected_spawning_output =
+      dq["numbers_at_age"][i_age_year] * population->proportion_female[age] *
+      dq["proportion_mature_at_age"][i_age_year] *
+      population->spawning_weight_at_age[i_age_year] *
+      population->fecundity_at_age[i_age_year];
+
+  // Test that spawning output uses spawning weight at age times fecundity at
+  // age instead of the population weight at age.
+  EXPECT_DOUBLE_EQ(dq["spawning_biomass"][year], expected_spawning_output);
+}
 }  // namespace
