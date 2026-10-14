@@ -280,7 +280,8 @@ fit <- parameters_4_model |>
 ```
 
 ```{r load-precomputed-fit, echo=FALSE}
-data("fit_big_unoptimized", "fit_big_optimized", package = "FIMS")
+data("fit_big_optimized", package = "FIMS")
+fit_big_unoptimized <- FIMS:::fit_big_unoptimized
 test_fit <- fit_big_unoptimized
 fit <- fit_big_optimized
 ```
