@@ -663,6 +663,7 @@ class SimplexProjectionInterface : public EDMInterfaceBase {
    * @brief The forecast horizon.
    */
   SharedInt forecast_horizon = 1;
+  SharedInt time_exclusion_radius = 0;
   /**
    * @brief Prediction output vector.
    */
