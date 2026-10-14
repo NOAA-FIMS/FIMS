@@ -27,11 +27,7 @@ request](https://github.com/NOAA-FIMS/FIMS/issues/new?template=feature_request.y
 Before submitting either of these tickets, please search the [existing
 issues](https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue) to see if
 something identical or similar has already been submitted. Once created,
-Issues are automatically tagged with the `status: triage_needed` tag and
-placed on the [Issue Triage
-Board](https://github.com/orgs/NOAA-FIMS/projects/21) where they will be
-labeled, given an assignee, and given a milestone by those in charge of
-the triage process.
+Issues are automatically tagged with the `status: triage_needed` tag.
 
 ## Contributing code
 
