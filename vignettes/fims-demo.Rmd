@@ -294,11 +294,15 @@ sanity <- sanity_fims(fit)
 sanity[["all_ok"]]
 ```
 
-The same checks are stored on the fit and returned as a tibble by `get_convergence(fit)`, so they can be compared across many fits, e.g., in a simulation.
+The same checks are stored on the fit and returned as a tibble by `get_convergence()`. Each row is 1 check, with its `severity` (`"OK"`, `"NOTE"` for a check that did not run, `"WARN"`, or `"FAIL"`), the `value` that was checked, the `threshold` it was compared with, the `parameter` it points to, and a `message`. Because the tibble is stored on the fit, it can be collected across many fits, e.g., in a simulation.
+
+```{r get-convergence}
+get_convergence(fit)
+```
 
 ### Oh no! My model didn't converge! 😨 HELP‼️
 
-If you find yourself in the unfortunate situation where your model didn't converge, there are several things that you can look at. Start with `sanity_fims(fit)`, which names the parameters with the largest gradients and any negative log-likelihood components that are not finite.
+If you find yourself in the unfortunate situation where your model didn't converge, there are several things that you can look at. Start with `sanity_fims(fit)`, which names the parameters with the largest gradients and any negative log-likelihood components that are not finite. See [Checking a fit that did not converge](#checking-a-fit-that-did-not-converge) below for an example.
 
 #### Getting the non-converged fit output
 
@@ -320,6 +324,28 @@ dplyr::count(log_data_frame, level)
 # Subset for just the warnings
 log_data_frame |> dplyr::filter(level == "warning")
 
+clear()
+```
+
+#### Checking a fit that did not converge
+
+To see what the checks look like for a model that did not converge, the model below is fit again but `nlminb()` is stopped after 5 iterations. `fit_fims()` warns that the optimization failed, and because the maximum gradient is above 0.01, the standard errors are not calculated.
+
+```{r nonconverged-fit}
+nonconverged_fit <- parameters_4_model |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(
+    optimize = TRUE,
+    control = list(eval.max = 5, iter.max = 5, trace = 0)
+  )
+```
+
+`get_convergence()` shows that the optimizer and maximum gradient checks failed and that the Hessian was not checked. The `parameter` column of `max_gradient` names the 3 parameters with the largest gradients, which are a good place to start looking.
+
+```{r nonconverged-checks}
+get_convergence(nonconverged_fit)
+sanity <- sanity_fims(nonconverged_fit)
+sanity[["all_ok"]]
 clear()
 ```
 
