@@ -29,6 +29,7 @@ methods::setOldClass("package_version")
 #'   in the source `FIMSFrame`.
 #' @slot embedding_dimension Integer. The embedding dimension \eqn{E} used.
 #' @slot time_lag Integer. The time lag \eqn{\tau} used.
+#' @slot forecast_horizon Integer. The distance in the future to predict.
 #' @slot n_library Integer. Number of library points (rows) in the embedding.
 #' @slot parameters List. Method-specific hyperparameters:
 #'   \describe{
@@ -49,6 +50,7 @@ methods::setClass(
     embedding_name = "character",
     embedding_dimension = "integer",
     time_lag = "integer",
+    forecast_horizon = "integer",
     n_library = "integer",
     parameters = "list",
     version = "package_version"
@@ -744,6 +746,7 @@ select_n_neighbors <- function(data,
   emb      <- embeddings[[embedding_name]]
   E_used   <- emb$E
   tau_used <- emb$tau
+  forecast_horizon_used <- emb$forecast_horizon
 
   # --- Rebuild DelayEmbedding ---------------------------------------------
   data_tbl <- get_data(data)
@@ -760,11 +763,15 @@ select_n_neighbors <- function(data,
   lib_de <- methods::new(DelayEmbedding)
   if (isTRUE(emb$drop_missing)) {
     lib_de$construct_drop_missing(
-      as.numeric(series_data), as.integer(E_used), as.integer(tau_used), -999.0
+      as.numeric(series_data),
+      as.integer(E_used),
+      as.integer(tau_used),
+      as.integer(forecast_horizon_used),
+      -999.0
     )
   } else {
     lib_de$construct(
-      as.numeric(series_data), as.integer(E_used), as.integer(tau_used)
+      as.numeric(series_data), as.integer(E_used), as.integer(tau_used), as.integer(forecast_horizon_used)
     )
   }
   lib_id       <- lib_de$get_id()
@@ -911,7 +918,7 @@ fit_edm <- function(data,
   emb    <- embeddings[[embedding_name]]
   E_used   <- emb$E
   tau_used <- emb$tau
-
+  forecast_horizon_used <- emb$forecast_horizon
   # Guard: multivariate embeddings require C++ construct_multivariate() support
   # which will be added in the next phase. Raise a clear, actionable error.
   if (isTRUE(emb$multivariate)) {
@@ -945,13 +952,15 @@ fit_edm <- function(data,
       as.numeric(series_data),
       as.integer(E_used),
       as.integer(tau_used),
+      as.integer(forecast_horizon_used),
       -999.0
     )
   } else {
     lib_de$construct(
       as.numeric(series_data),
       as.integer(E_used),
-      as.integer(tau_used)
+      as.integer(tau_used),
+      as.integer(forecast_horizon_used)
     )
   }
 
@@ -1042,6 +1051,7 @@ fit_edm <- function(data,
     embedding_name     = embedding_name,
     embedding_dimension = as.integer(E_used),
     time_lag           = as.integer(tau_used),
+    forecast_horizon   = as.integer(forecast_horizon_used),
     n_library          = as.integer(n_lib),
     parameters         = result$parameters,
     version            = utils::packageVersion("FIMS")
@@ -1114,6 +1124,7 @@ edm_forecast <- function(fit, data, n_ahead = 1L, ...) {
   emb      <- embeddings[[embedding_name]]
   E_used   <- fit@embedding_dimension
   tau_used <- fit@time_lag
+  forecast_horizon_used <- fit@forecast_horizon
   method   <- get_method(fit)
   params   <- get_parameters(fit)
 
@@ -1135,13 +1146,15 @@ edm_forecast <- function(fit, data, n_ahead = 1L, ...) {
       as.numeric(full_series),
       as.integer(E_used),
       as.integer(tau_used),
+      as.integer(forecast_horizon_used),
       -999.0
     )
   } else {
     lib_de$construct(
       as.numeric(full_series),
       as.integer(E_used),
-      as.integer(tau_used)
+      as.integer(tau_used),
+      as.integer(forecast_horizon_used)
     )
   }
   lib_id <- lib_de$get_id()
@@ -1149,7 +1162,12 @@ edm_forecast <- function(fit, data, n_ahead = 1L, ...) {
   # Helper: predict one step ahead using the last row of test_de
   .predict_last <- function(test_series) {
     test_de <- methods::new(DelayEmbedding)
-    test_de$construct(as.numeric(test_series), as.integer(E_used), as.integer(tau_used))
+    test_de$construct(
+      as.numeric(test_series),
+      as.integer(E_used),
+      as.integer(tau_used),
+      as.integer(forecast_horizon_used)
+    )
     if (test_de$n_rows == 0L) {
       cli::cli_abort(c(
         "Cannot build a test query from the extended series.",

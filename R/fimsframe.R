@@ -852,6 +852,7 @@ create_edm_embedding <- function(
     series_type = series_type,
     E = as.integer(E),
     tau = as.integer(tau),
+    forecast_horizon = forecast_horizon,
     drop_missing = drop_missing,
     n_rows = as.integer(edm_obj$n_rows),
     n_cols = as.integer(edm_obj$n_cols),
