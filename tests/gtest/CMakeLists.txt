@@ -459,3 +459,30 @@ target_link_libraries(information_Information_Clear
 )
 
 gtest_discover_tests(information_Information_Clear)
+
+# test_fimsMath_fimsMath_ageingError.cpp
+add_executable(fimsMath_fimsMath_ageingError
+  test_fimsMath_fimsMath_ageingError.cpp
+)
+add_as_invoker_manifest(fimsMath_fimsMath_ageingError)
+
+target_link_libraries(fimsMath_fimsMath_ageingError
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fimsMath_fimsMath_ageingError)
+
+
+# test_population_CatchAtAge_EvaluateAgeingError.cpp
+add_executable(population_CatchAtAge_EvaluateAgeingError
+  test_population_CatchAtAge_EvaluateAgeingError.cpp
+)
+add_as_invoker_manifest(population_CatchAtAge_EvaluateAgeingError)
+
+target_link_libraries(population_CatchAtAge_EvaluateAgeingError
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_CatchAtAge_EvaluateAgeingError)

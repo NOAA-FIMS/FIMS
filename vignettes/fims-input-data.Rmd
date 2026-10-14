@@ -35,7 +35,7 @@ The input data for a FIMS model is a single long data frame with the following c
 
 Two drawbacks of the long format are (1) some information is duplicated, and (2) the long format is harder to read and understand by looking at the raw data frame. To meet this second challenge, the FIMS team is working on functions to summarize, visualize, and check for errors in the input data.
 
-The currently available values for the `type` column are `r glue::glue_collapse(glue::glue('\"{FIMS::fims_input_types}\"'), sep = ", ", last = ", and ")`. The "weight_at_age" and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
+The currently available values for the `type` column are `r glue::glue_collapse(glue::glue('\"{FIMS::fims_input_types}\"'), sep = ", ", last = ", and ")`. The "weight_at_age", "ageing_error", and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood. They are used in the population dynamics calculations or, for "ageing_error", in the expected age compositions.
 
 The individual data types are described in more detail below after introducing the example data set that is included in the package.
 
@@ -226,6 +226,94 @@ FIMS::data_big |>
   ggplot2::scale_x_continuous(breaks = get_ages(data_4_model)) +
   geom_hline(yintercept = 0) +
   ggtitle("Weight-at-age by time step in data_big example data set")
+```
+
+## Ageing error (`type == "ageing_error"`)
+
+Ageing error data are optional. Age readers do not always assign the true age, which spreads a strong year class across neighboring ages. With ageing error rows, each fleet's expected age composition is moved from true age to observed age before it is compared to the data. Length compositions, catch, and indices still use true age, and ageing error is not part of the likelihood.
+
+Each row gives the probability that a fish of one true age is read as one observed age. The observed age goes in `age`, the true age in `uncertainty`, and the probability in `observed`, with `unit = "proportion"`. The `uncertainty` column holds formulas for other data types, so true ages are stored as text, e.g., `uncertainty = as.character(true_age)`.
+
+Each set of rows is a full matrix over the model ages, and the probabilities for each true age must sum to 1. Sums within 1e-3 of 1 are rescaled to exactly 1, with a warning, and larger differences are an error. If a matrix was rounded to fewer than 3 decimal places, first check that `uncertainty` holds the true age and `age` the observed age, then divide each true age's probabilities by their total before adding it. Probability on observed ages below the youngest model age is added to that age, and above the oldest model age to the plus group, with a warning. Every observed age needs a total probability, summed across true ages, of at least 1e-3, because an expected proportion of 0 makes the likelihood undefined.
+
+Every model age needs rows as a true age, in `uncertainty`. Rows for true ages outside the model ages are not used, with a warning. Each row is the probability of each observed age given one true age, so probabilities for observed ages within a row can be added, but combining rows for different true ages needs the number of fish at each true age, which is unknown. The model has no fish below the youngest age, e.g., true age 0 in a model that starts at age 1, so dropping those rows changes nothing. Above the plus group, the row for the plus-group true age is used for every fish in the plus group.
+
+Ageing error can vary by fleet and year. For each fleet and year, the most specific rows are used:
+
+  1. rows for that fleet and that `timing`,
+  2. rows for that fleet with `timing = NA`,
+  3. rows with `fleet = NA` and that `timing`, and
+  4. rows with `fleet = NA` and `timing = NA`.
+
+Rows with `fleet = NA` apply to every fleet with age-composition data. A `timing` applies to that year only. Without a `timing = NA` default, every model year needs its own rows, including projection years. A fleet with no rows that apply to it has no ageing error, which is also the default.
+
+With ageing error, the reported `agecomp_proportion` and `agecomp_expected` are at observed age, while `catch_numbers_at_age` and `index_numbers_at_age` stay at true age.
+
+`data_big` does not include ageing error. The example below adds a matrix where each age is read 1 year too young or too old with probability 0.1.
+
+```{r data_big-ageing_error}
+ageing_error_ages <- get_ages(data_4_model)
+n_ageing_error_ages <- length(ageing_error_ages)
+ageing_error_matrix <- diag(0.8, n_ageing_error_ages)
+ageing_error_matrix[cbind(
+  1:(n_ageing_error_ages - 1),
+  2:n_ageing_error_ages
+)] <- 0.1
+ageing_error_matrix[cbind(
+  2:n_ageing_error_ages,
+  1:(n_ageing_error_ages - 1)
+)] <- 0.1
+ageing_error_matrix[1, 1] <- 0.9
+ageing_error_matrix[n_ageing_error_ages, n_ageing_error_ages] <- 0.9
+ageing_error <- tibble::tibble(
+  type = "ageing_error",
+  fleet = NA_character_,
+  age = rep(ageing_error_ages, times = n_ageing_error_ages),
+  length = NA_real_,
+  timing = NA_real_,
+  # Rows of the matrix are true ages, so t() lists observed ages within each
+  # true age.
+  observed = as.vector(t(ageing_error_matrix)),
+  unit = "proportion",
+  uncertainty = as.character(rep(ageing_error_ages, each = n_ageing_error_ages))
+)
+data_with_ageing_error <- FIMSFrame(dplyr::bind_rows(data_big, ageing_error))
+get_data(data_with_ageing_error) |>
+  dplyr::filter(type == "ageing_error") |>
+  head(3)
+```
+
+[Stock Synthesis](https://nmfs-ost.github.io/ss3-website/) and the [AgeingError package](https://pfmc-assessments.github.io/AgeingError/) describe ageing error by the mean and standard deviation of observed age at each true age, from age 0 to the population maximum age. In that convention an observed age covers the year from that age to the next, so unbiased readers have a mean of true age + 0.5 (entered as -1 in Stock Synthesis), and a standard deviation of 0.001 means almost no ageing error. The probability of each observed age is the normal probability over its year. The first and last observed ages collect the tails, as FIMS does when it folds observed ages outside the model ages, so each row sums to 1. The example below uses this convention, so vectors from Stock Synthesis or the AgeingError package can be used directly.
+
+```{r ageing_error-from-mean-sd}
+# Rows are true ages and columns are observed ages. Here readers are unbiased
+# and the standard deviation grows with age.
+n_ages <- n_ageing_error_ages
+mean_observed_age <- matrix(ageing_error_ages + 0.5, n_ages, n_ages)
+sd_observed_age <- matrix(0.1 * ageing_error_ages, n_ages, n_ages)
+observed_age <- matrix(ageing_error_ages, n_ages, n_ages, byrow = TRUE)
+# The first observed age starts at -Inf and the last ends at Inf so they
+# collect the tails.
+lower_bound <- observed_age
+lower_bound[, 1] <- -Inf
+upper_bound <- observed_age + 1
+upper_bound[, n_ages] <- Inf
+ageing_error_matrix <-
+  stats::pnorm(upper_bound, mean_observed_age, sd_observed_age) -
+  stats::pnorm(lower_bound, mean_observed_age, sd_observed_age)
+round(ageing_error_matrix[1:4, 1:4], 3)
+```
+
+The [AgeingError package](https://pfmc-assessments.github.io/AgeingError/) estimates ageing error from double reads and returns it as `ageing_error` rows. `AgeingError::run()` stores 1 table per reader in `ageing_error_fims`, and `AgeingError::ageing_error_matrix_to_fims()` converts any matrix with true ages as rows. Bind the table for 1 reader, not `ageing_error_fims` itself, which holds every reader. The tables use `fleet = NA` and `timing = NA`, so to use different readers for different fleets or years, set `fleet` or `timing` in each table first. The tables start at true age 0 and run to the oldest age read, so FIMS drops true ages outside the model ages and adds observed ages outside them to the end ages, with warnings.
+
+```{r ageing_error-from-AgeingError, eval = FALSE}
+# out is the result of AgeingError::run() on double-read data.
+reader1 <- out[["output"]][["ageing_error_fims"]][["reader1"]]
+reader2 <- out[["output"]][["ageing_error_fims"]][["reader2"]] |>
+  dplyr::mutate(fleet = "survey1")
+data_with_ageing_error <- FIMSFrame(
+  dplyr::bind_rows(data_big, reader1, reader2)
+)
 ```
 
 ## Age-to-length conversion (`type == "age_to_length_conversion"`)

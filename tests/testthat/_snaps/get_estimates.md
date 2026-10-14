@@ -333,35 +333,35 @@
           parameter_id fleet  year_i   age length  input observed estimation_type
                  <int> <chr>   <int> <dbl>  <dbl>  <dbl>    <dbl> <chr>
         1            4 fleet1      1    NA     NA -4.66        NA fixed_effects
-        2           24 fleet1      2    NA     NA -3.60        NA fixed_effects
-        3           25 fleet1      3    NA     NA -3.10        NA fixed_effects
-        4           26 fleet1      4    NA     NA -2.80        NA fixed_effects
-        5           27 fleet1      5    NA     NA -3.02        NA fixed_effects
-        6           28 fleet1      6    NA     NA -2.44        NA fixed_effects
-        7           29 fleet1      7    NA     NA -2.43        NA fixed_effects
-        8           30 fleet1      8    NA     NA -1.68        NA fixed_effects
-        9           31 fleet1      9    NA     NA -2.22        NA fixed_effects
-       10           32 fleet1     10    NA     NA -2.02        NA fixed_effects
-       11           33 fleet1     11    NA     NA -1.89        NA fixed_effects
-       12           34 fleet1     12    NA     NA -1.82        NA fixed_effects
-       13           35 fleet1     13    NA     NA -2.15        NA fixed_effects
-       14           36 fleet1     14    NA     NA -1.78        NA fixed_effects
-       15           37 fleet1     15    NA     NA -1.71        NA fixed_effects
-       16           38 fleet1     16    NA     NA -1.82        NA fixed_effects
-       17           39 fleet1     17    NA     NA -1.16        NA fixed_effects
-       18           40 fleet1     18    NA     NA -1.36        NA fixed_effects
-       19           41 fleet1     19    NA     NA -1.37        NA fixed_effects
-       20           42 fleet1     20    NA     NA -1.38        NA fixed_effects
-       21           43 fleet1     21    NA     NA -1.05        NA fixed_effects
-       22           44 fleet1     22    NA     NA -1.37        NA fixed_effects
-       23           45 fleet1     23    NA     NA -0.871       NA fixed_effects
-       24           46 fleet1     24    NA     NA -1.06        NA fixed_effects
-       25           47 fleet1     25    NA     NA -1.07        NA fixed_effects
-       26           48 fleet1     26    NA     NA -1.16        NA fixed_effects
-       27           49 fleet1     27    NA     NA -1.18        NA fixed_effects
-       28           50 fleet1     28    NA     NA -0.840       NA fixed_effects
-       29           51 fleet1     29    NA     NA -1.11        NA fixed_effects
-       30           52 fleet1     30    NA     NA -0.694       NA fixed_effects
+        2           25 fleet1      2    NA     NA -3.60        NA fixed_effects
+        3           26 fleet1      3    NA     NA -3.10        NA fixed_effects
+        4           27 fleet1      4    NA     NA -2.80        NA fixed_effects
+        5           28 fleet1      5    NA     NA -3.02        NA fixed_effects
+        6           29 fleet1      6    NA     NA -2.44        NA fixed_effects
+        7           30 fleet1      7    NA     NA -2.43        NA fixed_effects
+        8           31 fleet1      8    NA     NA -1.68        NA fixed_effects
+        9           32 fleet1      9    NA     NA -2.22        NA fixed_effects
+       10           33 fleet1     10    NA     NA -2.02        NA fixed_effects
+       11           34 fleet1     11    NA     NA -1.89        NA fixed_effects
+       12           35 fleet1     12    NA     NA -1.82        NA fixed_effects
+       13           36 fleet1     13    NA     NA -2.15        NA fixed_effects
+       14           37 fleet1     14    NA     NA -1.78        NA fixed_effects
+       15           38 fleet1     15    NA     NA -1.71        NA fixed_effects
+       16           39 fleet1     16    NA     NA -1.82        NA fixed_effects
+       17           40 fleet1     17    NA     NA -1.16        NA fixed_effects
+       18           41 fleet1     18    NA     NA -1.36        NA fixed_effects
+       19           42 fleet1     19    NA     NA -1.37        NA fixed_effects
+       20           43 fleet1     20    NA     NA -1.38        NA fixed_effects
+       21           44 fleet1     21    NA     NA -1.05        NA fixed_effects
+       22           45 fleet1     22    NA     NA -1.37        NA fixed_effects
+       23           46 fleet1     23    NA     NA -0.871       NA fixed_effects
+       24           47 fleet1     24    NA     NA -1.06        NA fixed_effects
+       25           48 fleet1     25    NA     NA -1.07        NA fixed_effects
+       26           49 fleet1     26    NA     NA -1.16        NA fixed_effects
+       27           50 fleet1     27    NA     NA -1.18        NA fixed_effects
+       28           51 fleet1     28    NA     NA -0.840       NA fixed_effects
+       29           52 fleet1     29    NA     NA -1.11        NA fixed_effects
+       30           53 fleet1     30    NA     NA -0.694       NA fixed_effects
        31            3 fleet1     NA    NA     NA  0           NA constant
        32           NA fleet1      1     1     NA NA           14 derived_quantity
        33           NA fleet1      1     2     NA NA           20 derived_quantity
@@ -1311,35 +1311,35 @@
           parameter_id fleet  year_i   age length input observed estimation_type
                  <int> <chr>   <int> <dbl>  <dbl> <dbl>    <dbl> <chr>
         1            4 fleet1      1    NA     NA -6.99       NA fixed_effects
-        2           24 fleet1      2    NA     NA -5.40       NA fixed_effects
-        3           25 fleet1      3    NA     NA -4.65       NA fixed_effects
-        4           26 fleet1      4    NA     NA -4.19       NA fixed_effects
-        5           27 fleet1      5    NA     NA -4.54       NA fixed_effects
-        6           28 fleet1      6    NA     NA -3.66       NA fixed_effects
-        7           29 fleet1      7    NA     NA -3.64       NA fixed_effects
-        8           30 fleet1      8    NA     NA -2.52       NA fixed_effects
-        9           31 fleet1      9    NA     NA -3.32       NA fixed_effects
-       10           32 fleet1     10    NA     NA -3.03       NA fixed_effects
-       11           33 fleet1     11    NA     NA -2.84       NA fixed_effects
-       12           34 fleet1     12    NA     NA -2.74       NA fixed_effects
-       13           35 fleet1     13    NA     NA -3.22       NA fixed_effects
-       14           36 fleet1     14    NA     NA -2.66       NA fixed_effects
-       15           37 fleet1     15    NA     NA -2.57       NA fixed_effects
-       16           38 fleet1     16    NA     NA -2.74       NA fixed_effects
-       17           39 fleet1     17    NA     NA -1.73       NA fixed_effects
-       18           40 fleet1     18    NA     NA -2.04       NA fixed_effects
-       19           41 fleet1     19    NA     NA -2.05       NA fixed_effects
-       20           42 fleet1     20    NA     NA -2.07       NA fixed_effects
-       21           43 fleet1     21    NA     NA -1.58       NA fixed_effects
-       22           44 fleet1     22    NA     NA -2.06       NA fixed_effects
-       23           45 fleet1     23    NA     NA -1.31       NA fixed_effects
-       24           46 fleet1     24    NA     NA -1.59       NA fixed_effects
-       25           47 fleet1     25    NA     NA -1.60       NA fixed_effects
-       26           48 fleet1     26    NA     NA -1.74       NA fixed_effects
-       27           49 fleet1     27    NA     NA -1.77       NA fixed_effects
-       28           50 fleet1     28    NA     NA -1.26       NA fixed_effects
-       29           51 fleet1     29    NA     NA -1.67       NA fixed_effects
-       30           52 fleet1     30    NA     NA -1.04       NA fixed_effects
+        2           25 fleet1      2    NA     NA -5.40       NA fixed_effects
+        3           26 fleet1      3    NA     NA -4.65       NA fixed_effects
+        4           27 fleet1      4    NA     NA -4.19       NA fixed_effects
+        5           28 fleet1      5    NA     NA -4.54       NA fixed_effects
+        6           29 fleet1      6    NA     NA -3.66       NA fixed_effects
+        7           30 fleet1      7    NA     NA -3.64       NA fixed_effects
+        8           31 fleet1      8    NA     NA -2.52       NA fixed_effects
+        9           32 fleet1      9    NA     NA -3.32       NA fixed_effects
+       10           33 fleet1     10    NA     NA -3.03       NA fixed_effects
+       11           34 fleet1     11    NA     NA -2.84       NA fixed_effects
+       12           35 fleet1     12    NA     NA -2.74       NA fixed_effects
+       13           36 fleet1     13    NA     NA -3.22       NA fixed_effects
+       14           37 fleet1     14    NA     NA -2.66       NA fixed_effects
+       15           38 fleet1     15    NA     NA -2.57       NA fixed_effects
+       16           39 fleet1     16    NA     NA -2.74       NA fixed_effects
+       17           40 fleet1     17    NA     NA -1.73       NA fixed_effects
+       18           41 fleet1     18    NA     NA -2.04       NA fixed_effects
+       19           42 fleet1     19    NA     NA -2.05       NA fixed_effects
+       20           43 fleet1     20    NA     NA -2.07       NA fixed_effects
+       21           44 fleet1     21    NA     NA -1.58       NA fixed_effects
+       22           45 fleet1     22    NA     NA -2.06       NA fixed_effects
+       23           46 fleet1     23    NA     NA -1.31       NA fixed_effects
+       24           47 fleet1     24    NA     NA -1.59       NA fixed_effects
+       25           48 fleet1     25    NA     NA -1.60       NA fixed_effects
+       26           49 fleet1     26    NA     NA -1.74       NA fixed_effects
+       27           50 fleet1     27    NA     NA -1.77       NA fixed_effects
+       28           51 fleet1     28    NA     NA -1.26       NA fixed_effects
+       29           52 fleet1     29    NA     NA -1.67       NA fixed_effects
+       30           53 fleet1     30    NA     NA -1.04       NA fixed_effects
        31            3 fleet1     NA    NA     NA  0          NA constant
        32           NA fleet1      1     1     NA NA          14 derived_quantity
        33           NA fleet1      1     2     NA NA          20 derived_quantity

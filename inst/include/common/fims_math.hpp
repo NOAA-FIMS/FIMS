@@ -369,6 +369,47 @@ inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
 }
 
 /**
+ * @brief Converts proportions at true age to proportions at observed age
+ * using an ageing error matrix.
+ *
+ * @details
+ * Ageing error spreads fish of one true age across several observed ages, so
+ * the expected composition of observed ages is
+ *
+ * \f$ p^{obs}_{a'} = \sum_{a} p_{a} E_{a,a'} \f$
+ *
+ * where \f$ E_{a,a'} \f$ is the probability that a fish of true age \f$ a \f$
+ * is read as age \f$ a' \f$. Each row of \f$ E \f$ sums to 1, so the total
+ * is unchanged. The caller checks the length of `ageing_error`.
+ *
+ * @tparam Type The scalar type, a TMB AD type or double.
+ * @param proportion_at_true_age Proportions at true age, one per model age.
+ * @param ageing_error 1 matrix for all years or 1 per year, with true age as
+ * rows and observed age varying fastest.
+ * @param year Year index, used only when there is 1 matrix per year.
+ * @return Proportions at observed age, one per model age.
+ */
+template <typename Type>
+inline fims::Vector<Type> apply_ageing_error(
+    const fims::Vector<Type> &proportion_at_true_age,
+    const fims::Vector<Type> &ageing_error, size_t year = 0) {
+  const size_t n_ages = proportion_at_true_age.size();
+  const size_t matrix_size = n_ages * n_ages;
+  const size_t matrix_offset =
+      (ageing_error.size() == matrix_size) ? 0 : year * matrix_size;
+
+  fims::Vector<Type> proportion_at_observed_age(n_ages, static_cast<Type>(0.0));
+  for (size_t true_age = 0; true_age < n_ages; true_age++) {
+    for (size_t observed_age = 0; observed_age < n_ages; observed_age++) {
+      proportion_at_observed_age[observed_age] +=
+          proportion_at_true_age[true_age] *
+          ageing_error[matrix_offset + true_age * n_ages + observed_age];
+    }
+  }
+  return proportion_at_observed_age;
+}
+
+/**
  * Sum elements of a vector
  *
  * @brief

@@ -75,6 +75,21 @@ test_that("rcpp fleet log_q can have a prior", {
   clear()
 })
 
+test_that("rcpp fleet accepts 1 ageing error matrix or 1 per year", {
+  # Rows of 2 values are true ages.
+  for (n_matrices in c(1, 3)) {
+    fleet <- methods::new(Fleet)
+    fleet$n_years$set(3)
+    fleet$n_ages$set(2)
+    fleet$log_Fmort$resize(3)
+    fleet$ageing_error$resize(4 * n_matrices)
+    fleet$ageing_error[] <- rep(c(0.9, 0.1, 0.2, 0.8), n_matrices)
+    #' @description Test that n_ages^2 or n_years * n_ages^2 ageing error values are accepted.
+    expect_no_error(CreateTMBModel())
+    clear()
+  }
+})
+
 
 ## Error handling ----
 test_that("rcpp fleet returns correct error messages", {
@@ -87,5 +102,17 @@ test_that("rcpp fleet returns correct error messages", {
   expect_error(fleet1$SetObservedLengthCompDataID("id"))
   #' @description Test that the rcpp fleet interface returns an error when given a string as an index ID rather than an integer.
   expect_error(fleet1$SetObservedIndexDataID("id"))
+  clear()
+})
+
+test_that("rcpp fleet rejects ageing error of the wrong size", {
+  fleet <- methods::new(Fleet)
+  fleet$n_years$set(3)
+  fleet$n_ages$set(2)
+  fleet$log_Fmort$resize(3)
+  fleet$ageing_error$resize(6)
+  fleet$ageing_error[] <- rep(0.5, 6)
+  #' @description Test that ageing error that is not n_ages^2 or n_years * n_ages^2 values returns an error.
+  expect_error(CreateTMBModel(), "ageing_error size mismatch")
   clear()
 })
