@@ -80,6 +80,7 @@ struct SimplexProjection : public EDMPredictorBase<Type> {
    * @param query_point Lagged coordinate vector of length embedding_dimension
    *   representing the state at time t:
    *   [x_t, x_{t-tau}, ..., x_{t-(E-1)*tau}].
+   * @param  query_point_time The integer time at which the query point occured.
    * @return Predicted value \f$\hat{x}_{t+1}\f$.
    * @throws std::runtime_error if library is null.
    * @throws std::invalid_argument if query_point.size() != embedding_dimension.
@@ -110,6 +111,7 @@ struct SimplexProjection : public EDMPredictorBase<Type> {
     // -----------------------------------------------------------------------
     const double kInf = std::numeric_limits<double>::max();
     std::vector<size_t> nn_indices(k, 0);
+    std::vector<size_t> nn_time(k, 0);
     std::vector<Type> nn_sq_dist(k, Type(kInf));
 
     for (size_t i = 0; i < n_lib; ++i) {
@@ -129,7 +131,10 @@ struct SimplexProjection : public EDMPredictorBase<Type> {
       }
 
       // Replace the worst slot if this neighbor is closer.
-      if (d < nn_sq_dist[worst]) {
+      // also exclude any points that are too close in time to the prediction point.
+      // could add other exclusion logic here in the future also.
+      if (d < nn_sq_dist[worst] & 
+          abs(i-this->query_point_time)>this->time_exclusion_radius) {
         nn_sq_dist[worst] = d;
         nn_indices[worst] = i;
       }
@@ -184,7 +189,7 @@ struct SimplexProjection : public EDMPredictorBase<Type> {
       for (size_t col = 0; col < E; ++col) {
         query_point[col] = test_embedding.at(row, col);
       }
-      this->predictions[row] = predict_one(query_point);
+      this->predictions[row] = predict_one(query_point,row);
     }
   }
 };

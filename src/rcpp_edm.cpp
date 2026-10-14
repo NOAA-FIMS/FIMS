@@ -70,6 +70,9 @@ void register_edm(Rcpp::Module& m) {
       .property("forecast_horizon",
                 &SimplexProjectionInterface::get_forecast_horizon,
                 &SimplexProjectionInterface::set_forecast_horizon)
+      .property("time_exclusion_radius",
+                &SimplexProjectionInterface::get_time_exclusion_radius,
+                &SimplexProjectionInterface::set_time_exclusion_radius)
       .field("predictions", &SimplexProjectionInterface::predictions)
       .method("get_id", &SimplexProjectionInterface::get_id)
       .method("predict", &SimplexProjectionInterface::predict)

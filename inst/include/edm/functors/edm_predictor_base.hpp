@@ -60,6 +60,16 @@ struct EDMPredictorBase {
   /** @brief Embedding dimension E. Must match library->n_cols. */
   size_t embedding_dimension = 0;
 
+  /** @brief Exclude any points closer than or equal in time
+   *  to the point in integer time. This is forward and backward in time.
+   */
+  size_t time_exclusion_radius = 0;
+
+  /** @brief Exclude any points closer than or equal in time
+   *  to the point in integer time. This is forward and backward in time.
+   */
+  size_t query_point_time = 0;
+
   /** @brief Time lag tau (informational; not used by base directly). */
   size_t time_lag = 1;
 

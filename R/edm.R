@@ -540,6 +540,8 @@ model_edm_matrix_multivariate <- function(x,
 #'   Default is `1`.
 #' @param E_max Positive integer. Maximum embedding dimension to evaluate.
 #'   Default is `10`.
+#' @param time_exclusion_radius Exclude any points closer than or equal in time
+#'   to the point in integer time. This is forward and backward in time.
 #' @param drop_missing Logical. When `TRUE` (default), rows containing the FIMS
 #'   missing-value sentinel `-999` are dropped before constructing the
 #'   embedding.
@@ -575,6 +577,7 @@ select_embedding_dimension <- function(data,
                                        forecast_horizon = 1L,
                                        E_min     = 1L,
                                        E_max     = 10L,
+                                       time_exclusion_radius = 0L,
                                        drop_missing = TRUE) {
 
   # --- Input validation ---------------------------------------------------
@@ -658,6 +661,7 @@ select_embedding_dimension <- function(data,
     sp <- methods::new(SimplexProjection)
     sp$embedding_dimension <- as.integer(E_try)
     sp$n_neighbors         <- as.integer(E_try + 1L)
+    sp$time_exclusion_radius <- as.integer(time_exclusion_radius)
     preds <- sp$predict(lib_id, lib_id)
 
     rho_vec[[i]]  <- stats::cor(preds, target_vals, use = "complete.obs")
@@ -695,6 +699,8 @@ select_embedding_dimension <- function(data,
 #'   Defaults to `E + 1`.
 #' @param k_max Positive integer. Maximum number of neighbours to evaluate.
 #'   Defaults to `min(floor(n_library / 2), E + 10)`.
+#' @param time_exclusion_radius Exclude any points closer than or equal in time
+#'   to the point in integer time. This is forward and backward in time.
 #'
 #' @return A [tibble::tibble()] with one row per candidate value and columns:
 #'   \describe{
@@ -718,7 +724,8 @@ select_embedding_dimension <- function(data,
 select_n_neighbors <- function(data,
                                embedding_name = NULL,
                                k_min = NULL,
-                               k_max = NULL) {
+                               k_max = NULL,
+                               time_exclusion_radius = 0L) {
 
   # --- Input validation ---------------------------------------------------
   if (!methods::is(data, "FIMSFrame")) {
@@ -798,6 +805,7 @@ select_n_neighbors <- function(data,
     sp <- methods::new(SimplexProjection)
     sp$embedding_dimension <- as.integer(E_used)
     sp$n_neighbors         <- as.integer(k)
+    sp$time_exclusion_radius <- as.integer(time_exclusion_radius)
     preds <- sp$predict(lib_id, lib_id)
 
     rho_vec[[i]]  <- stats::cor(preds, target_vals, use = "complete.obs")
@@ -841,6 +849,8 @@ select_n_neighbors <- function(data,
 #'   Simplex Projection. Defaults to `E + 1` when set to `0`.
 #'   Only used when `method = "simplex"`. Ignored when `auto_select = TRUE`.
 #'   Default is `0`.
+#' @param time_exclusion_radius Exclude any points closer than or equal in time
+#'   to the point in integer time. This is forward and backward in time.
 #' @param auto_select Logical. When `TRUE` and `method = "simplex"`, calls
 #'   [select_n_neighbors()] internally to choose the `n_neighbors` value that
 #'   maximises in-library Pearson correlation (\eqn{\rho}). Default is `FALSE`.
@@ -879,6 +889,7 @@ fit_edm <- function(data,
                     tau = 1L,
                     theta = 1.0,
                     n_neighbors = 0L,
+                    time_exclusion_radius = 0L,
                     auto_select = FALSE,
                     gp_phi_init = NULL,
                     gp_sigma2_init = 1.0,
@@ -996,6 +1007,7 @@ fit_edm <- function(data,
       sp <- methods::new(SimplexProjection)
       sp$embedding_dimension <- as.integer(E_used)
       sp$n_neighbors         <- k
+      sp$time_exclusion_radius <- as.integer(time_exclusion_radius)
       preds  <- sp$predict(lib_id, lib_id)
       params <- list(n_neighbors = k, auto_selected = isTRUE(auto_select))
       list(predictions = preds, parameters = params)
@@ -1071,6 +1083,8 @@ fit_edm <- function(data,
 #'   Required to reconstruct the time series for building forecast query points.
 #' @param n_ahead Positive integer. Number of time steps to forecast ahead.
 #'   Default is `1`.
+#' @param time_exclusion_radius Exclude any points closer than or equal in time
+#'   to the point in integer time. This is forward and backward in time.
 #' @param ... Additional arguments (reserved for future use).
 #'
 #' @return A [tibble::tibble()] with columns:
@@ -1094,7 +1108,11 @@ fit_edm <- function(data,
 #' forecasts <- edm_forecast(fit, ff, n_ahead = 5)
 #' print(forecasts)
 #' }
-edm_forecast <- function(fit, data, n_ahead = 1L, ...) {
+edm_forecast <- function(fit, 
+                         data,
+                         time_exclusion_radius = 0L, 
+                         n_ahead = 1L, 
+                         ...) {
 
   # --- Input validation ---------------------------------------------------
   if (!is.EDMFit(fit)) {
@@ -1180,6 +1198,7 @@ edm_forecast <- function(fit, data, n_ahead = 1L, ...) {
         sp <- methods::new(SimplexProjection)
         sp$embedding_dimension <- as.integer(E_used)
         sp$n_neighbors         <- as.integer(params[["n_neighbors"]])
+        sp$time_exclusion_radius <- as.integer(time_exclusion_radius)
         sp$predict(lib_id, test_id)
       },
       smap = {

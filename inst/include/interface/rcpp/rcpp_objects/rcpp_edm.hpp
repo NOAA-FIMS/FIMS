@@ -69,7 +69,8 @@ class EDMInterfaceBase : public FIMSRcppInterfaceBase {
   /**
    * @brief Copy constructor.
    */
-  EDMInterfaceBase(const EDMInterfaceBase& other) : id(other.id) {}
+  EDMInterfaceBase(const EDMInterfaceBase& other) 
+        : id(other.id) {}
 
   /**
    * @brief The destructor.
@@ -80,6 +81,7 @@ class EDMInterfaceBase : public FIMSRcppInterfaceBase {
    * @brief Get the ID for the child EDM interface objects to inherit.
    */
   virtual uint32_t get_id() = 0;
+  
 };
 
 /**
@@ -676,6 +678,8 @@ class SimplexProjectionInterface : public EDMInterfaceBase {
   void set_test_de_id(int val) { this->test_de_id.set(val); }
   int get_forecast_horizon() const { return this->forecast_horizon.get(); }
   void set_forecast_horizon(int val) { this->forecast_horizon.set(val); }
+  int get_time_exclusion_radius() const { return this->time_exclusion_radius.get(); }
+  void set_time_exclusion_radius(int val) { this->time_exclusion_radius.set(val); }
 
   /**
    * @brief The constructor.
@@ -697,6 +701,7 @@ class SimplexProjectionInterface : public EDMInterfaceBase {
         lib_de_id(other.lib_de_id),
         test_de_id(other.test_de_id),
         forecast_horizon(other.forecast_horizon),
+        time_exclusion_radius(other.time_exclusion_radius), 
         predictions(other.predictions) {}
 
   /**
@@ -852,6 +857,10 @@ class SMapProjectionInterface : public EDMInterfaceBase {
    * @brief The forecast horizon.
    */
   SharedInt forecast_horizon = 1;
+    /** @brief Exclude any points closer than or equal in time
+   *  to the point in integer time. This is forward and backward in time.
+   */
+  SharedInt time_exclusion_radius = 0;
   /**
    * @brief Prediction output vector.
    */
