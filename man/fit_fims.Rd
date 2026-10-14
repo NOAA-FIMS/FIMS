@@ -20,7 +20,7 @@ fit_fims(
 \item{input}{Input list as returned by \code{\link[=initialize_fims]{initialize_fims()}}.}
 
 \item{get_sd}{A boolean specifying if the \code{\link[TMB:sdreport]{TMB::sdreport()}} should be
-calculated? It is skipped when the maximum gradient is above 1 or not
+calculated? It is skipped when the maximum gradient is above 0.01 or not
 finite, because standard errors far from the optimum are not meaningful.}
 
 \item{save_sd}{A logical, with the default \code{TRUE}, indicating whether the

@@ -72,8 +72,8 @@ test_that("`get_convergence()` works with correct inputs", {
   expect_equal(
     object = convergence[["check"]],
     expected = c(
-      "optimizer", "max_gradient", "hessian", "standard_errors",
-      "condition_number"
+      "optimizer", "max_gradient", "nll", "hessian", "standard_errors",
+      "large_standard_errors", "condition_number"
     )
   )
   #' @description Test that `get_convergence()` stores the maximum gradient of the fit.
@@ -178,7 +178,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
   # Set control parameters that will allow convergence but
   # return moderately large gradient
   bad_control <- list(
-    rel.tol = 1e-4,
+    rel.tol = 1e-8,
     trace = 0
   )
 
@@ -293,10 +293,20 @@ test_that("fit_fims() errors when optimization fails to converge", {
   ))
   expect_true(inherits(test_results, "FIMSFit"))
   expect_equal(get_opt(test_results)[["convergence"]], 1L)
-  #' @description Test that fit_fims() stores a failed optimizer check and a not-checked Hessian when nlminb fails.
+  #' @description Test that fit_fims() stores a failed optimizer check, a failed negative log-likelihood check, and a not-checked Hessian when nlminb fails.
+  convergence <- get_convergence(test_results)
   expect_equal(
-    object = get_convergence(test_results)[["severity"]],
-    expected = c("FAIL", "NOTE")
+    object = convergence[["check"]],
+    expected = c("optimizer", "nll", "sdreport")
+  )
+  expect_equal(
+    object = convergence[["severity"]],
+    expected = c("FAIL", "FAIL", "NOTE")
+  )
+  #' @description Test that fit_fims() names the objective as not finite when nlminb fails.
+  expect_match(
+    convergence[["parameter"]][convergence[["check"]] == "nll"],
+    "objective"
   )
   expect_equal(
     names(get_opt(test_results)),

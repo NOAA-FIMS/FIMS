@@ -279,13 +279,30 @@ fit <- parameters_4_model |>
   fit_fims(optimize = TRUE)
 ```
 
+### Model sanity check
+
+`fit_fims()` checks the fit and warns about any problem it finds. `sanity_fims()` prints the result of every check in one place, similar to `sdmTMB::sanity()`:
+
+- `optimizer`: the `nlminb()` convergence code is 0.
+- `max_gradient`: the maximum absolute gradient is below 0.001. It fails above 0.01, and then the standard errors are not calculated.
+- `nll`: the negative log-likelihood and each of its components are finite. Components that are not finite are named, e.g., `fleet1_catch`.
+- `hessian`, `standard_errors`, and `large_standard_errors`: the Hessian is positive definite, no standard error is `NA`, and no fixed or random effect has a standard error above 1000.
+- `condition_number`: the condition number of the Hessian is at or below 1e5. Larger values mean some parameters are weakly identified.
+
+```{r sanity-check}
+sanity <- sanity_fims(fit)
+sanity[["all_ok"]]
+```
+
+The same checks are stored on the fit and returned as a tibble by `get_convergence(fit)`, so they can be compared across many fits, e.g., in a simulation.
+
 ### Oh no! My model didn't converge! 😨 HELP‼️
 
-If you find yourself in the unfortunate situation where your model didn't converge, there are several things that you can look at.
+If you find yourself in the unfortunate situation where your model didn't converge, there are several things that you can look at. Start with `sanity_fims(fit)`, which names the parameters with the largest gradients and any negative log-likelihood components that are not finite.
 
 #### Getting the non-converged fit output
 
-One of the things you can do is to inspect the fit output. You can start with the NLL (We are sorry these aren't named yet, it's in the list of things to add) by running `get_report(fit)$nll_components` which will give you a clue as to which part of these components might have caused your model to not converge.
+One of the things you can do is to inspect the fit output. You can start with the negative log-likelihood components by running `get_report(fit)$nll_components`, which will give you a clue as to which part of the model might have caused it to not converge. They are not named yet, but `sanity_fims(fit)` names any component that is not finite.
 
 You can then do `names(get_report(fit))` to see the names of all the information you can look into specifically and then look at that. You can also look in `View(get_estimates(fit))` to look through the tibble and identify problem data. Also, see the [Viewing results](#viewing-results) section for more information on how to view and filter the results.
 
