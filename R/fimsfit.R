@@ -102,7 +102,7 @@ methods::setMethod(
     convergence_bullet <- stats::setNames(
       if (length(flagged_checks) > 0) {
         "Convergence: {.val {convergence_status}} from
-        {.val {flagged_checks}}. Use {.code get_convergence()} to see each
+        {.val {flagged_checks}}. Use {.code sanity_fims(fit)} to see each
         check."
       } else {
         "Convergence: {.val {convergence_status}}"
@@ -555,7 +555,7 @@ FIMSFit <- function(
 #'
 #' @param input Input list as returned by [initialize_fims()].
 #' @param get_sd A boolean specifying if the [TMB::sdreport()] should be
-#'   calculated? It is skipped when the maximum gradient is above 1 or not
+#'   calculated? It is skipped when the maximum gradient is above 0.01 or not
 #'   finite, because standard errors far from the optimum are not meaningful.
 #' @param save_sd A logical, with the default `TRUE`, indicating whether the
 #'   sdreport is returned in the output. If `FALSE`, the slot for the report
@@ -657,16 +657,7 @@ fit_fims <- function(input,
   )
 
   if (is.null(opt)) {
-    failed_nlminb_object <- return_failed_nlminb(obj)
-    failed_fit <- fit <- FIMSFit(
-      input = input,
-      obj = obj,
-      opt = failed_nlminb_object[["opt"]],
-      sdreport = list(),
-      run_time = failed_nlminb_object[["run_time"]],
-      convergence = failed_nlminb_object[["convergence"]]
-    )
-    return(failed_fit)
+    return(failed_fims_fit(input, obj))
   }
 
   gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
@@ -693,16 +684,7 @@ fit_fims <- function(input,
           "i" = "The model successfully converged before this loop.",
           "i" = "The failed results are being returned."
         ))
-        failed_nlminb_object <- return_failed_nlminb(obj)
-        failed_fit <- fit <- FIMSFit(
-          input = input,
-          obj = obj,
-          opt = failed_nlminb_object[["opt"]],
-          sdreport = list(),
-          run_time = failed_nlminb_object[["run_time"]],
-          convergence = failed_nlminb_object[["convergence"]]
-        )
-        return(failed_fit)
+        return(failed_fims_fit(input, obj))
       }
       gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
       maxgrad <- max(abs(gradient))
@@ -781,8 +763,13 @@ fit_fims <- function(input,
     obj = obj,
     opt = opt,
     sdreport = sdreport,
-    run_time = run_time,
-    convergence = dplyr::bind_rows(mle_convergence, sdreport_convergence)
+    run_time = run_time
+  )
+  # The NLL check reads the report and model output that FIMSFit() builds
+  fit@convergence <- dplyr::bind_rows(
+    mle_convergence,
+    check_nll_convergence(opt, get_report(fit), get_model_output(fit)),
+    sdreport_convergence
   )
   print(fit)
   if (!is.null(filename)) {
@@ -873,16 +860,42 @@ return_failed_nlminb <- function(object) {
       objective = NA_real_,
       convergence = 1L,
       message = "Optimization failed"
-    ),
-    convergence = convergence_check(
-      check = c("optimizer", "sdreport"),
-      severity = c("FAIL", "NOTE"),
-      value = c(1, NA),
-      threshold = c(0, NA),
-      message = c(
-        "nlminb failed or returned an objective that is not finite.",
-        "Hessian not checked because the optimization failed."
-      )
     )
   ))
+}
+
+#' Build the FIMSFit returned when nlminb fails
+#'
+#' @param input Input list as returned by [initialize_fims()].
+#' @param obj The TMB object used for fitting.
+#' @return
+#' A FIMSFit object with the partial results and the convergence checks. The
+#' report is from the last parameters nlminb tried, so the `"nll"` check names
+#' the negative log-likelihood components that were not finite there.
+#' @noRd
+failed_fims_fit <- function(input, obj) {
+  failed_nlminb_object <- return_failed_nlminb(obj)
+  fit <- FIMSFit(
+    input = input,
+    obj = obj,
+    opt = failed_nlminb_object[["opt"]],
+    sdreport = list(),
+    run_time = failed_nlminb_object[["run_time"]]
+  )
+  fit@convergence <- dplyr::bind_rows(
+    convergence_check(
+      check = "optimizer",
+      severity = "FAIL",
+      value = 1,
+      threshold = 0,
+      message = "nlminb failed or returned an objective that is not finite."
+    ),
+    check_nll_convergence(get_opt(fit), get_report(fit), get_model_output(fit)),
+    convergence_check(
+      check = "sdreport",
+      severity = "NOTE",
+      message = "Hessian not checked because the optimization failed."
+    )
+  )
+  fit
 }
