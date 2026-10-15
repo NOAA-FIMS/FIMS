@@ -9,5 +9,5 @@ fims_input_types <- c(
 )
 
 usethis::use_data(fims_input_types, overwrite = TRUE)
-usethis::use_data(fims_input_types, overwrite = TRUE, internal = TRUE)
+save(fims_input_types, file = file.path("data-raw", "fims_input_types.rda"))
 on.exit(rm(fims_input_types), add = TRUE)

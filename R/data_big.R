@@ -42,3 +42,32 @@
 #' @seealso
 #' * [FIMSFrame()]
 "data_big"
+
+#' FIMS parameter tibble
+#'
+#' A tibble of default FIMS parameters updated with operating-model values for
+#' the example data set. The parameter table uses the same columns and
+#' structure returned by [setup_default_parameters()].
+#'
+#' @source \url{www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
+#' @seealso [setup_default_parameters()]
+"parameters_big"
+
+#' FIMS fit using the example data
+#'
+#' Precomputed [FIMSFit] objects for the example data, with and without
+#' optimization. Both objects have the same slots; the optimized fit includes
+#' uncertainty information when available.
+#'
+#' @format An object of class `FIMSFit`.
+#' @seealso [fit_fims()]
+"fit_big_optimized"
+
+#' FIMS estimates for the example data
+#'
+#' Precomputed estimate tibbles returned by [get_estimates()] for the example
+#' data, with and without optimization.
+#'
+#' @format A tibble returned by [get_estimates()].
+#' @seealso [get_estimates()]
+"estimates_big_optimized"
