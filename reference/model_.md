@@ -121,4 +121,5 @@ Observations are ordered by age and length in the order defined by
 [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md).
 When multiple observations are present across a single age and length,
 they are averaged because `age_to_length_conversion` data cannot vary
-across fleets or time.
+across fleets or time. The values for each age are then rescaled to sum
+to 1.

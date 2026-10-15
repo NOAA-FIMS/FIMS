@@ -304,13 +304,19 @@ projection_fit <- parameters_projection |>
   fit_fims(optimize = TRUE)
 ```
 
+    ## Warning: ! 10 of the 39 `log_devs` values in the recruitment module are constant, but
+    ##   the recruitment process distribution includes all of them.
+    ## ℹ The constant values still add to the negative log-likelihood and affect the
+    ##   estimate of `log_sd` (biased low when they are fixed at 0) and, for `log_r`,
+    ##   the stock-recruit parameters.
+
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
     ## ℹ Maximum gradient went from 0.00128 to 0.00037 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 14.70453 seconds
+    ## ℹ Total run time was 14.01954 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00037
     ## ℹ Negative log likelihood (NLL):

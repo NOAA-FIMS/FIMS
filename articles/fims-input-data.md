@@ -467,13 +467,16 @@ steps.](fims-input-data_files/figure-html/data_big-weight_at_age-plot-1.png)
 The age-to-length conversion data type contains the distribution of
 lengths for each age. The `age` and `length` columns contain all the
 combinations of age and length bins, and the `observed` column contains
-the proportion of fish at each age that are in each length bin. The
-`unit` column should be “proportion”. A single set of the age-to-length
-conversion data is required, rather than separate copies for each fleet
-(name) or time step. The age-to-length conversion data are not currently
-included in the likelihood but are used to convert numbers at age to
-numbers at length for the population dynamics calculations when length
-compositions are included in the model.
+the proportion of fish at each age that are in each length bin. FIMS
+rescales the values for each age to sum to 1, so they can be entered as
+proportions or counts, and warns when it does. The `unit` column is not
+used for this type, and “proportion” is the convention even for counts.
+A single set of the age-to-length conversion data is required, rather
+than separate copies for each fleet (name) or time step. The
+age-to-length conversion data are not currently included in the
+likelihood but are used to convert numbers at age to numbers at length
+for the population dynamics calculations when length compositions are
+included in the model.
 
 Note: purely age-based models which have no length-composition data can
 omit the age-to-length conversion data as well.
