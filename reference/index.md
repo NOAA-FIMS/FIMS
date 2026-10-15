@@ -6,6 +6,12 @@ Example datasets used in demonstrations and other package data.
 
 - [`data_big`](https://NOAA-FIMS.github.io/FIMS/reference/data_big.md) :
   FIMS input data frame
+- [`parameters_big`](https://NOAA-FIMS.github.io/FIMS/reference/parameters_big.md)
+  : FIMS parameter tibble
+- [`estimates_big_optimized`](https://NOAA-FIMS.github.io/FIMS/reference/estimates_big_optimized.md)
+  : FIMS estimates for the example data
+- [`fit_big_optimized`](https://NOAA-FIMS.github.io/FIMS/reference/fit_big_optimized.md)
+  : FIMS fit using the example data
 - [`fims_input_types`](https://NOAA-FIMS.github.io/FIMS/reference/fims_input_types.md)
   : Vector of acceptable FIMS input types
 - [`fims_distributions`](https://NOAA-FIMS.github.io/FIMS/reference/fims_distributions.md)
