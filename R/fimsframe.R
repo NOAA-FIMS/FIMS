@@ -751,6 +751,25 @@ methods::setValidity(
       ))
     }
 
+    # Composition data are counts ("number") or proportions that are scaled by
+    # the sample size ("proportion"), so any other unit would be read as a
+    # proportion without a message.
+    comp_units <- object@data |>
+      dplyr::filter(.data$type %in% grep("_comp", present_types, value = TRUE)) |>
+      dplyr::pull(.data$unit) |>
+      unique()
+    unknown_comp_units <- setdiff(comp_units, c("number", "proportion"))
+    if (length(unknown_comp_units) > 0) {
+      cli::cli_abort(c(
+        "x" = "Composition data have the following units that FIMS does not
+        use: {.val {unknown_comp_units}}.",
+        "i" = "The {.var unit} of age and length composition data must be
+        {.val number} for counts or {.val proportion} for proportions.",
+        "i" = "Use {.code dplyr::count(dplyr::filter(data, grepl('_comp',
+        type)), fleet, type, unit)} to find the rows with each unit."
+      ))
+    }
+
     # Ensure composition data sum to 1.0 per group if units are proportions
     for (present_type in grep("_comp", present_types, value = TRUE)) {
       test <- object@data |>

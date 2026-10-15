@@ -316,6 +316,15 @@ test_that("`FIMSFrame()` returns correct error messages", {
     regexp = "more than one unit:\\s+\"fleet1 catch\""
   )
 
+  #' @description Test that `FIMSFrame()` returns an error for a composition unit other than "number" or "proportion", rather than reading it as a proportion.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      unit = ifelse(type == "age_comp", "Proportion", unit)
+    )),
+    regexp = "units that FIMS does not\\s+use: \"Proportion\""
+  )
+
   terminal_weight <- dplyr::filter(
     data_big,
     type == "weight_at_age",
