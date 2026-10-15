@@ -171,7 +171,7 @@ test_that("`initialize_fims()` returns correct error messages", {
   #' @description Test that `initialize_fims()` fails when no fleets are provided.
   expect_error(
     initialize_fims(parameters = parameters_no_fleets, data = data),
-    "No fleets found in the provided `parameters`."
+    "No fleets found in the provided `parameters`"
   )
   clear()
 
@@ -495,7 +495,7 @@ test_that("`initialize_catch()` returns correct error messages", {
       data = data,
       fleet = "unknown_fleet"
     ),
-    "Fleet `unknown_fleet` not found in the data object."
+    "`fleet` \"unknown_fleet\" is not present in `data`"
   )
   clear()
 })
@@ -537,7 +537,7 @@ test_that("`initialize_index()` returns correct error messages", {
       data = data,
       fleet = "unknown_fleet"
     ),
-    "Fleet `unknown_fleet` not found in the data object."
+    "`fleet` \"unknown_fleet\" is not present in `data`"
   )
   clear()
 })
@@ -658,7 +658,7 @@ test_that("`initialize_comp()` returns correct error messages", {
       fleet = "unknown_fleet",
       type = "AgeComp"
     ),
-    "Fleet `unknown_fleet` not found in the data object."
+    "`fleet` \"unknown_fleet\" is not present in `data`"
   )
   clear()
 
@@ -682,7 +682,7 @@ test_that("`initialize_comp()` returns correct error messages", {
       fleet = "fleet1",
       type = "AgeComp"
     ),
-    "is unavailable or empty"
+    "Fleet \"fleet1\" has no age-composition data"
   )
   clear()
 

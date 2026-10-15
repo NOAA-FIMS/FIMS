@@ -100,9 +100,9 @@
 #' }
 #'
 plot_likelihood <- function(like_fit, group = "label") {
-  # check that like_fit is actually the output from fims_likelihood()
+  # check that like_fit is actually the output from run_fims_likelihood()
   if (!"vec" %in% names(like_fit) | !"estimates" %in% names(like_fit)) {
-    cli::cli_abort("like_fit needs to be a list returned by `fims_likelihood()` that contains `vec` and `estimates`")
+    cli::cli_abort("like_fit needs to be a list returned by `run_fims_likelihood()` that contains `vec` and `estimates`")
   }
 
   # get column name for parameter being profiled
@@ -110,7 +110,11 @@ plot_likelihood <- function(like_fit, group = "label") {
     names() |>
     grep(pattern = "value_", value = TRUE)
   if (length(column_name) > 1) {
-    cli::cli_abort("Function doesn't yet support multiple profile parameters")
+    cli::cli_abort(c(
+      "x" = "{.fn plot_likelihood} plots 1 profiled parameter, but
+      {.arg like_fit} has {length(column_name)}: {.val {column_name}}.",
+      "i" = "Run {.fn run_fims_likelihood} for 1 parameter at a time."
+    ))
   }
   if (length(column_name) == 0) {
     cli::cli_abort(
