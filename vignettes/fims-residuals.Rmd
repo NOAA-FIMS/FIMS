@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 This vignette is closely related to the more general [FIMS diagnostics vignette](https://noaa-fims.github.io/FIMS/articles/fims-diagnostics.html)
 
-The objective of this vignette is to demonstrate the use of Pearson residuals, using the information returned by `get_estimates()`. One-step-ahead (OSA) residuals (Waagepetersen 2006; Thygesen et al. 2017) and extensions are not yet available in FIMS.
+The objective of this vignette is to demonstrate the use of Pearson residuals, using the information returned by `get_estimates()`. One-step-ahead (OSA) residuals and extensions are not yet available in FIMS.
 
 This example uses the precomputed estimates for the package's `data_big` model, so it does not need to refit the model.
 
