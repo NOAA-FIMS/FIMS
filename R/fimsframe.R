@@ -898,6 +898,46 @@ validate_fleets_have_observations <- function(data) {
   invisible(TRUE)
 }
 
+# dlnorm takes the log of each observation, so a negative catch or an index of
+# 0 or less makes the objective NaN. A catch of 0 is allowed because it is
+# treated as a year with no fishing (see setup_default_Fleet()).
+validate_lognormal_observations <- function(data) {
+  invalid_rows <- data |>
+    dplyr::filter(
+      .data[["type"]] %in% c("catch", "index"),
+      .data[["observed"]] != -999,
+      .data[["observed"]] < 0 |
+        (.data[["type"]] == "index" & .data[["observed"]] == 0)
+    )
+  # Return before parsing so data without an uncertainty column still work.
+  if (NROW(invalid_rows) == 0) {
+    return(invisible(TRUE))
+  }
+  invalid_rows <- invalid_rows |>
+    dplyr::filter(
+      unlist(parse_data_distribution(.data[["uncertainty"]])[["family"]]) ==
+        "dlnorm"
+    )
+  if (NROW(invalid_rows) > 0) {
+    invalid_labels <- paste(
+      invalid_rows[["type"]],
+      invalid_rows[["fleet"]],
+      invalid_rows[["timing"]]
+    )
+    cli::cli_abort(c(
+      "x" = "The following {.var type}, {.var fleet}, and {.var timing}
+      combinations are fit with {.code dlnorm} but have a negative catch or
+      an index of 0 or less: {.val {invalid_labels}}.",
+      "i" = "A lognormal distribution needs observations greater than 0. A
+      catch of 0 is allowed and means no fishing. Use -999 for a missing
+      observation, or a distribution that allows 0, e.g., {.code dnorm}.",
+      "i" = "Use {.code dplyr::filter(data, type %in% c('catch', 'index'),
+      observed != -999, observed <= 0)} to find the rows."
+    ))
+  }
+  invisible(TRUE)
+}
+
 # Keep fleet-bin resolution explicit by default. Fixed age-to-length rows are
 # only treated as bin geometry when a caller intentionally opts into that path.
 resolve_fleet_length_bins <- function(
@@ -1096,6 +1136,7 @@ FIMSFrame <- function(data) {
   years <- start_year:end_year
 
   validate_fleets_have_observations(data)
+  validate_lognormal_observations(data)
 
   # Get the fleets represented in the data
   fleets <- unique(na.omit(data[["fleet"]]))

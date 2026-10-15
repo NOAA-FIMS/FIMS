@@ -58,7 +58,7 @@ data_4_model
 
 ## Catch (`type == "catch"`)
 
-The catch data type contains the total catch in weight for each time step. FIMS does not yet include the option to model discards internally, so "catch" should account for all catch. The catch are not associated with an age or length so those columns should only contain `NA` values. The `unit` column should currently always be `mt`. The `uncertainty` column should be the standard deviation of the logged observations if you are using the lognormal distribution to fit your data. `log_Fmort` parameters for each fleet and time step with catch can be estimated to fit the model to the catch data, informed by the uncertainty values. Common practice is to set the uncertainty to a small number, like 0.001, so the catch data are fit closely.
+The catch data type contains the total catch in weight for each time step. FIMS does not yet include the option to model discards internally, so "catch" should account for all catch. The catch are not associated with an age or length so those columns should only contain `NA` values. The `unit` column should currently always be `mt`. The `uncertainty` column should be the standard deviation of the logged observations if you are using the lognormal distribution to fit your data. `log_Fmort` parameters for each fleet and time step with catch can be estimated to fit the model to the catch data, informed by the uncertainty values. Common practice is to set the uncertainty to a small number, like 0.001, so the catch data are fit closely. A catch of 0 means the fleet did not fish in that time step. `setup_default_parameters()` fixes `log_Fmort` for that fleet and year at -200, so fishing mortality is effectively 0, and the 0 is left out of the likelihood. It is reported as -999 in the output, the same as missing data. If you estimate `log_Fmort` in that year instead, `initialize_fims()` warns, because nothing in the data informs it. A fleet with a catch of 0 in every year and no composition data gives no information on its selectivity. Use -999, not 0, for a missing catch.
 
 ```{r data_big-catch}
 # first three rows of the catch data
@@ -81,7 +81,7 @@ FIMS::data_big |>
 
 ## Indices (`type == "index"`)
 
-The index data type contains the relative or absolute abundance index for each time step. The inputs are similar to catch, in having `NA` values for age and length, `mt` for `unit`, and index uncertainty as the standard deviation of the logged observations.
+The index data type contains the relative or absolute abundance index for each time step. The inputs are similar to catch, in having `NA` values for age and length, `mt` for `unit`, and index uncertainty as the standard deviation of the logged observations. An index of 0 or less cannot be fit with the lognormal distribution, and `FIMSFrame()` returns an error for it. Use -999 for a missing index, or a distribution that allows 0.
 
 ```{r data_big-indices}
 # first three rows of the index data

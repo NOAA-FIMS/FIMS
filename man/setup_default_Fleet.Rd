@@ -22,7 +22,9 @@ catchability coefficients (log_q) and fishing mortality (log_Fmort) for fleets.
 For fishing fleets, log_q is set to an estimation type of "constant" with a
 default value of 0, while log_Fmort is set to "fixed_effects". For survey
 fleets, log_q is set to "fixed_effects" and log_Fmort is set to "constant"
-with a default value of -200.
+with a default value of -200. For a year with a catch of 0, log_Fmort is
+also set to "constant" at -200, so fishing mortality is effectively 0 that
+year.
 }
 \details{
 The function builds module-specific defaults by calling helper

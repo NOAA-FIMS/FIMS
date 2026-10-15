@@ -264,6 +264,30 @@ test_that("`setup_default_parameters()` works with edge cases", {
 
   expect_equal(log_devs_distribution_type, NA_character_)
 
+  zero_catch_data <- data_big |>
+    dplyr::mutate(
+      observed = dplyr::if_else(type == "catch" & timing == 3, 0, observed)
+    ) |>
+    FIMSFrame()
+  log_Fmort_defaults <- setup_default_Fleet(
+    data = zero_catch_data,
+    fleet = "fleet1"
+  ) |>
+    dplyr::filter(.data[["label"]] == "log_Fmort")
+  #' @description Test that `log_Fmort` is fixed at -200 in a year with a catch of 0.
+  expect_equal(
+    dplyr::filter(log_Fmort_defaults, .data[["timing"]] == 3) |>
+      dplyr::select("value", "estimation_type"),
+    tibble::tibble(value = -200, estimation_type = "constant")
+  )
+  #' @description Test that `log_Fmort` stays estimated in years with catch.
+  expect_equal(
+    dplyr::filter(log_Fmort_defaults, .data[["timing"]] != 3) |>
+      dplyr::pull(.data[["estimation_type"]]) |>
+      unique(),
+    "fixed_effects"
+  )
+
   clear()
 })
 
