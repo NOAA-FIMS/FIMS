@@ -74,6 +74,7 @@ struct AgeToLengthConversionFixed : public AgeToLengthConversionBase<Type> {
            HasValidSize(*fleet_ptr);
   }
 
+  /** @cond */
   /**
    * @brief Returns whether the fleet stores one age x length table for all
    * years or one table per year.
@@ -86,6 +87,7 @@ struct AgeToLengthConversionFixed : public AgeToLengthConversionBase<Type> {
     return matrix_size == table_size ||
            matrix_size == fleet_ref.n_years * table_size;
   }
+  /** @endcond */
 
   /**
    * @brief Prepare the fixed-matrix age-to-length conversion for the current

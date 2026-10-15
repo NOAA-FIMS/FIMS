@@ -570,8 +570,9 @@ methods::setMethod(
   "model_age_to_length_conversion",
   "FIMSFrame",
   function(x, fleet = NA) {
-    # A misspelled fleet name would otherwise fall back to the shared rows.
-    if (length(fleet) == 1 && !is.na(fleet)) {
+    # fleet = NA asks for the shared rows. Anything else must be 1 fleet in
+    # the data, or a misspelled name would fall back to the shared rows.
+    if (length(fleet) != 1 || !is.na(fleet)) {
       assert_presence_of_fleet(x, fleet)
     }
     resolve_age_to_length_conversion(
@@ -897,11 +898,44 @@ validate_fleets_have_observations <- function(data) {
   invisible(TRUE)
 }
 
-# For each model year, a fleet uses the first age_to_length_conversion rows it
-# finds in this order: its own rows for that year, its own rows with
-# timing = NA, the shared rows (fleet = NA) for that year, and the shared rows
-# with timing = NA. When every year uses the same rows, 1 table is returned
-# (timing = NA) for all years.
+# Finds the rows each fleet uses in each year of a fleet- and year-specific
+# input. A fleet uses the first rows it finds in this order: its own rows for
+# that year, its own rows with timing = NA, the shared rows (fleet = NA) for
+# that year, and the shared rows with timing = NA. `has_source` is FALSE when
+# there are none, and the caller decides whether that is an error.
+find_table_sources <- function(data, fleets, years) {
+  # is.na() keeps fleet = NA apart from a fleet named "NA".
+  # as.numeric() prints integer and double years the same way.
+  table_key <- function(fleet, timing) {
+    paste(is.na(fleet), fleet, as.numeric(timing))
+  }
+  supplied <- unique(table_key(data[["fleet"]], data[["timing"]]))
+  tibble::tibble(
+    fleet = rep(as.character(fleets), each = length(years)),
+    year = rep(years, times = length(fleets))
+  ) |>
+    dplyr::mutate(
+      source_fleet = dplyr::if_else(
+        table_key(.data[["fleet"]], .data[["year"]]) %in% supplied |
+          table_key(.data[["fleet"]], NA) %in% supplied,
+        .data[["fleet"]],
+        NA_character_
+      ),
+      source_timing = dplyr::if_else(
+        table_key(.data[["source_fleet"]], .data[["year"]]) %in% supplied,
+        as.numeric(.data[["year"]]),
+        NA_real_
+      ),
+      has_source = table_key(
+        .data[["source_fleet"]],
+        .data[["source_timing"]]
+      ) %in% supplied
+    )
+}
+
+# Returns the age_to_length_conversion table a fleet uses in each model year,
+# chosen by find_table_sources(). When every year uses the same rows, 1 table
+# is returned (timing = NA) for all years.
 # Each age is rescaled to sum to 1 so values can be entered as proportions or
 # counts. An age that does not sum to 1 would otherwise get more or less weight
 # in the expected length compositions. Given a fleet's length bins in
@@ -912,11 +946,6 @@ validate_fleets_have_observations <- function(data) {
 # are lower edges or centers.
 resolve_age_to_length_conversion <- function(data, years, fleet = NA,
                                              lengths = NULL) {
-  if (length(fleet) != 1) {
-    cli::cli_abort(
-      "{.var fleet} must be 1 fleet name, or NA for the shared rows."
-    )
-  }
   owner <- if (is.na(fleet)) {
     "the shared rows (fleet = NA)"
   } else {
@@ -933,23 +962,10 @@ resolve_age_to_length_conversion <- function(data, years, fleet = NA,
     data,
     .data[["type"]] == "age_to_length_conversion"
   )
-  has_rows <- function(source_fleet, source_timing) {
-    any(
-      conversion_data[["fleet"]] %in% source_fleet &
-        conversion_data[["timing"]] %in% source_timing
+  sources <- find_table_sources(conversion_data, fleet, years) |>
+    dplyr::select(
+      timing = "year", "source_fleet", "source_timing", "has_source"
     )
-  }
-  sources <- purrr::map(years, \(year) {
-    source_fleet <- if (has_rows(fleet, c(year, NA))) fleet else NA
-    source_timing <- if (has_rows(source_fleet, year)) year else NA
-    tibble::tibble(
-      timing = year,
-      source_fleet = source_fleet,
-      source_timing = source_timing,
-      has_source = has_rows(source_fleet, source_timing)
-    )
-  }) |>
-    purrr::list_rbind()
   if (!all(sources[["has_source"]])) {
     missing_years <- sources[["timing"]][!sources[["has_source"]]]
     cli::cli_abort(missing_message)
@@ -1108,6 +1124,7 @@ validate_age_to_length_conversion <- function(data, ages, years,
   age_sums <- data |>
     dplyr::summarize(
       sum_observed = sum(.data[["observed"]]),
+      is_number = all(.data[["unit"]] %in% "number"),
       .by = c("fleet", "timing", "age")
     ) |>
     dplyr::mutate(
@@ -1145,9 +1162,12 @@ validate_age_to_length_conversion <- function(data, ages, years,
       zero_messages
     ))
   }
-  # Matches the tolerance for composition data.
+  # Counts (unit = "number") are rescaled without a warning. Any other unit is
+  # read as proportions, which may be an input error if they do not sum to 1.
+  # The 1e-3 tolerance matches composition data.
   rescaled_ages <- dplyr::filter(
     age_sums,
+    !.data[["is_number"]],
     abs(.data[["sum_observed"]] - 1) > 1e-3
   )
   if (NROW(rescaled_ages) > 0) {

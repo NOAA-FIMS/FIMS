@@ -338,7 +338,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
     model_age_to_length_conversion(FIMSFrame(data_big))
   )
 
-  #' @description Test that age-to-length conversion values entered as counts give the same table as proportions.
+  #' @description Test that `FIMSFrame()` warns and rescales when age-to-length conversion proportions do not sum to 1.
   expect_warning(
     counts <- FIMSFrame(dplyr::mutate(
       data_big,
@@ -352,6 +352,24 @@ test_that("`FIMSFrame()` returns correct error messages", {
   )
   expect_equal(
     model_age_to_length_conversion(counts),
+    model_age_to_length_conversion(FIMSFrame(data_big))
+  )
+
+  #' @description Test that `FIMSFrame()` rescales age-to-length conversion counts (unit = "number") without a warning.
+  expect_no_warning(
+    number_counts <- FIMSFrame(dplyr::mutate(
+      data_big,
+      observed = ifelse(
+        type == "age_to_length_conversion",
+        observed * 100,
+        observed
+      ),
+      unit = ifelse(type == "age_to_length_conversion", "number", unit)
+    )),
+    message = "rescaled to sum to 1"
+  )
+  expect_equal(
+    model_age_to_length_conversion(number_counts),
     model_age_to_length_conversion(FIMSFrame(data_big))
   )
 
@@ -596,6 +614,28 @@ test_that("`model_*()` returns correct outputs for edge cases", {
   #' @description Test that `model_age_to_length_conversion()` uses the `timing = NA` rows for years without their own rows.
   expect_equal(by_year[, 4], model_age_to_length_conversion(fims_frame))
 
+  #' @description Test that `find_table_sources()` uses a fleet's rows for that year, then its `timing = NA` rows, then the shared rows for that year, then the shared `timing = NA` rows.
+  sources <- FIMS:::find_table_sources(
+    data.frame(fleet = c("fleet1", "fleet1", NA, NA), timing = c(1, NA, 2, NA)),
+    fleets = c("fleet1", "survey1"),
+    years = 1:3
+  )
+  expect_equal(
+    sources[["source_fleet"]],
+    c("fleet1", "fleet1", "fleet1", NA, NA, NA)
+  )
+  expect_equal(sources[["source_timing"]], c(1, NA, NA, NA, 2, NA))
+  expect_true(all(sources[["has_source"]]))
+
+  #' @description Test that `find_table_sources()` does not use rows for a fleet named "NA" as the shared rows.
+  expect_false(
+    FIMS:::find_table_sources(
+      data.frame(fleet = "NA", timing = NA),
+      fleets = NA,
+      years = 1
+    )[["has_source"]]
+  )
+
   #' @description Test that `FIMSFrame()` errors when a fleet with length data has no age-to-length conversion rows for some years.
   expect_error(
     FIMSFrame(dplyr::bind_rows(
@@ -619,13 +659,13 @@ test_that("`model_*()` returns correct outputs for edge cases", {
   #' @description Test that `model_age_to_length_conversion()` errors when more than 1 fleet is given.
   expect_error(
     model_age_to_length_conversion(fleet_data, c("fleet1", "survey1")),
-    regexp = "must be 1 fleet name"
+    regexp = "must be a single non-missing character string"
   )
 
   #' @description Test that `model_age_to_length_conversion()` errors on a fleet name that is not in the data.
   expect_error(
     model_age_to_length_conversion(fleet_data, "flet1"),
-    regexp = "not present in the"
+    regexp = "is not present in"
   )
 
   # Bins from 100 to 500, so fish below and above them are added to the end
