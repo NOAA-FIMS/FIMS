@@ -41,8 +41,9 @@ setup_default_Population(
 
 - proportion_female:
 
-  A numeric value between 0 and 1 specifying the proportion of females.
-  Default is `0.5`.
+  A numeric value or vector (length equal to the number of ages) between
+  0 and 1 specifying the proportion of each age that is female, which
+  scales spawning biomass. Default is `0.5`.
 
 ## Value
 

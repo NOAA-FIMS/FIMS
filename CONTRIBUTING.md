@@ -185,8 +185,8 @@ checks to follow so that the code is ready for a pull request:
 - Spell check the package using [cspell](https://cspell.org/). Install
   with `npm install -g cspell` and run
   `cspell "**/*.{cpp,hpp,h,R,Rmd,md}"` from the package root. Add any
-  project-specific terms to `inst/WORDLIST` (used as the cspell
-  dictionary).
+  terms needed to
+  [`NOAA-FIMS/.github/cspell.json`](https://github.com/NOAA-FIMS/.github/blob/main/cspell.json).
 - Build the roxygen documentation using
   [`devtools::document()`](https://devtools.r-lib.org/reference/document.html).
   See the [r-lib](https://roxygen2.r-lib.org/) for all available tags
