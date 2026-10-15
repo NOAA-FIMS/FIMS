@@ -190,11 +190,9 @@ inline const Type pow(const Type &x, const Type &y) {
 /**
  * @brief Computes the natural logarithm of the absolute value of the [gamma
  * function](https://en.wikipedia.org/wiki/Gamma_function) of x for a TMB
- * model. The function specifically uses std::lgamma, defined in cmath header,
- * instead of ::lgamma because the standard library function works with TMBad
- * library, which is designed to recognize and apply its automatic
- * differentiation capabilities to functions from the standard library. Also
- * note that this function cannot be tested using the compilation flag
+ * model. Calls TMB's global lgamma overload, which supports automatic
+ * differentiation types as well as doubles. Note that this function cannot
+ * be tested using the compilation flag
  * -DTMB_MODEL through CMake and Google Test.
  * @param x The value to take the natural logarithm of the absolute value of
  * the gamma function of. Please use fims_math::lgamma<double>(x) if x is an
@@ -204,9 +202,8 @@ inline const Type pow(const Type &x, const Type &y) {
  */
 template <class Type>
 inline const Type lgamma(const Type &x) {
-  // use std::lgamma for double type, look for TMB version of lgamma if AD type
-  using std::lgamma;
-  return lgamma(x);
+  // TMB's overload is global and is not found by argument-dependent lookup.
+  return ::lgamma(x);
 }
 
 /**
@@ -400,6 +397,67 @@ T sum(const fims::Vector<T> &v) {
     ret += v[i];
   }
   return ret;
+}
+
+/**
+ * @brief Dirichlet-multinomial probability mass function (linear
+ * parameterization).
+ *
+ * Calculates the log-probability of the Dirichlet-multinomial distribution
+ * using the linear parameterization (theta) as in Fisch et al (2021)
+ * \cite fishres:Fisch:2021:ALF. Let
+ * \f$ n = \sum x_i \f$ be the total count and \f$ \alpha_i = \theta n p_i \f$
+ * be the category-specific precision. The log-likelihood is:
+ * \f[
+ * \begin{aligned}
+ * \ln \mathcal{L}(x \mid p, \theta) &= \ln \Gamma(n + 1) - \sum_{i} \ln
+ * \Gamma(x_i + 1) \\
+ * &\quad + \ln \Gamma(\theta n) - \ln \Gamma(n + \theta n) \\
+ * &\quad + \sum_{i} \left[ \ln \Gamma(x_i + \theta n p_i) - \ln \Gamma(\theta n
+ * p_i) \right]
+ * \end{aligned}
+ * \f]
+ *
+ * @param x Vector of observed counts for each category.
+ * @param p Vector of predicted probabilities for each category (must sum to 1).
+ * @param theta The linear overdispersion parameter (theta > 0).
+ * @param give_log Integer flag; if 1, returns log-probability, else raw
+ * probability. The default is 0, providing the raw probability.
+ * @return The log-likelihood or likelihood scalar.
+ */
+
+template <typename Type>
+inline const Type ddirichlet_multinom(const fims::Vector<Type> &x,
+                                      const fims::Vector<Type> &p,
+                                      const Type &theta, int give_log = 0) {
+  Type n = fims_math::sum(x);
+  Type theta_n = theta * n;
+
+  // 1. Base Multinomial combinatorial term: log(n!) = lgamma(n + 1)
+  Type log_like = fims_math::lgamma(n + static_cast<Type>(1.0));
+
+  // 2. Dirichlet base precision terms: log(Gamma(theta*n)) - log(Gamma(n +
+  // theta*n))
+  log_like += fims_math::lgamma(theta_n) - fims_math::lgamma(n + theta_n);
+
+  // 3. Category-specific terms requiring a loop for compatibility
+  for (size_t i = 0; i < x.size(); ++i) {
+    // Calculate the category-specific precision alpha_i
+    Type alpha_i = theta_n * p[i];
+    Type x_i = x[i];
+
+    // Subtract log(x_i!)
+    log_like -= fims_math::lgamma(x_i + static_cast<Type>(1.0));
+
+    // Add log(Gamma(x_i + alpha_i)) - log(Gamma(alpha_i))
+    log_like += fims_math::lgamma(x_i + alpha_i) - fims_math::lgamma(alpha_i);
+  }
+
+  if (give_log) {
+    return log_like;
+  } else {
+    return fims_math::exp(log_like);
+  }
 }
 
 }  // namespace fims_math

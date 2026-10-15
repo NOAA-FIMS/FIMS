@@ -459,3 +459,14 @@ target_link_libraries(information_Information_Clear
 )
 
 gtest_discover_tests(information_Information_Clear)
+
+# test_fims_math_ddirichlet_multinom.cpp
+add_executable(FimsMathDdirichletMultinomTest
+  test_fims_math_ddirichlet_multinom.cpp
+)
+add_as_invoker_manifest(FimsMathDdirichletMultinomTest)
+target_link_libraries(FimsMathDdirichletMultinomTest
+  gtest_main
+  fims_test
+)
+gtest_discover_tests(FimsMathDdirichletMultinomTest DISCOVERY_TIMEOUT 10)

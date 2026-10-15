@@ -78,6 +78,7 @@ IF(BUILD_DOC)
   set(DOXYGEN_AUTOLINK_SUPPORT YES)
   set(DOXYGEN_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/doxygen")
   set(DOXYGEN_HTML_OUTPUT "html")
+  set(DOXYGEN_CITE_BIB_FILES "doxygen/fishres.bib")
 
   doxygen_add_docs(fims_doxygen
     inst/include
