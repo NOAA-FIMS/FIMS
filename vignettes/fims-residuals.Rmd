@@ -1,0 +1,91 @@
+---
+title: "Analyzing model residuals"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Analyzing model residuals}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 9,
+  fig.height = 7,
+  out.width = "100%"
+)
+```
+
+## Available diagnostics
+
+Residuals help assess whether a model captures patterns in the observations. This vignette demonstrates Pearson residuals using observed values, expected values, and likelihood information returned by `get_estimates()`. One-step-ahead (OSA) residuals and runs tests are not currently available in FIMS and are not covered here.
+
+The example uses the precomputed estimates for the package's `data_big` model, so it does not need to refit the model.
+
+```{r setup}
+library(FIMS)
+
+data("estimates_big_optimized")
+```
+
+## Calculate Pearson residuals
+
+A Pearson residual is the difference between an observation and its expected value, divided by the model-implied standard deviation. The calculation depends on the likelihood distribution. For a lognormal likelihood with meanlog \(\mu\) and sdlog \(\sigma\), the response-scale mean is \(\exp(\mu + \sigma^2 / 2)\) and the variance is \(\exp(2\mu + \sigma^2)(\exp(\sigma^2) - 1)\). FIMS reports `expected` as \(\mu\) and `log_sd` as \(\log(\sigma)\) for this likelihood.
+
+The example below calculates response-scale Pearson residuals for the lognormal data streams. It excludes missing or non-positive observations and rows without the likelihood quantities needed for this calculation.
+
+```{r pearson-residuals}
+lognormal_residuals <- estimates_big_optimized |>
+  dplyr::filter(
+    grepl("lognormal", tolower(.data$distribution)),
+    !is.na(.data$observed),
+    .data$observed > 0,
+    !is.na(.data$expected),
+    !is.na(.data$log_sd),
+    !is.na(.data$year_i)
+  ) |>
+  dplyr::mutate(
+    sdlog = exp(.data$log_sd),
+    expected_mean = exp(.data$expected + .data$sdlog^2 / 2),
+    expected_variance = exp(2 * .data$expected + .data$sdlog^2) *
+      (exp(.data$sdlog^2) - 1),
+    pearson_residual = (.data$observed - .data$expected_mean) /
+      sqrt(.data$expected_variance)
+  ) |>
+  dplyr::filter(
+    is.finite(.data$pearson_residual),
+    .data$expected_variance > 0
+  )
+```
+
+Residuals near zero indicate observations close to the fitted expectation. Large positive or negative values identify observations that are poorly predicted under the assumed likelihood. This calculation is specific to lognormal data; use the variance implied by the selected likelihood when analyzing other data streams.
+
+## Plot residuals
+
+`stockplotr::plot_timeseries()` provides the figure. The example facets by stream label so that quantities from different data types are not mixed in a single panel. The year column in the estimates is an index (`year_i`), not necessarily the calendar year.
+
+```{r pearson-residual-plot}
+residual_plot_data <- lognormal_residuals |>
+  dplyr::mutate(
+    year = .data$year_i,
+    pearson_residual = .data$pearson_residual,
+    model = "FIMS",
+    group_var = .data$fleet
+  )
+
+stockplotr::plot_timeseries(
+  residual_plot_data,
+  x = "year",
+  y = "pearson_residual",
+  geom = "point",
+  xlab = "Year index",
+  ylab = "Pearson residual",
+  group = "fleet",
+  facet = "label"
+) +
+  ggplot2::geom_hline(yintercept = 0, linetype = "dashed") +
+  stockplotr::theme_noaa()
+```
+
+Inspect residual patterns across years and streams rather than relying only on their magnitude. For example, a sequence of residuals with the same sign may indicate a temporal pattern that warrants further investigation. This vignette does not calculate formal runs tests or OSA residuals; those diagnostics can be added when the corresponding FIMS capabilities are available.
