@@ -493,6 +493,19 @@ test_that("`initialize_fims()` fits catch and index to the expected quantity mat
   )))
 })
 
+test_that("`initialize_fims()` errors for a catch unit it cannot map", {
+  #' @description Test that `initialize_fims()` errors rather than fitting a catch unit with no mapping, e.g., one added to FIMSFrame() but not to initialize_fleet().
+  frame <- FIMSFrame(data_big)
+  # FIMSFrame() rejects this unit, so it is set on the stored data directly
+  frame@data[["unit"]][frame@data[["type"]] == "catch"] <- "t"
+  expect_error(
+    object = setup_default_parameters(frame) |>
+      initialize_fims(data = frame),
+    regexp = "has no rule for the catch or index unit"
+  )
+  clear()
+})
+
 # test_initialize_catch ----
 ## IO correctness ----
 test_that("`initialize_catch()` works with correct inputs", {

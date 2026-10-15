@@ -555,10 +555,22 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     ) |>
     dplyr::select(dplyr::all_of(c("type", "unit"))) |>
     dplyr::distinct()
-  fleet_units <- stats::setNames(
-    dplyr::if_else(fleet_units[["unit"]] == "number", "number", "weight"),
-    fleet_units[["type"]]
+  model_units <- dplyr::case_when(
+    fleet_units[["unit"]] == "number" ~ "number",
+    fleet_units[["unit"]] == "mt" ~ "weight"
   )
+  # A unit allowed by FIMSFrame() but not mapped here would otherwise be fit as
+  # the wrong quantity.
+  if (anyNA(model_units)) {
+    cli::cli_abort(c(
+      "x" = "{.fn initialize_fleet} has no rule for the catch or index unit
+        {.val {fleet_units[['unit']][is.na(model_units)]}} of fleet
+        {.val {fleet}}.",
+      "i" = "Map the unit to {.val number} or {.val weight} in
+        {.fn initialize_fleet}."
+    ))
+  }
+  fleet_units <- stats::setNames(model_units, fleet_units[["type"]])
 
   # Link the observed catch data to the fleet module using its associated ID.
   if ("catch" %in% fleet_types) {
