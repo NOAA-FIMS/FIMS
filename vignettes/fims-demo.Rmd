@@ -339,13 +339,9 @@ get_convergence(fit)
 
 ### Oh no! My model didn't converge! 😨 HELP‼️
 
-If you find yourself in the unfortunate situation where your model didn't converge, there are several things that you can look at. Start with `sanity_fims(fit)`, which names the parameters with the largest gradients and any negative log-likelihood components that are not finite. See [Checking a fit that did not converge](#checking-a-fit-that-did-not-converge) below for an example.
+If you find yourself in the unfortunate situation where your model didn't converge, start with `sanity_fims(fit)`. It names the parameters with the largest gradients and any negative log-likelihood components that are not finite. See [Checking a fit that did not converge](#checking-a-fit-that-did-not-converge) below for an example.
 
-#### Getting the non-converged fit output
-
-One of the things you can do is to inspect the fit output. You can start with the negative log-likelihood components by running `get_report(fit)$nll_components`, which will give you a clue as to which part of the model might have caused it to not converge. They are not named yet, but `sanity_fims(fit)` names any component that is not finite.
-
-You can then do `names(get_report(fit))` to see the names of all the information you can look into specifically and then look at that. You can also look in `View(get_estimates(fit))` to look through the tibble and identify problem data. Also, see the [Viewing results](#viewing-results) section for more information on how to view and filter the results.
+To dig further, `get_report(fit)[["nll_components"]]` shows each negative log-likelihood component, and `names(get_report(fit))` lists everything else in the report. You can also look through `View(get_estimates(fit))` to identify problem data. See the [Viewing results](#viewing-results) section for how to view and filter the results.
 
 #### Logging system
 
