@@ -361,6 +361,51 @@ is.FIMSFit <- function(x) {
 
 # Constructors ----
 
+# Restore full vectors, including fixed and shared map entries, from the best
+# joint parameter vector. The named par argument includes random effects;
+# parList's first argument accepts only the reduced fixed effects.
+restore_tmb_parameters <- function(obj) {
+  parameters <- obj[["env"]]$parList(par = obj[["env"]][["last.par.best"]])
+  FIMS::set_fixed(parameters[["p"]])
+  FIMS::set_random(parameters[["re"]])
+}
+
+# Apply TMB's factor map to names from FIMS's full parameter registry.
+# TMB omits NA entries and returns one optimized parameter per factor level.
+tmb_mapped_parameter_names <- function(parameter_names, map = NULL) {
+  if (is.null(map)) {
+    return(parameter_names)
+  }
+  if (!is.factor(map)) {
+    cli::cli_abort("A TMB parameter map must be a factor.")
+  }
+  if (length(parameter_names) != length(map)) {
+    cli::cli_abort(c(
+      "x" = "A TMB parameter map must have one entry per FIMS parameter.",
+      "i" = "Found {length(map)} map entries for {length(parameter_names)}
+      parameters."
+    ))
+  }
+
+  # Remove NAs in map because NAs indicate a parameter is fixed at its initial
+  # value, and therefore is not active.
+  keep <- !is.na(map)
+  active_map <- droplevels(map[keep])
+  active_names <- parameter_names[keep]
+
+  # Return one representative FIMS parameter name for each active TMB map level.
+  # When multiple parameters share a level, TMB optimizes one value, so use the
+  # first corresponding FIMS name. Factor levels determine the output order.
+  vapply(
+    X = levels(active_map),
+    FUN = function(level, XX = active_names, YY = active_map) {
+      XX[as.character(YY) == level][[1L]]
+    },
+    FUN.VALUE = character(1L),
+    USE.NAMES = FALSE
+  )
+}
+
 #' Class constructors for class `FIMSFit` and associated child classes
 #'
 #' Create an object with the class of `FIMSFit` after running a FIMS model. This
@@ -431,7 +476,7 @@ FIMSFit <- function(
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
-  n_random_effects <- length(obj[["env"]]$parList()[["re"]])
+  n_random_effects <- n_total - n_fixed_effects
   number_of_parameters <- c(
     fixed_effects = n_fixed_effects,
     random_effects = n_random_effects
@@ -452,10 +497,23 @@ FIMSFit <- function(
   }
   max_gradient <- if (length(opt) > 0) max(abs(gradient_vector)) else NA_real_
 
-  # Rename parameters instead of "p"
-  parameter_names <- names(get_parameter_names(obj[["par"]]))
+  # get_parameter_names() describes the full FIMS vector. Reduce those names
+  # using the same factor map that TMB used to construct obj$par.
+  full_parameter_names <- names(get_parameter_names(
+    as.list(input[["parameters"]][["p"]])
+  ))
+  parameter_names <- tmb_mapped_parameter_names(
+    full_parameter_names,
+    input[["map"]][["p"]]
+  )
+  if (length(parameter_names) != length(obj[["par"]])) {
+    cli::cli_abort(c(
+      "x" = "TMB and FIMS produced different numbers of fixed parameters.",
+      "i" = "TMB produced {length(obj[[\"par\"]])} parameters",
+      "i" = "FIMS produced {length(parameter_names)} parameters"
+    ))
+  }
   names(obj[["par"]]) <- parameter_names
-  random_effects_names <- names(get_random_names(obj[["env"]]$parList()[["re"]]))
 
   # Get the report
   report <- if (length(opt) == 0) {
@@ -667,7 +725,7 @@ fit_fims <- function(input,
     parameter_names = parameter_names
   )
 
-  FIMS::set_fixed(opt[["par"]])
+  restore_tmb_parameters(obj)
 
   time_sdreport <- NA
   if (get_sd) {
