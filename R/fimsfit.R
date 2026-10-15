@@ -837,10 +837,12 @@ return_failed_nlminb <- function(object) {
     not accurate or stable and should not be used for management.",
     "i" = "A {.cls FIMSFit} object containing partial results is returned.",
     "i" = "Type the name of the variable you assigned it (e.g.,
-           {.code fit <- ...}) to inspect the model inputs and configuration.
-           Additionally, try running {.code FIMS::fit_fims(optimize = FALSE)}
-           and inspecting the output through {.code get_report(fit)} or by
-           viewing the tabular output from {.code View(get_estimates(fit))}."
+           {.code fit <- ...}) to inspect the model inputs and configuration.",
+    "i" = "Run {.code sanity_fims(fit)} to see each convergence check, or
+           {.code get_convergence(fit)} for the same checks as a tibble.",
+    "i" = "To check the starting values, run
+           {.code fit_fims(optimize = FALSE)} and look at
+           {.code get_report(fit)}."
   )
   cli::cli_warn(message = failed_nlminb_message)
   # Construct a fallback optimizer result with consistent structure, i.e.,
