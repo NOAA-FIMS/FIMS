@@ -976,7 +976,16 @@ class VonBertalanffySchnuteGrowthInterface
           if (v <= 0.0) {
             Rcpp::stop((base_name + " must be > 0").c_str());
           }
-          v = fims_math::log(v);
+
+          if (&pv == &this->mean_length_young &&
+              GetLengthReferenceParameterization() ==
+                  LengthReferenceParameterization::
+                      kEstimatedLengthYoungBelowConstantLengthOld) {
+            // Match the bounded inverse logit used in evaluation and reporting.
+            v = fims_math::logit(0.0, InitialLengthAtRefAgeOld(), v);
+          } else {
+            v = fims_math::log(v);
+          }
         }
         target[i] = static_cast<Type>(v);
         if (pv[i].estimation_type_m.get() == "fixed_effects") {
