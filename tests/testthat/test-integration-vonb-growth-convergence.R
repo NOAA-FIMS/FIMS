@@ -286,6 +286,58 @@ initialize_test_fleet <- function(parameters, data, fleet) {
 }
 
 ## IO correctness ----
+test_that("reference lengths survive initialization across estimation settings", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_convergence_context()
+  settings <- expand.grid(
+    young = c("constant", "fixed_effects"),
+    old = c("constant", "fixed_effects"),
+    stringsAsFactors = FALSE
+  )
+
+  for (i in seq_len(nrow(settings))) {
+    parameters <- ctx$parameters |>
+      dplyr::mutate(
+        estimation_type = dplyr::case_when(
+          module_name == "Growth" & label == "mean_length_young" ~
+            settings$young[i],
+          module_name == "Growth" & label == "mean_length_old" ~
+            settings$old[i],
+          TRUE ~ estimation_type
+        )
+      )
+
+    fit <- parameters |>
+      FIMS::initialize_fims(data = ctx$data) |>
+      FIMS::fit_fims(optimize = FALSE, get_sd = FALSE)
+
+    lengths <- FIMS::get_estimates(fit) |>
+      dplyr::filter(
+        module_name == "Growth",
+        label %in% c("mean_length_young", "mean_length_old")
+      )
+    case <- paste("young:", settings$young[i], "old:", settings$old[i])
+
+    #' @description Finalized reference lengths equal their physical inputs for all constant/fixed-effect combinations.
+    expect_equal(
+      lengths$estimated,
+      lengths$input,
+      tolerance = 1e-6,
+      info = case
+    )
+
+    #' @description Backend length at the youngest reference age equals the supplied younger length.
+    expect_equal(
+      as.numeric(FIMS::get_report(fit)[["growth_mean_LAA"]][[1]][1]),
+      lengths$input[lengths$label == "mean_length_young"],
+      tolerance = 1e-8,
+      info = case
+    )
+  }
+})
+
 test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   ctx <- make_vonb_convergence_context()
   on.exit(

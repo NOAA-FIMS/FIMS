@@ -344,6 +344,42 @@ test_that("rcpp von bertalanffy growth allows above-reference ages", {
   expect_true(is.finite(vb$evaluate(age_above_ref)))
 })
 
+test_that("estimated younger length loads below constant older length", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_test_context()
+
+  for (estimation_type in c("fixed_effects", "random_effects")) {
+    FIMS::clear()
+
+    vb <- new_vonb(ctx)
+    vb$mean_length_young[1]$estimation_type$set(estimation_type)
+    vb$mean_length_old[1]$estimation_type$set("constant")
+
+    FIMS::CreateTMBModel()
+
+    if (estimation_type == "fixed_effects") {
+      working <- FIMS::get_fixed()
+      other <- FIMS::get_random()
+    } else {
+      working <- FIMS::get_random()
+      other <- FIMS::get_fixed()
+    }
+
+    #' @description The younger length is registered in the requested parameter category.
+    expect_length(working, 1L)
+    expect_length(other, 0L)
+
+    #' @description The loader encodes estimated younger length on the bounded-logit scale.
+    expect_equal(
+      as.numeric(working),
+      qlogis(ctx$mean_length_young / ctx$mean_length_old),
+      tolerance = 1e-10
+    )
+  }
+})
+
 ## Error handling ----
 test_that("rcpp von bertalanffy growth rejects reversed reference ages", {
   ctx <- make_vonb_test_context()
