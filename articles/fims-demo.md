@@ -753,17 +753,17 @@ high_slope_fit <- parameters_high_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00435 to 0.00069 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00199 to 0.00025 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.20389 minutes
+    ## ℹ Total run time was 19.11915 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00069
+    ## ℹ Maximum gradient= 0.00025
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.59119
+    ## ℹ Terminal SB= 1791.5912
 
 ``` r
 
@@ -776,17 +776,17 @@ low_slope_fit <- parameters_low_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00635 to 0.00063 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00316 to 0.00034 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.17259 minutes
+    ## ℹ Total run time was 19.97045 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00063
+    ## ℹ Maximum gradient= 0.00034
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.5849
+    ## ℹ Terminal SB= 1791.58086
 
 ``` r
 
@@ -887,17 +887,17 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00376 to 0.00029 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00331 to 0.00033 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.11247 minutes
+    ## ℹ Total run time was 18.80732 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00029
+    ## ℹ Maximum gradient= 0.00033
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.29832
     ## • Total NLL= 3164.88132
-    ## ℹ Terminal SB= 1791.01404
+    ## ℹ Terminal SB= 1791.0122
 
 ``` r
 
@@ -986,17 +986,17 @@ age_only_fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.0024 to 0.00021 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00197 to 0.00048 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 11.87308 seconds
+    ## ℹ Total run time was 3.74308 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00021
+    ## ℹ Maximum gradient= 0.00048
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 1627.76704
     ## • Total NLL= 1564.08529
-    ## ℹ Terminal SB= 1740.95134
+    ## ℹ Terminal SB= 1740.95
 
 ``` r
 
@@ -1022,17 +1022,17 @@ length_only_fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.01707 to 2e-04 after 3 steps.
+    ## ℹ Maximum gradient went from 0.01823 to 0.00018 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.5153 minutes
+    ## ℹ Total run time was 24.27128 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 2e-04
+    ## ℹ Maximum gradient= 0.00018
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 1568.32685
     ## • Total NLL= 1518.62643
-    ## ℹ Terminal SB= 1722.35137
+    ## ℹ Terminal SB= 1722.36062
 
 ``` r
 
