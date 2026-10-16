@@ -1,0 +1,109 @@
+---
+title: "Analyzing model residuals"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Analyzing model residuals}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 9,
+  fig.height = 7,
+  out.width = "100%"
+)
+```
+
+This vignette is closely related to the more general [FIMS diagnostics vignette](https://noaa-fims.github.io/FIMS/articles/fims-diagnostics.html)
+
+The objective of this vignette is to demonstrate the use of Pearson residuals, which are returned in the `resids` column of `get_estimates()`. One-step-ahead (OSA) residuals and extensions are not yet available in FIMS.
+
+This example uses the precomputed fit for the package's `data_big` model, so it does not need to refit the model. `get_estimates()` builds the table of estimates from the fit, including the `resids` column.
+
+```{r setup}
+library(FIMS)
+
+data("fit_big_optimized")
+estimates <- get_estimates(fit_big_optimized)
+```
+
+## Pearson residuals
+
+`get_estimates()` calculates Pearson residuals for every data observation and returns them in the `resids` column, next to `observed` and `expected`, so you do not have to calculate them yourself. Rows that are not data, e.g., parameters and derived quantities, have a residual of `NA`. Under the hood, `get_estimates()` calls `calculate_residuals()`, which you can also call directly, e.g., `calculate_residuals(estimates, type = "pearson")`.
+
+A Pearson residual is the observed value minus the expected (fitted) value, divided by the standard deviation implied by the likelihood. The calculation depends on the likelihood distribution. For a lognormal likelihood (`log_normal` in FIMS) with meanlog $\mu$ and sdlog $\sigma$, the response-scale mean is $\exp(\mu + \sigma^2 / 2)$ and the variance is $\exp(2\mu + \sigma^2)(\exp(\sigma^2) - 1)$. FIMS reports `expected` as $\mu$ and `log_sd` as $\log(\sigma)$ for this likelihood. For a normal likelihood (`normal`), the residual is $(y - \mu) / \sigma$.
+
+The example below keeps the residuals for the lognormal data streams.
+
+```{r pearson-residuals}
+lognormal_residuals <- estimates |>
+  dplyr::filter(
+    .data$distribution == "log_normal",
+    !is.na(.data$resids)
+  )
+
+lognormal_residuals |>
+  dplyr::select(label, fleet, year_i, observed, expected, resids)
+```
+
+Residuals near zero indicate observations close to the fitted expectation; large positive or negative values indicate observations that are poorly predicted under the assumed likelihood. 
+
+## Plot residuals
+
+`stockplotr::plot_timeseries()` provides the figure shown below. The example facets by stream label so that quantities from different data types are not mixed in a single panel. The year column in the estimates is an index (`year_i`)
+
+```{r pearson-residual-plot}
+residual_plot_data <- lognormal_residuals |>
+  dplyr::mutate(
+    year = .data$year_i,
+    model = "FIMS",
+    group_var = .data$fleet
+  )
+
+stockplotr::plot_timeseries(
+  residual_plot_data,
+  x = "year",
+  y = "resids",
+  geom = "point",
+  xlab = "Year index",
+  ylab = "Pearson residual",
+  group = "fleet",
+  facet = "label"
+) +
+  ggplot2::geom_hline(yintercept = 0, linetype = "dashed") +
+  stockplotr::theme_noaa()
+```
+
+## Pearson residuals for multinomial likelihoods
+
+For multinomial composition data, `observed` is the number in each bin, `expected` is the expected proportion in bin $i$, $p_i$, and the sample size, $N$, is the sum of the observations across the bins of a composition. The expected number in bin $i$ is $Np_i$ and its variance is $Np_i(1 - p_i)$.
+
+The Pearson residual for bin $i$ is:
+$$r_i = \frac{o_i - Np_i}{\sqrt{Np_i(1 - p_i)}}$$
+
+Bins with an expected proportion of zero have no variance, so their residual is `NA`.
+
+```{r multinomial-residuals}
+multinomial_residuals <- estimates |>
+  dplyr::filter(
+    .data$distribution == "multinomial",
+    !is.na(.data$age),
+    !is.na(.data$resids)
+  )
+
+multinomial_residuals |>
+  dplyr::mutate(
+    year = .data$year_i,
+    sign = ifelse(.data$resids >= 0, "Positive", "Negative")
+  ) |>
+  ggplot2::ggplot(ggplot2::aes(x = year, y = .data$age, size = abs(.data$resids), color = sign)) +
+  ggplot2::geom_point(alpha = 0.7) +
+  ggplot2::scale_size_continuous(range = c(0.05, 2.5), name = "Pearson residual") +
+  ggplot2::scale_color_manual(values = c("Positive" = "blue", "Negative" = "red")) +
+  ggplot2::labs(x = "Year", y = "Age class", color = "Sign") +
+  stockplotr::theme_noaa()
+
+```

@@ -203,7 +203,9 @@ methods::setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
 #' uncertainties from a fitted model. The `year_i` column is a position that
 #' starts at 1, and the `age` and `length` columns are the ages and length bins
 #' from the data. `age` is `NA` if populations have different ages, and both
-#' are `NA` for fits saved before they were added to the output.
+#' are `NA` for fits saved before they were added to the output. The
+#' `resids` column holds Pearson residuals for the data, see
+#' [calculate_residuals()], and is `NA` for all other rows.
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
@@ -264,7 +266,9 @@ methods::setMethod(
       by = c("unique_id")
     ) |>
       dplyr::select(-dplyr::all_of("unique_id")) |>
-      dplyr::relocate(dplyr::all_of("uncertainty"), .after = dplyr::all_of("estimation_type"))
+      dplyr::relocate(dplyr::all_of("uncertainty"), .after = dplyr::all_of("estimation_type")) |>
+      # Add Pearson residuals for the data so users do not have to
+      calculate_residuals(type = "pearson")
   }
 )
 
