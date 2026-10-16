@@ -105,7 +105,9 @@ from a stored R vector rather than the compiled C++ objective function.
 uncertainties from a fitted model. The \code{year_i} column is a position that
 starts at 1, and the \code{age} and \code{length} columns are the ages and length bins
 from the data. \code{age} is \code{NA} if populations have different ages, and both
-are \code{NA} for fits saved before they were added to the output.
+are \code{NA} for fits saved before they were added to the output. The
+\code{resids} column holds Pearson residuals for the data, see
+\code{\link[=calculate_residuals]{calculate_residuals()}}, and is \code{NA} for all other rows.
 
 \code{\link[=get_number_of_parameters]{get_number_of_parameters()}} returns a vector of integers specifying the
 number of fixed-effect parameters and the number of random-effect parameters

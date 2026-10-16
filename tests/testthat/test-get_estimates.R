@@ -19,7 +19,7 @@ fit_big_unoptimized <- FIMS:::fit_big_unoptimized
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
   "parameter_id", "fleet", "year_i", "age", "length",
-  "input", "estimated", "expected", "observed",
+  "input", "estimated", "expected", "observed", "resids",
   "estimation_type", "uncertainty",
   "distribution", "input_type",
   "lpdf", "likelihood", "log_sd", "log_like_cv", "gradient"
@@ -36,11 +36,11 @@ test_that("`get_estimates()` works with deterministic run", {
   #' @description Test that the result values from the model fit have not changed from the accepted version.
   expect_snapshot({
     estimates_snapshot <- FIMS:::estimates_big_unoptimized |>
-      # Remove the estimate, uncertainty, and gradient columns, as they
-      # may change between runs
+      # Remove the estimate, uncertainty, gradient, and residual columns, as
+      # they may change between runs
       dplyr::select(
         -estimated, -expected, -uncertainty, -gradient,
-        -likelihood, -log_like_cv
+        -likelihood, -log_like_cv, -dplyr::any_of("resids")
       )
 
     estimates_snapshot_lines <- capture.output(
@@ -58,7 +58,7 @@ test_that("`get_estimates()` works with estimation run", {
     estimates_snapshot <- estimates_big_optimized |>
       dplyr::select(
         -estimated, -expected, -uncertainty, -gradient,
-        -likelihood, -log_like_cv
+        -likelihood, -log_like_cv, -dplyr::any_of("resids")
       )
     estimates_snapshot_lines <- capture.output(
       print(estimates_snapshot, n = 320, width = Inf)
