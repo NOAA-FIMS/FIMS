@@ -105,5 +105,4 @@ multinomial_residuals |>
   ggplot2::scale_color_manual(values = c("Positive" = "blue", "Negative" = "red")) +
   ggplot2::labs(x = "Year", y = "Age class", color = "Sign") +
   stockplotr::theme_noaa()
-
 ```
