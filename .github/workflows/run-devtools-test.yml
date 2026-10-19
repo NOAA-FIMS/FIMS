@@ -55,4 +55,5 @@ jobs:
         shell: Rscript {0}
         run: |
           # Use devtools' debug flags so the tests match local development.
-          devtools::test()
+          # stop_on_failure = TRUE fails the job when an expectation fails.
+          devtools::test(stop_on_failure = TRUE)
