@@ -52,6 +52,7 @@ TEST_F(CAAEvaluateTestFixture, HandlesCorrectInput) {
     // Baranov Catch Equation adapted from
     // \inst\include\population_dynamics\population\population.hpp
     catch_temp = (population->fleets[fleet_index]->Fmort[year] *
+                  fims_math::exp(population->log_f_multiplier[year]) *
                   population->fleets[fleet_index]->selectivity->evaluate(
                       population->ages[age])) /
                  dq_pop["mortality_Z"][i_age_year] * test_naa[i_age_year] *
