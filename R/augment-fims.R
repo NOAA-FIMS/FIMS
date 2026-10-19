@@ -11,7 +11,7 @@
 #' | Column        | Role                                                      |
 #' |---------------|-----------------------------------------------------------|
 #' | `.truth`      | Observed data value (maps from `observed`)                |
-#' | `.pred`       | Model-expected value (maps from `expected`)               |
+#' | `.pred`       | Model prediction on the data scale (from `estimated`)     |
 #' | `.weight`     | Inverse-variance weight from `uncertainty` (optional)     |
 #' | `label`       | Parameter / quantity label, e.g. `"catch_expected"`    |
 #' | `fleet`       | Fleet name for fleet rows, otherwise `NA`                 |
@@ -96,10 +96,13 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
     names(fit_rows)
   )
 
+  # `expected` holds the distribution parameter, such as the log-scale mean of
+  # a lognormal or the proportions of a multinomial. `estimated` holds the
+  # model prediction on the same scale as `observed`.
   out <- fit_rows |>
     dplyr::mutate(
       .truth = as.numeric(.data$observed),
-      .pred  = as.numeric(.data$expected)
+      .pred  = as.numeric(.data$estimated)
     ) |>
     dplyr::select(
       dplyr::all_of(c(meta_cols, ".truth", ".pred")),
