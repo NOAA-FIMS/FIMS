@@ -43,6 +43,7 @@ TEST_F(CAAPrepareTestFixture,
            fleet_index++) {
         mortality_F[i_age_year] +=
             population->fleets[fleet_index]->Fmort[year] *
+            fims_math::exp(population->log_f_multiplier[year]) *
             population->fleets[fleet_index]->selectivity->evaluate(
                 population->ages[age]);
       }

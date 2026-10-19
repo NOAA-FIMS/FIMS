@@ -27,8 +27,6 @@ TEST_F(CAAEvaluateTestFixture,
   size_t pop_id = population->GetId();
   auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
 
-  catch_at_age_model->CalculateMortality(population, sb_i_age_year, sb_year,
-                                         sb_age);
   catch_at_age_model->CalculateNumbersAA(population, sb_i_age_year,
                                          sb_i_agem1_yearm1, sb_age);
   for (size_t year = 0; year < n_years; year++) {
@@ -71,10 +69,11 @@ TEST_F(CAAEvaluateTestFixture,
                                            r_year);
 
   // testing that expected recruitment and population numbers_at_age match
-  // EXPECT_DOUBLE_EQ() verifies that the two double values are approximately
-  // equal, to within 4 ULPs from each other.
-  EXPECT_DOUBLE_EQ(dq["numbers_at_age"][r_i_age_year],
-                   expect_recruitment[r_i_age_year]);
+  // The model computes exp(log(mean) + deviation), which rounds differently
+  // from mean * exp(deviation) on each platform, so use a relative tolerance.
+  EXPECT_NEAR(dq["numbers_at_age"][r_i_age_year],
+              expect_recruitment[r_i_age_year],
+              1e-10 * expect_recruitment[r_i_age_year]);
   // testing that population numbers_at_age > 0.0
   EXPECT_GT(dq["numbers_at_age"][r_i_age_year], 0.0);
 }
