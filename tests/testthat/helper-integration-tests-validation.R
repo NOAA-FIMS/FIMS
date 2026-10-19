@@ -147,20 +147,23 @@ validate_fims <- function(
   }
 
   # Recruitment log deviations
-  # The input value of om_input[["logR.resid"]] is dropped from the model
-  # TODO: the estimates table contains fixed "true" values for LogRecDev, causing
-  # the test below to pass even when recruitment log_devs are fixed. Need to add
-  # additional checks to verify that real estimates are being extracted?
-  if (use_fimsfit &&
-    length(report[["log_recruit_dev"]]) == (om_input[["nyr"]] - 1)
-  ) {
-    validate_error(
-      expected = om_input[["logR.resid"]][-1],
-      param_name = "log_devs",
-      use_fimsfit = use_fimsfit,
-      estimates = estimates,
-      use_strict_outlier_check = TRUE
-    )
+  # The OM year-1 deviation has no FIMS parameter. Deviations are centered on 0,
+  # so check correlation, spread and z-scores instead of relative error.
+  if (use_fimsfit) {
+    log_devs <- estimates |>
+      dplyr::filter(label == "log_devs")
+    if (any(log_devs[["estimation_type"]] != "constant")) {
+      om_log_devs <- om_input[["logR.resid"]][-1]
+      #' @description Test that estimated recruitment log_devs are correlated with the OM deviations.
+      expect_gte(cor(log_devs[["estimated"]], om_log_devs), 0.95)
+      #' @description Test that the spread of estimated recruitment log_devs is within 20% of the spread of the OM deviations.
+      expect_equal(sd(log_devs[["estimated"]]) / sd(om_log_devs), 1, tolerance = 0.2)
+      #' @description Test that no estimated recruitment log_dev is more than 4 standard errors from the OM deviation.
+      expect_lte(
+        max(abs((log_devs[["estimated"]] - om_log_devs) / log_devs[["uncertainty"]])),
+        4
+      )
+    }
   }
 
   # Expected fishery catch and survey index from om_output
