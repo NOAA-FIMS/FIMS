@@ -66,8 +66,9 @@ test_that("an unfished population stays at its equilibrium age structure", {
   natural_mortality <- exp(unique(
     get_input(default_parameters, "Population", "log_M")
   ))
-  #' @description Test that the setup has a single natural mortality and a single set of weights, which the closed form assumes.
+  #' @description Test that the setup has a single natural mortality, which the closed form assumes.
   expect_length(natural_mortality, 1)
+  #' @description Test that the setup has a single set of weights at age, which the closed form assumes.
   expect_equal(nrow(unique(weight_at_age)), 1)
 
   # Recruits enter at the first model age. Each later age has survived M once
