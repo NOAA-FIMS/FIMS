@@ -480,8 +480,13 @@ test_that("`model_*()` works with the correct inputs", {
     index_dat[[fleet_names_index[index_i]]] <- methods::new(index, n_years)
     #' @description Test that `model_index()` works with correct inputs.
     expect_silent(
-      index_dat[[fleet_names_index[index_i]]] <-
+      index_dat[[fleet_names_index[index_i]]]$index_data[] <-
         model_index(fims_frame, fleet_names_index[index_i])
+    )
+    #' @description Test that `model_index()` values reach the Rcpp index object unchanged.
+    expect_equal(
+      index_dat[[fleet_names_index[index_i]]]$index_data$get_values(),
+      model_index(fims_frame, fleet_names_index[index_i])
     )
   }
 
@@ -496,6 +501,11 @@ test_that("`model_*()` works with the correct inputs", {
     age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data[] <- model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])
     expect_silent(
       age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data[] <- model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])
+    )
+    #' @description Test that `model_age_comp()` values reach the Rcpp age-composition object unchanged.
+    expect_equal(
+      age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$get_values(),
+      model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])
     )
   }
 

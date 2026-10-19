@@ -38,8 +38,13 @@ test_that("rcpp data works with correct inputs", {
     index <- Index
     index_dat[[fleet_names_index[index_i]]] <- methods::new(index, n_years)
     #' @description Test that adding index data to a model is possible.
-    expect_silent(index_dat[[fleet_names_index[index_i]]] <-
+    expect_silent(index_dat[[fleet_names_index[index_i]]]$index_data[] <-
       model_index(fims_frame, fleet_names_index[index_i]))
+    #' @description Test that the index data stored in the Rcpp object match the FIMSFrame data.
+    expect_equal(
+      index_dat[[fleet_names_index[index_i]]]$index_data$get_values(),
+      model_index(fims_frame, fleet_names_index[index_i])
+    )
   }
 
   clear()
@@ -52,6 +57,11 @@ test_that("rcpp data works with correct inputs", {
     #' @description Test that adding age-composition data to a model is possible.
     expect_silent(
       age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data[] <- c(t(model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])))
+    )
+    #' @description Test that the age-composition data stored in the Rcpp object match the FIMSFrame data.
+    expect_equal(
+      age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$get_values(),
+      c(t(model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])))
     )
   }
 
