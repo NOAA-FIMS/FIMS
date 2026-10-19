@@ -202,12 +202,22 @@ make_vonb_model_comparison_context <- function() {
   data("data_big", package = "FIMS")
   fims_frame <- FIMS::FIMSFrame(data_big)
 
-  # Keep the older fixture for non-recruitment, non-growth, non-population
-  # structural parameters only. Drop old Data rows because current main uses
-  # parsed uncertainty strings rather than Data rows in the parameter table.
-  base_parameters <- readRDS(
-    testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
-  ) |>
+  # Keep the Model Comparison parameters for non-recruitment, non-growth,
+  # non-population structural parameters only. Drop old Data rows because
+  # current main uses parsed uncertainty strings rather than Data rows in the
+  # parameter table. parameters_big divides the estimated values by
+  # initial_value_scale, so multiply to start at the OM values.
+  initial_value_scale <- readRDS(
+    testthat::test_path("fixtures", "initial_value_scale.RDS")
+  )
+  base_parameters <- FIMS::parameters_big |>
+    dplyr::mutate(
+      value = dplyr::if_else(
+        estimation_type != "constant",
+        value * initial_value_scale,
+        value
+      )
+    ) |>
     dplyr::filter(
       !module_name %in% c("Data", "Growth", "Recruitment", "Population")
     )
