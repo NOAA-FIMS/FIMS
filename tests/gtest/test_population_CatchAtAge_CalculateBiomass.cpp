@@ -20,28 +20,33 @@ TEST_F(
     CAAEvaluateTestFixture,
     HandlesCorrectInput_CatchAtAge_CalculateBiomass_CalculateSpawningBiomass) {
   uint32_t pop_id = population->GetId();
-  catch_at_age_model->CalculateMaturityAA(population, i_age_year, year, age);
-  catch_at_age_model->CalculateSpawningBiomass(population, i_age_year, year,
-                                               age);
-  catch_at_age_model->CalculateBiomass(population, i_age_year, year, age);
-
-  std::vector<double> test_SB(n_years + 1, 0);
-  std::vector<double> test_B(n_years + 1, 0);
-
   auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
-  test_SB[year] += dq["numbers_at_age"][i_age_year] *
-                   catch_at_age_model->populations[0]->proportion_female[age] *
-                   dq["proportion_mature_at_age"][i_age_year] *
-                   catch_at_age_model->populations[0]->growth->evaluate(
-                       year, population->ages[age]);
-  test_B[year] += dq["numbers_at_age"][i_age_year] *
-                  catch_at_age_model->populations[0]->growth->evaluate(
-                      year, population->ages[age]);
 
-  EXPECT_EQ(dq["spawning_biomass"][year], test_SB[year]);
+  // Sum over all ages because proportion female and maturity vary by age, so
+  // a wrong age in either one changes the total.
+  double expected_spawning_biomass = 0.0;
+  double expected_biomass = 0.0;
+  for (int age = 0; age < n_ages; age++) {
+    int i_age_year = year * n_ages + age;
+    catch_at_age_model->CalculateMaturityAA(population, i_age_year, year, age);
+    catch_at_age_model->CalculateSpawningBiomass(population, i_age_year, year,
+                                                 age);
+    catch_at_age_model->CalculateBiomass(population, i_age_year, year, age);
+
+    double weight = population->growth->evaluate(year, population->ages[age]);
+    // Logistic maturity with the fixture's inflection point 6 and slope 0.15
+    double maturity = 1.0 / (1.0 + exp(-0.15 * (population->ages[age] - 6.0)));
+    expected_spawning_biomass += dq["numbers_at_age"][i_age_year] *
+                                 population->proportion_female[age] * maturity *
+                                 weight;
+    expected_biomass += dq["numbers_at_age"][i_age_year] * weight;
+  }
+
+  EXPECT_NEAR(dq["spawning_biomass"][year], expected_spawning_biomass,
+              1e-10 * expected_spawning_biomass);
   EXPECT_GT(dq["spawning_biomass"][year], 0);
 
-  EXPECT_EQ(dq["biomass"][year], test_B[year]);
+  EXPECT_NEAR(dq["biomass"][year], expected_biomass, 1e-10 * expected_biomass);
   EXPECT_GT(dq["biomass"][year], 0);
 }
 
@@ -54,8 +59,6 @@ TEST_F(CAAEvaluateTestFixture,
   int i_age_year = year * population->n_ages + age;
   int i_agem1_yearm1 = (year - 1) * population->n_ages + age - 1;
 
-  catch_at_age_model->CalculateMortality(population, i_agem1_yearm1, year - 1,
-                                         age - 1);
   catch_at_age_model->CalculateMaturityAA(population, i_age_year, year, age);
   catch_at_age_model->CalculateNumbersAA(population, i_age_year, i_agem1_yearm1,
                                          age);
