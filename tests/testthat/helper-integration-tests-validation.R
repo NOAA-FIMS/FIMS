@@ -330,6 +330,27 @@ verify_fims_deterministic <- function(
     c(t(om_output[["SSB"]]))
   )
 
+  # The OM gives unfished numbers per recruit (N.pr0) and unfished spawning
+  # biomass per recruit (Phi.0), so R0 times these is the unfished stock.
+  om_unfished_spawning_biomass <- om_input[["R0"]] * om_input[["Phi.0"]]
+  #' @description Test that the first-year unfished numbers at age from report are equal to R0 times the OM numbers per recruit.
+  expect_equal(
+    report[["unfished_numbers_at_age"]][[1]][1:n_ages],
+    om_input[["R0"]] * om_input[["N.pr0"]]
+  )
+
+  #' @description Test that the first-year unfished spawning biomass from report is equal to R0 times the OM spawning biomass per recruit.
+  expect_equal(
+    report[["unfished_spawning_biomass"]][[1]][1],
+    om_unfished_spawning_biomass
+  )
+
+  #' @description Test that the spawning biomass ratio from report is equal to the OM spawning biomass divided by the OM unfished spawning biomass.
+  expect_equal(
+    report[["spawning_biomass_ratio"]][[1]][1:n_years],
+    om_output[["SSB"]] / om_unfished_spawning_biomass
+  )
+
   fims_naa <- matrix(
     report[["numbers_at_age"]][[1]][1:(om_input[["nyr"]] * om_input[["nages"]])],
     nrow = om_input[["nyr"]],
