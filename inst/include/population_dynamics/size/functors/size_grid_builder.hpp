@@ -93,48 +93,43 @@ struct SizeGridBuilder {
   }
 
   /**
-   * @brief Build one fleet observation-bin edge vector from stored bin centers.
+   * @brief Build one fleet observation-bin edge vector from stored bin lower
+   * edges.
    *
-   * For multiple centers, edges are inferred from adjacent midpoints. A single
-   * center is not enough information to infer observation-bin geometry
-   * consistently, so this helper requires at least 2 strictly increasing
-   * centers.
+   * Fleet lengths are the lower edge of each observation bin, as in SS3 and
+   * WHAM. The edges are those values plus 1 upper edge for the last bin, which
+   * gets the same width as the bin before it. The first and last bins are
+   * open-ended when the population grid is mapped onto them, so they act as
+   * minus and plus groups. That upper edge only sets the range of the default
+   * population grid and the representative length of the last bin. At least
+   * 2 strictly increasing lower edges are required because 1 value gives no
+   * bin width.
    *
-   * @param centers Fleet observation-bin centers.
-   * @return Strictly increasing observation-bin edges inferred from the
-   * centers.
+   * @param lower_edges Fleet observation-bin lower edges.
+   * @return Strictly increasing observation-bin edges, 1 longer than
+   * `lower_edges`.
    */
-  static fims::Vector<double> BuildObservationEdgesFromCenters(
-      const fims::Vector<double>& centers) {
-    if (centers.size() < 2) {
+  static fims::Vector<double> BuildObservationEdgesFromLowerEdges(
+      const fims::Vector<double>& lower_edges) {
+    if (lower_edges.size() < 2) {
       throw std::runtime_error(
-          "SizeGridBuilder requires at least 2 observation-bin centers to "
+          "SizeGridBuilder requires at least 2 observation-bin lower edges to "
           "build fleet edges");
     }
 
-    for (std::size_t center_index = 1; center_index < centers.size();
-         ++center_index) {
-      if (!(centers[center_index] > centers[center_index - 1])) {
+    for (std::size_t edge_index = 1; edge_index < lower_edges.size();
+         ++edge_index) {
+      if (!(lower_edges[edge_index] > lower_edges[edge_index - 1])) {
         throw std::runtime_error(
-            "SizeGridBuilder requires observation-bin centers to be strictly "
-            "increasing");
+            "SizeGridBuilder requires observation-bin lower edges to be "
+            "strictly increasing");
       }
     }
 
-    fims::Vector<double> edges;
-    edges.resize(centers.size() + 1);
-
-    edges[0] = centers[0] - 0.5 * (centers[1] - centers[0]);
-
-    for (std::size_t center_index = 0; center_index + 1 < centers.size();
-         ++center_index) {
-      edges[center_index + 1] =
-          0.5 * (centers[center_index] + centers[center_index + 1]);
-    }
-
-    edges[centers.size()] =
-        centers[centers.size() - 1] +
-        0.5 * (centers[centers.size() - 1] - centers[centers.size() - 2]);
+    const std::size_t n_bins = lower_edges.size();
+    fims::Vector<double> edges = lower_edges;
+    edges.emplace_back(lower_edges[n_bins - 1] +
+                       (lower_edges[n_bins - 1] - lower_edges[n_bins - 2]));
 
     return edges;
   }

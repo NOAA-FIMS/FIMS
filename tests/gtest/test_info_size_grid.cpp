@@ -17,17 +17,17 @@ std::shared_ptr<fims_popdy::Population<double>> MakePopulation() {
   return population;
 }
 
-std::shared_ptr<fims_popdy::Fleet<double>> MakeFleetWithCenters(
-    const std::vector<double>& centers) {
+std::shared_ptr<fims_popdy::Fleet<double>> MakeFleetWithLowerEdges(
+    const std::vector<double>& lower_edges) {
   auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
   fleet->n_years = 1;
   fleet->n_ages = 1;
-  fleet->n_lengths = centers.size();
+  fleet->n_lengths = lower_edges.size();
   fleet->requires_age_length_mapping = true;
-  fleet->lengths.resize(centers.size());
+  fleet->lengths.resize(lower_edges.size());
 
-  for (std::size_t i = 0; i < centers.size(); ++i) {
-    fleet->lengths[i] = centers[i];
+  for (std::size_t i = 0; i < lower_edges.size(); ++i) {
+    fleet->lengths[i] = lower_edges[i];
   }
 
   return fleet;
@@ -99,7 +99,7 @@ TEST(InformationSizeGrid,
   bool valid_model = true;
 
   auto population = MakePopulation();
-  auto fleet = MakeFleetWithCenters({0.0, 0.5, 1.0});
+  auto fleet = MakeFleetWithLowerEdges({0.0, 0.5, 1.0});
   population->fleets.push_back(fleet);
   population->n_fleets = population->fleets.size();
 
@@ -125,7 +125,7 @@ TEST(InformationSizeGrid,
   bool valid_model = true;
 
   auto population = MakePopulation();
-  auto fleet = MakeFleetWithCenters({0.5, 1.5, 2.5, 3.5});
+  auto fleet = MakeFleetWithLowerEdges({0.0, 1.0, 2.0, 3.0});
   population->fleets.push_back(fleet);
   population->n_fleets = population->fleets.size();
 
@@ -155,7 +155,7 @@ TEST(InformationSizeGrid,
   bool valid_model = true;
 
   auto population = MakePopulation();
-  auto fleet = MakeFleetWithCenters({0.5, 1.5, 2.5, 3.5});
+  auto fleet = MakeFleetWithLowerEdges({0.0, 1.0, 2.0, 3.0});
   population->fleets.push_back(fleet);
   population->n_fleets = population->fleets.size();
 
@@ -182,7 +182,7 @@ TEST(InformationSizeGrid,
   bool valid_model = true;
 
   auto population = MakePopulation();
-  auto fleet = MakeFleetWithCenters({1.0, 2.0, 3.0});
+  auto fleet = MakeFleetWithLowerEdges({1.0, 2.0, 3.0});
   population->fleets.push_back(fleet);
   population->n_fleets = population->fleets.size();
 
@@ -203,7 +203,7 @@ TEST(InformationSizeGrid,
 }
 
 TEST(InformationSizeGrid,
-     PrepareFleetObservationBinEdgesFailsWhenCentersDoNotMatchNLengths) {
+     PrepareFleetObservationBinEdgesFailsWhenLowerEdgesDoNotMatchNLengths) {
   fims::FIMSLog::fims_log->clear();
 
   fims_info::Information<double> info;
@@ -227,7 +227,8 @@ TEST(InformationSizeGrid,
   EXPECT_FALSE(valid_model);
   EXPECT_GT(fims::FIMSLog::fims_log->get_error_count(), error_count_before);
   EXPECT_NE(fims::FIMSLog::fims_log->get_errors().find(
-                "Fleet length_bin centers are not consistent with n_lengths"),
+                "Fleet length_bin lower edges are not consistent with "
+                "n_lengths"),
             std::string::npos);
 
   fims::FIMSLog::fims_log->clear();

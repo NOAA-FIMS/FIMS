@@ -123,7 +123,8 @@ model.
 \code{\link[=get_n_ages]{get_n_ages()}} returns an integer specifying the number of age bins used in
 the model.
 
-\code{\link[=get_lengths]{get_lengths()}} returns a vector of length bins used in the model.
+\code{\link[=get_lengths]{get_lengths()}} returns a vector of the lower edges of the length bins used
+in the model.
 
 \code{\link[=get_n_lengths]{get_n_lengths()}} returns an integer specifying the number of length bins
 used in the model.
