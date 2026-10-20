@@ -374,13 +374,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates unfished equilibrium numbers at age.
+   * @brief Calculates unfished equilibrium numbers at age with first-year
+   * natural mortality.
    *
    * Returns the unfished age structure that a constant number of recruits
-   * \f$R\f$ reaches under first-year natural mortality. With \f$R = R_0\f$
-   * these are the first-year unfished numbers at age, and with \f$R = 1\f$
-   * they are the numbers per recruit summed in CalculateSBPR0(), so
-   * \f$SB^U_0 = R_0 \phi_0\f$.
+   * \f$R\f$ reaches. With \f$R = R_0\f$ these are the first-year unfished
+   * numbers at age, and with \f$R = 1\f$ they are the numbers per recruit
+   * summed in CalculateSBPR0(), so \f$SB^U_0 = R_0 \phi_0\f$.
    *
    * Standard update, with \f$N_0 = R\f$:
    * \f[
@@ -400,16 +400,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
   std::vector<Type> CalculateUnfishedEquilibriumNumbers(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       Type recruits) {
-    std::vector<Type> numbers_at_age(population->n_ages, recruits);
+    std::vector<Type> unfished_numbers_at_age(population->n_ages, recruits);
     for (size_t a = 1; a < population->n_ages; a++) {
-      numbers_at_age[a] =
-          numbers_at_age[a - 1] * fims_math::exp(-population->M[a - 1]);
+      unfished_numbers_at_age[a] = unfished_numbers_at_age[a - 1] *
+                                   fims_math::exp(-population->M[a - 1]);
     }
 
     size_t plus_group = population->n_ages - 1;
-    numbers_at_age[plus_group] /=
+    unfished_numbers_at_age[plus_group] /=
         (1.0 - fims_math::exp(-population->M[plus_group]));
-    return numbers_at_age;
+    return unfished_numbers_at_age;
   }
 
   /**
