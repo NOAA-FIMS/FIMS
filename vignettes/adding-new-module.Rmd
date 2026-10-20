@@ -5,7 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Adding a New C++ Module}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-level: "power-user"
+level: "contributor"
 summary: "Instructions for adding a new C++ module to FIMS"
 ---
 

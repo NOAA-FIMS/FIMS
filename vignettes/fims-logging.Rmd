@@ -5,7 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Introducing the FIMS Logging System}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-level: "power-user"
+level: "contributor"
 summary: "How to use logging for FIMS development"
 ---
 

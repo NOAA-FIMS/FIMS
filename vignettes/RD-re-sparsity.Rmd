@@ -5,7 +5,7 @@ vignette: >
   %\VignetteIndexEntry{RE Sparsity}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-level: "power-user"
+level: "contributor"
 summary: "Investigates the performance and optimization time of simple random effects paramaterized as a dense vs. sparse matrix"
 ---
 
