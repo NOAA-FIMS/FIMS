@@ -225,14 +225,23 @@ class VonBertalanffySchnuteGrowthModelAdapter
   }
 
   /**
-   * @brief Access the log-scale length-at-age SD vector at the two reference
-   * ages.
+   * @brief Access the log-scale length-at-age SD at the younger reference age.
    * @return Mutable parameter vector.
    */
-  fims::Vector<Type>& LengthAtAgeSdAtRefAgesVector() {
+  fims::Vector<Type>& LengthAtAgeSdYoungVector() {
     use_param_vectors_ = true;
     growth_products_prepared_ = false;
-    return length_at_age_sd_at_reference_ages_vector_;
+    return length_at_age_sd_young_vector_;
+  }
+
+  /**
+   * @brief Access the log-scale length-at-age SD at the older reference age.
+   * @return Mutable parameter vector.
+   */
+  fims::Vector<Type>& LengthAtAgeSdOldVector() {
+    use_param_vectors_ = true;
+    growth_products_prepared_ = false;
+    return length_at_age_sd_old_vector_;
   }
 
   /**
@@ -443,7 +452,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
   fims::Vector<Type> reference_age_for_length_old_vector_;
   fims::Vector<Type> length_weight_a_vector_;
   fims::Vector<Type> length_weight_b_vector_;
-  fims::Vector<Type> length_at_age_sd_at_reference_ages_vector_;
+  fims::Vector<Type> length_at_age_sd_young_vector_;
+  fims::Vector<Type> length_at_age_sd_old_vector_;
   fims::Vector<Type> log_sd_mean_length_young_vector_;
   fims::Vector<Type> log_sd_mean_length_old_vector_;
   fims::Vector<Type> log_sd_growth_coefficient_vector_;
@@ -571,10 +581,10 @@ class VonBertalanffySchnuteGrowthModelAdapter
     return fims_math::exp(length_weight_b_vector_[0]);
   }
   Type CurrentLengthAtAgeSdAtReferenceAge1() const {
-    return fims_math::exp(length_at_age_sd_at_reference_ages_vector_[0]);
+    return fims_math::exp(length_at_age_sd_young_vector_[0]);
   }
   Type CurrentLengthAtAgeSdAtReferenceAge2() const {
-    return fims_math::exp(length_at_age_sd_at_reference_ages_vector_[1]);
+    return fims_math::exp(length_at_age_sd_old_vector_[0]);
   }
   Type CurrentSdLengthAtRefAgeYoung() const {
     return fims_math::exp(log_sd_mean_length_young_vector_[0]);
@@ -637,7 +647,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
   }
 
   bool HasInterpolationSdInputs() const {
-    return length_at_age_sd_at_reference_ages_vector_.size() > 0;
+    return length_at_age_sd_young_vector_.size() > 0 ||
+           length_at_age_sd_old_vector_.size() > 0;
   }
 
   bool HasAnyStructuredDeltaMethodInput() const {
@@ -690,8 +701,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
     if (!has_sd && !has_any_structured_delta) {
       throw std::runtime_error(
           "VonBertalanffySchnuteGrowthModelAdapter requires either "
-          "length_at_age_sd_at_reference_ages or the structured delta-method "
-          "growth variability inputs");
+          "both length_at_age_sd_young and length_at_age_sd_old, "
+          "or the structured delta-method growth variability inputs");
     }
 
     if (has_any_structured_delta && !has_structured_delta) {
@@ -704,14 +715,16 @@ class VonBertalanffySchnuteGrowthModelAdapter
       throw std::runtime_error(
           "von Bertalanffy--Schnute growth adapter requires variability inputs "
           "for exactly one supported path. Supply either the interpolation "
-          "inputs length_at_age_sd_at_reference_ages or the full delta-method "
-          "variability inputs, but not both");
+          "inputs length_at_age_sd_young and length_at_age_sd_old or the full "
+          "delta-method variability inputs, but not both");
     }
 
-    if (has_sd && length_at_age_sd_at_reference_ages_vector_.size() != 2) {
+    if (has_sd &&
+        (length_at_age_sd_young_vector_.size() != 1 ||
+         length_at_age_sd_old_vector_.size() != 1)) {
       throw std::runtime_error(
-          "VonBertalanffySchnuteGrowthModelAdapter expected exactly 2 "
-          "length_at_age_sd_at_reference_ages values");
+          "VonBertalanffySchnuteGrowthModelAdapter requires exactly one "
+          "length_at_age_sd_young value and one length_at_age_sd_old value");
     }
 
     if (has_structured_delta &&
