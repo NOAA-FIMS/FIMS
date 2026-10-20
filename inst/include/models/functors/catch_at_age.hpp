@@ -617,11 +617,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    std::vector<Type> numbers_spr =
+    std::vector<Type> numbers_per_recruit =
         CalculateUnfishedEquilibriumNumbers(population, 1.0);
     Type phi_0 = 0.0;
     for (size_t a = 0; a < population->n_ages; a++) {
-      phi_0 += numbers_spr[a] *
+      phi_0 += numbers_per_recruit[a] *
                population->proportion_female.get_force_scalar(a) *
                dq_["proportion_mature_at_age"][a] *
                PopulationMeanWeightAA(population, 0, a);

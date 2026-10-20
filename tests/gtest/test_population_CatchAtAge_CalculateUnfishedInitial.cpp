@@ -80,6 +80,7 @@ TEST_F(CAAEvaluateTestFixture,
   }
 }
 
+// CatchAtAge_CalculateUnfishedEquilibriumNumbers,
 // CatchAtAge_CalculateUnfishedNumbersAA and
 // CatchAtAge_CalculateUnfishedSpawningBiomass
 // IO correctness
