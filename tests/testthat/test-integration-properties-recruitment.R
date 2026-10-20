@@ -9,6 +9,11 @@
 
 # integration_properties_recruitment ----
 ## Setup ----
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 # Each test changes a few inputs, runs the model without optimizing, and
 # compares the output to a value worked out in R from the inputs, or from
 # other model outputs through a closed form. The helpers are in
