@@ -541,6 +541,38 @@ test_that("von bertalanffy report defaults to lightweight derived age-to-length 
 
   report <- FIMS::get_report(fit)
 
+  sd_labels <- c("length_at_age_sd_young", "length_at_age_sd_old")
+  supplied_sd <- ctx$parameters |>
+    dplyr::filter(module_name == "Growth", label %in% sd_labels) |>
+    dplyr::arrange(match(label, sd_labels)) |>
+    dplyr::pull(value)
+
+  reported_sd <- FIMS::get_estimates(fit) |>
+    dplyr::filter(module_name == "Growth", label %in% sd_labels) |>
+    dplyr::arrange(match(label, sd_labels))
+
+  #' @description Finalized Growth reporting preserves both named SDs in physical length units before optimization.
+  expect_equal(reported_sd$label, sd_labels)
+  expect_equal(reported_sd$estimated, supplied_sd, tolerance = 1e-8)
+
+  reference_labels <- c(
+    "reference_age_for_length_young",
+    "reference_age_for_length_old"
+  )
+  reference_ages <- ctx$parameters |>
+    dplyr::filter(module_name == "Growth", label %in% reference_labels) |>
+    dplyr::arrange(match(label, reference_labels)) |>
+    dplyr::pull(value)
+
+  reference_indices <- match(reference_ages, FIMS::get_ages(ctx$data))
+
+  #' @description Backend SD-at-age recovers the supplied SDs at the two reference ages.
+  expect_equal(
+    as.numeric(report[["growth_sd_LAA"]][[1]])[reference_indices],
+    supplied_sd,
+    tolerance = 1e-6
+  )
+
   #' @description Test that the derived von Bertalanffy--Schnute path is still selected in reports by default.
   expect_equal(report[["age_to_length_conversion_derived_used"]][[1]][1], 1)
 
