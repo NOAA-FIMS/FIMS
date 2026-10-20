@@ -464,26 +464,32 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
   #' @description Test that the fitted von Bertalanffy--Schnute output includes the three Model Comparison OM-truth growth parameters.
   expect_setequal(growth_estimates$label, expected_growth$label)
 
-  #' @description Test that fitted mean_length_young remains close to the model comparison OM value at age 1.
-  expect_equal(
-    growth_estimates |>
-      dplyr::filter(label == "mean_length_young") |>
-      dplyr::pull(estimated),
-    growth_estimates |>
-      dplyr::filter(label == "mean_length_young") |>
-      dplyr::pull(expected),
-    tolerance = 30
+  # The bound is in mm. Reading the length labels half a bin off (25 mm for
+  # the 50 mm bins in data_big) fails it.
+  #' @description Test that fitted mean_length_young remains within 2 mm of the Model Comparison OM value at age 1.
+  expect_lte(
+    abs(
+      growth_estimates |>
+        dplyr::filter(label == "mean_length_young") |>
+        dplyr::pull(estimated) -
+        growth_estimates |>
+        dplyr::filter(label == "mean_length_young") |>
+        dplyr::pull(expected)
+    ),
+    2
   )
 
-  #' @description Test that fitted mean_length_old remains close to the model comparison OM value at age 12.
-  expect_equal(
-    growth_estimates |>
-      dplyr::filter(label == "mean_length_old") |>
-      dplyr::pull(estimated),
-    growth_estimates |>
-      dplyr::filter(label == "mean_length_old") |>
-      dplyr::pull(expected),
-    tolerance = 30
+  #' @description Test that fitted mean_length_old remains within 2 mm of the Model Comparison OM value at age 12.
+  expect_lte(
+    abs(
+      growth_estimates |>
+        dplyr::filter(label == "mean_length_old") |>
+        dplyr::pull(estimated) -
+        growth_estimates |>
+        dplyr::filter(label == "mean_length_old") |>
+        dplyr::pull(expected)
+    ),
+    2
   )
 
   #' @description Test that fitted growth_coefficient remains within 0.01 of the Model Comparison OM growth coefficient.
