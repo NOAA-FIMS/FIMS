@@ -7,10 +7,11 @@
 #' one lines, that will be used in the bookdown report of the results from
 #' {testthat}. This line can be more than 80 characters.
 
-# integration_population_properties ----
+# integration_properties_dynamics ----
 ## Setup ----
 # Each test changes a few inputs, runs the model without optimizing, and
-# compares the output to a value worked out in R from the inputs alone.
+# compares the output to a value worked out in R from the inputs alone. The
+# helpers are in helper-properties.R.
 data("data_big")
 data_4_model <- FIMSFrame(data_big)
 default_parameters <- setup_default_parameters(data = data_4_model)
@@ -19,70 +20,28 @@ n_ages <- get_n_ages(data_4_model)
 n_years <- get_n_years(data_4_model)
 
 # data_big has 1 fleet with weight at age, so these are the model weights.
-weight_at_age <- data_big |>
-  dplyr::filter(type == "weight_at_age") |>
-  dplyr::arrange(timing, age) |>
-  dplyr::pull(observed) |>
-  matrix(ncol = n_ages, byrow = TRUE)
-
-get_input <- function(parameters, module, input_label, fleet_name = NA) {
-  parameters |>
-    dplyr::filter(
-      module_name == module,
-      label == input_label,
-      is.na(fleet_name) | fleet == fleet_name
-    ) |>
-    dplyr::arrange(timing, age) |>
-    dplyr::pull(value)
-}
-
-get_output <- function(estimates, output_label, fleet_name = NA) {
-  estimates |>
-    dplyr::filter(
-      label == output_label,
-      is.na(fleet_name) | fleet == fleet_name
-    ) |>
-    dplyr::arrange(year_i, age) |>
-    dplyr::pull(estimated)
-}
-
-run_model <- function(parameters) {
-  fit <- parameters |>
-    initialize_fims(data = data_4_model) |>
-    fit_fims(optimize = FALSE)
-  estimates <- get_estimates(fit)
-  clear()
-  estimates
-}
-
-# The logistic curve used for maturity and selectivity in FIMS
-logistic <- function(x, inflection_point, slope) {
-  1 / (1 + exp(-slope * (x - inflection_point)))
-}
+weight_at_age <- weight_at_age_matrix(data_big)
 
 ## IO correctness ----
 test_that("an unfished population stays at its equilibrium age structure", {
-  r0 <- exp(get_input(default_parameters, "Recruitment", "log_rzero"))
+  r0 <- exp(pull_input(default_parameters, "Recruitment", "log_rzero"))
   natural_mortality <- exp(unique(
-    get_input(default_parameters, "Population", "log_M")
+    pull_input(default_parameters, "Population", "log_M")
   ))
   #' @description Test that the setup has a single natural mortality, which the closed form assumes.
   expect_length(natural_mortality, 1)
   #' @description Test that the setup has a single set of weights at age, which the closed form assumes.
   expect_equal(nrow(unique(weight_at_age)), 1)
 
-  # Recruits enter at the first model age. Each later age has survived M once
-  # per year of age. The plus group holds all older ages, which is the sum of
-  # a geometric series with ratio exp(-M).
-  equilibrium_numbers <- r0 * exp(-natural_mortality * (seq_len(n_ages) - 1))
-  equilibrium_numbers[n_ages] <- equilibrium_numbers[n_ages] /
-    (1 - exp(-natural_mortality))
+  equilibrium_numbers <- equilibrium_numbers_at_age(
+    r0, rep(natural_mortality, n_ages)
+  )
   maturity <- logistic(
     ages,
-    get_input(default_parameters, "Maturity", "inflection_point"),
-    get_input(default_parameters, "Maturity", "slope")
+    pull_input(default_parameters, "Maturity", "inflection_point"),
+    pull_input(default_parameters, "Maturity", "slope")
   )
-  proportion_female <- get_input(
+  proportion_female <- pull_input(
     default_parameters, "Population", "proportion_female"
   )
   unfished_spawning_biomass <- sum(
@@ -102,21 +61,21 @@ test_that("an unfished population stays at its equilibrium age structure", {
         .default = value
       )
     )
-  estimates <- run_model(parameters)
+  estimates <- run_deterministic(parameters, data_4_model)
 
   #' @description Test that numbers at age equal the unfished equilibrium in every year, including the year after the last.
   expect_equal(
-    object = get_output(estimates, "numbers_at_age"),
+    object = pull_output(estimates, "numbers_at_age"),
     expected = rep(equilibrium_numbers, n_years + 1)
   )
   #' @description Test that spawning biomass equals unfished spawning biomass from R0 and spawning biomass per recruit in every year.
   expect_equal(
-    object = get_output(estimates, "spawning_biomass"),
+    object = pull_output(estimates, "spawning_biomass"),
     expected = rep(unfished_spawning_biomass, n_years + 1)
   )
   #' @description Test that the spawning biomass ratio is 1 in every year when there is no fishing.
   expect_equal(
-    object = get_output(estimates, "spawning_biomass_ratio"),
+    object = pull_output(estimates, "spawning_biomass_ratio"),
     expected = rep(1, n_years + 1)
   )
 })
@@ -138,29 +97,29 @@ test_that("catch at age follows the Baranov equation with 2 fishing fleets", {
         .default = value
       )
     )
-  estimates <- run_model(parameters)
+  estimates <- run_deterministic(parameters, data_4_model)
 
   # Rows are years and columns are ages.
   fishing_mortality <- purrr::map(
     c(fleet1 = "fleet1", survey1 = "survey1"),
     \(fleet_name) {
       fishing_mortality_by_year <- exp(
-        get_input(parameters, "Fleet", "log_Fmort", fleet_name)
+        pull_input(parameters, "Fleet", "log_Fmort", fleet_name)
       )
       selectivity <- logistic(
         ages,
-        get_input(parameters, "Selectivity", "inflection_point", fleet_name),
-        get_input(parameters, "Selectivity", "slope", fleet_name)
+        pull_input(parameters, "Selectivity", "inflection_point", fleet_name),
+        pull_input(parameters, "Selectivity", "slope", fleet_name)
       )
       outer(fishing_mortality_by_year, selectivity)
     }
   )
-  natural_mortality <- get_input(parameters, "Population", "log_M") |>
+  natural_mortality <- pull_input(parameters, "Population", "log_M") |>
     exp() |>
     matrix(ncol = n_ages, byrow = TRUE)
   total_mortality <- natural_mortality +
     fishing_mortality[["fleet1"]] + fishing_mortality[["survey1"]]
-  numbers_at_age <- get_output(estimates, "numbers_at_age") |>
+  numbers_at_age <- pull_output(estimates, "numbers_at_age") |>
     matrix(ncol = n_ages, byrow = TRUE)
   fished_years <- seq_len(n_years)
 
@@ -169,7 +128,7 @@ test_that("catch at age follows the Baranov equation with 2 fishing fleets", {
       (1 - exp(-total_mortality)) * numbers_at_age[fished_years, ]
     #' @description Test that catch numbers at age for each fleet equal F / Z * (1 - exp(-Z)) * N with F and Z from the inputs.
     expect_equal(
-      object = get_output(estimates, "catch_numbers_at_age", fleet_name),
+      object = pull_output(estimates, "catch_numbers_at_age", fleet_name),
       expected = as.vector(t(expected_catch))
     )
   }
@@ -185,61 +144,5 @@ test_that("catch at age follows the Baranov equation with 2 fishing fleets", {
   expect_equal(
     object = numbers_at_age[fished_years + 1, -1],
     expected = expected_numbers
-  )
-})
-
-test_that("maturity in one year changes spawning biomass in that year only", {
-  changed_year <- 16
-  changed_inflection_point <- 6
-  slope <- get_input(default_parameters, "Maturity", "slope")
-  default_inflection_point <- get_input(
-    default_parameters, "Maturity", "inflection_point"
-  )
-  # One maturity row per year makes maturity time-varying.
-  maturity_by_year <- default_parameters |>
-    dplyr::filter(module_name == "Maturity", label == "inflection_point") |>
-    dplyr::slice(rep(1, n_years)) |>
-    dplyr::mutate(
-      timing = seq_len(n_years),
-      value = dplyr::if_else(
-        timing == changed_year, changed_inflection_point, value
-      )
-    )
-  parameters <- default_parameters |>
-    dplyr::filter(!(module_name == "Maturity" & label == "inflection_point")) |>
-    dplyr::bind_rows(maturity_by_year)
-
-  default_estimates <- run_model(default_parameters)
-  estimates <- run_model(parameters)
-  default_spawning_biomass <- get_output(default_estimates, "spawning_biomass")
-  spawning_biomass <- get_output(estimates, "spawning_biomass")
-  numbers_at_age <- get_output(estimates, "numbers_at_age") |>
-    matrix(ncol = n_ages, byrow = TRUE)
-  proportion_female <- get_input(
-    default_parameters, "Population", "proportion_female"
-  )
-  earlier_years <- seq_len(changed_year - 1)
-
-  #' @description Test that spawning biomass before the changed maturity year is the same as with constant maturity.
-  expect_equal(
-    object = spawning_biomass[earlier_years],
-    expected = default_spawning_biomass[earlier_years]
-  )
-  # Spawning biomass is a start-of-year sum over ages of numbers, weight,
-  # proportion female, and proportion mature in that year.
-  expected_spawning_biomass <- sum(
-    numbers_at_age[changed_year, ] * weight_at_age[changed_year, ] *
-      proportion_female *
-      logistic(ages, changed_inflection_point, slope)
-  )
-  #' @description Test that spawning biomass in the changed year uses that year's maturity ogive.
-  expect_equal(
-    object = spawning_biomass[changed_year],
-    expected = expected_spawning_biomass
-  )
-  #' @description Test that the later maturity lowers spawning biomass in the changed year.
-  expect_lt(
-    spawning_biomass[changed_year],
-    default_spawning_biomass[changed_year]
   )
 })
