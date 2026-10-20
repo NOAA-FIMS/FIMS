@@ -149,7 +149,7 @@ FIMS::data_big |>
 
 ## Length compositions (`type == "length_comp"`)
 
-The length-composition data are similar to the age compositions, except with values in the `length` column and `age = NA`. The `length` column identifies the length bin for each observation. The `observed` column contains either the number or the proportion of fish in each length bin. The `unit` column should be either "number" or "proportion". The `uncertainty` column should be the input sample size for the time step, repeated across all length bins in that time step.
+The length-composition data are similar to the age compositions, except with values in the `length` column and `age = NA`. The `length` column identifies the length bin for each observation by its lower edge. A bin holds lengths from its lower edge up to the next lower edge. For example, with bins at 0, 50, ..., 1100, `length = 250` is the bin from 250 to 300. When growth is estimated in FIMS, the first bin also holds all smaller fish and the last bin holds all larger fish. With fixed `age_to_length_conversion` rows, those rows set what each bin holds. The `observed` column contains either the number or the proportion of fish in each length bin. The `unit` column should be either "number" or "proportion". The `uncertainty` column should be the input sample size for the time step, repeated across all length bins in that time step.
 
 When length compositions are included, FIMS needs a way to convert numbers at age into numbers at length. This can come from fixed `age_to_length_conversion` rows or from a growth-derived age-to-length conversion using the VonB-Schnute Growth module.
 
@@ -179,7 +179,7 @@ FIMS::data_big |>
 
 The `length_bin` data type defines length bins without providing length-composition observations. These rows are useful when a model needs length-bin geometry for a growth-derived age-to-length conversion, but the user is not fitting length-composition data for that fleet.
 
-For `length_bin` rows, the `length` column contains the length-bin values. The `observed`, `age`, and `uncertainty` columns should usually be `NA`. The `fleet` column identifies which fleet or survey the length bins apply to, and `timing` can be `NA` unless fleet-specific timing is needed.
+For `length_bin` rows, the `length` column contains the lower edge of each length bin, the same as for length compositions. The `observed`, `age`, and `uncertainty` columns should usually be `NA`. The `fleet` column identifies which fleet or survey the length bins apply to, and `timing` can be `NA` unless fleet-specific timing is needed.
 
 ## Weight-at-age data (`type == "weight_at_age"`)
 
