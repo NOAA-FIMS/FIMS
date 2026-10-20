@@ -776,13 +776,29 @@ class VonBertalanffySchnuteGrowthInterface
 
     const double a1 = this->reference_age_for_length_young[0].initial_value_m;
     const double a2 = this->reference_age_for_length_old[0].initial_value_m;
+    if (!std::isfinite(a1)) {
+      Rcpp::stop("reference_age_for_length_young must be finite");
+    }
+    if (!std::isfinite(a2)) {
+      Rcpp::stop("reference_age_for_length_old must be finite");
+    }
     if (a2 <= a1) {
       Rcpp::stop(
           "VonBertalanffySchnuteGrowth reference_age_for_length_old must be > "
           "reference_age_for_length_young");
     }
 
-    auto check_positive = [](VariableVector& pv, const std::string& base_name) {
+    auto check_finite = [](VariableVector& pv, const std::string& base_name) {
+      for (size_t i = 0; i < pv.size(); i++) {
+        if (!std::isfinite(pv[i].initial_value_m)) {
+          Rcpp::stop((base_name + " must be finite").c_str());
+        }
+      }
+    };
+
+    auto check_positive = [&check_finite](VariableVector& pv,
+                                          const std::string& base_name) {
+      check_finite(pv, base_name);
       for (size_t i = 0; i < pv.size(); i++) {
         if (pv[i].initial_value_m <= 0.0) {
           Rcpp::stop((base_name + " must be > 0").c_str());
@@ -806,6 +822,18 @@ class VonBertalanffySchnuteGrowthInterface
     if (has_sd) {
       check_positive(this->length_at_age_sd_young, "length_at_age_sd_young");
       check_positive(this->length_at_age_sd_old, "length_at_age_sd_old");
+    }
+    if (has_structured_delta) {
+      check_finite(this->log_sd_mean_length_young, "log_sd_mean_length_young");
+      check_finite(this->log_sd_mean_length_old, "log_sd_mean_length_old");
+      check_finite(this->log_sd_growth_coefficient,
+                   "log_sd_growth_coefficient");
+      check_finite(this->mean_length_young_mean_length_old_logit_corr,
+                   "mean_length_young_mean_length_old_logit_corr");
+      check_finite(this->mean_length_young_growth_coefficient_logit_corr,
+                   "mean_length_young_growth_coefficient_logit_corr");
+      check_finite(this->mean_length_old_growth_coefficient_logit_corr,
+                   "mean_length_old_growth_coefficient_logit_corr");
     }
   }
 
