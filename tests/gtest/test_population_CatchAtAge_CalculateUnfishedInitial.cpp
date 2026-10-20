@@ -91,6 +91,9 @@ TEST_F(
 
   size_t pop_id = population->GetId();
   auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
+  std::vector<double> unfished_initial_numbers_at_age =
+      catch_at_age_model->CalculateUnfishedEquilibriumNumbers(
+          population, fims_math::exp(population->recruitment->log_rzero[0]));
 
   for (int year = 0; year < (population->n_years + 1); year++) {
     for (int age = 0; age < population->n_ages; age++) {
@@ -104,8 +107,8 @@ TEST_F(
       }
 
       if (year == 0 && age > 0) {
-        catch_at_age_model->CalculateUnfishedInitialNumbersAA(population,
-                                                              i_age_year, age);
+        dq["unfished_numbers_at_age"][i_age_year] =
+            unfished_initial_numbers_at_age[age];
         test_unfished_numbers_at_age[i_age_year] =
             test_unfished_numbers_at_age[i_age_year - 1] *
             fims_math::exp(-fims_math::exp(population->log_M[i_age_year - 1]));
@@ -157,7 +160,7 @@ TEST_F(
   }
 }
 
-// CatchAtAge_CalculateUnfishedInitialNumbersAA and CatchAtAge_CalculateSBPR0
+// CatchAtAge_CalculateUnfishedEquilibriumNumbers and CatchAtAge_CalculateSBPR0
 // IO correctness
 TEST_F(
     CAAEvaluateTestFixture,
@@ -165,29 +168,26 @@ TEST_F(
   size_t pop_id = population->GetId();
   auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
   double r0 = fims_math::exp(population->recruitment->log_rzero[0]);
+  std::vector<double> unfished_initial_numbers_at_age =
+      catch_at_age_model->CalculateUnfishedEquilibriumNumbers(population, r0);
 
   for (int age = 0; age < population->n_ages; age++) {
-    if (age == 0) {
-      dq["unfished_numbers_at_age"][age] = r0;
-    } else {
-      catch_at_age_model->CalculateUnfishedInitialNumbersAA(population, age,
-                                                            age);
-    }
+    dq["unfished_numbers_at_age"][age] = unfished_initial_numbers_at_age[age];
     catch_at_age_model->CalculateMaturityAA(population, age, 0, age);
     catch_at_age_model->CalculateUnfishedSpawningBiomass(population, age, 0,
                                                          age);
   }
 
   // Unfished spawning biomass in year 0 is the equilibrium, so it must equal
-  // unfished recruitment times unfished spawning biomass per recruit. The
-  // fixture's natural mortality varies by age, so this also checks that both
-  // use the natural mortality of the age being left.
+  // unfished recruitment times unfished spawning biomass per recruit. This
+  // checks that CalculateSBPR0() uses the same first-year proportion female,
+  // maturity, and weight at age as CalculateUnfishedSpawningBiomass().
   double phi_0 = catch_at_age_model->CalculateSBPR0(population);
   EXPECT_NEAR(dq["unfished_spawning_biomass"][0], r0 * phi_0,
               1e-10 * r0 * phi_0);
 }
 
-// CatchAtAge_CalculateUnfishedInitialNumbersAA and
+// CatchAtAge_CalculateUnfishedEquilibriumNumbers and
 // CatchAtAge_CalculateUnfishedNumbersAA
 // Edge handling
 TEST_F(CAAEvaluateTestFixture,
@@ -199,15 +199,17 @@ TEST_F(CAAEvaluateTestFixture,
   for (size_t i = 0; i < population->M.size(); i++) {
     population->M[i] = m;
   }
+  std::vector<double> unfished_initial_numbers_at_age =
+      catch_at_age_model->CalculateUnfishedEquilibriumNumbers(population, r0);
 
   for (int year = 0; year < (population->n_years + 1); year++) {
     for (int age = 0; age < population->n_ages; age++) {
       int i_age_year = year * population->n_ages + age;
-      if (age == 0) {
+      if (year == 0) {
+        dq["unfished_numbers_at_age"][i_age_year] =
+            unfished_initial_numbers_at_age[age];
+      } else if (age == 0) {
         dq["unfished_numbers_at_age"][i_age_year] = r0;
-      } else if (year == 0) {
-        catch_at_age_model->CalculateUnfishedInitialNumbersAA(population,
-                                                              i_age_year, age);
       } else {
         int i_agem1_yearm1 = (year - 1) * population->n_ages + (age - 1);
         catch_at_age_model->CalculateUnfishedNumbersAA(population, i_age_year,

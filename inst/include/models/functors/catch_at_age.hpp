@@ -374,46 +374,42 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates unfished numbers at age in the first year.
+   * @brief Calculates unfished equilibrium numbers at age.
    *
-   * The first year has no previous year to project from, so unfished numbers
-   * at age are set to the equilibrium age structure implied by unfished
-   * recruitment and year-0 natural mortality. This is the same age structure
-   * used for \f$\phi_0\f$ in CalculateSBPR0(), so that
+   * Returns the unfished age structure that a constant number of recruits
+   * \f$R\f$ reaches under first-year natural mortality. With \f$R = R_0\f$
+   * these are the first-year unfished numbers at age, and with \f$R = 1\f$
+   * they are the numbers per recruit summed in CalculateSBPR0(), so
    * \f$SB^U_0 = R_0 \phi_0\f$.
    *
-   * Standard update, with \f$N^U_{0,0} = R_0\f$ set by the caller:
+   * Standard update, with \f$N_0 = R\f$:
    * \f[
-   * N^U_{a,0} = N^U_{a-1,0} \exp(-M_{a-1,0})
+   * N_a = N_{a-1} \exp(-M_{a-1}) \quad \text{for } a = 1, \ldots, A-1
    * \f]
    *
-   * Plus group update (if \f$a = A\f$), where the plus group holds survivors
-   * of all older ages and so is the sum of a geometric series:
+   * Plus group update, where the plus group holds survivors of all older ages
+   * and so is the sum of a geometric series:
    * \f[
-   * N^U_{A,0} = \frac{N^U_{A-1,0} \exp(-M_{A-1,0})}{1 - \exp(-M_{A,0})}
+   * N_A = \frac{N_{A-1} \exp(-M_{A-1})}{1 - \exp(-M_A)}
    * \f]
    *
    * @snippet{doc} this param_population
-   * @snippet{doc} this param_i_age_year
-   * @snippet{doc} this param_age
+   * @param recruits Number of recruits at age 0.
+   * @return Unfished numbers at each age.
    */
-  void CalculateUnfishedInitialNumbersAA(
+  std::vector<Type> CalculateUnfishedEquilibriumNumbers(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_age_year, size_t age) {
-    std::map<std::string, fims::Vector<Type>> &dq_ =
-        this->GetPopulationDerivedQuantities(population->GetId());
-
-    // In year 0, the previous age is the previous element of the same year
-    size_t i_agem1 = i_age_year - 1;
-    dq_["unfished_numbers_at_age"][i_age_year] =
-        dq_["unfished_numbers_at_age"][i_agem1] *
-        fims_math::exp(-population->M[i_agem1]);
-
-    if (age == (population->n_ages - 1)) {
-      dq_["unfished_numbers_at_age"][i_age_year] =
-          dq_["unfished_numbers_at_age"][i_age_year] /
-          (1.0 - fims_math::exp(-population->M[i_age_year]));
+      Type recruits) {
+    std::vector<Type> numbers_at_age(population->n_ages, recruits);
+    for (size_t a = 1; a < population->n_ages; a++) {
+      numbers_at_age[a] =
+          numbers_at_age[a - 1] * fims_math::exp(-population->M[a - 1]);
     }
+
+    size_t plus_group = population->n_ages - 1;
+    numbers_at_age[plus_group] /=
+        (1.0 - fims_math::exp(-population->M[plus_group]));
+    return numbers_at_age;
   }
 
   /**
@@ -610,15 +606,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * w_a
    * \f]
    *
-   * The numbers at age \f$N_a\f$ are calculated recursively with the natural
-   * mortality of the age being left, as in the population dynamics:
-   * \f[ N_a = N_{a-1} \times \exp(-M_{a-1}) \quad \text{for } a = 1,
-   * \ldots, A-1 \f]
-   *
-   * Plus group update:
-   * \f[
-   * N_A = \frac{N_{A-1} \times \exp(-M_{A-1})}{1 - \exp(-M_A)}
-   * \f]
+   * The numbers per recruit \f$N_a\f$ come from
+   * CalculateUnfishedEquilibriumNumbers() with one recruit.
    *
    * @snippet{doc} this param_population
    * @return Type
@@ -628,30 +617,15 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    std::vector<Type> numbers_spr(population->n_ages, 1.0);
+    std::vector<Type> numbers_spr =
+        CalculateUnfishedEquilibriumNumbers(population, 1.0);
     Type phi_0 = 0.0;
-    phi_0 += numbers_spr[0] *
-             population->proportion_female.get_force_scalar(0) *
-             dq_["proportion_mature_at_age"][0] *
-             PopulationMeanWeightAA(population, 0, 0);
-    for (size_t a = 1; a < (population->n_ages - 1); a++) {
-      numbers_spr[a] =
-          numbers_spr[a - 1] * fims_math::exp(-population->M[a - 1]);
+    for (size_t a = 0; a < population->n_ages; a++) {
       phi_0 += numbers_spr[a] *
                population->proportion_female.get_force_scalar(a) *
                dq_["proportion_mature_at_age"][a] *
                PopulationMeanWeightAA(population, 0, a);
     }
-
-    numbers_spr[population->n_ages - 1] =
-        (numbers_spr[population->n_ages - 2] *
-         fims_math::exp(-population->M[population->n_ages - 2])) /
-        (1 - fims_math::exp(-population->M[population->n_ages - 1]));
-    phi_0 +=
-        numbers_spr[population->n_ages - 1] *
-        population->proportion_female.get_force_scalar(population->n_ages - 1) *
-        dq_["proportion_mature_at_age"][population->n_ages - 1] *
-        PopulationMeanWeightAA(population, 0, population->n_ages - 1);
 
     return phi_0;
   }
@@ -1481,6 +1455,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
           this->GetPopulationDerivedQuantities(population->GetId());
       // CAAPopulationProxy<Type>& population = this->populations_proxies[p];
 
+      // The first year has no previous year to project from, so unfished
+      // numbers at age start at equilibrium.
+      std::vector<Type> unfished_initial_numbers_at_age =
+          CalculateUnfishedEquilibriumNumbers(
+              population,
+              fims_math::exp(population->recruitment->log_rzero[0]));
+
       for (size_t y = 0; y <= population->n_years; y++) {
         for (size_t a = 0; a < population->n_ages; a++) {
           /*
@@ -1517,6 +1498,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
             // Initial numbers at age is a user input or estimated parameter
             // vector.
             CalculateInitialNumbersAA(population, i_age_year, a);
+            pdq_["unfished_numbers_at_age"][i_age_year] =
+                unfished_initial_numbers_at_age[a];
 
             if (a == 0) {
               /*
@@ -1524,10 +1507,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
              */
               pdq_["expected_recruitment"][y] =
                   pdq_["numbers_at_age"][i_age_year];
-              pdq_["unfished_numbers_at_age"][i_age_year] =
-                  fims_math::exp(population->recruitment->log_rzero[0]);
-            } else {
-              CalculateUnfishedInitialNumbersAA(population, i_age_year, a);
             }
 
           } else {
