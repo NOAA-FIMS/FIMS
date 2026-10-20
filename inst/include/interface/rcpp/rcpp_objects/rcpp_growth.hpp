@@ -538,10 +538,9 @@ class VonBertalanffySchnuteGrowthInterface
               vb->ReferenceAgeForLengthOldVector(), false);
     set_final(this->length_weight_a, vb->LengthWeightAVector(), true);
     set_final(this->length_weight_b, vb->LengthWeightBVector(), true);
-    set_final(this->length_at_age_sd_young,
-              vb->LengthAtAgeSdYoungVector(), true);
-    set_final(this->length_at_age_sd_old,
-              vb->LengthAtAgeSdOldVector(), true);
+    set_final(this->length_at_age_sd_young, vb->LengthAtAgeSdYoungVector(),
+              true);
+    set_final(this->length_at_age_sd_old, vb->LengthAtAgeSdOldVector(), true);
     set_final(this->log_sd_mean_length_young,
               vb->LogSdLengthAtRefAgeYoungVector(), false);
     set_final(this->log_sd_mean_length_old, vb->LogSdLengthAtRefAgeOldVector(),
@@ -755,9 +754,8 @@ class VonBertalanffySchnuteGrowthInterface
           "delta-method variability inputs, but not both");
     }
 
-    if (has_sd &&
-        (this->length_at_age_sd_young.size() != 1 ||
-         this->length_at_age_sd_old.size() != 1)) {
+    if (has_sd && (this->length_at_age_sd_young.size() != 1 ||
+                   this->length_at_age_sd_old.size() != 1)) {
       Rcpp::stop(
           "Interpolation requires exactly one length_at_age_sd_young value "
           "and one length_at_age_sd_old value");
@@ -826,10 +824,8 @@ class VonBertalanffySchnuteGrowthInterface
       check_positive(this->length_at_age_sd_old, "length_at_age_sd_old");
     }
     if (has_structured_delta) {
-      check_finite(this->log_sd_mean_length_young,
-                   "log_sd_mean_length_young");
-      check_finite(this->log_sd_mean_length_old,
-                   "log_sd_mean_length_old");
+      check_finite(this->log_sd_mean_length_young, "log_sd_mean_length_young");
+      check_finite(this->log_sd_mean_length_old, "log_sd_mean_length_old");
       check_finite(this->log_sd_growth_coefficient,
                    "log_sd_growth_coefficient");
       check_finite(this->mean_length_young_mean_length_old_logit_corr,
