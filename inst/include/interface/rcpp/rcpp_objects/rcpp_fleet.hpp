@@ -507,6 +507,18 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
 
+    // The index reads 1 log_q for all years or 1 log_q per year
+    if (this->log_q.size() != 1 &&
+        this->log_q.size() != static_cast<size_t>(this->n_years.get())) {
+      FIMS_ERROR_LOG("The size of `log_q` is not 1 or `n_years`: " +
+                     fims::to_string(this->log_q.size()) + " values and " +
+                     fims::to_string(this->n_years.get()) + " years");
+      throw std::invalid_argument(
+          "Fleet log_q size mismatch. Fleet log_q has " +
+          fims::to_string(this->log_q.size()) +
+          " values, but it needs 1 value or 1 value per year (" +
+          fims::to_string(this->n_years.get()) + ").");
+    }
     fleet->log_q.resize(this->log_q.size());
     for (size_t i = 0; i < this->log_q.size(); i++) {
       fleet->log_q[i] = this->log_q[i].initial_value_m;
