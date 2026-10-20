@@ -235,4 +235,33 @@ TEST_F(CAAEvaluateTestFixture,
     }
   }
 }
+
+// CatchAtAge_CalculateUnfishedEquilibriumNumbers
+// IO correctness
+TEST_F(CAAEvaluateTestFixture,
+       HandlesAgeVaryingM_CatchAtAge_CalculateUnfishedEquilibriumNumbers) {
+  // First-year natural mortality rises with age. Later years use a different
+  // value, which must not enter the equilibrium.
+  for (size_t i = 0; i < population->M.size(); i++) {
+    population->M[i] = (i < population->n_ages) ? 0.1 + 0.05 * i : 1.0;
+  }
+  double recruits = 1000.0;
+  std::vector<double> unfished_numbers_at_age =
+      catch_at_age_model->CalculateUnfishedEquilibriumNumbers(population,
+                                                              recruits);
+
+  // Survival to age a is exp(-(M_0 + ... + M_{a-1})), and the plus group adds
+  // the geometric tail of survival at M_A.
+  EXPECT_EQ(unfished_numbers_at_age.size(), population->n_ages);
+  int plus_group = population->n_ages - 1;
+  double cumulative_m = 0.0;
+  for (int age = 0; age < population->n_ages; age++) {
+    double expected = recruits * std::exp(-cumulative_m);
+    if (age == plus_group) {
+      expected /= -std::expm1(-(0.1 + 0.05 * age));
+    }
+    EXPECT_NEAR(unfished_numbers_at_age[age], expected, 1e-10 * expected);
+    cumulative_m += 0.1 + 0.05 * age;
+  }
+}
 }  // namespace
