@@ -5,7 +5,7 @@ vignette: >
   %\VignetteIndexEntry{Intro to C++}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-level: "power-user"
+level: "contributor"
 summary: "Intro training to C++ for FIMS development"
 ---
 <!--
