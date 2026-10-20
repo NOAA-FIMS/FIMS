@@ -22,36 +22,36 @@ pull_input <- function(parameters, module, input_label, fleet_name = NA) {
     dplyr::pull(value)
 }
 
-#' Pull the values of one output from a tibble of estimates
+#' Pull the values of one output from a TMB report
 #'
-#' @param estimates A tibble from `get_estimates()`.
+#' @details The report holds 1 vector per population or per fleet. Fleets are
+#' in the order they first appear in the parameters, which for `data_big` is
+#' fleet1 and then survey1.
+#' @param report A list from `get_report()`.
 #' @param output_label A string with the output label, e.g.,
 #'   `"spawning_biomass"`.
-#' @param fleet_name A string with the fleet name. The default `NA` keeps
-#'   every fleet.
+#' @param fleet_number The position of the fleet in the report. The default
+#'   of 1 is also the only population.
 #' @return A numeric vector ordered by year and then age or length.
-pull_output <- function(estimates, output_label, fleet_name = NA) {
-  estimates |>
-    dplyr::filter(
-      label == output_label,
-      is.na(fleet_name) | fleet == fleet_name
-    ) |>
-    dplyr::arrange(year_i, age, length) |>
-    dplyr::pull(estimated)
+pull_output <- function(report, output_label, fleet_number = 1) {
+  report[[output_label]][[fleet_number]]
 }
 
-#' Run FIMS once at the input values and return the estimates
+#' Run FIMS once at the input values and return the report
 #'
+#' @details The report is used rather than `get_estimates()` because it keeps
+#' full precision, which exact comparisons of small values such as
+#' proportions need.
 #' @param parameters A tibble from `setup_default_parameters()`.
 #' @param data A `FIMSFrame` object.
-#' @return A tibble from `get_estimates()`.
+#' @return A list from `get_report()`.
 run_deterministic <- function(parameters, data) {
   fit <- parameters |>
     initialize_fims(data = data) |>
     fit_fims(optimize = FALSE)
-  estimates <- get_estimates(fit)
+  report <- get_report(fit)
   clear()
-  estimates
+  report
 }
 
 #' The logistic curve used for maturity and selectivity in FIMS

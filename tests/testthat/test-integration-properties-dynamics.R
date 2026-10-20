@@ -22,6 +22,10 @@ n_years <- get_n_years(data_4_model)
 # data_big has 1 fleet with weight at age, so these are the model weights.
 weight_at_age <- weight_at_age_matrix(data_big)
 
+# Position of each fleet in the report, in the order the fleets first appear
+# in the parameters.
+fleet_number <- c(fleet1 = 1, survey1 = 2)
+
 ## IO correctness ----
 test_that("an unfished population stays at its equilibrium age structure", {
   r0 <- exp(pull_input(default_parameters, "Recruitment", "log_rzero"))
@@ -61,21 +65,21 @@ test_that("an unfished population stays at its equilibrium age structure", {
         .default = value
       )
     )
-  estimates <- run_deterministic(parameters, data_4_model)
+  report <- run_deterministic(parameters, data_4_model)
 
   #' @description Test that numbers at age equal the unfished equilibrium in every year, including the year after the last.
   expect_equal(
-    object = pull_output(estimates, "numbers_at_age"),
+    object = pull_output(report, "numbers_at_age"),
     expected = rep(equilibrium_numbers, n_years + 1)
   )
   #' @description Test that spawning biomass equals unfished spawning biomass from R0 and spawning biomass per recruit in every year.
   expect_equal(
-    object = pull_output(estimates, "spawning_biomass"),
+    object = pull_output(report, "spawning_biomass"),
     expected = rep(unfished_spawning_biomass, n_years + 1)
   )
   #' @description Test that the spawning biomass ratio is 1 in every year when there is no fishing.
   expect_equal(
-    object = pull_output(estimates, "spawning_biomass_ratio"),
+    object = pull_output(report, "spawning_biomass_ratio"),
     expected = rep(1, n_years + 1)
   )
 })
@@ -97,7 +101,7 @@ test_that("catch at age follows the Baranov equation with 2 fishing fleets", {
         .default = value
       )
     )
-  estimates <- run_deterministic(parameters, data_4_model)
+  report <- run_deterministic(parameters, data_4_model)
 
   # Rows are years and columns are ages.
   fishing_mortality <- purrr::map(
@@ -119,7 +123,7 @@ test_that("catch at age follows the Baranov equation with 2 fishing fleets", {
     matrix(ncol = n_ages, byrow = TRUE)
   total_mortality <- natural_mortality +
     fishing_mortality[["fleet1"]] + fishing_mortality[["survey1"]]
-  numbers_at_age <- pull_output(estimates, "numbers_at_age") |>
+  numbers_at_age <- pull_output(report, "numbers_at_age") |>
     matrix(ncol = n_ages, byrow = TRUE)
   fished_years <- seq_len(n_years)
 
@@ -128,7 +132,9 @@ test_that("catch at age follows the Baranov equation with 2 fishing fleets", {
       (1 - exp(-total_mortality)) * numbers_at_age[fished_years, ]
     #' @description Test that catch numbers at age for each fleet equal F / Z * (1 - exp(-Z)) * N with F and Z from the inputs.
     expect_equal(
-      object = pull_output(estimates, "catch_numbers_at_age", fleet_name),
+      object = pull_output(
+        report, "catch_numbers_at_age", fleet_number[[fleet_name]]
+      ),
       expected = as.vector(t(expected_catch))
     )
   }

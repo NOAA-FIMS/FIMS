@@ -41,13 +41,13 @@ test_that("maturity in one year changes spawning biomass in that year only", {
     dplyr::filter(!(module_name == "Maturity" & label == "inflection_point")) |>
     dplyr::bind_rows(maturity_by_year)
 
-  default_estimates <- run_deterministic(default_parameters, data_4_model)
-  estimates <- run_deterministic(parameters, data_4_model)
+  default_report <- run_deterministic(default_parameters, data_4_model)
+  report <- run_deterministic(parameters, data_4_model)
   default_spawning_biomass <- pull_output(
-    default_estimates, "spawning_biomass"
+    default_report, "spawning_biomass"
   )
-  spawning_biomass <- pull_output(estimates, "spawning_biomass")
-  numbers_at_age <- pull_output(estimates, "numbers_at_age") |>
+  spawning_biomass <- pull_output(report, "spawning_biomass")
+  numbers_at_age <- pull_output(report, "numbers_at_age") |>
     matrix(ncol = n_ages, byrow = TRUE)
   proportion_female <- pull_input(
     default_parameters, "Population", "proportion_female"
