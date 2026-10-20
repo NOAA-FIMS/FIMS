@@ -719,9 +719,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
           "delta-method variability inputs, but not both");
     }
 
-    if (has_sd &&
-        (length_at_age_sd_young_vector_.size() != 1 ||
-         length_at_age_sd_old_vector_.size() != 1)) {
+    if (has_sd && (length_at_age_sd_young_vector_.size() != 1 ||
+                   length_at_age_sd_old_vector_.size() != 1)) {
       throw std::runtime_error(
           "VonBertalanffySchnuteGrowthModelAdapter requires exactly one "
           "length_at_age_sd_young value and one length_at_age_sd_old value");
