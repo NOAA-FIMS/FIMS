@@ -24,7 +24,7 @@ Prepare the test data in the new file or in a separate file if you plan on reusi
   }
   ```
 - Use pre-existing integration data, e.g., `tests/testthat/fixtures/integration_test_data_components.RData` and `tests/testthat/fixtures/integration_test_data.RData`, by loading them within the `setup` section, e.g., `load(testthat::test_path("fixtures", "integration_test_data.RData"))` or within `prepare_test_data()`, where these data objects can be updated by running `data-raw/data_big.R`.
-- Use pre-existing package data, e.g., `FIMS::data_big`, `FIMS::parameters_big`, `FIMS::fit_big_optimized`, and `FIMS::estimates_big_optimized`, by referring to them directly in tests. Update these objects by running `source(file.path("data-raw", "data_big.R"))` after changing the model or estimate-generation code.
+- Use pre-existing package data, e.g., `FIMS::data_big`, `FIMS::parameters_big`, `FIMS::fit_big_optimized`, and `FIMS::estimates_big_optimized`, by referring to them directly in tests. Update these objects by running `source(file.path("data-raw", "data_big.R"))` after changing the model or estimate-generation code. The fits are only saved again when their version or estimates change, so delete `data/fit_big_optimized.rda` to force a new save.
 
 ### :pencil: Edit the code in the new test file
 
