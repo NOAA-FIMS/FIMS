@@ -227,11 +227,11 @@ make_vonb_demo_data <- function(
           mean = true_mean_length,
           sd = true_sd_length
         ) -
-        stats::pnorm(
-          q = lower_edge,
-          mean = true_mean_length,
-          sd = true_sd_length
-        )
+          stats::pnorm(
+            q = lower_edge,
+            mean = true_mean_length,
+            sd = true_sd_length
+          )
     ) |>
     dplyr::ungroup()
 
