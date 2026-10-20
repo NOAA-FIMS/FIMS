@@ -98,25 +98,34 @@ double NormalCdf(double x, double mean, double sd) {
   return 0.5 * (1.0 + std::erf((x - mean) / (sd * std::sqrt(2.0))));
 }
 
-TEST(SizeGridBuilder, BuildObservationEdgesFromCentersUsesAdjacentMidpoints) {
-  fims::Vector<double> centers = {1.0, 2.0, 4.0};
-
-  const fims::Vector<double> edges =
-      fims_popdy::SizeGridBuilder::BuildObservationEdgesFromCenters(centers);
-
-  ASSERT_EQ(edges.size(), 4u);
-  EXPECT_DOUBLE_EQ(edges[0], 0.5);
-  EXPECT_DOUBLE_EQ(edges[1], 1.5);
-  EXPECT_DOUBLE_EQ(edges[2], 3.0);
-  EXPECT_DOUBLE_EQ(edges[3], 5.0);
+// Normal CDF written out here so the expected values do not reuse the
+// provider's own probabilities.
+double NormalCdf(double x, double mean, double sd) {
+  return 0.5 * (1.0 + std::erf((x - mean) / (sd * std::sqrt(2.0))));
 }
 
-TEST(SizeGridBuilder, BuildObservationEdgesFromCentersRejectsSingleCenter) {
-  fims::Vector<double> centers = {3.0};
+TEST(SizeGridBuilder, BuildObservationEdgesFromLowerEdgesAddsLastBinUpperEdge) {
+  fims::Vector<double> lower_edges = {1.0, 2.0, 4.0};
 
-  EXPECT_THROW(
-      fims_popdy::SizeGridBuilder::BuildObservationEdgesFromCenters(centers),
-      std::runtime_error);
+  const fims::Vector<double> edges =
+      fims_popdy::SizeGridBuilder::BuildObservationEdgesFromLowerEdges(
+          lower_edges);
+
+  // The lower edges are kept as they are, and the last bin gets the width of
+  // the bin before it.
+  ASSERT_EQ(edges.size(), 4u);
+  EXPECT_DOUBLE_EQ(edges[0], 1.0);
+  EXPECT_DOUBLE_EQ(edges[1], 2.0);
+  EXPECT_DOUBLE_EQ(edges[2], 4.0);
+  EXPECT_DOUBLE_EQ(edges[3], 6.0);
+}
+
+TEST(SizeGridBuilder, BuildObservationEdgesFromLowerEdgesRejectsSingleEdge) {
+  fims::Vector<double> lower_edges = {3.0};
+
+  EXPECT_THROW(fims_popdy::SizeGridBuilder::BuildObservationEdgesFromLowerEdges(
+                   lower_edges),
+               std::runtime_error);
 }
 
 TEST(SizeGridBuilder,

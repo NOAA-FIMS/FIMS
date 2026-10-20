@@ -1047,13 +1047,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Compute expected fleet-specific weight-at-age from a normalized
-   * age-to-length conversion row and fleet observation-bin centers.
+   * age-to-length conversion row and fleet observation-bin midpoints.
    *
    * This is the bin-based downstream WAA step used with the growth-derived
    * age-to-length conversion path. Instead of using only growth->evaluate(age),
    * it computes expected weight as the weighted average of weight-at-length
    * over the same fleet observation bins used in the mapped age-to-length
-   * conversion row.
+   * conversion row. Fleet lengths are bin lower edges, so weight is evaluated
+   * at the midpoint of each bin's edges. Evaluating it at the lower edge would
+   * take weight at a length half a bin too short. The first and last bins are
+   * open-ended, so their midpoints are nominal.
    *
    * @param growth_observation Shared pointer to the linked growth-derived
    * observation capability.
@@ -1069,9 +1072,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
       const fims::Vector<Type> &age_to_length_conversion_row) {
     Type mean_weight = static_cast<Type>(0.0);
     for (size_t l = 0; l < fleet->n_lengths; ++l) {
-      mean_weight +=
-          age_to_length_conversion_row[l] *
-          growth_observation->EvaluateWeightAtLength(fleet->lengths[l]);
+      const double bin_midpoint =
+          0.5 * (fleet->length_bin_edges[l] + fleet->length_bin_edges[l + 1]);
+      mean_weight += age_to_length_conversion_row[l] *
+                     growth_observation->EvaluateWeightAtLength(bin_midpoint);
     }
     return mean_weight;
   }
@@ -1118,7 +1122,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This helper builds the fleet-specific age-to-length conversion row for the
    * requested year and age, then converts that mapped age-to-length row into
    * expected weight using weight-at-length evaluated at the fleet
-   * observation-bin centers.
+   * observation-bin midpoints.
    *
    * @param age_to_length_conversion_derived Shared pointer to the
    * growth-derived age-to-length conversion.
