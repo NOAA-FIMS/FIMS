@@ -34,6 +34,47 @@ check_ASSAMC <- function() {
   return(TRUE)
 }
 
+# A saved fit changes on every run because it stores its run time and the
+# Rcpp model object, and the optimized estimates differ in about the 5th
+# significant digit between GitHub runners. Saving the fit only when its
+# version or estimates change keeps pull requests from carrying .rda files
+# that are not their own. Delete data/fit_big_optimized.rda to force a save.
+optimized_fit_changed <- function(fit, estimates, tolerance = 1e-3) {
+  fit_file <- file.path("data", "fit_big_optimized.rda")
+  estimates_file <- file.path("data", "estimates_big_optimized.rda")
+  if (!file.exists(fit_file) || !file.exists(estimates_file)) {
+    return(TRUE)
+  }
+  saved <- new.env()
+  load(fit_file, envir = saved)
+  load(estimates_file, envir = saved)
+  saved_estimates <- saved[["estimates_big_optimized"]]
+  if (!identical(
+    FIMS::get_version(fit),
+    FIMS::get_version(saved[["fit_big_optimized"]])
+  ) ||
+    !identical(dim(estimates), dim(saved_estimates)) ||
+    !identical(names(estimates), names(saved_estimates))) {
+    return(TRUE)
+  }
+  is_value <- purrr::map_lgl(estimates, is.double)
+  if (!identical(estimates[!is_value], saved_estimates[!is_value])) {
+    return(TRUE)
+  }
+  # The gradient is near 0 at the optimum, so its difference between runners
+  # is large relative to its value and it is not compared.
+  value_columns <- setdiff(names(estimates)[is_value], "gradient")
+  purrr::map_lgl(value_columns, \(column) {
+    new_values <- estimates[[column]]
+    saved_values <- saved_estimates[[column]]
+    # Relative difference above 1 and absolute difference below 1.
+    allowed_difference <- tolerance * pmax(abs(saved_values), 1)
+    !identical(is.na(new_values), is.na(saved_values)) ||
+      any(abs(new_values - saved_values) > allowed_difference, na.rm = TRUE)
+  }) |>
+    any()
+}
+
 # Ensure usethis writes generated data to the package root.
 usethis::proj_set(".", force = TRUE)
 
@@ -505,11 +546,17 @@ FIMS::clear()
 usethis::use_data(
   data_big,
   parameters_big,
-  fit_big_optimized,
-  estimates_big_optimized,
   overwrite = TRUE,
   compress = "xz"
 )
+if (optimized_fit_changed(fit_big_optimized, estimates_big_optimized)) {
+  usethis::use_data(
+    fit_big_optimized,
+    estimates_big_optimized,
+    overwrite = TRUE,
+    compress = "xz"
+  )
+}
 
 on.exit(unlink(main_dir, recursive = TRUE), add = TRUE)
 on.exit(setwd(working_dir), add = TRUE)
