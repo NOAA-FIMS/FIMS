@@ -122,7 +122,7 @@ FIMS::data_big |>
 
 ## Age compositions (`type == "age_comp"`)
 
-The age-composition data type contains the age distribution of a fleet for a time step. The `age` column contains integer ages defining the age bins. While standard FIMS models typically assume age bins start at zero, the data_big example currently uses ages ranging from 1--12, and thus, recruitment will be age-1 fish not age-0 fish. The `observed` column contains either the number or the proportion of the catch or survey in each age bin. The `unit` column should be either "number" or "proportion". If "proportion" is used, the observations are checked at a later step to confirm that they sum to 1.0. The `uncertainty` column should be the input sample size for the time step (equal across all ages within that time step).
+The age-composition data type contains the age distribution of a fleet for a time step. The `age` column contains integer ages defining the age bins. While standard FIMS models typically assume age bins start at zero, the data_big example currently uses ages ranging from 1--12, and thus, recruitment will be age-1 fish not age-0 fish. The `observed` column contains either the number or the proportion of the catch or survey in each age bin. The `unit` column should be either "number" or "proportion". If "proportion" is used, the observations are checked at a later step to confirm that they sum to 1.0. The `uncertainty` column should be the input sample size for the time step (equal across all ages within that time step). When the unit is set to a proportion, the sample size is multiplied by the proportion; however, when it is set to a number, the sample size is ignored.
 
 ```{r data_big-age_comp}
 # first three rows of the age composition data
@@ -149,7 +149,7 @@ FIMS::data_big |>
 
 ## Length compositions (`type == "length_comp"`)
 
-The length-composition data are similar to the age compositions, except with values in the `length` column and `age = NA`. The `length` column identifies the length bin for each observation. The `observed` column contains either the number or the proportion of fish in each length bin. The `unit` column should be either "number" or "proportion". The `uncertainty` column should be the input sample size for the time step, repeated across all length bins in that time step.
+The length-composition data are similar to the age compositions, except with values in the `length` column and `age = NA`. The `length` column identifies the length bin for each observation. The `observed` column contains either the number or the proportion of fish in each length bin. The `unit` column should be either "number" or "proportion". The `uncertainty` column should be the input sample size for the time step, repeated across all length bins in that time step. When the unit is set to a proportion, the sample size is multiplied by the proportion; however, when it is set to a number, the sample size is ignored.
 
 When length compositions are included, FIMS needs a way to convert numbers at age into numbers at length. This can come from fixed `age_to_length_conversion` rows or from a growth-derived age-to-length conversion using the VonB-Schnute Growth module.
 
