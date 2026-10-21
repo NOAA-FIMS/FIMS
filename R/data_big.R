@@ -29,10 +29,11 @@
 #'   \item{timing}{The timing, i.e., year the data was collected.}
 #'   \item{observed}{The observed measurement of interest.}
 #'   \item{unit}{A character string specifying the units of `observed`. Allowed
-#'     units for each data type are as follows. `mt` is used for `index`,
-#'     `catch`, and `weight_at_age` data. `number` or `proportion` are each
-#'     viable units for the composition data, where the former is the preferred
-#'     unit of measurement.}
+#'     units for each data type are as follows. `mt` or `number` are used for
+#'     `index` and `catch` data, with 1 unit per fleet for each type. `mt` is
+#'     used for `weight_at_age` data. `number` or `proportion` are each viable
+#'     units for the composition data, where the former is the preferred unit
+#'     of measurement.}
 #'   \item{uncertainty}{A right-handed formula specifying the distributional
 #'     assumptions for the entry in `observed`. See [FIMSFrame()] for more
 #'     information about this column.
