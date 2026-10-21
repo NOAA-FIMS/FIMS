@@ -573,15 +573,14 @@ class Information {
     }
 
     valid_model = false;
-    FIMS_ERROR_LOG(
-        "Fleet " + fims::to_string(f->id) +
-        " has fleet length observation bins but no usable "
-        "age-to-length conversion path. Provide fixed "
-        "age-to-length conversion of size " +
-        fims::to_string(f->n_ages * f->n_lengths) + " (or " +
-        fims::to_string(f->n_years * f->n_ages * f->n_lengths) +
-        " for 1 table per year) or use a supported growth-derived "
-        "age-to-length conversion path.");
+    FIMS_ERROR_LOG("Fleet " + fims::to_string(f->id) +
+                   " has fleet length observation bins but no usable "
+                   "age-to-length conversion path. Provide fixed "
+                   "age-to-length conversion of size " +
+                   fims::to_string(f->n_ages * f->n_lengths) + " (or " +
+                   fims::to_string(f->n_years * f->n_ages * f->n_lengths) +
+                   " for 1 table per year) or use a supported growth-derived "
+                   "age-to-length conversion path.");
   }
 
   /**
