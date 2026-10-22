@@ -384,10 +384,13 @@ class VonBertalanffySchnuteGrowthInterface
   /** @copydoc fims_popdy::VonBertalanffySchnuteGrowth::length_weight_b */
   VariableVector length_weight_b;
   /**
-   * @brief Natural-scale SD values at the two reference ages for the legacy
-   * interpolation path.
+   * @brief Natural-scale length-at-age SD at the younger reference age.
    */
-  VariableVector length_at_age_sd_at_reference_ages;
+  VariableVector length_at_age_sd_young;
+  /**
+   * @brief Natural-scale length-at-age SD at the older reference age.
+   */
+  VariableVector length_at_age_sd_old;
   /**
    * @brief Working-scale von Bertalanffy--Schnute variability parameter for
    * sd(log(mean_length_young)).
@@ -428,7 +431,8 @@ class VonBertalanffySchnuteGrowthInterface
       : GrowthDerivedObservationInterfaceBase() {
     // Variability inputs are optional and mutually exclusive by path, so
     // leave them absent until a caller explicitly supplies one path.
-    this->length_at_age_sd_at_reference_ages.resize(0);
+    this->length_at_age_sd_young.resize(0);
+    this->length_at_age_sd_old.resize(0);
     this->log_sd_mean_length_young.resize(0);
     this->log_sd_mean_length_old.resize(0);
     this->log_sd_growth_coefficient.resize(0);
@@ -458,8 +462,8 @@ class VonBertalanffySchnuteGrowthInterface
         reference_age_for_length_old(other.reference_age_for_length_old),
         length_weight_a(other.length_weight_a),
         length_weight_b(other.length_weight_b),
-        length_at_age_sd_at_reference_ages(
-            other.length_at_age_sd_at_reference_ages),
+        length_at_age_sd_young(other.length_at_age_sd_young),
+        length_at_age_sd_old(other.length_at_age_sd_old),
         log_sd_mean_length_young(other.log_sd_mean_length_young),
         log_sd_mean_length_old(other.log_sd_mean_length_old),
         log_sd_growth_coefficient(other.log_sd_growth_coefficient),
@@ -534,8 +538,9 @@ class VonBertalanffySchnuteGrowthInterface
               vb->ReferenceAgeForLengthOldVector(), false);
     set_final(this->length_weight_a, vb->LengthWeightAVector(), true);
     set_final(this->length_weight_b, vb->LengthWeightBVector(), true);
-    set_final(this->length_at_age_sd_at_reference_ages,
-              vb->LengthAtAgeSdAtRefAgesVector(), true);
+    set_final(this->length_at_age_sd_young, vb->LengthAtAgeSdYoungVector(),
+              true);
+    set_final(this->length_at_age_sd_old, vb->LengthAtAgeSdOldVector(), true);
     set_final(this->log_sd_mean_length_young,
               vb->LogSdLengthAtRefAgeYoungVector(), false);
     set_final(this->log_sd_mean_length_old, vb->LogSdLengthAtRefAgeOldVector(),
@@ -709,7 +714,8 @@ class VonBertalanffySchnuteGrowthInterface
       Rcpp::stop("VonBertalanffySchnuteGrowth parameters not set");
     }
 
-    const bool has_sd = this->length_at_age_sd_at_reference_ages.size() > 0;
+    const bool has_sd = this->length_at_age_sd_young.size() > 0 ||
+                        this->length_at_age_sd_old.size() > 0;
     const bool has_any_structured_delta =
         this->log_sd_mean_length_young.size() > 0 ||
         this->log_sd_mean_length_old.size() > 0 ||
@@ -728,8 +734,8 @@ class VonBertalanffySchnuteGrowthInterface
     if (require_variability && !has_sd && !has_any_structured_delta) {
       Rcpp::stop(
           "VonBertalanffySchnuteGrowth requires either "
-          "length_at_age_sd_at_reference_ages or the structured delta-method "
-          "growth variability inputs");
+          "both length_at_age_sd_young and length_at_age_sd_old, "
+          "or the structured delta-method growth variability inputs");
     }
 
     if (has_any_structured_delta && !has_structured_delta) {
@@ -744,12 +750,15 @@ class VonBertalanffySchnuteGrowthInterface
           "von Bertalanffy--Schnute growth requires variability inputs for "
           "one supported path. Supply either the interpolation inputs "
 
-          "length_at_age_sd_at_reference_ages or the full delta-method "
-          "variability inputs, but not both");
+          "length_at_age_sd_young and length_at_age_sd_old or the full "
+          "delta-method variability inputs, but not both");
     }
 
-    if (has_sd && this->length_at_age_sd_at_reference_ages.size() != 2) {
-      Rcpp::stop("length_at_age_sd_at_reference_ages must have two values");
+    if (has_sd && (this->length_at_age_sd_young.size() != 1 ||
+                   this->length_at_age_sd_old.size() != 1)) {
+      Rcpp::stop(
+          "Interpolation requires exactly one length_at_age_sd_young value "
+          "and one length_at_age_sd_old value");
     }
 
     if (has_structured_delta &&
@@ -795,8 +804,8 @@ class VonBertalanffySchnuteGrowthInterface
     }
 
     if (has_sd) {
-      check_positive(this->length_at_age_sd_at_reference_ages,
-                     "length_at_age_sd_at_reference_ages");
+      check_positive(this->length_at_age_sd_young, "length_at_age_sd_young");
+      check_positive(this->length_at_age_sd_old, "length_at_age_sd_old");
     }
   }
 
@@ -917,8 +926,10 @@ class VonBertalanffySchnuteGrowthInterface
       ss << "}";
     };
 
-    append_optional_parameter("length_at_age_sd_at_reference_ages",
-                              this->length_at_age_sd_at_reference_ages);
+    append_optional_parameter("length_at_age_sd_young",
+                              this->length_at_age_sd_young);
+    append_optional_parameter("length_at_age_sd_old",
+                              this->length_at_age_sd_old);
     append_optional_parameter("log_sd_mean_length_young",
                               this->log_sd_mean_length_young);
     append_optional_parameter("log_sd_mean_length_old",
@@ -1023,9 +1034,12 @@ class VonBertalanffySchnuteGrowthInterface
                       "length_weight_a", true);
     load_and_register(this->length_weight_b, vb->LengthWeightBVector(),
                       "length_weight_b", true);
-    load_optional_and_register(this->length_at_age_sd_at_reference_ages,
-                               vb->LengthAtAgeSdAtRefAgesVector(),
-                               "length_at_age_sd_at_reference_ages", true);
+    load_optional_and_register(this->length_at_age_sd_young,
+                               vb->LengthAtAgeSdYoungVector(),
+                               "length_at_age_sd_young", true);
+    load_optional_and_register(this->length_at_age_sd_old,
+                               vb->LengthAtAgeSdOldVector(),
+                               "length_at_age_sd_old", true);
     load_optional_and_register(this->log_sd_mean_length_young,
                                vb->LogSdLengthAtRefAgeYoungVector(),
                                "log_sd_mean_length_young", false);
