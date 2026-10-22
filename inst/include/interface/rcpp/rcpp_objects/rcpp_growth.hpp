@@ -975,7 +975,7 @@ class VonBertalanffySchnuteGrowthInterface
     vb->id = this->id;
 
     // Build parameter vectors and register if estimable. Growth variability
-    // must be supplied through either the legacy interpolation SD anchors or
+    // must be supplied through either the interpolation SD inputs or
     // the transformed delta-method variability inputs.
     ValidateVonBertalanffySchnuteGrowthInputs(true);
 

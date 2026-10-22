@@ -366,6 +366,65 @@ test_that("reference lengths survive initialization across estimation settings",
   }
 })
 
+test_that("von bertalanffy automatic K derivative matches numerical differences", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_convergence_context()
+  input <- FIMS::initialize_fims(
+    parameters = ctx$parameters,
+    data = ctx$data
+  )
+  fit <- FIMS::fit_fims(input, optimize = FALSE, get_sd = FALSE)
+  obj <- FIMS::get_obj(fit)
+  starting <- obj[["par"]]
+
+  k_index <- grep("^Growth\\..*\\.growth_coefficient\\.", names(starting))
+  expect_length(k_index, 1L)
+
+  reference_ages <- ctx$parameters |>
+    dplyr::filter(
+      module_name == "Growth",
+      label %in% c(
+        "reference_age_for_length_young",
+        "reference_age_for_length_old"
+      )
+    ) |>
+    dplyr::arrange(match(label, c(
+      "reference_age_for_length_young",
+      "reference_age_for_length_old"
+    ))) |>
+    dplyr::pull(value)
+  reference_span <- diff(reference_ages)
+
+  # Reuse the same AD tape on both sides of the small-x transition.
+  for (growth_coefficient in c(
+    exp(starting[k_index]),
+    0.99e-3 / reference_span,
+    1.01e-3 / reference_span
+  )) {
+    point <- starting
+    point[k_index] <- log(growth_coefficient)
+    automatic <- as.numeric(obj[["gr"]](point))[k_index]
+
+    step <- 1e-4
+    plus <- minus <- point
+    plus[k_index] <- plus[k_index] + step
+    minus[k_index] <- minus[k_index] - step
+    numerical <- (obj[["fn"]](plus) - obj[["fn"]](minus)) / (2 * step)
+
+    #' @description Automatic derivatives with respect to log K agree with numerical differences.
+    expect_true(
+      is.finite(automatic) && is.finite(numerical),
+      info = paste("K:", growth_coefficient)
+    )
+    expect_true(
+      abs(automatic - numerical) / max(1, abs(numerical)) < 1e-4,
+      info = paste("K:", growth_coefficient)
+    )
+  }
+})
+
 test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   ctx <- make_vonb_convergence_context()
   on.exit(

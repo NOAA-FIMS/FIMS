@@ -65,6 +65,7 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
     auto scaled_decay = [](const Type& x,
                            Type* decay_derivative) -> Type {
       const Type threshold = Type(1e-3);
+      // Keep both expressions safe because AD may evaluate the inactive branch.
       const Type series_x = fims_math::cond_exp_lt(
           x, threshold, x, Type(0.0));
       const Type regular_x = fims_math::cond_exp_lt(

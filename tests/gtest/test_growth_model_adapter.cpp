@@ -176,7 +176,7 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, RejectsBothVariabilityPaths) {
 
 
 TEST(VonBertalanffySchnuteGrowthModelAdapter,
-     EstimatedOlderLengthStaysAboveYoungerLength) {
+     PreservesLengthOrderingAndHandlesTinyGaps) {
   for (bool young_is_constant : {false, true}) {
     SCOPED_TRACE(young_is_constant);
     fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double> adapter;

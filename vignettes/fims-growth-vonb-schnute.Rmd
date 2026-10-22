@@ -44,7 +44,7 @@ The `VonBertalanffySchnute` growth module uses two reference ages to estimate th
 
 The older reference length must be greater than the younger reference length. Either length can be held constant or estimated. FIMS uses transformations to preserve this ordering during fitting: an estimated older length is the younger length plus a positive difference, while an estimated younger length is bounded below the older length when the older length is constant. Supply starting values in physical length units; finalized Growth parameter estimates are also reported in those units.
 
-This parameterization supports increasing growth curves that approach a plateau. Exactly flat or decreasing curves are not yet supported.
+This parameterization supports increasing growth curves that approach a plateau. When the difference between the two reference lengths is extremely small, the model may calculate them as equal because of rounding.
 
 When older length is estimated, its internal working value represents the logarithm of the length difference, not the logarithm of older length. This distinction matters when interpreting raw optimizer output or attaching distributions to working-scale parameters.
 
