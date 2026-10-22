@@ -417,20 +417,10 @@ setup_default_Growth <- function(
         "reference_age_for_length_old",
         "length_weight_a",
         "length_weight_b",
-        "length_at_age_sd_at_reference_ages",
-        "length_at_age_sd_at_reference_ages"
+        "length_at_age_sd_young",
+        "length_at_age_sd_old"
       ),
-      age = c(
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        reference_age_for_length_young,
-        reference_age_for_length_old
-      ),
+      age = NA_real_,
       value = c(
         275,
         725,

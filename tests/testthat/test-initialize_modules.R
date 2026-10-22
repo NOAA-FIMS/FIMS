@@ -296,6 +296,71 @@ test_that("`initialize_growth()` works with correct inputs", {
   clear()
 })
 
+test_that("`initialize_growth()` assigns named SDs independently of row order", {
+  clear()
+  on.exit(clear(), add = TRUE)
+
+  parameters <- setup_default_Growth(
+    data = data,
+    module_type = "VonBertalanffySchnute"
+  ) |>
+    dplyr::mutate(
+      value = dplyr::case_when(
+        label == "reference_age_for_length_young" ~ 4,
+        label == "reference_age_for_length_old" ~ 18,
+        label == "length_at_age_sd_young" ~ 31,
+        label == "length_at_age_sd_old" ~ 79,
+        TRUE ~ value
+      )
+    ) |>
+    dplyr::slice(dplyr::n():1)
+
+  #' @description Named SD inputs initialize without warnings after changing reference ages and reversing row order.
+  expect_no_warning(
+    result <- initialize_growth(parameters = parameters, data = data)
+  )
+
+  #' @description Each SD and reference age is assigned to its named field.
+  expect_equal(result$length_at_age_sd_young[1]$value, 31)
+  expect_equal(result$length_at_age_sd_old[1]$value, 79)
+  expect_equal(result$reference_age_for_length_young[1]$value, 4)
+  expect_equal(result$reference_age_for_length_old[1]$value, 18)
+})
+
+test_that("`initialize_growth()` rejects malformed named SD inputs", {
+  clear()
+  on.exit(clear(), add = TRUE)
+
+  parameters <- setup_default_Growth(
+    data = data,
+    module_type = "VonBertalanffySchnute"
+  )
+  young <- which(parameters$label == "length_at_age_sd_young")
+  old <- which(parameters$label == "length_at_age_sd_old")
+
+  duplicate <- parameters
+  duplicate$label[old] <- "length_at_age_sd_young"
+
+  age_labeled <- parameters
+  age_labeled$age[young] <- 4
+
+  cases <- list(
+    missing_young = parameters[-young, ],
+    missing_old = parameters[-old, ],
+    duplicate_young = duplicate,
+    unexpected_age = age_labeled
+  )
+
+  #' @description Interpolation requires one SD of each name and no separate age labels.
+  for (case in names(cases)) {
+    expect_error(
+      initialize_growth(parameters = cases[[case]], data = data),
+      regexp = "interpolation-based variability inputs are malformed",
+      info = case
+    )
+  }
+})
+
 # test_initialize_maturity ----
 ## IO correctness ----
 test_that("`initialize_maturity()` works with correct inputs", {
