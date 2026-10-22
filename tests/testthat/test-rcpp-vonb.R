@@ -380,7 +380,65 @@ test_that("estimated younger length loads below constant older length", {
   }
 })
 
+test_that("estimated older length loads as a positive length difference", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_test_context()
+
+  for (estimation_type in c("fixed_effects", "random_effects")) {
+    FIMS::clear()
+
+    vb <- new_vonb(ctx)
+    vb$mean_length_young[1]$estimation_type$set("constant")
+    vb$mean_length_old[1]$estimation_type$set(estimation_type)
+
+    FIMS::CreateTMBModel()
+
+    if (estimation_type == "fixed_effects") {
+      working <- FIMS::get_fixed()
+      other <- FIMS::get_random()
+    } else {
+      working <- FIMS::get_random()
+      other <- FIMS::get_fixed()
+    }
+
+    #' @description Older length is registered in the requested parameter category.
+    expect_length(working, 1L)
+    expect_length(other, 0L)
+
+    #' @description The loader stores the log difference between physical reference lengths.
+    expect_equal(
+      as.numeric(working),
+      log(ctx$mean_length_old - ctx$mean_length_young),
+      tolerance = 1e-10,
+      info = estimation_type
+    )
+  }
+})
+
 ## Error handling ----
+test_that("rcpp von bertalanffy growth rejects unordered starting lengths", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_test_context()
+
+  for (old_length in c(ctx$mean_length_young, ctx$mean_length_young - 1)) {
+    FIMS::clear()
+    vb <- new_vonb(ctx)
+    vb$mean_length_old[1]$value <- old_length
+    vb$mean_length_old[1]$estimation_type$set("fixed_effects")
+
+    #' @description Equal or reversed starting lengths are rejected before backend loading.
+    expect_error(
+      FIMS::CreateTMBModel(),
+      regexp = "mean_length_old must be > mean_length_young",
+      info = paste("older length:", old_length)
+    )
+  }
+})
+
 test_that("rcpp von bertalanffy growth rejects reversed reference ages", {
   ctx <- make_vonb_test_context()
   vb_bad <- new_vonb(

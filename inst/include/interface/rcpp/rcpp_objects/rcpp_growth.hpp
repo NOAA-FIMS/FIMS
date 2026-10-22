@@ -647,7 +647,9 @@ class VonBertalanffySchnuteGrowthInterface
       case LengthReferenceParameterization::kEstimatedReferenceLengths:
       case LengthReferenceParameterization::
           kConstantLengthYoungEstimatedLengthOld:
-        return fims_math::exp(mean_length_old_src[0]);
+        // Match evaluation: younger length plus the positive difference.
+        return FinalMeanLengthYoungFromWorkingScale(mean_length_young_src) +
+               fims_math::exp(mean_length_old_src[0]);
 
       case LengthReferenceParameterization::
           kEstimatedLengthYoungBelowConstantLengthOld:
@@ -983,6 +985,10 @@ class VonBertalanffySchnuteGrowthInterface
                       kEstimatedLengthYoungBelowConstantLengthOld) {
             // Match the bounded inverse logit used in evaluation and reporting.
             v = fims_math::logit(0.0, InitialLengthAtRefAgeOld(), v);
+          } else if (&pv == &this->mean_length_old &&
+                     IsEstimated(this->mean_length_old)) {
+            // Store the positive difference from the younger reference length.
+            v = fims_math::log(v - InitialLengthAtRefAgeYoung());
           } else {
             v = fims_math::log(v);
           }

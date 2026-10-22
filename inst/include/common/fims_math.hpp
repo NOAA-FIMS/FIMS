@@ -34,6 +34,15 @@ inline const Type exp(const Type &x) {
 }
 
 /**
+ * @brief Select a value according to whether left is less than right.
+ */
+template <class Type>
+inline Type cond_exp_lt(const Type &left, const Type &right,
+                        const Type &if_true, const Type &if_false) {
+  return left < right ? if_true : if_false;
+}
+
+/**
  * @brief The natural log function (base e)
  * @param x the value to take the log of. Please use fims_math::log<double>(x)
  * if x is an integer.
@@ -110,6 +119,15 @@ inline const Type exp(const Type &x) {
   // use std::exp for double type, look for TMB version of exp if AD type
   using std::exp;
   return exp(x);
+}
+
+/**
+ * @brief Select a value using a condition evaluated during AD playback.
+ */
+template <class Type>
+inline Type cond_exp_lt(const Type &left, const Type &right,
+                        const Type &if_true, const Type &if_false) {
+  return TMBad::CondExpLt(left, right, if_true, if_false);
 }
 
 /**

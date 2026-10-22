@@ -50,6 +50,79 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
   virtual ~VonBertalanffySchnuteGrowth() {}
 
   /**
+   * @brief Growth fraction at or after the younger reference age.
+   * @details Requires ordered reference ages and nonnegative K.
+   * Uses the linear-growth limit as K approaches zero.
+   * @param age Age on the natural scale.
+   * @param derivative Optional output derivative with respect to K.
+   */
+  Type growth_fraction(const Type& age, Type* derivative = nullptr) const {
+    const Type elapsed_age = age - reference_age_for_length_young;
+    const Type reference_age_span =
+        reference_age_for_length_old - reference_age_for_length_young;
+
+    // Evaluate (1 - exp(-x)) / x and, optionally, its derivative.
+    auto scaled_decay = [](const Type& x,
+                           Type* decay_derivative) -> Type {
+      const Type threshold = Type(1e-3);
+      const Type series_x = fims_math::cond_exp_lt(
+          x, threshold, x, Type(0.0));
+      const Type regular_x = fims_math::cond_exp_lt(
+          x, threshold, Type(1.0), x);
+
+      const Type series =
+          Type(1.0) +
+          series_x *
+              (Type(-0.5) +
+               series_x *
+                   (Type(1.0 / 6.0) +
+                    series_x *
+                        (Type(-1.0 / 24.0) +
+                         series_x * Type(1.0 / 120.0))));
+      const Type regular =
+          (Type(1.0) - fims_math::exp(-regular_x)) / regular_x;
+
+      if (decay_derivative != nullptr) {
+        const Type series_derivative =
+            Type(-0.5) +
+            series_x *
+                (Type(1.0 / 3.0) +
+                 series_x *
+                     (Type(-1.0 / 8.0) +
+                      series_x * Type(1.0 / 30.0)));
+        const Type regular_derivative =
+            (fims_math::exp(-regular_x) - regular) / regular_x;
+
+        *decay_derivative = fims_math::cond_exp_lt(
+            x, threshold, series_derivative, regular_derivative);
+      }
+
+      return fims_math::cond_exp_lt(x, threshold, series, regular);
+    };
+
+    Type elapsed_derivative = Type(0.0);
+    Type reference_derivative = Type(0.0);
+    const Type elapsed_decay = scaled_decay(
+        growth_coefficient * elapsed_age,
+        derivative != nullptr ? &elapsed_derivative : nullptr);
+    const Type reference_decay = scaled_decay(
+        growth_coefficient * reference_age_span,
+        derivative != nullptr ? &reference_derivative : nullptr);
+    const Type age_ratio = elapsed_age / reference_age_span;
+    const Type decay_ratio = elapsed_decay / reference_decay;
+
+    if (derivative != nullptr) {
+      *derivative =
+          age_ratio *
+          (elapsed_age * elapsed_derivative -
+           decay_ratio * reference_age_span * reference_derivative) /
+          reference_decay;
+    }
+
+    return age_ratio * decay_ratio;
+  }
+
+  /**
    * @brief Evaluate mean length at age.
    * @param age Age on the natural scale.
    * @return Mean length at the requested age.
@@ -66,18 +139,8 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
              reference_age_for_length_young;
     }
 
-    const Type denom =
-        Type(1.0) -
-        fims_math::exp(-growth_coefficient * (reference_age_for_length_old -
-                                              reference_age_for_length_young));
-    // AD-safe floor to avoid divide-by-zero/NaN when denominator is tiny.
-    const Type denom_safe =
-        fims_math::ad_max(fims_math::ad_fabs(denom), static_cast<Type>(1e-8));
-    const Type numer =
-        Type(1.0) - fims_math::exp(-growth_coefficient *
-                                   (age - reference_age_for_length_young));
     return mean_length_young +
-           (mean_length_old - mean_length_young) * numer / denom_safe;
+           (mean_length_old - mean_length_young) * growth_fraction(age);
   }
 
   /**
@@ -120,19 +183,8 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
       return;
     }
 
-    const Type age_delta_1 = age - reference_age_for_length_young;
-    const Type age_delta_2 =
-        reference_age_for_length_old - reference_age_for_length_young;
-
-    const Type exp_num = fims_math::exp(-growth_coefficient * age_delta_1);
-    const Type exp_den = fims_math::exp(-growth_coefficient * age_delta_2);
-
-    const Type numer = Type(1.0) - exp_num;
-    const Type denom = Type(1.0) - exp_den;
-    const Type denom_safe =
-        fims_math::ad_max(fims_math::ad_fabs(denom), static_cast<Type>(1e-8));
-
-    const Type ratio = numer / denom_safe;
+    Type d_ratio_d_k = Type(0.0);
+    const Type ratio = growth_fraction(age, &d_ratio_d_k);
     const Type delta_length = mean_length_old - mean_length_young;
     const Type mean_length = mean_length_young + delta_length * ratio;
     const Type mean_length_safe =
@@ -140,13 +192,7 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
 
     const Type d_length_d_l1 = Type(1.0) - ratio;
     const Type d_length_d_l2 = ratio;
-
-    const Type d_numer_d_k = age_delta_1 * exp_num;
-    const Type d_denom_d_k = age_delta_2 * exp_den;
-    const Type d_ratio_d_k = (d_numer_d_k * denom_safe - numer * d_denom_d_k) /
-                             (denom_safe * denom_safe);
     const Type d_length_d_k = delta_length * d_ratio_d_k;
-
     d_log_laa_d_length_young = d_length_d_l1 / mean_length_safe;
     d_log_laa_d_length_old = d_length_d_l2 / mean_length_safe;
     d_log_laa_d_k = d_length_d_k / mean_length_safe;
@@ -154,9 +200,10 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
 
   /**
    * @brief Evaluate the gradient of log mean length at age with respect to
-   * the log-scale FIMS VonBertalanffySchnute parameterization
    * [log(mean_length_young), log(mean_length_old),
    *  log(growth_coefficient)].
+   * @details These derivatives use physical reference lengths on log scales
+   * for delta-method variability, not the optimizer's log length difference.
    * @param age Age on the natural scale.
    * @param d_log_laa_d_log_length_young Output derivative with respect to
    * log(mean_length_young).

@@ -78,7 +78,9 @@ void ConfigureAdapter(
   adapter.LengthAtAgeSdAtRefAgesVector().resize(2);
 
   adapter.MeanLengthYoungVector()[0] = fims_math::log(mean_length_young);
-  adapter.MeanLengthOldVector()[0] = fims_math::log(mean_length_old);
+  // Estimated older length is stored as the log difference from younger length.
+  adapter.MeanLengthOldVector()[0] =
+      fims_math::log(mean_length_old - mean_length_young);
   adapter.GrowthCoefficientVector()[0] = fims_math::log(growth_coefficient);
   adapter.ReferenceAgeForLengthYoungVector()[0] =
       reference_age_for_length_young;
