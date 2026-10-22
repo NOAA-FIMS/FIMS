@@ -158,7 +158,9 @@ class VonBertalanffySchnuteGrowthModelAdapter
   }
 
   /**
-   * @brief Access the log-scale length-at-reference-age-2 parameter vector.
+   * @brief Access working-scale storage for the older reference length.
+   * @details When older length is estimated, stores log(older - younger).
+   * When constant, stores log(older); evaluation uses the saved constant.
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& MeanLengthOldVector() {
@@ -442,9 +444,12 @@ class VonBertalanffySchnuteGrowthModelAdapter
   }
 
  private:
-  // Stored parameter vectors on their working scales. Positive parameters
-  // use log scale, reference ages stay on the natural scale, and
-  // correlation terms use transformed working-scale values.
+  // Reference-length working scales depend on estimation settings:
+  // estimated older length uses log(older - younger); estimated younger
+  // length uses log(younger), or a bounded logit when older is constant.
+  // Constant lengths are stored on log scales.
+  // Other positive parameters use log scales, reference ages stay on the
+  // natural scale, and correlations use transformed working-scale values.
   fims::Vector<Type> mean_length_young_vector_;
   fims::Vector<Type> mean_length_old_vector_;
   fims::Vector<Type> growth_coefficient_vector_;
@@ -552,7 +557,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
       case LengthReferenceParameterization::kEstimatedReferenceLengths:
       case LengthReferenceParameterization::
           kConstantLengthYoungEstimatedLengthOld:
-        return CurrentMeanLengthOldStorage();
+        // Recover older length from younger length plus the positive difference.
+        return CurrentMeanLengthYoung() + CurrentMeanLengthOldStorage();
 
       case LengthReferenceParameterization::
           kEstimatedLengthYoungBelowConstantLengthOld:

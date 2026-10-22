@@ -21,34 +21,14 @@ fims_popdy::VonBertalanffySchnuteGrowth<double> MakeValidVonB() {
 TEST(VonBertalanffySchnuteEvaluate, BasicSanity) {
   auto vb = MakeValidVonB();
 
-  // expected values from the formula (guarded denominator)
-  const double denom_raw = 1.0 - std::exp(-vb.growth_coefficient *
-                                          (vb.reference_age_for_length_old -
-                                           vb.reference_age_for_length_young));
-  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
+  const double L1 = vb.length_at_age(1.0);
+  const double L5 = vb.length_at_age(5.0);
+  const double L12 = vb.length_at_age(12.0);
 
-  double L1 = vb.length_at_age(1.0);
-  double L5 = vb.length_at_age(5.0);
-  double L12 = vb.length_at_age(12.0);
-
-  const double L1_expected =
-      vb.mean_length_young +
-      (vb.mean_length_old - vb.mean_length_young) *
-          (1.0 - std::exp(-vb.growth_coefficient *
-                          (1.0 - vb.reference_age_for_length_young))) /
-          denom;
-  const double L12_expected =
-      vb.mean_length_young +
-      (vb.mean_length_old - vb.mean_length_young) *
-          (1.0 - std::exp(-vb.growth_coefficient *
-                          (12.0 - vb.reference_age_for_length_young))) /
-          denom;
-
-  // sanity checks
-  EXPECT_NEAR(L1, L1_expected, 1e-12);
-  EXPECT_GT(L5, 275.0);
-  EXPECT_LT(L5, 725.0);
-  EXPECT_NEAR(L12, L12_expected, 1e-12);
+  EXPECT_NEAR(L1, vb.mean_length_young, 1e-12);
+  EXPECT_GT(L5, vb.mean_length_young);
+  EXPECT_LT(L5, vb.mean_length_old);
+  EXPECT_NEAR(L12, vb.mean_length_old, 1e-12);
 
   double W5 = vb.evaluate(0, 5.0);
   EXPECT_NEAR(W5, 2.5e-11 * std::pow(L5, 3.0), 1e-10);
@@ -127,6 +107,48 @@ TEST(VonBertalanffySchnuteEvaluate, UsesLinearRampBelowFirstReferenceAge) {
               vb.mean_length_young * ratio_half / mean_length_half_safe, 1e-12);
   EXPECT_NEAR(d_log_laa_d_log_length_old, 0.0, 1e-12);
   EXPECT_NEAR(d_log_laa_d_log_k, 0.0, 1e-12);
+}
+
+TEST(VonBertalanffySchnuteEvaluate, AnalyticalGradientMatchesNumericalGradient) {
+  auto vb = MakeValidVonB();
+  const double step = 1e-4;
+
+  for (double growth_coefficient :
+       {0.18, 0.99e-3 / 11.0, 1.01e-3 / 11.0, 1e-20}) {
+    SCOPED_TRACE(growth_coefficient);
+    vb.growth_coefficient = growth_coefficient;
+
+    for (double age : {0.5, 1.0, 5.0, 12.0, 18.0}) {
+      SCOPED_TRACE(age);
+
+      double analytical[3];
+      vb.log_length_at_age_logscale_gradient(
+          age, analytical[0], analytical[1], analytical[2]);
+
+      double* parameters[] = {
+          &vb.mean_length_young,
+          &vb.mean_length_old,
+          &vb.growth_coefficient};
+      const char* labels[] = {
+          "mean_length_young", "mean_length_old", "growth_coefficient"};
+
+      for (int i = 0; i < 3; ++i) {
+        SCOPED_TRACE(labels[i]);
+        const double original = *parameters[i];
+
+        *parameters[i] = original * std::exp(step);
+        const double plus = std::log(vb.length_at_age(age));
+
+        *parameters[i] = original * std::exp(-step);
+        const double minus = std::log(vb.length_at_age(age));
+
+        *parameters[i] = original;
+        const double numerical = (plus - minus) / (2.0 * step);
+
+        EXPECT_NEAR(analytical[i], numerical, 1e-6);
+      }
+    }
+  }
 }
 
 }  // namespace
