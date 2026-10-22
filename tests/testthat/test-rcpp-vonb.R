@@ -36,9 +36,6 @@ make_vonb_test_context <- function() {
   )
 }
 
-ad_fabs <- function(x, C = 1e-5) sqrt(x * x + C)
-ad_max <- function(a, b, C = 1e-5) 0.5 * (a + b + ad_fabs(a - b, C))
-
 new_vonb <- function(
   ctx,
   mean_length_young_in = ctx$mean_length_young,
@@ -163,18 +160,10 @@ test_that("rcpp von bertalanffy growth evaluate() works with correct input", {
   )
 
   age <- ctx$reference_age_for_length_old
-  denom_raw <- 1 - exp(-ctx$growth_coefficient *
-    (ctx$reference_age_for_length_old - ctx$reference_age_for_length_young))
-  denom <- ad_max(ad_fabs(denom_raw), 1e-8)
+  expected_weight_at_age <-
+    ctx$length_weight_a * ctx$mean_length_old^ctx$length_weight_b
 
-  expected_length_at_age <- ctx$mean_length_young +
-    (ctx$mean_length_old - ctx$mean_length_young) *
-      (1 - exp(-ctx$growth_coefficient * (age - ctx$reference_age_for_length_young))) / denom
-
-  expected_weight_at_age <- ctx$length_weight_a * expected_length_at_age^ctx$length_weight_b
-
-  #' @description Test that VonBertalanffySchnuteGrowth evaluate() returns expected
-  #' weight-at-age under guarded denominator math.
+  #' @description Growth evaluation returns the expected weight at the older reference age.
   expect_equal(
     object = vb$evaluate(age),
     expected = expected_weight_at_age,
@@ -194,15 +183,8 @@ test_that("rcpp von bertalanffy growth evaluate() works with delta-method variab
   )
 
   age <- ctx$reference_age_for_length_old
-  denom_raw <- 1 - exp(-ctx$growth_coefficient *
-    (ctx$reference_age_for_length_old - ctx$reference_age_for_length_young))
-  denom <- ad_max(ad_fabs(denom_raw), 1e-8)
-
-  expected_length_at_age <- ctx$mean_length_young +
-    (ctx$mean_length_old - ctx$mean_length_young) *
-      (1 - exp(-ctx$growth_coefficient * (age - ctx$reference_age_for_length_young))) / denom
-
-  expected_weight_at_age <- ctx$length_weight_a * expected_length_at_age^ctx$length_weight_b
+  expected_weight_at_age <-
+    ctx$length_weight_a * ctx$mean_length_old^ctx$length_weight_b
 
   #' @description Test that VonBertalanffySchnuteGrowth evaluate() returns expected
   #' weight-at-age when only the delta-method variability block is supplied.

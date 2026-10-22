@@ -52,10 +52,9 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, UsesWaaFromLaa) {
   const double growth_coefficient = 0.18;
   const double reference_age_for_length_young = 1.0;
   const double reference_age_for_length_old = 12.0;
-  const double denom_raw =
+  const double denom =
       1.0 - std::exp(-growth_coefficient * (reference_age_for_length_old -
                                             reference_age_for_length_young));
-  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double L =
       mean_length_young +
       (mean_length_old - mean_length_young) *
@@ -82,10 +81,9 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, HonorsAgeOffset) {
   const double growth_coefficient = 0.18;
   const double reference_age_for_length_young = 1.0;
   const double reference_age_for_length_old = 12.0;
-  const double denom_raw =
+  const double denom =
       1.0 - std::exp(-growth_coefficient * (reference_age_for_length_old -
                                             reference_age_for_length_young));
-  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double L =
       mean_length_young +
       (mean_length_old - mean_length_young) *
@@ -131,10 +129,9 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, ExtrapolatesAboveCachedAgeRange) {
   const double growth_coefficient = 0.18;
   const double reference_age_for_length_young = 1.0;
   const double reference_age_for_length_old = 12.0;
-  const double denom_raw =
+  const double denom =
       1.0 - std::exp(-growth_coefficient * (reference_age_for_length_old -
                                             reference_age_for_length_young));
-  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double L =
       mean_length_young +
       (mean_length_old - mean_length_young) *

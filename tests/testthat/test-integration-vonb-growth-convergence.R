@@ -299,9 +299,8 @@ test_that("reference lengths survive initialization across estimation settings",
         )
       )
 
-    fit <- parameters |>
-      FIMS::initialize_fims(data = ctx$data) |>
-      FIMS::fit_fims(optimize = FALSE, get_sd = FALSE)
+    input <- FIMS::initialize_fims(parameters = parameters, data = ctx$data)
+    fit <- FIMS::fit_fims(input, optimize = FALSE, get_sd = FALSE)
 
     lengths <- FIMS::get_estimates(fit) |>
       dplyr::filter(
@@ -325,6 +324,45 @@ test_that("reference lengths survive initialization across estimation settings",
       tolerance = 1e-8,
       info = case
     )
+    if (settings$old[i] == "fixed_effects") {
+      working <- FIMS::get_fixed()
+      parameter_names <- names(FIMS::get_obj(fit)[["par"]])
+      old_index <- grep("^Growth\\..*\\.mean_length_old\\.", parameter_names)
+      expect_length(old_index, 1L)
+
+      expected_young <- lengths[["input"]][
+        lengths[["label"]] == "mean_length_young"
+      ]
+
+      if (settings$young[i] == "fixed_effects") {
+        young_index <- grep(
+          "^Growth\\..*\\.mean_length_young\\.", parameter_names
+        )
+        expect_length(young_index, 1L)
+        expected_young <- 400
+        working[young_index] <- log(expected_young)
+      }
+
+      working[old_index] <- log(200)
+      FIMS::set_fixed(working)
+
+      updated_lengths <- FIMS:::reshape_json_estimates(
+        input[["model"]]$get_output()
+      ) |>
+        dplyr::filter(
+          module_name == "Growth",
+          label %in% c("mean_length_young", "mean_length_old")
+        ) |>
+        dplyr::arrange(match(label, c("mean_length_young", "mean_length_old")))
+
+      #' @description Reporting reconstructs physical lengths from updated working values.
+      expect_equal(
+        updated_lengths[["estimated"]],
+        c(expected_young, expected_young + 200),
+        tolerance = 1e-8,
+        info = case
+      )
+    }
   }
 })
 
