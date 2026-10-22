@@ -62,7 +62,7 @@
 #' )
 #'
 #' # Calculate Mohn's rho for spawning biomass
-#' rho_ssb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
+#' rho_sb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
 #'
 #' # Calculate Mohn's rho for recruitment
 #' rho_rec <- calculate_mohns_rho(retro_fit, quantity = "expected_recruitment")
