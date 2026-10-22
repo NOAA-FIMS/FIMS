@@ -151,4 +151,27 @@ TEST(VonBertalanffySchnuteEvaluate, AnalyticalGradientMatchesNumericalGradient) 
   }
 }
 
+TEST(VonBertalanffySchnuteEvaluate, ApproachesLinearGrowthForSmallK) {
+  auto vb = MakeValidVonB();
+
+  for (double growth_coefficient : {0.0, 1e-20}) {
+    SCOPED_TRACE(growth_coefficient);
+    vb.growth_coefficient = growth_coefficient;
+
+    for (double age : {1.0, 5.0, 12.0, 18.0}) {
+      SCOPED_TRACE(age);
+
+      const double fraction =
+          (age - vb.reference_age_for_length_young) /
+          (vb.reference_age_for_length_old -
+           vb.reference_age_for_length_young);
+      const double expected =
+          vb.mean_length_young +
+          (vb.mean_length_old - vb.mean_length_young) * fraction;
+
+      EXPECT_NEAR(vb.length_at_age(age), expected, 1e-10);
+    }
+  }
+}
+
 }  // namespace
