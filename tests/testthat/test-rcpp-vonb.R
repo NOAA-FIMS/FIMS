@@ -332,76 +332,50 @@ test_that("rcpp von bertalanffy growth allows above-reference ages", {
   expect_true(is.finite(vb$evaluate(age_above_ref)))
 })
 
-test_that("estimated younger length loads below constant older length", {
+test_that("estimated reference lengths load on the correct working scales", {
   FIMS::clear()
   on.exit(FIMS::clear(), add = TRUE)
 
   ctx <- make_vonb_test_context()
+  expected_working <- c(
+    mean_length_young = qlogis(
+      ctx$mean_length_young / ctx$mean_length_old
+    ),
+    mean_length_old = log(ctx$mean_length_old - ctx$mean_length_young)
+  )
 
-  for (estimation_type in c("fixed_effects", "random_effects")) {
-    FIMS::clear()
+  for (field in names(expected_working)) {
+    for (estimation_type in c("fixed_effects", "random_effects")) {
+      FIMS::clear()
 
-    vb <- new_vonb(ctx)
-    vb$mean_length_young[1]$estimation_type$set(estimation_type)
-    vb$mean_length_old[1]$estimation_type$set("constant")
+      vb <- new_vonb(ctx)
+      vb$mean_length_young[1]$estimation_type$set("constant")
+      vb$mean_length_old[1]$estimation_type$set("constant")
+      vb[[field]][1]$estimation_type$set(estimation_type)
 
-    FIMS::CreateTMBModel()
+      FIMS::CreateTMBModel()
 
-    if (estimation_type == "fixed_effects") {
-      working <- FIMS::get_fixed()
-      other <- FIMS::get_random()
-    } else {
-      working <- FIMS::get_random()
-      other <- FIMS::get_fixed()
+      if (estimation_type == "fixed_effects") {
+        working <- FIMS::get_fixed()
+        other <- FIMS::get_random()
+      } else {
+        working <- FIMS::get_random()
+        other <- FIMS::get_fixed()
+      }
+      case <- paste(field, estimation_type)
+
+      #' @description Each estimated reference length uses the requested parameter category.
+      expect_equal(length(working), 1L, info = case)
+      expect_equal(length(other), 0L, info = case)
+
+      #' @description Younger length uses a bounded logit and older length uses a log difference when the other length is constant.
+      expect_equal(
+        as.numeric(working),
+        unname(expected_working[[field]]),
+        tolerance = 1e-10,
+        info = case
+      )
     }
-
-    #' @description The younger length is registered in the requested parameter category.
-    expect_length(working, 1L)
-    expect_length(other, 0L)
-
-    #' @description The loader encodes estimated younger length on the bounded-logit scale.
-    expect_equal(
-      as.numeric(working),
-      qlogis(ctx$mean_length_young / ctx$mean_length_old),
-      tolerance = 1e-10
-    )
-  }
-})
-
-test_that("estimated older length loads as a positive length difference", {
-  FIMS::clear()
-  on.exit(FIMS::clear(), add = TRUE)
-
-  ctx <- make_vonb_test_context()
-
-  for (estimation_type in c("fixed_effects", "random_effects")) {
-    FIMS::clear()
-
-    vb <- new_vonb(ctx)
-    vb$mean_length_young[1]$estimation_type$set("constant")
-    vb$mean_length_old[1]$estimation_type$set(estimation_type)
-
-    FIMS::CreateTMBModel()
-
-    if (estimation_type == "fixed_effects") {
-      working <- FIMS::get_fixed()
-      other <- FIMS::get_random()
-    } else {
-      working <- FIMS::get_random()
-      other <- FIMS::get_fixed()
-    }
-
-    #' @description Older length is registered in the requested parameter category.
-    expect_length(working, 1L)
-    expect_length(other, 0L)
-
-    #' @description The loader stores the log difference between physical reference lengths.
-    expect_equal(
-      as.numeric(working),
-      log(ctx$mean_length_old - ctx$mean_length_young),
-      tolerance = 1e-10,
-      info = estimation_type
-    )
   }
 })
 
