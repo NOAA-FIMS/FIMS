@@ -25,8 +25,8 @@ test_that("label_values() works with correct inputs", {
 
   #' @description Test that `label_values()` indexes repeated labels within their name, as for ADREPORT vectors.
   expect_equal(
-    object = FIMS:::label_values(1:4, c("biomass", "biomass", "ssb", "biomass")),
-    expected = c("biomass[1]", "biomass[2]", "ssb", "biomass[3]")
+    object = FIMS:::label_values(1:4, c("biomass", "biomass", "sb", "biomass")),
+    expected = c("biomass[1]", "biomass[2]", "sb", "biomass[3]")
   )
 })
 

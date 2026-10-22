@@ -62,17 +62,17 @@ TEST_F(CAAEvaluateTestFixture,
   catch_at_age_model->CalculateSpawningBiomass(population, i_age_year, year,
                                                age);
 
-  std::vector<double> test_SSB(n_years + 1, 0);
+  std::vector<double> test_SB(n_years + 1, 0);
 
   auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
-  test_SSB[n_years] +=
+  test_SB[n_years] +=
       dq["numbers_at_age"][i_age_year] *
       catch_at_age_model->populations[0]->proportion_female[age] *
       dq["proportion_mature_at_age"][i_age_year] *
       catch_at_age_model->populations[0]->growth->evaluate(
           year, population->ages[age]);
 
-  EXPECT_EQ(dq["spawning_biomass"][year], test_SSB[year]);
+  EXPECT_EQ(dq["spawning_biomass"][year], test_SB[year]);
   EXPECT_GT(dq["spawning_biomass"][year], 0);
 }
 }  // namespace

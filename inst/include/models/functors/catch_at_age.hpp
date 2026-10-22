@@ -1464,7 +1464,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
      code for initial structure and recruitment 0 loops. Could also have started
      loops at 1 with initial structure and recruitment setup outside the loops.
 
-     year loop is extended to <= n_years because SSB is calculated as the start
+     year loop is extended to <= n_years because SB is calculated as the start
      of the year value and by extending one extra year we get estimates of the
      population structure at the end of the final year. An alternative approach
      would be to keep initial numbers at age in it's own vector and each year to
@@ -1504,7 +1504,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
              to inform the subsequent catch and change in numbers at age
              calculations. This is only calculated for years < n_years as these
              are the model estimated years with data. The year loop extends to
-             y=n_years so that population numbers at age and SSB can be
+             y=n_years so that population numbers at age and SB can be
              calculated at the end of the last year of the model
              */
             CalculateMortality(population, i_age_year, y, a);
