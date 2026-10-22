@@ -31,7 +31,8 @@ make_vonb_test_context <- function() {
     growth_coefficient = 0.18,
     length_weight_a = 2.5e-11,
     length_weight_b = 3,
-    length_at_age_sd_at_reference_ages = c(28, 73)
+    length_at_age_sd_young = 28,
+    length_at_age_sd_old = 73
   )
 }
 
@@ -47,7 +48,8 @@ new_vonb <- function(
   reference_age_for_length_old_in = ctx$reference_age_for_length_old,
   length_weight_a_in = ctx$length_weight_a,
   length_weight_b_in = ctx$length_weight_b,
-  length_at_age_sd_at_reference_ages_in = ctx$length_at_age_sd_at_reference_ages
+  length_at_age_sd_young_in = ctx$length_at_age_sd_young,
+  length_at_age_sd_old_in = ctx$length_at_age_sd_old
 ) {
   vb <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
 
@@ -72,9 +74,11 @@ new_vonb <- function(
   vb$length_weight_b$resize(1)
   vb$length_weight_b[1]$value <- length_weight_b_in
 
-  vb$length_at_age_sd_at_reference_ages$resize(2)
-  vb$length_at_age_sd_at_reference_ages[1]$value <- length_at_age_sd_at_reference_ages_in[1]
-  vb$length_at_age_sd_at_reference_ages[2]$value <- length_at_age_sd_at_reference_ages_in[2]
+  vb$length_at_age_sd_young$resize(1)
+  vb$length_at_age_sd_young[1]$value <- length_at_age_sd_young_in
+
+  vb$length_at_age_sd_old$resize(1)
+  vb$length_at_age_sd_old[1]$value <- length_at_age_sd_old_in
 
   vb$n_ages$set(FIMS::get_n_ages(ctx$fims_frame))
 
@@ -258,9 +262,11 @@ test_that("rcpp von bertalanffy growth rejects both variability paths at once", 
   ctx <- make_vonb_test_context()
   vb <- new_vonb_with_delta_block(ctx)
 
-  vb$length_at_age_sd_at_reference_ages$resize(2)
-  vb$length_at_age_sd_at_reference_ages[1]$value <- ctx$length_at_age_sd_at_reference_ages[1]
-  vb$length_at_age_sd_at_reference_ages[2]$value <- ctx$length_at_age_sd_at_reference_ages[2]
+  vb$length_at_age_sd_young$resize(1)
+  vb$length_at_age_sd_young[1]$value <- ctx$length_at_age_sd_young
+
+  vb$length_at_age_sd_old$resize(1)
+  vb$length_at_age_sd_old[1]$value <- ctx$length_at_age_sd_old
 
   on.exit(
     {
