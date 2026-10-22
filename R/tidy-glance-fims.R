@@ -158,7 +158,7 @@ tidy.FIMSFit <- function(
 #' [generics::glance()] convention.  Standard information-criterion columns
 #' (`logLik`, `AIC`, `BIC`, `nobs`) are included alongside FIMS-specific
 #' diagnostics (`max_gradient`, `marginal_nll`, `total_nll`, `converged`,
-#' `terminal_ssb`).
+#' `terminal_sb`).
 #'
 #' @section Information criteria:
 #' AIC and BIC are computed from the **marginal** log-likelihood (i.e. after
@@ -191,7 +191,7 @@ tidy.FIMSFit <- function(
 #'     below 0.001 are generally considered well-converged.}
 #'   \item{`converged`}{Logical; `TRUE` when `opt$convergence == 0` **and**
 #'     `max_gradient < 0.001`.}
-#'   \item{`terminal_ssb`}{Spawning stock biomass at the terminal year,
+#'   \item{`terminal_sb`}{Spawning biomass at the terminal year,
 #'     extracted from the TMB report. Returns a list-column when multiple
 #'     populations are present.}
 #'   \item{`fims_version`}{The version of FIMS used to fit the model.}
@@ -264,9 +264,9 @@ glance.FIMSFit <- function(x, ...) {
   # terminal spawning biomass
   # spawning_biomass is a list, one element per population; take the last
   # value from each and store as a list-column (supports multi-population).
-  ssb_list <- report[["spawning_biomass"]]
-  terminal_ssb <- if (!is.null(ssb_list) && length(ssb_list) > 0) {
-    list(vapply(ssb_list, utils::tail, n = 1L, FUN.VALUE = numeric(1L)))
+  sb_list <- report[["spawning_biomass"]]
+  terminal_sb <- if (!is.null(sb_list) && length(sb_list) > 0) {
+    list(vapply(sb_list, utils::tail, n = 1L, FUN.VALUE = numeric(1L)))
   } else {
     list(NA_real_)
   }
@@ -286,7 +286,7 @@ glance.FIMSFit <- function(x, ...) {
     total_nll    = total_nll,
     max_gradient = max_grad,
     converged    = converged,
-    terminal_ssb = terminal_ssb,
+    terminal_sb = terminal_sb,
     fims_version = as.character(get_version(x)),
     run_time     = run_time
   )

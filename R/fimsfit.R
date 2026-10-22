@@ -84,7 +84,7 @@ methods::setMethod(
       sep = "="
     ))
     div_digit <- cli::cli_div(theme = list(.val = list(digits = 5)))
-    terminal_ssb <- sapply(
+    terminal_sb <- sapply(
       x@report[["spawning_biomass"]],
       function(y) utils::tail(y, 1)
     )
@@ -96,7 +96,7 @@ methods::setMethod(
       "i" = "Negative log likelihood (NLL):",
       "*" = "Marginal NLL= {.val {x@opt$objective}}",
       "*" = "Total NLL= {.val {x@report$jnll}}",
-      "i" = "Terminal SB= {.val {terminal_ssb}}"
+      "i" = "Terminal SB= {.val {terminal_sb}}"
     ))
     cli::cli_end(div_digit)
   }

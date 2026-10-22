@@ -129,7 +129,7 @@ To visualize the results of the retrospective analysis, we can use `plot_retrosp
 ```{r, plot-spawning-biomass, message = FALSE, warning = FALSE}
 #| fig.alt: >
 #|   Plot of spawning biomass showing a small negative bias with removed years.
-fig_retrospective_ssb <- stockplotr::plot_spawning_biomass(
+fig_retrospective_sb <- stockplotr::plot_spawning_biomass(
   retro_fit$estimates |>
     dplyr::rename(
       year = year_i,
@@ -140,7 +140,7 @@ fig_retrospective_ssb <- stockplotr::plot_spawning_biomass(
     ),
   group = "retrospective_peel"
 )
-print(fig_retrospective_ssb)
+print(fig_retrospective_sb)
 ```
 
 We can compare the spawning biomass estimates from the reference model and each peel for the last six years. 

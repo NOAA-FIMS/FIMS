@@ -84,7 +84,7 @@ test_that("deterministic test of fims with recruitment re", {
   # Compare spawning biomass to true value
   for (i in 1:length(om_output_list[[iter_id]][["SSB"]])) {
     #' @description Test that the spawning biomass vector from FIMS matches the "true" values from the operating model.
-    expect_equal(report[["ssb"]][[1]][i], om_output_list[[iter_id]][["SSB"]][i])
+    expect_equal(report[["spawning_biomass"]][[1]][i], om_output_list[[iter_id]][["SSB"]][i])
   }
 
   # Compare recruitment to true value
