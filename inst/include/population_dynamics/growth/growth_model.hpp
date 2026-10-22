@@ -77,11 +77,13 @@ class GrowthModel : public GrowthModelBase<Type> {
   /// Set the covariance values used by the delta-method growth
   /// variability path.
   ///
-  /// The supplied covariance must match the current log-scale FIMS
-  /// VonBertalanffySchnute estimation parameterization in this exact order:
+  /// The supplied covariance describes variability in the physical growth
+  /// parameters on log scales, in this exact order:
   /// 1. log(mean_length_young)
   /// 2. log(mean_length_old)
   /// 3. log(growth_coefficient)
+  /// These are not necessarily the optimizer's working scales. In particular,
+  /// the second entry describes log older length, not log length difference.
   void SetGrowthParameterCovariance(
       Type mean_length_young_variance,
       Type mean_length_young_mean_length_old_covariance,
@@ -137,20 +139,6 @@ class GrowthModel : public GrowthModelBase<Type> {
           "reference_age_for_length_young");
     }
 
-    Type laa_min = Type(0.0);
-    Type slope = Type(0.0);
-
-    if (!use_delta_method_variability_) {
-      laa_min = vb_.length_at_age(vb_.reference_age_for_length_young);
-      const Type laa_max = vb_.length_at_age(vb_.reference_age_for_length_old);
-      const Type laa_delta_safe = fims_math::ad_max(
-          fims_math::ad_fabs(laa_max - laa_min), static_cast<Type>(1e-8));
-      slope = (n_ages_ > 1) ? (length_at_age_sd_at_reference_age_old_ -
-                               length_at_age_sd_at_reference_age_young_) /
-                                  laa_delta_safe
-                            : Type(0.0);
-    }
-
     // Fill mean length-at-age, sd, and mean weight-at-age.
     for (std::size_t y = 0; y < n_years_; ++y) {
       for (std::size_t a = 0; a < n_ages_; ++a) {
@@ -159,7 +147,7 @@ class GrowthModel : public GrowthModelBase<Type> {
 
           // log-scale params live upstream; laa here is natural scale
           const Type laa = vb_.length_at_age(age);
-          const Type sd_laa = ComputeLengthSdAtAge(age, laa, laa_min, slope);
+          const Type sd_laa = ComputeLengthSdAtAge(age, laa);
           const Type waa = vb_.weight_at_age(age);
 
           products_.MeanLAA(y, a, s) = laa;
@@ -175,9 +163,9 @@ class GrowthModel : public GrowthModelBase<Type> {
   const GrowthProducts<Type>& GetProducts() const override { return products_; }
 
  private:
-  /// Validate that the supplied 3-parameter covariance matrix on the
-  /// log-scale FIMS estimation parameterization is usable for the
-  /// delta-method growth variability path.
+  /// Validate that the supplied covariance matrix for log physical reference
+  /// lengths and log growth coefficient is usable for the delta-method
+  /// growth variability path.
   void ValidateGrowthParameterCovariance(
       Type mean_length_young_variance,
       Type mean_length_young_mean_length_old_covariance,
@@ -240,8 +228,7 @@ class GrowthModel : public GrowthModelBase<Type> {
 
   /// Compute length-at-age SD using either the interpolation path or the
   /// covariance-based delta-method path.
-  Type ComputeLengthSdAtAge(const Type& age, const Type& laa,
-                            const Type& laa_min, const Type& slope) const {
+  Type ComputeLengthSdAtAge(const Type& age, const Type& laa) const {
     if (use_delta_method_variability_) {
       const Type log_var = ComputeLogLengthVarianceAtAge(age);
       const Type log_var_safe =
@@ -250,10 +237,21 @@ class GrowthModel : public GrowthModelBase<Type> {
       return fims_math::ad_max(sd_laa, static_cast<Type>(1e-8));
     }
 
-    const Type sd_laa =
-        (n_ages_ > 1)
-            ? length_at_age_sd_at_reference_age_young_ + slope * (laa - laa_min)
-            : length_at_age_sd_at_reference_age_young_;
+    Type sd_laa = length_at_age_sd_at_reference_age_young_;
+    if (n_ages_ > 1) {
+      // Hold SD at its endpoint values outside the reference-age interval.
+      const Type age_above_young = fims_math::cond_exp_lt(
+          age, vb_.reference_age_for_length_young,
+          vb_.reference_age_for_length_young, age);
+      const Type interpolation_age = fims_math::cond_exp_lt(
+          vb_.reference_age_for_length_old, age_above_young,
+          vb_.reference_age_for_length_old, age_above_young);
+
+      sd_laa +=
+          vb_.growth_fraction(interpolation_age) *
+          (length_at_age_sd_at_reference_age_old_ -
+           length_at_age_sd_at_reference_age_young_);
+    }
 
     return fims_math::ad_max(sd_laa, static_cast<Type>(1e-8));
   }
