@@ -42,9 +42,15 @@ The `VonBertalanffySchnute` growth module uses two reference ages to estimate th
 - `mean_length_old`
 - `growth_coefficient`
 
+The older reference length must be greater than the younger reference length. Either length can be held constant or estimated. FIMS uses transformations to preserve this ordering during fitting: an estimated older length is the younger length plus a positive difference, while an estimated younger length is bounded below the older length when the older length is constant. Supply starting values in physical length units; finalized Growth parameter estimates are also reported in those units.
+
+This parameterization supports increasing growth curves that approach a plateau. When the difference between the two reference lengths is extremely small, the model may calculate them as equal because of rounding.
+
+When older length is estimated, its internal working value represents the logarithm of the length difference, not the logarithm of older length. This distinction matters when interpreting raw optimizer output or attaching distributions to working-scale parameters.
+
 FIMS uses the fitted growth curve and supplied variability in length-at-age to prepare mean length-at-age, standard deviation of length-at-age, mean weight-at-age, and the growth-derived age-to-length conversion used by length-based fleet calculations. For the later, we use the term "growth-derived" age-to-length conversion because users can also specify an age-to-length conversion in their data, along with empirical weight-at-age data, and bypass estimating growth but still fit to length-composition data. So, growth-derived refers to the fact that the conversion is estimated from growth parameters rather than user input.
 
-This vignette uses interpolation-based variability, with `length_at_age_sd_young` and `length_at_age_sd_old` supplying the standard deviations of length at the younger and older reference ages. These SDs use the same length units as the growth inputs. Their `age` entries are `NA` because their ages come from `reference_age_for_length_young` and `reference_age_for_length_old`.
+This vignette uses interpolation-based variability, with `length_at_age_sd_young` and `length_at_age_sd_old` supplying the standard deviations of length at the younger and older reference ages. These SDs use the same length units as the growth inputs. Their `age` entries are `NA` because their ages come from `reference_age_for_length_young` and `reference_age_for_length_old`. Between the two reference ages, SD is interpolated linearly with mean length. Before the younger reference age, SD stays at `length_at_age_sd_young`; after the older reference age, it stays at `length_at_age_sd_old`. Mean length continues to follow the growth curve.
 
 > Note:  The delta-method variability pathway is wired into FIMS, but it is not used here because it depends on using von Bertalanffy growth, which is not yet available in FIMS.
 
@@ -148,14 +154,11 @@ make_vonb_demo_data <- function(
       reference_age_for_length_old = reference_age_for_length_old
     ),
     true_sd_length = stats::approx(
-      x = c(
-        reference_age_for_length_young,
-        reference_age_for_length_old
-      ),
+      x = c(mean_length_young, mean_length_old),
       y = sd_at_reference_ages,
-      xout = ages,
+      xout = true_mean_length,
       rule = 2
-    )$y
+    )[["y"]]
   ) |>
     dplyr::mutate(
       true_weight_at_age =

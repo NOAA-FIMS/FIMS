@@ -36,9 +36,6 @@ make_vonb_test_context <- function() {
   )
 }
 
-ad_fabs <- function(x, C = 1e-5) sqrt(x * x + C)
-ad_max <- function(a, b, C = 1e-5) 0.5 * (a + b + ad_fabs(a - b, C))
-
 new_vonb <- function(
   ctx,
   mean_length_young_in = ctx$mean_length_young,
@@ -163,18 +160,10 @@ test_that("rcpp von bertalanffy growth evaluate() works with correct input", {
   )
 
   age <- ctx$reference_age_for_length_old
-  denom_raw <- 1 - exp(-ctx$growth_coefficient *
-    (ctx$reference_age_for_length_old - ctx$reference_age_for_length_young))
-  denom <- ad_max(ad_fabs(denom_raw), 1e-8)
+  expected_weight_at_age <-
+    ctx$length_weight_a * ctx$mean_length_old^ctx$length_weight_b
 
-  expected_length_at_age <- ctx$mean_length_young +
-    (ctx$mean_length_old - ctx$mean_length_young) *
-      (1 - exp(-ctx$growth_coefficient * (age - ctx$reference_age_for_length_young))) / denom
-
-  expected_weight_at_age <- ctx$length_weight_a * expected_length_at_age^ctx$length_weight_b
-
-  #' @description Test that VonBertalanffySchnuteGrowth evaluate() returns expected
-  #' weight-at-age under guarded denominator math.
+  #' @description Growth evaluation returns the expected weight at the older reference age.
   expect_equal(
     object = vb$evaluate(age),
     expected = expected_weight_at_age,
@@ -194,15 +183,8 @@ test_that("rcpp von bertalanffy growth evaluate() works with delta-method variab
   )
 
   age <- ctx$reference_age_for_length_old
-  denom_raw <- 1 - exp(-ctx$growth_coefficient *
-    (ctx$reference_age_for_length_old - ctx$reference_age_for_length_young))
-  denom <- ad_max(ad_fabs(denom_raw), 1e-8)
-
-  expected_length_at_age <- ctx$mean_length_young +
-    (ctx$mean_length_old - ctx$mean_length_young) *
-      (1 - exp(-ctx$growth_coefficient * (age - ctx$reference_age_for_length_young))) / denom
-
-  expected_weight_at_age <- ctx$length_weight_a * expected_length_at_age^ctx$length_weight_b
+  expected_weight_at_age <-
+    ctx$length_weight_a * ctx$mean_length_old^ctx$length_weight_b
 
   #' @description Test that VonBertalanffySchnuteGrowth evaluate() returns expected
   #' weight-at-age when only the delta-method variability block is supplied.
@@ -350,7 +332,75 @@ test_that("rcpp von bertalanffy growth allows above-reference ages", {
   expect_true(is.finite(vb$evaluate(age_above_ref)))
 })
 
+test_that("estimated reference lengths load on the correct working scales", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_test_context()
+  expected_working <- c(
+    mean_length_young = qlogis(
+      ctx$mean_length_young / ctx$mean_length_old
+    ),
+    mean_length_old = log(ctx$mean_length_old - ctx$mean_length_young)
+  )
+
+  for (field in names(expected_working)) {
+    for (estimation_type in c("fixed_effects", "random_effects")) {
+      FIMS::clear()
+
+      vb <- new_vonb(ctx)
+      vb$mean_length_young[1]$estimation_type$set("constant")
+      vb$mean_length_old[1]$estimation_type$set("constant")
+      vb[[field]][1]$estimation_type$set(estimation_type)
+
+      FIMS::CreateTMBModel()
+
+      if (estimation_type == "fixed_effects") {
+        working <- FIMS::get_fixed()
+        other <- FIMS::get_random()
+      } else {
+        working <- FIMS::get_random()
+        other <- FIMS::get_fixed()
+      }
+      case <- paste(field, estimation_type)
+
+      #' @description Each estimated reference length uses the requested parameter category.
+      expect_equal(length(working), 1L, info = case)
+      expect_equal(length(other), 0L, info = case)
+
+      #' @description Younger length uses a bounded logit and older length uses a log difference when the other length is constant.
+      expect_equal(
+        as.numeric(working),
+        unname(expected_working[[field]]),
+        tolerance = 1e-10,
+        info = case
+      )
+    }
+  }
+})
+
 ## Error handling ----
+test_that("rcpp von bertalanffy growth rejects unordered starting lengths", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_test_context()
+
+  for (old_length in c(ctx$mean_length_young, ctx$mean_length_young - 1)) {
+    FIMS::clear()
+    vb <- new_vonb(ctx)
+    vb$mean_length_old[1]$value <- old_length
+    vb$mean_length_old[1]$estimation_type$set("fixed_effects")
+
+    #' @description Equal or reversed starting lengths are rejected before backend loading.
+    expect_error(
+      FIMS::CreateTMBModel(),
+      regexp = "mean_length_old must be > mean_length_young",
+      info = paste("older length:", old_length)
+    )
+  }
+})
+
 test_that("rcpp von bertalanffy growth rejects reversed reference ages", {
   ctx <- make_vonb_test_context()
   vb_bad <- new_vonb(
