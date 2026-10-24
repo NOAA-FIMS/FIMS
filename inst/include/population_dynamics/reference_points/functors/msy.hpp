@@ -41,8 +41,8 @@ struct MSYResult {
  * @brief Maximize included fleets' equilibrium yield within supplied bounds.
  * @details Every fleet still contributes mortality and catch. At least one
  * fleet must be included in the objective; otherwise MSY is undefined.
- * A grid locates the best sampled region, then golden-section search
- * refines its neighboring interval. Both endpoints remain candidates. This
+ * A grid locates candidate local maxima, then golden-section search refines
+ * each neighboring interval. Both endpoints remain candidates. This
  * numerical search does not guarantee a global maximum for arbitrary fishing
  * patterns; inspect sensitivity to bounds and grid resolution when needed.
  */
@@ -72,63 +72,82 @@ inline MSYResult CalculateMSY(const ReferencePointInputs<double>& inputs,
     }
     return equilibrium.objective_yield;
   };
-  size_t best_index = 0;
+  std::vector<double> grid_yield(options.grid_intervals + 1);
+  grid_yield[0] = result.equilibrium.objective_yield;
   for (size_t i = 1; i <= options.grid_intervals; ++i) {
-    const double previous_best = result.equilibrium.objective_yield;
-    evaluate(options.max_f * (static_cast<double>(i) / options.grid_intervals));
-    if (result.equilibrium.objective_yield > previous_best) best_index = i;
+    const double f = options.max_f * (static_cast<double>(i) /
+                                       options.grid_intervals);
+    grid_yield[i] = evaluate(f);
   }
   // A coarse grid can step past a narrow productive region into collapse.
   // Search below the first grid point before declaring no positive yield.
   double first_positive_f = options.max_f / options.grid_intervals;
+  bool found_below_grid = false;
   if (result.equilibrium.objective_yield <= 0.0 &&
       !result.equilibrium.collapsed) {
     while (first_positive_f > options.tolerance) {
       first_positive_f *= 0.5;
-      if (evaluate(first_positive_f) > 0.0) break;
+      if (evaluate(first_positive_f) > 0.0) {
+        found_below_grid = true;
+        break;
+      }
     }
   }
   if (result.equilibrium.objective_yield <= 0.0) {
     result.status = MSYStatus::no_positive_yield;
     return result;
   }
-  double lower = best_index == 0
-                     ? 0.0
-                     : options.max_f * (static_cast<double>(best_index - 1) /
-                                        options.grid_intervals);
-  double upper =
-      best_index == 0
-          ? 2.0 * first_positive_f
-          : options.max_f *
-                (static_cast<double>(
-                     (std::min)(best_index + 1, options.grid_intervals)) /
-                 options.grid_intervals);
+
   const double ratio = (std::sqrt(5.0) - 1.0) / 2.0;
-  double left = upper - ratio * (upper - lower);
-  double right = lower + ratio * (upper - lower);
-  double left_yield = evaluate(left);
-  double right_yield = evaluate(right);
-  while (upper - lower > options.tolerance &&
-         result.iterations < options.max_iterations) {
-    if (left_yield < right_yield) {
-      lower = left;
-      left = right;
-      left_yield = right_yield;
-      right = lower + ratio * (upper - lower);
-      right_yield = evaluate(right);
-    } else {
-      upper = right;
-      right = left;
-      right_yield = left_yield;
-      left = upper - ratio * (upper - lower);
-      left_yield = evaluate(left);
+  bool hit_iteration_limit = false;
+  auto refine = [&](double lower, double upper) {
+    double left = upper - ratio * (upper - lower);
+    double right = lower + ratio * (upper - lower);
+    double left_yield = evaluate(left);
+    double right_yield = evaluate(right);
+    size_t iterations = 0;
+    while (upper - lower > options.tolerance &&
+           iterations < options.max_iterations) {
+      if (left_yield < right_yield) {
+        lower = left;
+        left = right;
+        left_yield = right_yield;
+        right = lower + ratio * (upper - lower);
+        right_yield = evaluate(right);
+      } else {
+        upper = right;
+        right = left;
+        right_yield = left_yield;
+        left = upper - ratio * (upper - lower);
+        left_yield = evaluate(left);
+      }
+      ++iterations;
     }
-    ++result.iterations;
+    result.iterations += iterations;
+    hit_iteration_limit = hit_iteration_limit ||
+                          upper - lower > options.tolerance;
+  };
+
+  for (size_t i = 1; i < options.grid_intervals; ++i) {
+    if (grid_yield[i] > grid_yield[i - 1] &&
+        grid_yield[i] > grid_yield[i + 1]) {
+      const double lower = options.max_f *
+                           (static_cast<double>(i - 1) / options.grid_intervals);
+      const double upper = options.max_f *
+                           (static_cast<double>(i + 1) / options.grid_intervals);
+      refine(lower, upper);
+    }
   }
-  if (upper - lower <= options.tolerance) {
-    result.status = result.fishing_mortality == options.max_f
-                        ? MSYStatus::upper_bound
-                        : MSYStatus::converged;
+  if (found_below_grid) {
+    refine(0.0, (std::min)(options.max_f, 2.0 * first_positive_f));
+  }
+
+  if (result.fishing_mortality == options.max_f) {
+    result.status = MSYStatus::upper_bound;
+  } else if (hit_iteration_limit) {
+    result.status = MSYStatus::iteration_limit;
+  } else {
+    result.status = MSYStatus::converged;
   }
   return result;
 }

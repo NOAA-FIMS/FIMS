@@ -229,7 +229,7 @@ isTRUE(all.equal(reference, recalculated))
 
 ```{r validate-workflow, include=FALSE}
 stopifnot(
-  all(reference$spr$status == "converged"),
+  all(vapply(reference$spr, `[[`, character(1), "status") == "converged"),
   reference$msy$status == "converged",
   isTRUE(all.equal(reference$inputs$natural_mortality, c(0.3, 0.4, 0.5))),
   first_year$inputs$recruitment$phi0 == reference$inputs$recruitment$phi0,

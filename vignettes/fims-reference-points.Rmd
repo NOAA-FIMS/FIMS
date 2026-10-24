@@ -68,18 +68,28 @@ spr_result <- calculate_reference_points(
   spr_targets = c(0.5, 0.4, 0.35),
   msy = FALSE
 )
-knitr::kable(spr_result$spr, digits = 6)
+spr_table <- do.call(rbind, lapply(spr_result$spr, function(target) {
+  data.frame(
+    target = target$target,
+    fishing_mortality = target$fishing_mortality,
+    achieved_spr = target$achieved_spr,
+    residual = target$residual,
+    status = target$status
+  )
+}))
+knitr::kable(spr_table, digits = 6)
 ```
 
 A target of `0.4` means 40% of unfished spawning biomass per recruit. Check the
-`status` column before using its fishing mortality. The residual is achieved
+`status` field in each target record before using its fishing mortality. The residual is achieved
 SPR minus the requested target. SPR calculations do not require a
 stock-recruitment relationship.
 
 ```{r check-spr, include=FALSE}
 stopifnot(
-  all(spr_result$spr$status == "converged"),
-  all(abs(spr_result$spr$residual) <= spr_result$settings$tolerance)
+  all(vapply(spr_result$spr, `[[`, character(1), "status") == "converged"),
+  all(abs(vapply(spr_result$spr, `[[`, numeric(1), "residual")) <=
+    spr_result$settings$tolerance)
 )
 ```
 
@@ -123,7 +133,13 @@ intentionally small bound illustrates two different outcomes:
 
 ```{r restricted-bounds}
 restricted <- calculate_reference_points(inputs, max_f = 0.001)
-restricted$spr[, c("target", "fishing_mortality", "status")]
+do.call(rbind, lapply(restricted$spr, function(target) {
+  data.frame(
+    target = target$target,
+    fishing_mortality = target$fishing_mortality,
+    status = target$status
+  )
+}))
 restricted$msy[c("fishing_mortality", "status")]
 ```
 
@@ -147,13 +163,14 @@ For SPR, `tolerance` controls the absolute SPR residual; for MSY, it controls
 the width of the refined F interval. `no_positive_yield` means the MSY search
 found no positive yield at its search resolution.
 
-The MSY solver first samples a grid, then refines the best sampled region.
-Convergence does not guarantee a global maximum for every possible fishing
-pattern. Compare bounds and grid resolution when assessing unusual patterns.
+The MSY solver first samples a grid, then refines each detected interior local
+peak. Convergence does not guarantee a global maximum for every possible
+fishing pattern. Compare bounds and grid resolution when assessing unusual
+patterns.
 
 ```{r check-bounds, include=FALSE}
 stopifnot(
-  restricted$spr$status == "not_bracketed",
+  all(vapply(restricted$spr, `[[`, character(1), "status") == "not_bracketed"),
   restricted$msy$status == "upper_bound",
   result$msy$status == "converged",
   wider$msy$status == "converged",
@@ -177,10 +194,13 @@ allocation_results <- lapply(c(0.25, 0.5, 0.75), function(first_share) {
     weight = inputs$weight
   )
   reference <- calculate_reference_points(scenario)
-  stopifnot(reference$spr$status == "converged", reference$msy$status == "converged")
+  stopifnot(
+    all(vapply(reference$spr, `[[`, character(1), "status") == "converged"),
+    reference$msy$status == "converged"
+  )
   data.frame(
     first_fleet_share = first_share,
-    F_40 = reference$spr$fishing_mortality,
+    F_40 = reference$spr[[1]]$fishing_mortality,
     F_MSY = reference$msy$fishing_mortality,
     MSY = reference$msy$yield
   )

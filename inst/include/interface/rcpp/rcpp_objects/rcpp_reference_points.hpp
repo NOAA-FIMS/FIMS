@@ -79,41 +79,88 @@ inline Rcpp::List CalculateReferencePointsR(
                              include_in_msy});
   }
   const auto unfished = fims_popdy::CalculatePerRecruit(inputs, 0.0);
-  Rcpp::NumericVector f(targets.size()), spr(targets.size()),
-      residual(targets.size());
-  Rcpp::IntegerVector iterations(targets.size());
-  Rcpp::CharacterVector status(targets.size());
   fims_popdy::SPROptions options;
   options.max_f = max_f;
   options.tolerance = tolerance;
   options.max_iterations = max_iterations;
+  Rcpp::List spr_results(targets.size());
+  const bool has_recruitment = snapshot.containsElementNamed("recruitment") &&
+                               !Rf_isNull(snapshot["recruitment"]);
+  bool has_valid_baseline = false;
+  fims_popdy::ReferencePointRecruitment recruitment{};
+  if (has_recruitment) {
+    Rcpp::List recruitment_input = snapshot["recruitment"];
+    if (Rcpp::as<std::string>(recruitment_input["type"]) ==
+        "beverton_holt") {
+      recruitment = {Rcpp::as<double>(recruitment_input["rzero"]),
+                     Rcpp::as<double>(recruitment_input["steepness"]),
+                     Rcpp::as<double>(recruitment_input["phi0"])};
+      has_valid_baseline = std::isfinite(recruitment.rzero) &&
+                           recruitment.rzero > 0.0 &&
+                           std::isfinite(recruitment.steepness) &&
+                           recruitment.steepness > 0.2 &&
+                           recruitment.steepness < 1.0 &&
+                           std::isfinite(recruitment.phi0) &&
+                           recruitment.phi0 > 0.0;
+    }
+  }
   for (R_xlen_t i = 0; i < targets.size(); ++i) {
     const auto result = fims_popdy::CalculateSPR(inputs, targets[i], options);
-    f[i] = result.fishing_mortality;
-    spr[i] = result.spr;
-    residual[i] = result.residual;
-    iterations[i] = result.iterations;
+    const auto per_recruit =
+        fims_popdy::CalculatePerRecruit(inputs, result.fishing_mortality);
+    std::string spr_status;
     switch (result.status) {
       case fims_popdy::SPRStatus::converged:
-        status[i] = "converged";
+        spr_status = "converged";
         break;
       case fims_popdy::SPRStatus::not_bracketed:
-        status[i] = "not_bracketed";
+        spr_status = "not_bracketed";
         break;
       default:
-        status[i] = "iteration_limit";
+        spr_status = "iteration_limit";
     }
+    double equilibrium_recruitment = NA_REAL;
+    double spawning_biomass = NA_REAL;
+    double biomass = NA_REAL;
+    double total_yield = NA_REAL;
+    Rcpp::NumericVector fleet_yield(inputs.fleets.size(), NA_REAL);
+    Rcpp::LogicalVector collapsed = Rcpp::LogicalVector::create(NA_LOGICAL);
+    if (has_valid_baseline) {
+      const auto equilibrium = fims_popdy::CalculateEquilibrium(
+          inputs, result.fishing_mortality, recruitment);
+      equilibrium_recruitment = equilibrium.recruitment;
+      spawning_biomass = equilibrium.spawning_biomass;
+      biomass = equilibrium.biomass;
+      total_yield = equilibrium.yield;
+      fleet_yield = ReferencePointVectorToR(equilibrium.fleet_yield);
+      collapsed[0] = equilibrium.collapsed;
+    }
+    spr_results[i] = Rcpp::List::create(
+        Rcpp::Named("target") = targets[i],
+        Rcpp::Named("fishing_mortality") = result.fishing_mortality,
+        Rcpp::Named("achieved_spr") = result.spr,
+        Rcpp::Named("residual") = result.residual,
+        Rcpp::Named("iterations") = result.iterations,
+        Rcpp::Named("status") = spr_status,
+        Rcpp::Named("spr_fished_per_recruit") = per_recruit.spawning_biomass,
+        Rcpp::Named("spr_unfished_per_recruit") =
+            unfished.spawning_biomass,
+        Rcpp::Named("biomass_per_recruit") = per_recruit.biomass,
+        Rcpp::Named("fleet_yield_per_recruit") =
+            ReferencePointVectorToR(per_recruit.fleet_yield),
+        Rcpp::Named("recruitment") = equilibrium_recruitment,
+        Rcpp::Named("spawning_biomass") = spawning_biomass,
+        Rcpp::Named("biomass") = biomass,
+        Rcpp::Named("fleet_yield") = fleet_yield,
+        Rcpp::Named("total_yield") = total_yield,
+        Rcpp::Named("collapsed") = collapsed);
   }
   Rcpp::List output = Rcpp::List::create(
       Rcpp::Named("inputs") = snapshot,
       Rcpp::Named("unfished_per_recruit") = Rcpp::List::create(
           Rcpp::Named("biomass") = unfished.biomass,
           Rcpp::Named("spawning_biomass") = unfished.spawning_biomass),
-      Rcpp::Named("spr") = Rcpp::DataFrame::create(
-          Rcpp::Named("target") = targets, Rcpp::Named("fishing_mortality") = f,
-          Rcpp::Named("spr") = spr, Rcpp::Named("residual") = residual,
-          Rcpp::Named("iterations") = iterations,
-          Rcpp::Named("status") = status),
+        Rcpp::Named("spr") = spr_results,
       Rcpp::Named("msy") = R_NilValue);
   if (include_msy) {
     if (!snapshot.containsElementNamed("recruitment") ||
@@ -152,7 +199,7 @@ inline Rcpp::List CalculateReferencePointsR(
     }
     output["msy"] = Rcpp::List::create(
         Rcpp::Named("fishing_mortality") = result.fishing_mortality,
-        // Preserve the legacy yield field as total catch from all fleets.
+        // objective_yield is optimized; yield remains total catch for compatibility.
         Rcpp::Named("yield") = result.equilibrium.yield,
         Rcpp::Named("total_yield") = result.equilibrium.yield,
         Rcpp::Named("objective_yield") = result.equilibrium.objective_yield,

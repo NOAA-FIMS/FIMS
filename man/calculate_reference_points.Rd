@@ -70,8 +70,15 @@ The flags are saved in the returned snapshot; they do not modify live fleets.}
 }
 \value{
 A list with the input snapshot, unfished per-recruit biomass,
-an \code{spr} data frame, an \code{msy} list (or \code{NULL}), and solver \code{settings}.
-Check \code{status} before using a candidate. SPR status is \code{converged},
+an \code{spr} list with one record per target, an \code{msy} list (or
+\code{NULL}), and solver \code{settings}. Each SPR record contains
+\code{fishing_mortality}, \code{achieved_spr}, \code{residual},
+\code{iterations}, \code{status}, spawning biomass and yield per recruit, and
+equilibrium \code{recruitment}, \code{spawning_biomass}, \code{biomass},
+\code{fleet_yield}, \code{total_yield}, and \code{collapsed}. Equilibrium
+fields are \code{NA} when valid Beverton-Holt recruitment inputs are absent;
+per-recruit values are still returned. Check \code{status} before using a
+candidate. SPR status is \code{converged},
 \code{not_bracketed}, or \code{iteration_limit}. MSY status is \code{converged},
 \code{upper_bound}, \code{no_positive_yield}, or \code{iteration_limit}. An upper-bound
 MSY candidate is not an interior optimum; increase \code{max_f} and reassess.
@@ -79,6 +86,8 @@ Within \code{msy}, \code{objective_yield} is the optimized yield from included f
 \code{total_yield} includes all fleets' catch at that same F. The legacy \code{yield}
 field remains an alias for \code{total_yield}, not necessarily the MSY objective.
 \code{fleet_yield} reports catches for all fleets, including excluded fleets.
+In \code{msy}, \code{spawning_biomass} is mature female biomass and
+\code{biomass} is total stock biomass, both at equilibrium.
 }
 \description{
 Calculate spawning potential ratio (SPR) targets and optional Beverton-Holt
@@ -94,9 +103,10 @@ Inclusion flags do not change or renormalize fleet shares and do not affect
 SPR. MSY uses mean recruitment without deviations, with steepness
 strictly between 0.2 and 1. Nonpositive recruitment equilibria are extinction.
 
-MSY uses a grid followed by golden-section refinement of the best sampled
-region. Check sensitivity to bounds and grid resolution for unusual fishing
-patterns. These post-fit calculations do not provide standard errors.
+MSY uses a grid followed by golden-section refinement of each detected
+interior local peak. Check sensitivity to bounds and grid resolution for
+unusual fishing patterns. These post-fit calculations do not provide standard
+errors.
 
 \code{get_reference_points()} refreshes the live model's derived quantities and
 copies the chosen year's biology. It uses the current internal double
@@ -107,6 +117,8 @@ The returned snapshot records population ID, year index, ages, and fleet IDs.
 Catch weights follow the population weights used by \code{CatchAtAge}. The model's
 initial \code{phi0} is retained for recruitment even if reference-year biology
 differs. Thus unfished equilibrium recruitment in that year need not be R0.
+A warning is issued if a fleet has zero fishing mortality in the selected
+year but is assigned a positive reference-point share.
 }
 \examples{
 inputs <- list(

@@ -14,11 +14,21 @@ test_that("reference points agree with analytic SPR and an independent MSY optim
   #' @description R results agree with analytic per-recruit formulas and R's optimizer.
   inputs <- reference_point_test_inputs()
   result <- calculate_reference_points(inputs, spr_targets = c(1, 0.4))
-  expect_equal(result$spr$status, c("converged", "converged"))
-  expect_equal(result$spr$fishing_mortality[1], 0)
-  expect_equal(result$spr$fishing_mortality[2], log1p(expm1(0.2) / 0.4) - 0.2,
+  expect_equal(vapply(result$spr, `[[`, character(1), "status"), c("converged", "converged"))
+  expect_equal(result$spr[[1]]$fishing_mortality, 0)
+  expect_equal(result$spr[[2]]$fishing_mortality, log1p(expm1(0.2) / 0.4) - 0.2,
     tolerance = 1e-7
   )
+  expect_type(result$spr[[2]]$fleet_yield, "double")
+  expect_length(result$spr[[2]]$fleet_yield, 1)
+  expect_equal(result$spr[[2]]$recruitment, 1000 * 0.863636363636, tolerance = 1e-6)
+  expect_true(result$spr[[2]]$collapsed == FALSE)
+  collapsed <- calculate_reference_points(
+    inputs, spr_targets = 0.05, msy = FALSE
+  )
+  expect_true(collapsed$spr[[1]]$collapsed)
+  expect_equal(collapsed$spr[[1]]$recruitment, 0)
+  expect_equal(collapsed$spr[[1]]$fleet_yield, 0)
   yield <- function(f) {
     sbpr <- 1 / expm1(0.2 + f)
     r <- max(0, 1000 * (0.8 * 0.75 - 0.2 * 0.25 * inputs$recruitment$phi0 / sbpr) / 0.55)
@@ -36,10 +46,14 @@ test_that("reference point R interface validates requests and reports failed bou
   #' @description Failed bounds and unsupported recruitment remain explicit to R users.
   inputs <- reference_point_test_inputs()
   result <- calculate_reference_points(inputs, max_f = 0.001)
-  expect_equal(result$spr$status, "not_bracketed")
+  expect_equal(result$spr[[1]]$status, "not_bracketed")
   expect_equal(result$msy$status, "upper_bound")
   inputs$recruitment <- NULL
-  expect_null(calculate_reference_points(inputs, msy = FALSE)$msy)
+  spr_only <- calculate_reference_points(inputs, spr_targets = c(0.4, 0.3), msy = FALSE)
+  expect_null(spr_only$msy)
+  expect_length(spr_only$spr, 2)
+  expect_true(all(is.na(vapply(spr_only$spr, `[[`, numeric(1), "recruitment"))))
+  expect_length(spr_only$spr[[1]]$fleet_yield_per_recruit, 1)
   expect_error(calculate_reference_points(inputs), "Beverton-Holt")
   inputs$recruitment <- list(type = "unsupported")
   expect_error(calculate_reference_points(inputs), "only Beverton-Holt")
@@ -220,6 +234,17 @@ test_that("multifleet MSY agrees with independent equations and optimization", {
     expect_equal(finer$msy$fishing_mortality, result$msy$fishing_mortality, tolerance = 1e-6)
     expect_equal(finer$msy$objective_yield, result$msy$objective_yield, tolerance = 1e-8)
   }
+  inputs <- multifleet_reference_inputs()
+  multiple_targets <- calculate_reference_points(
+    inputs, spr_targets = c(0.4, 0.3), msy = TRUE
+  )
+  expect_length(multiple_targets$spr, 2)
+  expect_equal(
+    vapply(multiple_targets$spr, `[[`, character(1), "status"),
+    c("converged", "converged")
+  )
+  expect_type(multiple_targets$spr[[1]]$fleet_yield, "double")
+  expect_length(multiple_targets$spr[[1]]$fleet_yield, length(inputs$fleets))
 })
 
 test_that("fleet inclusion defaults and validation are explicit", {

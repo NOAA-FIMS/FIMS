@@ -49,6 +49,21 @@ TEST(ReferencePoints, SingleAgePlusGroup) {
   EXPECT_NEAR(result.yield, 3.0 * 0.3 / 0.5, 1e-12);
 }
 
+// Small mortality retains precision in terminal abundance and the catch integral.
+TEST(ReferencePoints, LowMortalityUsesStableExponentialLoss) {
+  ReferencePointInputs<double> inputs;
+  inputs.natural_mortality = {1e-10};
+  inputs.weight = {1.0};
+  inputs.maturity = {1.0};
+  inputs.proportion_female = {1.0};
+  inputs.fleets = {{1.0, {1.0}, {1.0}}};
+
+  const auto result = CalculatePerRecruit(inputs, 1e-10);
+  EXPECT_NEAR(result.numbers[0], 5e9, 1.0);
+  EXPECT_NEAR(result.fleet_yield[0], 0.5, 1e-12);
+  EXPECT_GT(result.fleet_yield[0], 0.0);
+}
+
 // Iterating annual cohorts independently converges to the calculated numbers.
 TEST(ReferencePoints, MatchesLongRunProjectionWithTwoFleets) {
   auto inputs = MakeInputs();
@@ -236,6 +251,51 @@ TEST(ReferencePoints, EquilibriumMatchesRecruitmentFixedPoint) {
             1000.0);
 }
 
+// SPR-target equilibrium outputs scale the per-recruit values consistently.
+TEST(ReferencePoints, SPREquilibriumBenchmarkValues) {
+  ReferencePointInputs<double> inputs;
+  inputs.natural_mortality = {0.2, 0.2};
+  inputs.weight = {1.0, 1.0};
+  inputs.maturity = {0.0, 1.0};
+  inputs.proportion_female = {1.0, 1.0};
+  inputs.fleets = {{1.0, {1.0, 1.0}, {1.0, 1.0}}};
+  const double phi0 = CalculatePerRecruit(inputs, 0.0).spawning_biomass;
+  SPROptions options;
+  options.tolerance = 1e-12;
+  const auto spr = CalculateSPR(inputs, 0.4, options);
+  const auto per_recruit = CalculatePerRecruit(inputs, spr.fishing_mortality);
+  const auto equilibrium = fims_popdy::CalculateEquilibrium(
+      inputs, spr.fishing_mortality, {1000.0, 0.75, phi0});
+
+  EXPECT_EQ(spr.status, SPRStatus::converged);
+  EXPECT_NEAR(equilibrium.recruitment, 0.863636363636 * 1000.0, 1e-6);
+  EXPECT_NEAR(equilibrium.spawning_biomass,
+              0.345454545454 * 1000.0 * phi0, 1e-5);
+  EXPECT_NEAR(equilibrium.biomass, equilibrium.recruitment * per_recruit.biomass,
+              1e-10);
+  EXPECT_NEAR(equilibrium.fleet_yield[0],
+              equilibrium.recruitment * per_recruit.fleet_yield[0], 1e-10);
+}
+
+TEST(ReferencePoints, SPRTargetCanReportRecruitmentCollapse) {
+  ReferencePointInputs<double> inputs;
+  inputs.natural_mortality = {0.2, 0.2};
+  inputs.weight = {1.0, 1.0};
+  inputs.maturity = {0.0, 1.0};
+  inputs.proportion_female = {1.0, 1.0};
+  inputs.fleets = {{1.0, {1.0, 1.0}, {1.0, 1.0}}};
+  const double phi0 = CalculatePerRecruit(inputs, 0.0).spawning_biomass;
+  const auto spr = CalculateSPR(inputs, 0.05);
+  ASSERT_EQ(spr.status, SPRStatus::converged);
+  const auto equilibrium = fims_popdy::CalculateEquilibrium(
+      inputs, spr.fishing_mortality, {1000.0, 0.75, phi0});
+  EXPECT_TRUE(equilibrium.collapsed);
+  EXPECT_DOUBLE_EQ(equilibrium.recruitment, 0.0);
+  EXPECT_DOUBLE_EQ(equilibrium.biomass, 0.0);
+  EXPECT_DOUBLE_EQ(equilibrium.spawning_biomass, 0.0);
+  EXPECT_DOUBLE_EQ(equilibrium.yield, 0.0);
+}
+
 // Low spawning potential has only the extinction equilibrium.
 TEST(ReferencePoints, EquilibriumCollapseAndInvalidRecruitment) {
   const auto inputs = MakeInputs();
@@ -360,6 +420,15 @@ TEST(ReferencePoints, ObjectiveExclusionPreservesMortalityAndCatch) {
   inputs.fleets[1].include_in_msy = true;
   EXPECT_DOUBLE_EQ(CalculateSPR(inputs, 0.4).fishing_mortality,
                    without_objective.fishing_mortality);
+  inputs.fleets[1].include_in_msy = false;
+  const auto msy = fims_popdy::CalculateMSY(inputs, sr);
+  EXPECT_NEAR(msy.equilibrium.objective_yield,
+              msy.equilibrium.fleet_yield[0], 1e-10);
+  EXPECT_NEAR(msy.equilibrium.yield,
+              msy.equilibrium.fleet_yield[0] +
+                  msy.equilibrium.fleet_yield[1],
+              1e-10);
+  EXPECT_GT(msy.equilibrium.yield, msy.equilibrium.objective_yield);
 }
 
 // A zero-share fleet removes its mortality; that differs from objective

@@ -20,8 +20,14 @@
 #' @param max_iterations Maximum solver refinement iterations.
 #' @param grid_intervals Number of initial intervals in the MSY grid search.
 #' @return A list with the input snapshot, unfished per-recruit biomass,
-#'   an `spr` data frame, an `msy` list (or `NULL`), and solver `settings`.
-#'   Check `status` before using a candidate. SPR status is `converged`,
+#'   an `spr` list with one record per target, an `msy` list (or `NULL`), and
+#'   solver `settings`. Each SPR record contains `fishing_mortality`,
+#'   `achieved_spr`, `residual`, `iterations`, `status`, spawning biomass and
+#'   yield per recruit, and equilibrium `recruitment`, `spawning_biomass`,
+#'   `biomass`, `fleet_yield`, `total_yield`, and `collapsed`. Equilibrium
+#'   fields are `NA` when valid Beverton-Holt recruitment inputs are absent;
+#'   per-recruit values are still returned. Check `status` before using a
+#'   candidate. SPR status is `converged`,
 #'   `not_bracketed`, or `iteration_limit`. MSY status is `converged`,
 #'   `upper_bound`, `no_positive_yield`, or `iteration_limit`. An upper-bound
 #'   MSY candidate is not an interior optimum; increase `max_f` and reassess.
@@ -29,6 +35,8 @@
 #'   `total_yield` includes all fleets' catch at that same F. The legacy `yield`
 #'   field remains an alias for `total_yield`, not necessarily the MSY objective.
 #'   `fleet_yield` reports catches for all fleets, including excluded fleets.
+#'   In `msy`, `spawning_biomass` is mature female biomass and `biomass` is
+#'   total stock biomass, both at equilibrium.
 #' @details
 #' Ages are annual and the final age is a plus group. Natural mortality must be
 #' strictly positive. Biomass is measured at the start of the year. Fleet shares
@@ -39,9 +47,10 @@
 #' SPR. MSY uses mean recruitment without deviations, with steepness
 #' strictly between 0.2 and 1. Nonpositive recruitment equilibria are extinction.
 #'
-#' MSY uses a grid followed by golden-section refinement of the best sampled
-#' region. Check sensitivity to bounds and grid resolution for unusual fishing
-#' patterns. These post-fit calculations do not provide standard errors.
+#' MSY uses a grid followed by golden-section refinement of each detected
+#' interior local peak. Check sensitivity to bounds and grid resolution for
+#' unusual fishing patterns. These post-fit calculations do not provide
+#' standard errors.
 #' @export
 #' @examples
 #' inputs <- list(
@@ -105,6 +114,8 @@ calculate_reference_points <- function(inputs, spr_targets = 0.4, msy = TRUE,
 #' Catch weights follow the population weights used by `CatchAtAge`. The model's
 #' initial `phi0` is retained for recruitment even if reference-year biology
 #' differs. Thus unfished equilibrium recruitment in that year need not be R0.
+#' A warning is issued if a fleet has zero fishing mortality in the selected
+#' year but is assigned a positive reference-point share.
 #' @export
 get_reference_points <- function(model, population, year, fleet_shares = NULL,
                                  spr_targets = 0.4, msy = TRUE, max_f = 5,

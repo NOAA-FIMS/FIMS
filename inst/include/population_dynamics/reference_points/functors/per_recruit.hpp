@@ -59,6 +59,16 @@ struct PerRecruitResult {
   fims::Vector<Type> fleet_yield; /*!< Annual catch weight by fleet. */
 };
 
+/** @brief Stable Baranov catch integral (1 - exp(-Z)) / Z. */
+template <typename Type>
+inline Type CatchIntegral(const Type& z) {
+  if (std::abs(fims_math::Value(z)) < 1e-8) {
+    return Type(1.0) - Type(0.5) * z;
+  }
+  using std::expm1;
+  return -expm1(-z) / z;
+}
+
 /** @brief Check dimensions and biological ranges before calculation. */
 template <typename Type>
 void ValidateReferencePointInputs(const ReferencePointInputs<Type>& inputs) {
@@ -133,7 +143,8 @@ PerRecruitResult<Type> CalculatePerRecruit(
   for (size_t a = 1; a < n; ++a) {
     result.numbers[a] = result.numbers[a - 1] * survival[a - 1];
   }
-  const Type plus_group_loss = Type(1.0) - survival[n - 1];
+  using std::expm1;
+  const Type plus_group_loss = -expm1(-mortality[n - 1]);
   if (fims_math::Value(plus_group_loss) <= 0.0) {
     throw std::domain_error(
         "Plus-group mortality is too small for equilibrium");
@@ -149,8 +160,8 @@ PerRecruitResult<Type> CalculatePerRecruit(
       const Type fleet_mortality =
           fishing_mortality * fishing.share * fishing.selectivity[a];
       result.fleet_yield[fleet] +=
-          result.numbers[a] * (fleet_mortality / mortality[a]) *
-          (Type(1.0) - survival[a]) * fishing.weight[a];
+          result.numbers[a] * fleet_mortality * CatchIntegral(mortality[a]) *
+          fishing.weight[a];
     }
   }
   for (size_t fleet = 0; fleet < inputs.fleets.size(); ++fleet) {
