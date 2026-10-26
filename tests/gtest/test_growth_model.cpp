@@ -60,8 +60,9 @@ TEST(GrowthModel, CanConstructAndPrepare) {
   const double observed_length_at_age_12 = p.MeanLAA(0, 11, 0);
 
   EXPECT_NEAR(observed_length_at_age_1, expected_length_at_age_1, 1e-8);
-  EXPECT_GT(expected_length_at_age_5, mean_length_young);
-  EXPECT_LT(expected_length_at_age_5, mean_length_old);
+  EXPECT_NEAR(p.MeanLAA(0, 4, 0), expected_length_at_age_5, 1e-8);
+  EXPECT_GT(p.MeanLAA(0, 4, 0), mean_length_young);
+  EXPECT_LT(p.MeanLAA(0, 4, 0), mean_length_old);
   EXPECT_NEAR(observed_length_at_age_12, expected_length_at_age_12, 1e-8);
   EXPECT_NEAR(p.SdLAA(0, 0, 0), 28.0, 1e-7);
   EXPECT_NEAR(p.SdLAA(0, 11, 0), 73.0, 1e-7);
@@ -220,6 +221,48 @@ TEST(GrowthModel, HoldsSdConstantOutsideReferenceAges) {
   // Holding SD constant must not stop mean growth.
   EXPECT_LT(products.MeanLAA(0, 2, 0), products.MeanLAA(0, 4, 0));
   EXPECT_GT(products.MeanLAA(0, 20, 0), products.MeanLAA(0, 18, 0));
+}
+
+TEST(GrowthModel, MultipleYearsMatchSingleYearAfterParameterUpdates) {
+  fims_popdy::GrowthModel<double> single_year(1, 12, 1);
+  fims_popdy::GrowthModel<double> multiple_years(3, 12, 1);
+
+  for (int setting = 0; setting < 2; ++setting) {
+    SCOPED_TRACE(setting);
+
+    const double young_length = setting == 0 ? 275.0 : 300.0;
+    const double old_length = setting == 0 ? 725.0 : 800.0;
+    const double k = setting == 0 ? 0.18 : 1e-20;
+
+    for (auto* model : {&single_year, &multiple_years}) {
+      model->SetVonBertalanffySchnuteParameters(
+          young_length, old_length, k, 1.0, 12.0);
+      model->SetLengthWeightParameters(2.5e-11, 3.0);
+      model->SetLengthSdParams(28.0, 73.0);
+      model->SetAgeOffset(1.0);
+      model->Prepare();
+    }
+
+    const auto& expected = single_year.GetProducts();
+    const auto& actual = multiple_years.GetProducts();
+
+    // Reference endpoints independently check that parameters were refreshed.
+    EXPECT_NEAR(expected.MeanLAA(0, 0, 0), young_length, 1e-8);
+    EXPECT_NEAR(expected.MeanLAA(0, 11, 0), old_length, 1e-8);
+
+    for (std::size_t year = 0; year < 3; ++year) {
+      SCOPED_TRACE(year);
+      for (std::size_t age = 0; age < 12; ++age) {
+        SCOPED_TRACE(age);
+        EXPECT_DOUBLE_EQ(actual.MeanLAA(year, age, 0),
+                         expected.MeanLAA(0, age, 0));
+        EXPECT_DOUBLE_EQ(actual.SdLAA(year, age, 0),
+                         expected.SdLAA(0, age, 0));
+        EXPECT_DOUBLE_EQ(actual.MeanWAA(year, age, 0),
+                         expected.MeanWAA(0, age, 0));
+      }
+    }
+  }
 }
 
 }  // namespace
