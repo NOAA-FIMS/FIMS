@@ -22,10 +22,11 @@ namespace fims_popdy {
  * @brief Concrete growth model using VonBertalanffySchnute growth (Phase 1).
  *
  * Assumptions:
- * - single sex (n_sexes = 1)
- * - no time variation (n_years = 1)
- * - fixed mean-growth parameters
- * - optional covariance-based delta-method variability
+ * - growth and variability parameters are shared across years and sexes
+ * - the Growth adapter currently supports one sex
+ * - parameters may be estimated and updated between preparations
+ * - variability uses reference-age SD interpolation or the covariance-based
+ *   delta method
  */
 template <typename Type>
 class GrowthModel : public GrowthModelBase<Type> {
@@ -139,20 +140,20 @@ class GrowthModel : public GrowthModelBase<Type> {
           "reference_age_for_length_young");
     }
 
-    // Fill mean length-at-age, sd, and mean weight-at-age.
-    for (std::size_t y = 0; y < n_years_; ++y) {
+    // Growth parameters are shared across years and sexes in this model.
+    if (n_years_ > 0 && n_sexes_ > 0) {
       for (std::size_t a = 0; a < n_ages_; ++a) {
-        for (std::size_t s = 0; s < n_sexes_; ++s) {
-          const Type age = static_cast<Type>(a) + age_offset_;
+        const Type age = static_cast<Type>(a) + age_offset_;
+        const Type laa = vb_.length_at_age(age);
+        const Type sd_laa = ComputeLengthSdAtAge(age, laa);
+        const Type waa = vb_.weight_at_length(laa);
 
-          // log-scale params live upstream; laa here is natural scale
-          const Type laa = vb_.length_at_age(age);
-          const Type sd_laa = ComputeLengthSdAtAge(age, laa);
-          const Type waa = vb_.weight_at_age(age);
-
-          products_.MeanLAA(y, a, s) = laa;
-          products_.SdLAA(y, a, s) = sd_laa;
-          products_.MeanWAA(y, a, s) = waa;
+        for (std::size_t y = 0; y < n_years_; ++y) {
+          for (std::size_t s = 0; s < n_sexes_; ++s) {
+            products_.MeanLAA(y, a, s) = laa;
+            products_.SdLAA(y, a, s) = sd_laa;
+            products_.MeanWAA(y, a, s) = waa;
+          }
         }
       }
     }
