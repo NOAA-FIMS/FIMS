@@ -276,6 +276,155 @@ initialize_test_fleet <- function(parameters, data, fleet) {
 }
 
 ## IO correctness ----
+test_that("reference lengths survive initialization across estimation settings", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_convergence_context()
+  settings <- expand.grid(
+    young = c("constant", "fixed_effects"),
+    old = c("constant", "fixed_effects"),
+    stringsAsFactors = FALSE
+  )
+
+  for (i in seq_len(nrow(settings))) {
+    parameters <- ctx$parameters |>
+      dplyr::mutate(
+        estimation_type = dplyr::case_when(
+          module_name == "Growth" & label == "mean_length_young" ~
+            settings$young[i],
+          module_name == "Growth" & label == "mean_length_old" ~
+            settings$old[i],
+          TRUE ~ estimation_type
+        )
+      )
+
+    input <- FIMS::initialize_fims(parameters = parameters, data = ctx$data)
+    fit <- FIMS::fit_fims(input, optimize = FALSE, get_sd = FALSE)
+
+    lengths <- FIMS::get_estimates(fit) |>
+      dplyr::filter(
+        module_name == "Growth",
+        label %in% c("mean_length_young", "mean_length_old")
+      )
+    case <- paste("young:", settings$young[i], "old:", settings$old[i])
+
+    #' @description Finalized reference lengths equal their physical inputs for all constant/fixed-effect combinations.
+    expect_equal(
+      lengths$estimated,
+      lengths$input,
+      tolerance = 1e-6,
+      info = case
+    )
+
+    #' @description Backend length at the youngest reference age equals the supplied younger length.
+    expect_equal(
+      as.numeric(FIMS::get_report(fit)[["growth_mean_LAA"]][[1]][1]),
+      lengths$input[lengths$label == "mean_length_young"],
+      tolerance = 1e-8,
+      info = case
+    )
+    if (settings$old[i] == "fixed_effects") {
+      working <- FIMS::get_fixed()
+      parameter_names <- names(FIMS::get_obj(fit)[["par"]])
+      old_index <- grep("^Growth\\..*\\.mean_length_old\\.", parameter_names)
+      expect_length(old_index, 1L)
+
+      expected_young <- lengths[["input"]][
+        lengths[["label"]] == "mean_length_young"
+      ]
+
+      if (settings$young[i] == "fixed_effects") {
+        young_index <- grep(
+          "^Growth\\..*\\.mean_length_young\\.", parameter_names
+        )
+        expect_length(young_index, 1L)
+        expected_young <- 400
+        working[young_index] <- log(expected_young)
+      }
+
+      working[old_index] <- log(200)
+      FIMS::set_fixed(working)
+
+      updated_lengths <- FIMS:::reshape_json_estimates(
+        input[["model"]]$get_output()
+      ) |>
+        dplyr::filter(
+          module_name == "Growth",
+          label %in% c("mean_length_young", "mean_length_old")
+        ) |>
+        dplyr::arrange(match(label, c("mean_length_young", "mean_length_old")))
+
+      #' @description Reporting reconstructs physical lengths from updated working values.
+      expect_equal(
+        updated_lengths[["estimated"]],
+        c(expected_young, expected_young + 200),
+        tolerance = 1e-8,
+        info = case
+      )
+    }
+  }
+})
+
+test_that("von bertalanffy automatic K derivative matches numerical differences", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_convergence_context()
+  input <- FIMS::initialize_fims(
+    parameters = ctx$parameters,
+    data = ctx$data
+  )
+  fit <- FIMS::fit_fims(input, optimize = FALSE, get_sd = FALSE)
+  obj <- FIMS::get_obj(fit)
+  starting <- obj[["par"]]
+
+  k_index <- grep("^Growth\\..*\\.growth_coefficient\\.", names(starting))
+  expect_length(k_index, 1L)
+
+  reference_ages <- ctx$parameters |>
+    dplyr::filter(
+      module_name == "Growth",
+      label %in% c(
+        "reference_age_for_length_young",
+        "reference_age_for_length_old"
+      )
+    ) |>
+    dplyr::arrange(match(label, c(
+      "reference_age_for_length_young",
+      "reference_age_for_length_old"
+    ))) |>
+    dplyr::pull(value)
+  reference_span <- diff(reference_ages)
+
+  # Reuse the same AD tape on both sides of the small-x transition.
+  for (growth_coefficient in c(
+    exp(starting[k_index]),
+    0.99e-3 / reference_span,
+    1.01e-3 / reference_span
+  )) {
+    point <- starting
+    point[k_index] <- log(growth_coefficient)
+    automatic <- as.numeric(obj[["gr"]](point))[k_index]
+
+    step <- 1e-4
+    plus <- minus <- point
+    plus[k_index] <- plus[k_index] + step
+    minus[k_index] <- minus[k_index] - step
+    numerical <- (obj[["fn"]](plus) - obj[["fn"]](minus)) / (2 * step)
+
+    #' @description Automatic derivatives with respect to log K agree with numerical differences.
+    expect_true(
+      is.finite(automatic) && is.finite(numerical),
+      info = paste("K:", growth_coefficient)
+    )
+    expect_true(
+      abs(automatic - numerical) / max(1, abs(numerical)) < 1e-4,
+      info = paste("K:", growth_coefficient)
+    )
+  }
+})
+
 test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   ctx <- make_vonb_convergence_context()
   on.exit(
