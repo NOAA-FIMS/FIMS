@@ -230,13 +230,21 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
   }
 
   /**
+   * @brief Evaluate weight from a supplied length.
+   * @param length Length on the natural scale.
+   * @return Weight at the supplied length.
+   */
+  Type weight_at_length(const Type& length) const {
+    return length_weight_a * fims_math::pow(length, length_weight_b);
+  }
+
+  /**
    * @brief Evaluate mean weight at age via the length-weight relationship.
    * @param age Age on the natural scale.
    * @return Mean weight at the requested age.
    */
   Type weight_at_age(const Type& age) const {
-    Type length = length_at_age(age);
-    return length_weight_a * fims_math::pow(length, length_weight_b);
+    return weight_at_length(length_at_age(age));
   }
 
   virtual const Type evaluate(int year, const double& a) override {
