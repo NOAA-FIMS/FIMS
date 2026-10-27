@@ -124,7 +124,8 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
   }
 
   /**
-   * @brief Prepare conversion using population products refreshed by the caller.
+   * @brief Prepare conversion using population products refreshed by the
+   * caller.
    * @return False if required products are unavailable.
    */
   bool PrepareFromPopulationProducts() {
