@@ -1170,6 +1170,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       if (growth_observation != nullptr) {
         growth_observation->PrepareGrowthProducts();
+
+        // Prepared on every evaluation because nothing marks the size
+        // products stale when growth parameters change.
+        if (population->size_distribution_provider != nullptr) {
+          population->size_distribution_provider->PrepareSizeProducts();
+        }
       }
     }
   }
@@ -1278,9 +1284,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This function returns the biological mean weight at age for a population.
    * If the growth object does not support the growth-derived observation
    * interface, it uses the historical direct growth evaluation path.
-   * If the growth object does support that interface, it reads biological
-   * mean weight-at-age directly from the prepared growth products and does
-   * not require any fleet observation-bin mapping.
+   * If the growth object does support that interface and the population has
+   * a size grid, it returns weight averaged over the population length-at-age
+   * distribution. Without a size grid, it reads weight at the mean length
+   * from the prepared growth products. Neither requires fleet
+   * observation-bin mapping.
    *
    * @param population Shared pointer to the population object.
    * @param year Year index.
@@ -1308,6 +1316,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     if (growth_observation == nullptr) {
       return population->growth->evaluate(year, population->ages[age]);
+    }
+
+    if (population->size_distribution_provider != nullptr) {
+      return population->size_distribution_provider->MeanWeightAtAge(
+          (std::min)(year, population->n_years - 1), age);
     }
 
     return BiologicalMeanWeightFromPreparedGrowthProducts(

@@ -99,6 +99,16 @@ class SizeDistributionProviderBase {
    */
   virtual const Type& ProbSize(std::size_t year_index, std::size_t age_index,
                                std::size_t size_bin_index) const = 0;
+
+  /**
+   * @brief Read prepared mean weight-at-age averaged over the population
+   * size bins.
+   * @param year_index Year index.
+   * @param age_index Age index.
+   * @return Read-only mean weight-at-age value.
+   */
+  virtual const Type& MeanWeightAtAge(std::size_t year_index,
+                                      std::size_t age_index) const = 0;
 };
 
 }  // namespace fims_popdy

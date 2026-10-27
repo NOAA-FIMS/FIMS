@@ -27,7 +27,8 @@ namespace fims_popdy {
  *
  * The provider reads mean length, length standard deviation, and weight-at-age
  * from a Growth-derived observation object, then builds probability rows on the
- * population biological size grid.
+ * population biological size grid and the mean weight-at-age averaged over
+ * those rows.
  *
  * @tparam Type Numeric or automatic-differentiation scalar type.
  */
@@ -155,6 +156,31 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
       plus_group_warning_emitted_ = true;
     }
 
+    // Weight depends only on length, so it is evaluated once per bin. The
+    // first and last bins are weighted at their centers even though they hold
+    // the lower and upper tails, as in SS3.
+    fims::Vector<Type> weight_at_bin(population_size_grid_->n_bins);
+    for (std::size_t size_bin_index = 0;
+         size_bin_index < population_size_grid_->n_bins; ++size_bin_index) {
+      weight_at_bin[size_bin_index] =
+          growth_observation_->EvaluateWeightAtLength(static_cast<Type>(
+              population_size_grid_->centers[size_bin_index]));
+    }
+
+    mean_weight_at_age_.resize(n_years_ * n_ages_);
+    for (std::size_t year_index = 0; year_index < n_years_; ++year_index) {
+      for (std::size_t age_index = 0; age_index < n_ages_; ++age_index) {
+        Type mean_weight = static_cast<Type>(0.0);
+        for (std::size_t size_bin_index = 0;
+             size_bin_index < population_size_grid_->n_bins; ++size_bin_index) {
+          mean_weight +=
+              size_products_.ProbSize(year_index, age_index, size_bin_index) *
+              weight_at_bin[size_bin_index];
+        }
+        mean_weight_at_age_[year_index * n_ages_ + age_index] = mean_weight;
+      }
+    }
+
     size_products_prepared_ = true;
   }
 
@@ -180,6 +206,39 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     }
 
     return size_products_.ProbSize(year_index, age_index, size_bin_index);
+  }
+
+  /**
+   * @brief Mean weight-at-age averaged over the population length-at-age
+   * distribution.
+   *
+   * \f[
+   * \bar{W}_{y,a} = \sum_l P(l \mid y, a) \, W(c_l)
+   * \f]
+   * where \f$c_l\f$ is the center of population size bin \f$l\f$ and \f$W\f$
+   * is the length-weight relationship. Unlike the growth products' `MeanWAA`,
+   * which is weight at the mean length, this includes the effect of the
+   * spread of lengths at age on mean weight. Values are from the last call to
+   * PrepareSizeProducts(), which the catch-at-age model makes on every
+   * evaluation.
+   *
+   * @param year_index Year index.
+   * @param age_index Age index.
+   * @return Mean weight-at-age on the natural scale.
+   */
+  const Type& MeanWeightAtAge(std::size_t year_index,
+                              std::size_t age_index) const override {
+    if (!size_products_prepared_) {
+      throw std::runtime_error(
+          "GrowthDerivedSizeProvider requires prepared size products");
+    }
+
+    if (year_index >= n_years_ || age_index >= n_ages_) {
+      throw std::out_of_range(
+          "GrowthDerivedSizeProvider mean weight-at-age index out of range");
+    }
+
+    return mean_weight_at_age_[year_index * n_ages_ + age_index];
   }
 
   /**
@@ -257,6 +316,7 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
   bool size_products_prepared_ = false;
   bool plus_group_warning_emitted_ = false;
   SizeProducts<Type> size_products_;
+  fims::Vector<Type> mean_weight_at_age_;
 };
 
 }  // namespace fims_popdy
