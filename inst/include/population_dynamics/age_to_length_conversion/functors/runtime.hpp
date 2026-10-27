@@ -67,8 +67,7 @@ BuildAgeToLengthConversionFleet(
               population->growth)) {
     auto age_to_length_conversion_derived =
         std::make_shared<AgeToLengthConversionDerived<Type>>(
-            fleet, growth_observation,
-            population->size_distribution_provider);
+            fleet, growth_observation, population->size_distribution_provider);
 
     const bool prepared =
         preparation == AgeToLengthPreparation::kUsePreparedPopulationProducts
@@ -101,8 +100,9 @@ BuildAgeToLengthConversionFleet(
 
 /**
  * @brief Ensure a fleet has a usable age-to-length conversion.
- * @details Reuses a derived conversion when its fleet, growth, and size-provider
- * links match. Otherwise rebuilds it. Throws if no usable conversion is available.
+ * @details Reuses a derived conversion when its fleet, growth, and
+ * size-provider links match. Otherwise rebuilds it. Throws if no usable
+ * conversion is available.
  * @param population Shared pointer to the owning population.
  * @param fleet Shared pointer to the fleet.
  * @param preparation Whether to prepare population products or use products
@@ -215,8 +215,8 @@ void EnsurePopulationFleetAgeToLengthConversion(
   }
 
   for (size_t i = 0; i < population->fleets.size(); ++i) {
-    EnsureAgeToLengthConversionFleet<Type>(
-        population, population->fleets[i], preparation);
+    EnsureAgeToLengthConversionFleet<Type>(population, population->fleets[i],
+                                           preparation);
   }
 }
 
