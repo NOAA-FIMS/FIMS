@@ -21,6 +21,12 @@
 
 namespace fims_popdy {
 
+// Select who is responsible for preparing population products.
+enum class AgeToLengthPreparation {
+  kPreparePopulationProducts,
+  kUsePreparedPopulationProducts
+};
+
 /**
  * @brief Build the active age-to-length conversion for a fleet from the current
  * population and fleet state.
@@ -36,6 +42,8 @@ namespace fims_popdy {
  *
  * @param population Shared pointer to the owning population.
  * @param fleet Shared pointer to the fleet.
+ * @param preparation Whether to prepare population products or use products
+ * already refreshed by the caller.
  * @return Shared pointer to an active age-to-length conversion implementation,
  * or nullptr when no usable age-to-length conversion path exists.
  */
@@ -43,7 +51,9 @@ template <typename Type>
 std::shared_ptr<AgeToLengthConversionBase<Type>>
 BuildAgeToLengthConversionFleet(
     const std::shared_ptr<Population<Type>>& population,
-    const std::shared_ptr<Fleet<Type>>& fleet) {
+    const std::shared_ptr<Fleet<Type>>& fleet,
+    AgeToLengthPreparation preparation =
+        AgeToLengthPreparation::kPreparePopulationProducts) {
   if (population == nullptr || fleet == nullptr) {
     return nullptr;
   }
@@ -55,14 +65,17 @@ BuildAgeToLengthConversionFleet(
   if (std::shared_ptr<GrowthDerivedObservationBase<Type>> growth_observation =
           std::dynamic_pointer_cast<GrowthDerivedObservationBase<Type>>(
               population->growth)) {
-    std::shared_ptr<AgeToLengthConversionBase<Type>>
-        age_to_length_conversion_derived =
-            std::make_shared<AgeToLengthConversionDerived<Type>>(
-                fleet, growth_observation,
-                population->size_distribution_provider);
+    auto age_to_length_conversion_derived =
+        std::make_shared<AgeToLengthConversionDerived<Type>>(
+            fleet, growth_observation,
+            population->size_distribution_provider);
 
-    if (age_to_length_conversion_derived->IsActive() &&
-        age_to_length_conversion_derived->PrepareForCurrentState()) {
+    const bool prepared =
+        preparation == AgeToLengthPreparation::kUsePreparedPopulationProducts
+            ? age_to_length_conversion_derived->PrepareFromPopulationProducts()
+            : age_to_length_conversion_derived->PrepareForCurrentState();
+
+    if (prepared) {
       FIMS_INFO_LOG(
           "Growth-derived age-to-length conversion successfully set to fleet " +
           fims::to_string(fleet->id) + " for population " +
@@ -87,24 +100,20 @@ BuildAgeToLengthConversionFleet(
 }
 
 /**
- * @brief Ensure a fleet has an active age-to-length conversion before
- * length-based calculations.
- *
- * Reuses the current fleet age-to-length conversion when it matches the current
- * population growth path and can prepare for the current model state. For the
- * migrated growth-derived path, this preparation includes both upstream growth
- * products and linked population size-provider products. Otherwise rebuilds the
- * fleet age-to-length conversion from the current population and fleet state.
- * Throws when the fleet has length bins but no usable age-to-length conversion
- * path can be constructed.
- *
+ * @brief Ensure a fleet has a usable age-to-length conversion.
+ * @details Reuses a derived conversion when its fleet, growth, and size-provider
+ * links match. Otherwise rebuilds it. Throws if no usable conversion is available.
  * @param population Shared pointer to the owning population.
  * @param fleet Shared pointer to the fleet.
+ * @param preparation Whether to prepare population products or use products
+ * already refreshed by the caller.
  */
 template <typename Type>
 void EnsureAgeToLengthConversionFleet(
     const std::shared_ptr<Population<Type>>& population,
-    const std::shared_ptr<Fleet<Type>>& fleet) {
+    const std::shared_ptr<Fleet<Type>>& fleet,
+    AgeToLengthPreparation preparation =
+        AgeToLengthPreparation::kPreparePopulationProducts) {
   if (fleet == nullptr) {
     throw std::runtime_error(
         "Fleet pointer was null while resolving age-to-length conversion.");
@@ -132,9 +141,21 @@ void EnsureAgeToLengthConversionFleet(
                   fleet->age_to_length_conversion_model);
 
       if (age_to_length_conversion_derived != nullptr &&
-          age_to_length_conversion_derived->IsActive() &&
-          age_to_length_conversion_derived->PrepareForCurrentState()) {
-        return;
+          age_to_length_conversion_derived->fleet_.lock() == fleet &&
+          age_to_length_conversion_derived->growth_observation_ ==
+              growth_observation &&
+          age_to_length_conversion_derived->size_provider_.lock() ==
+              population->size_distribution_provider) {
+        const bool prepared =
+            preparation ==
+                    AgeToLengthPreparation::kUsePreparedPopulationProducts
+                ? age_to_length_conversion_derived
+                      ->PrepareFromPopulationProducts()
+                : age_to_length_conversion_derived->PrepareForCurrentState();
+
+        if (prepared) {
+          return;
+        }
       }
     } else if (fleet->age_to_length_conversion_model->IsActive() &&
                fleet->age_to_length_conversion_model
@@ -144,7 +165,7 @@ void EnsureAgeToLengthConversionFleet(
   }
 
   fleet->age_to_length_conversion_model =
-      BuildAgeToLengthConversionFleet<Type>(population, fleet);
+      BuildAgeToLengthConversionFleet<Type>(population, fleet, preparation);
 
   if (fleet->age_to_length_conversion_model != nullptr) {
     return;
@@ -179,10 +200,14 @@ void EnsureAgeToLengthConversionFleet(
  *
  * @param population Shared pointer to the population whose fleets should be
  * checked.
+ * @param preparation Whether to prepare population products or use products
+ * already refreshed by the caller.
  */
 template <typename Type>
 void EnsurePopulationFleetAgeToLengthConversion(
-    const std::shared_ptr<Population<Type>>& population) {
+    const std::shared_ptr<Population<Type>>& population,
+    AgeToLengthPreparation preparation =
+        AgeToLengthPreparation::kPreparePopulationProducts) {
   if (population == nullptr) {
     throw std::runtime_error(
         "Population pointer was null while resolving age-to-length "
@@ -190,7 +215,8 @@ void EnsurePopulationFleetAgeToLengthConversion(
   }
 
   for (size_t i = 0; i < population->fleets.size(); ++i) {
-    EnsureAgeToLengthConversionFleet<Type>(population, population->fleets[i]);
+    EnsureAgeToLengthConversionFleet<Type>(
+        population, population->fleets[i], preparation);
   }
 }
 
