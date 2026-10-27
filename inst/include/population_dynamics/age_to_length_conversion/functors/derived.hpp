@@ -124,6 +124,23 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
   }
 
   /**
+   * @brief Prepare conversion using population products refreshed by the caller.
+   * @return False if required products are unavailable.
+   */
+  bool PrepareFromPopulationProducts() {
+    if (!this->IsActive()) {
+      return false;
+    }
+
+    const auto size_provider_ptr = TryGetSizeProvider();
+    const GrowthProducts<Type>* growth_products = TryGetGrowthProducts();
+
+    return size_provider_ptr != nullptr &&
+           size_provider_ptr->HasPreparedSizeProducts() &&
+           growth_products != nullptr && growth_products->n_sexes == 1;
+  }
+
+  /**
    * @brief Builds the normalized age-to-length conversion row for a given year
    * and age.
    * @param year Year index.

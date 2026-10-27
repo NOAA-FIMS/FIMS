@@ -1131,18 +1131,15 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Ensure all fleets linked to this model have a usable age-to-length
-   * conversion.
-   *
-   * Reuses each fleet's current age-to-length conversion when it matches the
-   * current population growth path and can prepare for the current model state.
-   * Otherwise rebuilds the fleet age-to-length conversion from the current
-   * population and fleet state before evaluation or reporting uses it.
+   * @brief Ensure fleet conversions use prepared population products.
+   * @details Requires PreparePopulationGrowthProducts() for the current
+   * parameter state. Reporting reuses products from the preceding evaluation.
    */
   void EnsureAllFleetAgeToLengthConversion() {
     for (size_t p = 0; p < this->populations.size(); ++p) {
       fims_popdy::EnsurePopulationFleetAgeToLengthConversion<Type>(
-          this->populations[p]);
+          this->populations[p],
+          fims_popdy::AgeToLengthPreparation::kUsePreparedPopulationProducts);
     }
   }
 
@@ -1184,11 +1181,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @brief Compute fleet-specific expected weight-at-age from the
    * growth-derived age-to-length conversion path.
    *
-   * This helper uses the fleet-specific growth-derived path only. It first
-   * prefers the per-evaluation fleet WAA cache and then falls back to the
-   * shared age-to-length conversion-row calculation helper. If neither
-   * growth-derived path is available, the function fails rather than silently
-   * switching to a different weight-at-age meaning.
+   * Calculates expected weight using the fleet's mapped length probabilities
+   * and weights at its bin centers. Requires an active growth-derived
+   * conversion with prepared population products.
    *
    * @param fleet Shared pointer to the fleet object.
    * @param year Year index.

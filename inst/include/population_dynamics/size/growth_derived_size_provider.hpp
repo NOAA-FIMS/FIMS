@@ -65,6 +65,8 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
   }
 
   void PrepareSizeProducts() override {
+    size_products_prepared_ = false;
+
     if (!population_size_grid_) {
       throw std::runtime_error(
           "GrowthDerivedSizeProvider requires a population biological size "
@@ -182,6 +184,10 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     }
 
     size_products_prepared_ = true;
+  }
+
+  bool HasPreparedSizeProducts() const override {
+    return size_products_prepared_;
   }
 
   void InvalidatePreparedSizeProducts() override {

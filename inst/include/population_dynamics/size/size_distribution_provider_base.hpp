@@ -64,6 +64,12 @@ class SizeDistributionProviderBase {
   virtual void PrepareSizeProducts() = 0;
 
   /**
+   * @brief Whether size products have been prepared without later invalidation.
+   * @details Does not detect changes to upstream parameters.
+   */
+  virtual bool HasPreparedSizeProducts() const = 0;
+
+  /**
    * @brief Invalidate any prepared size state held by this provider.
    *
    * This is called when upstream biological inputs or the canonical population
