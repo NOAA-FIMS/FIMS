@@ -133,7 +133,7 @@ PerRecruitResult<Type> CalculatePerRecruit(
   for (size_t a = 1; a < n; ++a) {
     result.numbers[a] = result.numbers[a - 1] * survival[a - 1];
   }
-  const Type plus_group_loss = Type(1.0) - survival[n - 1];
+  const Type plus_group_loss = -fims_math::expm1(-mortality[n - 1]);
   if (fims_math::Value(plus_group_loss) <= 0.0) {
     throw std::domain_error(
         "Plus-group mortality is too small for equilibrium");
@@ -150,7 +150,7 @@ PerRecruitResult<Type> CalculatePerRecruit(
           fishing_mortality * fishing.share * fishing.selectivity[a];
       result.fleet_yield[fleet] +=
           result.numbers[a] * (fleet_mortality / mortality[a]) *
-          (Type(1.0) - survival[a]) * fishing.weight[a];
+          (-fims_math::expm1(-mortality[a])) * fishing.weight[a];
     }
   }
   for (size_t fleet = 0; fleet < inputs.fleets.size(); ++fleet) {

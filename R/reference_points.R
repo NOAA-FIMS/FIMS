@@ -17,10 +17,32 @@
 #'   `F * share * selectivity`; selectivity is not normalized automatically.
 #' @param tolerance Positive absolute solver tolerance: SPR residual for SPR,
 #'   and width of the fishing mortality interval for MSY.
-#' @param max_iterations Maximum solver refinement iterations.
+#' @param max_iterations Maximum bisection steps for SPR, or golden-section
+#'   steps per candidate interval for MSY.
 #' @param grid_intervals Number of initial intervals in the MSY grid search.
 #' @return A list with the input snapshot, unfished per-recruit biomass,
-#'   an `spr` data frame, an `msy` list (or `NULL`), and solver `settings`.
+#'   an expanded `spr` data frame, an `msy` list (or `NULL`), a common
+#'   `reference_points` data frame, `conventions`, and solver `settings`.
+#'   Each SPR row includes per-recruit spawning biomass, biomass, total and
+#'   objective yields, and a `fleet_yield_per_recruit` list column. With supported
+#'   recruitment inputs, it also includes equilibrium recruitment, spawning
+#'   biomass, total biomass, total and objective yields, a `fleet_yield` list
+#'   column, and a separate logical `collapsed` flag. Without a recruitment
+#'   baseline (or with an unsupported recruitment type in SPR-only mode),
+#'   equilibrium fields and `collapsed` are `NA`. Invalid supplied Beverton-Holt
+#'   parameters are errors. Quantities at unconverged candidates are returned
+#'   for diagnosis; they must not be interpreted as achieved target benchmarks.
+#'   `reference_points` uses identical columns for MSY and every SPR target,
+#'   with catches in `fleet_yield_<id>` columns (one-based fleet positions when
+#'   no `inputs$fleet_ids` are supplied). `total_biomass` is total stock biomass;
+#'   `spawning_biomass` is mature female biomass. The existing `biomass`, `spr`,
+#'   and MSY `yield` fields remain available for compatibility.
+#'   SPR `lower_bound`, `upper_bound`, and `bracket_width` describe the last
+#'   searched interval, not a guaranteed F error bound; `not_bracketed` means
+#'   that interval did not bracket the target. MSY `bracket_width` is the largest
+#'   remaining refinement interval, `iterations` sums steps across intervals,
+#'   and `intervals_refined` counts them. MSY table residual and bounds are `NA`.
+#'   Biological collapse is separate from numerical solver status.
 #'   Check `status` before using a candidate. SPR status is `converged`,
 #'   `not_bracketed`, or `iteration_limit`. MSY status is `converged`,
 #'   `upper_bound`, `no_positive_yield`, or `iteration_limit`. An upper-bound
@@ -39,9 +61,9 @@
 #' SPR. MSY uses mean recruitment without deviations, with steepness
 #' strictly between 0.2 and 1. Nonpositive recruitment equilibria are extinction.
 #'
-#' MSY uses a grid followed by golden-section refinement of the best sampled
-#' region. Check sensitivity to bounds and grid resolution for unusual fishing
-#' patterns. These post-fit calculations do not provide standard errors.
+#' MSY uses a grid followed by golden-section refinement of candidate peaks,
+#' including plateaus, and both boundary-adjacent intervals. Check sensitivity
+#' to bounds and grid resolution for unusual fishing patterns. These post-fit calculations do not provide standard errors.
 #' @export
 #' @examples
 #' inputs <- list(
@@ -73,6 +95,12 @@ calculate_reference_points <- function(inputs, spr_targets = 0.4, msy = TRUE,
   if (tolerance >= 1) stop("tolerance must be less than one", call. = FALSE)
   scalar(max_iterations, "max_iterations", 1, .Machine$integer.max, TRUE)
   scalar(grid_intervals, "grid_intervals", 2, .Machine$integer.max, TRUE)
+  if (!is.null(inputs$fleet_ids) &&
+    (length(inputs$fleet_ids) != length(inputs$fleets) ||
+      anyNA(inputs$fleet_ids) || anyDuplicated(inputs$fleet_ids) ||
+      any(!nzchar(as.character(inputs$fleet_ids))))) {
+    stop("fleet_ids must contain one unique nonmissing ID per fleet", call. = FALSE)
+  }
   result <- calculate_reference_points_cpp(
     inputs, spr_targets, msy, max_f, tolerance,
     as.integer(max_iterations), as.integer(grid_intervals)
@@ -81,7 +109,48 @@ calculate_reference_points <- function(inputs, spr_targets = 0.4, msy = TRUE,
     max_f = max_f, tolerance = tolerance, max_iterations = max_iterations,
     grid_intervals = grid_intervals
   )
+  result$reference_points <- reference_point_table(result)
+  result$conventions <- list(
+    fishing_mortality = "Sum of fleet F coefficients; selectivity is used as supplied",
+    fleet_shares = "Fixed mortality coefficient shares, not catch shares",
+    spawning_biomass = "Beginning-of-year mature female biomass",
+    total_biomass = "Beginning-of-year total stock biomass",
+    spr_baseline = "Unfished per-recruit spawning biomass of the input snapshot",
+    recruitment_baseline = "Supplied stock-recruit phi0; never rebased automatically",
+    msy_objective = "Equilibrium yield of fleets with include_in_msy = TRUE"
+  )
   result
+}
+
+# Construct an additive reporting view without changing legacy result objects.
+reference_point_table <- function(result) {
+  fields <- c(
+    "target", "fishing_mortality", "achieved_spr", "spawning_biomass",
+    "total_biomass", "recruitment", "objective_yield", "total_yield",
+    "spawning_biomass_per_recruit", "biomass_per_recruit",
+    "objective_yield_per_recruit", "total_yield_per_recruit",
+    "residual", "lower_bound", "upper_bound", "bracket_width",
+    "iterations", "status", "collapsed"
+  )
+  rows <- result$spr[, fields, drop = FALSE]
+  rows$reference_point <- if (nrow(rows)) paste0("SPR_", result$spr$target) else character()
+  fleet_yield <- result$spr$fleet_yield
+  if (!is.null(result$msy)) {
+    msy <- result$msy
+    msy[c("target", "residual", "lower_bound", "upper_bound")] <- rep(list(NA_real_), 4)
+    msy <- as.data.frame(msy[fields], stringsAsFactors = FALSE)
+    msy$reference_point <- "MSY"
+    rows <- rbind(msy, rows)
+    fleet_yield <- c(list(result$msy$fleet_yield), fleet_yield)
+  }
+  ids <- result$inputs$fleet_ids
+  if (is.null(ids)) ids <- seq_along(result$inputs$fleets)
+  for (i in seq_along(ids)) {
+    rows[[paste0("fleet_yield_", ids[i])]] <- vapply(fleet_yield, `[`, numeric(1), i)
+  }
+  rows <- rows[, c("reference_point", setdiff(names(rows), "reference_point")), drop = FALSE]
+  rownames(rows) <- NULL
+  rows
 }
 
 #' @rdname calculate_reference_points
@@ -101,7 +170,13 @@ calculate_reference_points <- function(inputs, spr_targets = 0.4, msy = TRUE,
 #' parameters, as `model$get_output()` does. After fitting, synchronize these
 #' with [set_fixed()] and [set_random()] before calling. It does not retrieve
 #' estimates from a saved `FIMSFit`, change parameters, or refit the model.
-#' The returned snapshot records population ID, year index, ages, and fleet IDs.
+#' The returned snapshot records population ID, year index, ages, fleet IDs,
+#' `f_multiplier`, and `effective_fishing_mortality` (the multiplier times the
+#' sum of the reference year's fleet F coefficients). The multiplier cancels
+#' from normalized fleet shares but must be included in historical F/reference-F
+#' ratios. Such ratios require matching allocation and selectivity conventions;
+#' overriding shares defines a different fishing pattern. Index catchability
+#' must not be multiplied into these fishing coefficients.
 #' Catch weights follow the population weights used by `CatchAtAge`. The model's
 #' initial `phi0` is retained for recruitment even if reference-year biology
 #' differs. Thus unfished equilibrium recruitment in that year need not be R0.

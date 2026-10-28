@@ -79,10 +79,35 @@ inline Rcpp::List CalculateReferencePointsR(
                              include_in_msy});
   }
   const auto unfished = fims_popdy::CalculatePerRecruit(inputs, 0.0);
-  Rcpp::NumericVector f(targets.size()), spr(targets.size()),
-      residual(targets.size());
-  Rcpp::IntegerVector iterations(targets.size());
-  Rcpp::CharacterVector status(targets.size());
+  // SPR roots need no recruitment model. Absolute equilibrium quantities do.
+  bool has_recruitment = false;
+  fims_popdy::ReferencePointRecruitment sr{0.0, 0.0, 0.0};
+  if (snapshot.containsElementNamed("recruitment") &&
+      !Rf_isNull(snapshot["recruitment"])) {
+    Rcpp::List recruitment = snapshot["recruitment"];
+    if (Rcpp::as<std::string>(recruitment["type"]) == "beverton_holt") {
+      sr = {Rcpp::as<double>(recruitment["rzero"]),
+            Rcpp::as<double>(recruitment["steepness"]),
+            Rcpp::as<double>(recruitment["phi0"])};
+      fims_popdy::ValidateReferencePointRecruitment(sr);
+      has_recruitment = true;
+    } else if (include_msy) {
+      Rcpp::stop("MSY currently supports only Beverton-Holt recruitment");
+    }
+  }
+  if (include_msy && !has_recruitment) {
+    Rcpp::stop(
+        "MSY requires Beverton-Holt recruitment; use msy = FALSE for SPR only");
+  }
+  const R_xlen_t n = targets.size();
+  Rcpp::NumericVector f(n), spr(n), residual(n), lower(n), upper(n), width(n),
+      sbpr(n), bpr(n), ypr(n), objective_ypr(n), recruits(n, NA_REAL),
+      spawning_biomass(n, NA_REAL), biomass(n, NA_REAL),
+      total_yield(n, NA_REAL), objective_yield(n, NA_REAL);
+  Rcpp::List fleet_ypr(n), fleet_yield(n);
+  Rcpp::LogicalVector collapsed(n, NA_LOGICAL);
+  Rcpp::IntegerVector iterations(n);
+  Rcpp::CharacterVector status(n);
   fims_popdy::SPROptions options;
   options.max_f = max_f;
   options.tolerance = tolerance;
@@ -93,6 +118,27 @@ inline Rcpp::List CalculateReferencePointsR(
     spr[i] = result.spr;
     residual[i] = result.residual;
     iterations[i] = result.iterations;
+    lower[i] = result.lower_bound;
+    upper[i] = result.upper_bound;
+    width[i] = result.bracket_width;
+    const auto pr = fims_popdy::CalculatePerRecruit(inputs, f[i]);
+    sbpr[i] = pr.spawning_biomass;
+    bpr[i] = pr.biomass;
+    ypr[i] = pr.yield;
+    objective_ypr[i] = pr.objective_yield;
+    fleet_ypr[i] = ReferencePointVectorToR(pr.fleet_yield);
+    fleet_yield[i] = Rcpp::NumericVector(inputs.fleets.size(), NA_REAL);
+    if (has_recruitment) {
+      const auto eq = fims_popdy::CalculateEquilibrium(inputs, f[i], sr);
+      recruits[i] = eq.recruitment;
+      spawning_biomass[i] = eq.spawning_biomass;
+      biomass[i] = eq.biomass;
+      total_yield[i] = eq.yield;
+      objective_yield[i] = eq.objective_yield;
+      fleet_yield[i] = ReferencePointVectorToR(eq.fleet_yield);
+      collapsed[i] = eq.collapsed;
+    }
+
     switch (result.status) {
       case fims_popdy::SPRStatus::converged:
         status[i] = "converged";
@@ -104,32 +150,37 @@ inline Rcpp::List CalculateReferencePointsR(
         status[i] = "iteration_limit";
     }
   }
+  Rcpp::DataFrame spr_output = Rcpp::DataFrame::create(
+      Rcpp::Named("target") = targets, Rcpp::Named("fishing_mortality") = f,
+      Rcpp::Named("spr") = spr, Rcpp::Named("residual") = residual,
+      Rcpp::Named("iterations") = iterations, Rcpp::Named("status") = status);
+  spr_output["achieved_spr"] = spr;
+  spr_output["lower_bound"] = lower;
+  spr_output["upper_bound"] = upper;
+  spr_output["bracket_width"] = width;
+  spr_output["spawning_biomass_per_recruit"] = sbpr;
+  spr_output["biomass_per_recruit"] = bpr;
+  spr_output["total_yield_per_recruit"] = ypr;
+  spr_output["objective_yield_per_recruit"] = objective_ypr;
+  spr_output["fleet_yield_per_recruit"] = fleet_ypr;
+  spr_output["recruitment"] = recruits;
+  spr_output["spawning_biomass"] = spawning_biomass;
+  spr_output["biomass"] = biomass;
+  spr_output["total_biomass"] = biomass;
+  spr_output["total_yield"] = total_yield;
+  spr_output["objective_yield"] = objective_yield;
+  spr_output["fleet_yield"] = fleet_yield;
+  spr_output["collapsed"] = collapsed;
+  // Appending Rcpp list columns can drop attributes when the list is resized.
+  spr_output.attr("class") = "data.frame";
+  spr_output.attr("row.names") = Rcpp::IntegerVector::create(NA_INTEGER, -n);
   Rcpp::List output = Rcpp::List::create(
       Rcpp::Named("inputs") = snapshot,
       Rcpp::Named("unfished_per_recruit") = Rcpp::List::create(
           Rcpp::Named("biomass") = unfished.biomass,
           Rcpp::Named("spawning_biomass") = unfished.spawning_biomass),
-      Rcpp::Named("spr") = Rcpp::DataFrame::create(
-          Rcpp::Named("target") = targets, Rcpp::Named("fishing_mortality") = f,
-          Rcpp::Named("spr") = spr, Rcpp::Named("residual") = residual,
-          Rcpp::Named("iterations") = iterations,
-          Rcpp::Named("status") = status),
-      Rcpp::Named("msy") = R_NilValue);
+      Rcpp::Named("spr") = spr_output, Rcpp::Named("msy") = R_NilValue);
   if (include_msy) {
-    if (!snapshot.containsElementNamed("recruitment") ||
-        Rf_isNull(snapshot["recruitment"])) {
-      Rcpp::stop(
-          "MSY requires Beverton-Holt recruitment; use msy = FALSE for SPR "
-          "only");
-    }
-    Rcpp::List recruitment = snapshot["recruitment"];
-    if (Rcpp::as<std::string>(recruitment["type"]) != "beverton_holt") {
-      Rcpp::stop("MSY currently supports only Beverton-Holt recruitment");
-    }
-    fims_popdy::ReferencePointRecruitment sr{
-        Rcpp::as<double>(recruitment["rzero"]),
-        Rcpp::as<double>(recruitment["steepness"]),
-        Rcpp::as<double>(recruitment["phi0"])};
     fims_popdy::MSYOptions msy_options;
     msy_options.max_f = max_f;
     msy_options.tolerance = tolerance;
@@ -150,13 +201,14 @@ inline Rcpp::List CalculateReferencePointsR(
       default:
         msy_status = "iteration_limit";
     }
-    output["msy"] = Rcpp::List::create(
+    Rcpp::List msy_output = Rcpp::List::create(
         Rcpp::Named("fishing_mortality") = result.fishing_mortality,
         // Preserve the legacy yield field as total catch from all fleets.
         Rcpp::Named("yield") = result.equilibrium.yield,
         Rcpp::Named("total_yield") = result.equilibrium.yield,
         Rcpp::Named("objective_yield") = result.equilibrium.objective_yield,
         Rcpp::Named("biomass") = result.equilibrium.biomass,
+        Rcpp::Named("total_biomass") = result.equilibrium.biomass,
         Rcpp::Named("spawning_biomass") = result.equilibrium.spawning_biomass,
         Rcpp::Named("recruitment") = result.equilibrium.recruitment,
         Rcpp::Named("fleet_yield") =
@@ -164,6 +216,21 @@ inline Rcpp::List CalculateReferencePointsR(
         Rcpp::Named("collapsed") = result.equilibrium.collapsed,
         Rcpp::Named("iterations") = result.iterations,
         Rcpp::Named("status") = msy_status);
+    const auto pr =
+        fims_popdy::CalculatePerRecruit(inputs, result.fishing_mortality);
+    msy_output["achieved_spr"] =
+        unfished.spawning_biomass > 0.0
+            ? pr.spawning_biomass / unfished.spawning_biomass
+            : NA_REAL;
+    msy_output["spawning_biomass_per_recruit"] = pr.spawning_biomass;
+    msy_output["biomass_per_recruit"] = pr.biomass;
+    msy_output["total_yield_per_recruit"] = pr.yield;
+    msy_output["objective_yield_per_recruit"] = pr.objective_yield;
+    msy_output["fleet_yield_per_recruit"] =
+        ReferencePointVectorToR(pr.fleet_yield);
+    msy_output["bracket_width"] = result.bracket_width;
+    msy_output["intervals_refined"] = result.intervals_refined;
+    output["msy"] = msy_output;
   }
   return output;
 }

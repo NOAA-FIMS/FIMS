@@ -74,4 +74,17 @@ TEST_F(SBPR0Test, BevertonHoltReturnsR0AtUnfishedEquilibrium) {
                                         model.CalculateSBPR0(population)),
               1000.0, 1e-10);
 }
+TEST_F(SBPR0Test, TinyMortalityMatchesStableReferenceEngine) {
+  population->M = {1e-18, 1e-18, 1e-18, 1.0, 1.0, 1.0};
+  fims_popdy::ReferencePointInputs<double> inputs;
+  inputs.natural_mortality = {1e-18, 1e-18, 1e-18};
+  inputs.weight = {1.0, 2.0, 3.0};
+  inputs.maturity = {0.0, 0.5, 1.0};
+  inputs.proportion_female = {0.5, 0.5, 0.5};
+  const double expected =
+      fims_popdy::CalculatePerRecruit(inputs, 0.0).spawning_biomass;
+  const double actual = model.CalculateSBPR0(population);
+  EXPECT_TRUE(std::isfinite(actual));
+  EXPECT_NEAR(actual / expected, 1.0, 1e-14);
+}
 }  // namespace

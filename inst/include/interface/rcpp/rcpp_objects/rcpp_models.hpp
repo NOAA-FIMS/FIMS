@@ -262,6 +262,12 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       fleet_ids.push_back(fleet->GetId());
     snapshot["population_id"] = population_id;
     snapshot["year_index"] = year;
+    snapshot["f_multiplier"] = population->f_multiplier[year - 1];
+    double total_f = 0.0;
+    for (const auto& fleet : population->fleets)
+      total_f += fleet->Fmort[year - 1];
+    snapshot["effective_fishing_mortality"] =
+        population->f_multiplier[year - 1] * total_f;
     snapshot["fleet_ids"] = fleet_ids;
     snapshot["ages"] =
         Rcpp::wrap(population->ages.begin(), population->ages.end());

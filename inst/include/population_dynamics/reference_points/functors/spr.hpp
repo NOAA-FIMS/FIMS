@@ -29,6 +29,10 @@ struct SPRResult {
       0.0;               /*!< Candidate fishing mortality coefficient. */
   double spr = 1.0;      /*!< Achieved SBPR(F) / SBPR(0). */
   double residual = 0.0; /*!< Achieved SPR minus the requested target. */
+  double lower_bound =
+      0.0; /*!< Last searched interval, not an F error bound. */
+  double upper_bound = 0.0; /*!< For not_bracketed, the searched upper limit. */
+  double bracket_width = 0.0; /*!< Width of the last searched interval. */
   size_t iterations = 0; /*!< Number of bisection steps performed. */
   SPRStatus status = SPRStatus::iteration_limit; /*!< Solver outcome. */
 };
@@ -63,6 +67,8 @@ inline SPRResult CalculateSPR(const ReferencePointInputs<double>& inputs,
     result.spr = CalculatePerRecruit(inputs, f).spawning_biomass / unfished;
     result.residual = result.spr - target;
   };
+  result.upper_bound = options.max_f;
+  result.bracket_width = options.max_f;
   evaluate(options.max_f);
   if (std::abs(result.residual) <= options.tolerance) {
     result.status = SPRStatus::converged;
@@ -75,6 +81,9 @@ inline SPRResult CalculateSPR(const ReferencePointInputs<double>& inputs,
   double lower = 0.0;
   double upper = options.max_f;
   for (size_t i = 0; i < options.max_iterations; ++i) {
+    result.lower_bound = lower;
+    result.upper_bound = upper;
+    result.bracket_width = upper - lower;
     evaluate(lower + (upper - lower) / 2.0);
     result.iterations = i + 1;
     if (std::abs(result.residual) <= options.tolerance) {

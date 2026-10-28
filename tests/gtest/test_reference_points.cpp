@@ -419,3 +419,43 @@ TEST(ReferencePoints, MultifleetMSYIsInvariantToOrderAndSplitting) {
   }
 }
 }  // namespace
+
+// Cancellation must not destroy finite low-mortality equilibria or catches.
+TEST(ReferencePoints, StableLossAtTinyMortality) {
+  for (double m : {1e-10, 1e-18}) {
+    fims_popdy::ReferencePointInputs<double> inputs;
+    inputs.natural_mortality = {m};
+    inputs.weight = {1.0};
+    inputs.maturity = {1.0};
+    inputs.proportion_female = {1.0};
+    inputs.fleets = {{1.0, {1.0}, {1.0}}};
+    const auto pr = fims_popdy::CalculatePerRecruit(inputs, m);
+    EXPECT_NEAR(pr.numbers[0] * -std::expm1(-2.0 * m), 1.0, 1e-14);
+    EXPECT_NEAR(pr.yield, 0.5, 1e-14);
+  }
+}
+
+TEST(ReferencePoints, BoundaryAdjacentMSYAndIntervalDiagnostics) {
+  fims_popdy::ReferencePointInputs<double> inputs;
+  inputs.natural_mortality = {0.2, 0.2};
+  inputs.weight = {1.0, 1.0};
+  inputs.maturity = {0.0, 1.0};
+  inputs.proportion_female = {1.0, 1.0};
+  inputs.fleets = {{1.0, {1.0, 1.0}, {1.0, 1.0}}};
+  fims_popdy::ReferencePointRecruitment sr{1000.0, 0.75, 1.0 / std::expm1(0.2)};
+  for (double bound : {0.41, 0.372369089366}) {
+    fims_popdy::MSYOptions options;
+    options.max_f = bound;
+    options.grid_intervals = bound == 0.41 ? 2 : 100;
+    const auto result = fims_popdy::CalculateMSY(inputs, sr, options);
+    EXPECT_EQ(result.status, fims_popdy::MSYStatus::converged);
+    EXPECT_NEAR(result.fishing_mortality, 0.37199709, 1e-7);
+    EXPECT_NEAR(result.equilibrium.yield, 503.371401258, 1e-6);
+    EXPECT_LE(result.bracket_width, options.tolerance);
+    EXPECT_GE(result.intervals_refined, 2u);
+  }
+  const auto spr = fims_popdy::CalculateSPR(inputs, 0.4);
+  EXPECT_LE(spr.lower_bound, spr.fishing_mortality);
+  EXPECT_GE(spr.upper_bound, spr.fishing_mortality);
+  EXPECT_DOUBLE_EQ(spr.bracket_width, spr.upper_bound - spr.lower_bound);
+}

@@ -68,7 +68,7 @@ spr_result <- calculate_reference_points(
   spr_targets = c(0.5, 0.4, 0.35),
   msy = FALSE
 )
-knitr::kable(spr_result$spr, digits = 6)
+knitr::kable(spr_result$spr[, c("target", "fishing_mortality", "spr", "residual", "status")], digits = 6)
 ```
 
 A target of `0.4` means 40% of unfished spawning biomass per recruit. Check the
@@ -99,7 +99,7 @@ inputs$recruitment <- list(
 )
 result <- calculate_reference_points(inputs, spr_targets = c(0.4, 0.35))
 unlist(result$msy[c(
-  "fishing_mortality", "yield", "biomass", "spawning_biomass",
+  "fishing_mortality", "objective_yield", "total_yield", "biomass", "spawning_biomass",
   "recruitment", "status"
 )])
 ```
@@ -115,6 +115,36 @@ and have zero biomass and yield.
 Currently, MSY supports Beverton-Holt recruitment with steepness strictly
 between 0.2 and 1. Calculations use fixed biology and fleet shares and do not
 provide uncertainty estimates.
+
+## Compare complete reference points
+
+The common table has one row for MSY and each requested SPR target. Equilibrium
+quantities in an SPR row are evaluated at that target's fishing mortality.
+
+```{r benchmark-table}
+knitr::kable(result$reference_points[, c(
+  "reference_point", "fishing_mortality", "achieved_spr", "recruitment",
+  "spawning_biomass", "total_yield", "fleet_yield_1", "status", "collapsed"
+)], digits = 4)
+```
+
+`spawning_biomass` means mature female biomass; `total_biomass` means all stock
+biomass. A converged SPR root can still have `collapsed = TRUE` under the
+recruitment model. Without recruitment inputs, per-recruit outputs remain
+available, but absolute equilibrium quantities and `collapsed` are `NA`.
+Per-target fleet vectors are also available as `result$spr$fleet_yield[[1]]`
+and `result$spr$fleet_yield_per_recruit[[1]]`.
+
+The SPR denominator uses this snapshot's unfished biology. The supplied
+recruitment `phi0` retains the stock-recruit baseline; it is never automatically
+replaced with the snapshot denominator. With matched baselines and steepness
+0.75, SPR 40% implies recruitment about 86.36% of R0 and spawning biomass about
+34.55% of baseline spawning biomass.
+
+`bracket_width` records the last searched SPR interval or the largest remaining
+MSY refinement interval. SPR convergence uses residual tolerance, so its width
+need not be below that tolerance. MSY `iterations` sums steps across candidate
+intervals; `max_iterations` limits each interval separately.
 
 ## Inspect bounds and convergence
 
@@ -147,7 +177,8 @@ For SPR, `tolerance` controls the absolute SPR residual; for MSY, it controls
 the width of the refined F interval. `no_positive_yield` means the MSY search
 found no positive yield at its search resolution.
 
-The MSY solver first samples a grid, then refines the best sampled region.
+The MSY solver first samples a grid, then refines candidate peaks, including
+plateaus, and both boundary-adjacent intervals.
 Convergence does not guarantee a global maximum for every possible fishing
 pattern. Compare bounds and grid resolution when assessing unusual patterns.
 
@@ -240,6 +271,6 @@ stopifnot(
   directed_only$msy$objective_yield == directed_only$msy$fleet_yield[1],
   isTRUE(all.equal(directed_only$msy$total_yield, sum(directed_only$msy$fleet_yield))),
   identical(directed_only$msy$yield, directed_only$msy$total_yield),
-  identical(all_fleets$spr, directed_only$spr)
+  identical(all_fleets$spr$fishing_mortality, directed_only$spr$fishing_mortality)
 )
 ```

@@ -222,6 +222,13 @@ inline const Type pnorm(const Type &x, const Type &mean, const Type &sd) {
 
 #endif
 
+/** @brief Stable exp(x) - 1 for doubles and AD types (via argument lookup). */
+template <class Type>
+inline Type expm1(const Type& x) {
+  using std::expm1;
+  return expm1(x);
+}
+
 /**
  * @brief The general logistic function
  *

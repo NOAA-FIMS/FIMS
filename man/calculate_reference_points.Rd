@@ -49,7 +49,8 @@ The \code{inputs} returned by \code{\link[=get_reference_points]{get_reference_p
 \item{tolerance}{Positive absolute solver tolerance: SPR residual for SPR,
 and width of the fishing mortality interval for MSY.}
 
-\item{max_iterations}{Maximum solver refinement iterations.}
+\item{max_iterations}{Maximum bisection steps for SPR, or golden-section
+steps per candidate interval for MSY.}
 
 \item{grid_intervals}{Number of initial intervals in the MSY grid search.}
 
@@ -70,7 +71,28 @@ The flags are saved in the returned snapshot; they do not modify live fleets.}
 }
 \value{
 A list with the input snapshot, unfished per-recruit biomass,
-an \code{spr} data frame, an \code{msy} list (or \code{NULL}), and solver \code{settings}.
+an expanded \code{spr} data frame, an \code{msy} list (or \code{NULL}), a common
+\code{reference_points} data frame, \code{conventions}, and solver \code{settings}.
+Each SPR row includes per-recruit spawning biomass, biomass, total and
+objective yields, and a \code{fleet_yield_per_recruit} list column. With supported
+recruitment inputs, it also includes equilibrium recruitment, spawning
+biomass, total biomass, total and objective yields, a \code{fleet_yield} list
+column, and a separate logical \code{collapsed} flag. Without a recruitment
+baseline (or with an unsupported recruitment type in SPR-only mode),
+equilibrium fields and \code{collapsed} are \code{NA}. Invalid supplied Beverton-Holt
+parameters are errors. Quantities at unconverged candidates are returned
+for diagnosis; they must not be interpreted as achieved target benchmarks.
+\code{reference_points} uses identical columns for MSY and every SPR target,
+with catches in \verb{fleet_yield_<id>} columns (one-based fleet positions when
+no \code{inputs$fleet_ids} are supplied). \code{total_biomass} is total stock biomass;
+\code{spawning_biomass} is mature female biomass. The existing \code{biomass}, \code{spr},
+and MSY \code{yield} fields remain available for compatibility.
+SPR \code{lower_bound}, \code{upper_bound}, and \code{bracket_width} describe the last
+searched interval, not a guaranteed F error bound; \code{not_bracketed} means
+that interval did not bracket the target. MSY \code{bracket_width} is the largest
+remaining refinement interval, \code{iterations} sums steps across intervals,
+and \code{intervals_refined} counts them. MSY table residual and bounds are \code{NA}.
+Biological collapse is separate from numerical solver status.
 Check \code{status} before using a candidate. SPR status is \code{converged},
 \code{not_bracketed}, or \code{iteration_limit}. MSY status is \code{converged},
 \code{upper_bound}, \code{no_positive_yield}, or \code{iteration_limit}. An upper-bound
@@ -94,16 +116,22 @@ Inclusion flags do not change or renormalize fleet shares and do not affect
 SPR. MSY uses mean recruitment without deviations, with steepness
 strictly between 0.2 and 1. Nonpositive recruitment equilibria are extinction.
 
-MSY uses a grid followed by golden-section refinement of the best sampled
-region. Check sensitivity to bounds and grid resolution for unusual fishing
-patterns. These post-fit calculations do not provide standard errors.
+MSY uses a grid followed by golden-section refinement of candidate peaks,
+including plateaus, and both boundary-adjacent intervals. Check sensitivity
+to bounds and grid resolution for unusual fishing patterns. These post-fit calculations do not provide standard errors.
 
 \code{get_reference_points()} refreshes the live model's derived quantities and
 copies the chosen year's biology. It uses the current internal double
 parameters, as \code{model$get_output()} does. After fitting, synchronize these
 with \code{\link[=set_fixed]{set_fixed()}} and \code{\link[=set_random]{set_random()}} before calling. It does not retrieve
 estimates from a saved \code{FIMSFit}, change parameters, or refit the model.
-The returned snapshot records population ID, year index, ages, and fleet IDs.
+The returned snapshot records population ID, year index, ages, fleet IDs,
+\code{f_multiplier}, and \code{effective_fishing_mortality} (the multiplier times the
+sum of the reference year's fleet F coefficients). The multiplier cancels
+from normalized fleet shares but must be included in historical F/reference-F
+ratios. Such ratios require matching allocation and selectivity conventions;
+overriding shares defines a different fishing pattern. Index catchability
+must not be multiplied into these fishing coefficients.
 Catch weights follow the population weights used by \code{CatchAtAge}. The model's
 initial \code{phi0} is retained for recruitment even if reference-year biology
 differs. Thus unfished equilibrium recruitment in that year need not be R0.

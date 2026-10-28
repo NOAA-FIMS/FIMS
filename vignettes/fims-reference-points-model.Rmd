@@ -103,7 +103,10 @@ reference <- get_reference_points(
   model, population$get_id(), year = 2L,
   spr_targets = c(0.4, 0.35)
 )
-knitr::kable(reference$spr, digits = 6)
+knitr::kable(reference$reference_points[, c(
+  "reference_point", "fishing_mortality", "achieved_spr", "recruitment",
+  "spawning_biomass", "total_yield", "status", "collapsed"
+)], digits = 6)
 reference$msy[c("fishing_mortality", "yield", "spawning_biomass", "status")]
 ```
 
@@ -211,7 +214,7 @@ stopifnot(
   !included_first$inputs$fleets[[2]]$include_in_msy,
   included_first$msy$fleet_yield[2] > 0,
   included_first$msy$objective_yield == included_first$msy$fleet_yield[1],
-  identical(included_first$spr, reference$spr)
+  identical(included_first$spr$fishing_mortality, reference$spr$fishing_mortality)
 )
 ```
 
@@ -243,3 +246,14 @@ Inspect solver status for every calculation. A converged bounded MSY search
 still requires sensible biological assumptions and checks of the search bounds.
 The current implementation supports Beverton-Holt MSY and does not calculate
 standard errors; use `msy = FALSE` when only SPR targets are needed.
+
+
+## Compare fishing intensity on the same scale
+
+The saved `f_multiplier` multiplies the live model's fleet F coefficients.
+`effective_fishing_mortality` is their multiplied sum. It is the comparable
+numerator for an F/reference-F ratio when fleet allocation and selectivity
+conventions match. The multiplier cancels in relative fleet shares; it does
+not cancel from the historical total intensity. Overrides to fleet shares
+change the reference fishing pattern and must be reported alongside a ratio.
+Fleet catches in `reference_points` are labeled by the saved fleet IDs.

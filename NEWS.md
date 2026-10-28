@@ -2,6 +2,8 @@
 
 ## Bug Fixes
 
+* *(reference_points)* Use stable mortality losses in per-recruit calculations and the live unfished recruitment baseline. Refine multiple MSY candidate peaks and plateaus while retaining boundary-adjacent searches.
+
 * *(CatchAtAge)* Use preceding-age mortality in unfished spawning biomass per recruit. This corrects the Beverton-Holt recruitment baseline for age-varying natural mortality; constant-mortality results are unchanged. Existing fits with age-varying mortality should be refitted when adopting this correction.
 
 * *(CatchAtAge)* Build expected length comps from age comp proportions (#1751)
@@ -26,6 +28,8 @@
 * *(No Category)* Adds more exploration/explanation to demo
 
 ## Features
+
+* *(reference_points)* Return equilibrium and per-recruit quantities at every SPR target, with biological collapse separate from solver status. Add a common `reference_points` table, interval diagnostics, and live-model fishing multiplier metadata while retaining existing output fields. MSY `max_iterations` now applies per candidate interval; reported iterations sum across intervals.
 
 * *(reference_points)* Add `include_in_msy` fleet flags to exclude yield while retaining mortality and catch. Report `objective_yield` and `total_yield`; legacy `yield` remains total catch. Empty or all-excluded MSY objectives now raise an error; SPR-only calculations remain available. Add independent multifleet validation and bycatch examples.
 
