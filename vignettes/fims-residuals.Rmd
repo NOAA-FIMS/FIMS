@@ -34,7 +34,27 @@ estimates <- get_estimates(fit_big_optimized)
 
 `get_estimates()` calculates Pearson residuals for every data observation and returns them in the `resids` column, next to `observed` and `expected`, so you do not have to calculate them yourself. Rows that are not data, e.g., parameters and derived quantities, have a residual of `NA`. Under the hood, `get_estimates()` calls `calculate_residuals()`, which you can also call directly, e.g., `calculate_residuals(estimates, type = "pearson")`.
 
-A Pearson residual is the observed value minus the expected (fitted) value, divided by the standard deviation implied by the likelihood. The calculation depends on the likelihood distribution. For a lognormal likelihood (`log_normal` in FIMS) with meanlog $\mu$ and sdlog $\sigma$, the response-scale mean is $\exp(\mu + \sigma^2 / 2)$ and the variance is $\exp(2\mu + \sigma^2)(\exp(\sigma^2) - 1)$. FIMS reports `expected` as $\mu$ and `log_sd` as $\log(\sigma)$ for this likelihood. For a normal likelihood (`normal`), the residual is $(y - \mu) / \sigma$.
+Pearson residuals are a useful way to assess how well the model fits the data. They measure how far each observation is from its fitted value, scaled by the amount of variability expected under the assumed likelihood. This makes them easier to compare across observations and helps reveal patterns such as bias, outliers, or systematic lack of fit.
+
+The exact calculation depends on the likelihood distribution. In general, a Pearson residual is the observed value minus the expected value, divided by the standard deviation implied by the likelihood. For a normal likelihood (`normal` in FIMS), the residual is simply $(y - \mu)/\sigma$. For a lognormal likelihood (`log_normal` in FIMS), the residual is calculated on the response scale as
+
+$$
+\frac{y - E(y)}{\sqrt{\mathrm{Var}(y)}}
+$$
+
+where
+
+$$
+E(y) = \exp\left(\mu + \frac{\sigma^2}{2}\right)
+$$
+
+and
+
+$$
+\mathrm{Var}(y) = \exp\left(2\mu + \sigma^2\right)\left(\exp\left(\sigma^2\right) - 1\right).
+$$
+
+In FIMS, `expected` is reported on the log scale as $\mu$, and `log_sd` is the log of the standard deviation parameter.
 
 The example below keeps the residuals for the lognormal data streams.
 
