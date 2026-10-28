@@ -59,6 +59,15 @@ struct PerRecruitResult {
   fims::Vector<Type> fleet_yield; /*!< Annual catch weight by fleet. */
 };
 
+/** @brief Stable Baranov catch integral (1 - exp(-Z)) / Z. */
+template <typename Type>
+inline Type CatchIntegral(const Type& z) {
+  if (std::abs(fims_math::Value(z)) < 1e-8) {
+    return Type(1.0) - Type(0.5) * z;
+  }
+  return -fims_math::expm1(-z) / z;
+}
+
 /** @brief Check dimensions and biological ranges before calculation. */
 template <typename Type>
 void ValidateReferencePointInputs(const ReferencePointInputs<Type>& inputs) {
@@ -149,8 +158,8 @@ PerRecruitResult<Type> CalculatePerRecruit(
       const Type fleet_mortality =
           fishing_mortality * fishing.share * fishing.selectivity[a];
       result.fleet_yield[fleet] +=
-          result.numbers[a] * (fleet_mortality / mortality[a]) *
-          (-fims_math::expm1(-mortality[a])) * fishing.weight[a];
+          result.numbers[a] * fleet_mortality * CatchIntegral(mortality[a]) *
+          fishing.weight[a];
     }
   }
   for (size_t fleet = 0; fleet < inputs.fleets.size(); ++fleet) {

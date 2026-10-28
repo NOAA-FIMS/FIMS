@@ -180,6 +180,8 @@ reference_point_table <- function(result) {
 #' Catch weights follow the population weights used by `CatchAtAge`. The model's
 #' initial `phi0` is retained for recruitment even if reference-year biology
 #' differs. Thus unfished equilibrium recruitment in that year need not be R0.
+#' A warning is issued when a fleet with zero reference-year fishing mortality
+#' is assigned a positive reference-point share.
 #' @export
 get_reference_points <- function(model, population, year, fleet_shares = NULL,
                                  spr_targets = 0.4, msy = TRUE, max_f = 5,

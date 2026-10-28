@@ -256,6 +256,19 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     model->do_reporting = reporting;
     const auto inputs = fims_popdy::MakeReferencePointInputs(
         *model, population, year - 1, Rcpp::as<std::vector<double>>(shares));
+    bool warned_survey_share = false;
+    for (size_t f = 0; f < population->fleets.size(); ++f) {
+      if (population->fleets[f]->Fmort[year - 1] <= 0.0 &&
+          inputs.fleets[f].share > 0.0) {
+        warned_survey_share = true;
+        break;
+      }
+    }
+    if (warned_survey_share) {
+      Rcpp::warning(
+          "A fleet with zero fishing mortality has a positive reference-point "
+          "share; use a zero share for survey fleets.");
+    }
     Rcpp::List snapshot = ReferencePointInputsToR(inputs);
     Rcpp::IntegerVector fleet_ids;
     for (const auto& fleet : population->fleets)

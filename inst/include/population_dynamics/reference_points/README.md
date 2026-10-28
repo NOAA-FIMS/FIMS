@@ -30,7 +30,8 @@ recruitment and bounded MSY calculations use the same per-recruit engine.
   modified, and results hold no references to population state.
 
 Survival into age `a` uses mortality at age `a - 1`. The plus-group abundance
-is divided by `1 - exp(-Z[last])`. SPR is `SBPR(F) / SBPR(0)`, not the annual
+is divided by the stable equivalent `-expm1(-Z[last])`. Catch uses the stable
+Baranov integral `-expm1(-Z) / Z`. SPR is `SBPR(F) / SBPR(0)`, not the annual
 spawning biomass divided by initial unfished spawning biomass.
 
 ## Example
@@ -106,6 +107,17 @@ fleets zero share. Selectivity is used as supplied. Catch weights match the
 population weights used in CatchAtAge's catch calculation. The live model
 adapter requires at least two consecutive annual ages.
 
+The R `spr` output is a data frame with one row per requested target. Each row
+contains solver diagnostics, spawning biomass and yield per recruit, and (when
+valid Beverton-Holt inputs are available) equilibrium recruitment, spawning
+biomass, total biomass, fleet-specific catch, total catch, and a collapse flag.
+Without a recruitment baseline (or with an unsupported type in SPR-only mode),
+equilibrium quantities are `NA` while per-recruit quantities remain available.
+Invalid supplied Beverton-Holt parameters are errors. Fleet vectors are list
+columns, e.g. `result$spr$fleet_yield[[1]]`. The additive `reference_points`
+table combines MSY and SPR results with fleet-ID catch columns. Biological
+collapse is separate from numerical convergence.
+
 For MSY, the adapter retains the recruitment model's `R0`, steepness, and initial
 `CalculateSBPR0()` baseline. It deliberately preserves the fitted model's
 stock-recruit relationship when reference-year biology differs. Therefore the
@@ -127,10 +139,12 @@ steepness must be strictly between 0.2 and 1. Unsupported recruitment models
 can still calculate SPR by setting `msy = FALSE` in R. MSY requires at least
 one included fleet; an empty or all-excluded objective throws an error.
 
-`CalculateMSY` evaluates a grid on [0, max_f], then refines the best sampled
-region using golden-section search. If the grid misses a narrow productive
-region, the solver also searches below the first grid point. Endpoints remain
-candidates. The result includes F, yield, recruitment, total and spawning
+`CalculateMSY` evaluates a grid on [0, max_f], then refines every detected
+local maximum, including plateaus, and both boundary-adjacent intervals using
+golden-section search. If the grid misses a narrow
+productive region, the solver also searches below the first grid point.
+Endpoints remain candidates. The result includes F, objective and total yield,
+recruitment, total and spawning
 biomass, yield by fleet, iterations, and status:
 
 - `converged`: the refined F interval is within tolerance.

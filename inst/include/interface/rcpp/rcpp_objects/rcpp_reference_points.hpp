@@ -159,6 +159,9 @@ inline Rcpp::List CalculateReferencePointsR(
   spr_output["upper_bound"] = upper;
   spr_output["bracket_width"] = width;
   spr_output["spawning_biomass_per_recruit"] = sbpr;
+  spr_output["spr_fished_per_recruit"] = sbpr;
+  spr_output["spr_unfished_per_recruit"] =
+      Rcpp::NumericVector(n, unfished.spawning_biomass);
   spr_output["biomass_per_recruit"] = bpr;
   spr_output["total_yield_per_recruit"] = ypr;
   spr_output["objective_yield_per_recruit"] = objective_ypr;
