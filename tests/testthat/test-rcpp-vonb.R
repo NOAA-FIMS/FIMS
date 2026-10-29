@@ -573,6 +573,93 @@ test_that("rcpp Traditional random t0 uses log-distance storage", {
   expect_equal(vb$age_at_zero_length[1]$value, -0.5)
 })
 
+test_that("rcpp Traditional random t0 links its log-distance distribution", {
+  FIMS::clear()
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(ctx)
+  t0_distribution <- methods::new(FIMS::DnormDistribution)
+  obj <- NULL
+
+  on.exit(
+    {
+      if (!is.null(obj)) {
+        TMB::FreeADFun(obj)
+      }
+      rm(obj, vb, t0_distribution, ctx)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  vb$min_age$set(2)
+  vb$age_at_zero_length[1]$estimation_type$set("random_effects")
+
+  distribution_mean <- 0.2
+  distribution_sd <- 0.7
+
+  t0_distribution$expected_values$resize(1)
+  t0_distribution$expected_values[1]$value <- distribution_mean
+  t0_distribution$log_sd$resize(1)
+  t0_distribution$log_sd[1]$value <- log(distribution_sd)
+  t0_distribution$set_distribution_links(
+    "random_effects",
+    vb$age_at_zero_length$get_id()
+  )
+
+  FIMS::CreateTMBModel()
+
+  parameters <- list(
+    p = FIMS::get_fixed(),
+    re = FIMS::get_random()
+  )
+
+  expect_length(parameters[["re"]], 1)
+  if (length(parameters[["re"]]) != 1) {
+    return(invisible(NULL))
+  }
+
+  expect_equal(unname(parameters[["re"]]), log(1.5))
+
+  # Leave random unspecified to evaluate the joint density without
+  # integrating out t0 through a Laplace approximation.
+  obj <- TMB::MakeADFun(
+    data = list(),
+    parameters = parameters,
+    DLL = "FIMS",
+    silent = TRUE
+  )
+
+  expect_length(obj[["par"]], 1)
+  if (length(obj[["par"]]) != 1) {
+    return(invisible(NULL))
+  }
+
+  #' @description Test that the linked t0 distribution evaluates log-distance
+  #' values, including updates after registration, rather than natural ages.
+  for (distance in c(1.5, 2.5)) {
+    working_parameters <- obj[["par"]]
+    working_parameters[[1]] <- log(distance)
+
+    obj[["fn"]](working_parameters)
+    reported_nll <- as.numeric(
+      obj[["report"]](working_parameters)[["nll_components"]]
+    )
+
+    expect_length(reported_nll, 1)
+    expect_equal(
+      reported_nll,
+      -stats::dnorm(
+        log(distance),
+        mean = distribution_mean,
+        sd = distribution_sd,
+        log = TRUE
+      ),
+      tolerance = 1e-10
+    )
+  }
+})
+
 test_that("rcpp von Bertalanffy Traditional growth initializes with delta-method variability", {
   ctx <- make_vonb_traditional_test_context()
   vb <- new_vonb_traditional(
