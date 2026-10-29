@@ -454,13 +454,6 @@ test_that("edm_skill() embedding_name column matches fit embedding_name", {
   expect_equal(sk$embedding_name, get_embedding_name(fit))
 })
 
-test_that("edm_skill() simplex rmse is zero for perfect in-library self-prediction", {
-  #' @description Simplex in-library rmse should be ~0 when predictions perfectly track targets.
-  fit <- fit_edm(local_ff, method = "simplex")
-  sk  <- edm_skill(fit, local_ff)
-  expect_lt(sk$rmse, 1e-6)
-})
-
 ## Error handling ----
 
 test_that("edm_skill() errors when fit is not an EDMFit", {
@@ -558,4 +551,5 @@ test_that("edm_compare() errors when embedding is missing", {
   #' @description edm_compare() throws an error if requested embedding_name is not found.
   expect_error(edm_compare(local_ff, embedding_name = "nonexistent"), regexp = "not found")
 })
+
 

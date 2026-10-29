@@ -112,7 +112,8 @@ void register_edm(Rcpp::Module& m) {
       .property("embedding_dimension",
                 &GPEdmProjectionInterface::get_embedding_dimension,
                 &GPEdmProjectionInterface::set_embedding_dimension)
-      .field("phi", &GPEdmProjectionInterface::phi)
+      .property("phi", &GPEdmProjectionInterface::get_phi,
+                &GPEdmProjectionInterface::set_phi)
       .property("sigma2",
                 &GPEdmProjectionInterface::get_sigma2,
                 &GPEdmProjectionInterface::set_sigma2)
@@ -140,4 +141,3 @@ void register_edm(Rcpp::Module& m) {
       .method("get", &SharedDouble::get)
       .method("set", &SharedDouble::set);
 }
-

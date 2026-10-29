@@ -23,43 +23,43 @@ test_that("create_edm_embedding() validates bad inputs", {
 
   # Not a FIMSFrame
   expect_error(
-    create_edm_embedding(list(), "index", "survey1", E = 3, tau = 1),
+    create_edm_embedding(list(), "index", "survey1", E = 3, tau = 1, forecast_horizon = 1),
     regexp = "FIMSFrame"
   )
 
   # Bad series_type type
   expect_error(
-    create_edm_embedding(data_4_model, 123, "survey1", E = 3, tau = 1),
+    create_edm_embedding(data_4_model, 123, "survey1", E = 3, tau = 1, forecast_horizon = 1),
     regexp = "series_type"
   )
 
   # Bad E (0)
   expect_error(
-    create_edm_embedding(data_4_model, "index", "survey1", E = 0, tau = 1),
+    create_edm_embedding(data_4_model, "index", "survey1", E = 0, tau = 1, forecast_horizon = 1),
     regexp = "E"
   )
 
   # Bad E (non-integer 3.5)
   expect_error(
-    create_edm_embedding(data_4_model, "index", "survey1", E = 3.5, tau = 1),
+    create_edm_embedding(data_4_model, "index", "survey1", E = 3.5, tau = 1, forecast_horizon = 1),
     regexp = "E"
   )
 
   # Bad tau (-1)
   expect_error(
-    create_edm_embedding(data_4_model, "index", "survey1", E = 3, tau = -1),
+    create_edm_embedding(data_4_model, "index", "survey1", E = 3, tau = -1, forecast_horizon = 1),
     regexp = "tau"
   )
 
   # Bad tau (non-integer 1.2)
   expect_error(
-    create_edm_embedding(data_4_model, "index", "survey1", E = 3, tau = 1.2),
+    create_edm_embedding(data_4_model, "index", "survey1", E = 3, tau = 1.2, forecast_horizon = 1),
     regexp = "tau"
   )
 
   # Non-existent series
   expect_error(
-    create_edm_embedding(data_4_model, "index", "no_such_fleet", E = 3, tau = 1),
+    create_edm_embedding(data_4_model, "index", "no_such_fleet", E = 3, tau = 1, forecast_horizon = 1),
     regexp = "No data found"
   )
 })

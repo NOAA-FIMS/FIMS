@@ -9,12 +9,13 @@ test_that("Simplex projection works inside FIMS TMB framework", {
   lib_series <- c(10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0)
   E <- 3L
   tau <- 1L
-  lib_de$construct(lib_series, E, tau)
+  forecast_horizon <- 1L
+  lib_de$construct(lib_series, E, tau, forecast_horizon)
 
   # Create delay embedding object for test
   test_de <- methods::new(DelayEmbedding)
   test_series <- c(50.0, 60.0, 70.0, 80.0)
-  test_de$construct(test_series, E, tau)
+  test_de$construct(test_series, E, tau, forecast_horizon)
 
   # Create SimplexProjection module
   sp <- methods::new(SimplexProjection)
@@ -59,12 +60,13 @@ test_that("SMap projection works inside FIMS TMB framework", {
   lib_series <- c(10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0)
   E <- 3L
   tau <- 1L
-  lib_de$construct(lib_series, E, tau)
+  forecast_horizon <- 1L
+  lib_de$construct(lib_series, E, tau, forecast_horizon)
 
   # Create delay embedding object for test
   test_de <- methods::new(DelayEmbedding)
   test_series <- c(50.0, 60.0, 70.0, 80.0)
-  test_de$construct(test_series, E, tau)
+  test_de$construct(test_series, E, tau, forecast_horizon)
 
   # Create SMapProjection module
   smap <- methods::new(SMapProjection)
@@ -107,12 +109,13 @@ test_that("GPEdm projection works inside FIMS TMB framework", {
   lib_series <- c(10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0)
   E <- 3L
   tau <- 1L
-  lib_de$construct(lib_series, E, tau)
+  forecast_horizon <- 1L
+  lib_de$construct(lib_series, E, tau, forecast_horizon)
 
   # Create delay embedding object for test
   test_de <- methods::new(DelayEmbedding)
   test_series <- c(50.0, 60.0, 70.0, 80.0)
-  test_de$construct(test_series, E, tau)
+  test_de$construct(test_series, E, tau, forecast_horizon)
 
   # Create GPEdmProjection module
   gp <- methods::new(GPEdmProjection)

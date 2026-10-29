@@ -1045,6 +1045,7 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
   SharedInt embedding_dimension;
   /**
    * @brief The ARD length-scale parameters (phi).
+   * @details Assign through set_phi() to keep the registered model copy in sync.
    */
   Rcpp::NumericVector phi;
   /**
@@ -1074,6 +1075,18 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
 
   int get_embedding_dimension() const { return this->embedding_dimension.get(); }
   void set_embedding_dimension(int val) { this->embedding_dimension.set(val); }
+  Rcpp::NumericVector get_phi() const { return this->phi; }
+  void set_phi(Rcpp::NumericVector values) {
+    auto registered = std::dynamic_pointer_cast<GPEdmProjectionInterface>(
+        EDMInterfaceBase::live_objects.at(this->id));
+    if (!registered) {
+      throw std::runtime_error(
+          "GPEdmProjectionInterface::set_phi: registered object has wrong type.");
+    }
+    // Rcpp vector assignment replaces storage rather than updating the copy.
+    this->phi = values;
+    registered->phi = values;
+  }
   double get_sigma2() const { return this->sigma2.get(); }
   void set_sigma2(double val) { this->sigma2.set(val); }
   double get_ve() const { return this->ve.get(); }
@@ -1152,10 +1165,11 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
 
     this->sigma2 = gp.sigma2;
     this->ve = gp.ve;
-    this->phi = Rcpp::NumericVector(gp.phi.size());
+    Rcpp::NumericVector fitted_phi(gp.phi.size());
     for (size_t i = 0; i < gp.phi.size(); ++i) {
-      this->phi[i] = gp.phi[i];
+      fitted_phi[i] = gp.phi[i];
     }
+    this->set_phi(fitted_phi);
 
     return Rcpp::List::create(
         Rcpp::Named("phi") = this->phi,
