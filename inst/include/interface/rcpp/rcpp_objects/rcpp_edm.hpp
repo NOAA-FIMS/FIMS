@@ -558,6 +558,36 @@ void populate_edm_model_matrices(
       model->test_target_uncertainty_storage);
 }
 
+#ifdef TMB_MODEL
+/**
+ * @brief Validate embeddings, populate owned matrices, and register an EDM model.
+ */
+template <typename Type>
+bool register_edm_model(
+    uint32_t lib_id, uint32_t test_id,
+    std::shared_ptr<fims_edm::EDMModel<Type>>& model,
+    const std::string& context) {
+  auto it_lib = EDMInterfaceBase::live_objects.find(lib_id);
+  auto it_test = EDMInterfaceBase::live_objects.find(test_id);
+  if (it_lib == EDMInterfaceBase::live_objects.end() ||
+      it_test == EDMInterfaceBase::live_objects.end()) {
+    FIMS_ERROR_LOG(context + ": invalid lib_de_id or test_de_id.");
+    return false;
+  }
+
+  auto* library = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
+  auto* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
+  if (!library || !test) {
+    FIMS_ERROR_LOG(context + ": objects are not DelayEmbeddingInterface.");
+    return false;
+  }
+
+  populate_edm_model_matrices<Type>(library, test, model);
+  fims_info::Information<Type>::GetInstance()->edm_models[model->id] = model;
+  return true;
+}
+#endif
+
 /**
  * @brief Rcpp interface for Simplex projection.
  */
@@ -697,25 +727,8 @@ class SimplexProjectionInterface : public EDMInterfaceBase {
     model->n_neighbors = this->n_neighbors;
     model->forecast_horizon = this->forecast_horizon;
 
-    auto it_lib = EDMInterfaceBase::live_objects.find(this->lib_de_id);
-    auto it_test = EDMInterfaceBase::live_objects.find(this->test_de_id);
-    if (it_lib == EDMInterfaceBase::live_objects.end() ||
-        it_test == EDMInterfaceBase::live_objects.end()) {
-      FIMS_ERROR_LOG("SimplexProjectionInterface: invalid lib_de_id or test_de_id.");
-      return false;
-    }
-
-    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
-    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
-    if (!lib || !test) {
-      FIMS_ERROR_LOG("SimplexProjectionInterface: objects are not DelayEmbeddingInterface.");
-      return false;
-    }
-
-    populate_edm_model_matrices<Type>(lib, test, model);
-
-    fims_info::Information<Type>::GetInstance()->edm_models[this->id] = model;
-    return true;
+    return register_edm_model<Type>(
+        this->lib_de_id, this->test_de_id, model, "SimplexProjectionInterface");
   }
 
   virtual bool add_to_fims_tmb() {
@@ -878,25 +891,8 @@ class SMapProjectionInterface : public EDMInterfaceBase {
     model->kernel = this->kernel;
     model->forecast_horizon = this->forecast_horizon;
 
-    auto it_lib = EDMInterfaceBase::live_objects.find(this->lib_de_id);
-    auto it_test = EDMInterfaceBase::live_objects.find(this->test_de_id);
-    if (it_lib == EDMInterfaceBase::live_objects.end() ||
-        it_test == EDMInterfaceBase::live_objects.end()) {
-      FIMS_ERROR_LOG("SMapProjectionInterface: invalid lib_de_id or test_de_id.");
-      return false;
-    }
-
-    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
-    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
-    if (!lib || !test) {
-      FIMS_ERROR_LOG("SMapProjectionInterface: objects are not DelayEmbeddingInterface.");
-      return false;
-    }
-
-    populate_edm_model_matrices<Type>(lib, test, model);
-
-    fims_info::Information<Type>::GetInstance()->edm_models[this->id] = model;
-    return true;
+    return register_edm_model<Type>(
+        this->lib_de_id, this->test_de_id, model, "SMapProjectionInterface");
   }
 
   virtual bool add_to_fims_tmb() {
@@ -1132,25 +1128,8 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
       model->phi.assign(this->embedding_dimension, 0.1);
     }
 
-    auto it_lib = EDMInterfaceBase::live_objects.find(this->lib_de_id);
-    auto it_test = EDMInterfaceBase::live_objects.find(this->test_de_id);
-    if (it_lib == EDMInterfaceBase::live_objects.end() ||
-        it_test == EDMInterfaceBase::live_objects.end()) {
-      FIMS_ERROR_LOG("GPEdmProjectionInterface: invalid lib_de_id or test_de_id.");
-      return false;
-    }
-
-    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
-    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
-    if (!lib || !test) {
-      FIMS_ERROR_LOG("GPEdmProjectionInterface: objects are not DelayEmbeddingInterface.");
-      return false;
-    }
-
-    populate_edm_model_matrices<Type>(lib, test, model);
-
-    fims_info::Information<Type>::GetInstance()->edm_models[this->id] = model;
-    return true;
+    return register_edm_model<Type>(
+        this->lib_de_id, this->test_de_id, model, "GPEdmProjectionInterface");
   }
 
   virtual bool add_to_fims_tmb() {

@@ -316,8 +316,10 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
   }
 
  private:
+  using PredictionWeights = Eigen::Matrix<Type, Eigen::Dynamic, 1>;
+
   /** @brief Solve the current library covariance system for prediction weights. */
-  std::vector<Type> solve_library_weights() const {
+  PredictionWeights solve_library_weights() const {
     const size_t N = this->library->n_rows;
     const size_t E = this->embedding_dimension;
 
@@ -336,34 +338,24 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
     BuildCovarianceMatrix<Type>(this->library->embedded_values, N, E,
                                 phi, sigma2, ve, Sigma);
 
-    // --- Build target vector y ---
-    std::vector<Type> y(N);
-    for (size_t i = 0; i < N; ++i) {
-      y[i] = *(this->library->target_values[i]);
-    }
-
-    // --- Solve Sigma * alpha = y (alpha overwrites y) via Cholesky (Eigen::LDLT) ---
+    // --- Solve Sigma * alpha = y via Cholesky (Eigen::LDLT) ---
     Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic> Sigma_mat(N, N);
     for (size_t i = 0; i < N; ++i) {
       for (size_t j = 0; j < N; ++j) {
         Sigma_mat(i, j) = Sigma[i * N + j];
       }
     }
-    Eigen::Matrix<Type, Eigen::Dynamic, 1> y_mat(N);
+    PredictionWeights y_mat(N);
     for (size_t i = 0; i < N; ++i) {
-      y_mat(i) = y[i];
+      y_mat(i) = *(this->library->target_values[i]);
     }
     Eigen::LDLT<Eigen::Matrix<Type, Eigen::Dynamic, Eigen::Dynamic>> ldlt(Sigma_mat);
-    Eigen::Matrix<Type, Eigen::Dynamic, 1> alpha = ldlt.solve(y_mat).eval();
-    for (size_t i = 0; i < N; ++i) {
-      y[i] = alpha(i);
-    }
-    return y;
+    return ldlt.solve(y_mat).eval();
   }
 
   /** @brief Compute a query's posterior mean using solved library weights. */
   Type predict_with_weights(const fims::Vector<Type>& query_point,
-                            const std::vector<Type>& weights) const {
+                            const PredictionWeights& weights) const {
     const size_t N = this->library->n_rows;
     const size_t E = this->embedding_dimension;
     // --- Build k_star: covariance between query and every library row ---
@@ -374,7 +366,7 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
     // --- Posterior mean: y_hat = k_star^T alpha ---
     Type y_hat = Type(0);
     for (size_t i = 0; i < N; ++i) {
-      y_hat += k_star[i] * weights[i];
+      y_hat += k_star[i] * weights(i);
     }
     return y_hat;
   }

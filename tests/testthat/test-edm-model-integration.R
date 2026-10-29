@@ -52,6 +52,62 @@ test_that("Simplex projection works inside FIMS TMB framework", {
   clear()
 })
 
+for (predictor_name in c("SimplexProjection", "SMapProjection", "GPEdmProjection")) {
+  test_that(paste(predictor_name, "preserves TMB registration diagnostics"), {
+    #' @description EDM registration logs invalid IDs before wrong object types and succeeds with valid embeddings after rejected registrations.
+    clear()
+    withr::defer(clear())
+    library_embedding <- methods::new(DelayEmbedding)
+    test_embedding <- methods::new(DelayEmbedding)
+    series <- c(0.4, 0.9, 0.3, 0.8, 0.5, 0.7, 0.2, 0.6, 0.4, 0.9)
+    library_embedding$construct(series, 2L, 1L, 1L)
+    test_embedding$construct(series[5:10], 2L, 1L, 1L)
+    predictor_class <- switch(predictor_name,
+      SimplexProjection = SimplexProjection,
+      SMapProjection = SMapProjection,
+      GPEdmProjection = GPEdmProjection
+    )
+    predictor <- methods::new(predictor_class)
+    predictor[["embedding_dimension"]] <- 2L
+    library_id <- library_embedding$get_id()
+    test_id <- test_embedding$get_id()
+    wrong_type_id <- predictor$get_id()
+    for (ids in list(
+      c(0L, test_id), c(library_id, 0L), c(0L, 0L), c(wrong_type_id, 0L),
+      c(wrong_type_id, test_id), c(library_id, wrong_type_id),
+      c(wrong_type_id, wrong_type_id)
+    )) {
+      predictor[["lib_de_id"]] <- ids[[1L]]
+      predictor[["test_de_id"]] <- ids[[2L]]
+      expect_no_error(CreateTMBModel())
+      message <- if (0L %in% ids) {
+        "invalid lib_de_id or test_de_id."
+      } else {
+        "objects are not DelayEmbeddingInterface."
+      }
+      errors <- jsonlite::fromJSON(get_log_errors())
+      expect_equal(
+        tail(errors[["message"]], 2L),
+        rep(paste0(predictor_name, "Interface: ", message), 2L)
+      )
+    }
+
+    predictor[["lib_de_id"]] <- library_id
+    predictor[["test_de_id"]] <- test_id
+    expected <- predictor$predict(library_id, test_id)
+    expect_no_error(CreateTMBModel())
+    objective <- TMB::MakeADFun(
+      data = list(),
+      parameters = list(p = get_fixed(), re = get_random()),
+      DLL = "FIMS",
+      silent = TRUE
+    )
+    objective$report()
+    predictor$finalize()
+    expect_equal(predictor[["predictions"]]$get_values(), expected)
+  })
+}
+
 test_that("SMap projection works inside FIMS TMB framework", {
   clear()
 
