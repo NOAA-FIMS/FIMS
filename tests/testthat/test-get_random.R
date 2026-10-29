@@ -34,7 +34,7 @@ test_that("`get_random()` works with correct inputs", {
   selectivity$slope[1]$value <- 0.2
   selectivity$slope[1]$estimation_status$set("random_effects")
   CreateTMBModel()
-  #' @description Test that setting a selectivity parameter to `constant` in a previously defined module changes the number of random effects parameters.
+  #' @description Test that setting a selectivity parameter to `not_estimated` in a previously defined module changes the number of random effects parameters.
   expect_equal(
     selectivity$slope[1]$value,
     get_random()
@@ -47,7 +47,7 @@ test_that("`get_random()` works with correct inputs", {
   fish_selex$inflection_point_desc[1]$value <- 3
   fish_selex$inflection_point_desc[1]$estimation_status$set("random_effects")
   fish_selex$slope_asc[1]$value <- 1
-  fish_selex$slope_asc[1]$estimation_status$set("constant")
+  fish_selex$slope_asc[1]$estimation_status$set("not_estimated")
   fish_selex$slope_desc[1]$value <- 1.5
   fish_selex$slope_desc[1]$estimation_status$set("random_effects")
 

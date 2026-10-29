@@ -412,7 +412,7 @@ A good `finalize()` implementation usually does the following:
 - checks whether the object has already been finalized,
 - looks up the concrete module in the appropriate `info->*_models` map,
 - copies `final_value_m` from the C++ object for estimable parameters, and
-- leaves `final_value_m` equal to `initial_value_m` for constant parameters.
+- leaves `final_value_m` equal to `initial_value_m` for not_estimated parameters.
 
 **See also**
 

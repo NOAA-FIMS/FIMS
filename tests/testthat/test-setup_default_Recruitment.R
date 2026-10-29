@@ -31,13 +31,13 @@ test_that("`setup_default_Recruitment()` works with edge cases", {
   expect_false("log_sd" %in% result[["label"]])
 
 
-  #' @description Test that `log_devs` estimation_status switches to constant when no process distribution is used.
+  #' @description Test that `log_devs` estimation_status switches to not_estimated when no process distribution is used.
   expect_equal(
     result |>
       dplyr::filter(.data[["label"]] == "log_devs") |>
       dplyr::pull(.data[["estimation_status"]]) |>
       unique(),
-    "constant"
+    "not_estimated"
   )
 
   #' @description Test that `log_devs` distribution_type is `NA` for BevertonHolt when distribution is `NA`.

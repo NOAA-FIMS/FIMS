@@ -30,7 +30,7 @@ recruitment$log_rzero[1]$estimation_status$set("fixed_effects")
 # set up logit_steep
 recruitment$logit_steep[1]$value <- -log(1.0 - om_input$h) +
   log(om_input$h - 0.2)
-recruitment$logit_steep[1]$estimation_status$set("constant")
+recruitment$logit_steep[1]$estimation_status$set("not_estimated")
 # turn on estimation of deviations recruit deviations should enter the model in
 # normal space. The log is taken in the likelihood calculations alternative
 # setting: recruitment$log_devs <- rep(0, length(om_input$logR.resid))
@@ -48,7 +48,7 @@ recruitment_distribution <- initialize_process_distribution(
   module = recruitment,
   par = "log_devs",
   family = gaussian(),
-  sd = list(value = om_input$logR_sd, estimation_status = "constant")
+  sd = list(value = om_input$logR_sd, estimation_status = "not_estimated")
 )
 
 # Set up fishing fleet modules to test initialize_data_distribution
@@ -66,7 +66,7 @@ fishing_fleet$log_Fmort[] <- log(om_output$f)
 
 fishing_fleet$log_Fmort$set_estimation_status(c("fixed_effects"))
 fishing_fleet$log_q[1]$value <- log(1.0)
-fishing_fleet$log_q$set_estimation_status(c("constant"))
+fishing_fleet$log_q$set_estimation_status(c("not_estimated"))
 fishing_fleet$SetObservedIndexDataID(fishing_fleet_index$get_id())
 
 # Set up fishery index data using the lognormal
@@ -103,7 +103,7 @@ test_that("`initialize_data_distribution()` works with correct inputs", {
   )
   #' @description Test that `initialize_data_distribution()` returns the correct log sd estimation status.
   expect_equal(
-    "constant",
+    "not_estimated",
     fishing_fleet_index_distribution1$log_sd[1]$estimation_status$get()
   )
   #' @description Test that `initialize_data_distribution()` returns the correct log sd values when scalar.
@@ -125,7 +125,7 @@ test_that("`sd` value from `initialize_process_distribution()` must be greater t
       module = recruitment,
       par = "log_devs",
       family = gaussian(),
-      sd = list(value = -1, estimation_status = "constant")
+      sd = list(value = -1, estimation_status = "not_estimated")
     ),
     "are out of bounds"
   )
@@ -140,7 +140,7 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       module = recruitment,
       par = "log_devs",
       family = multinomial(),
-      sd = list(value = om_input$logR_sd, estimation_status = "constant")
+      sd = list(value = om_input$logR_sd, estimation_status = "not_estimated")
     ),
     "FIMS currently does not allow the family"
   )
@@ -151,7 +151,7 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       module = recruitment,
       par = "log_devs",
       family = binomial(),
-      sd = list(value = om_input$logR_sd, estimation_status = "constant")
+      sd = list(value = om_input$logR_sd, estimation_status = "not_estimated")
     ),
     "FIMS currently does not allow the family"
   )
@@ -164,7 +164,7 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       family = gaussian(),
       sd = list(
         value = rep(om_input$logR_sd, 3),
-        estimation_status = rep("constant", 2)
+        estimation_status = rep("not_estimated", 2)
       )
     ),
     "must match"
@@ -178,7 +178,7 @@ test_that("`initialize_process_distribution()` returns correct error messages", 
       family = "normal",
       sd = list(
         value = rep(om_input$logR_sd, 3),
-        estimation_status = "constant"
+        estimation_status = "not_estimated"
       )
     ),
     "should be an object of class"

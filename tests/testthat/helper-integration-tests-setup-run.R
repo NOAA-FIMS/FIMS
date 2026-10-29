@@ -231,7 +231,7 @@ prepare_test_data <- function() {
       tibble::tibble(
         module_name = "Recruitment",
         label = "log_sd",
-        estimation_status = "constant",
+        estimation_status = "not_estimated",
         value = log(om_input_list[[iter_id]][["logR_sd"]])
       ),
       by = c("module_name", "label")
@@ -296,7 +296,7 @@ prepare_test_data <- function() {
   )
 
   # Update the initial parameter values so estimation tests do not start
-  # at the true values. Only modify parameters with estimation_status != "constant".
+  # at the true values. Only modify parameters with estimation_status != "not_estimated".
   # Rationale:
   # - Starting at the true values may hide problems with the estimation
   #   procedure, such as whether the optimizer can recover the true values from
@@ -311,7 +311,7 @@ prepare_test_data <- function() {
   modified_parameters <- modified_parameters |>
     dplyr::mutate(
       value = dplyr::if_else(
-        estimation_status != "constant",
+        estimation_status != "not_estimated",
         value * initial_value_scale,
         value
       )

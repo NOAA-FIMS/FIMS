@@ -232,7 +232,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   PopulationInterface() : PopulationInterfaceBase() {
     this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
-    this->proportion_female[0].estimation_status_m.set("constant");
+    this->proportion_female[0].estimation_status_m.set("not_estimated");
     this->fleet_ids = std::make_shared<std::set<uint32_t>>();
     std::shared_ptr<PopulationInterface> population =
         std::make_shared<PopulationInterface>(*this);
@@ -358,7 +358,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       return;
     } else {
       for (size_t i = 0; i < this->log_M.size(); i++) {
-        if (this->log_M[i].estimation_status_m.get() == "constant") {
+        if (this->log_M[i].estimation_status_m.get() == "not_estimated") {
           this->log_M[i].final_value_m = this->log_M[i].initial_value_m;
         } else {
           this->log_M[i].final_value_m = pop->log_M[i];
@@ -366,7 +366,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
 
       for (size_t i = 0; i < this->log_f_multiplier.size(); i++) {
-        if (this->log_f_multiplier[i].estimation_status_m.get() == "constant") {
+        if (this->log_f_multiplier[i].estimation_status_m.get() == "not_estimated") {
           this->log_f_multiplier[i].final_value_m =
               this->log_f_multiplier[i].initial_value_m;
         } else {
@@ -375,7 +375,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
 
       for (size_t i = 0; i < this->log_init_naa.size(); i++) {
-        if (this->log_init_naa[i].estimation_status_m.get() == "constant") {
+        if (this->log_init_naa[i].estimation_status_m.get() == "not_estimated") {
           this->log_init_naa[i].final_value_m =
               this->log_init_naa[i].initial_value_m;
         } else {
@@ -384,7 +384,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
 
       for (size_t i = 0; i < this->proportion_female.size(); i++) {
-        if (this->proportion_female[i].estimation_status_m.get() == "constant") {
+        if (this->proportion_female[i].estimation_status_m.get() == "not_estimated") {
           this->proportion_female[i].final_value_m =
               this->proportion_female[i].initial_value_m;
         } else {
@@ -443,7 +443,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       this->log_f_multiplier.resize((this->n_years.get()));
       for (size_t i = 0; i < log_f_multiplier.size(); i++) {
         this->log_f_multiplier[i].initial_value_m = static_cast<double>(0.0);
-        this->log_f_multiplier[i].estimation_status_m.set("constant");
+        this->log_f_multiplier[i].estimation_status_m.set("not_estimated");
       }
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     }
@@ -532,7 +532,7 @@ class PopulationInterface : public PopulationInterfaceBase {
           "with 0.5.");
       this->proportion_female.resize(1);
       this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
-      this->proportion_female[0].estimation_status_m.set("constant");
+      this->proportion_female[0].estimation_status_m.set("not_estimated");
       population->proportion_female.resize(this->proportion_female.size());
     }
 

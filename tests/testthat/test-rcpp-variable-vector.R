@@ -247,7 +247,7 @@ test_that("rcpp VariableVector deep copies have new ids and independent storage"
   variable_vector_copy[1]$value <- 20
   variable_vector_copy[1]$estimation_status$set("fixed_effects")
   expect_equal(variable_vector[1]$value, 2)
-  expect_equal(variable_vector[1]$estimation_status$get(), "constant")
+  expect_equal(variable_vector[1]$estimation_status$get(), "not_estimated")
   expect_equal(variable_vector_copy[1]$value, 20)
   expect_equal(variable_vector_copy[1]$estimation_status$get(), "fixed_effects")
 

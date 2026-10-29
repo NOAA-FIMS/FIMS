@@ -41,11 +41,11 @@ test_that("`initialize_fims()` works with edge cases", {
   modified_log_devs <- default_parameters |>
     dplyr::filter(label == "log_devs") |>
     # change first 10 estimation_status for label of log_devs from fixed_effects
-    # to constant
+    # to not_estimated
     dplyr::mutate(
       estimation_status = dplyr::if_else(
         timing <= 11,
-        "constant",
+        "not_estimated",
         estimation_status
       ),
       distribution_type = dplyr::if_else(
@@ -68,7 +68,7 @@ test_that("`initialize_fims()` works with edge cases", {
     parameters = default_parameters,
     data = data
   )
-  #' @description Test that `initialize_fims()` warns when some process values are constant but still included in the process distribution.
+  #' @description Test that `initialize_fims()` warns when some process values are not_estimated but still included in the process distribution.
   expect_warning(
     init_parm_multiple_types <- initialize_fims(
       parameters = parameters_multiple_types,
@@ -88,12 +88,12 @@ test_that("`initialize_fims()` works with edge cases", {
   parameters_na_types <- parameters_multiple_types |>
     dplyr::mutate(
       estimation_status = dplyr::if_else(
-        label == "log_devs" & estimation_status == "constant",
+        label == "log_devs" & estimation_status == "not_estimated",
         NA_character_,
         estimation_status
       )
     )
-  #' @description Test that `initialize_fims()` treats an NA estimation_status in `log_devs` as constant and warns instead of erroring.
+  #' @description Test that `initialize_fims()` treats an NA estimation_status in `log_devs` as not_estimated and warns instead of erroring.
   expect_warning(
     initialize_fims(parameters = parameters_na_types, data = data),
     regexp = "10 of the 29"
@@ -194,7 +194,7 @@ test_that("`initialize_fims()` returns correct error messages", {
   #' @description Test that `initialize_fims()` correctly returns an error on an unknown estimation_status.
   expect_error(
     initialize_fims(parameters = parameters_wrong_type, data = data),
-    "The `estimation_status` must be one of: constant, fixed_effects, and random_effects."
+    "The `estimation_status` must be one of: not_estimated, fixed_effects, and random_effects."
   )
   clear()
 
@@ -236,7 +236,7 @@ test_that("`initialize_fims()` returns correct error messages", {
           module_name = "Recruitment",
           label = "log_devs",
           timing = 2:get_n_years(data),
-          estimation_status = "constant"
+          estimation_status = "not_estimated"
         ),
         by = c("module_name", "label", "timing")
       )
@@ -614,11 +614,11 @@ test_that("`initialize_fims()` works with edge cases", {
   modified_log_devs <- default_parameters |>
     dplyr::filter(label == "log_devs") |>
     # change first 10 estimation_status for label of log_devs from random_effects
-    # to constant
+    # to not_estimated
     dplyr::mutate(
       estimation_status = dplyr::if_else(
         timing <= 11,
-        "constant",
+        "not_estimated",
         estimation_status
       ),
       distribution_type = dplyr::if_else(
@@ -638,7 +638,7 @@ test_that("`initialize_fims()` works with edge cases", {
     dplyr::filter(label != "log_devs" | is.na(label)) |>
     dplyr::bind_rows(modified_log_devs)
   init_parm_default <- initialize_fims(parameters = default_parameters, data = data)
-  #' @description Test that `initialize_fims()` warns when some `log_devs` are constant but still included in the process distribution.
+  #' @description Test that `initialize_fims()` warns when some `log_devs` are not_estimated but still included in the process distribution.
   expect_warning(
     init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data),
     regexp = "10 of the 29"

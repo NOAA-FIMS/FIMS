@@ -161,7 +161,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
-        if (this->inflection_point[i].estimation_status_m.get() == "constant") {
+        if (this->inflection_point[i].estimation_status_m.get() == "not_estimated") {
           this->inflection_point[i].final_value_m =
               this->inflection_point[i].initial_value_m;
         } else {
@@ -170,7 +170,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
 
       for (size_t i = 0; i < slope.size(); i++) {
-        if (this->slope[i].estimation_status_m.get() == "constant") {
+        if (this->slope[i].estimation_status_m.get() == "not_estimated") {
           this->slope[i].final_value_m = this->slope[i].initial_value_m;
         } else {
           this->slope[i].final_value_m = sel->slope[i];
@@ -391,7 +391,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
       for (size_t i = 0; i < inflection_point_asc.size(); i++) {
         if (this->inflection_point_asc[i].estimation_status_m.get() ==
-            "constant") {
+            "not_estimated") {
           this->inflection_point_asc[i].final_value_m =
               this->inflection_point_asc[i].initial_value_m;
         } else {
@@ -401,7 +401,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
 
       for (size_t i = 0; i < slope_asc.size(); i++) {
-        if (this->slope_asc[i].estimation_status_m.get() == "constant") {
+        if (this->slope_asc[i].estimation_status_m.get() == "not_estimated") {
           this->slope_asc[i].final_value_m = this->slope_asc[i].initial_value_m;
         } else {
           this->slope_asc[i].final_value_m = sel->slope_asc[i];
@@ -410,7 +410,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
 
       for (size_t i = 0; i < inflection_point_desc.size(); i++) {
         if (this->inflection_point_desc[i].estimation_status_m.get() ==
-            "constant") {
+            "not_estimated") {
           this->inflection_point_desc[i].final_value_m =
               this->inflection_point_desc[i].initial_value_m;
         } else {
@@ -420,7 +420,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
 
       for (size_t i = 0; i < slope_desc.size(); i++) {
-        if (this->slope_desc[i].estimation_status_m.get() == "constant") {
+        if (this->slope_desc[i].estimation_status_m.get() == "not_estimated") {
           this->slope_desc[i].final_value_m =
               this->slope_desc[i].initial_value_m;
         } else {
@@ -717,7 +717,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
           std::dynamic_pointer_cast<fims_popdy::AgeSpecificSelectivity<double>>(
               it->second);
       for (size_t i = 0; i < logit_sel_at_age.size(); i++) {
-        if (this->logit_sel_at_age[i].estimation_status_m.get() == "constant") {
+        if (this->logit_sel_at_age[i].estimation_status_m.get() == "not_estimated") {
           this->logit_sel_at_age[i].final_value_m =
               this->logit_sel_at_age[i].initial_value_m;
         } else {

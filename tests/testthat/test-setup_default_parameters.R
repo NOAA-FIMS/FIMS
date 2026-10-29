@@ -292,13 +292,13 @@ test_that("`setup_default_parameters()` works with edge cases", {
 
   expect_equal(log_sd_value, numeric(0))
 
-  #' @description Test that `log_devs` estimation_status is constant when distribution is not specified.
+  #' @description Test that `log_devs` estimation_status is not_estimated when distribution is not specified.
   log_devs_value <- recruitment_without_distribution |>
     dplyr::filter(.data[["label"]] == "log_devs") |>
     dplyr::pull(.data[["estimation_status"]]) |>
     unique()
 
-  expect_equal(log_devs_value, "constant")
+  expect_equal(log_devs_value, "not_estimated")
 
   #' @description Test that `log_devs` distribution_type is `NA` when distribution is not specified.
   log_devs_distribution_type <- recruitment_without_distribution |>

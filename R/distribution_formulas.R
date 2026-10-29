@@ -175,7 +175,7 @@ initialize_data_distribution <- function(
     new_module$log_sd[] <- log(
       unlist(uncertainty_split[[ancillary_parameter]], use.names = FALSE)
     )
-    new_module$log_sd$set_estimation_status("constant")
+    new_module$log_sd$set_estimation_status("not_estimated")
   }
 
   # setup link to observed data
@@ -217,8 +217,8 @@ initialize_data_distribution <- function(
 #'   stores the initial values (scalar or vector) for the relevant standard
 #'   deviations. The default is `value = 1`. The second entry is named
 #'  `"estimation_status"` and it stores a vector of booleans (default =
-#'   "constant") is a string indicating whether or not standard deviation is
-#'   estimated as a fixed effect or held constant. If `"value"` is a vector and
+#'   "not_estimated") is a string indicating whether or not standard deviation is
+#'   estimated as a fixed effect. If `"value"` is a vector and
 #'   `"estimation_status"` is a scalar, the single value specified
 #'   `"estimation_status"` value will be repeated to match the length of `value`.
 #'   Otherwise, the dimensions of the two must match.
@@ -244,7 +244,7 @@ initialize_data_distribution <- function(
 #'   module = recruitment,
 #'   par = "log_devs",
 #'   family = gaussian(),
-#'   sd = list(value = 0.4, estimation_status = "constant")
+#'   sd = list(value = 0.4, estimation_status = "not_estimated")
 #' )
 #' }
 initialize_process_distribution <- function(
@@ -278,7 +278,7 @@ initialize_process_distribution <- function(
 
     # setup whether or not sd parameter is estimated
     et <- sd[["estimation_status"]]
-    et[is.na(et)] <- "constant"
+    et[is.na(et)] <- "not_estimated"
     new_module$log_sd$set_estimation_status(et)
   }
 
@@ -294,12 +294,12 @@ initialize_process_distribution <- function(
 
     # setup whether or not sd parameter is estimated
     et <- sd[["estimation_status"]]
-    et[is.na(et)] <- "constant"
+    et[is.na(et)] <- "not_estimated"
     new_module$log_sd$set_estimation_status(et)
 
     #   if (length(sd[["value"]]) > 1 && length(sd[["estimation_status"]]) == 1) {
-    #     if (sd[["estimation_status"]] == "constant") {
-    #       new_module$log_sd$set_estimation_status(c("constant"))
+    #     if (sd[["estimation_status"]] == "not_estimated") {
+    #       new_module$log_sd$set_estimation_status(c("not_estimated"))
     #     } else {
     #       new_module$log_sd$set_estimation_status(c("fixed_effects"))
     #     }

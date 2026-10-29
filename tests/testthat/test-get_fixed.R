@@ -47,7 +47,7 @@ test_that("`get_fixed()` works with correct inputs", {
   fish_selex$inflection_point_desc[1]$value <- 3
   fish_selex$inflection_point_desc[1]$estimation_status$set("fixed_effects")
   fish_selex$slope_asc[1]$value <- 1
-  fish_selex$slope_asc[1]$estimation_status$set("constant")
+  fish_selex$slope_asc[1]$estimation_status$set("not_estimated")
   fish_selex$slope_desc[1]$value <- 1.5
   fish_selex$slope_desc[1]$estimation_status$set("fixed_effects")
 

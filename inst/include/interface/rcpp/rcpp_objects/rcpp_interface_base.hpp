@@ -46,10 +46,10 @@ class Variable {
    */
   double final_value_m = 0.0;
   /**
-   * @brief A string indicating the estimation status. Options are: constant,
-   * fixed_effects, or random_effects, where the default is constant.
+   * @brief A string indicating the estimation status. Options are: not_estimated,
+   * fixed_effects, or random_effects, where the default is not_estimated.
    */
-  SharedString estimation_status_m = SharedString("constant");
+  SharedString estimation_status_m = SharedString("not_estimated");
 
   /**
    * @brief The constructor for initializing a variable.
@@ -339,11 +339,11 @@ class VariableVector {
     }
 
     auto validate_estimation_status = [&](const std::string& est_type) {
-      if (est_type != "constant" && est_type != "fixed_effects" &&
+      if (est_type != "not_estimated" && est_type != "fixed_effects" &&
           est_type != "random_effects") {
         throw std::invalid_argument(
             "Invalid estimation_status: " + est_type +
-            ". Valid options are: constant, fixed_effects, or random_effects.");
+            ". Valid options are: not_estimated, fixed_effects, or random_effects.");
       }
     };
 

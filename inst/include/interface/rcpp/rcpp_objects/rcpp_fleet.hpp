@@ -444,7 +444,7 @@ class FleetInterface : public FleetInterfaceBase {
           std::dynamic_pointer_cast<fims_popdy::Fleet<double>>(it->second);
 
       for (size_t i = 0; i < this->log_Fmort.size(); i++) {
-        if (this->log_Fmort[i].estimation_status_m.get() == "constant") {
+        if (this->log_Fmort[i].estimation_status_m.get() == "not_estimated") {
           this->log_Fmort[i].final_value_m = this->log_Fmort[i].initial_value_m;
         } else {
           this->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
@@ -452,7 +452,7 @@ class FleetInterface : public FleetInterfaceBase {
       }
 
       for (size_t i = 0; i < this->log_q.size(); i++) {
-        if (this->log_q[i].estimation_status_m.get() == "constant") {
+        if (this->log_q[i].estimation_status_m.get() == "not_estimated") {
           this->log_q[i].final_value_m = this->log_q[i].initial_value_m;
         } else {
           this->log_q[i].final_value_m = fleet->log_q[i];
@@ -461,7 +461,7 @@ class FleetInterface : public FleetInterfaceBase {
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
         if (this->age_to_length_conversion[i].estimation_status_m.get() ==
-            "constant") {
+            "not_estimated") {
           this->age_to_length_conversion[i].final_value_m =
               this->age_to_length_conversion[i].initial_value_m;
         } else {

@@ -155,7 +155,7 @@ test_that("`get_estimates()` handles non-finite derived quantities", {
     parameters[["fleet"]] == "fleet1" & parameters[["label"]] == "log_Fmort"
   )[1]
   parameters[["value"]][first_log_fmort] <- -1000
-  parameters[["estimation_status"]][first_log_fmort] <- "constant"
+  parameters[["estimation_status"]][first_log_fmort] <- "not_estimated"
   fit <- parameters |>
     initialize_fims(data = data_4_model) |>
     fit_fims(optimize = FALSE)
@@ -175,13 +175,13 @@ test_that("`get_estimates()` works for a model without random effects", {
   data_4_model <- FIMSFrame(data_big)
   # Without a distribution on the recruitment deviations, the model has no
   # random-effect distribution and so no distribution parameters to report.
-  # initialize_fims() requires the deviations to be constant in that case.
+  # initialize_fims() requires the deviations to be not_estimated in that case.
   recruitment_deviations <- c("log_devs", "log_sd")
   parameters <- setup_default_parameters(data = data_4_model) |>
     dplyr::mutate(
       estimation_status = dplyr::if_else(
         .data$module_name == "Recruitment" & .data$label == "log_devs",
-        "constant",
+        "not_estimated",
         .data$estimation_status
       ),
       distribution_type = dplyr::if_else(

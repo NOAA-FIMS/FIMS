@@ -117,7 +117,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
   ) |>
     dplyr::mutate(
       value = dplyr::if_else(
-        estimation_status != "constant",
+        estimation_status != "not_estimated",
         value / initial_value_scale,
         value
       )
@@ -185,7 +185,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
       tibble::tibble(
         module_name = "Recruitment",
         label = "log_sd",
-        estimation_status = "constant"
+        estimation_status = "not_estimated"
       ),
       by = c("module_name", "label")
     )

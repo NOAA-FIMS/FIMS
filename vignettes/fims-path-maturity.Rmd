@@ -98,9 +98,9 @@ library(FIMS)
 maturity <- methods::new(LogisticMaturity)
 # Populate the maturity module with parameter values.
 maturity$inflection_point[1]$value <- 10
-maturity$inflection_point[1]$estimation_status$set("constant")
+maturity$inflection_point[1]$estimation_status$set("not_estimated")
 maturity$slope[1]$value <- 0.2
-maturity$slope[1]$estimation_status$set("constant")
+maturity$slope[1]$estimation_status$set("not_estimated")
 ```
 
 To run a FIMS model, more modules than just a maturity module need to be linked to a population module. But, this example only includes a maturity module so the code below is just pseudo code showing how to link a maturity module to a population module. The code below assumes that growth and recruitment modules, i.e., modules 2 and 3, have already been set up.

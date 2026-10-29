@@ -43,7 +43,7 @@ test_that("rcpp population interface works with correct inputs", {
     )
     #' @description Test that the log_M values are not estimated.
     expect_equal(
-      object = population$log_M[i]$estimation_status$get(), "constant"
+      object = population$log_M[i]$estimation_status$get(), "not_estimated"
     )
   }
 
@@ -59,7 +59,7 @@ test_that("rcpp population interface works with correct inputs", {
     )
   }
 
-  population$log_init_naa$set_estimation_status(c("constant"))
+  population$log_init_naa$set_estimation_status(c("not_estimated"))
   population$log_M$set_estimation_status(c("fixed_effects"))
 
   for (i in 1:(n_years * n_ages)) {
@@ -82,7 +82,7 @@ test_that("rcpp population interface works with correct inputs", {
     )
     #' @description Test that the log_init_naa values not estimated.
     expect_equal(
-      object = population$log_init_naa[i]$estimation_status$get(), "constant"
+      object = population$log_init_naa[i]$estimation_status$get(), "not_estimated"
     )
   }
 

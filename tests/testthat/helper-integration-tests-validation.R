@@ -215,7 +215,7 @@ validate_fims <- function(
       # See code in tests/testthat/helper-integration-tests-setup-run.R.
       dplyr::mutate(
         input = dplyr::if_else(
-          estimation_status != "constant",
+          estimation_status != "not_estimated",
           input / initial_value_scale,
           input
         )

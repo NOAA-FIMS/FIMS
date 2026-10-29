@@ -362,7 +362,7 @@
        28           50 fleet1     28    NA     NA -0.840       NA fixed_effects
        29           51 fleet1     29    NA     NA -1.11        NA fixed_effects
        30           52 fleet1     30    NA     NA -0.694       NA fixed_effects
-       31            3 fleet1     NA    NA     NA  0           NA constant
+       31            3 fleet1     NA    NA     NA  0           NA not_estimated
        32           NA fleet1      1     1     NA NA           14 derived_quantity
        33           NA fleet1      1     2     NA NA           20 derived_quantity
        34           NA fleet1      1     3     NA NA           23 derived_quantity
@@ -1340,7 +1340,7 @@
        28           50 fleet1     28    NA     NA -0.840       NA fixed_effects
        29           51 fleet1     29    NA     NA -1.11        NA fixed_effects
        30           52 fleet1     30    NA     NA -0.694       NA fixed_effects
-       31            3 fleet1     NA    NA     NA  0           NA constant
+       31            3 fleet1     NA    NA     NA  0           NA not_estimated
        32           NA fleet1      1     1     NA NA           14 derived_quantity
        33           NA fleet1      1     2     NA NA           20 derived_quantity
        34           NA fleet1      1     3     NA NA           23 derived_quantity

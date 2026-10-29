@@ -410,7 +410,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         }
       }
       for (size_t i = 0; i < n_x; i++) {
-        if (this->log_sd[i].estimation_status_m.get() == "constant") {
+        if (this->log_sd[i].estimation_status_m.get() == "not_estimated") {
           this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
         } else {
           this->log_sd[i].final_value_m = dnorm->log_sd.get_force_scalar(i);
@@ -418,7 +418,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       }
 
       for (size_t i = 0; i < this->expected_mean.size(); i++) {
-        if (this->expected_mean[i].estimation_status_m.get() == "constant") {
+        if (this->expected_mean[i].estimation_status_m.get() == "not_estimated") {
           this->expected_mean[i].final_value_m =
               this->expected_mean[i].initial_value_m;
         } else {
@@ -762,7 +762,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
       }
 
       for (size_t i = 0; i < n_x; i++) {
-        if (this->log_sd[i].estimation_status_m.get() == "constant") {
+        if (this->log_sd[i].estimation_status_m.get() == "not_estimated") {
           this->log_sd[i].final_value_m = this->log_sd[i].initial_value_m;
         } else {
           this->log_sd[i].final_value_m = dlnorm->log_sd.get_force_scalar(i);

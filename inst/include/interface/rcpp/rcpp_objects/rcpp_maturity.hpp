@@ -159,7 +159,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
-        if (this->inflection_point[i].estimation_status_m.get() == "constant") {
+        if (this->inflection_point[i].estimation_status_m.get() == "not_estimated") {
           this->inflection_point[i].final_value_m =
               this->inflection_point[i].initial_value_m;
         } else {
@@ -168,7 +168,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
       }
 
       for (size_t i = 0; i < slope.size(); i++) {
-        if (this->slope[i].estimation_status_m.get() == "constant") {
+        if (this->slope[i].estimation_status_m.get() == "not_estimated") {
           this->slope[i].final_value_m = this->slope[i].initial_value_m;
         } else {
           this->slope[i].final_value_m = mat->slope[i];

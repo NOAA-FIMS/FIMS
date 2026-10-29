@@ -157,8 +157,8 @@ test_that("posterior equals prior with no data", {
   recruitment <- methods::new(BevertonHoltRecruitment)
   recruitment_process <- new(LogDevsRecruitmentProcess)
 
-  # set up recruitment parameters and fix as constant (default)
-  # do not set up a recruitment distribution as devs will be held constant
+  # set up recruitment parameters and fix as not_estimated (default)
+  # do not set up a recruitment distribution as devs will not be estimated
   # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- log(om_input[["R0"]])
   # set up logit_steep
@@ -182,9 +182,9 @@ test_that("posterior equals prior with no data", {
   # Maturity
   maturity <- methods::new(LogisticMaturity)
   maturity$inflection_point[1]$value <- om_input[["A50.mat"]]
-  maturity$inflection_point[1]$estimation_status$set("constant")
+  maturity$inflection_point[1]$estimation_status$set("not_estimated")
   maturity$slope[1]$value <- om_input[["slope.mat"]]
-  maturity$slope[1]$estimation_status$set("constant")
+  maturity$slope[1]$estimation_status$set("not_estimated")
 
   # Population
   population <- methods::new(Population)

@@ -30,8 +30,8 @@ be used in the model. The argument takes a family class, e.g.,
 stores the initial values (scalar or vector) for the relevant standard
 deviations. The default is \code{value = 1}. The second entry is named
 \code{"estimation_status"} and it stores a vector of booleans (default =
-"constant") is a string indicating whether or not standard deviation is
-estimated as a fixed effect or held constant. If \code{"value"} is a vector and
+"not_estimated") is a string indicating whether or not standard deviation is
+estimated as a fixed effect. If \code{"value"} is a vector and
 \code{"estimation_status"} is a scalar, the single value specified
 \code{"estimation_status"} value will be repeated to match the length of \code{value}.
 Otherwise, the dimensions of the two must match.}
@@ -58,7 +58,7 @@ recruitment_distribution <- initialize_process_distribution(
   module = recruitment,
   par = "log_devs",
   family = gaussian(),
-  sd = list(value = 0.4, estimation_status = "constant")
+  sd = list(value = 0.4, estimation_status = "not_estimated")
 )
 }
 }

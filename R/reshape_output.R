@@ -77,7 +77,7 @@ reshape_json_estimates <- function(model_output) {
   distribution_information <- NULL
   if ("parameters" %in% names(density_components)) {
     # Only random-effect distributions for now. The log_sd of a data
-    # distribution is set from the data uncertainty, held constant, and
+    # distribution is set from the data uncertainty, not estimated, and
     # already reported next to each observation, and a prior's parameters are
     # fixed inputs.
     random_effect_distributions <- density_components |>

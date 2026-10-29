@@ -51,7 +51,7 @@
 #'   \item{\code{length}:}{The length bin the parameter applies to.}
 #'   \item{\code{timing}:}{The timing step (year) the parameter applies to.}
 #'   \item{\code{value}:}{The initial value of the parameter.}
-#'   \item{\code{estimation_status}:}{The estimation status (e.g., "constant",
+#'   \item{\code{estimation_status}:}{The estimation status (e.g., "not_estimated",
 #'     "fixed_effects", "random_effects").}
 #'   \item{\code{distribution_type}:}{The type of distribution (e.g., "data",
 #'     "process"), where a process distribution can refer to a fixed effect or a
@@ -446,12 +446,12 @@ setup_default_Growth <- function(
         "fixed_effects",
         "fixed_effects",
         "fixed_effects",
-        "constant",
-        "constant",
-        "constant",
-        "constant",
-        "constant",
-        "constant"
+        "not_estimated",
+        "not_estimated",
+        "not_estimated",
+        "not_estimated",
+        "not_estimated",
+        "not_estimated"
       )
     )
 
@@ -564,7 +564,7 @@ setup_default_Population <- function(
       value = .env$log_M,
       age = rep(ages, n_years),
       timing = rep(years, each = n_ages),
-      estimation_status = "constant"
+      estimation_status = "not_estimated"
     ) |>
     dplyr::add_row(
       label = "log_init_naa",
@@ -576,7 +576,7 @@ setup_default_Population <- function(
       label = "proportion_female",
       age = if (length(proportion_female) == 1) NA else ages,
       value = .env$proportion_female,
-      estimation_status = "constant"
+      estimation_status = "not_estimated"
     ) |>
     dplyr::mutate(
       module_name = "Population"
@@ -654,7 +654,7 @@ setup_default_DoubleLogistic <- function() {
 #' Following recommended practices for age-specific selectivity, default
 #' realized selectivity at ages >= 10 is functionally equal to 1.
 #' The default estimation status for the max age selectivity parameter
-#' is also set to "constant".
+#' is also set to "not_estimated".
 #' @return
 #' A tibble containing the default age-specific parameters on the logit scale.
 #' Number of parameters is equal to the number of age classes
@@ -676,7 +676,7 @@ setup_default_AgeSpecific <- function(
       value = qlogis(1 / (1 + (exp(-1 * (get_ages(data) - 2))))),
       estimation_status = c(
         rep("fixed_effects", length(get_ages(data)) - 1),
-        "constant"
+        "not_estimated"
       )
     )
 }
@@ -736,9 +736,9 @@ setup_default_Selectivity <- function(
 #' @description
 #' This function sets up default parameters for a fleet module, including natural log of
 #' catchability coefficients (log_q) and fishing mortality (log_Fmort) for fleets.
-#' For fishing fleets, log_q is set to an estimation status of "constant" with a
+#' For fishing fleets, log_q is set to an estimation status of "not_estimated" with a
 #' default value of 0, while log_Fmort is set to "fixed_effects". For survey
-#' fleets, log_q is set to "fixed_effects" and log_Fmort is set to "constant"
+#' fleets, log_q is set to "fixed_effects" and log_Fmort is set to "not_estimated"
 #' with a default value of -200.
 #'
 #' @param fleet A character. Name of the fleet.
@@ -781,7 +781,7 @@ setup_default_Fleet <- function(
       fleet = .env$fleet,
       label = "log_q",
       value = 0,
-      estimation_status = if (has_catch) "constant" else "fixed_effects"
+      estimation_status = if (has_catch) "not_estimated" else "fixed_effects"
     )
 
   # Set up default parameters for fishing mortality
@@ -794,7 +794,7 @@ setup_default_Fleet <- function(
       label = "log_Fmort",
       timing = get_start_year(data):get_end_year(data),
       value = if (has_index) -200 else -3,
-      estimation_status = if (has_index) "constant" else "fixed_effects"
+      estimation_status = if (has_index) "not_estimated" else "fixed_effects"
     )
   # Compile all default parameters into a single list
   default <- dplyr::bind_rows(
@@ -839,11 +839,11 @@ setup_default_Maturity <- function(
     "Logistic" = setup_default_Logistic()
   ) |>
     # We don't have an option to input maturity data into FIMS, so the maturity
-    # parameters aren't really estimable. The parameters should be constant for
+    # parameters aren't really estimable. The parameters should be not_estimated for
     # now. See more details from
     # https://github.com/orgs/NOAA-FIMS/discussions/944.
     dplyr::mutate(
-      estimation_status = "constant",
+      estimation_status = "not_estimated",
       module_name = "Maturity"
     )
 }
@@ -893,7 +893,7 @@ setup_default_BevertonHoltRecruitment <- function(
     dplyr::mutate(
       label = "logit_steep",
       value = -log(1.0 - 0.75) + log(0.75 - 0.2),
-      estimation_status = "constant"
+      estimation_status = "not_estimated"
     )
 
   log_devs <- setup_default_parameters_template(
@@ -914,7 +914,7 @@ setup_default_BevertonHoltRecruitment <- function(
         tibble::tibble(
           label = "log_devs",
           timing = (get_start_year(data) + 1):get_end_year(data),
-          estimation_status = "constant",
+          estimation_status = "not_estimated",
           distribution_type = NA_character_
         ),
         by = c("label", "timing")
@@ -967,7 +967,7 @@ setup_default_DnormDistribution <- function(
     dplyr::mutate(
       label = "log_sd",
       value = !!value,
-      estimation_status = "constant",
+      estimation_status = "not_estimated",
       distribution_type = input_type,
       distribution = "Dnorm"
     )
@@ -1019,7 +1019,7 @@ setup_default_DlnormDistribution <- function(
 
   default <- default |>
     dplyr::mutate(
-      estimation_status = "constant",
+      estimation_status = "not_estimated",
       distribution_type = input_type,
       distribution = "Dlnorm"
     )

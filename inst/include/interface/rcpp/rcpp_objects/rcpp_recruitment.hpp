@@ -213,7 +213,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
               it->second);
 
       for (size_t i = 0; i < this->logit_steep.size(); i++) {
-        if (this->logit_steep[i].estimation_status_m.get() == "constant") {
+        if (this->logit_steep[i].estimation_status_m.get() == "not_estimated") {
           this->logit_steep[i].final_value_m =
               this->logit_steep[i].initial_value_m;
         } else {
@@ -222,7 +222,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
 
       for (size_t i = 0; i < log_rzero.size(); i++) {
-        if (log_rzero[i].estimation_status_m.get() == "constant") {
+        if (log_rzero[i].estimation_status_m.get() == "not_estimated") {
           this->log_rzero[i].final_value_m = this->log_rzero[i].initial_value_m;
         } else {
           this->log_rzero[i].final_value_m = recr->log_rzero[i];
@@ -230,7 +230,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
 
       for (size_t i = 0; i < this->log_devs.size(); i++) {
-        if (this->log_devs[i].estimation_status_m.get() == "constant") {
+        if (this->log_devs[i].estimation_status_m.get() == "not_estimated") {
           this->log_devs[i].final_value_m = this->log_devs[i].initial_value_m;
         } else {
           this->log_devs[i].final_value_m = recr->log_recruit_devs[i];
@@ -238,7 +238,7 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
       }
 
       for (size_t i = 0; i < this->log_r.size(); i++) {
-        if (this->log_r[i].estimation_status_m.get() == "constant") {
+        if (this->log_r[i].estimation_status_m.get() == "not_estimated") {
           this->log_r[i].final_value_m = this->log_r[i].initial_value_m;
         } else {
           this->log_r[i].final_value_m = recr->log_r[i];

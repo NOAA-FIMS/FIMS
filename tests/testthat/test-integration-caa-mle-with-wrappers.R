@@ -255,19 +255,19 @@ if (Sys.getenv("RUN_SLOW_TESTS") == "true") {
     ) |>
       dplyr::mutate(
         value = dplyr::if_else(
-          estimation_status != "constant",
+          estimation_status != "not_estimated",
           value / initial_value_scale,
           value
         )
       )
 
-    # Force fleet1's Fmort to be constant for the first 10 years.
+    # Force fleet1's Fmort to be not_estimated for the first 10 years.
     # From years 11-30, the Fmort estimation status is fixed_effects.
     fit_mixed_estimation_status <- modified_parameters |>
       dplyr::mutate(
         estimation_status = dplyr::if_else(
           fleet == "fleet1" & label == "log_Fmort" & timing %in% 1:10,
-          "constant",
+          "not_estimated",
           estimation_status
         )
       ) |>
@@ -277,7 +277,7 @@ if (Sys.getenv("RUN_SLOW_TESTS") == "true") {
 
     mixed_output <- get_estimates(fit_mixed_estimation_status) |>
       dplyr::filter(label == "log_Fmort", module_id == 1)
-    #' @description Test that there are 10 years of constant fishing mortality values and 20 years of fixed effects for the fishing fleet.
+    #' @description Test that there are 10 years of not_estimated fishing mortality values and 20 years of fixed effects for the fishing fleet.
     expect_equal(
       dplyr::pull(dplyr::count(mixed_output, estimation_status)),
       c(10, 20)
@@ -307,10 +307,10 @@ if (Sys.getenv("RUN_SLOW_TESTS") == "true") {
     parameters <- readRDS(
       testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
     )
-    # Set all non-NA estimation statuses to "constant" and initialize the model
+    # Set all non-NA estimation statuses to "not_estimated" and initialize the model
     initialized_model <- parameters |>
       dplyr::rows_update(
-        # log_devs has a special error when set to constant
+        # log_devs has a special error when set to not_estimated
         y = tibble::tibble(
           label = "log_devs",
           timing = 2:get_n_years(data_age_length_comp),
@@ -332,7 +332,7 @@ if (Sys.getenv("RUN_SLOW_TESTS") == "true") {
       dplyr::mutate(
         estimation_status = dplyr::if_else(
           !is.na(estimation_status),
-          "constant",
+          "not_estimated",
           estimation_status
         )
       ) |>
@@ -376,18 +376,18 @@ if (Sys.getenv("RUN_SLOW_TESTS") == "true") {
     parameters <- readRDS(
       testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
     )
-    # Set log_devs constant but leave in Recruitment distribution parameters.
+    # Set log_devs not_estimated but leave in Recruitment distribution parameters.
     initialized_parameters <- parameters |>
       dplyr::rows_update(
         y = tibble::tibble(
           label = "log_devs",
           timing = 2:get_n_years(data_age_length_comp),
-          estimation_status = "constant"
+          estimation_status = "not_estimated"
         ),
         by = c("label", "timing")
       )
 
-    #' @description Test that FIMS returns an error when log_devs are constant but Recruitment expects a distribution process.
+    #' @description Test that FIMS returns an error when log_devs are not_estimated but Recruitment expects a distribution process.
     expect_error(
       object = initialized_parameters |>
         initialize_fims(

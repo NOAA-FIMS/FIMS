@@ -39,11 +39,11 @@ namespace fims_popdy {
  * smooth parametric curve across ages. This flexibility can create
  * identifiability problems, especially when estimating both selectivity and
  * fishing mortality. Users should ensure that at least one age-specific
- * selectivity parameter is "constant", i.e., not estimated, and is equal to or
+ * selectivity parameter is "not_estimated", and is equal to or
  * near 1, or otherwise impose suitable constraints. This can be achieved by
  * setting at least one age-specific parameter (`logit_sel_at_age`), which are
  * on the logit scale, to a value greater than 10 with estimation_status ==
- * "constant".
+ * "not_estimated".
  */
 template <typename Type>
 struct AgeSpecificSelectivity : public SelectivityBase<Type> {
