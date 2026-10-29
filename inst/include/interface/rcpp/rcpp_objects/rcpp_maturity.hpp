@@ -159,7 +159,8 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
-        if (this->inflection_point[i].estimation_status_m.get() == "not_estimated") {
+        if (this->inflection_point[i].estimation_status_m.get() ==
+            "not_estimated") {
           this->inflection_point[i].final_value_m =
               this->inflection_point[i].initial_value_m;
         } else {

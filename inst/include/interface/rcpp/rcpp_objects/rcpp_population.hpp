@@ -366,7 +366,8 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
 
       for (size_t i = 0; i < this->log_f_multiplier.size(); i++) {
-        if (this->log_f_multiplier[i].estimation_status_m.get() == "not_estimated") {
+        if (this->log_f_multiplier[i].estimation_status_m.get() ==
+            "not_estimated") {
           this->log_f_multiplier[i].final_value_m =
               this->log_f_multiplier[i].initial_value_m;
         } else {
@@ -375,7 +376,8 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
 
       for (size_t i = 0; i < this->log_init_naa.size(); i++) {
-        if (this->log_init_naa[i].estimation_status_m.get() == "not_estimated") {
+        if (this->log_init_naa[i].estimation_status_m.get() ==
+            "not_estimated") {
           this->log_init_naa[i].final_value_m =
               this->log_init_naa[i].initial_value_m;
         } else {
@@ -384,7 +386,8 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
 
       for (size_t i = 0; i < this->proportion_female.size(); i++) {
-        if (this->proportion_female[i].estimation_status_m.get() == "not_estimated") {
+        if (this->proportion_female[i].estimation_status_m.get() ==
+            "not_estimated") {
           this->proportion_female[i].final_value_m =
               this->proportion_female[i].initial_value_m;
         } else {

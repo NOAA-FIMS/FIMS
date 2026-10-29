@@ -161,7 +161,8 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
-        if (this->inflection_point[i].estimation_status_m.get() == "not_estimated") {
+        if (this->inflection_point[i].estimation_status_m.get() ==
+            "not_estimated") {
           this->inflection_point[i].final_value_m =
               this->inflection_point[i].initial_value_m;
         } else {
@@ -717,7 +718,8 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
           std::dynamic_pointer_cast<fims_popdy::AgeSpecificSelectivity<double>>(
               it->second);
       for (size_t i = 0; i < logit_sel_at_age.size(); i++) {
-        if (this->logit_sel_at_age[i].estimation_status_m.get() == "not_estimated") {
+        if (this->logit_sel_at_age[i].estimation_status_m.get() ==
+            "not_estimated") {
           this->logit_sel_at_age[i].final_value_m =
               this->logit_sel_at_age[i].initial_value_m;
         } else {

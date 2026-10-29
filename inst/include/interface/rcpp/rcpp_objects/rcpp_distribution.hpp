@@ -418,7 +418,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
       }
 
       for (size_t i = 0; i < this->expected_mean.size(); i++) {
-        if (this->expected_mean[i].estimation_status_m.get() == "not_estimated") {
+        if (this->expected_mean[i].estimation_status_m.get() ==
+            "not_estimated") {
           this->expected_mean[i].final_value_m =
               this->expected_mean[i].initial_value_m;
         } else {
@@ -572,7 +573,8 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(distribution->expected_mean[i]);
       }
-      if (this->expected_mean[i].estimation_status_m.get() == "random_effects") {
+      if (this->expected_mean[i].estimation_status_m.get() ==
+          "random_effects") {
         FIMS_ERROR_LOG("expected_mean cannot be set to random effects");
       }
     }
