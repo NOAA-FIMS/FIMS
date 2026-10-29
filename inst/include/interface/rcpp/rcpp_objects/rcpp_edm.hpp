@@ -447,109 +447,69 @@ inline fims_edm::DelayEmbeddingMatrix<double> to_matrix(DelayEmbeddingInterface*
 }
 
 /**
- * @brief Helper to populate EDMModel matrices from DelayEmbeddingInterface.
+ * @brief Copy one embedding into model-owned typed storage and bind its matrix.
+ */
+template <typename Type>
+void populate_edm_matrix(
+    const DelayEmbeddingInterface& source,
+    fims_edm::DelayEmbeddingMatrix<Type>& matrix,
+    std::vector<Type>& embedded_values_storage,
+    std::vector<Type>& target_values_storage,
+    std::vector<Type>& embedded_uncertainty_storage,
+    std::vector<Type>& target_uncertainty_storage) {
+  matrix.n_rows = source.target_values.storage_m->size();
+  matrix.n_cols = matrix.n_rows > 0
+      ? source.embedded_values.storage_m->size() / matrix.n_rows : 0;
+
+  const auto copy_and_bind = [](const RealVector& values,
+                                std::vector<Type>& storage,
+                                std::vector<const Type*>& pointers) {
+    storage.resize(values.storage_m->size());
+    for (size_t i = 0; i < storage.size(); ++i) {
+      storage[i] = Type((*values.storage_m)[i]);
+    }
+    // Bind only after resizing the model-owned backing storage.
+    pointers.resize(storage.size());
+    for (size_t i = 0; i < storage.size(); ++i) {
+      pointers[i] = &storage[i];
+    }
+  };
+
+  copy_and_bind(source.embedded_values, embedded_values_storage,
+                matrix.embedded_values);
+  copy_and_bind(source.target_values, target_values_storage,
+                matrix.target_values);
+  if (source.embedded_uncertainty.storage_m &&
+      !source.embedded_uncertainty.storage_m->empty()) {
+    copy_and_bind(source.embedded_uncertainty, embedded_uncertainty_storage,
+                  matrix.embedded_uncertainty);
+  }
+  if (source.target_uncertainty.storage_m &&
+      !source.target_uncertainty.storage_m->empty()) {
+    copy_and_bind(source.target_uncertainty, target_uncertainty_storage,
+                  matrix.target_uncertainty);
+  }
+}
+
+/**
+ * @brief Populate library and test matrices using their separate owned storage.
  */
 template <typename Type>
 void populate_edm_model_matrices(
     DelayEmbeddingInterface* de_lib,
     DelayEmbeddingInterface* de_test,
     std::shared_ptr<fims_edm::EDMModel<Type>>& model) {
-  
-  // 1. Library Matrix
-  model->library_matrix.n_rows = de_lib->target_values.storage_m->size();
-  model->library_matrix.n_cols = model->library_matrix.n_rows > 0 
-      ? (de_lib->embedded_values.storage_m->size() / model->library_matrix.n_rows) : 0;
-
-  // Copy values to backing storage
-  model->library_embedded_values_storage.resize(de_lib->embedded_values.storage_m->size());
-  for (size_t i = 0; i < de_lib->embedded_values.storage_m->size(); i++) {
-    model->library_embedded_values_storage[i] = Type((*de_lib->embedded_values.storage_m)[i]);
-  }
-  model->library_target_values_storage.resize(de_lib->target_values.storage_m->size());
-  for (size_t i = 0; i < de_lib->target_values.storage_m->size(); i++) {
-    model->library_target_values_storage[i] = Type((*de_lib->target_values.storage_m)[i]);
-  }
-
-  // Set pointers in library_matrix to point to backing storage
-  model->library_matrix.embedded_values.resize(model->library_embedded_values_storage.size());
-  for (size_t i = 0; i < model->library_embedded_values_storage.size(); i++) {
-    model->library_matrix.embedded_values[i] = &(model->library_embedded_values_storage[i]);
-  }
-  model->library_matrix.target_values.resize(model->library_target_values_storage.size());
-  for (size_t i = 0; i < model->library_target_values_storage.size(); i++) {
-    model->library_matrix.target_values[i] = &(model->library_target_values_storage[i]);
-  }
-
-  // Handle library uncertainty if present
-  if (de_lib->embedded_uncertainty.storage_m && de_lib->embedded_uncertainty.storage_m->size() > 0) {
-    model->library_embedded_uncertainty_storage.resize(de_lib->embedded_uncertainty.storage_m->size());
-    for (size_t i = 0; i < de_lib->embedded_uncertainty.storage_m->size(); i++) {
-      model->library_embedded_uncertainty_storage[i] = Type((*de_lib->embedded_uncertainty.storage_m)[i]);
-    }
-    model->library_matrix.embedded_uncertainty.resize(model->library_embedded_uncertainty_storage.size());
-    for (size_t i = 0; i < model->library_embedded_uncertainty_storage.size(); i++) {
-      model->library_matrix.embedded_uncertainty[i] = &(model->library_embedded_uncertainty_storage[i]);
-    }
-  }
-  if (de_lib->target_uncertainty.storage_m && de_lib->target_uncertainty.storage_m->size() > 0) {
-    model->library_target_uncertainty_storage.resize(de_lib->target_uncertainty.storage_m->size());
-    for (size_t i = 0; i < de_lib->target_uncertainty.storage_m->size(); i++) {
-      model->library_target_uncertainty_storage[i] = Type((*de_lib->target_uncertainty.storage_m)[i]);
-    }
-    model->library_matrix.target_uncertainty.resize(model->library_target_uncertainty_storage.size());
-    for (size_t i = 0; i < model->library_target_uncertainty_storage.size(); i++) {
-      model->library_matrix.target_uncertainty[i] = &(model->library_target_uncertainty_storage[i]);
-    }
-  }
-
-  // 2. Test Matrix
-  model->test_matrix.n_rows = de_test->target_values.storage_m->size();
-  model->test_matrix.n_cols = model->test_matrix.n_rows > 0 
-      ? (de_test->embedded_values.storage_m->size() / model->test_matrix.n_rows) : 0;
-
-  // Copy values to backing storage
-  model->test_embedded_values_storage.resize(de_test->embedded_values.storage_m->size());
-  for (size_t i = 0; i < de_test->embedded_values.storage_m->size(); i++) {
-    model->test_embedded_values_storage[i] = Type((*de_test->embedded_values.storage_m)[i]);
-  }
-  model->test_target_values_storage.resize(de_test->target_values.storage_m->size());
-  for (size_t i = 0; i < de_test->target_values.storage_m->size(); i++) {
-    model->test_target_values_storage[i] = Type((*de_test->target_values.storage_m)[i]);
-  }
-
-  // Set pointers in test_matrix to point to backing storage
-  model->test_matrix.embedded_values.resize(model->test_embedded_values_storage.size());
-  for (size_t i = 0; i < model->test_embedded_values_storage.size(); i++) {
-    model->test_matrix.embedded_values[i] = &(model->test_embedded_values_storage[i]);
-  }
-  model->test_matrix.target_values.resize(model->test_target_values_storage.size());
-  for (size_t i = 0; i < model->test_target_values_storage.size(); i++) {
-    model->test_matrix.target_values[i] = &(model->test_target_values_storage[i]);
-  }
-
-  // Handle test uncertainty if present
-  if (de_test->embedded_uncertainty.storage_m && de_test->embedded_uncertainty.storage_m->size() > 0) {
-    model->test_embedded_uncertainty_storage.resize(de_test->embedded_uncertainty.storage_m->size());
-    for (size_t i = 0; i < de_test->embedded_uncertainty.storage_m->size(); i++) {
-      model->test_embedded_uncertainty_storage[i] = Type((*de_test->embedded_uncertainty.storage_m)[i]);
-    }
-    model->test_matrix.embedded_uncertainty.resize(model->test_embedded_uncertainty_storage.size());
-    for (size_t i = 0; i < model->test_embedded_uncertainty_storage.size(); i++) {
-      model->test_matrix.embedded_uncertainty[i] = &(model->test_embedded_uncertainty_storage[i]);
-    }
-  }
-  if (de_test->target_uncertainty.storage_m && de_test->target_uncertainty.storage_m->size() > 0) {
-    model->test_target_uncertainty_storage.resize(de_test->target_uncertainty.storage_m->size());
-    for (size_t i = 0; i < de_test->target_uncertainty.storage_m->size(); i++) {
-      model->test_target_uncertainty_storage[i] = Type((*de_test->target_uncertainty.storage_m)[i]);
-    }
-    model->test_matrix.target_uncertainty.resize(model->test_target_uncertainty_storage.size());
-    for (size_t i = 0; i < model->test_target_uncertainty_storage.size(); i++) {
-      model->test_matrix.target_uncertainty[i] = &(model->test_target_uncertainty_storage[i]);
-    }
-  }
+  populate_edm_matrix(
+      *de_lib, model->library_matrix, model->library_embedded_values_storage,
+      model->library_target_values_storage,
+      model->library_embedded_uncertainty_storage,
+      model->library_target_uncertainty_storage);
+  populate_edm_matrix(
+      *de_test, model->test_matrix, model->test_embedded_values_storage,
+      model->test_target_values_storage,
+      model->test_embedded_uncertainty_storage,
+      model->test_target_uncertainty_storage);
 }
-
 
 /**
  * @brief Rcpp interface for Simplex projection.
