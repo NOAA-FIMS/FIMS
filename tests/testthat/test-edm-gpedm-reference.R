@@ -138,3 +138,133 @@ test_that("GP-EDM matches the GPEDM README training/test example", {
     tolerance = 1e-8
   )
 })
+
+for (case_name in c(
+  "two_active_lags",
+  "longer_horizon_and_lag",
+  "uncertainty",
+  "longer_horizon_with_uncertainty"
+)) {
+  test_that(paste("GP-EDM matches GPEDM for", case_name), {
+    #' @description Direct and TMB GP predictions match GPEDM with two active lags, longer horizons, and optional embedding uncertainty.
+    clear()
+    withr::defer(clear())
+    reference <- readRDS(test_path("fixtures", "edm-gpedm-cases.rds"))[[case_name]]
+    parameters <- reference[["parameters"]]
+    scaling <- reference[["scaling"]]
+    expect_true(all(parameters[c("phi1", "phi2")] > 0.1))
+    for (dimension in seq_len(reference[["embedding_dimension"]])) {
+      expect_gt(
+        max(abs(
+          reference[["out_of_sample"]] -
+            reference[["ablated_predictions"]][, dimension]
+        )),
+        0.01
+      )
+    }
+
+    embeddings <- lapply(c("training", "test"), function(partition) {
+      series <- reference[[paste0(partition, "_series")]]
+      rows <- reference[[paste0(partition, "_rows")]]
+      uncertainty <- reference[[paste0(partition, "_uncertainty")]]
+      expect_length(
+        rows,
+        length(series) -
+          (reference[["embedding_dimension"]] - 1L) * reference[["time_lag"]] -
+          reference[["forecast_horizon"]]
+      )
+      embedding <- methods::new(DelayEmbedding)
+      if (reference[["with_uncertainty"]]) {
+        embedding$construct_drop_missing_with_uncertainty(
+          series,
+          reference[["embedding_dimension"]],
+          reference[["time_lag"]],
+          reference[["forecast_horizon"]],
+          -999,
+          uncertainty
+        )
+      } else {
+        embedding$construct_drop_missing(
+          series,
+          reference[["embedding_dimension"]],
+          reference[["time_lag"]],
+          reference[["forecast_horizon"]],
+          -999
+        )
+      }
+      expect_equal(embedding[["n_rows"]], length(rows))
+      matrix <- matrix(
+        embedding[["embedded_values"]]$get_values(),
+        ncol = reference[["embedding_dimension"]],
+        byrow = TRUE
+      )
+      expect_equal(matrix, reference[[paste0(partition, "_predictors")]])
+      targets <- embedding[["target_values"]]$get_values()
+      expect_equal(targets, reference[[paste0(partition, "_series")]][rows])
+      if (reference[["with_uncertainty"]]) {
+        expect_equal(
+          embedding[["embedded_uncertainty"]]$get_values(),
+          as.numeric(t(reference[[paste0(partition, "_embedded_uncertainty")]]))
+        )
+        expect_equal(
+          embedding[["target_uncertainty"]]$get_values(),
+          uncertainty[rows]
+        )
+      } else {
+        expect_length(embedding[["embedded_uncertainty"]]$get_values(), 0L)
+        expect_length(embedding[["target_uncertainty"]]$get_values(), 0L)
+      }
+      matrix <- sweep(matrix, 2, scaling[["xmeans"]], "-") |>
+        sweep(2, scaling[["xsds"]], "/")
+      embedding[["embedded_values"]]$set_values(as.numeric(t(matrix)))
+      embedding[["target_values"]]$set_values(
+        (targets - scaling[["ymeans"]]) / scaling[["ysds"]]
+      )
+      embedding
+    })
+    library_embedding <- embeddings[[1L]]
+    test_embedding <- embeddings[[2L]]
+    projection <- methods::new(GPEdmProjection)
+    projection[["embedding_dimension"]] <- reference[["embedding_dimension"]]
+    projection[["phi"]] <- unname(parameters[c("phi1", "phi2")])
+    projection[["sigma2"]] <- unname(parameters[["sigma2"]])
+    projection[["ve"]] <- unname(parameters[["ve"]])
+    projection[["forecast_horizon"]] <- reference[["forecast_horizon"]]
+    projection[["lib_de_id"]] <- library_embedding$get_id()
+    projection[["test_de_id"]] <- test_embedding$get_id()
+
+    for (partition in seq_along(embeddings)) {
+      predictions <- projection$predict(
+        library_embedding$get_id(), embeddings[[partition]]$get_id()
+      )
+      expected <- reference[[c("in_sample", "out_of_sample")[[partition]]]]
+      expect_length(predictions, length(expected))
+      expect_true(all(is.finite(predictions)))
+      expect_equal(
+        predictions * scaling[["ysds"]] + scaling[["ymeans"]],
+        expected,
+        tolerance = 1e-8
+      )
+    }
+
+    # GP currently carries embedding uncertainty but does not use it in the
+    # kernel; GPEDM's shared nugget ve remains the modeled prediction noise.
+    expect_no_error(CreateTMBModel())
+    objective <- TMB::MakeADFun(
+      data = list(),
+      parameters = list(p = get_fixed(), re = get_random()),
+      DLL = "FIMS",
+      silent = TRUE
+    )
+    objective$report()
+    projection$finalize()
+    model_predictions <- projection[["predictions"]]$get_values()
+    expect_length(model_predictions, length(reference[["out_of_sample"]]))
+    expect_true(all(is.finite(model_predictions)))
+    expect_equal(
+      model_predictions * scaling[["ysds"]] + scaling[["ymeans"]],
+      reference[["out_of_sample"]],
+      tolerance = 1e-8
+    )
+  })
+}
