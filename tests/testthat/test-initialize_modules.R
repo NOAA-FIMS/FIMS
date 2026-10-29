@@ -40,13 +40,13 @@ test_that("`initialize_fims()` works with correct inputs", {
 test_that("`initialize_fims()` works with edge cases", {
   modified_log_devs <- default_parameters |>
     dplyr::filter(label == "log_devs") |>
-    # change first 10 estimation_type for label of log_devs from fixed_effects
+    # change first 10 estimation_status for label of log_devs from fixed_effects
     # to constant
     dplyr::mutate(
-      estimation_type = dplyr::if_else(
+      estimation_status = dplyr::if_else(
         timing <= 11,
         "constant",
-        estimation_type
+        estimation_status
       ),
       distribution_type = dplyr::if_else(
         timing <= 11,
@@ -76,7 +76,7 @@ test_that("`initialize_fims()` works with edge cases", {
     ),
     regexp = "10 of the 29"
   )
-  #' @description Test that `initialize_fims()` works with multiple estimation types.
+  #' @description Test that `initialize_fims()` works with multiple estimation statuses.
   expect_equal(
     length(init_parm_multiple_types$parameters$p) +
       length(init_parm_multiple_types$parameters$re),
@@ -87,13 +87,13 @@ test_that("`initialize_fims()` works with edge cases", {
 
   parameters_na_types <- parameters_multiple_types |>
     dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        label == "log_devs" & estimation_type == "constant",
+      estimation_status = dplyr::if_else(
+        label == "log_devs" & estimation_status == "constant",
         NA_character_,
-        estimation_type
+        estimation_status
       )
     )
-  #' @description Test that `initialize_fims()` treats an NA estimation_type in `log_devs` as constant and warns instead of erroring.
+  #' @description Test that `initialize_fims()` treats an NA estimation_status in `log_devs` as constant and warns instead of erroring.
   expect_warning(
     initialize_fims(parameters = parameters_na_types, data = data),
     regexp = "10 of the 29"
@@ -177,10 +177,10 @@ test_that("`initialize_fims()` returns correct error messages", {
 
   parameters_wrong_type <- default_parameters |>
     dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        estimation_type == "fixed_effects",
+      estimation_status = dplyr::if_else(
+        estimation_status == "fixed_effects",
         "fixed.effects",
-        estimation_type
+        estimation_status
       )
     )
   parameters_wrong_type[[
@@ -188,13 +188,13 @@ test_that("`initialize_fims()` returns correct error messages", {
   ]][[
     "recruitment"
   ]][[
-    "BevertonHoltRecruitment.log_devs.estimation_type"
+    "BevertonHoltRecruitment.log_devs.estimation_status"
   ]] <-
     "fixed.effects"
-  #' @description Test that `initialize_fims()` correctly returns an error on an unknown estimation_type.
+  #' @description Test that `initialize_fims()` correctly returns an error on an unknown estimation_status.
   expect_error(
     initialize_fims(parameters = parameters_wrong_type, data = data),
-    "The `estimation_type` must be one of: constant, fixed_effects, and random_effects."
+    "The `estimation_status` must be one of: constant, fixed_effects, and random_effects."
   )
   clear()
 
@@ -216,12 +216,12 @@ test_that("`initialize_fims()` returns correct error messages", {
           module_name = "Recruitment",
           label = "log_devs",
           timing = 2:get_n_years(data),
-          estimation_type = "random_effects"
+          estimation_status = "random_effects"
         ),
         by = c("module_name", "label", "timing")
       )
 
-    #' @description Test that `initialize_fims()` returns correct error with distribution estimation type mismatch.
+    #' @description Test that `initialize_fims()` returns correct error with distribution estimation status mismatch.
     expect_error(
       missing_recruitment_distribution_error |>
         initialize_fims(data = data),
@@ -236,7 +236,7 @@ test_that("`initialize_fims()` returns correct error messages", {
           module_name = "Recruitment",
           label = "log_devs",
           timing = 2:get_n_years(data),
-          estimation_type = "constant"
+          estimation_status = "constant"
         ),
         by = c("module_name", "label", "timing")
       )
@@ -613,13 +613,13 @@ test_that("`initialize_comp()` works with correct inputs", {
 test_that("`initialize_fims()` works with edge cases", {
   modified_log_devs <- default_parameters |>
     dplyr::filter(label == "log_devs") |>
-    # change first 10 estimation_type for label of log_devs from random_effects
+    # change first 10 estimation_status for label of log_devs from random_effects
     # to constant
     dplyr::mutate(
-      estimation_type = dplyr::if_else(
+      estimation_status = dplyr::if_else(
         timing <= 11,
         "constant",
-        estimation_type
+        estimation_status
       ),
       distribution_type = dplyr::if_else(
         timing <= 11,
@@ -643,7 +643,7 @@ test_that("`initialize_fims()` works with edge cases", {
     init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data),
     regexp = "10 of the 29"
   )
-  #' @description Test that `initialize_fims()` works with multiple estimation types.
+  #' @description Test that `initialize_fims()` works with multiple estimation statuses.
   expect_equal(length(unlist(init_parm_multiple_types$parameters)), length(unlist(init_parm_default$parameters)) - 10)
 })
 

@@ -19,7 +19,7 @@ test_that("`setup_default_Maturity()` works with correct inputs", {
   expect_s3_class(result, "tbl_df")
   expect_true(all(result[["module_name"]] == "Maturity"))
   expect_true(all(result[["module_type"]] == "Logistic"))
-  expect_true(all(result[["estimation_type"]] == "constant"))
+  expect_true(all(result[["estimation_status"]] == "constant"))
 
   clear()
 })

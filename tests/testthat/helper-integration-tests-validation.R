@@ -208,14 +208,14 @@ validate_fims <- function(
         !is.na(input),
         !is.na(estimated),
         !is.na(uncertainty),
-        estimation_type == "fixed_effects"
+        estimation_status == "fixed_effects"
       ) |>
       # Restore input values back to true OM values for estimated parameters
       # so that parameter tolerance/recovery tests evaluate against truth.
       # See code in tests/testthat/helper-integration-tests-setup-run.R.
       dplyr::mutate(
         input = dplyr::if_else(
-          estimation_type != "constant",
+          estimation_status != "constant",
           input / initial_value_scale,
           input
         )

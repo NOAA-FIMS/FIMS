@@ -1308,7 +1308,7 @@
       318 Fleet               1 <NA>        agecomp_expected <NA>        NA
       319 Fleet               1 <NA>        agecomp_expected <NA>        NA
       320 Fleet               1 <NA>        agecomp_expected <NA>        NA
-          parameter_id fleet  year_i   age length  input observed estimation_type
+          parameter_id fleet  year_i   age length  input observed estimation_status
                  <int> <chr>   <int> <dbl>  <dbl>  <dbl>    <dbl> <chr>
         1            4 fleet1      1    NA     NA -4.66        NA fixed_effects
         2           24 fleet1      2    NA     NA -3.60        NA fixed_effects

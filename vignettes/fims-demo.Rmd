@@ -130,10 +130,10 @@ default_parameters
 
 ### Update parameters
 
-The default parameters created above include a mix of parameters that are fixed at their starting values, i.e., "constant"; estimated as fixed effects, i.e., "fixed_effects"; and estimated as random effects, i.e., "random_effects". Additionally, the parameter table can include specifications for empirical relationships that actually are not parameters at all, such as empirical weight at age. These empirical relationships will have an "estimation_type" of `NA`. Below is a summary of how many fall into each category.
+The default parameters created above include a mix of parameters that are fixed at their starting values, i.e., "constant"; estimated as fixed effects, i.e., "fixed_effects"; and estimated as random effects, i.e., "random_effects". Additionally, the parameter table can include specifications for empirical relationships that actually are not parameters at all, such as empirical weight at age. These empirical relationships will have an "estimation_status" of `NA`. Below is a summary of how many fall into each category.
 
 ```{r explore-parameters}
-dplyr::count(default_parameters, estimation_type)
+dplyr::count(default_parameters, estimation_status)
 ```
 
 Using `dplyr::count()` to summarize parameter labels by module names is a good way to understand what default parameters have been defined based on the data in your FIMSFrame. Because there is empirical weight-at-age data in `data_big`, the default is to model growth empirically rather than with parameters, and thus, the label for the growth module is `NA`. See the [vignette on growth](fims-growth-vonb-schnute.html) for an example of how to estimate growth internally.
@@ -149,7 +149,7 @@ Counting the constant parameters by `module_name`, `fleet`, `label`, and `value`
 (n_ages <- FIMS::get_n_ages(data_4_model))
 
 default_parameters |>
-  dplyr::filter(estimation_type == "constant") |>
+  dplyr::filter(estimation_status == "constant") |>
   dplyr::count(module_name, fleet, label, value)
 ```
 
@@ -471,7 +471,7 @@ parameters_age_specific_selectivity <- parameters_4_model |>
 # Look at updated default parameters
 parameters_age_specific_selectivity |>
   dplyr::filter(fleet == "survey1", module_name == "Selectivity") |>
-  dplyr::select(module_type, fleet, label, age, value, estimation_type)
+  dplyr::select(module_type, fleet, label, age, value, estimation_status)
 
 # Update the age-specific selectivity parameterization to facilitate estimation
 # Values for first two ages are set to generic initial values and estimated
@@ -488,7 +488,7 @@ parameters_age_specific_selectivity <- parameters_age_specific_selectivity |>
         8.999956, 11.000085, 12.982599, 15.019483, 18.420681,
         18.420681, 18.420681
       ),
-      estimation_type = c(rep("fixed_effects", 2), rep("constant", 10))
+      estimation_status = c(rep("fixed_effects", 2), rep("constant", 10))
     ),
     by = c("fleet", "label", "age")
   )

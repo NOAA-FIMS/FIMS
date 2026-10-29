@@ -161,7 +161,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
-        if (this->inflection_point[i].estimation_type_m.get() == "constant") {
+        if (this->inflection_point[i].estimation_status_m.get() == "constant") {
           this->inflection_point[i].final_value_m =
               this->inflection_point[i].initial_value_m;
         } else {
@@ -170,7 +170,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
 
       for (size_t i = 0; i < slope.size(); i++) {
-        if (this->slope[i].estimation_type_m.get() == "constant") {
+        if (this->slope[i].estimation_status_m.get() == "constant") {
           this->slope[i].final_value_m = this->slope[i].initial_value_m;
         } else {
           this->slope[i].final_value_m = sel->slope[i];
@@ -232,7 +232,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     for (size_t i = 0; i < this->inflection_point.size(); i++) {
       selectivity->inflection_point[i] =
           this->inflection_point[i].initial_value_m;
-      if (this->inflection_point[i].estimation_type_m.get() ==
+      if (this->inflection_point[i].estimation_status_m.get() ==
           "fixed_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".inflection_point."
@@ -240,7 +240,7 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->inflection_point[i]);
       }
-      if (this->inflection_point[i].estimation_type_m.get() ==
+      if (this->inflection_point[i].estimation_status_m.get() ==
           "random_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".inflection_point."
@@ -255,13 +255,13 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
     selectivity->slope.resize(this->slope.size());
     for (size_t i = 0; i < this->slope.size(); i++) {
       selectivity->slope[i] = this->slope[i].initial_value_m;
-      if (this->slope[i].estimation_type_m.get() == "fixed_effects") {
+      if (this->slope[i].estimation_status_m.get() == "fixed_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->slope[i]);
       }
-      if (this->slope[i].estimation_type_m.get() == "random_effects") {
+      if (this->slope[i].estimation_status_m.get() == "random_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterRandomEffectName(ss.str());
@@ -390,7 +390,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
               fims_popdy::DoubleLogisticSelectivity<double>>(it->second);
 
       for (size_t i = 0; i < inflection_point_asc.size(); i++) {
-        if (this->inflection_point_asc[i].estimation_type_m.get() ==
+        if (this->inflection_point_asc[i].estimation_status_m.get() ==
             "constant") {
           this->inflection_point_asc[i].final_value_m =
               this->inflection_point_asc[i].initial_value_m;
@@ -401,7 +401,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
 
       for (size_t i = 0; i < slope_asc.size(); i++) {
-        if (this->slope_asc[i].estimation_type_m.get() == "constant") {
+        if (this->slope_asc[i].estimation_status_m.get() == "constant") {
           this->slope_asc[i].final_value_m = this->slope_asc[i].initial_value_m;
         } else {
           this->slope_asc[i].final_value_m = sel->slope_asc[i];
@@ -409,7 +409,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
 
       for (size_t i = 0; i < inflection_point_desc.size(); i++) {
-        if (this->inflection_point_desc[i].estimation_type_m.get() ==
+        if (this->inflection_point_desc[i].estimation_status_m.get() ==
             "constant") {
           this->inflection_point_desc[i].final_value_m =
               this->inflection_point_desc[i].initial_value_m;
@@ -420,7 +420,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       }
 
       for (size_t i = 0; i < slope_desc.size(); i++) {
-        if (this->slope_desc[i].estimation_type_m.get() == "constant") {
+        if (this->slope_desc[i].estimation_status_m.get() == "constant") {
           this->slope_desc[i].final_value_m =
               this->slope_desc[i].initial_value_m;
         } else {
@@ -499,7 +499,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     for (size_t i = 0; i < this->inflection_point_asc.size(); i++) {
       selectivity->inflection_point_asc[i] =
           this->inflection_point_asc[i].initial_value_m;
-      if (this->inflection_point_asc[i].estimation_type_m.get() ==
+      if (this->inflection_point_asc[i].estimation_status_m.get() ==
           "fixed_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".inflection_point_asc."
@@ -507,7 +507,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->inflection_point_asc[i]);
       }
-      if (this->inflection_point_asc[i].estimation_type_m.get() ==
+      if (this->inflection_point_asc[i].estimation_status_m.get() ==
           "random_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".inflection_point_asc."
@@ -523,14 +523,14 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     for (size_t i = 0; i < this->slope_asc.size(); i++) {
       selectivity->slope_asc[i] = this->slope_asc[i].initial_value_m;
 
-      if (this->slope_asc[i].estimation_type_m.get() == "fixed_effects") {
+      if (this->slope_asc[i].estimation_status_m.get() == "fixed_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".slope_asc."
            << this->slope_asc[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->slope_asc[i]);
       }
-      if (this->slope_asc[i].estimation_type_m.get() == "random_effects") {
+      if (this->slope_asc[i].estimation_status_m.get() == "random_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".slope_asc."
            << this->slope_asc[i].id_m;
@@ -546,7 +546,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
       selectivity->inflection_point_desc[i] =
           this->inflection_point_desc[i].initial_value_m;
 
-      if (this->inflection_point_desc[i].estimation_type_m.get() ==
+      if (this->inflection_point_desc[i].estimation_status_m.get() ==
           "fixed_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".inflection_point_desc."
@@ -554,7 +554,7 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->inflection_point_desc[i]);
       }
-      if (this->inflection_point_desc[i].estimation_type_m.get() ==
+      if (this->inflection_point_desc[i].estimation_status_m.get() ==
           "random_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".inflection_point_desc."
@@ -570,14 +570,14 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
     for (size_t i = 0; i < this->slope_desc.size(); i++) {
       selectivity->slope_desc[i] = this->slope_desc[i].initial_value_m;
 
-      if (this->slope_desc[i].estimation_type_m.get() == "fixed_effects") {
+      if (this->slope_desc[i].estimation_status_m.get() == "fixed_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".slope_desc."
            << this->slope_desc[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->slope_desc[i]);
       }
-      if (this->slope_desc[i].estimation_type_m.get() == "random_effects") {
+      if (this->slope_desc[i].estimation_status_m.get() == "random_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".slope_desc."
            << this->slope_desc[i].id_m;
@@ -717,7 +717,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
           std::dynamic_pointer_cast<fims_popdy::AgeSpecificSelectivity<double>>(
               it->second);
       for (size_t i = 0; i < logit_sel_at_age.size(); i++) {
-        if (this->logit_sel_at_age[i].estimation_type_m.get() == "constant") {
+        if (this->logit_sel_at_age[i].estimation_status_m.get() == "constant") {
           this->logit_sel_at_age[i].final_value_m =
               this->logit_sel_at_age[i].initial_value_m;
         } else {
@@ -778,7 +778,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
     for (size_t i = 0; i < this->logit_sel_at_age.size(); i++) {
       selectivity->logit_sel_at_age[i] =
           this->logit_sel_at_age[i].initial_value_m;
-      if (this->logit_sel_at_age[i].estimation_type_m.get() ==
+      if (this->logit_sel_at_age[i].estimation_status_m.get() ==
           "fixed_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".logit_sel_at_age."
@@ -786,7 +786,7 @@ class AgeSpecificSelectivityInterface : public SelectivityInterfaceBase {
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(selectivity->logit_sel_at_age[i]);
       }
-      if (this->logit_sel_at_age[i].estimation_type_m.get() ==
+      if (this->logit_sel_at_age[i].estimation_status_m.get() ==
           "random_effects") {
         ss.str("");
         ss << "Selectivity." << this->id << ".logit_sel_at_age."

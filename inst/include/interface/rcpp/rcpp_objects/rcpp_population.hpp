@@ -232,7 +232,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   PopulationInterface() : PopulationInterfaceBase() {
     this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
-    this->proportion_female[0].estimation_type_m.set("constant");
+    this->proportion_female[0].estimation_status_m.set("constant");
     this->fleet_ids = std::make_shared<std::set<uint32_t>>();
     std::shared_ptr<PopulationInterface> population =
         std::make_shared<PopulationInterface>(*this);
@@ -358,7 +358,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       return;
     } else {
       for (size_t i = 0; i < this->log_M.size(); i++) {
-        if (this->log_M[i].estimation_type_m.get() == "constant") {
+        if (this->log_M[i].estimation_status_m.get() == "constant") {
           this->log_M[i].final_value_m = this->log_M[i].initial_value_m;
         } else {
           this->log_M[i].final_value_m = pop->log_M[i];
@@ -366,7 +366,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
 
       for (size_t i = 0; i < this->log_f_multiplier.size(); i++) {
-        if (this->log_f_multiplier[i].estimation_type_m.get() == "constant") {
+        if (this->log_f_multiplier[i].estimation_status_m.get() == "constant") {
           this->log_f_multiplier[i].final_value_m =
               this->log_f_multiplier[i].initial_value_m;
         } else {
@@ -375,7 +375,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
 
       for (size_t i = 0; i < this->log_init_naa.size(); i++) {
-        if (this->log_init_naa[i].estimation_type_m.get() == "constant") {
+        if (this->log_init_naa[i].estimation_status_m.get() == "constant") {
           this->log_init_naa[i].final_value_m =
               this->log_init_naa[i].initial_value_m;
         } else {
@@ -384,7 +384,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
 
       for (size_t i = 0; i < this->proportion_female.size(); i++) {
-        if (this->proportion_female[i].estimation_type_m.get() == "constant") {
+        if (this->proportion_female[i].estimation_status_m.get() == "constant") {
           this->proportion_female[i].final_value_m =
               this->proportion_female[i].initial_value_m;
         } else {
@@ -443,7 +443,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       this->log_f_multiplier.resize((this->n_years.get()));
       for (size_t i = 0; i < log_f_multiplier.size(); i++) {
         this->log_f_multiplier[i].initial_value_m = static_cast<double>(0.0);
-        this->log_f_multiplier[i].estimation_type_m.set("constant");
+        this->log_f_multiplier[i].estimation_status_m.set("constant");
       }
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     }
@@ -465,13 +465,13 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->log_init_naa.resize(this->log_init_naa.size());
     for (size_t i = 0; i < log_M.size(); i++) {
       population->log_M[i] = this->log_M[i].initial_value_m;
-      if (this->log_M[i].estimation_type_m.get() == "fixed_effects") {
+      if (this->log_M[i].estimation_status_m.get() == "fixed_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_M[i]);
       }
-      if (this->log_M[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_M[i].estimation_status_m.get() == "random_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_M." << this->log_M[i].id_m;
         info->RegisterRandomEffectName(ss.str());
@@ -483,7 +483,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     for (size_t i = 0; i < log_f_multiplier.size(); i++) {
       population->log_f_multiplier[i] =
           this->log_f_multiplier[i].initial_value_m;
-      if (this->log_f_multiplier[i].estimation_type_m.get() ==
+      if (this->log_f_multiplier[i].estimation_status_m.get() ==
           "fixed_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_f_multiplier."
@@ -491,7 +491,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_f_multiplier[i]);
       }
-      if (this->log_f_multiplier[i].estimation_type_m.get() ==
+      if (this->log_f_multiplier[i].estimation_status_m.get() ==
           "random_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_f_multiplier."
@@ -505,14 +505,14 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
-      if (this->log_init_naa[i].estimation_type_m.get() == "fixed_effects") {
+      if (this->log_init_naa[i].estimation_status_m.get() == "fixed_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_init_naa."
            << this->log_init_naa[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->log_init_naa[i]);
       }
-      if (this->log_init_naa[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_init_naa[i].estimation_status_m.get() == "random_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_init_naa."
            << this->log_init_naa[i].id_m;
@@ -532,7 +532,7 @@ class PopulationInterface : public PopulationInterfaceBase {
           "with 0.5.");
       this->proportion_female.resize(1);
       this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
-      this->proportion_female[0].estimation_type_m.set("constant");
+      this->proportion_female[0].estimation_status_m.set("constant");
       population->proportion_female.resize(this->proportion_female.size());
     }
 
@@ -546,7 +546,7 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
       population->proportion_female[i] =
           this->proportion_female[i].initial_value_m;
-      if (this->proportion_female[i].estimation_type_m.get() ==
+      if (this->proportion_female[i].estimation_status_m.get() ==
           "fixed_effects") {
         ss.str("");
         ss << "Population." << this->id << ".proportion_female."
@@ -554,7 +554,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(population->proportion_female[i]);
       }
-      if (this->proportion_female[i].estimation_type_m.get() ==
+      if (this->proportion_female[i].estimation_status_m.get() ==
           "random_effects") {
         ss.str("");
         ss << "Population." << this->id << ".proportion_female."

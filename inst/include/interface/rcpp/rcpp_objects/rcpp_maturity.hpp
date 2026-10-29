@@ -159,7 +159,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
               it->second);
 
       for (size_t i = 0; i < inflection_point.size(); i++) {
-        if (this->inflection_point[i].estimation_type_m.get() == "constant") {
+        if (this->inflection_point[i].estimation_status_m.get() == "constant") {
           this->inflection_point[i].final_value_m =
               this->inflection_point[i].initial_value_m;
         } else {
@@ -168,7 +168,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
       }
 
       for (size_t i = 0; i < slope.size(); i++) {
-        if (this->slope[i].estimation_type_m.get() == "constant") {
+        if (this->slope[i].estimation_status_m.get() == "constant") {
           this->slope[i].final_value_m = this->slope[i].initial_value_m;
         } else {
           this->slope[i].final_value_m = mat->slope[i];
@@ -229,7 +229,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     maturity->inflection_point.resize(this->inflection_point.size());
     for (size_t i = 0; i < this->inflection_point.size(); i++) {
       maturity->inflection_point[i] = this->inflection_point[i].initial_value_m;
-      if (this->inflection_point[i].estimation_type_m.get() ==
+      if (this->inflection_point[i].estimation_status_m.get() ==
           "fixed_effects") {
         ss.str("");
         ss << "Maturity." << this->id << ".inflection_point."
@@ -237,7 +237,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->inflection_point[i]);
       }
-      if (this->inflection_point[i].estimation_type_m.get() ==
+      if (this->inflection_point[i].estimation_status_m.get() ==
           "random_effects") {
         ss.str("");
         ss << "Maturity." << this->id << ".inflection_point."
@@ -252,13 +252,13 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     maturity->slope.resize(this->slope.size());
     for (size_t i = 0; i < this->slope.size(); i++) {
       maturity->slope[i] = this->slope[i].initial_value_m;
-      if (this->slope[i].estimation_type_m.get() == "fixed_effects") {
+      if (this->slope[i].estimation_status_m.get() == "fixed_effects") {
         ss.str("");
         ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(maturity->slope[i]);
       }
-      if (this->slope[i].estimation_type_m.get() == "random_effects") {
+      if (this->slope[i].estimation_status_m.get() == "random_effects") {
         ss.str("");
         ss << "Maturity." << this->id << ".slope." << this->slope[i].id_m;
         info->RegisterRandomEffect(maturity->slope[i]);

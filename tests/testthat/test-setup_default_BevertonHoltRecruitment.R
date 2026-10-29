@@ -32,7 +32,7 @@ test_that("`setup_default_BevertonHoltRecruitment()` works with edge cases", {
   expect_equal(
     result |>
       dplyr::filter(.data[["label"]] == "log_devs") |>
-      dplyr::pull(.data[["estimation_type"]]) |>
+      dplyr::pull(.data[["estimation_status"]]) |>
       unique(),
     "constant"
   )

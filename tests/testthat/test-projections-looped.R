@@ -79,11 +79,11 @@ run_FIMS_projection_scenario <- function(om_input,
   fishing_fleet_selectivity$inflection_point[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["A50.sel1"]]
 
   # turn on estimation of inflection_point
-  fishing_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
+  fishing_fleet_selectivity$inflection_point[1]$estimation_status$set("fixed_effects")
   fishing_fleet_selectivity$slope[1]$value <- om_input[["sel_fleet"]][["fleet1"]][["slope.sel1"]]
 
   # turn on estimation of slope
-  fishing_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
+  fishing_fleet_selectivity$slope[1]$estimation_status$set("fixed_effects")
 
   # Initialize the fishing fleet module
   fishing_fleet <- methods::new(Fleet)
@@ -100,7 +100,7 @@ run_FIMS_projection_scenario <- function(om_input,
     # Log-transform OM fishing mortality
     # NOTE: Is this index y correct? It starts at 1 but others start at 0?
     fishing_fleet$log_Fmort[y]$value <- (log(om_output[["f"]][y]))
-    fishing_fleet$log_Fmort[y]$estimation_type$set("fixed_effects")
+    fishing_fleet$log_Fmort[y]$estimation_status$set("fixed_effects")
   }
 
   if (n_projection_years > 0) {
@@ -108,12 +108,12 @@ run_FIMS_projection_scenario <- function(om_input,
       # Log-transform OM fishing mortality
       # NOTE: Is this index y correct? It starts at 1 but others start at 0?
       fishing_fleet$log_Fmort[y]$value <- (log(projected_F[y - om_input$nyr]))
-      fishing_fleet$log_Fmort[y]$estimation_type$set(estimate_projected_F[y - om_input$nyr])
+      fishing_fleet$log_Fmort[y]$estimation_status$set(estimate_projected_F[y - om_input$nyr])
     }
   }
 
   fishing_fleet$log_q[1]$value <- (log(1.0))
-  fishing_fleet$log_q[1]$estimation_type$set("constant")
+  fishing_fleet$log_q[1]$estimation_status$set("constant")
   fishing_fleet$SetSelectivityID(fishing_fleet_selectivity$get_id())
   fishing_fleet$SetObservedCatchDataID(fishing_fleet_catch$get_id())
   fishing_fleet$SetObservedAgeCompDataID(fishing_fleet_age_comp$get_id())
@@ -128,7 +128,7 @@ run_FIMS_projection_scenario <- function(om_input,
     # Compute lognormal SD from OM coefficient of variation (CV)
     fishing_fleet_catch_distribution$log_sd[y]$value <- (log(sqrt(log(em_input[["cv.L"]][["fleet1"]]^2 + 1))))
   }
-  fishing_fleet_catch_distribution$log_sd$set_estimation_types(c("constant"))
+  fishing_fleet_catch_distribution$log_sd$set_estimation_status(c("constant"))
   # Set Data using the IDs from the modules defined above
   fishing_fleet_catch_distribution$set_observed_data(fishing_fleet$GetObservedCatchDataID())
   fishing_fleet_catch_distribution$set_distribution_links("data", fishing_fleet$log_catch_expected$get_id())
@@ -150,7 +150,7 @@ run_FIMS_projection_scenario <- function(om_input,
   }
 
   # Turn off estimation for length-at-age
-  fishing_fleet$age_to_length_conversion$set_estimation_types(c("constant"))
+  fishing_fleet$age_to_length_conversion$set_estimation_status(c("constant"))
 
   # Repeat similar setup for the survey fleet (e.g., index, age comp, and length comp)
   # This includes initializing logistic selectivity, observed data modules, and distribution links.
@@ -184,11 +184,11 @@ run_FIMS_projection_scenario <- function(om_input,
   survey_fleet_selectivity$inflection_point[1]$value <- (om_input[["sel_survey"]][["survey1"]][["A50.sel1"]])
 
   # turn on estimation of inflection_point
-  survey_fleet_selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
+  survey_fleet_selectivity$inflection_point[1]$estimation_status$set("fixed_effects")
   survey_fleet_selectivity$slope[1]$value <- (om_input[["sel_survey"]][["survey1"]][["slope.sel1"]])
 
   # turn on estimation of slope
-  survey_fleet_selectivity$slope[1]$estimation_type$set("fixed_effects")
+  survey_fleet_selectivity$slope[1]$estimation_status$set("fixed_effects")
 
   survey_fleet <- methods::new(Fleet)
   survey_fleet$n_ages$set(om_input[["nages"]])
@@ -200,9 +200,9 @@ run_FIMS_projection_scenario <- function(om_input,
     # Set very low survey fishing mortality
     survey_fleet$log_Fmort[y]$value <- (-200)
   }
-  survey_fleet$log_Fmort$set_estimation_types(c("constant"))
+  survey_fleet$log_Fmort$set_estimation_status(c("constant"))
   survey_fleet$log_q[1]$value <- (log(om_output[["survey_q"]][["survey1"]]))
-  survey_fleet$log_q[1]$estimation_type$set("fixed_effects")
+  survey_fleet$log_q[1]$estimation_status$set("fixed_effects")
   survey_fleet$SetSelectivityID(survey_fleet_selectivity$get_id())
   survey_fleet$SetObservedIndexDataID(survey_fleet_index$get_id())
   survey_fleet$SetObservedAgeCompDataID(survey_fleet_age_comp$get_id())
@@ -218,7 +218,7 @@ run_FIMS_projection_scenario <- function(om_input,
   for (y in 1:(om_input$nyr + n_projection_years)) {
     survey_fleet_index_distribution$log_sd[y]$value <- (log(sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1))))
   }
-  survey_fleet_index_distribution$log_sd$set_estimation_types(c("constant"))
+  survey_fleet_index_distribution$log_sd$set_estimation_status(c("constant"))
   # Set Data using the IDs from the modules defined above
   survey_fleet_index_distribution$set_observed_data(survey_fleet$GetObservedIndexDataID())
   survey_fleet_index_distribution$set_distribution_links("data", survey_fleet$log_index_expected$get_id())
@@ -247,7 +247,7 @@ run_FIMS_projection_scenario <- function(om_input,
     survey_fleet$age_to_length_conversion[i]$value <- (c(t(em_input[["age_to_length_conversion"]]))[i])
   }
   # Turn off estimation for length-at-age
-  survey_fleet$age_to_length_conversion$set_estimation_types(c("constant"))
+  survey_fleet$age_to_length_conversion$set_estimation_status(c("constant"))
 
   # Recruitment
   # create new module in the recruitment class (specifically Beverton-Holt,
@@ -257,17 +257,17 @@ run_FIMS_projection_scenario <- function(om_input,
   recruitment$SetRecruitmentProcessID(recruitment_process$get_id())
 
   # NOTE: in first set of parameters below (for recruitment),
-  # $estimation_type (default is "constant")
+  # $estimation_status (default is "constant")
   # is defined even if it matches the defaults in order to provide an example
   # of how that is done. Other sections of the code below leave defaults in
   # place as appropriate.
 
   # set up log_rzero (equilibrium recruitment)
   recruitment$log_rzero[1]$value <- (log(om_input[["R0"]]))
-  recruitment$log_rzero[1]$estimation_type$set("fixed_effects")
+  recruitment$log_rzero[1]$estimation_status$set("fixed_effects")
   # set up logit_steep
   recruitment$logit_steep[1]$value <- (-log(1.0 - om_input[["h"]]) + log(om_input[["h"]] - 0.2))
-  recruitment$logit_steep[1]$estimation_type$set("constant")
+  recruitment$logit_steep[1]$estimation_status$set("constant")
   recruitment$n_years$set(om_input[["nyr"]] + n_projection_years)
 
   # turn on estimation of deviations
@@ -281,14 +281,14 @@ run_FIMS_projection_scenario <- function(om_input,
   # set values for estimated years
   for (y in 1:(om_input[["nyr"]] - 1)) {
     recruitment$log_devs[y]$value <- (om_input[["logR.resid"]][y + 1])
-    recruitment$log_devs[y]$estimation_type$set("random_effects")
+    recruitment$log_devs[y]$estimation_status$set("random_effects")
   }
 
   if (n_projection_years > 0) {
     # set projection years to zero
     for (y in (om_input[["nyr"]]):(om_input[["nyr"]] - 1 + n_projection_years)) {
       recruitment$log_devs[y]$value <- (0)
-      recruitment$log_devs[y]$estimation_type$set("constant")
+      recruitment$log_devs[y]$estimation_status$set("constant")
     }
   }
 
@@ -310,7 +310,7 @@ run_FIMS_projection_scenario <- function(om_input,
     recruitment_distribution$expected_values[i]$value <- (0)
   }
 
-  recruitment_distribution$log_sd[1]$estimation_type$set("fixed_effects")
+  recruitment_distribution$log_sd[1]$estimation_status$set("fixed_effects")
   recruitment_distribution$set_distribution_links("random_effects", recruitment$log_devs$get_id())
 
   # Growth
@@ -323,9 +323,9 @@ run_FIMS_projection_scenario <- function(om_input,
   # Maturity
   maturity <- methods::new(LogisticMaturity)
   maturity$inflection_point[1]$value <- (om_input[["A50.mat"]])
-  maturity$inflection_point[1]$estimation_type$set("constant")
+  maturity$inflection_point[1]$estimation_status$set("constant")
   maturity$slope[1]$value <- (om_input[["slope.mat"]])
-  maturity$slope[1]$estimation_type$set("constant")
+  maturity$slope[1]$estimation_status$set("constant")
 
   # Population
   population <- methods::new(Population)
@@ -333,12 +333,12 @@ run_FIMS_projection_scenario <- function(om_input,
   for (i in 1:((om_input[["nyr"]] + n_projection_years) * om_input[["nages"]])) {
     population$log_M[i]$value <- (log(om_input[["M.age"]][1]))
   }
-  population$log_M$set_estimation_types(c("constant"))
+  population$log_M$set_estimation_status(c("constant"))
   population$log_init_naa$resize(om_input[["nages"]])
   for (i in 1:om_input$nages) {
     population$log_init_naa[i]$value <- (log(om_output[["N.age"]][1, i]))
   }
-  population$log_init_naa$set_estimation_types(c("fixed_effects"))
+  population$log_init_naa$set_estimation_status(c("fixed_effects"))
   population$n_ages$set(om_input[["nages"]])
   population$ages[] <- om_input[["ages"]]
 
@@ -361,12 +361,12 @@ run_FIMS_projection_scenario <- function(om_input,
     for (i in 1:(om_input[["nyr"]])) {
       # log_f_multiplier will have no impact on results when fixed at 0
       population$log_f_multiplier[i]$value <- 0.0
-      population$log_f_multiplier[i]$estimation_type$set("constant")
+      population$log_f_multiplier[i]$estimation_status$set("constant")
     }
     if (n_projection_years > 0) {
       for (i in (om_input[["nyr"]] + 1):(om_input[["nyr"]] + n_projection_years)) {
         population$log_f_multiplier[i]$value <- 0.0
-        population$log_f_multiplier[i]$estimation_type$set("random_effects")
+        population$log_f_multiplier[i]$estimation_status$set("random_effects")
       }
 
       F_mult_distribution <- methods::new(DnormDistribution)
@@ -384,7 +384,7 @@ run_FIMS_projection_scenario <- function(om_input,
 
       F_mult_distribution$set_distribution_mean(1)
       # F_mult_distribution$set_distribution_mean(-0.6931472)
-      F_mult_distribution$expected_mean[1]$estimation_type$set("fixed_effects")
+      F_mult_distribution$expected_mean[1]$estimation_status$set("fixed_effects")
 
       F_mult_distribution$observed_values$resize(om_input[["nyr"]] + n_projection_years)
       F_mult_distribution$expected_values$resize(om_input[["nyr"]] + n_projection_years)
@@ -393,25 +393,25 @@ run_FIMS_projection_scenario <- function(om_input,
         F_mult_distribution$observed_values[i]$value <- 0
         F_mult_distribution$expected_values[i]$value <- 0
         F_mult_distribution$log_sd[i]$value <- 200
-        F_mult_distribution$log_sd[i]$estimation_type$set("constant")
+        F_mult_distribution$log_sd[i]$estimation_status$set("constant")
       }
       for (i in (om_input[["nyr"]] + 1):(om_input[["nyr"]] + n_projection_years)) {
         F_mult_distribution$observed_values[i]$value <- 0
         F_mult_distribution$expected_values[i]$value <- 0
         F_mult_distribution$log_sd[i]$value <- -0
-        F_mult_distribution$log_sd[i]$estimation_type$set("constant")
+        F_mult_distribution$log_sd[i]$estimation_status$set("constant")
       }
       for (i in (om_input[["nyr"]] + max(1, (n_projection_years - 30))):(om_input[["nyr"]] + n_projection_years)) {
         F_mult_distribution$observed_values[i]$value <- 0
         F_mult_distribution$expected_values[i]$value <- 0
         F_mult_distribution$log_sd[i]$value <- -5
-        F_mult_distribution$log_sd[i]$estimation_type$set("constant")
+        F_mult_distribution$log_sd[i]$estimation_status$set("constant")
       }
       for (i in (om_input[["nyr"]] + max(1, (n_projection_years - 5))):(om_input[["nyr"]] + n_projection_years)) {
         F_mult_distribution$observed_values[i]$value <- 0
         F_mult_distribution$expected_values[i]$value <- 0
         F_mult_distribution$log_sd[i]$value <- -5
-        F_mult_distribution$log_sd[i]$estimation_type$set("constant")
+        F_mult_distribution$log_sd[i]$estimation_status$set("constant")
       }
       F_mult_distribution$set_distribution_links("random_effects", population$log_f_multiplier$get_id())
     }

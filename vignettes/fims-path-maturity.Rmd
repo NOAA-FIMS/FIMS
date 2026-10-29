@@ -98,9 +98,9 @@ library(FIMS)
 maturity <- methods::new(LogisticMaturity)
 # Populate the maturity module with parameter values.
 maturity$inflection_point[1]$value <- 10
-maturity$inflection_point[1]$estimation_type$set("constant")
+maturity$inflection_point[1]$estimation_status$set("constant")
 maturity$slope[1]$value <- 0.2
-maturity$slope[1]$estimation_type$set("constant")
+maturity$slope[1]$estimation_status$set("constant")
 ```
 
 To run a FIMS model, more modules than just a maturity module need to be linked to a population module. But, this example only includes a maturity module so the code below is just pseudo code showing how to link a maturity module to a population module. The code below assumes that growth and recruitment modules, i.e., modules 2 and 3, have already been set up.
@@ -218,10 +218,10 @@ Rcpp::class_<Variable>(
     .field("value", &Variable::initial_value_m)
     .field("estimated_value", &Variable::final_value_m)
     .field("id", &Variable::id_m)
-    .field("estimation_type", &Variable::estimation_type_m);
+    .field("estimation_status", &Variable::estimation_status_m);
 ```
 
-Each field (i.e., parameter) from `maturity` (i.e., the maturity module we defined in R) will therefore inherit the four fields defined in the Variable class: `value`, `estimated_value`, `id`, `estimation_type`. That is, two parameter fields and 8 fields within those parameters.
+Each field (i.e., parameter) from `maturity` (i.e., the maturity module we defined in R) will therefore inherit the four fields defined in the Variable class: `value`, `estimated_value`, `id`, `estimation_status`. That is, two parameter fields and 8 fields within those parameters.
 
 ## `fims` namespace
 
@@ -277,7 +277,7 @@ Within rcpp_maturity.hpp, there is a link to the `fims_info::Information` class 
 // info is a shared pointer that points to fims_info::Information
 std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > info =
         fims_info::Information<TMB_FIMS_REAL_TYPE>::GetInstance();
- if (this->inflection_point.estimation_type == "random_effects") {
+ if (this->inflection_point.estimation_status == "random_effects") {
         /*
          if inflection_point is a random effect, 
          the inflection_point value from LogisticMaturityInterface (maturity->inflection_point) 
@@ -285,7 +285,7 @@ std::shared_ptr<fims_info::Information<TMB_FIMS_REAL_TYPE> > info =
         */
         info->RegisterRandomEffect(maturity->inflection_point);
   }
-  if (this->inflection_point.estimation_type == "fixed_effects") {
+  if (this->inflection_point.estimation_status == "fixed_effects") {
         /*
          if inflection_point is estimated as a fixed_effect,
          the inflection_point value from LogisticMaturityInterface (maturity->inflection_point)
