@@ -46,7 +46,7 @@ test_that("`setup_default_Growth()` supports traditional von Bertalanffy delta-m
 
   #' @description Test that traditional Von Bertalanffy defaults use delta-method variability.
   expect_s3_class(result, "tbl_df")
-  expect_equal(nrow(result), 11)
+  expect_equal(nrow(result), 8)
   expect_equal(unique(result[["module_name"]]), "Growth")
   expect_equal(unique(result[["module_type"]]), "VonBertalanffyTraditional")
   expect_equal(
@@ -59,18 +59,22 @@ test_that("`setup_default_Growth()` supports traditional von Bertalanffy delta-m
       "length_weight_b",
       "log_sd_asymptotic_length",
       "log_sd_growth_coefficient",
-      "log_sd_age_at_zero_length",
-      "asymptotic_length_growth_coefficient_logit_corr",
-      "asymptotic_length_age_at_zero_length_logit_corr",
-      "growth_coefficient_age_at_zero_length_logit_corr"
+      "asymptotic_length_growth_coefficient_logit_corr"
     )
   )
   expect_equal(
     result[["value"]][result[["label"]] == "log_sd_asymptotic_length"],
     log(0.1)
   )
-  expect_equal(result[["estimation_type"]][1:3], rep("fixed_effects", 3))
-  expect_true(all(result[["estimation_type"]][4:11] == "constant"))
+  expect_equal(result[["estimation_type"]][1:2], rep("fixed_effects", 2))
+
+  #' @description Test that traditional delta-method defaults hold t0 constant.
+  expect_equal(
+    result[["estimation_type"]][result[["label"]] == "age_at_zero_length"],
+    "constant"
+  )
+
+  expect_true(all(result[["estimation_type"]][4:8] == "constant"))
 
   clear()
 })

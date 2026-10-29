@@ -93,10 +93,7 @@ make_vonb_traditional_test_context <- function() {
     length_at_age_sd_at_reference_ages = c(5, 10),
     log_sd_asymptotic_length = log(0.1),
     log_sd_growth_coefficient = log(0.1),
-    log_sd_age_at_zero_length = log(0.1),
     asymptotic_length_growth_coefficient_logit_corr = 0,
-    asymptotic_length_age_at_zero_length_logit_corr = 0,
-    growth_coefficient_age_at_zero_length_logit_corr = 0,
     n_ages = 10
   )
 }
@@ -144,20 +141,9 @@ new_vonb_traditional <- function(
     vb$log_sd_growth_coefficient$resize(1)
     vb$log_sd_growth_coefficient[1]$value <- ctx$log_sd_growth_coefficient
 
-    vb$log_sd_age_at_zero_length$resize(1)
-    vb$log_sd_age_at_zero_length[1]$value <- ctx$log_sd_age_at_zero_length
-
     vb$asymptotic_length_growth_coefficient_logit_corr$resize(1)
     vb$asymptotic_length_growth_coefficient_logit_corr[1]$value <-
       ctx$asymptotic_length_growth_coefficient_logit_corr
-
-    vb$asymptotic_length_age_at_zero_length_logit_corr$resize(1)
-    vb$asymptotic_length_age_at_zero_length_logit_corr[1]$value <-
-      ctx$asymptotic_length_age_at_zero_length_logit_corr
-
-    vb$growth_coefficient_age_at_zero_length_logit_corr$resize(1)
-    vb$growth_coefficient_age_at_zero_length_logit_corr[1]$value <-
-      ctx$growth_coefficient_age_at_zero_length_logit_corr
   }
 
   vb$n_ages$set(ctx$n_ages)
@@ -246,18 +232,44 @@ test_that("rcpp von Bertalanffy Traditional growth finalizes JSON values from ru
   data("data_big", package = "FIMS")
   fims_frame <- FIMS::FIMSFrame(data_big)
 
+  expected_fixed_effects <- tibble::tibble(
+    label = c(
+      "asymptotic_length",
+      "growth_coefficient",
+      "log_sd_asymptotic_length",
+      "log_sd_growth_coefficient",
+      "asymptotic_length_growth_coefficient_logit_corr"
+    ),
+    runtime = c(log(123), log(0.321), -2.5, -1.5, 0.75),
+    expected = c(123, 0.321, -2.5, -1.5, 0.75)
+  )
+
+  growth_parameters <- FIMS::setup_default_Growth(
+    module_type = "VonBertalanffyTraditional"
+  ) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data[["label"]] %in% expected_fixed_effects[["label"]],
+        "fixed_effects",
+        .data[["estimation_type"]]
+      ),
+      value = dplyr::if_else(
+        .data[["label"]] == "age_at_zero_length",
+        0,
+        .data[["value"]]
+      )
+    )
+
   parameters <- FIMS::setup_default_parameters(data = fims_frame) |>
     dplyr::filter(.data[["module_name"]] != "Growth") |>
-    dplyr::bind_rows(
-      FIMS::setup_default_Growth(module_type = "VonBertalanffyTraditional")
-    )
+    dplyr::bind_rows(growth_parameters)
 
   input <- parameters |>
     FIMS::initialize_fims(data = fims_frame)
 
   on.exit(
     {
-      rm(input, parameters, fims_frame)
+      rm(input, parameters, growth_parameters, fims_frame)
       gc()
       FIMS::clear()
     },
@@ -267,23 +279,24 @@ test_that("rcpp von Bertalanffy Traditional growth finalizes JSON values from ru
   fixed_effects <- input[["parameters"]][["p"]]
   names(fixed_effects) <- names(FIMS::get_parameter_names(fixed_effects))
 
-  asymptotic_length_name <- names(fixed_effects)[
-    grepl("\\.asymptotic_length\\.", names(fixed_effects))
-  ]
-  growth_coefficient_name <- names(fixed_effects)[
-    grepl("\\.growth_coefficient\\.", names(fixed_effects))
-  ]
-  age_at_zero_length_name <- names(fixed_effects)[
-    grepl("\\.age_at_zero_length\\.", names(fixed_effects))
-  ]
+  #' @description Test that mean t0 is not registered for estimation under
+  #' Traditional delta-method variability.
+  expect_length(
+    grep("\\.age_at_zero_length\\.", names(fixed_effects)),
+    0
+  )
 
-  expect_length(asymptotic_length_name, 1)
-  expect_length(growth_coefficient_name, 1)
-  expect_length(age_at_zero_length_name, 1)
+  #' @description Test that both mean growth parameters and all three supported
+  #' delta-method variability parameters can be registered as fixed effects.
+  for (i in seq_len(nrow(expected_fixed_effects))) {
+    label <- expected_fixed_effects[["label"]][[i]]
+    parameter_name <- names(fixed_effects)[
+      grepl(paste0("\\.", label, "\\."), names(fixed_effects))
+    ]
 
-  fixed_effects[[asymptotic_length_name]] <- log(123)
-  fixed_effects[[growth_coefficient_name]] <- log(0.321)
-  fixed_effects[[age_at_zero_length_name]] <- -1.25
+    expect_length(parameter_name, 1)
+    fixed_effects[[parameter_name]] <- expected_fixed_effects[["runtime"]][[i]]
+  }
 
   FIMS::set_fixed(fixed_effects)
 
@@ -295,67 +308,141 @@ test_that("rcpp von Bertalanffy Traditional growth finalizes JSON values from ru
       .data[["module_type"]] == "VonBertalanffyTraditional"
     )
 
-  expected_fixed_effects <- tibble::tibble(
-    label = c("asymptotic_length", "growth_coefficient", "age_at_zero_length"),
-    expected = c(123, 0.321, -1.25)
+  expected_output <- dplyr::bind_rows(
+    expected_fixed_effects |>
+      dplyr::select(dplyr::all_of(c("label", "expected"))) |>
+      dplyr::mutate(estimation_type = "fixed_effects"),
+    tibble::tibble(
+      label = c(
+        "age_at_zero_length",
+        "length_weight_a",
+        "length_weight_b"
+      ),
+      expected = c(0, 2.5e-11, 3),
+      estimation_type = "constant"
+    )
   )
 
-  reported_fixed_effects <- growth_estimates |>
-    dplyr::filter(.data[["label"]] %in% expected_fixed_effects[["label"]]) |>
-    dplyr::select(
-      dplyr::all_of(c("label", "input", "estimated"))
-    ) |>
-    dplyr::left_join(expected_fixed_effects, by = "label") |>
-    dplyr::arrange(match(.data[["label"]], expected_fixed_effects[["label"]]))
+  reported_output <- growth_estimates |>
+    dplyr::arrange(match(.data[["label"]], expected_output[["label"]]))
 
-  #' @description Test that finalized Traditional growth JSON reports all
-  #' expected runtime fixed-effect values, not stale initial values.
+  #' @description Test that finalized Traditional JSON contains exactly the
+  #' active parameter rows, with no missing, duplicated, or obsolete entries.
   expect_equal(
-    reported_fixed_effects[["label"]],
-    expected_fixed_effects[["label"]]
+    reported_output[["label"]],
+    expected_output[["label"]]
   )
+
+  #' @description Test that final values use their public scales, including
+  #' valid zero-valued constant t0 and the transformed correlation scale.
   expect_equal(
-    reported_fixed_effects[["estimated"]],
-    reported_fixed_effects[["expected"]],
+    reported_output[["estimated"]],
+    expected_output[["expected"]],
     tolerance = 1e-6
   )
+  expect_equal(
+    reported_output[["estimation_type"]],
+    expected_output[["estimation_type"]]
+  )
+
+  reported_fixed_effects <- reported_output |>
+    dplyr::filter(.data[["label"]] %in% expected_fixed_effects[["label"]])
+
+  #' @description Test that estimated growth and variability parameters report
+  #' updated runtime values rather than stale initial values.
   expect_true(all(
     abs(reported_fixed_effects[["estimated"]] -
       reported_fixed_effects[["input"]]) > 1e-6
   ))
+})
 
-  expected_delta_constants <- tibble::tibble(
-    label = c(
-      "log_sd_asymptotic_length",
-      "log_sd_growth_coefficient",
-      "log_sd_age_at_zero_length",
-      "asymptotic_length_growth_coefficient_logit_corr",
-      "asymptotic_length_age_at_zero_length_logit_corr",
-      "growth_coefficient_age_at_zero_length_logit_corr"
-    ),
-    expected = c(log(0.1), log(0.1), log(0.1), 0, 0, 0)
+test_that("rcpp Traditional interpolation finalizes transformed t0 in years", {
+  fims_frame <- FIMS::FIMSFrame(FIMS::data_big)
+
+  growth_parameters <- FIMS::setup_default_Growth(
+    data = fims_frame,
+    module_type = "VonBertalanffyTraditional",
+    variability_type = "interpolation"
+  ) |>
+    dplyr::mutate(
+      value = dplyr::if_else(
+        .data[["label"]] == "age_at_zero_length",
+        -0.5,
+        .data[["value"]]
+      ),
+      estimation_type = dplyr::if_else(
+        .data[["label"]] == "age_at_zero_length",
+        "fixed_effects",
+        .data[["estimation_type"]]
+      )
+    )
+
+  minimum_required_age <- min(
+    FIMS::get_ages(fims_frame),
+    growth_parameters[["value"]][
+      growth_parameters[["label"]] == "reference_age_for_length_young"
+    ]
   )
 
-  reported_delta_constants <- growth_estimates |>
-    dplyr::filter(.data[["label"]] %in% expected_delta_constants[["label"]]) |>
-    dplyr::select(dplyr::all_of(c("label", "estimated"))) |>
-    dplyr::left_join(expected_delta_constants, by = "label") |>
-    dplyr::arrange(match(.data[["label"]], expected_delta_constants[["label"]]))
+  parameters <- FIMS::setup_default_parameters(data = fims_frame) |>
+    dplyr::filter(.data[["module_name"]] != "Growth") |>
+    dplyr::bind_rows(growth_parameters)
 
-  #' @description Test that finalized Traditional growth JSON reports all active
-  #' delta-method constants exactly on their public scales, including valid
-  #' zero-valued correlation parameters.
+  input <- FIMS::initialize_fims(
+    parameters = parameters,
+    data = fims_frame
+  )
+
+  on.exit(
+    {
+      rm(input)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  fixed_effects <- input[["parameters"]][["p"]]
+  names(fixed_effects) <- names(FIMS::get_parameter_names(fixed_effects))
+  t0_index <- grep("\\.age_at_zero_length\\.", names(fixed_effects))
+
+  #' @description Test that interpolation t0 is registered exactly once.
+  expect_length(t0_index, 1)
+  if (length(t0_index) != 1) {
+    return(invisible(NULL))
+  }
+
+  #' @description Test that initial working-scale storage represents the
+  #' supplied natural-scale t0.
   expect_equal(
-    reported_delta_constants[["label"]],
-    expected_delta_constants[["label"]]
-  )
-  expect_equal(
-    reported_delta_constants[["estimated"]],
-    reported_delta_constants[["expected"]],
-    tolerance = 1e-5
+    unname(fixed_effects[t0_index]),
+    log(minimum_required_age + 0.5)
   )
 
-  expect_false("length_at_age_sd_at_reference_ages" %in% growth_estimates[["label"]])
+  # Set a different runtime t0 without fitting a model.
+  expected_t0 <- -1.25
+  fixed_effects[t0_index] <- log(minimum_required_age - expected_t0)
+  FIMS::set_fixed(fixed_effects)
+
+  reported_t0 <- FIMS:::reshape_json_estimates(
+    input[["model"]]$get_output()
+  ) |>
+    dplyr::filter(
+      .data[["module_name"]] == "Growth",
+      .data[["module_type"]] == "VonBertalanffyTraditional",
+      .data[["label"]] == "age_at_zero_length"
+    )
+
+  #' @description Test that JSON contains exactly one t0 row and reports its
+  #' updated natural-scale value, not eta or the initial value.
+  expect_equal(nrow(reported_t0), 1L)
+  if (nrow(reported_t0) != 1L) {
+    return(invisible(NULL))
+  }
+
+  expect_equal(reported_t0[["input"]], -0.5)
+  expect_equal(reported_t0[["estimated"]], expected_t0, tolerance = 1e-6)
+  expect_equal(reported_t0[["estimation_type"]], "fixed_effects")
 })
 
 test_that("rcpp von Bertalanffy Traditional growth initializes with interpolation variability", {
@@ -374,9 +461,116 @@ test_that("rcpp von Bertalanffy Traditional growth initializes with interpolatio
     add = TRUE
   )
 
-  #' @description Test that VonBertalanffyTraditionalGrowth can initialize the TMB
-  #' growth object using interpolation-based length-at-age variability.
+  vb$min_age$set(0)
+  vb$age_at_zero_length[1]$estimation_type$set("fixed_effects")
+
+  #' @description Test that Traditional interpolation registers estimated t0
+  #' on the log-distance scale using the youngest required age.
   expect_no_error(vb$add_to_fims_tmb())
+
+  fixed_effects <- FIMS::get_fixed()
+  parameter_names <- names(FIMS::get_parameter_names(fixed_effects))
+  t0_index <- grep("\\.age_at_zero_length\\.", parameter_names)
+
+  expect_length(t0_index, 1)
+  if (length(t0_index) != 1) {
+    return(invisible(NULL))
+  }
+
+  expect_equal(
+    unname(fixed_effects[t0_index]),
+    log(0.5)
+  )
+
+  #' @description Test that registration preserves the user-supplied t0
+  #' on its natural age scale.
+  expect_equal(vb$age_at_zero_length[1]$value, -0.5)
+})
+
+test_that("rcpp Traditional estimated t0 requires a valid age limit", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(ctx)
+
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  vb$age_at_zero_length[1]$estimation_type$set("fixed_effects")
+
+  #' @description Test that estimated t0 requires a supplied, nonnegative
+  #' population minimum age.
+  expect_error(
+    vb$add_to_fims_tmb(),
+    regexp = "min_age must be supplied and nonnegative"
+  )
+
+  #' @description Test that estimated t0 must be below the population minimum
+  #' when it is younger than the interpolation reference age.
+  vb$min_age$set(0)
+  for (invalid_t0 in c(0, 0.1)) {
+    vb$age_at_zero_length[1]$value <- invalid_t0
+
+    expect_error(
+      vb$add_to_fims_tmb(),
+      regexp = "strictly less than 0\\."
+    )
+  }
+
+  #' @description Test that estimated t0 must be below the younger interpolation
+  #' reference age when it is younger than the population minimum.
+  vb$min_age$set(2)
+  for (invalid_t0 in c(1, 1.1)) {
+    vb$age_at_zero_length[1]$value <- invalid_t0
+
+    expect_error(
+      vb$add_to_fims_tmb(),
+      regexp = "strictly less than 1\\."
+    )
+  }
+})
+
+test_that("rcpp Traditional random t0 uses log-distance storage", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(ctx)
+
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  vb$min_age$set(2)
+  vb$age_at_zero_length[1]$estimation_type$set("random_effects")
+
+  #' @description Test that random-effect t0 uses log-distance storage with
+  #' the younger interpolation reference age as the controlling limit.
+  expect_no_error(vb$add_to_fims_tmb())
+
+  random_effects <- FIMS::get_random()
+  parameter_names <- names(FIMS::get_random_names(random_effects))
+  t0_index <- grep("\\.age_at_zero_length\\.", parameter_names)
+
+  expect_length(t0_index, 1)
+  if (length(t0_index) != 1) {
+    return(invisible(NULL))
+  }
+
+  expect_equal(
+    unname(random_effects[t0_index]),
+    log(1.5)
+  )
+
+  #' @description Test that random-effect registration leaves the public
+  #' natural-scale t0 input unchanged.
+  expect_equal(vb$age_at_zero_length[1]$value, -0.5)
 })
 
 test_that("rcpp von Bertalanffy Traditional growth initializes with delta-method variability", {
@@ -395,9 +589,31 @@ test_that("rcpp von Bertalanffy Traditional growth initializes with delta-method
     add = TRUE
   )
 
-  #' @description Test that VonBertalanffyTraditionalGrowth can initialize the TMB
-  #' growth object using traditional Linf, K, t0 delta-method variability.
+  vb$log_sd_asymptotic_length[1]$estimation_type$set("fixed_effects")
+  vb$log_sd_growth_coefficient[1]$estimation_type$set("fixed_effects")
+
+  #' @description Test that Traditional growth registers estimable SDs for
+  #' log(Linf) and log(K), while keeping their correlation and mean t0 constant.
   expect_no_error(vb$add_to_fims_tmb())
+
+  parameter_names <- names(FIMS::get_parameter_names(FIMS::get_fixed()))
+
+  expect_length(
+    grep("\\.log_sd_asymptotic_length\\.", parameter_names),
+    1
+  )
+  expect_length(
+    grep("\\.log_sd_growth_coefficient\\.", parameter_names),
+    1
+  )
+  expect_length(
+    grep("\\.asymptotic_length_growth_coefficient_logit_corr\\.", parameter_names),
+    0
+  )
+  expect_length(
+    grep("\\.age_at_zero_length\\.", parameter_names),
+    0
+  )
 })
 
 ## Edge handling ----
@@ -582,8 +798,107 @@ test_that("rcpp von Bertalanffy Traditional growth rejects partial delta-method 
   #' traditional delta-method variability inputs.
   expect_error(
     vb$add_to_fims_tmb(),
-    regexp = "requires all six traditional delta-method variability inputs"
+    regexp = "requires all three traditional delta-method variability inputs"
   )
+})
+
+test_that("rcpp von Bertalanffy Traditional growth rejects non-finite t0", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(ctx)
+
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  #' @description Test that Traditional growth rejects non-finite t0 inputs
+  #' during direct evaluation and registration for model use.
+  for (invalid_t0 in c(NA_real_, NaN, Inf, -Inf)) {
+    vb$age_at_zero_length[1]$value <- invalid_t0
+
+    expect_error(
+      vb$evaluate(5),
+      regexp = "Initial age_at_zero_length \\(t0\\) is .*Supply a finite numeric value\\."
+    )
+    expect_error(
+      vb$add_to_fims_tmb(),
+      regexp = "Initial age_at_zero_length \\(t0\\) is .*Supply a finite numeric value\\."
+    )
+  }
+})
+
+test_that("rcpp von Bertalanffy Traditional delta variability requires constant t0", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(
+    ctx,
+    include_interpolation_variability = FALSE,
+    include_delta_method_variability = TRUE
+  )
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  #' @description Test that Traditional delta-method variability rejects mean t0
+  #' configured as either a fixed effect or a random effect.
+  for (estimation_type in c("fixed_effects", "random_effects")) {
+    vb$age_at_zero_length[1]$estimation_type$set(estimation_type)
+
+    expect_error(
+      vb$add_to_fims_tmb(),
+      regexp = "age_at_zero_length to have estimation_type 'constant'"
+    )
+  }
+})
+
+test_that("rcpp von Bertalanffy Traditional interpolation requires constant reference ages", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(ctx)
+
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  reference_fields <- c(
+    "reference_age_for_length_young",
+    "reference_age_for_length_old"
+  )
+
+  for (field in reference_fields) {
+    vb[[field]][1]$estimation_type$set("constant")
+  }
+
+  #' @description Test that either Traditional interpolation reference age
+  #' rejects fixed-effect and random-effect estimation.
+  for (field in reference_fields) {
+    for (estimation_type in c("fixed_effects", "random_effects")) {
+      vb[[field]][1]$estimation_type$set(estimation_type)
+
+      expect_error(
+        vb$add_to_fims_tmb(),
+        regexp = "both reference ages to have estimation_type 'constant'"
+      )
+    }
+
+    vb[[field]][1]$estimation_type$set("constant")
+  }
+
+  #' @description Test that Traditional interpolation accepts both reference
+  #' ages configured as constants.
+  expect_true(vb$add_to_fims_tmb())
 })
 
 test_that("rcpp von Bertalanffy Schnute growth rejects reversed reference ages", {

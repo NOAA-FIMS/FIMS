@@ -308,6 +308,36 @@ test_that("`initialize_growth()` supports traditional von Bertalanffy variabilit
   clear()
 })
 
+test_that("`initialize_growth()` receives the youngest population age", {
+  #' @description Test that traditional Growth receives population minimum ages
+  #' of zero and one for both supported variability methods.
+  for (minimum_age in c(0, 1)) {
+    shifted_data <- data_big |>
+      dplyr::mutate(
+        age = .data$age - min(get_ages(data)) + minimum_age
+      )
+
+    growth_data <- FIMSFrame(shifted_data)
+    expect_equal(min(get_ages(growth_data)), minimum_age)
+
+    for (variability_type in c("delta_method", "interpolation")) {
+      parameters <- setup_default_Growth(
+        data = growth_data,
+        module_type = "VonBertalanffyTraditional",
+        variability_type = variability_type
+      )
+
+      growth <- initialize_growth(
+        parameters = parameters,
+        data = growth_data
+      )
+
+      expect_equal(growth$min_age$get(), minimum_age)
+      clear()
+    }
+  }
+})
+
 # test_initialize_maturity ----
 ## IO correctness ----
 test_that("`initialize_maturity()` works with correct inputs", {

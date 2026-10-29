@@ -8,6 +8,7 @@
 #ifndef POPULATION_DYNAMICS_GROWTH_MODEL_HPP
 #define POPULATION_DYNAMICS_GROWTH_MODEL_HPP
 
+#include <cmath>
 #include <cstddef>
 #include <stdexcept>
 
@@ -256,6 +257,20 @@ class GrowthModel : public GrowthModelBase<Type> {
       Type log_growth_coefficient_variance,
       Type log_growth_coefficient_age_at_zero_length_covariance,
       Type age_at_zero_length_variance) const {
+    const Type covariance_inputs[] = {
+        log_asymptotic_length_variance,
+        log_asymptotic_length_log_growth_coefficient_covariance,
+        log_asymptotic_length_age_at_zero_length_covariance,
+        log_growth_coefficient_variance,
+        log_growth_coefficient_age_at_zero_length_covariance,
+        age_at_zero_length_variance};
+
+    for (const auto& input : covariance_inputs) {
+      if (!std::isfinite(fims_math::Value(input))) {
+        throw std::runtime_error(
+            "Traditional growth covariance inputs must be finite");
+      }
+    }
     if (log_asymptotic_length_variance < Type(0.0) ||
         log_growth_coefficient_variance < Type(0.0) ||
         age_at_zero_length_variance < Type(0.0)) {
@@ -310,25 +325,32 @@ class GrowthModel : public GrowthModelBase<Type> {
     }
   }
 
-  /// Smoothly guard log-length variance without imposing a large CV floor.
-  Type SafeLogLengthVariance(const Type& log_var) const {
-    if (growth_parameterization_ == GrowthParameterization::kTraditional) {
-      return fims_math::ad_max(log_var, static_cast<Type>(0.0),
-                               static_cast<Type>(1e-12));
+  /// Convert finite, nonnegative length variance to SD, preserving exact zero.
+  Type LengthSdFromVariance(const Type& variance) const {
+    const double variance_value = fims_math::Value(variance);
+    if (!std::isfinite(variance_value) || variance_value < 0.0) {
+      throw std::runtime_error(
+          "Traditional growth calculated length variance must be finite "
+          "and nonnegative");
     }
 
-    return fims_math::ad_max(log_var, static_cast<Type>(0.0));
+#ifdef TMB_MODEL
+    // Avoid a singular sqrt derivative at zero without masking invalid values.
+    const Type sqrt_argument = CppAD::CondExpEq(
+        variance, Type(0.0), Type(1.0), variance);
+    const Type sd = fims_math::sqrt(sqrt_argument);
+    return CppAD::CondExpEq(
+        variance, Type(0.0), Type(0.0), sd);
+#else
+    return variance == Type(0.0) ? Type(0.0) : fims_math::sqrt(variance);
+#endif
   }
 
-  /// Compute length-at-age SD using either the interpolation path or the
-  /// covariance-based delta-method path.
+  /// Compute length-at-age SD using either interpolation or the delta method.
   Type ComputeLengthSdAtAge(const Type& age, const Type& laa,
                             const Type& laa_min, const Type& slope) const {
     if (use_delta_method_variability_) {
-      const Type log_var = ComputeLogLengthVarianceAtAge(age);
-      const Type log_var_safe = SafeLogLengthVariance(log_var);
-      const Type sd_laa = laa * fims_math::sqrt(log_var_safe);
-      return fims_math::ad_max(sd_laa, static_cast<Type>(1e-8));
+      return LengthSdFromVariance(ComputeLengthVarianceAtAge(age));
     }
 
     const Type sd_laa =
@@ -339,39 +361,38 @@ class GrowthModel : public GrowthModelBase<Type> {
     return fims_math::ad_max(sd_laa, static_cast<Type>(1e-8));
   }
 
-  /// Compute delta-method variance of log length at age using the active
-  /// parameterization-specific covariance matrix.
-  Type ComputeLogLengthVarianceAtAge(const Type& age) const {
-    return ComputeTraditionalLogLengthVarianceAtAge(age);
+  /// Compute delta-method variance on the natural length scale.
+  Type ComputeLengthVarianceAtAge(const Type& age) const {
+    return ComputeTraditionalLengthVarianceAtAge(age);
   }
 
-  /// Compute delta-method variance for [log(Linf), log(K), t0].
-  Type ComputeTraditionalLogLengthVarianceAtAge(const Type& age) const {
-    Type d_log_laa_d_log_asymptotic_length = Type(0.0);
-    Type d_log_laa_d_log_growth_coefficient = Type(0.0);
-    Type d_log_laa_d_age_at_zero_length = Type(0.0);
+  /// Propagate covariance of [log(Linf), log(K), t0] into length variance.
+  Type ComputeTraditionalLengthVarianceAtAge(const Type& age) const {
+    Type d_laa_d_log_asymptotic_length = Type(0.0);
+    Type d_laa_d_log_growth_coefficient = Type(0.0);
+    Type d_laa_d_age_at_zero_length = Type(0.0);
 
-    traditional_vb_.log_length_at_age_working_scale_gradient(
-        age, d_log_laa_d_log_asymptotic_length,
-        d_log_laa_d_log_growth_coefficient,
-        d_log_laa_d_age_at_zero_length);
+    traditional_vb_.length_at_age_working_scale_gradient(
+        age, d_laa_d_log_asymptotic_length,
+        d_laa_d_log_growth_coefficient,
+        d_laa_d_age_at_zero_length);
 
-    return d_log_laa_d_log_asymptotic_length *
-               d_log_laa_d_log_asymptotic_length *
+    return d_laa_d_log_asymptotic_length *
+               d_laa_d_log_asymptotic_length *
                log_asymptotic_length_variance_ +
-           Type(2.0) * d_log_laa_d_log_asymptotic_length *
-               d_log_laa_d_log_growth_coefficient *
+           Type(2.0) * d_laa_d_log_asymptotic_length *
+               d_laa_d_log_growth_coefficient *
                log_asymptotic_length_log_growth_coefficient_covariance_ +
-           Type(2.0) * d_log_laa_d_log_asymptotic_length *
-               d_log_laa_d_age_at_zero_length *
+           Type(2.0) * d_laa_d_log_asymptotic_length *
+               d_laa_d_age_at_zero_length *
                log_asymptotic_length_age_at_zero_length_covariance_ +
-           d_log_laa_d_log_growth_coefficient *
-               d_log_laa_d_log_growth_coefficient *
+           d_laa_d_log_growth_coefficient *
+               d_laa_d_log_growth_coefficient *
                log_growth_coefficient_variance_ +
-           Type(2.0) * d_log_laa_d_log_growth_coefficient *
-               d_log_laa_d_age_at_zero_length *
+           Type(2.0) * d_laa_d_log_growth_coefficient *
+               d_laa_d_age_at_zero_length *
                log_growth_coefficient_age_at_zero_length_covariance_ +
-           d_log_laa_d_age_at_zero_length * d_log_laa_d_age_at_zero_length *
+           d_laa_d_age_at_zero_length * d_laa_d_age_at_zero_length *
                age_at_zero_length_variance_;
   }
 

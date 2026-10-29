@@ -89,19 +89,11 @@ void register_growth(Rcpp::Module& m) {
       .field("log_sd_growth_coefficient",
              &VonBertalanffyTraditionalGrowthInterface::
                  log_sd_growth_coefficient)
-      .field("log_sd_age_at_zero_length",
-             &VonBertalanffyTraditionalGrowthInterface::
-                 log_sd_age_at_zero_length)
       .field("asymptotic_length_growth_coefficient_logit_corr",
              &VonBertalanffyTraditionalGrowthInterface::
                  asymptotic_length_growth_coefficient_logit_corr)
-      .field("asymptotic_length_age_at_zero_length_logit_corr",
-             &VonBertalanffyTraditionalGrowthInterface::
-                 asymptotic_length_age_at_zero_length_logit_corr)
-      .field("growth_coefficient_age_at_zero_length_logit_corr",
-             &VonBertalanffyTraditionalGrowthInterface::
-                 growth_coefficient_age_at_zero_length_logit_corr)
       .field("n_ages", &VonBertalanffyTraditionalGrowthInterface::n_ages)
+      .field("min_age", &VonBertalanffyTraditionalGrowthInterface::min_age)
       .method("get_id", &VonBertalanffyTraditionalGrowthInterface::get_id)
       .method("evaluate", &VonBertalanffyTraditionalGrowthInterface::evaluate)
       .method("to_json", &VonBertalanffyTraditionalGrowthInterface::to_json)

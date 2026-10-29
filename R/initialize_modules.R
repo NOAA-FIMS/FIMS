@@ -193,10 +193,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
           "length_at_age_sd_at_reference_ages",
           "log_sd_asymptotic_length",
           "log_sd_growth_coefficient",
-          "log_sd_age_at_zero_length",
-          "asymptotic_length_growth_coefficient_logit_corr",
-          "asymptotic_length_age_at_zero_length_logit_corr",
-          "growth_coefficient_age_at_zero_length_logit_corr"
+          "asymptotic_length_growth_coefficient_logit_corr"
         )
       }
 
