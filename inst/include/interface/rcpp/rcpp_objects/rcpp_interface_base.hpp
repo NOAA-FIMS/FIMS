@@ -46,18 +46,19 @@ class Variable {
    */
   double final_value_m = 0.0;
   /**
-   * @brief A string indicating the estimation type. Options are: constant,
-   * fixed_effects, or random_effects, where the default is constant.
+   * @brief A string indicating the estimation status. Options are:
+   * not_estimated, fixed_effects, or random_effects, where the default is
+   * not_estimated.
    */
-  SharedString estimation_type_m = SharedString("constant");
+  SharedString estimation_status_m = SharedString("not_estimated");
 
   /**
    * @brief The constructor for initializing a variable.
    */
-  Variable(double value, std::string estimation_type)
+  Variable(double value, std::string estimation_status)
       : id_m(Variable::id_g++),
         initial_value_m(value),
-        estimation_type_m(estimation_type) {}
+        estimation_status_m(estimation_status) {}
 
   /**
    * @brief The constructor for initializing a variable.
@@ -66,7 +67,7 @@ class Variable {
       : id_m(other.id_m),
         initial_value_m(other.initial_value_m),
         final_value_m(other.final_value_m),
-        estimation_type_m(other.estimation_type_m) {}
+        estimation_status_m(other.estimation_status_m) {}
 
   /**
    * @brief The constructor for initializing a variable.
@@ -77,7 +78,7 @@ class Variable {
       return *this;      // Yes, so skip assignment, and just return *this.
     this->id_m = right.id_m;
     this->initial_value_m = right.initial_value_m;
-    this->estimation_type_m = right.estimation_type_m;
+    this->estimation_status_m = right.estimation_status_m;
     return *this;
   }
 
@@ -127,7 +128,7 @@ inline std::ostream& operator<<(std::ostream& out, const Variable& p) {
   out << "{\"id\": " << p.id_m
       << ",\n\"value\": " << sanitize_val(p.initial_value_m)
       << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m);
-  out << ",\n\"estimation_type\": \"" << p.estimation_type_m << "\"\n}";
+  out << ",\n\"estimation_status\": \"" << p.estimation_status_m << "\"\n}";
 
   return out;
 }
@@ -315,16 +316,16 @@ class VariableVector {
   }
 
   /**
-   * @brief Sets the estimation type for all Variables within a
+   * @brief Sets the estimation status for all Variables within a
    * VariableVector.
    */
-  void set_estimation_types(Rcpp::CharacterVector estimation_types) {
+  void set_estimation_status(Rcpp::CharacterVector estimation_status) {
     const size_t vector_size = this->storage_m->size();
-    const size_t input_size = estimation_types.size();
+    const size_t input_size = estimation_status.size();
 
     if (input_size != 1 && input_size != vector_size) {
       throw std::invalid_argument(
-          "VariableVector::set_estimation_types(): `estimation_types` length "
+          "VariableVector::set_estimation_status(): `estimation_status` length "
           "(" +
           std::to_string(input_size) +
           ") must be 1 (broadcast) or equal to the VariableVector size (" +
@@ -333,25 +334,25 @@ class VariableVector {
           "Received length: " +
           std::to_string(input_size) +
           ". "
-          "Pass a single estimation type to apply to all elements, or a "
+          "Pass a single estimation status to apply to all elements, or a "
           "vector of length " +
           std::to_string(vector_size) + ".");
     }
 
-    auto validate_estimation_type = [&](const std::string& est_type) {
-      if (est_type != "constant" && est_type != "fixed_effects" &&
-          est_type != "random_effects") {
-        throw std::invalid_argument(
-            "Invalid estimation_type: " + est_type +
-            ". Valid options are: constant, fixed_effects, or random_effects.");
+    auto validate_estimation_status = [&](const std::string& est_status) {
+      if (est_status != "not_estimated" && est_status != "fixed_effects" &&
+          est_status != "random_effects") {
+        throw std::invalid_argument("Invalid estimation_status: " + est_status +
+                                    ". Valid options are: not_estimated, "
+                                    "fixed_effects, or random_effects.");
       }
     };
 
     for (size_t i = 0; i < vector_size; i++) {
-      std::string est_type =
-          Rcpp::as<std::string>(estimation_types[input_size == 1 ? 0 : i]);
-      validate_estimation_type(est_type);
-      this->storage_m->at(i).estimation_type_m.set(est_type);
+      std::string est_status =
+          Rcpp::as<std::string>(estimation_status[input_size == 1 ? 0 : i]);
+      validate_estimation_status(est_status);
+      this->storage_m->at(i).estimation_status_m.set(est_status);
     }
   }
 
@@ -392,8 +393,8 @@ class VariableVector {
       const Variable& variable = this->storage_m->at(i);
       variable_copy.initial_value_m = variable.initial_value_m;
       variable_copy.final_value_m = variable.final_value_m;
-      variable_copy.estimation_type_m =
-          SharedString(variable.estimation_type_m.get());
+      variable_copy.estimation_status_m =
+          SharedString(variable.estimation_status_m.get());
       copy.storage_m->push_back(variable_copy);
     }
     return copy;

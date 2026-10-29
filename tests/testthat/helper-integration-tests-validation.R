@@ -152,7 +152,7 @@ validate_fims <- function(
   if (use_fimsfit) {
     log_devs <- estimates |>
       dplyr::filter(label == "log_devs")
-    if (any(log_devs[["estimation_type"]] != "constant")) {
+    if (any(log_devs[["estimation_status"]] != "not_estimated")) {
       om_log_devs <- om_input[["logR.resid"]][-1]
       #' @description Test that estimated recruitment log_devs are correlated with the OM deviations.
       expect_gte(cor(log_devs[["estimated"]], om_log_devs), 0.95)
@@ -211,14 +211,14 @@ validate_fims <- function(
         !is.na(input),
         !is.na(estimated),
         !is.na(uncertainty),
-        estimation_type == "fixed_effects"
+        estimation_status == "fixed_effects"
       ) |>
       # Restore input values back to true OM values for estimated parameters
       # so that parameter tolerance/recovery tests evaluate against truth.
       # See code in tests/testthat/helper-integration-tests-setup-run.R.
       dplyr::mutate(
         input = dplyr::if_else(
-          estimation_type != "constant",
+          estimation_status != "not_estimated",
           input / initial_value_scale,
           input
         )

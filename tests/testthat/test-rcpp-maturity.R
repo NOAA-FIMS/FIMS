@@ -17,15 +17,15 @@ test_that("rcpp maturity works with correct inputs", {
   maturity1 <- methods::new(LogisticMaturity)
 
   maturity1$inflection_point[1]$value <- 10.0
-  maturity1$inflection_point[1]$estimation_type$set("fixed_effects")
+  maturity1$inflection_point[1]$estimation_status$set("fixed_effects")
   maturity1$slope[1]$value <- 0.2
 
   #' @description Test that `get_id()` from the maturity module returns the correct id.
   expect_equal(maturity1$get_id(), 1)
   #' @description Test that the value of `inflection_point` can be set and get correctly.
   expect_equal(maturity1$inflection_point[1]$value, 10.0)
-  #' @description Test that the `estimation_type` of `inflection_point` can be set and get correctly.
-  expect_equal(maturity1$inflection_point[1]$estimation_type$get(), "fixed_effects")
+  #' @description Test that the `estimation_status` of `inflection_point` can be set and get correctly.
+  expect_equal(maturity1$inflection_point[1]$estimation_status$get(), "fixed_effects")
   #' @description Test that the value of `slope` can be set and get correctly.
   expect_equal(maturity1$slope[1]$value, 0.2)
   #' @description Test that the `evaluate()` method from the maturity module works correctly.
@@ -42,9 +42,9 @@ test_that("rcpp maturity works with correct inputs", {
 test_that("rcpp maturity parameters can have a prior", {
   maturity <- methods::new(LogisticMaturity)
   maturity$inflection_point[1]$value <- 3.0
-  maturity$inflection_point[1]$estimation_type$set("fixed_effects")
+  maturity$inflection_point[1]$estimation_status$set("fixed_effects")
   maturity$slope[1]$value <- 1.0
-  maturity$slope[1]$estimation_type$set("fixed_effects")
+  maturity$slope[1]$estimation_status$set("fixed_effects")
 
   maturity_prior <- methods::new(DnormDistribution)
   maturity_prior$expected_values$resize(2)

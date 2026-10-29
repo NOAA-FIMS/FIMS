@@ -442,7 +442,7 @@ parameters <- parameters |>
 parameters |>
   dplyr::filter(module_name == "Growth") |>
   dplyr::arrange(label, age) |>
-  dplyr::select(label, age, value, estimation_type)
+  dplyr::select(label, age, value, estimation_status)
 ```
 
 You can change the three starting values and rerun the fit to examine whether the model reaches the same solution. The two SD-anchor values can also be changed to explore how assumed variability in length-at-age affects the growth-derived age-to-length probabilities.

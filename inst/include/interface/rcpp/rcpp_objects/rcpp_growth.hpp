@@ -311,14 +311,14 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
       ss << "\"id\": null,\n";
       ss << "\"value\": " << weights[i] << ",\n";
       ss << "\"estimated_value\": " << weights[i] << ",\n";
-      ss << "\"estimation_type\": \"constant\"\n";
+      ss << "\"estimation_status\": \"not_estimated\"\n";
       ss << "},\n";
     }
     ss << "{\n";
     ss << "\"id\": null,\n";
     ss << "\"value\": " << weights[weights.size() - 1] << ",\n";
     ss << "\"estimated_value\": " << weights[weights.size() - 1] << ",\n";
-    ss << "\"estimation_type\": \"constant\"\n";
+    ss << "\"estimation_status\": \"not_estimated\"\n";
     ss << "}\n]\n";
     ss << "}\n]\n}\n";
     return ss.str();
@@ -508,7 +508,7 @@ class VonBertalanffySchnuteGrowthInterface
     auto set_final = [](VariableVector& pv, const fims::Vector<double>& src,
                         bool log_scale) {
       for (size_t i = 0; i < pv.size(); i++) {
-        if (pv[i].estimation_type_m.get() == "constant") {
+        if (pv[i].estimation_status_m.get() == "not_estimated") {
           pv[i].final_value_m = pv[i].initial_value_m;
         } else {
           double v = src[i];
@@ -589,7 +589,7 @@ class VonBertalanffySchnuteGrowthInterface
   };
 
   bool IsEstimated(VariableVector& pv) {
-    return pv.size() > 0 && pv[0].estimation_type_m.get() != "constant";
+    return pv.size() > 0 && pv[0].estimation_status_m.get() != "not_estimated";
   }
 
   double InitialLengthAtRefAgeYoung() {
@@ -662,7 +662,7 @@ class VonBertalanffySchnuteGrowthInterface
 
   void SetFinalLengthParameter(VariableVector& pv, double final_value) const {
     for (size_t i = 0; i < pv.size(); i++) {
-      if (pv[i].estimation_type_m.get() == "constant") {
+      if (pv[i].estimation_status_m.get() == "not_estimated") {
         pv[i].final_value_m = pv[i].initial_value_m;
       } else {
         pv[i].final_value_m = final_value;
@@ -979,13 +979,13 @@ class VonBertalanffySchnuteGrowthInterface
           v = fims_math::log(v);
         }
         target[i] = static_cast<Type>(v);
-        if (pv[i].estimation_type_m.get() == "fixed_effects") {
+        if (pv[i].estimation_status_m.get() == "fixed_effects") {
           ss.str("");
           ss << "Growth." << this->id << "." << base_name << "." << pv[i].id_m;
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(target[i]);
         }
-        if (pv[i].estimation_type_m.get() == "random_effects") {
+        if (pv[i].estimation_status_m.get() == "random_effects") {
           ss.str("");
           ss << "Growth." << this->id << "." << base_name << "." << pv[i].id_m;
           info->RegisterRandomEffectName(ss.str());
