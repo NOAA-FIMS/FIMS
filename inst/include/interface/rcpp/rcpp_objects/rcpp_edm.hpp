@@ -209,37 +209,12 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * series.
    * @param E The embedding dimension (must be > 0).
    * @param tau The time lag (must be > 0).
-   * @param forecast_horizon TODO.
+   * @param forecast_horizon Positive number of time steps ahead to predict.
    */
-  void construct(Rcpp::NumericVector series, uint32_t E, uint32_t tau, uint32_t forecast_horizon) {
-    fims::Vector<double> fims_series;
-    fims_series.resize(series.size());
-    for (R_xlen_t i = 0; i < series.size(); i++) {
-      fims_series[i] = series[i];
-    }
-
-    fims_edm::DelayEmbeddingMatrix<double> embedding =
-        fims_edm::MakeDelayEmbedding(fims_series, E, tau, forecast_horizon);
-
-    this->embedding_dimension = E;
-    this->time_lag = tau;
-    this->forecast_horizon = forecast_horizon;
-    this->n_rows = embedding.n_rows;
-    this->n_cols = embedding.n_cols;
-
-    this->embedded_values.resize(embedding.embedded_values.size());
-    for (size_t i = 0; i < embedding.embedded_values.size(); i++) {
-      this->embedded_values[i] = *embedding.embedded_values[i];
-    }
-
-    this->target_values.resize(embedding.target_values.size());
-    for (size_t i = 0; i < embedding.target_values.size(); i++) {
-      this->target_values[i] = *embedding.target_values[i];
-    }
-
-    // No uncertainty provided — leave uncertainty fields empty
-    this->embedded_uncertainty.resize(0);
-    this->target_uncertainty.resize(0);
+  void construct(Rcpp::NumericVector series, uint32_t E, uint32_t tau,
+                 uint32_t forecast_horizon) {
+    ConstructInternal(series, E, tau, forecast_horizon,
+                      Rcpp::NumericVector(), false, 0.0);
   }
 
   /**
@@ -249,6 +224,8 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * @details Same as construct() but also populates embedded_uncertainty and
    * target_uncertainty following the same pointer-based layout as the value
    * fields. @p uncertainty must have the same length as @p series.
+   * Uses the forecast horizon stored by a previous construction call;
+   * constructing a fresh object with this method raises an error.
    *
    * @param series An Rcpp::NumericVector representing the univariate time
    * series.
@@ -260,45 +237,8 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
   void construct_with_uncertainty(Rcpp::NumericVector series, uint32_t E,
                                   uint32_t tau,
                                   Rcpp::NumericVector uncertainty) {
-    fims::Vector<double> fims_series;
-    fims_series.resize(series.size());
-    for (R_xlen_t i = 0; i < series.size(); i++) {
-      fims_series[i] = series[i];
-    }
-
-    fims::Vector<double> fims_uncertainty;
-    fims_uncertainty.resize(uncertainty.size());
-    for (R_xlen_t i = 0; i < uncertainty.size(); i++) {
-      fims_uncertainty[i] = uncertainty[i];
-    }
-
-    fims_edm::DelayEmbeddingMatrix<double> embedding =
-        fims_edm::MakeDelayEmbedding(fims_series, E, tau, forecast_horizon, fims_uncertainty);
-
-    this->embedding_dimension = E;
-    this->time_lag = tau;
-    this->n_rows = embedding.n_rows;
-    this->n_cols = embedding.n_cols;
-
-    this->embedded_values.resize(embedding.embedded_values.size());
-    for (size_t i = 0; i < embedding.embedded_values.size(); i++) {
-      this->embedded_values[i] = *embedding.embedded_values[i];
-    }
-
-    this->target_values.resize(embedding.target_values.size());
-    for (size_t i = 0; i < embedding.target_values.size(); i++) {
-      this->target_values[i] = *embedding.target_values[i];
-    }
-
-    this->embedded_uncertainty.resize(embedding.embedded_uncertainty.size());
-    for (size_t i = 0; i < embedding.embedded_uncertainty.size(); i++) {
-      this->embedded_uncertainty[i] = *embedding.embedded_uncertainty[i];
-    }
-
-    this->target_uncertainty.resize(embedding.target_uncertainty.size());
-    for (size_t i = 0; i < embedding.target_uncertainty.size(); i++) {
-      this->target_uncertainty[i] = *embedding.target_uncertainty[i];
-    }
+    ConstructInternal(series, E, tau, this->forecast_horizon.get(),
+                      uncertainty, false, 0.0);
   }
 
   /**
@@ -309,7 +249,7 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * series.
    * @param E The embedding dimension (must be > 0).
    * @param tau The time lag (must be > 0).
-   * @param forecast_horizon
+   * @param forecast_horizon Positive number of time steps ahead to predict.
    * @param missing_value The sentinel value representing missing data
    * (e.g., -999.0).
    */
@@ -318,38 +258,8 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
                               uint32_t tau,
                               uint32_t forecast_horizon,
                               double missing_value) {
-    fims::Vector<double> fims_series;
-    fims_series.resize(series.size());
-    for (R_xlen_t i = 0; i < series.size(); i++) {
-      fims_series[i] = series[i];
-    }
-
-    fims_edm::DelayEmbeddingMatrix<double> embedding =
-        fims_edm::MakeDelayEmbeddingDropMissing(fims_series,
-                                                E,
-                                                tau,
-                                                forecast_horizon,
-                                                missing_value);
-
-    this->embedding_dimension = E;
-    this->time_lag = tau;
-    this->n_rows = embedding.n_rows;
-    this->n_cols = embedding.n_cols;
-    this->forecast_horizon = forecast_horizon;
-
-    this->embedded_values.resize(embedding.embedded_values.size());
-    for (size_t i = 0; i < embedding.embedded_values.size(); i++) {
-      this->embedded_values[i] = *embedding.embedded_values[i];
-    }
-
-    this->target_values.resize(embedding.target_values.size());
-    for (size_t i = 0; i < embedding.target_values.size(); i++) {
-      this->target_values[i] = *embedding.target_values[i];
-    }
-
-    // No uncertainty provided — leave uncertainty fields empty
-    this->embedded_uncertainty.resize(0);
-    this->target_uncertainty.resize(0);
+    ConstructInternal(series, E, tau, forecast_horizon,
+                      Rcpp::NumericVector(), true, missing_value);
   }
 
   /**
@@ -364,7 +274,7 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
    * series.
    * @param E The embedding dimension (must be > 0).
    * @param tau The time lag (must be > 0).
-   * @param forecast_horizon TODO.
+   * @param forecast_horizon Positive number of time steps ahead to predict.
    * @param missing_value The sentinel value representing missing data.
    * @param uncertainty An Rcpp::NumericVector of uncertainty values with the
    * same length as @p series.
@@ -376,50 +286,8 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
       uint32_t forecast_horizon,
       double missing_value,
       Rcpp::NumericVector uncertainty) {
-    fims::Vector<double> fims_series;
-    fims_series.resize(series.size());
-    for (R_xlen_t i = 0; i < series.size(); i++) {
-      fims_series[i] = series[i];
-    }
-
-    fims::Vector<double> fims_uncertainty;
-    fims_uncertainty.resize(uncertainty.size());
-    for (R_xlen_t i = 0; i < uncertainty.size(); i++) {
-      fims_uncertainty[i] = uncertainty[i];
-    }
-
-    fims_edm::DelayEmbeddingMatrix<double> embedding =
-        fims_edm::MakeDelayEmbeddingDropMissing(fims_series,
-                                                E,
-                                                tau,
-                                                forecast_horizon,
-                                                missing_value, fims_uncertainty);
-
-    this->embedding_dimension = E;
-    this->time_lag = tau;
-    this->forecast_horizon = forecast_horizon;
-    this->n_rows = embedding.n_rows;
-    this->n_cols = embedding.n_cols;
-
-    this->embedded_values.resize(embedding.embedded_values.size());
-    for (size_t i = 0; i < embedding.embedded_values.size(); i++) {
-      this->embedded_values[i] = *embedding.embedded_values[i];
-    }
-
-    this->target_values.resize(embedding.target_values.size());
-    for (size_t i = 0; i < embedding.target_values.size(); i++) {
-      this->target_values[i] = *embedding.target_values[i];
-    }
-
-    this->embedded_uncertainty.resize(embedding.embedded_uncertainty.size());
-    for (size_t i = 0; i < embedding.embedded_uncertainty.size(); i++) {
-      this->embedded_uncertainty[i] = *embedding.embedded_uncertainty[i];
-    }
-
-    this->target_uncertainty.resize(embedding.target_uncertainty.size());
-    for (size_t i = 0; i < embedding.target_uncertainty.size(); i++) {
-      this->target_uncertainty[i] = *embedding.target_uncertainty[i];
-    }
+    ConstructInternal(series, E, tau, forecast_horizon,
+                      uncertainty, true, missing_value);
   }
 
   /**
@@ -491,6 +359,51 @@ class DelayEmbeddingInterface : public EDMInterfaceBase {
   }
 
 #endif
+
+ private:
+  static fims::Vector<double> ToFimsVector(
+      const Rcpp::NumericVector& values) {
+    fims::Vector<double> result;
+    result.resize(values.size());
+    for (R_xlen_t i = 0; i < values.size(); ++i) {
+      result[i] = values[i];
+    }
+    return result;
+  }
+
+  static void CopyEmbeddingValues(const std::vector<const double*>& source,
+                                  RealVector& destination) {
+    destination.resize(source.size());
+    for (size_t i = 0; i < source.size(); ++i) {
+      destination[i] = *source[i];
+    }
+  }
+
+  void ConstructInternal(const Rcpp::NumericVector& series, uint32_t dimension,
+                         uint32_t lag, uint32_t horizon,
+                         const Rcpp::NumericVector& uncertainty,
+                         bool drop_missing, double missing_value) {
+    const auto values = ToFimsVector(series);
+    const auto uncertainties = ToFimsVector(uncertainty);
+    const auto embedding = drop_missing
+        ? fims_edm::MakeDelayEmbeddingDropMissing(
+              values, dimension, lag, horizon, missing_value, uncertainties)
+        : fims_edm::MakeDelayEmbedding(
+              values, dimension, lag, horizon, uncertainties);
+
+    this->embedding_dimension = dimension;
+    this->time_lag = lag;
+    this->forecast_horizon = horizon;
+    this->n_rows = embedding.n_rows;
+    this->n_cols = embedding.n_cols;
+
+    // Dereference while the temporary input storage is still alive.
+    CopyEmbeddingValues(embedding.embedded_values, this->embedded_values);
+    CopyEmbeddingValues(embedding.target_values, this->target_values);
+    CopyEmbeddingValues(embedding.embedded_uncertainty,
+                        this->embedded_uncertainty);
+    CopyEmbeddingValues(embedding.target_uncertainty, this->target_uncertainty);
+  }
 };
 
 /**

@@ -1,8 +1,8 @@
 #include "edm/functors/delay_embedding.hpp"
 #include "gtest/gtest.h"
 
-// ### Layout note (h=1 default)
-// With forecast_horizon=1 (default):
+// ### Layout note (h=1)
+// With forecast_horizon=1:
 //   n_rows          = series.size() - lag_span - 1
 //   embedded[row]   = [series[t], series[t-tau], ...] where t = row + lag_span
 //   target[row]     = series[t + 1]  (one step ahead)
@@ -17,7 +17,7 @@ TEST(DelayEmbedding, BuildsEmbeddingWithUnitLag) {
   fims::Vector<double> series = {1.0, 2.0, 3.0, 4.0, 5.0};
 
   fims_edm::DelayEmbeddingMatrix<double> embedding =
-      fims_edm::MakeDelayEmbedding(series, 3, 1);
+      fims_edm::MakeDelayEmbedding(series, 3, 1, 1);
 
   EXPECT_EQ(embedding.n_rows, 2);
   EXPECT_EQ(embedding.n_cols, 3);
@@ -43,7 +43,7 @@ TEST(DelayEmbedding, BuildsEmbeddingWithLargerLag) {
   fims::Vector<double> series = {10.0, 20.0, 30.0, 40.0, 50.0, 60.0};
 
   fims_edm::DelayEmbeddingMatrix<double> embedding =
-      fims_edm::MakeDelayEmbedding(series, 2, 2);
+      fims_edm::MakeDelayEmbedding(series, 2, 2, 1);
 
   EXPECT_EQ(embedding.n_rows, 3);
   EXPECT_EQ(embedding.n_cols, 2);
@@ -65,7 +65,7 @@ TEST(DelayEmbedding, SupportsEmbeddingDimensionOne) {
   fims::Vector<double> series = {4.0, 5.0, 6.0};
 
   fims_edm::DelayEmbeddingMatrix<double> embedding =
-      fims_edm::MakeDelayEmbedding(series, 1, 1);
+      fims_edm::MakeDelayEmbedding(series, 1, 1, 1);
 
   EXPECT_EQ(embedding.n_rows, 2);
   EXPECT_EQ(embedding.n_cols, 1);
@@ -78,15 +78,20 @@ TEST(DelayEmbedding, SupportsEmbeddingDimensionOne) {
 TEST(DelayEmbedding, RejectsInvalidInputs) {
   fims::Vector<double> series = {1.0, 2.0, 3.0};
 
-  EXPECT_THROW(fims_edm::MakeDelayEmbedding(series, 0, 1),
+  EXPECT_THROW(fims_edm::MakeDelayEmbedding(series, 0, 1, 1),
                std::invalid_argument);
-  EXPECT_THROW(fims_edm::MakeDelayEmbedding(series, 2, 0),
+  EXPECT_THROW(fims_edm::MakeDelayEmbedding(series, 2, 0, 1),
+               std::invalid_argument);
+  EXPECT_THROW(fims_edm::MakeDelayEmbedding(series, 2, 1, 0),
+               std::invalid_argument);
+  fims::Vector<double> uncertainty = {0.1};
+  EXPECT_THROW(fims_edm::MakeDelayEmbedding(series, 2, 1, 1, uncertainty),
                std::invalid_argument);
   // E=4, tau=1: lag_span=3, need size >= 3+1+1=5, only have 3
-  EXPECT_THROW(fims_edm::MakeDelayEmbedding(series, 4, 1),
+  EXPECT_THROW(fims_edm::MakeDelayEmbedding(series, 4, 1, 1),
                std::invalid_argument);
   // E=2, tau=3: lag_span=3, need size >= 3+1+1=5, only have 3
-  EXPECT_THROW(fims_edm::MakeDelayEmbedding(series, 2, 3),
+  EXPECT_THROW(fims_edm::MakeDelayEmbedding(series, 2, 3, 1),
                std::invalid_argument);
 }
 
@@ -101,7 +106,7 @@ TEST(DelayEmbedding, DropsRowsWithMissingValues) {
   fims::Vector<double> series = {1.0, missing_value, 3.0, 4.0, 5.0};
 
   fims_edm::DelayEmbeddingMatrix<double> embedding =
-      fims_edm::MakeDelayEmbeddingDropMissing(series, 2, 1, missing_value);
+      fims_edm::MakeDelayEmbeddingDropMissing(series, 2, 1, 1, missing_value);
 
   EXPECT_EQ(embedding.n_rows, 1);
   EXPECT_EQ(embedding.n_cols, 2);
@@ -115,7 +120,7 @@ TEST(DelayEmbedding, DropsRowsWithMissingValues) {
 TEST(DelayEmbedding, ThrowsOnOutOfBoundsMatrixAccess) {
   fims::Vector<double> series = {1.0, 2.0, 3.0};
   fims_edm::DelayEmbeddingMatrix<double> embedding =
-      fims_edm::MakeDelayEmbedding(series, 2, 1);
+      fims_edm::MakeDelayEmbedding(series, 2, 1, 1);
 
   EXPECT_THROW(embedding.at(embedding.n_rows, 0), std::invalid_argument);
   EXPECT_THROW(embedding.at(0, embedding.n_cols), std::invalid_argument);
@@ -127,7 +132,7 @@ TEST(DelayEmbedding, DynamicallyReflectsOriginalSeriesModifications) {
   fims::Vector<double> series = {1.0, 2.0, 3.0, 4.0, 5.0};
 
   fims_edm::DelayEmbeddingMatrix<double> embedding =
-      fims_edm::MakeDelayEmbedding(series, 3, 1);
+      fims_edm::MakeDelayEmbedding(series, 3, 1, 1);
 
   EXPECT_DOUBLE_EQ(embedding.at(0, 0), 3.0);
   EXPECT_DOUBLE_EQ(*embedding.target_values[0], 4.0);
@@ -147,7 +152,7 @@ TEST(DelayEmbedding, PropagatesUncertaintyVectors) {
   fims::Vector<double> uncertainty = {0.1, 0.2, 0.3, 0.4, 0.5};
 
   fims_edm::DelayEmbeddingMatrix<double> embedding =
-      fims_edm::MakeDelayEmbedding(series, 3, 1, uncertainty);
+      fims_edm::MakeDelayEmbedding(series, 3, 1, 1, uncertainty);
 
   EXPECT_EQ(embedding.n_rows, 2);
   EXPECT_EQ(embedding.n_cols, 3);
@@ -167,7 +172,7 @@ TEST(DelayEmbedding, UncertaintyFieldsEmptyWhenNotProvided) {
   fims::Vector<double> series = {1.0, 2.0, 3.0, 4.0, 5.0};
 
   fims_edm::DelayEmbeddingMatrix<double> embedding =
-      fims_edm::MakeDelayEmbedding(series, 3, 1);
+      fims_edm::MakeDelayEmbedding(series, 3, 1, 1);
 
   EXPECT_TRUE(embedding.embedded_uncertainty.empty());
   EXPECT_TRUE(embedding.target_uncertainty.empty());
@@ -179,7 +184,7 @@ TEST(DelayEmbedding, UncertaintyDynamicallyReflectsSeriesModifications) {
   fims::Vector<double> uncertainty = {0.1, 0.2, 0.3, 0.4, 0.5};
 
   fims_edm::DelayEmbeddingMatrix<double> embedding =
-      fims_edm::MakeDelayEmbedding(series, 3, 1, uncertainty);
+      fims_edm::MakeDelayEmbedding(series, 3, 1, 1, uncertainty);
 
   EXPECT_DOUBLE_EQ(*embedding.target_uncertainty[0], 0.4);
 
@@ -197,7 +202,7 @@ TEST(DelayEmbedding, DropMissingPropagatesUncertainty) {
   fims::Vector<double> uncertainty = {0.1, 0.2,           0.3, 0.4, 0.5};
 
   fims_edm::DelayEmbeddingMatrix<double> embedding =
-      fims_edm::MakeDelayEmbeddingDropMissing(series, 2, 1, missing_value,
+      fims_edm::MakeDelayEmbeddingDropMissing(series, 2, 1, 1, missing_value,
                                               uncertainty);
 
   EXPECT_EQ(embedding.n_rows, 1);
@@ -208,6 +213,50 @@ TEST(DelayEmbedding, DropMissingPropagatesUncertainty) {
   // embedded_uncertainty at row 0: [sigma_3, sigma_2] = [0.4, 0.3]
   EXPECT_DOUBLE_EQ(*embedding.embedded_uncertainty[0 * 2 + 0], 0.4);
   EXPECT_DOUBLE_EQ(*embedding.embedded_uncertainty[0 * 2 + 1], 0.3);
+}
+
+TEST(DelayEmbedding, PreservesLargerHorizonAndUncertaintyPointers) {
+  fims::Vector<double> series = {10, 20, 30, 40, 50, 60, 70};
+  fims::Vector<double> uncertainty = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7};
+  auto embedding =
+      fims_edm::MakeDelayEmbedding(series, 2, 2, 3, uncertainty);
+
+  ASSERT_EQ(embedding.n_rows, 2);
+  EXPECT_EQ(embedding.n_cols, 2);
+  EXPECT_DOUBLE_EQ(embedding.at(0, 0), 30);
+  EXPECT_DOUBLE_EQ(embedding.at(0, 1), 10);
+  EXPECT_DOUBLE_EQ(*embedding.target_values[0], 60);
+  EXPECT_DOUBLE_EQ(*embedding.target_values[1], 70);
+  EXPECT_EQ(embedding.embedded_values[0], &series[2]);
+  EXPECT_EQ(embedding.target_values[0], &series[5]);
+  EXPECT_EQ(embedding.embedded_uncertainty[0], &uncertainty[2]);
+  EXPECT_EQ(embedding.target_uncertainty[0], &uncertainty[5]);
+}
+
+TEST(DelayEmbedding, DropMissingRetainsMissingTargets) {
+  fims::Vector<double> series = {1, 2, -999};
+  fims::Vector<double> uncertainty = {0.1, 0.2, 0.3};
+  auto embedding = fims_edm::MakeDelayEmbeddingDropMissing(
+      series, 2, 1, 1, -999.0, uncertainty);
+
+  ASSERT_EQ(embedding.n_rows, 1);
+  EXPECT_DOUBLE_EQ(embedding.at(0, 0), 2);
+  EXPECT_DOUBLE_EQ(*embedding.target_values[0], -999);
+  EXPECT_DOUBLE_EQ(*embedding.target_uncertainty[0], 0.3);
+}
+
+TEST(DelayEmbedding, DropMissingCanRemoveEveryRow) {
+  fims::Vector<double> series = {-999, -999, -999};
+  fims::Vector<double> uncertainty = {0.1, 0.2, 0.3};
+  auto embedding = fims_edm::MakeDelayEmbeddingDropMissing(
+      series, 2, 1, 1, -999.0, uncertainty);
+
+  EXPECT_EQ(embedding.n_rows, 0);
+  EXPECT_EQ(embedding.n_cols, 2);
+  EXPECT_TRUE(embedding.embedded_values.empty());
+  EXPECT_TRUE(embedding.target_values.empty());
+  EXPECT_TRUE(embedding.embedded_uncertainty.empty());
+  EXPECT_TRUE(embedding.target_uncertainty.empty());
 }
 
 }  // namespace
