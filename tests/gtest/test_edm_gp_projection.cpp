@@ -65,8 +65,7 @@ struct GPSetup {
           size_t forecast_horizon = 1)
       : series(std::move(s)) {
     lib_emb  = fims_edm::MakeDelayEmbedding(series, E, /*tau=*/1,
-                                              fims::Vector<double>(),
-                                              forecast_horizon);
+                                          forecast_horizon);
     test_emb = lib_emb;  // use same embedding as test for predict()
 
     gp.library             = &lib_emb;
@@ -101,7 +100,7 @@ TEST(GPEdmProjection, ThrowsWhenLibraryTooSmall) {
   // Use a 3-element series with E=2, horizon=1 → 1 row only
   fims::Vector<double> s = make_vec({1.0, 2.0, 3.0});
   fims_edm::DelayEmbeddingMatrix<double> emb =
-      fims_edm::MakeDelayEmbedding(s, /*E=*/2, /*tau=*/1);
+      fims_edm::MakeDelayEmbedding(s, /*E=*/2, /*tau=*/1, /*h=*/1);
   // emb has 1 row → too small
 
   fims_edm::GPEdmProjection<double> gp;
@@ -138,7 +137,7 @@ TEST(GPEdmProjection, ThrowsOnTestEmbeddingDimensionMismatch) {
 
   // Build a test embedding with E=3
   fims_edm::DelayEmbeddingMatrix<double> bad_test =
-      fims_edm::MakeDelayEmbedding(s, /*E=*/3, /*tau=*/1);
+      fims_edm::MakeDelayEmbedding(s, /*E=*/3, /*tau=*/1, /*h=*/1);
   EXPECT_THROW(setup.gp.predict(bad_test), std::invalid_argument);
 }
 
@@ -217,7 +216,7 @@ TEST(GPEdmProjection, LargePhiGivesDifferentPredThanSmallPhi) {
   auto s = logistic_map(30);
   const size_t E = 2;
   fims_edm::DelayEmbeddingMatrix<double> emb =
-      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1);
+      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1, /*h=*/1);
 
   fims::Vector<double> q = make_vec({0.6, 0.3});
 
@@ -252,11 +251,9 @@ TEST(GPEdmProjection, ForecastHorizonTwoGivesDifferentPredictions) {
   const size_t E = 2;
 
   fims_edm::DelayEmbeddingMatrix<double> emb_h1 =
-      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1, fims::Vector<double>(),
-                                    /*forecast_horizon=*/1);
+      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1, /*forecast_horizon=*/1);
   fims_edm::DelayEmbeddingMatrix<double> emb_h2 =
-      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1, fims::Vector<double>(),
-                                    /*forecast_horizon=*/2);
+      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1, /*forecast_horizon=*/2);
 
   fims_edm::GPEdmProjection<double> gp_h1, gp_h2;
   gp_h1.library = &emb_h1; gp_h1.embedding_dimension = E;
@@ -282,7 +279,7 @@ TEST(GPEdmProjection, FitProducesFiniteHyperparameters) {
   auto s = logistic_map(40);
   const size_t E = 2;
   fims_edm::DelayEmbeddingMatrix<double> emb =
-      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1);
+      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1, /*h=*/1);
 
   fims_edm::GPEdmProjection<double> gp;
   gp.library             = &emb;
@@ -306,7 +303,7 @@ TEST(GPEdmProjection, FitFollowedByPredictGivesFiniteResults) {
   auto s = logistic_map(50);
   const size_t E = 2;
   fims_edm::DelayEmbeddingMatrix<double> lib_emb =
-      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1);
+      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1, /*h=*/1);
 
   fims_edm::GPEdmProjection<double> gp;
   gp.library             = &lib_emb;
@@ -326,7 +323,7 @@ TEST(GPEdmProjection, FitInitializesPhiWhenEmpty) {
   auto s = logistic_map(30);
   const size_t E = 3;
   fims_edm::DelayEmbeddingMatrix<double> emb =
-      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1);
+      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1, /*h=*/1);
 
   fims_edm::GPEdmProjection<double> gp;
   gp.library             = &emb;
@@ -346,7 +343,7 @@ TEST(GPEdmProjection, LogisticMapPredictionInRange) {
   auto s = logistic_map(60);
   const size_t E = 2;
   fims_edm::DelayEmbeddingMatrix<double> lib_emb =
-      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1);
+      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1, /*h=*/1);
 
   fims_edm::GPEdmProjection<double> gp;
   gp.library             = &lib_emb;
@@ -374,7 +371,7 @@ TEST(GPEdmProjection, SMapStillWorksAfterRefactor) {
   auto s = logistic_map(30);
   const size_t E = 2;
   fims_edm::DelayEmbeddingMatrix<double> emb =
-      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1);
+      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1, /*h=*/1);
 
   fims_edm::SMapProjection<double> smap;
   smap.library             = &emb;
@@ -394,7 +391,7 @@ TEST(GPEdmProjection, IllConditionedNearZeroNuggetHandledByLDLT) {
   auto s = logistic_map(30);
   const size_t E = 2;
   fims_edm::DelayEmbeddingMatrix<double> emb =
-      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1);
+      fims_edm::MakeDelayEmbedding(s, E, /*tau=*/1, /*h=*/1);
 
   fims_edm::GPEdmProjection<double> gp;
   gp.library             = &emb;
@@ -409,4 +406,3 @@ TEST(GPEdmProjection, IllConditionedNearZeroNuggetHandledByLDLT) {
     }
   });
 }
-

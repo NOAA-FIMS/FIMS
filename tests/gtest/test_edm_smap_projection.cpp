@@ -3,8 +3,8 @@
 // Tests cover: IO correctness, edge handling, and error handling.
 //
 // ### Data-layout note (post mentor feedback, 2024-06)
-// MakeDelayEmbedding now takes a forecast_horizon parameter (default = 1).
-// With the default:
+// MakeDelayEmbedding takes an explicit forecast_horizon parameter.
+// With forecast_horizon = 1:
 //
 //   embedded_values[row][col] = &series[target_index - col * tau]
 //   target_values[row]        = &series[target_index + 1]   (x_{t+1})
@@ -33,12 +33,12 @@ namespace {
 
 // ---------------------------------------------------------------------------
 // Helper: build a DelayEmbeddingMatrix<double> from a flat time series.
-// Uses forecast_horizon = 1 (the new default) throughout.
+// Uses forecast_horizon = 1 unless another horizon is supplied.
 // ---------------------------------------------------------------------------
 DelayEmbeddingMatrix<double> MakeLib(const fims::Vector<double>& series,
                                      size_t E, size_t tau = 1,
                                      size_t h = 1) {
-  return MakeDelayEmbedding(series, E, tau, fims::Vector<double>(), h);
+  return MakeDelayEmbedding(series, E, tau, h);
 }
 
 // ---------------------------------------------------------------------------
@@ -323,4 +323,3 @@ TEST(SMapProjection, IllConditionedExtremeThetaHandledByLDLT) {
 }
 
 }  // namespace
-

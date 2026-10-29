@@ -17,7 +17,7 @@ TEST(SimplexProjection, DefaultNeighborCountIsZero) {
   // A library with 5 rows (≥ E+1 = 4) must succeed with n_neighbors = 0.
   fims::Vector<double> series = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0};
   fims_edm::DelayEmbeddingMatrix<double> lib =
-      fims_edm::MakeDelayEmbedding(series, 3, 1);
+      fims_edm::MakeDelayEmbedding(series, 3, 1, 1);
 
   sp.library = &lib;
   fims::Vector<double> q = {5.0, 4.0, 3.0};
@@ -38,7 +38,7 @@ TEST(SimplexProjection, DefaultNeighborCountIsZero) {
 TEST(SimplexProjection, ExactMatchDominatesWeighting) {
   fims::Vector<double> series = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
   fims_edm::DelayEmbeddingMatrix<double> lib =
-      fims_edm::MakeDelayEmbedding(series, 1, 1);  // h=1 default
+      fims_edm::MakeDelayEmbedding(series, 1, 1, 1);
 
   fims_edm::SimplexProjection<double> sp;
   sp.embedding_dimension = 1;
@@ -87,12 +87,19 @@ TEST(SimplexProjection, AllEqualDistancesGiveUniformWeights) {
   sp.time_lag = 1;
   sp.n_neighbors = 4;
   sp.library = &lib;
+  // This weighting test uses an out-of-library query, not a self-prediction.
+  sp.query_point_time = lib.n_rows;
 
   fims::Vector<double> q = {1.0, 0.0};
   double pred = sp.predict_one(q);
 
   // All weights identical → prediction = arithmetic mean of targets.
   EXPECT_NEAR(pred, 25.0, 1e-6);
+
+  // An in-library query at row 0 excludes that row, leaving three neighbors.
+  sp.query_point_time = 0;
+  sp.n_neighbors = 3;
+  EXPECT_NEAR(sp.predict_one(q), 30.0, 1e-6);
 }
 
 // ---------------------------------------------------------------------------
@@ -103,11 +110,11 @@ TEST(SimplexProjection, PredictFillsOutputVector) {
                                   6.0, 7.0, 8.0, 9.0, 10.0};
 
   fims_edm::DelayEmbeddingMatrix<double> lib =
-      fims_edm::MakeDelayEmbedding(series, 2, 1);  // h=1: n_rows = 10-1-1 = 8
+      fims_edm::MakeDelayEmbedding(series, 2, 1, 1);  // n_rows = 10-1-1 = 8
   ASSERT_EQ(lib.n_rows, 8u);
 
   fims_edm::DelayEmbeddingMatrix<double> test_emb =
-      fims_edm::MakeDelayEmbedding(series, 2, 1);
+      fims_edm::MakeDelayEmbedding(series, 2, 1, 1);
 
   fims_edm::SimplexProjection<double> sp;
   sp.embedding_dimension = 2;
@@ -138,7 +145,7 @@ TEST(SimplexProjection, ThrowsOnNullLibrary) {
 TEST(SimplexProjection, ThrowsOnQueryDimensionMismatch) {
   fims::Vector<double> series = {1.0, 2.0, 3.0, 4.0, 5.0};
   fims_edm::DelayEmbeddingMatrix<double> lib =
-      fims_edm::MakeDelayEmbedding(series, 2, 1);
+      fims_edm::MakeDelayEmbedding(series, 2, 1, 1);
 
   fims_edm::SimplexProjection<double> sp;
   sp.embedding_dimension = 2;
@@ -156,7 +163,7 @@ TEST(SimplexProjection, ThrowsWhenLibraryTooSmall) {
   fims::Vector<double> series = {1.0, 2.0, 3.0, 4.0};
   // E=2, tau=1, h=1 → n_rows = 4 - 1 - 1 = 2.
   fims_edm::DelayEmbeddingMatrix<double> lib =
-      fims_edm::MakeDelayEmbedding(series, 2, 1);
+      fims_edm::MakeDelayEmbedding(series, 2, 1, 1);
   ASSERT_EQ(lib.n_rows, 2u);
 
   fims_edm::SimplexProjection<double> sp;
@@ -186,7 +193,7 @@ TEST(SimplexProjection, LogisticMapPredictionInRange) {
   }
 
   fims_edm::DelayEmbeddingMatrix<double> lib =
-      fims_edm::MakeDelayEmbedding(series, 3, 1);
+      fims_edm::MakeDelayEmbedding(series, 3, 1, 1);
 
   fims_edm::SimplexProjection<double> sp;
   sp.embedding_dimension = 3;
@@ -209,11 +216,11 @@ TEST(SimplexProjection, LogisticMapPredictionInRange) {
 TEST(SimplexProjection, PredictThrowsOnTestDimensionMismatch) {
   fims::Vector<double> series = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0};
   fims_edm::DelayEmbeddingMatrix<double> lib =
-      fims_edm::MakeDelayEmbedding(series, 2, 1);
+      fims_edm::MakeDelayEmbedding(series, 2, 1, 1);
 
   // Test embedding uses E=3, but predictor expects E=2.
   fims_edm::DelayEmbeddingMatrix<double> test_emb =
-      fims_edm::MakeDelayEmbedding(series, 3, 1);
+      fims_edm::MakeDelayEmbedding(series, 3, 1, 1);
 
   fims_edm::SimplexProjection<double> sp;
   sp.embedding_dimension = 2;

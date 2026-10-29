@@ -483,7 +483,7 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
     // phi: half-Normal prior
     // lam_phi = (2^(modeprior-1))^2 * pi/2
     // Default modeprior=0: lam = (2^(-1))^2 * pi/2 = 0.25 * pi/2 = pi/8
-    const double kLamPhi = 0.25 * M_PI / 2.0;  // = pi/8
+    const double kLamPhi = 0.25 * std::acos(-1.0) / 2.0;  // = pi/8
     double lp_phi = 0.0;
     std::vector<double> dlp_phi(E, 0.0);
     for (size_t d = 0; d < E; ++d) {
