@@ -447,6 +447,53 @@ inline fims_edm::DelayEmbeddingMatrix<double> to_matrix(DelayEmbeddingInterface*
 }
 
 /**
+ * @brief Keep both registered embeddings alive while prediction uses their views.
+ */
+struct EDMPredictionEmbeddings {
+  std::shared_ptr<DelayEmbeddingInterface> library;
+  std::shared_ptr<DelayEmbeddingInterface> test;
+};
+
+inline EDMPredictionEmbeddings get_edm_prediction_embeddings(
+    uint32_t lib_id, uint32_t test_id, const std::string& context) {
+  auto it_lib = EDMInterfaceBase::live_objects.find(lib_id);
+  auto it_test = EDMInterfaceBase::live_objects.find(test_id);
+  if (it_lib == EDMInterfaceBase::live_objects.end() ||
+      it_test == EDMInterfaceBase::live_objects.end()) {
+    throw std::invalid_argument(context + ": invalid lib_id or test_id.");
+  }
+  auto library = std::dynamic_pointer_cast<DelayEmbeddingInterface>(
+      it_lib->second);
+  auto test = std::dynamic_pointer_cast<DelayEmbeddingInterface>(
+      it_test->second);
+  if (!library || !test) {
+    throw std::invalid_argument(
+        context + ": live objects are not of type DelayEmbeddingInterface.");
+  }
+  return {library, test};
+}
+
+inline Rcpp::NumericVector edm_predictions_to_r(
+    const std::vector<double>& predictions) {
+  return Rcpp::NumericVector(predictions.begin(), predictions.end());
+}
+
+/**
+ * @brief Copy evaluated predictions, leaving output unchanged without a model.
+ */
+inline void copy_edm_model_predictions(uint32_t id, RealVector& predictions) {
+  const auto information = fims_info::Information<double>::GetInstance();
+  const auto model = information->edm_models.find(id);
+  if (model != information->edm_models.end()) {
+    const auto& values = model->second->predictions;
+    predictions.resize(values.size());
+    for (size_t i = 0; i < values.size(); ++i) {
+      predictions[i] = values[i];
+    }
+  }
+}
+
+/**
  * @brief Copy one embedding into model-owned typed storage and bind its matrix.
  */
 template <typename Type>
@@ -595,21 +642,10 @@ class SimplexProjectionInterface : public EDMInterfaceBase {
    * @return A vector of predictions.
    */
   Rcpp::NumericVector predict(uint32_t lib_id, uint32_t test_id) {
-    auto it_lib = EDMInterfaceBase::live_objects.find(lib_id);
-    auto it_test = EDMInterfaceBase::live_objects.find(test_id);
-    if (it_lib == EDMInterfaceBase::live_objects.end() ||
-        it_test == EDMInterfaceBase::live_objects.end()) {
-      throw std::invalid_argument("SimplexProjectionInterface::predict: invalid lib_id or test_id.");
-    }
-
-    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
-    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
-    if (!lib || !test) {
-      throw std::invalid_argument("SimplexProjectionInterface::predict: live objects are not of type DelayEmbeddingInterface.");
-    }
-
-    fims_edm::DelayEmbeddingMatrix<double> lib_matrix = to_matrix(lib);
-    fims_edm::DelayEmbeddingMatrix<double> test_matrix = to_matrix(test);
+    const auto embeddings = get_edm_prediction_embeddings(
+        lib_id, test_id, "SimplexProjectionInterface::predict");
+    auto lib_matrix = to_matrix(embeddings.library.get());
+    auto test_matrix = to_matrix(embeddings.test.get());
 
     fims_edm::SimplexProjection<double> sp;
     sp.library = &lib_matrix;
@@ -618,11 +654,7 @@ class SimplexProjectionInterface : public EDMInterfaceBase {
 
     sp.predict(test_matrix);
 
-    Rcpp::NumericVector ret(sp.predictions.size());
-    for (size_t i = 0; i < sp.predictions.size(); ++i) {
-      ret[i] = sp.predictions[i];
-    }
-    return ret;
+    return edm_predictions_to_r(sp.predictions);
   }
 
   /**
@@ -635,15 +667,7 @@ class SimplexProjectionInterface : public EDMInterfaceBase {
     }
     this->finalized = true;
 
-    typedef typename fims_info::Information<double>::edm_models_iterator it_type;
-    it_type it = fims_info::Information<double>::GetInstance()->edm_models.find(this->id);
-    if (it != fims_info::Information<double>::GetInstance()->edm_models.end()) {
-      size_t n_preds = it->second->predictions.size();
-      this->predictions.resize(n_preds);
-      for (size_t i = 0; i < n_preds; ++i) {
-        this->predictions[i] = it->second->predictions[i];
-      }
-    }
+    copy_edm_model_predictions(this->id, this->predictions);
   }
 
 
@@ -793,21 +817,10 @@ class SMapProjectionInterface : public EDMInterfaceBase {
    * @return A vector of predictions.
    */
   Rcpp::NumericVector predict(uint32_t lib_id, uint32_t test_id) {
-    auto it_lib = EDMInterfaceBase::live_objects.find(lib_id);
-    auto it_test = EDMInterfaceBase::live_objects.find(test_id);
-    if (it_lib == EDMInterfaceBase::live_objects.end() ||
-        it_test == EDMInterfaceBase::live_objects.end()) {
-      throw std::invalid_argument("SMapProjectionInterface::predict: invalid lib_id or test_id.");
-    }
-
-    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
-    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
-    if (!lib || !test) {
-      throw std::invalid_argument("SMapProjectionInterface::predict: live objects are not of type DelayEmbeddingInterface.");
-    }
-
-    fims_edm::DelayEmbeddingMatrix<double> lib_matrix = to_matrix(lib);
-    fims_edm::DelayEmbeddingMatrix<double> test_matrix = to_matrix(test);
+    const auto embeddings = get_edm_prediction_embeddings(
+        lib_id, test_id, "SMapProjectionInterface::predict");
+    auto lib_matrix = to_matrix(embeddings.library.get());
+    auto test_matrix = to_matrix(embeddings.test.get());
 
     fims_edm::SMapProjection<double> sm;
     sm.library = &lib_matrix;
@@ -821,11 +834,7 @@ class SMapProjectionInterface : public EDMInterfaceBase {
 
     sm.predict(test_matrix);
 
-    Rcpp::NumericVector ret(sm.predictions.size());
-    for (size_t i = 0; i < sm.predictions.size(); ++i) {
-      ret[i] = sm.predictions[i];
-    }
-    return ret;
+    return edm_predictions_to_r(sm.predictions);
   }
 
   /**
@@ -838,16 +847,7 @@ class SMapProjectionInterface : public EDMInterfaceBase {
     }
     this->finalized = true;
 
-    // Pull prediction results from Information<double>
-    typedef typename fims_info::Information<double>::edm_models_iterator it_type;
-    it_type it = fims_info::Information<double>::GetInstance()->edm_models.find(this->id);
-    if (it != fims_info::Information<double>::GetInstance()->edm_models.end()) {
-      size_t n_preds = it->second->predictions.size();
-      this->predictions.resize(n_preds);
-      for (size_t i = 0; i < n_preds; ++i) {
-        this->predictions[i] = it->second->predictions[i];
-      }
-    }
+    copy_edm_model_predictions(this->id, this->predictions);
   }
 
   /**
@@ -1058,21 +1058,10 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
    * @return A vector of predictions.
    */
   Rcpp::NumericVector predict(uint32_t lib_id, uint32_t test_id) {
-    auto it_lib = EDMInterfaceBase::live_objects.find(lib_id);
-    auto it_test = EDMInterfaceBase::live_objects.find(test_id);
-    if (it_lib == EDMInterfaceBase::live_objects.end() ||
-        it_test == EDMInterfaceBase::live_objects.end()) {
-      throw std::invalid_argument("GPEdmProjectionInterface::predict: invalid lib_id or test_id.");
-    }
-
-    DelayEmbeddingInterface* lib = dynamic_cast<DelayEmbeddingInterface*>(it_lib->second.get());
-    DelayEmbeddingInterface* test = dynamic_cast<DelayEmbeddingInterface*>(it_test->second.get());
-    if (!lib || !test) {
-      throw std::invalid_argument("GPEdmProjectionInterface::predict: live objects are not of type DelayEmbeddingInterface.");
-    }
-
-    fims_edm::DelayEmbeddingMatrix<double> lib_matrix = to_matrix(lib);
-    fims_edm::DelayEmbeddingMatrix<double> test_matrix = to_matrix(test);
+    const auto embeddings = get_edm_prediction_embeddings(
+        lib_id, test_id, "GPEdmProjectionInterface::predict");
+    auto lib_matrix = to_matrix(embeddings.library.get());
+    auto test_matrix = to_matrix(embeddings.test.get());
 
     fims_edm::GPEdmProjection<double> gp;
     gp.library = &lib_matrix;
@@ -1090,11 +1079,7 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
 
     gp.predict(test_matrix);
 
-    Rcpp::NumericVector ret(gp.predictions.size());
-    for (size_t i = 0; i < gp.predictions.size(); ++i) {
-      ret[i] = gp.predictions[i];
-    }
-    return ret;
+    return edm_predictions_to_r(gp.predictions);
   }
 
   /**
@@ -1107,16 +1092,7 @@ class GPEdmProjectionInterface : public EDMInterfaceBase {
     }
     this->finalized = true;
 
-    // Pull prediction results from Information<double>
-    typedef typename fims_info::Information<double>::edm_models_iterator it_type;
-    it_type it = fims_info::Information<double>::GetInstance()->edm_models.find(this->id);
-    if (it != fims_info::Information<double>::GetInstance()->edm_models.end()) {
-      size_t n_preds = it->second->predictions.size();
-      this->predictions.resize(n_preds);
-      for (size_t i = 0; i < n_preds; ++i) {
-        this->predictions[i] = it->second->predictions[i];
-      }
-    }
+    copy_edm_model_predictions(this->id, this->predictions);
   }
 
   /**
