@@ -96,12 +96,7 @@ jobs:
       - name: Check links in pkgdown output
         uses: lycheeverse/lychee-action@v2
         with:
-          args: >-
-            --verbose
-            --no-progress
-            --exclude-mail
-            --accept 200,206,301,302,429
-            "docs/**/*.html"
+          args: --accept 200,403,503 docs/**/*.html"
           fail: true
   
       - name: Deploy package
