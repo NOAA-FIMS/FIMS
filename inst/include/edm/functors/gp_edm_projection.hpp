@@ -274,6 +274,50 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
     this->ValidateLibrary();
     this->ValidateQueryPoint(query_point);
 
+    const auto weights = solve_library_weights();
+    return predict_with_weights(query_point, weights);
+  }
+
+  /**
+   * @brief Predict for every row of a test embedding matrix.
+   *
+   * @details Solves for the library weights once per nonempty batch, then
+   * computes each query's posterior mean using those weights. Weights are local
+   * to this call so library and hyperparameter updates are always reflected.
+   *
+   * @param test_embedding  Query manifold (n_cols must equal embedding_dimension).
+   * @throws std::runtime_error if library is null or a nonempty batch has fewer
+   *   than 2 library rows.
+   * @throws std::invalid_argument if test_embedding.n_cols != embedding_dimension
+   *   or a nonempty batch has incompatible phi dimensions.
+   */
+  void predict(const DelayEmbeddingMatrix<Type>& test_embedding) override {
+    this->ValidateLibrary();
+    if (test_embedding.n_cols != this->embedding_dimension) {
+      throw std::invalid_argument(
+          "GPEdmProjection::predict: test_embedding.n_cols does not match "
+          "embedding_dimension.");
+    }
+
+    const size_t n_test = test_embedding.n_rows;
+    this->predictions.resize(n_test);
+    if (n_test == 0) {
+      return;
+    }
+
+    const auto weights = solve_library_weights();
+    fims::Vector<Type> query(this->embedding_dimension);
+    for (size_t row = 0; row < n_test; ++row) {
+      for (size_t col = 0; col < this->embedding_dimension; ++col) {
+        query[col] = test_embedding.at(row, col);
+      }
+      this->predictions[row] = predict_with_weights(query, weights);
+    }
+  }
+
+ private:
+  /** @brief Solve the current library covariance system for prediction weights. */
+  std::vector<Type> solve_library_weights() const {
     const size_t N = this->library->n_rows;
     const size_t E = this->embedding_dimension;
 
@@ -314,9 +358,14 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
     for (size_t i = 0; i < N; ++i) {
       y[i] = alpha(i);
     }
-    // y now holds alpha = Sigma^{-1} y_targets
+    return y;
+  }
 
-
+  /** @brief Compute a query's posterior mean using solved library weights. */
+  Type predict_with_weights(const fims::Vector<Type>& query_point,
+                            const std::vector<Type>& weights) const {
+    const size_t N = this->library->n_rows;
+    const size_t E = this->embedding_dimension;
     // --- Build k_star: covariance between query and every library row ---
     std::vector<Type> k_star;
     BuildKStarVector<Type>(query_point.data(), this->library->embedded_values,
@@ -325,42 +374,11 @@ struct GPEdmProjection : public EDMPredictorBase<Type> {
     // --- Posterior mean: y_hat = k_star^T alpha ---
     Type y_hat = Type(0);
     for (size_t i = 0; i < N; ++i) {
-      y_hat += k_star[i] * y[i];
+      y_hat += k_star[i] * weights[i];
     }
     return y_hat;
   }
 
-  /**
-   * @brief Predict for every row of a test embedding matrix.
-   *
-   * @details Iterates over @p test_embedding rows, extracts each query vector,
-   * calls predict_one(), and stores results in `predictions`.
-   *
-   * @param test_embedding  Query manifold (n_cols must equal embedding_dimension).
-   * @throws std::runtime_error if library is null or has fewer than 2 rows.
-   * @throws std::invalid_argument if test_embedding.n_cols != embedding_dimension.
-   */
-  void predict(const DelayEmbeddingMatrix<Type>& test_embedding) override {
-    this->ValidateLibrary();
-    if (test_embedding.n_cols != this->embedding_dimension) {
-      throw std::invalid_argument(
-          "GPEdmProjection::predict: test_embedding.n_cols does not match "
-          "embedding_dimension.");
-    }
-
-    const size_t n_test = test_embedding.n_rows;
-    this->predictions.resize(n_test);
-
-    fims::Vector<Type> query(this->embedding_dimension);
-    for (size_t row = 0; row < n_test; ++row) {
-      for (size_t col = 0; col < this->embedding_dimension; ++col) {
-        query[col] = test_embedding.at(row, col);
-      }
-      this->predictions[row] = predict_one(query);
-    }
-  }
-
- private:
   // -----------------------------------------------------------------------
   // Rprop helpers (all in double arithmetic, not in the AD trace)
   // -----------------------------------------------------------------------

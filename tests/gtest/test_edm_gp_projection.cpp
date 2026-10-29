@@ -15,6 +15,7 @@
  * Fisheries Integrated Modeling System project. See LICENSE in the source
  * folder for reuse information.
  */
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
@@ -161,6 +162,91 @@ TEST(GPEdmProjection, PredictOneReturnsScalar) {
   double pred = setup.gp.predict_one(q);
   // Just check it's a finite number
   EXPECT_TRUE(std::isfinite(pred));
+}
+
+TEST(GPEdmProjection, BatchMatchesSingleQueriesAfterLibraryAndParameterChanges) {
+  GPSetup setup(logistic_map(30), /*E=*/2, /*phi_val=*/0.5,
+                /*sigma2=*/1.4, /*ve=*/0.08);
+  setup.gp.phi = {0.35, 1.2};
+  auto test_series = logistic_map(12, 3.7, 0.6);
+  auto test_embedding = fims_edm::MakeDelayEmbedding(test_series, 2, 1, 1);
+  auto other_series = logistic_map(22, 3.6, 0.3);
+  auto other_library = fims_edm::MakeDelayEmbedding(other_series, 2, 1, 1);
+  double first_target = *setup.lib_emb.target_values[0];
+  double first_coordinate = *setup.lib_emb.embedded_values[0];
+  setup.lib_emb.target_values[0] = &first_target;
+  setup.lib_emb.embedded_values[0] = &first_coordinate;
+
+  auto check_predictions = [&]() {
+    std::vector<double> expected(test_embedding.n_rows);
+    fims::Vector<double> query(2);
+    for (size_t row = 0; row < test_embedding.n_rows; ++row) {
+      for (size_t col = 0; col < 2; ++col) {
+        query[col] = test_embedding.at(row, col);
+      }
+      expected[row] = setup.gp.predict_one(query);
+      ASSERT_TRUE(std::isfinite(expected[row]));
+    }
+    setup.gp.predict(test_embedding);
+    ASSERT_EQ(setup.gp.predictions.size(), expected.size());
+    for (size_t row = 0; row < expected.size(); ++row) {
+      EXPECT_NEAR(setup.gp.predictions[row], expected[row], 1e-12);
+    }
+  };
+  check_predictions();
+  auto previous = setup.gp.predictions;
+  auto check_changed_predictions = [&]() {
+    check_predictions();
+    const auto& current = setup.gp.predictions;
+    double largest_change = 0.0;
+    for (size_t row = 0; row < current.size(); ++row) {
+      largest_change =
+          std::max(largest_change, std::abs(current[row] - previous[row]));
+    }
+    EXPECT_GT(largest_change, 1e-6);
+    previous = current;
+  };
+
+  setup.gp.phi = {1.1, 0.2};
+  check_changed_predictions();
+  setup.gp.sigma2 = 0.7;
+  check_changed_predictions();
+  setup.gp.ve = 0.25;
+  check_changed_predictions();
+  first_target += 0.5;
+  check_changed_predictions();
+  first_coordinate += 0.2;
+  check_changed_predictions();
+  setup.gp.library = &other_library;
+  check_changed_predictions();
+  setup.gp.max_fit_iterations = 5;
+  setup.gp.fit();
+  check_predictions();
+
+  test_embedding.n_rows = 1;
+  check_predictions();
+}
+
+TEST(GPEdmProjection, BatchPreservesValidationAndEmptyOutputBehavior) {
+  GPSetup setup(linear_series(10), /*E=*/2);
+  auto empty_test = setup.test_emb;
+  empty_test.n_rows = 0;
+  setup.gp.predict(setup.test_emb);
+  setup.gp.predict(empty_test);
+  EXPECT_TRUE(setup.gp.predictions.empty());
+
+  setup.gp.phi.clear();
+  EXPECT_NO_THROW(setup.gp.predict(empty_test));
+  EXPECT_THROW(setup.gp.predict(setup.test_emb), std::invalid_argument);
+
+  setup.lib_emb.n_rows = 1;
+  EXPECT_NO_THROW(setup.gp.predict(empty_test));
+  EXPECT_THROW(setup.gp.predict(setup.test_emb), std::runtime_error);
+  empty_test.n_cols = 3;
+  EXPECT_THROW(setup.gp.predict(empty_test), std::invalid_argument);
+  empty_test.n_cols = 2;
+  setup.gp.library = nullptr;
+  EXPECT_THROW(setup.gp.predict(empty_test), std::runtime_error);
 }
 
 // ---------------------------------------------------------------------------
