@@ -356,16 +356,16 @@ test_that("estimated younger length loads below constant older length", {
 
   ctx <- make_vonb_test_context()
 
-  for (estimation_type in c("fixed_effects", "random_effects")) {
+  for (estimation_status in c("fixed_effects", "random_effects")) {
     FIMS::clear()
 
     vb <- new_vonb(ctx)
-    vb$mean_length_young[1]$estimation_type$set(estimation_type)
-    vb$mean_length_old[1]$estimation_type$set("constant")
+    vb$mean_length_young[1]$estimation_status$set(estimation_status)
+    vb$mean_length_old[1]$estimation_status$set("not_estimated")
 
     FIMS::CreateTMBModel()
 
-    if (estimation_type == "fixed_effects") {
+    if (estimation_status == "fixed_effects") {
       working <- FIMS::get_fixed()
       other <- FIMS::get_random()
     } else {

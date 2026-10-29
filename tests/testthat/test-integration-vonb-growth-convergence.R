@@ -213,7 +213,7 @@ make_vonb_model_comparison_context <- function() {
   base_parameters <- FIMS::parameters_big |>
     dplyr::mutate(
       value = dplyr::if_else(
-        estimation_type != "constant",
+        estimation_status != "not_estimated",
         value * initial_value_scale,
         value
       )
@@ -292,20 +292,20 @@ test_that("reference lengths survive initialization across estimation settings",
 
   ctx <- make_vonb_convergence_context()
   settings <- expand.grid(
-    young = c("constant", "fixed_effects"),
-    old = c("constant", "fixed_effects"),
+    young = c("not_estimated", "fixed_effects"),
+    old = c("not_estimated", "fixed_effects"),
     stringsAsFactors = FALSE
   )
 
   for (i in seq_len(nrow(settings))) {
     parameters <- ctx$parameters |>
       dplyr::mutate(
-        estimation_type = dplyr::case_when(
+        estimation_status = dplyr::case_when(
           module_name == "Growth" & label == "mean_length_young" ~
             settings$young[i],
           module_name == "Growth" & label == "mean_length_old" ~
             settings$old[i],
-          TRUE ~ estimation_type
+          TRUE ~ estimation_status
         )
       )
 
@@ -320,7 +320,7 @@ test_that("reference lengths survive initialization across estimation settings",
       )
     case <- paste("young:", settings$young[i], "old:", settings$old[i])
 
-    #' @description Finalized reference lengths equal their physical inputs for all constant/fixed-effect combinations.
+    #' @description Finalized reference lengths equal their physical inputs for all not_estimated/fixed-effect combinations.
     expect_equal(
       lengths$estimated,
       lengths$input,
