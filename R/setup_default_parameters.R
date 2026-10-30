@@ -344,6 +344,27 @@ choose_default_Growth_module_type <- function(data) {
 #'   Von Bertalanffy growth defaults to `"delta_method"` and also supports
 #'   `"interpolation"`. Schnute growth supports `"interpolation"` only. This
 #'   argument is ignored for `"EWAA"`.
+#' @details
+#' Traditional growth uses the same age units as the model for
+#' `age_at_zero_length` (`t0`) inputs and finalized estimates.
+#' Delta-method variability requires `t0` to have estimation type
+#' `"constant"` and describes between-fish variability in `log(Linf)`
+#' and `log(K)`, including their covariance.
+#'
+#' With interpolation variability, `t0` may be constant or estimated.
+#' Both interpolation reference ages must be constant. Estimated `t0`
+#' is stored internally as `log(age_limit - t0)`, where `age_limit` is
+#' the smaller of the population minimum age and the younger interpolation
+#' reference age. The initial `t0` must be strictly below this limit.
+#'
+#' A normal prior linked to fixed-effect `t0`, or a normal distribution
+#' linked to random-effect `t0`, acts on `log(age_limit - t0)`. Its mean
+#' and standard deviation must be specified on this log-distance scale,
+#' not the natural age scale.
+#' For example, when `age_limit = 1`, an initial `t0 = -0.5` is stored
+#' as `log(1.5)`. This conversion does not determine the distribution's
+#' mean. The linked distribution does not represent between-fish
+#' variability in `t0`.
 #' @return
 #' A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
@@ -416,7 +437,15 @@ setup_default_Growth <- function(
         "i" = "VonBertalanffySchnute defaults use the model ages to choose reference ages."
       ))
     }
+  } else if (identical(variability_type, "interpolation") && is.null(data)) {
+    cli::cli_abort(c(
+      "{.fn setup_default_Growth} requires {.var data} when using traditional Von Bertalanffy interpolation variability.",
+      "i" = "Interpolation defaults use the model ages to choose reference ages."
+    ))
+  }
 
+  if (identical(module_type, "VonBertalanffySchnute") ||
+    identical(variability_type, "interpolation")) {
     is.FIMSFrame(data)
 
     ages <- get_ages(data)
@@ -428,7 +457,9 @@ setup_default_Growth <- function(
       reference_age_for_length_young <- min(ages, na.rm = TRUE)
       reference_age_for_length_old <- max(ages, na.rm = TRUE)
     }
+  }
 
+  if (identical(module_type, "VonBertalanffySchnute")) {
     default <- setup_default_parameters_template(n_parameters = 9) |>
       dplyr::mutate(
         module_name = "Growth",
@@ -488,25 +519,6 @@ setup_default_Growth <- function(
     }
 
     if (identical(variability_type, "interpolation")) {
-      if (is.null(data)) {
-        cli::cli_abort(c(
-          "{.fn setup_default_Growth} requires {.var data} when using traditional Von Bertalanffy interpolation variability.",
-          "i" = "Interpolation defaults use the model ages to choose reference ages."
-        ))
-      }
-
-      is.FIMSFrame(data)
-
-      ages <- get_ages(data)
-      if (length(ages) == 0 || all(is.na(ages))) {
-        reference_age_for_length_young <- 0
-        n_ages <- get_n_ages(data)
-        reference_age_for_length_old <- if (n_ages > 0) n_ages - 1 else 0
-      } else {
-        reference_age_for_length_young <- min(ages, na.rm = TRUE)
-        reference_age_for_length_old <- max(ages, na.rm = TRUE)
-      }
-
       default <- setup_default_parameters_template(n_parameters = 9) |>
         dplyr::mutate(
           module_name = "Growth",

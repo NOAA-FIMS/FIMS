@@ -226,7 +226,6 @@ class VonBertalanffyGrowthModelAdapter
    */
   fims::Vector<Type>& MeanLengthYoungVector() {
     use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return mean_length_young_vector_;
   }
@@ -237,19 +236,17 @@ class VonBertalanffyGrowthModelAdapter
    */
   fims::Vector<Type>& MeanLengthOldVector() {
     use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return mean_length_old_vector_;
   }
 
   /**
-   * @brief Access the log-scale VonBertalanffySchnute growth coefficient
-   * vector.
+   * @brief Access the log-scale growth coefficient vector shared by both
+   * Von Bertalanffy parameterizations.
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& GrowthCoefficientVector() {
     use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return growth_coefficient_vector_;
   }
@@ -260,7 +257,6 @@ class VonBertalanffyGrowthModelAdapter
    */
   fims::Vector<Type>& AsymptoticLengthVector() {
     use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return asymptotic_length_vector_;
   }
@@ -271,7 +267,6 @@ class VonBertalanffyGrowthModelAdapter
    */
   fims::Vector<Type>& AgeAtZeroLengthVector() {
     use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return age_at_zero_length_vector_;
   }
@@ -282,7 +277,6 @@ class VonBertalanffyGrowthModelAdapter
    */
   fims::Vector<Type>& ReferenceAgeForLengthYoungVector() {
     use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return reference_age_for_length_young_vector_;
   }
@@ -293,7 +287,6 @@ class VonBertalanffyGrowthModelAdapter
    */
   fims::Vector<Type>& ReferenceAgeForLengthOldVector() {
     use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return reference_age_for_length_old_vector_;
   }
@@ -304,7 +297,6 @@ class VonBertalanffyGrowthModelAdapter
    */
   fims::Vector<Type>& LengthWeightAVector() {
     use_param_vectors_ = true;
-    lw_params_set_ = true;
     growth_products_prepared_ = false;
     return length_weight_a_vector_;
   }
@@ -315,7 +307,6 @@ class VonBertalanffyGrowthModelAdapter
    */
   fims::Vector<Type>& LengthWeightBVector() {
     use_param_vectors_ = true;
-    lw_params_set_ = true;
     growth_products_prepared_ = false;
     return length_weight_b_vector_;
   }
@@ -332,7 +323,7 @@ class VonBertalanffyGrowthModelAdapter
   }
 
   /**
-   * @brief Access the log-SD vector for growth_coefficient.
+   * @brief Access log(SD(log(K))) for between-fish variability.
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LogSdGrowthCoefficientVector() {
@@ -342,7 +333,7 @@ class VonBertalanffyGrowthModelAdapter
   }
 
   /**
-   * @brief Access the log-SD vector for log(asymptotic_length).
+   * @brief Access log(SD(log(Linf))) for between-fish variability.
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LogSdAsymptoticLengthVector() {
@@ -352,8 +343,8 @@ class VonBertalanffyGrowthModelAdapter
   }
 
   /**
-   * @brief Access the transformed correlation vector for asymptotic_length and
-   * growth_coefficient.
+   * @brief Access logit((rho + 1) / 2), where rho is the between-fish
+   * correlation of log(Linf) and log(K).
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LogitCorrAsymptoticLengthGrowthCoefficientVector() {
@@ -409,7 +400,7 @@ class VonBertalanffyGrowthModelAdapter
     EnsureParamsSet();
     if (n_sexes != 1) {
       throw std::runtime_error(
-          "VonBertalanffySchnuteGrowthModelAdapter currently supports n_sexes "
+          "VonBertalanffyGrowthModelAdapter currently supports n_sexes "
           "== 1");
     }
     n_years_ = n_years;
@@ -551,8 +542,6 @@ class VonBertalanffyGrowthModelAdapter
   std::size_t n_sexes_ = 1;
   double age_offset_ = 0.0;
   bool age_offset_set_ = false;
-  bool vb_params_set_ = false;
-  bool lw_params_set_ = false;
   bool growth_products_prepared_ = false;
 
   mutable std::shared_ptr<GrowthModel<Type>> model_;
@@ -611,12 +600,16 @@ class VonBertalanffyGrowthModelAdapter
     if (mean_growth_parameterization_ ==
             MeanGrowthParameterization::kTraditional &&
         HasTraditionalStructuredDeltaMethodInputs()) {
+      const Type sd_log_asymptotic_length = CurrentSdLogAsymptoticLength();
+      const Type sd_log_growth_coefficient = CurrentSdLogGrowthCoefficient();
+      const Type correlation = CurrentCorrAsymptoticLengthGrowthCoefficient();
+
       // Fixed t0 has zero between-fish variance and zero covariances.
       model_->SetTraditionalGrowthParameterCovariance(
-          CurrentLogAsymptoticLengthVariance(),
-          CurrentLogAsymptoticLengthLogGrowthCoefficientCovariance(),
+          sd_log_asymptotic_length * sd_log_asymptotic_length,
+          correlation * sd_log_asymptotic_length * sd_log_growth_coefficient,
           static_cast<Type>(0.0),
-          CurrentGrowthCoefficientVariance(),
+          sd_log_growth_coefficient * sd_log_growth_coefficient,
           static_cast<Type>(0.0),
           static_cast<Type>(0.0));
     } else {
@@ -632,16 +625,6 @@ class VonBertalanffyGrowthModelAdapter
     return fims_math::inv_logit(
         static_cast<Type>(-1.0), static_cast<Type>(1.0),
         asymptotic_length_growth_coefficient_logit_corr_vector_[0]);
-  }
-
-  Type CurrentLogAsymptoticLengthVariance() const {
-    const Type sd = CurrentSdLogAsymptoticLength();
-    return sd * sd;
-  }
-
-  Type CurrentLogAsymptoticLengthLogGrowthCoefficientCovariance() const {
-    return CurrentCorrAsymptoticLengthGrowthCoefficient() *
-           CurrentSdLogAsymptoticLength() * CurrentSdGrowthCoefficient();
   }
 
   Type CurrentMeanLengthYoungStorage() const {
@@ -725,13 +708,8 @@ class VonBertalanffyGrowthModelAdapter
   Type CurrentLengthAtAgeSdAtReferenceAge2() const {
     return fims_math::exp(length_at_age_sd_at_reference_ages_vector_[1]);
   }
-  Type CurrentSdGrowthCoefficient() const {
+  Type CurrentSdLogGrowthCoefficient() const {
     return fims_math::exp(log_sd_growth_coefficient_vector_[0]);
-  }
-
-  Type CurrentGrowthCoefficientVariance() const {
-    const Type sd = CurrentSdGrowthCoefficient();
-    return sd * sd;
   }
 
   bool HasInterpolationSdInputs() const {

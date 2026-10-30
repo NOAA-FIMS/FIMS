@@ -534,45 +534,6 @@ test_that("rcpp Traditional estimated t0 requires a valid age limit", {
   }
 })
 
-test_that("rcpp Traditional random t0 uses log-distance storage", {
-  ctx <- make_vonb_traditional_test_context()
-  vb <- new_vonb_traditional(ctx)
-
-  on.exit(
-    {
-      rm(vb, ctx)
-      gc()
-      FIMS::clear()
-    },
-    add = TRUE
-  )
-
-  vb$min_age$set(2)
-  vb$age_at_zero_length[1]$estimation_type$set("random_effects")
-
-  #' @description Test that random-effect t0 uses log-distance storage with
-  #' the younger interpolation reference age as the controlling limit.
-  expect_no_error(vb$add_to_fims_tmb())
-
-  random_effects <- FIMS::get_random()
-  parameter_names <- names(FIMS::get_random_names(random_effects))
-  t0_index <- grep("\\.age_at_zero_length\\.", parameter_names)
-
-  expect_length(t0_index, 1)
-  if (length(t0_index) != 1) {
-    return(invisible(NULL))
-  }
-
-  expect_equal(
-    unname(random_effects[t0_index]),
-    log(1.5)
-  )
-
-  #' @description Test that random-effect registration leaves the public
-  #' natural-scale t0 input unchanged.
-  expect_equal(vb$age_at_zero_length[1]$value, -0.5)
-})
-
 test_that("rcpp Traditional random t0 links its log-distance distribution", {
   FIMS::clear()
   ctx <- make_vonb_traditional_test_context()
@@ -619,7 +580,23 @@ test_that("rcpp Traditional random t0 links its log-distance distribution", {
     return(invisible(NULL))
   }
 
-  expect_equal(unname(parameters[["re"]]), log(1.5))
+  parameter_names <- names(
+    FIMS::get_random_names(parameters[["re"]])
+  )
+  t0_index <- grep("\\.age_at_zero_length\\.", parameter_names)
+
+  expect_length(t0_index, 1)
+  if (length(t0_index) != 1) {
+    return(invisible(NULL))
+  }
+
+  #' @description Test that random-effect t0 uses log-distance storage
+  #' while preserving the public natural-scale input.
+  expect_equal(
+    unname(parameters[["re"]][t0_index]),
+    log(1.5)
+  )
+  expect_equal(vb$age_at_zero_length[1]$value, -0.5)
 
   # Leave random unspecified to evaluate the joint density without
   # integrating out t0 through a Laplace approximation.

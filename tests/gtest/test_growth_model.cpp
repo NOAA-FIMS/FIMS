@@ -193,7 +193,6 @@ TEST(GrowthModel, TraditionalDeltaMethodAllowsLowCv) {
   const double cv_at_age_3 = p.SdLAA(0, 2, 0) / p.MeanLAA(0, 2, 0);
 
   EXPECT_NEAR(cv_at_age_3, 0.03, 1e-5);
-  EXPECT_LT(cv_at_age_3, 0.04);
 }
 
 TEST(GrowthModel, TraditionalDeltaMethodHandlesNearPerfectCorrelations) {

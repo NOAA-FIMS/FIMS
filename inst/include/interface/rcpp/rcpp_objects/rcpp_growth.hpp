@@ -96,6 +96,28 @@ class GrowthDerivedObservationInterfaceBase : public GrowthInterfaceBase {
   virtual ~GrowthDerivedObservationInterfaceBase() {}
 
  protected:
+  /**
+   * @brief Copy final parameter values, preserving constants and converting
+   * log storage to the public scale when requested.
+   * @param pv Public parameter vector.
+   * @param src Runtime parameter vector.
+   * @param log_scale Whether runtime values require exponentiation.
+   */
+  static void SetFinalParameterValues(
+      VariableVector& pv, const fims::Vector<double>& src, bool log_scale) {
+    for (size_t i = 0; i < pv.size(); i++) {
+      if (pv[i].estimation_type_m.get() == "constant") {
+        pv[i].final_value_m = pv[i].initial_value_m;
+      } else {
+        double v = src[i];
+        if (log_scale) {
+          v = fims_math::exp(v);
+        }
+        pv[i].final_value_m = v;
+      }
+    }
+  }
+
   template <typename Type>
   /**
    * @brief Look up the registered growth-derived observation object.
@@ -459,21 +481,6 @@ class VonBertalanffySchnuteGrowthInterface
       return;
     }
 
-    auto set_final = [](VariableVector& pv, const fims::Vector<double>& src,
-                        bool log_scale) {
-      for (size_t i = 0; i < pv.size(); i++) {
-        if (pv[i].estimation_type_m.get() == "constant") {
-          pv[i].final_value_m = pv[i].initial_value_m;
-        } else {
-          double v = src[i];
-          if (log_scale) {
-            v = fims_math::exp(v);
-          }
-          pv[i].final_value_m = v;
-        }
-      }
-    };
-
     SetFinalLengthParameter(
         this->mean_length_young,
         FinalMeanLengthYoungFromWorkingScale(vb->MeanLengthYoungVector()));
@@ -481,15 +488,18 @@ class VonBertalanffySchnuteGrowthInterface
         this->mean_length_old,
         FinalMeanLengthOldFromWorkingScale(vb->MeanLengthYoungVector(),
                                            vb->MeanLengthOldVector()));
-    set_final(this->growth_coefficient, vb->GrowthCoefficientVector(), true);
-    set_final(this->reference_age_for_length_young,
-              vb->ReferenceAgeForLengthYoungVector(), false);
-    set_final(this->reference_age_for_length_old,
-              vb->ReferenceAgeForLengthOldVector(), false);
-    set_final(this->length_weight_a, vb->LengthWeightAVector(), true);
-    set_final(this->length_weight_b, vb->LengthWeightBVector(), true);
-    set_final(this->length_at_age_sd_at_reference_ages,
-              vb->LengthAtAgeSdAtRefAgesVector(), true);
+    SetFinalParameterValues(this->growth_coefficient,
+                            vb->GrowthCoefficientVector(), true);
+    SetFinalParameterValues(this->reference_age_for_length_young,
+                            vb->ReferenceAgeForLengthYoungVector(), false);
+    SetFinalParameterValues(this->reference_age_for_length_old,
+                            vb->ReferenceAgeForLengthOldVector(), false);
+    SetFinalParameterValues(this->length_weight_a,
+                            vb->LengthWeightAVector(), true);
+    SetFinalParameterValues(this->length_weight_b,
+                            vb->LengthWeightBVector(), true);
+    SetFinalParameterValues(this->length_at_age_sd_at_reference_ages,
+                            vb->LengthAtAgeSdAtRefAgesVector(), true);
   }
 
   virtual double evaluate(double age) {
@@ -829,18 +839,9 @@ class VonBertalanffySchnuteGrowthInterface
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
-        growth_observation = std::make_shared<
+    std::shared_ptr<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<Type>> vb =
+        std::make_shared<
             fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<Type>>();
-    std::shared_ptr<fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<Type>>
-        vb = std::dynamic_pointer_cast<
-            fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<Type>>(
-            growth_observation);
-    if (!vb) {
-      Rcpp::stop(
-          "Failed to create VonBertalanffySchnute growth-derived observation "
-          "model");
-    }
 
     vb->id = this->id;
 
@@ -877,16 +878,6 @@ class VonBertalanffySchnuteGrowthInterface
       info->variable_map[pv.id_m] = &target;
     };
 
-    auto load_optional_and_register =
-        [&](VariableVector& pv, fims::Vector<Type>& target,
-            const std::string& base_name, bool log_scale) {
-          if (pv.size() == 0) {
-            target.resize(0);
-            return;
-          }
-          load_and_register(pv, target, base_name, log_scale);
-        };
-
     ConfigureLengthReferenceParameterization<Type>(vb);
 
     load_and_register(this->mean_length_young, vb->MeanLengthYoungVector(),
@@ -905,11 +896,11 @@ class VonBertalanffySchnuteGrowthInterface
                       "length_weight_a", true);
     load_and_register(this->length_weight_b, vb->LengthWeightBVector(),
                       "length_weight_b", true);
-    load_optional_and_register(this->length_at_age_sd_at_reference_ages,
-                               vb->LengthAtAgeSdAtRefAgesVector(),
-                               "length_at_age_sd_at_reference_ages", true);
+    load_and_register(this->length_at_age_sd_at_reference_ages,
+                      vb->LengthAtAgeSdAtRefAgesVector(),
+                      "length_at_age_sd_at_reference_ages", true);
 
-    this->RegisterGrowthObservationInInfo<Type>(growth_observation);
+    this->RegisterGrowthObservationInInfo<Type>(vb);
     return true;
   }
 
@@ -1031,41 +1022,30 @@ class VonBertalanffyTraditionalGrowthInterface
       return;
     }
 
-    auto set_final = [](VariableVector& pv, const fims::Vector<double>& src,
-                        bool log_scale) {
-      for (size_t i = 0; i < pv.size(); i++) {
-        if (pv[i].estimation_type_m.get() == "constant") {
-          pv[i].final_value_m = pv[i].initial_value_m;
-        } else {
-          double v = src[i];
-          if (log_scale) {
-            v = fims_math::exp(v);
-          }
-          pv[i].final_value_m = v;
-        }
-      }
-    };
-
-    set_final(this->asymptotic_length, vb->AsymptoticLengthVector(), true);
-    set_final(this->growth_coefficient, vb->GrowthCoefficientVector(), true);
+    SetFinalParameterValues(this->asymptotic_length,
+                            vb->AsymptoticLengthVector(), true);
+    SetFinalParameterValues(this->growth_coefficient,
+                            vb->GrowthCoefficientVector(), true);
     if (this->age_at_zero_length[0].estimation_type_m.get() == "constant") {
       this->age_at_zero_length[0].final_value_m =
           this->age_at_zero_length[0].initial_value_m;
     } else {
       this->age_at_zero_length[0].final_value_m = vb->GetAgeAtZeroLength();
     }
-    set_final(this->length_weight_a, vb->LengthWeightAVector(), true);
-    set_final(this->length_weight_b, vb->LengthWeightBVector(), true);
+    SetFinalParameterValues(this->length_weight_a,
+                            vb->LengthWeightAVector(), true);
+    SetFinalParameterValues(this->length_weight_b,
+                            vb->LengthWeightBVector(), true);
 
     const bool has_interpolation_variability =
         this->length_at_age_sd_at_reference_ages.size() > 0;
     if (has_interpolation_variability) {
-      set_final(this->reference_age_for_length_young,
-                vb->ReferenceAgeForLengthYoungVector(), false);
-      set_final(this->reference_age_for_length_old,
-                vb->ReferenceAgeForLengthOldVector(), false);
-      set_final(this->length_at_age_sd_at_reference_ages,
-                vb->LengthAtAgeSdAtRefAgesVector(), true);
+      SetFinalParameterValues(this->reference_age_for_length_young,
+                              vb->ReferenceAgeForLengthYoungVector(), false);
+      SetFinalParameterValues(this->reference_age_for_length_old,
+                              vb->ReferenceAgeForLengthOldVector(), false);
+      SetFinalParameterValues(this->length_at_age_sd_at_reference_ages,
+                              vb->LengthAtAgeSdAtRefAgesVector(), true);
     }
 
     const bool has_delta_method_variability =
@@ -1073,12 +1053,13 @@ class VonBertalanffyTraditionalGrowthInterface
         this->log_sd_growth_coefficient.size() > 0 &&
         this->asymptotic_length_growth_coefficient_logit_corr.size() > 0;
     if (has_delta_method_variability) {
-      set_final(this->log_sd_asymptotic_length,
-                vb->LogSdAsymptoticLengthVector(), false);
-      set_final(this->log_sd_growth_coefficient,
-                vb->LogSdGrowthCoefficientVector(), false);
-      set_final(this->asymptotic_length_growth_coefficient_logit_corr,
-                vb->LogitCorrAsymptoticLengthGrowthCoefficientVector(), false);
+      SetFinalParameterValues(this->log_sd_asymptotic_length,
+                              vb->LogSdAsymptoticLengthVector(), false);
+      SetFinalParameterValues(this->log_sd_growth_coefficient,
+                              vb->LogSdGrowthCoefficientVector(), false);
+      SetFinalParameterValues(
+          this->asymptotic_length_growth_coefficient_logit_corr,
+          vb->LogitCorrAsymptoticLengthGrowthCoefficientVector(), false);
     }
   }
 
@@ -1162,18 +1143,8 @@ class VonBertalanffyTraditionalGrowthInterface
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
-    std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
-        growth_observation =
-            std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>();
     std::shared_ptr<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>> vb =
-        std::dynamic_pointer_cast<
-            fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>(
-            growth_observation);
-    if (!vb) {
-      Rcpp::stop(
-          "Failed to create VonBertalanffyTraditional growth-derived "
-          "observation model");
-    }
+        std::make_shared<fims_popdy::VonBertalanffyGrowthModelAdapter<Type>>();
 
     vb->id = this->id;
     vb->UseVonBertalanffyTraditional();
@@ -1318,7 +1289,7 @@ class VonBertalanffyTraditionalGrowthInterface
         vb->LogitCorrAsymptoticLengthGrowthCoefficientVector(),
         "asymptotic_length_growth_coefficient_logit_corr", false);
 
-    this->RegisterGrowthObservationInInfo<Type>(growth_observation);
+    this->RegisterGrowthObservationInInfo<Type>(vb);
     return true;
   }
 
