@@ -36,17 +36,17 @@ base_model <- parameters |>
   fit_fims(optimize = TRUE)
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 3 times to improve gradient.
-#> ℹ Maximum gradient went from 0.00714 to 0.00022 after 3 steps.
+#> ℹ Maximum gradient went from 0.00187 to 0.00028 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 1.05206 minutes
+#> ℹ Total run time was 51.30865 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-#> ℹ Maximum gradient= 0.00022
+#> ℹ Maximum gradient= 0.00028
 #> ℹ Negative log likelihood (NLL):
 #> • Marginal NLL= 3231.28735
 #> • Total NLL= 3164.86339
-#> ℹ Terminal SB= 1728.65653
+#> ℹ Terminal SB= 1728.681
 
 # Clear memory post-run
 clear()
@@ -184,47 +184,47 @@ retro_fit <- run_fims_retrospective(
 #> ℹ running model with 0 years of data removed
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 3 times to improve gradient.
-#> ℹ Maximum gradient went from 0.00714 to 0.00022 after 3 steps.
+#> ℹ Maximum gradient went from 0.00187 to 0.00028 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 1.06057 minutes
+#> ℹ Total run time was 52.66075 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-#> ℹ Maximum gradient= 0.00022
+#> ℹ Maximum gradient= 0.00028
 #> ℹ Negative log likelihood (NLL):
 #> • Marginal NLL= 3231.28735
 #> • Total NLL= 3164.86339
-#> ℹ Terminal SB= 1728.65653
+#> ℹ Terminal SB= 1728.681
 #> ℹ running model with 1 years of data removed
 #> 
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 3 times to improve gradient.
-#> ℹ Maximum gradient went from 0.00821 to 0.00038 after 3 steps.
+#> ℹ Maximum gradient went from 0.00203 to 0.00033 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 1.07975 minutes
+#> ℹ Total run time was 51.17869 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-#> ℹ Maximum gradient= 0.00038
+#> ℹ Maximum gradient= 0.00033
 #> ℹ Negative log likelihood (NLL):
 #> • Marginal NLL= 3132.00827
-#> • Total NLL= 3066.98893
-#> ℹ Terminal SB= 1654.17244
+#> • Total NLL= 3066.98892
+#> ℹ Terminal SB= 1654.16189
 #> ℹ running model with 2 years of data removed
 #> 
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 3 times to improve gradient.
-#> ℹ Maximum gradient went from 0.00206 to 0.00034 after 3 steps.
+#> ℹ Maximum gradient went from 0.0074 to 0.00054 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 1.05231 minutes
+#> ℹ Total run time was 48.45964 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-#> ℹ Maximum gradient= 0.00034
+#> ℹ Maximum gradient= 0.00054
 #> ℹ Negative log likelihood (NLL):
 #> • Marginal NLL= 3036.85438
-#> • Total NLL= 2973.27389
-#> ℹ Terminal SB= 1500.18511
+#> • Total NLL= 2973.27386
+#> ℹ Terminal SB= 1500.13452
 ```
 
 ### Mohn’s Rho

@@ -50,7 +50,7 @@ metric function:
 |----------------|----------------------------------------------------------|
 | Column         | Role                                                     |
 | `.truth`       | Observed data value (maps from `observed`)               |
-| `.pred`        | Model-expected value (maps from `expected`)              |
+| `.pred`        | Model prediction on the data scale (from `estimated`)    |
 | `.weight`      | Inverse-variance weight from `uncertainty` (optional)    |
 | `label`        | Parameter / quantity label, e.g. `"catch_expected"`      |
 | `fleet`        | Fleet name for fleet rows, otherwise `NA`                |
