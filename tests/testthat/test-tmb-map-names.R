@@ -180,7 +180,8 @@ test_that("optimized fixed maps preserve shared uncertainty and fixed entries", 
   mapping[shared[2]] <- mapping[shared[1]]
   input[["map"]] <- list(p = factor(mapping, levels = rev(unique(stats::na.omit(mapping)))))
   fit <- fit_fims(
-    input, number_of_loops = 0,
+    input,
+    number_of_loops = 0,
     control = list(eval.max = 10000, iter.max = 10000, rel.tol = 1e-12)
   )
   metadata <- get_input(fit)[["tmb_mapping"]][["p"]]
@@ -219,7 +220,8 @@ test_that("optimized random maps expand shared values and standard errors", {
   mapping[fishing] <- seq_along(fishing)
   input[["map"]] <- list(p = factor(mapping), re = factor(c(1, NA, 1, 2)))
   fit <- fit_fims(
-    input, number_of_loops = 0,
+    input,
+    number_of_loops = 0,
     control = list(eval.max = 10000, iter.max = 10000, rel.tol = 1e-12)
   )
   metadata <- get_input(fit)[["tmb_mapping"]][["re"]]
@@ -330,7 +332,8 @@ test_that("mapped diagnostic fits retain consistent best parameters", {
   input[["map"]] <- list(p = factor(mapping))
   expect_warning(
     fit <- fit_fims(
-      input, get_sd = FALSE, number_of_loops = 0,
+      input,
+      get_sd = FALSE, number_of_loops = 0,
       control = list(eval.max = 1, iter.max = 1)
     ),
     "Optimization failed convergence checks"
