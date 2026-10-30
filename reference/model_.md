@@ -50,13 +50,13 @@ model_weight_at_age(x, fleet = NA_character_)
 # S4 method for class 'data.frame'
 model_weight_at_age(x, fleet = NA_character_)
 
-model_age_to_length_conversion(x)
+model_age_to_length_conversion(x, fleet = NA)
 
 # S4 method for class 'FIMSFrame'
-model_age_to_length_conversion(x)
+model_age_to_length_conversion(x, fleet = NA)
 
 # S4 method for class 'data.frame'
-model_age_to_length_conversion(x)
+model_age_to_length_conversion(x, fleet = NA)
 ```
 
 ## Arguments
@@ -131,10 +131,17 @@ year will be returned; and, finally population-level information with
 
 ### `model_age_to_length_conversion()`
 
-Returns a numeric vector of age-to-length conversion observations.
-Observations are ordered by age and length in the order defined by
-[`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md).
-When multiple observations are present across a single age and length,
-they are averaged because `age_to_length_conversion` data cannot vary
-across fleets or time. The values for each age are then rescaled to sum
-to 1.
+Returns a numeric vector of age-to-length conversion observations for 1
+`fleet`, or for the shared rows (`fleet = NA`) by default. For each
+year, a fleet uses its own rows for that year, then its own rows with
+`timing = NA`, then the shared rows for that year, then the shared rows
+with `timing = NA`. If every year uses the same rows, 1 table ordered by
+age and length is returned. Otherwise 1 table per year is returned,
+ordered by year, age, and length. The values for each age are rescaled
+to sum to 1 over all conversion lengths. For each fleet, the model adds
+probability for lengths below the first and above the last of the
+fleet's length bins to those bins, with a warning. Length is conditional
+on age, so length probabilities can be added together, but rows for ages
+outside the model ages are dropped by
+[`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)
+with a warning.

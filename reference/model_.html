@@ -125,13 +125,13 @@ indexing.</p>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
 <span><span class="fu">model_weight_at_age</span><span class="op">(</span><span class="va">x</span>, fleet <span class="op">=</span> <span class="cn">NA_character_</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">model_age_to_length_conversion</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="fu">model_age_to_length_conversion</span><span class="op">(</span><span class="va">x</span>, fleet <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'FIMSFrame'</span></span>
-<span><span class="fu">model_age_to_length_conversion</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="fu">model_age_to_length_conversion</span><span class="op">(</span><span class="va">x</span>, fleet <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
-<span><span class="fu">model_age_to_length_conversion</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">model_age_to_length_conversion</span><span class="op">(</span><span class="va">x</span>, fleet <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -220,12 +220,18 @@ returned for all other missing rows.</p>
 <h3 id="model-age-to-length-conversion-"><code>model_age_to_length_conversion()</code><a class="anchor" aria-label="anchor" href="#model-age-to-length-conversion-"></a></h3>
 
 
-<p>Returns a numeric vector of age-to-length conversion observations.
-Observations are ordered by age and length in the order defined by
-<code><a href="FIMSFrame.html">FIMSFrame()</a></code>. When multiple observations are present across a single age
-and length, they are averaged because <code>age_to_length_conversion</code> data cannot
-vary across fleets or time. The values for each age are then rescaled to sum
-to 1.</p>
+<p>Returns a numeric vector of age-to-length conversion observations for 1
+<code>fleet</code>, or for the shared rows (<code>fleet = NA</code>) by default. For each year, a
+fleet uses its own rows for that year, then its own rows with
+<code>timing = NA</code>, then the shared rows for that year, then the shared rows with
+<code>timing = NA</code>. If every year uses the same rows, 1 table ordered by age and
+length is returned. Otherwise 1 table per year is returned, ordered by year,
+age, and length. The values for each age are rescaled to sum to 1 over all
+conversion lengths. For each fleet, the model adds probability for lengths
+below the first and above the last of the fleet's length bins to those bins,
+with a warning. Length is conditional on age, so length probabilities can be
+added together, but rows for ages outside the model ages are dropped by
+<code><a href="FIMSFrame.html">FIMSFrame()</a></code> with a warning.</p>
 </div>
 
     </div>

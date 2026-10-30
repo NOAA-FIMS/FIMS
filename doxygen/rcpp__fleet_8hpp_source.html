@@ -608,66 +608,74 @@ $(function(){initNavTree('rcpp__fleet_8hpp_source.html','',''); });
 <div class="line"><a id="l00620" name="l00620"></a><span class="lineno">  620</span>      fleet-&gt;age_to_length_conversion.resize(</div>
 <div class="line"><a id="l00621" name="l00621"></a><span class="lineno">  621</span>          this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>.size());</div>
 <div class="line"><a id="l00622" name="l00622"></a><span class="lineno">  622</span> </div>
-<div class="line"><a id="l00623" name="l00623"></a><span class="lineno">  623</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> expected_age_to_length_conversion_size =</div>
-<div class="line"><a id="l00624" name="l00624"></a><span class="lineno">  624</span>          <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a9eee035642a547b13da5f925202a57dd">n_ages</a>.get() * this-&gt;<a class="code hl_variable" href="classFleetInterface.html#ac901b65d1568df1aaa3d906ba5150bd3">n_lengths</a>.get());</div>
-<div class="line"><a id="l00625" name="l00625"></a><span class="lineno">  625</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> supplied_age_to_length_conversion_size =</div>
-<div class="line"><a id="l00626" name="l00626"></a><span class="lineno">  626</span>          this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>.size();</div>
-<div class="line"><a id="l00627" name="l00627"></a><span class="lineno">  627</span> </div>
-<div class="line"><a id="l00628" name="l00628"></a><span class="lineno">  628</span>      <span class="keywordflow">if</span> (supplied_age_to_length_conversion_size != 0 &amp;&amp;</div>
-<div class="line"><a id="l00629" name="l00629"></a><span class="lineno">  629</span>          supplied_age_to_length_conversion_size !=</div>
-<div class="line"><a id="l00630" name="l00630"></a><span class="lineno">  630</span>              expected_age_to_length_conversion_size) {</div>
-<div class="line"><a id="l00631" name="l00631"></a><span class="lineno">  631</span>        <a class="code hl_define" href="def_8hpp.html#ae4ff8b8279af8e71e4459d586b695ebd">FIMS_ERROR_LOG</a>(</div>
-<div class="line"><a id="l00632" name="l00632"></a><span class="lineno">  632</span>            <span class="stringliteral">&quot;age_to_length_conversion size mismatch, &quot;</span> +</div>
-<div class="line"><a id="l00633" name="l00633"></a><span class="lineno">  633</span>            fims::to_string(supplied_age_to_length_conversion_size) +</div>
-<div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span>            <span class="stringliteral">&quot; != &quot;</span> + fims::to_string(expected_age_to_length_conversion_size));</div>
-<div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span>        <span class="keywordflow">throw</span> std::invalid_argument(</div>
-<div class="line"><a id="l00636" name="l00636"></a><span class="lineno">  636</span>            <span class="stringliteral">&quot;Fleet age_to_length_conversion size mismatch. Expected &quot;</span> +</div>
-<div class="line"><a id="l00637" name="l00637"></a><span class="lineno">  637</span>            fims::to_string(expected_age_to_length_conversion_size) +</div>
-<div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span>            <span class="stringliteral">&quot; values but received &quot;</span> +</div>
-<div class="line"><a id="l00639" name="l00639"></a><span class="lineno">  639</span>            fims::to_string(supplied_age_to_length_conversion_size) + <span class="stringliteral">&quot;.&quot;</span>);</div>
-<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span>      }</div>
-<div class="line"><a id="l00641" name="l00641"></a><span class="lineno">  641</span> </div>
-<div class="line"><a id="l00642" name="l00642"></a><span class="lineno">  642</span>      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; fleet-&gt;age_to_length_conversion.size(); i++) {</div>
-<div class="line"><a id="l00643" name="l00643"></a><span class="lineno">  643</span>        fleet-&gt;age_to_length_conversion[i] =</div>
-<div class="line"><a id="l00644" name="l00644"></a><span class="lineno">  644</span>            this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>[i].initial_value_m;</div>
-<div class="line"><a id="l00645" name="l00645"></a><span class="lineno">  645</span> </div>
-<div class="line"><a id="l00646" name="l00646"></a><span class="lineno">  646</span>        <span class="keywordflow">if</span> (this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>[i].estimation_type_m.get() ==</div>
-<div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span>            <span class="stringliteral">&quot;fixed_effects&quot;</span>) {</div>
-<div class="line"><a id="l00648" name="l00648"></a><span class="lineno">  648</span>          ss.str(<span class="stringliteral">&quot;&quot;</span>);</div>
-<div class="line"><a id="l00649" name="l00649"></a><span class="lineno">  649</span>          ss &lt;&lt; <span class="stringliteral">&quot;Fleet.&quot;</span> &lt;&lt; this-&gt;<span class="keywordtype">id</span> &lt;&lt; <span class="stringliteral">&quot;.age_to_length_conversion.&quot;</span></div>
-<div class="line"><a id="l00650" name="l00650"></a><span class="lineno">  650</span>             &lt;&lt; this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>[i].id_m;</div>
-<div class="line"><a id="l00651" name="l00651"></a><span class="lineno">  651</span>          info-&gt;RegisterParameterName(ss.str());</div>
-<div class="line"><a id="l00652" name="l00652"></a><span class="lineno">  652</span>          info-&gt;RegisterParameter(fleet-&gt;age_to_length_conversion[i]);</div>
-<div class="line"><a id="l00653" name="l00653"></a><span class="lineno">  653</span>        }</div>
+<div class="line"><a id="l00623" name="l00623"></a><span class="lineno">  623</span>      <span class="comment">// One age x length table for all years, or one table per year.</span></div>
+<div class="line"><a id="l00624" name="l00624"></a><span class="lineno">  624</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> expected_age_to_length_conversion_size =</div>
+<div class="line"><a id="l00625" name="l00625"></a><span class="lineno">  625</span>          <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a9eee035642a547b13da5f925202a57dd">n_ages</a>.get() * this-&gt;<a class="code hl_variable" href="classFleetInterface.html#ac901b65d1568df1aaa3d906ba5150bd3">n_lengths</a>.get());</div>
+<div class="line"><a id="l00626" name="l00626"></a><span class="lineno">  626</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> expected_age_to_length_conversion_size_by_year =</div>
+<div class="line"><a id="l00627" name="l00627"></a><span class="lineno">  627</span>          <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a2491c7cb0730f82cb5d7723ae4e4f386">n_years</a>.get()) *</div>
+<div class="line"><a id="l00628" name="l00628"></a><span class="lineno">  628</span>          expected_age_to_length_conversion_size;</div>
+<div class="line"><a id="l00629" name="l00629"></a><span class="lineno">  629</span>      <span class="keyword">const</span> <span class="keywordtype">size_t</span> supplied_age_to_length_conversion_size =</div>
+<div class="line"><a id="l00630" name="l00630"></a><span class="lineno">  630</span>          this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>.size();</div>
+<div class="line"><a id="l00631" name="l00631"></a><span class="lineno">  631</span> </div>
+<div class="line"><a id="l00632" name="l00632"></a><span class="lineno">  632</span>      <span class="keywordflow">if</span> (supplied_age_to_length_conversion_size != 0 &amp;&amp;</div>
+<div class="line"><a id="l00633" name="l00633"></a><span class="lineno">  633</span>          supplied_age_to_length_conversion_size !=</div>
+<div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span>              expected_age_to_length_conversion_size &amp;&amp;</div>
+<div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span>          supplied_age_to_length_conversion_size !=</div>
+<div class="line"><a id="l00636" name="l00636"></a><span class="lineno">  636</span>              expected_age_to_length_conversion_size_by_year) {</div>
+<div class="line"><a id="l00637" name="l00637"></a><span class="lineno">  637</span>        <a class="code hl_define" href="def_8hpp.html#ae4ff8b8279af8e71e4459d586b695ebd">FIMS_ERROR_LOG</a>(</div>
+<div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span>            <span class="stringliteral">&quot;age_to_length_conversion size mismatch, &quot;</span> +</div>
+<div class="line"><a id="l00639" name="l00639"></a><span class="lineno">  639</span>            fims::to_string(supplied_age_to_length_conversion_size) + <span class="stringliteral">&quot; != &quot;</span> +</div>
+<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span>            fims::to_string(expected_age_to_length_conversion_size) + <span class="stringliteral">&quot; or &quot;</span> +</div>
+<div class="line"><a id="l00641" name="l00641"></a><span class="lineno">  641</span>            fims::to_string(expected_age_to_length_conversion_size_by_year));</div>
+<div class="line"><a id="l00642" name="l00642"></a><span class="lineno">  642</span>        <span class="keywordflow">throw</span> std::invalid_argument(</div>
+<div class="line"><a id="l00643" name="l00643"></a><span class="lineno">  643</span>            <span class="stringliteral">&quot;Fleet age_to_length_conversion size mismatch. Expected &quot;</span> +</div>
+<div class="line"><a id="l00644" name="l00644"></a><span class="lineno">  644</span>            fims::to_string(expected_age_to_length_conversion_size) + <span class="stringliteral">&quot; or &quot;</span> +</div>
+<div class="line"><a id="l00645" name="l00645"></a><span class="lineno">  645</span>            fims::to_string(expected_age_to_length_conversion_size_by_year) +</div>
+<div class="line"><a id="l00646" name="l00646"></a><span class="lineno">  646</span>            <span class="stringliteral">&quot; values but received &quot;</span> +</div>
+<div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span>            fims::to_string(supplied_age_to_length_conversion_size) + <span class="stringliteral">&quot;.&quot;</span>);</div>
+<div class="line"><a id="l00648" name="l00648"></a><span class="lineno">  648</span>      }</div>
+<div class="line"><a id="l00649" name="l00649"></a><span class="lineno">  649</span> </div>
+<div class="line"><a id="l00650" name="l00650"></a><span class="lineno">  650</span>      <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; fleet-&gt;age_to_length_conversion.size(); i++) {</div>
+<div class="line"><a id="l00651" name="l00651"></a><span class="lineno">  651</span>        fleet-&gt;age_to_length_conversion[i] =</div>
+<div class="line"><a id="l00652" name="l00652"></a><span class="lineno">  652</span>            this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>[i].initial_value_m;</div>
+<div class="line"><a id="l00653" name="l00653"></a><span class="lineno">  653</span> </div>
 <div class="line"><a id="l00654" name="l00654"></a><span class="lineno">  654</span>        <span class="keywordflow">if</span> (this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>[i].estimation_type_m.get() ==</div>
-<div class="line"><a id="l00655" name="l00655"></a><span class="lineno">  655</span>            <span class="stringliteral">&quot;random_effects&quot;</span>) {</div>
-<div class="line"><a id="l00656" name="l00656"></a><span class="lineno">  656</span>          <a class="code hl_define" href="def_8hpp.html#ae4ff8b8279af8e71e4459d586b695ebd">FIMS_ERROR_LOG</a>(</div>
-<div class="line"><a id="l00657" name="l00657"></a><span class="lineno">  657</span>              <span class="stringliteral">&quot;age_to_length_conversion cannot be set to random effects&quot;</span>);</div>
-<div class="line"><a id="l00658" name="l00658"></a><span class="lineno">  658</span>        }</div>
-<div class="line"><a id="l00659" name="l00659"></a><span class="lineno">  659</span>      }</div>
-<div class="line"><a id="l00660" name="l00660"></a><span class="lineno">  660</span> </div>
-<div class="line"><a id="l00661" name="l00661"></a><span class="lineno">  661</span>      info-&gt;variable_map[this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>.id_m] =</div>
-<div class="line"><a id="l00662" name="l00662"></a><span class="lineno">  662</span>          &amp;(fleet)-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>;</div>
-<div class="line"><a id="l00663" name="l00663"></a><span class="lineno">  663</span>    }</div>
-<div class="line"><a id="l00664" name="l00664"></a><span class="lineno">  664</span> </div>
-<div class="line"><a id="l00665" name="l00665"></a><span class="lineno">  665</span>    <span class="comment">// add to Information</span></div>
-<div class="line"><a id="l00666" name="l00666"></a><span class="lineno">  666</span>    info-&gt;fleets[fleet-&gt;id] = fleet;</div>
-<div class="line"><a id="l00667" name="l00667"></a><span class="lineno">  667</span> </div>
-<div class="line"><a id="l00668" name="l00668"></a><span class="lineno">  668</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00669" name="l00669"></a><span class="lineno">  669</span>  }</div>
-<div class="line"><a id="l00670" name="l00670"></a><span class="lineno">  670</span></div>
-<div class="line"><a id="l00675" name="l00675"></a><span class="lineno">  675</span>  <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classFIMSRcppInterfaceBase.html#a9183d9379777d8be70ab66af1a07f94c">add_to_fims_tmb</a>() {</div>
-<div class="line"><a id="l00676" name="l00676"></a><span class="lineno">  676</span>    this-&gt;add_to_fims_tmb_internal&lt;TMB_FIMS_REAL_TYPE&gt;();</div>
-<div class="line"><a id="l00677" name="l00677"></a><span class="lineno">  677</span>    this-&gt;add_to_fims_tmb_internal&lt;TMBAD_FIMS_TYPE&gt;();</div>
-<div class="line"><a id="l00678" name="l00678"></a><span class="lineno">  678</span> </div>
-<div class="line"><a id="l00679" name="l00679"></a><span class="lineno">  679</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00680" name="l00680"></a><span class="lineno">  680</span>  }</div>
-<div class="line"><a id="l00681" name="l00681"></a><span class="lineno">  681</span> </div>
-<div class="line"><a id="l00682" name="l00682"></a><span class="lineno">  682</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00683" name="l00683"></a><span class="lineno">  683</span>};</div>
+<div class="line"><a id="l00655" name="l00655"></a><span class="lineno">  655</span>            <span class="stringliteral">&quot;fixed_effects&quot;</span>) {</div>
+<div class="line"><a id="l00656" name="l00656"></a><span class="lineno">  656</span>          ss.str(<span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><a id="l00657" name="l00657"></a><span class="lineno">  657</span>          ss &lt;&lt; <span class="stringliteral">&quot;Fleet.&quot;</span> &lt;&lt; this-&gt;<span class="keywordtype">id</span> &lt;&lt; <span class="stringliteral">&quot;.age_to_length_conversion.&quot;</span></div>
+<div class="line"><a id="l00658" name="l00658"></a><span class="lineno">  658</span>             &lt;&lt; this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>[i].id_m;</div>
+<div class="line"><a id="l00659" name="l00659"></a><span class="lineno">  659</span>          info-&gt;RegisterParameterName(ss.str());</div>
+<div class="line"><a id="l00660" name="l00660"></a><span class="lineno">  660</span>          info-&gt;RegisterParameter(fleet-&gt;age_to_length_conversion[i]);</div>
+<div class="line"><a id="l00661" name="l00661"></a><span class="lineno">  661</span>        }</div>
+<div class="line"><a id="l00662" name="l00662"></a><span class="lineno">  662</span>        <span class="keywordflow">if</span> (this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>[i].estimation_type_m.get() ==</div>
+<div class="line"><a id="l00663" name="l00663"></a><span class="lineno">  663</span>            <span class="stringliteral">&quot;random_effects&quot;</span>) {</div>
+<div class="line"><a id="l00664" name="l00664"></a><span class="lineno">  664</span>          <a class="code hl_define" href="def_8hpp.html#ae4ff8b8279af8e71e4459d586b695ebd">FIMS_ERROR_LOG</a>(</div>
+<div class="line"><a id="l00665" name="l00665"></a><span class="lineno">  665</span>              <span class="stringliteral">&quot;age_to_length_conversion cannot be set to random effects&quot;</span>);</div>
+<div class="line"><a id="l00666" name="l00666"></a><span class="lineno">  666</span>        }</div>
+<div class="line"><a id="l00667" name="l00667"></a><span class="lineno">  667</span>      }</div>
+<div class="line"><a id="l00668" name="l00668"></a><span class="lineno">  668</span> </div>
+<div class="line"><a id="l00669" name="l00669"></a><span class="lineno">  669</span>      info-&gt;variable_map[this-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>.id_m] =</div>
+<div class="line"><a id="l00670" name="l00670"></a><span class="lineno">  670</span>          &amp;(fleet)-&gt;<a class="code hl_variable" href="classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c">age_to_length_conversion</a>;</div>
+<div class="line"><a id="l00671" name="l00671"></a><span class="lineno">  671</span>    }</div>
+<div class="line"><a id="l00672" name="l00672"></a><span class="lineno">  672</span> </div>
+<div class="line"><a id="l00673" name="l00673"></a><span class="lineno">  673</span>    <span class="comment">// add to Information</span></div>
+<div class="line"><a id="l00674" name="l00674"></a><span class="lineno">  674</span>    info-&gt;fleets[fleet-&gt;id] = fleet;</div>
+<div class="line"><a id="l00675" name="l00675"></a><span class="lineno">  675</span> </div>
+<div class="line"><a id="l00676" name="l00676"></a><span class="lineno">  676</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00677" name="l00677"></a><span class="lineno">  677</span>  }</div>
+<div class="line"><a id="l00678" name="l00678"></a><span class="lineno">  678</span></div>
+<div class="line"><a id="l00683" name="l00683"></a><span class="lineno">  683</span>  <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classFIMSRcppInterfaceBase.html#a9183d9379777d8be70ab66af1a07f94c">add_to_fims_tmb</a>() {</div>
+<div class="line"><a id="l00684" name="l00684"></a><span class="lineno">  684</span>    this-&gt;add_to_fims_tmb_internal&lt;TMB_FIMS_REAL_TYPE&gt;();</div>
+<div class="line"><a id="l00685" name="l00685"></a><span class="lineno">  685</span>    this-&gt;add_to_fims_tmb_internal&lt;TMBAD_FIMS_TYPE&gt;();</div>
+<div class="line"><a id="l00686" name="l00686"></a><span class="lineno">  686</span> </div>
+<div class="line"><a id="l00687" name="l00687"></a><span class="lineno">  687</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00688" name="l00688"></a><span class="lineno">  688</span>  }</div>
+<div class="line"><a id="l00689" name="l00689"></a><span class="lineno">  689</span> </div>
+<div class="line"><a id="l00690" name="l00690"></a><span class="lineno">  690</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00691" name="l00691"></a><span class="lineno">  691</span>};</div>
 </div>
-<div class="line"><a id="l00684" name="l00684"></a><span class="lineno">  684</span> </div>
-<div class="line"><a id="l00685" name="l00685"></a><span class="lineno">  685</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00692" name="l00692"></a><span class="lineno">  692</span> </div>
+<div class="line"><a id="l00693" name="l00693"></a><span class="lineno">  693</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclassFIMSRcppInterfaceBase_html"><div class="ttname"><a href="classFIMSRcppInterfaceBase.html">FIMSRcppInterfaceBase</a></div><div class="ttdoc">Base class for all interface objects.</div><div class="ttdef"><b>Definition</b> rcpp_interface_base.hpp:655</div></div>
 <div class="ttc" id="aclassFIMSRcppInterfaceBase_html_a44e4e3b1dd18103bf79ccb30a76f5933"><div class="ttname"><a href="classFIMSRcppInterfaceBase.html#a44e4e3b1dd18103bf79ccb30a76f5933">FIMSRcppInterfaceBase::finalized</a></div><div class="ttdeci">bool finalized</div><div class="ttdoc">Is the object already finalized? The default is false.</div><div class="ttdef"><b>Definition</b> rcpp_interface_base.hpp:660</div></div>
 <div class="ttc" id="aclassFIMSRcppInterfaceBase_html_a66ae9ad9c0adae77184eefa59e283c5e"><div class="ttname"><a href="classFIMSRcppInterfaceBase.html#a66ae9ad9c0adae77184eefa59e283c5e">FIMSRcppInterfaceBase::fims_interface_objects</a></div><div class="ttdeci">static std::vector&lt; std::shared_ptr&lt; FIMSRcppInterfaceBase &gt; &gt; fims_interface_objects</div><div class="ttdoc">FIMS interface object vectors.</div><div class="ttdef"><b>Definition</b> rcpp_interface_base.hpp:665</div></div>

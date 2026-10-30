@@ -512,19 +512,28 @@ rows with <code>timing = NA</code>.</p>
 <h2 id="age-to-length-conversion-type-age_to_length_conversion">Age-to-length conversion
 (<code>type == "age_to_length_conversion"</code>)<a class="anchor" aria-label="anchor" href="#age-to-length-conversion-type-age_to_length_conversion"></a>
 </h2>
-<p>The age-to-length conversion data type contains the distribution of
-lengths for each age. The <code>age</code> and <code>length</code>
-columns contain all the combinations of age and length bins, and the
-<code>observed</code> column contains the proportion of fish at each age
-that are in each length bin. FIMS rescales the values for each age to
-sum to 1, so they can be entered as proportions or counts, and warns
-when it does. The <code>unit</code> column is not used for this type,
-and “proportion” is the convention even for counts. A single set of the
-age-to-length conversion data is required, rather than separate copies
-for each fleet (name) or time step. The age-to-length conversion data
-are not currently included in the likelihood but are used to convert
-numbers at age to numbers at length for the population dynamics
-calculations when length compositions are included in the model.</p>
+<p>The age-to-length conversion data describe how individuals at each
+age are distributed across length bins. In this table, the
+<code>age</code> and <code>length</code> columns define every age-length
+bin combination, and the <code>observed</code> column gives the
+proportion (<code>unit = "proportion"</code>) or count
+(<code>unit = "number"</code>) of individuals at that age in each length
+bin. For each age, FIMS rescales the observed values so they sum to 1,
+and it warns when proportion inputs do not already sum to 1.</p>
+<p>These data can be shared across fleets and years, or specified
+individually. Rows with <code>fleet = NA</code> are treated as shared
+across fleets that do not have fleet-specific information, while rows
+with <code>timing = NA</code> are treated as defaults across years that
+do not have their own timing. For a given fleet and year, FIMS uses rows
+in this order: (1) that fleet and year, (2) that fleet with
+<code>timing = NA</code>, (3) shared rows with <code>fleet = NA</code>
+for that year, and (4) shared rows with both <code>fleet = NA</code> and
+<code>timing = NA</code>. Each fleet-timing-age-length combination must
+appear at most once.</p>
+<p>Age-to-length conversion data are not part of the likelihood.
+Instead, they are used in the population dynamics calculations to
+convert numbers at age to numbers at length when length-composition data
+are included and growth is not estimated internally.</p>
 <p>Note: purely age-based models which have no length-composition data
 can omit the age-to-length conversion data as well.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
