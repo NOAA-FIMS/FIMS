@@ -14,7 +14,7 @@ setup_default_Growth(
 \item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
 your long input data. Required when \code{module_type = "VonBertalanffySchnute"}
 or when \code{module_type = "VonBertalanffyTraditional"} and
-\code{variability_type = "interpolation"}.}
+\code{variability_type = "linear_interpolation"}.}
 
 \item{module_type}{A character string specifying the type of growth module.
 The default is \code{"EWAA"}.}
@@ -22,8 +22,10 @@ The default is \code{"EWAA"}.}
 \item{variability_type}{A character string specifying the variability
 parameterization for growth-derived length-at-age products. Traditional
 Von Bertalanffy growth defaults to \code{"delta_method"} and also supports
-\code{"interpolation"}. Schnute growth supports \code{"interpolation"} only. This
-argument is ignored for \code{"EWAA"}.}
+\code{"linear_interpolation"}. Schnute growth supports
+\code{"linear_interpolation"} only. Linear interpolation specifies length SD
+at two reference ages and interpolates SD in mean-length space, not age
+space. This argument is ignored for \code{"EWAA"}.}
 }
 \value{
 A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
@@ -41,7 +43,7 @@ Delta-method variability requires \code{t0} to have estimation type
 \code{"constant"} and describes between-fish variability in \code{log(Linf)}
 and \code{log(K)}, including their covariance.
 
-With interpolation variability, \code{t0} may be constant or estimated.
+With linear interpolation variability, \code{t0} may be constant or estimated.
 Both interpolation reference ages must be constant. Estimated \code{t0}
 is stored internally as \code{log(age_limit - t0)}, where \code{age_limit} is
 the smaller of the population minimum age and the younger interpolation
