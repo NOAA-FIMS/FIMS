@@ -40,47 +40,91 @@ TEST(VonBertalanffyTraditionalEvaluate, BasicSanity) {
 }
 
 TEST(VonBertalanffyTraditionalEvaluate,
-     WorkingScaleLogLengthGradientMatchesAnalyticalResult) {
-  auto vb = MakeValidTraditionalVonB();
+     LogLengthGradientsMatchFiniteDifferences) {
+  // Small lengths exercise the smoothing; ordinary lengths check its limit.
+  for (const double asymptotic_length : {100.0, 0.001}) {
+    SCOPED_TRACE(asymptotic_length);
+    auto vb = MakeValidTraditionalVonB();
+    vb.asymptotic_length = asymptotic_length;
 
-  const double age = 5.0;
-  const double age_delta = age - vb.age_at_zero_length;
-  const double survival_like =
-      std::exp(-vb.growth_coefficient * age_delta);
-  const double one_minus_survival_like = 1.0 - survival_like;
+    const double age = 5.0;
+    const double relative_step = 1e-5;
+    const double linf_step = asymptotic_length * relative_step;
+    const double k_step = vb.growth_coefficient * relative_step;
+    const double t0_step = 1e-5;
 
-  double d_log_laa_d_log_asymptotic_length = 0.0;
-  double d_log_laa_d_log_growth_coefficient = 0.0;
-  double d_log_laa_d_age_at_zero_length = 0.0;
+    double natural_linf = 0.0;
+    double natural_k = 0.0;
+    double natural_t0 = 0.0;
+    vb.log_length_at_age_gradient(
+        age, natural_linf, natural_k, natural_t0);
 
-  vb.log_length_at_age_working_scale_gradient(
-      age, d_log_laa_d_log_asymptotic_length,
-      d_log_laa_d_log_growth_coefficient,
-      d_log_laa_d_age_at_zero_length);
+    auto plus = vb;
+    auto minus = vb;
+    plus.asymptotic_length += linf_step;
+    minus.asymptotic_length -= linf_step;
+    const double numerical_linf =
+        (plus.log_length_at_age(age) - minus.log_length_at_age(age)) /
+        (2.0 * linf_step);
 
-  const double length = vb.asymptotic_length * one_minus_survival_like;
-  const double length_safe = fims_math::ad_max(length, 1e-8);
+    plus = vb;
+    minus = vb;
+    plus.growth_coefficient += k_step;
+    minus.growth_coefficient -= k_step;
+    const double numerical_k =
+        (plus.log_length_at_age(age) - minus.log_length_at_age(age)) /
+        (2.0 * k_step);
 
-  EXPECT_NEAR(d_log_laa_d_log_asymptotic_length,
-              vb.asymptotic_length * one_minus_survival_like / length_safe,
-              1e-12);
-  EXPECT_NEAR(d_log_laa_d_log_growth_coefficient,
-              vb.asymptotic_length * vb.growth_coefficient * age_delta *
-                  survival_like / length_safe,
-              1e-12);
-  EXPECT_NEAR(d_log_laa_d_age_at_zero_length,
-              -vb.asymptotic_length * vb.growth_coefficient * survival_like /
-                  length_safe,
-              1e-12);
+    plus = vb;
+    minus = vb;
+    plus.age_at_zero_length += t0_step;
+    minus.age_at_zero_length -= t0_step;
+    const double numerical_t0 =
+        (plus.log_length_at_age(age) - minus.log_length_at_age(age)) /
+        (2.0 * t0_step);
+
+    EXPECT_NEAR(natural_linf, numerical_linf,
+                1e-6 * (1.0 + std::abs(numerical_linf)));
+    EXPECT_NEAR(natural_k, numerical_k,
+                1e-6 * (1.0 + std::abs(numerical_k)));
+    EXPECT_NEAR(natural_t0, numerical_t0,
+                1e-6 * (1.0 + std::abs(numerical_t0)));
+
+    double working_linf = 0.0;
+    double working_k = 0.0;
+    double working_t0 = 0.0;
+    vb.log_length_at_age_working_scale_gradient(
+        age, working_linf, working_k, working_t0);
+
+    EXPECT_NEAR(working_linf,
+                numerical_linf * vb.asymptotic_length, 1e-6);
+    EXPECT_NEAR(working_k,
+                numerical_k * vb.growth_coefficient, 1e-6);
+    EXPECT_NEAR(working_t0, numerical_t0, 1e-6);
+  }
 }
 
 TEST(VonBertalanffyTraditionalEvaluate, RejectsAgeBelowT0) {
   auto vb = MakeValidTraditionalVonB();
   vb.age_at_zero_length = 1.0;
 
-  EXPECT_ANY_THROW(vb.length_at_age(0.0));
-  EXPECT_ANY_THROW(vb.weight_at_age(0.0));
-  EXPECT_ANY_THROW(vb.evaluate(0, 0.0));
+  EXPECT_THROW(vb.length_at_age(0.0), std::runtime_error);
+  EXPECT_THROW(vb.weight_at_age(0.0), std::runtime_error);
+  EXPECT_THROW(vb.evaluate(0, 0.0), std::runtime_error);
+  EXPECT_THROW(vb.log_length_at_age(0.0), std::runtime_error);
+
+  double derivative_linf = 0.0;
+  double derivative_k = 0.0;
+  double derivative_t0 = 0.0;
+
+  EXPECT_THROW(
+      vb.log_length_at_age_gradient(
+          0.0, derivative_linf, derivative_k, derivative_t0),
+      std::runtime_error);
+  EXPECT_THROW(
+      vb.log_length_at_age_working_scale_gradient(
+          0.0, derivative_linf, derivative_k, derivative_t0),
+      std::runtime_error);
 }
 
 TEST(VonBertalanffyTraditionalEvaluate, AllowsPositiveT0AtAndAboveBoundary) {
