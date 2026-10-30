@@ -337,6 +337,46 @@ TEST(GrowthModel, TraditionalDeltaMethodIncludesT0Covariances) {
   EXPECT_NEAR(p.SdLAA(0, 2, 0), expected_sd, 1e-7);
 }
 
+TEST(GrowthModel, SwitchingToSchnuteRestoresInterpolation) {
+  fims_popdy::GrowthModel<double> gm(1, 5, 1);
+  gm.SetLengthWeightParameters(1.0e-5, 3.0);
+  gm.SetLengthSdParams(10.0, 20.0);
+  gm.SetAgeOffset(1.0);
+
+  gm.SetVonBertalanffyTraditionalParameters(100.0, 0.2, -0.5);
+  gm.SetTraditionalGrowthParameterCovariance(
+      0.01, 0.0, 0.0, 0.01, 0.0, 0.0);
+  ASSERT_NO_THROW(gm.Prepare());
+
+  gm.SetVonBertalanffySchnuteParameters(
+      30.0, 80.0, 0.2, 1.0, 5.0);
+  ASSERT_NO_THROW(gm.Prepare());
+
+  const auto& products = gm.GetProducts();
+  EXPECT_NEAR(products.MeanLAA(0, 0, 0), 30.0, 1e-12);
+  EXPECT_NEAR(products.SdLAA(0, 0, 0), 10.0, 1e-6);
+  EXPECT_NEAR(products.SdLAA(0, 4, 0), 20.0, 1e-6);
+}
+
+TEST(GrowthModel, SchnuteRejectsTraditionalDeltaCovariance) {
+  fims_popdy::GrowthModel<double> gm(1, 5, 1);
+  gm.SetVonBertalanffySchnuteParameters(
+      30.0, 80.0, 0.2, 1.0, 5.0);
+  gm.SetLengthWeightParameters(1.0e-5, 3.0);
+  gm.SetLengthSdParams(10.0, 20.0);
+  gm.SetAgeOffset(1.0);
+
+  gm.SetTraditionalGrowthParameterCovariance(
+      0.01, 0.0, 0.0, 0.01, 0.0, 0.0);
+  EXPECT_THROW(gm.Prepare(), std::runtime_error);
+
+  // Selecting Schnute again explicitly restores interpolation.
+  gm.SetVonBertalanffySchnuteParameters(
+      30.0, 80.0, 0.2, 1.0, 5.0);
+  ASSERT_NO_THROW(gm.Prepare());
+  EXPECT_NEAR(gm.GetProducts().SdLAA(0, 0, 0), 10.0, 1e-6);
+}
+
 TEST(GrowthModel, ZeroAgesThrows) {
   fims_popdy::GrowthModel<double> gm(1, 0, 1);
   gm.SetVonBertalanffySchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);

@@ -50,7 +50,8 @@ class GrowthModel : public GrowthModelBase<Type> {
         n_sexes_(n_sexes),
         products_(n_years, n_ages, n_sexes) {}
 
-  /// Set natural-scale VonBertalanffySchnute mean-growth parameters.
+  /// Select Schnute mean growth and interpolation variability, preserving
+  /// interpolation SD values and clearing any Traditional covariance.
   void SetVonBertalanffySchnuteParameters(Type mean_length_young,
                                           Type mean_length_old,
                                           Type growth_coefficient,
@@ -64,7 +65,7 @@ class GrowthModel : public GrowthModelBase<Type> {
     vb_.reference_age_for_length_old = reference_age_for_length_old;
     length_sd_reference_age_young_ = reference_age_for_length_young;
     length_sd_reference_age_old_ = reference_age_for_length_old;
-    needs_update_ = true;
+    ClearGrowthParameterCovariance();
   }
 
   /// Set natural-scale traditional Von Bertalanffy mean-growth parameters.
@@ -205,8 +206,16 @@ class GrowthModel : public GrowthModelBase<Type> {
   const GrowthProducts<Type>& GetProducts() const override { return products_; }
 
  private:
-  /// Validate constraints that belong to the selected mean-growth curve.
+  /// Validate the selected mean curve and its variability method.
   void ValidateMeanGrowthParameterization() const {
+    if (use_delta_method_variability_ &&
+        growth_parameterization_ != GrowthParameterization::kTraditional) {
+      throw std::runtime_error(
+          "GrowthModel delta-method covariance requires Traditional "
+          "Von Bertalanffy growth. Schnute supports interpolation "
+          "variability only.");
+    }
+
     if (growth_parameterization_ == GrowthParameterization::kSchnute &&
         vb_.reference_age_for_length_old <=
             vb_.reference_age_for_length_young) {
