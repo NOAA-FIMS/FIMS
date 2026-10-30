@@ -300,6 +300,39 @@ TEST(VonBertalanffyGrowthModelAdapter,
 }
 
 TEST(VonBertalanffyGrowthModelAdapter,
+     TraditionalTransformedT0RejectsChangedLimit) {
+  fims_popdy::VonBertalanffyGrowthModelAdapter<double> adapter;
+  ConfigureTraditionalAdapter(adapter, 100.0, 0.2, -0.5,
+                              1.0, 5.0, 1.0e-5, 3.0, 10.0, 20.0);
+
+  adapter.AgeAtZeroLengthVector()[0] = std::log(1.5);
+  adapter.UseLogDistanceAgeAtZeroLength(1.0);
+  adapter.SetAgeOffset(2.0);
+  adapter.Initialize(1, 5, 1);
+
+  EXPECT_NO_THROW(adapter.UseLogDistanceAgeAtZeroLength(1.0));
+  EXPECT_NEAR(adapter.GetAgeAtZeroLength(), -0.5, 1e-12);
+
+  // Both proposed limits satisfy the population-age check, but would
+  // reinterpret the existing log-distance parameter.
+  for (const double proposed_limit : {0.0, 1.5}) {
+    SCOPED_TRACE(proposed_limit);
+
+    EXPECT_THROW(adapter.UseLogDistanceAgeAtZeroLength(proposed_limit),
+                 std::runtime_error);
+    EXPECT_NEAR(adapter.GetAgeAtZeroLength(), -0.5, 1e-12);
+
+    adapter.PrepareGrowthProducts();
+    const auto* products = adapter.TryGetPreparedGrowthProducts();
+    ASSERT_NE(products, nullptr);
+
+    const double expected_length =
+        100.0 * (1.0 - std::exp(-0.2 * (2.0 - (-0.5))));
+    EXPECT_NEAR(products->MeanLAA(0, 0, 0), expected_length, 1e-12);
+  }
+}
+
+TEST(VonBertalanffyGrowthModelAdapter,
      TraditionalTransformedT0RejectsNonFiniteAges) {
   const double invalid_ages[] = {
       std::numeric_limits<double>::quiet_NaN(),
