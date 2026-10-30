@@ -918,6 +918,53 @@ test_that("rcpp von Bertalanffy Traditional growth rejects non-finite t0", {
   }
 })
 
+test_that("rcpp Traditional growth rejects non-finite positive inputs", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(ctx)
+
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  fields <- c(
+    "asymptotic_length",
+    "growth_coefficient",
+    "length_weight_a",
+    "length_weight_b",
+    "length_at_age_sd_at_reference_ages"
+  )
+
+  #' @description Test that positive Traditional growth inputs must also
+  #' be finite during direct evaluation and registration.
+  for (field in fields) {
+    for (i in seq_along(ctx[[field]])) {
+      original_value <- vb[[field]][i]$value
+
+      for (invalid_value in c(NA_real_, NaN, Inf, -Inf)) {
+        vb[[field]][i]$value <- invalid_value
+
+        expected_message <- paste0(field, " must be finite")
+
+        expect_error(
+          vb$evaluate(5),
+          regexp = expected_message
+        )
+        expect_error(
+          vb$add_to_fims_tmb(),
+          regexp = expected_message
+        )
+      }
+
+      vb[[field]][i]$value <- original_value
+    }
+  }
+})
+
 test_that("rcpp von Bertalanffy Traditional delta variability requires constant t0", {
   ctx <- make_vonb_traditional_test_context()
   vb <- new_vonb_traditional(

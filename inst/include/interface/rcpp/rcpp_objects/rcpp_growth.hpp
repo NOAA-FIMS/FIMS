@@ -1441,6 +1441,9 @@ class VonBertalanffyTraditionalGrowthInterface
 
     auto check_positive = [](VariableVector& pv, const std::string& base_name) {
       for (size_t i = 0; i < pv.size(); i++) {
+        if (!std::isfinite(pv[i].initial_value_m)) {
+          Rcpp::stop((base_name + " must be finite").c_str());
+        }
         if (pv[i].initial_value_m <= 0.0) {
           Rcpp::stop((base_name + " must be > 0").c_str());
         }
