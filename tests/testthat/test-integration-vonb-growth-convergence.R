@@ -202,12 +202,22 @@ make_vonb_model_comparison_context <- function() {
   data("data_big", package = "FIMS")
   fims_frame <- FIMS::FIMSFrame(data_big)
 
-  # Keep the older fixture for non-recruitment, non-growth, non-population
-  # structural parameters only. Drop old Data rows because current main uses
-  # parsed uncertainty strings rather than Data rows in the parameter table.
-  base_parameters <- readRDS(
-    testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
-  ) |>
+  # Keep the Model Comparison parameters for non-recruitment, non-growth,
+  # non-population structural parameters only. Drop old Data rows because
+  # current main uses parsed uncertainty strings rather than Data rows in the
+  # parameter table. parameters_big divides the estimated values by
+  # initial_value_scale, so multiply to start at the OM values.
+  initial_value_scale <- readRDS(
+    testthat::test_path("fixtures", "initial_value_scale.RDS")
+  )
+  base_parameters <- FIMS::parameters_big |>
+    dplyr::mutate(
+      value = dplyr::if_else(
+        estimation_type != "constant",
+        value * initial_value_scale,
+        value
+      )
+    ) |>
     dplyr::filter(
       !module_name %in% c("Data", "Growth", "Recruitment", "Population")
     )
@@ -383,6 +393,21 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     population_mean_waa[positive_catch_cells],
     tolerance = 1e-8
   )
+
+  #' @description Test that biological mean WAA is weight averaged over the length-at-age distribution, a (mu^3 + 3 mu sd^2) for b = 3, not weight at the mean length.
+  length_weight_a <- growth_estimates |>
+    dplyr::filter(.data[["label"]] == "length_weight_a") |>
+    dplyr::pull(.data[["estimated"]])
+  length_weight_b <- growth_estimates |>
+    dplyr::filter(.data[["label"]] == "length_weight_b") |>
+    dplyr::pull(.data[["estimated"]])
+  expect_equal(length_weight_b, 3)
+  mean_laa <- report[["growth_mean_LAA"]][[1]]
+  sd_laa <- report[["growth_sd_LAA"]][[1]]
+  expected_mean_waa <- length_weight_a *
+    (mean_laa^3 + 3 * mean_laa * sd_laa^2)
+  expect_lt(max(abs(population_mean_waa / expected_mean_waa - 1)), 1e-3)
+  expect_true(all(population_mean_waa > length_weight_a * mean_laa^3))
 
   realized_age_to_length_conversion <- report[["age_to_length_conversion_derived"]][[1]]
   n_years <- FIMS::get_n_years(ctx$data)

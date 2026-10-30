@@ -187,6 +187,145 @@ test_that("`model_weight_at_age()` works with projection years", {
   )
 })
 
+test_that("`model_weight_at_age()` uses timing = NA rows as the default and timing rows as overrides", {
+  n_ages <- get_n_ages(fims_frame)
+  n_weight_years <- get_n_years(fims_frame) + 1
+  default_weight_rows <- dplyr::filter(
+    data_big,
+    type == "weight_at_age",
+    timing == 1
+  ) |>
+    dplyr::mutate(timing = NA_integer_)
+  data_with_default <- dplyr::bind_rows(
+    dplyr::filter(data_big, type != "weight_at_age"),
+    default_weight_rows
+  )
+  #' @description Test that `model_weight_at_age()` copies `timing = NA` rows to every year, including the year after the last model year.
+  expect_equal(
+    model_weight_at_age(data_with_default),
+    rep(default_weight_rows[["observed"]], n_weight_years)
+  )
+  #' @description Test that `FIMSFrame()` does not add -999 rows for years covered by `timing = NA` weight-at-age rows.
+  expect_false(any(
+    get_data(FIMSFrame(data_with_default)) |>
+      dplyr::filter(type == "weight_at_age") |>
+      dplyr::pull(observed) == -999
+  ))
+
+  year_5_weight_rows <- dplyr::mutate(
+    default_weight_rows,
+    timing = 5L,
+    observed = observed * 2
+  )
+  weight_with_override <- model_weight_at_age(
+    dplyr::bind_rows(data_with_default, year_5_weight_rows)
+  )
+  year_5_index <- (5 - get_start_year(fims_frame)) * n_ages + seq_len(n_ages)
+  #' @description Test that `model_weight_at_age()` replaces the default with the rows for that timing in that year only.
+  expect_equal(
+    weight_with_override[year_5_index],
+    year_5_weight_rows[["observed"]]
+  )
+  expect_equal(
+    weight_with_override[-year_5_index],
+    rep(default_weight_rows[["observed"]], n_weight_years - 1)
+  )
+})
+
+test_that("`model_weight_at_age()` returns a fleet's own weight at age with the population as the fallback", {
+  n_ages <- get_n_ages(fims_frame)
+  n_years <- get_n_years(fims_frame)
+  population_weight <- model_weight_at_age(fims_frame)
+  first_year_weight <- dplyr::filter(
+    data_big,
+    type == "weight_at_age",
+    timing == 1
+  )
+  fleet_default_rows <- dplyr::mutate(
+    first_year_weight,
+    fleet = "fleet1",
+    timing = NA_integer_,
+    observed = observed * 2
+  )
+  fleet_year_5_rows <- dplyr::mutate(
+    fleet_default_rows,
+    timing = 5L,
+    observed = observed / 2 * 3
+  )
+  fleet_frame <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    fleet_default_rows,
+    fleet_year_5_rows
+  ))
+  fleet_weight <- model_weight_at_age(fleet_frame, fleet = "fleet1")
+  year_5_index <- (5 - get_start_year(fims_frame)) * n_ages + seq_len(n_ages)
+  #' @description Test that `model_weight_at_age()` returns 1 value per model year and age for a fleet.
+  expect_length(fleet_weight, n_years * n_ages)
+  #' @description Test that a fleet's rows for a year replace its own `timing = NA` rows in that year.
+  expect_equal(fleet_weight[year_5_index], fleet_year_5_rows[["observed"]])
+  expect_equal(
+    fleet_weight[-year_5_index],
+    rep(fleet_default_rows[["observed"]], n_years - 1)
+  )
+  #' @description Test that a fleet without its own rows gets the population weight at age for the model years.
+  expect_equal(
+    model_weight_at_age(fleet_frame, fleet = "survey1"),
+    population_weight[seq_len(n_years * n_ages)]
+  )
+  #' @description Test that fleet rows do not change the population weight at age.
+  expect_equal(model_weight_at_age(fleet_frame), population_weight)
+
+  fleet_year_only_frame <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    fleet_year_5_rows
+  ))
+  #' @description Test that a fleet with rows for 1 year uses the population weight at age in the other years.
+  expect_equal(
+    model_weight_at_age(fleet_year_only_frame, fleet = "fleet1")[-year_5_index],
+    population_weight[seq_len(n_years * n_ages)][-year_5_index]
+  )
+
+  population_default_rows <- dplyr::mutate(
+    first_year_weight,
+    fleet = NA_character_,
+    timing = NA_integer_
+  )
+  population_default_frame <- FIMSFrame(dplyr::bind_rows(
+    dplyr::filter(data_big, type != "weight_at_age"),
+    population_default_rows,
+    fleet_year_5_rows
+  ))
+  population_default_fleet_weight <- model_weight_at_age(
+    population_default_frame,
+    fleet = "fleet1"
+  )
+  #' @description Test that a fleet without its own rows uses the population default when no population year-specific rows exist.
+  expect_equal(
+    population_default_fleet_weight[-year_5_index],
+    rep(population_default_rows[["observed"]], n_years - 1)
+  )
+  expect_equal(
+    population_default_fleet_weight[year_5_index],
+    fleet_year_5_rows[["observed"]]
+  )
+
+  mixed_defaults_frame <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    population_default_rows,
+    fleet_default_rows,
+    fleet_year_5_rows
+  ))
+  #' @description Test that fleet and population defaults expand independently when both also have year-specific rows.
+  expect_equal(
+    model_weight_at_age(mixed_defaults_frame, fleet = "fleet1"),
+    fleet_weight
+  )
+  expect_equal(
+    model_weight_at_age(mixed_defaults_frame),
+    population_weight
+  )
+})
+
 ## Edge handling ----
 test_that("`FIMSFrame()` returns correct outputs for edge cases", {
   #' @description Test that `get_data()` retrieves the data slot as a data frame when passed a data frame rather than a FIMSFrame object.
@@ -252,6 +391,19 @@ test_that("`FIMSFrame()` returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
+test_that("`FIMSFrame()` warns about weight-at-age rows for a fleet", {
+  legacy_data <- dplyr::mutate(
+    data_big,
+    fleet = dplyr::if_else(type == "weight_at_age", "fleet1", fleet)
+  )
+  #' @description Test that `FIMSFrame()` warns and uses fleet rows as the population weight when there are no `fleet = NA` rows.
+  expect_warning(
+    legacy_frame <- FIMSFrame(legacy_data),
+    regexp = "used as the population weight at\\s+age"
+  )
+  expect_equal(model_weight_at_age(legacy_frame), model_weight_at_age(fims_frame))
+})
+
 test_that("`FIMSFrame()` returns correct error messages", {
   bad_input <- data.frame(test = 1, test2 = 2)
 
@@ -298,6 +450,33 @@ test_that("`FIMSFrame()` returns correct error messages", {
     regexp = "no catch, index, or composition\\s+data:\\s+\"fleet3\""
   )
 
+  #' @description Test that `FIMSFrame()` returns an error when catch or index units are not mt or number.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      unit = ifelse(type == "index", "numbers", unit)
+    )),
+    regexp = "units that FIMS does not\\s+use: \"numbers\""
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when a fleet has more than one catch unit.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      unit = ifelse(type == "catch" & timing == 1, "number", unit)
+    )),
+    regexp = "more than one unit:\\s+\"fleet1 catch\""
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error for a composition unit other than "number" or "proportion", rather than reading it as a proportion.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      unit = ifelse(type == "age_comp", "Proportion", unit)
+    )),
+    regexp = "units that FIMS does not\\s+use: \"Proportion\""
+  )
+
   terminal_weight <- dplyr::filter(
     data_big,
     type == "weight_at_age",
@@ -338,7 +517,7 @@ test_that("`FIMSFrame()` returns correct error messages", {
     model_age_to_length_conversion(FIMSFrame(data_big))
   )
 
-  #' @description Test that age-to-length conversion values entered as counts give the same table as proportions.
+  #' @description Test that `FIMSFrame()` warns and rescales when age-to-length conversion proportions do not sum to 1.
   expect_warning(
     counts <- FIMSFrame(dplyr::mutate(
       data_big,
@@ -352,6 +531,24 @@ test_that("`FIMSFrame()` returns correct error messages", {
   )
   expect_equal(
     model_age_to_length_conversion(counts),
+    model_age_to_length_conversion(FIMSFrame(data_big))
+  )
+
+  #' @description Test that `FIMSFrame()` rescales age-to-length conversion counts (unit = "number") without a warning.
+  expect_no_warning(
+    number_counts <- FIMSFrame(dplyr::mutate(
+      data_big,
+      observed = ifelse(
+        type == "age_to_length_conversion",
+        observed * 100,
+        observed
+      ),
+      unit = ifelse(type == "age_to_length_conversion", "number", unit)
+    )),
+    message = "rescaled to sum to 1"
+  )
+  expect_equal(
+    model_age_to_length_conversion(number_counts),
     model_age_to_length_conversion(FIMSFrame(data_big))
   )
 
@@ -380,7 +577,40 @@ test_that("`FIMSFrame()` returns correct error messages", {
         observed
       )
     )),
-    regexp = "all 0 for these\\s+ages:\\s+3"
+    regexp = "Age 3 is all 0\\."
+  )
+
+  #' @description Test that `FIMSFrame()` errors on duplicated age-to-length conversion rows rather than averaging them.
+  age_1_conversion <- dplyr::filter(
+    data_big,
+    type == "age_to_length_conversion",
+    age == 1
+  )
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(data_big, age_1_conversion)),
+    regexp = paste0(
+      "more than 1 row for\\s+", NROW(age_1_conversion), "\\s+combinations"
+    )
+  )
+
+  #' @description Test that `FIMSFrame()` errors when age-to-length conversion rows name a fleet with no other data.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::filter(data_big, type == "age_to_length_conversion") |>
+        dplyr::mutate(fleet = "bad1")
+    )),
+    regexp = "no catch, index, or composition\\s+data:\\s+\"bad1\""
+  )
+
+  #' @description Test that `FIMSFrame()` errors on age-to-length conversion timings outside the model years.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::filter(data_big, type == "age_to_length_conversion") |>
+        dplyr::mutate(timing = 99)
+    )),
+    regexp = "timings outside the model years"
   )
 
   #' @description Test that `FIMSFrame()` errors when the age-to-length conversion values for a length are all 0, which would make the likelihood undefined.
@@ -393,7 +623,55 @@ test_that("`FIMSFrame()` returns correct error messages", {
         observed
       )
     )),
-    regexp = "all 0 for these\\s+lengths:\\s+100"
+    regexp = "Length 100 is all 0\\."
+  )
+
+  weight_rows <- dplyr::filter(data_big, type == "weight_at_age")
+  #' @description Test that `FIMSFrame()` returns an error when weight-at-age data are for more than 1 fleet and there are no `fleet = NA` rows.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      dplyr::filter(data_big, type != "weight_at_age"),
+      dplyr::mutate(weight_rows, fleet = "fleet1"),
+      dplyr::mutate(weight_rows, fleet = "survey1")
+    )),
+    regexp = "more than 1 fleet,\\s+\"fleet1\"\\s+and\\s+\"survey1\""
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when weight-at-age data have a timing before the first model year.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::mutate(terminal_weight, timing = 0)
+    )),
+    regexp = "the following timings: 0"
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when weight-at-age data skip a year and have no `timing = NA` default.
+  expect_error(
+    FIMSFrame(dplyr::filter(data_big, !(type == "weight_at_age" & timing == 5))),
+    regexp = "missing these years:\\s+5"
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when a weight-at-age timing is missing an age.
+  expect_error(
+    FIMSFrame(dplyr::filter(
+      data_big,
+      !(type == "weight_at_age" & timing == 5 & age == 3)
+    )),
+    regexp = "missing ages for these timings:\\s+\"5\""
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when weight at age is -999.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      observed = dplyr::if_else(
+        type == "weight_at_age" & timing == 5 & age == 3,
+        -999,
+        observed
+      )
+    )),
+    regexp = "missing or negative"
   )
 
   #' @description Test that `FIMSFrame` validators pick up on a missing age in age-composition data.
@@ -480,8 +758,13 @@ test_that("`model_*()` works with the correct inputs", {
     index_dat[[fleet_names_index[index_i]]] <- methods::new(index, n_years)
     #' @description Test that `model_index()` works with correct inputs.
     expect_silent(
-      index_dat[[fleet_names_index[index_i]]] <-
+      index_dat[[fleet_names_index[index_i]]]$index_data[] <-
         model_index(fims_frame, fleet_names_index[index_i])
+    )
+    #' @description Test that `model_index()` values reach the Rcpp index object unchanged.
+    expect_equal(
+      index_dat[[fleet_names_index[index_i]]]$index_data$get_values(),
+      model_index(fims_frame, fleet_names_index[index_i])
     )
   }
 
@@ -496,6 +779,11 @@ test_that("`model_*()` works with the correct inputs", {
     age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data[] <- model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])
     expect_silent(
       age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data[] <- model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])
+    )
+    #' @description Test that `model_age_comp()` values reach the Rcpp age-composition object unchanged.
+    expect_equal(
+      age_comp_dat[[fleet_names_age_comp[fleet_f]]]$age_comp_data$get_values(),
+      model_age_comp(fims_frame, fleet_names_age_comp[fleet_f])
     )
   }
 
@@ -519,25 +807,150 @@ test_that("`model_*()` works with the correct inputs", {
 
 ## Edge handling ----
 test_that("`model_*()` returns correct outputs for edge cases", {
-  #' @description Test that `model_age_to_length_conversion()` returns averaged data when more than one value is given.
-  # The second set for age 1 is uniform over lengths, so it still sums to 1.
-  age_1_conversion <- dplyr::filter(
+  # fleet1 gets its own uniform table and survey1 keeps the shared table.
+  shared_conversion <- dplyr::filter(data_big, type == "age_to_length_conversion")
+  uniform_length_probability <- 1 / dplyr::n_distinct(shared_conversion[["length"]])
+  fleet_data <- dplyr::bind_rows(
     data_big,
-    type == "age_to_length_conversion",
-    age == 1
-  )
-  uniform_probability <- 1 / NROW(age_1_conversion)
-  multiple_data <- dplyr::bind_rows(
-    data_big,
-    dplyr::mutate(age_1_conversion, observed = uniform_probability)
+    dplyr::mutate(
+      shared_conversion,
+      fleet = "fleet1",
+      observed = uniform_length_probability
+    )
   ) |> FIMSFrame()
-  expect_warning(model_age_to_length_conversion(multiple_data))
+  #' @description Test that `model_age_to_length_conversion()` returns a fleet's own rows without averaging them with the shared rows.
   expect_equal(
-    suppressWarnings(model_age_to_length_conversion(multiple_data))[1],
-    data_big |> dplyr::filter(age == 1, length == 0, type == "age_to_length_conversion") |>
-      dplyr::pull(observed) |>
-      c(uniform_probability) |>
-      mean()
+    model_age_to_length_conversion(fleet_data, "fleet1"),
+    rep(uniform_length_probability, NROW(shared_conversion))
+  )
+  #' @description Test that `model_age_to_length_conversion()` returns the shared rows for a fleet without its own rows and by default.
+  expect_equal(
+    model_age_to_length_conversion(fleet_data, "survey1"),
+    model_age_to_length_conversion(fims_frame)
+  )
+  expect_equal(
+    model_age_to_length_conversion(fleet_data),
+    model_age_to_length_conversion(fims_frame)
+  )
+
+  # Year 5 gets a uniform table and every other year keeps the default.
+  year_data <- dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(
+      shared_conversion,
+      timing = 5,
+      observed = uniform_length_probability
+    )
+  ) |> FIMSFrame()
+  by_year <- matrix(
+    model_age_to_length_conversion(year_data),
+    ncol = n_years
+  )
+  #' @description Test that `model_age_to_length_conversion()` returns 1 table per year when a year has its own rows.
+  expect_equal(by_year[, 5], rep(uniform_length_probability, NROW(shared_conversion)))
+  #' @description Test that `model_age_to_length_conversion()` uses the `timing = NA` rows for years without their own rows.
+  expect_equal(by_year[, 4], model_age_to_length_conversion(fims_frame))
+
+  #' @description Test that `find_table_sources()` uses a fleet's rows for that year, then its `timing = NA` rows, then the shared rows for that year, then the shared `timing = NA` rows.
+  sources <- FIMS:::find_table_sources(
+    data.frame(fleet = c("fleet1", "fleet1", NA, NA), timing = c(1, NA, 2, NA)),
+    fleets = c("fleet1", "survey1"),
+    years = 1:3
+  )
+  expect_equal(
+    sources[["source_fleet"]],
+    c("fleet1", "fleet1", "fleet1", NA, NA, NA)
+  )
+  expect_equal(sources[["source_timing"]], c(1, NA, NA, NA, 2, NA))
+  expect_true(all(sources[["has_source"]]))
+
+  #' @description Test that `find_table_sources()` does not use rows for a fleet named "NA" as the shared rows.
+  expect_false(
+    FIMS:::find_table_sources(
+      data.frame(fleet = "NA", timing = NA),
+      fleets = NA,
+      years = 1
+    )[["has_source"]]
+  )
+
+  #' @description Test that `FIMSFrame()` errors when a fleet with length data has no age-to-length conversion rows for some years.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      dplyr::filter(data_big, type != "age_to_length_conversion"),
+      dplyr::mutate(shared_conversion, fleet = "fleet1", timing = 1)
+    )),
+    regexp = "rows cover fleet \"fleet1\" in\\s+these years: 2"
+  )
+
+  #' @description Test that `FIMSFrame()` errors when a fleet's age-to-length conversion table is missing an age.
+  # Dropping a middle age keeps every length above 0.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::filter(shared_conversion, age != 6) |>
+        dplyr::mutate(fleet = "fleet1")
+    )),
+    regexp = "fleet \"fleet1\" is\\s+missing"
+  )
+
+  #' @description Test that `model_age_to_length_conversion()` errors when more than 1 fleet is given.
+  expect_error(
+    model_age_to_length_conversion(fleet_data, c("fleet1", "survey1")),
+    regexp = "must be a single non-missing character string"
+  )
+
+  #' @description Test that `model_age_to_length_conversion()` errors on a fleet name that is not in the data.
+  expect_error(
+    model_age_to_length_conversion(fleet_data, "bad1"),
+    regexp = "is not present in"
+  )
+
+  # Bins from 100 to 500, so fish below and above them are added to the end
+  # bins.
+  short_lengths <- seq(100, 500, by = 50)
+  #' @description Test that `resolve_age_to_length_conversion()` warns when probability falls outside a fleet's length bins.
+  expect_warning(
+    in_bins <- FIMS:::resolve_age_to_length_conversion(
+      data_big,
+      years = 1:n_years,
+      lengths = short_lengths
+    ),
+    regexp = "added to the first and last bins"
+  )
+  expected_bins <- shared_conversion |>
+    dplyr::mutate(length = pmin(pmax(length, 100), 500)) |>
+    dplyr::summarize(value = sum(observed), .by = c("age", "length")) |>
+    dplyr::arrange(age, length)
+  #' @description Test that `resolve_age_to_length_conversion()` adds probability outside a fleet's length bins to the first and last bins.
+  expect_equal(in_bins[["value"]], expected_bins[["value"]])
+  #' @description Test that each age still sums to 1 within a fleet's length bins.
+  expect_equal(
+    dplyr::summarize(in_bins, total = sum(value), .by = "age")[["total"]],
+    rep(1, n_ages)
+  )
+
+  #' @description Test that `resolve_age_to_length_conversion()` errors on conversion lengths between a fleet's length bins.
+  expect_error(
+    FIMS:::resolve_age_to_length_conversion(
+      data_big,
+      years = 1:n_years,
+      lengths = seq(0, 1100, by = 100)
+    ),
+    regexp = "lengths between the\\s+fleet's length bins"
+  )
+
+  #' @description Test that `FIMSFrame()` drops age-to-length conversion rows for ages outside the model ages with a warning.
+  expect_warning(
+    extra_age_frame <- FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::filter(shared_conversion, age == max(age)) |>
+        dplyr::mutate(age = 13)
+    )),
+    regexp = "outside the model ages\\s+\\(1-12\\) are not used: 13"
+  )
+  expect_equal(
+    model_age_to_length_conversion(extra_age_frame),
+    model_age_to_length_conversion(fims_frame)
   )
 
   #' @description Test that `get_n_lengths()` works with a FIMSFrame object that does not have length data.
@@ -553,18 +966,15 @@ test_that("`model_*()` returns correct outputs for edge cases", {
 
 ## Error handling ----
 test_that("`model_*()` returns correct error messages", {
-  #' @description Test that the `model_age_to_length_conversion()` returns an error when a fleet is supplied.
-  expect_error(model_age_to_length_conversion(fims_frame, fleet = "fleet1"))
-
   #' @description Test that the `model_age_to_length_conversion()` returns an error when there is no age column in the data.
   expect_error(model_age_to_length_conversion(
     FIMSFrame(dplyr::select(data_big, -age))
   ))
 
-  #' @description Test that the `model_weight_at_age()` returns an error when providing an unused argument.
+  #' @description Test that `model_weight_at_age()` returns an error when more than 1 fleet is supplied.
   expect_error(
-    model_weight_at_age(fims_frame, fleet_names),
-    regexp = "unused argument"
+    model_weight_at_age(fims_frame, c("fleet1", "survey1")),
+    regexp = "single non-missing character string"
   )
 
   #' @description Test that `model_weight_at_age()` says what to add and lists the types when there is no weight-at-age data.

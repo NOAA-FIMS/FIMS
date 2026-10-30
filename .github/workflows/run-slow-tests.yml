@@ -111,5 +111,6 @@ jobs:
 
           filter_pattern <- Sys.getenv("TEST_FILTER")
           message(paste("Running test suite matching filter:", filter_pattern))
-          devtools::test(filter = filter_pattern)
+          # stop_on_failure = TRUE fails the job when an expectation fails.
+          devtools::test(filter = filter_pattern, stop_on_failure = TRUE)
 

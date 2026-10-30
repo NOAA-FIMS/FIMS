@@ -46,17 +46,17 @@ model_length_comp(x, fleet)
 
 \S4method{model_length_comp}{data.frame}(x, fleet)
 
-model_weight_at_age(x)
+model_weight_at_age(x, fleet = NA_character_)
 
-\S4method{model_weight_at_age}{FIMSFrame}(x)
+\S4method{model_weight_at_age}{FIMSFrame}(x, fleet = NA_character_)
 
-\S4method{model_weight_at_age}{data.frame}(x)
+\S4method{model_weight_at_age}{data.frame}(x, fleet = NA_character_)
 
-model_age_to_length_conversion(x)
+model_age_to_length_conversion(x, fleet = NA)
 
-\S4method{model_age_to_length_conversion}{FIMSFrame}(x)
+\S4method{model_age_to_length_conversion}{FIMSFrame}(x, fleet = NA)
 
-\S4method{model_age_to_length_conversion}{data.frame}(x)
+\S4method{model_age_to_length_conversion}{data.frame}(x, fleet = NA)
 }
 \arguments{
 \item{x}{An object returned from \code{\link[=FIMSFrame]{FIMSFrame()}}.}
@@ -111,20 +111,39 @@ conversion data are present in the \code{FIMSFrame} object.
 
 \subsection{\code{model_weight_at_age()}}{
 
-Returns a numeric vector of weight-at-age observations (type
-\code{"weight_at_age"}), ordered by age and year (plus one additional year) and
-using \code{-999} to indicate missing observations When multiple fleets are
-present, values are averaged across fleets.
+Returns a numeric vector of weight at age (type \code{"weight_at_age"}), ordered
+by year and then age. Rows with \code{timing = NA} apply to every year and rows
+with a \code{timing} replace that default for that year. With the default \code{fleet = NA}, the function returns the population weight at age from \code{fleet = NA}
+rows, including the year after the last modeled year. For the population,
+this additional year is needed to calculate biomass after all fishing for
+the terminal year has occurred. When users specify \code{fleet = NA} but no
+population-level information exists and information is only supplied for a
+single fleet, then this fleet-level information will be used for both the
+population and the fleet. The function will error though if population-level
+information is absent and information for more than one fleet exists. When a
+fleet name is specified, the function returns that fleet's weight at age for
+the model years if available. For years without fleet- and year-specific
+information, then the fleet-specific information without any timing attached
+to it is returned. If no fleet-specific information is available for the
+missing years, then the population's rows for that year will be returned;
+and, finally population-level information with \code{timing = NA} rows is
+returned for all other missing rows.
 }
 
 \subsection{\code{model_age_to_length_conversion()}}{
 
-Returns a numeric vector of age-to-length conversion observations.
-Observations are ordered by age and length in the order defined by
-\code{\link[=FIMSFrame]{FIMSFrame()}}. When multiple observations are present across a single age
-and length, they are averaged because \code{age_to_length_conversion} data cannot
-vary across fleets or time. The values for each age are then rescaled to sum
-to 1.
+Returns a numeric vector of age-to-length conversion observations for 1
+\code{fleet}, or for the shared rows (\code{fleet = NA}) by default. For each year, a
+fleet uses its own rows for that year, then its own rows with
+\code{timing = NA}, then the shared rows for that year, then the shared rows with
+\code{timing = NA}. If every year uses the same rows, 1 table ordered by age and
+length is returned. Otherwise 1 table per year is returned, ordered by year,
+age, and length. The values for each age are rescaled to sum to 1 over all
+conversion lengths. For each fleet, the model adds probability for lengths
+below the first and above the last of the fleet's length bins to those bins,
+with a warning. Length is conditional on age, so length probabilities can be
+added together, but rows for ages outside the model ages are dropped by
+\code{\link[=FIMSFrame]{FIMSFrame()}} with a warning.
 }
 }
 \keyword{FIMSFrame}

@@ -227,6 +227,57 @@ TEST(AgeToLengthConversionFixed, IsInactiveWithWrongMatrixSize) {
   EXPECT_FALSE(age_to_length_conversion.IsActive());
 }
 
+TEST(AgeToLengthConversionFixed,
+     BuildAgeToLengthConversionRowUsesTheYearTableWhenGivenOnePerYear) {
+  auto fleet = MakeFleet();
+  fleet->n_years = 2;
+  const std::size_t table_size = fleet->n_ages * fleet->n_lengths;
+  fleet->age_to_length_conversion.resize(fleet->n_years * table_size);
+  // Year 0 puts every age in the first length bin and year 1 in the last.
+  for (std::size_t year = 0; year < fleet->n_years; ++year) {
+    for (std::size_t age = 0; age < fleet->n_ages; ++age) {
+      for (std::size_t length = 0; length < fleet->n_lengths; ++length) {
+        const std::size_t full_bin = year == 0 ? 0 : fleet->n_lengths - 1;
+        fleet->age_to_length_conversion[year * table_size +
+                                        age * fleet->n_lengths + length] =
+            length == full_bin ? 1.0 : 0.0;
+      }
+    }
+  }
+
+  fims_popdy::AgeToLengthConversionFixed<double> age_to_length_conversion(
+      fleet);
+  fims::Vector<double> row;
+
+  EXPECT_TRUE(age_to_length_conversion.IsActive());
+  EXPECT_TRUE(
+      age_to_length_conversion.BuildAgeToLengthConversionRow(0, 2, row));
+  EXPECT_DOUBLE_EQ(row[0], 1.0);
+  EXPECT_DOUBLE_EQ(row[3], 0.0);
+  EXPECT_TRUE(
+      age_to_length_conversion.BuildAgeToLengthConversionRow(1, 2, row));
+  EXPECT_DOUBLE_EQ(row[0], 0.0);
+  EXPECT_DOUBLE_EQ(row[3], 1.0);
+  EXPECT_FALSE(
+      age_to_length_conversion.BuildAgeToLengthConversionRow(2, 2, row));
+}
+
+TEST(AgeToLengthConversionFixed,
+     BuildAgeToLengthConversionRowSharesOneTableAcrossYears) {
+  auto fleet = MakeFleet();
+  fleet->n_years = 2;
+  FillFixedMatrix(fleet);
+
+  fims_popdy::AgeToLengthConversionFixed<double> age_to_length_conversion(
+      fleet);
+  fims::Vector<double> row;
+
+  EXPECT_TRUE(
+      age_to_length_conversion.BuildAgeToLengthConversionRow(1, 1, row));
+  EXPECT_DOUBLE_EQ(row[0], 0.4);
+  EXPECT_DOUBLE_EQ(row[3], 0.1);
+}
+
 TEST(AgeToLengthConversionRuntime,
      BuildAgeToLengthConversionFleetReturnsNullWhenGrowthDerivedPrepareFails) {
   auto population = std::make_shared<fims_popdy::Population<double>>();
@@ -406,6 +457,47 @@ TEST(AgeToLengthConversionRuntime,
 
   EXPECT_EQ(growth->prepare_calls, 1u);
   EXPECT_DOUBLE_EQ(mean_weight, 2.5);
+}
+
+TEST(AgeToLengthConversionRuntime,
+     PopulationMeanWeightAAUsesSizeProviderWhenPopulationHasSizeGrid) {
+  fims_popdy::CatchAtAge<double> model;
+  auto population = std::make_shared<fims_popdy::Population<double>>();
+
+  auto growth = std::make_shared<
+      fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
+  ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
+                   73.0);
+  growth->SetAgeOffset(1.0);
+  growth->Initialize(1, 3, 1);
+
+  const fims_popdy::SizeGrid population_size_grid =
+      fims_popdy::SizeGridBuilder::BuildRegularGrid(0.0, 1500.0, 1.0);
+  std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
+      size_provider =
+          MakeConfiguredSizeProvider(growth, &population_size_grid, 1, 3);
+
+  population->growth = growth;
+  population->size_distribution_provider = size_provider;
+  population->n_years = 1;
+  population->n_ages = 3;
+  population->ages.resize(3);
+  population->ages[0] = 1.0;
+  population->ages[1] = 2.0;
+  population->ages[2] = 3.0;
+  model.populations.push_back(population);
+
+  // Prepares the growth products and then the population size products.
+  ASSERT_NO_THROW(model.PreparePopulationGrowthProducts());
+
+  const double expected = size_provider->MeanWeightAtAge(0, 1);
+  const double weight_at_mean_length =
+      growth->TryGetPreparedGrowthProducts()->MeanWAA(0, 1, 0);
+
+  // The loop over years reaches n_years, which reads the last year.
+  EXPECT_DOUBLE_EQ(model.PopulationMeanWeightAA(population, 0, 1), expected);
+  EXPECT_DOUBLE_EQ(model.PopulationMeanWeightAA(population, 1, 1), expected);
+  EXPECT_GT(expected, weight_at_mean_length);
 }
 
 TEST(AgeToLengthConversionDerived,

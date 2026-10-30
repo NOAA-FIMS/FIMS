@@ -207,6 +207,103 @@ test_that("`get_estimates()` works for a model without random effects", {
     object = sum(estimates[["label"]] == "log_sd", na.rm = TRUE),
     expected = 0
   )
+})
+
+test_that("`get_estimates()` works with time-varying age-specific selectivity", {
+  data_4_model <- FIMSFrame(data_big)
+  n_years <- get_n_years(data_4_model)
+  n_ages <- get_n_ages(data_4_model)
+  age_specific <- setup_default_Selectivity(
+    data = data_4_model,
+    fleet = "survey1",
+    module_type = "AgeSpecific"
+  )
+  # 1 set of values per year, in year-major order, with a different value for
+  # each year and age so the labels can be checked against the values
+  age_specific_by_year <- age_specific[
+    rep(seq_len(nrow(age_specific)), times = n_years),
+  ] |>
+    dplyr::mutate(
+      value = rep(seq_len(n_years), each = n_ages) / 10 +
+        rep(seq_len(n_ages), times = n_years) / 100,
+      estimation_type = "constant"
+    )
+  parameters <- setup_default_parameters(data = data_4_model) |>
+    dplyr::filter(
+      !(.data$fleet == "survey1" & .data$module_name == "Selectivity")
+    ) |>
+    dplyr::bind_rows(age_specific_by_year)
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  #' @description Test that `get_estimates()` works when age-specific selectivity has 1 set of values per year.
+  expect_no_error(estimates <- get_estimates(fit))
+  selectivity <- estimates |>
+    dplyr::filter(.data$label == "logit_sel_at_age")
+  #' @description Test that each time-varying age-specific selectivity value is labelled with its year and age.
+  expect_equal(
+    object = selectivity[["year_i"]],
+    expected = rep(seq_len(n_years), each = n_ages)
+  )
+  expect_equal(
+    object = selectivity[["age"]],
+    expected = rep(get_ages(data_4_model), times = n_years)
+  )
+  #' @description Test that each time-varying age-specific selectivity value is reported with the year and age it was given for.
+  expect_equal(
+    object = selectivity[["input"]],
+    expected = selectivity[["year_i"]] / 10 +
+      match(selectivity[["age"]], get_ages(data_4_model)) / 100
+  )
+  clear()
+})
+
+test_that("`get_estimates()` works with time-varying log_q", {
+  data_4_model <- FIMSFrame(data_big)
+  years <- get_start_year(data_4_model):get_end_year(data_4_model)
+  default_parameters <- setup_default_parameters(data = data_4_model)
+  # 1 log_q per year for survey1, in year order, with a different value in each
+  # year so the labels can be checked against the values
+  set_survey_log_q <- function(values) {
+    log_q_rows <- default_parameters |>
+      dplyr::filter(.data$fleet == "survey1", .data$label == "log_q") |>
+      dplyr::slice(rep(1, length(values))) |>
+      dplyr::mutate(timing = years[seq_along(values)], value = values)
+    default_parameters |>
+      dplyr::filter(!(.data$fleet == "survey1" & .data$label == "log_q")) |>
+      dplyr::bind_rows(log_q_rows)
+  }
+  get_survey_index <- function(fit) {
+    get_report(fit)[["index_expected"]][[2]]
+  }
+  constant_fit <- set_survey_log_q(-10) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  constant_index <- get_survey_index(constant_fit)
+  clear()
+  fit <- set_survey_log_q(-10 + years / 100) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  log_q <- get_estimates(fit) |>
+    dplyr::filter(.data$label == "log_q", .data$fleet == "survey1")
+  #' @description Test that time-varying log_q values are labeled with their year.
+  expect_equal(object = log_q[["year_i"]], expected = seq_along(years))
+  #' @description Test that each time-varying log_q value is reported for the year it was given for.
+  expect_equal(object = log_q[["input"]], expected = -10 + years / 100)
+  #' @description Test that the expected index in each year uses that year's log_q.
+  expect_equal(
+    object = get_survey_index(fit) / constant_index,
+    expected = exp(years / 100)
+  )
+  clear()
+
+  #' @description Test that a log_q with neither 1 value nor 1 value per year returns an error.
+  expect_error(
+    set_survey_log_q(c(-10, -10)) |>
+      initialize_fims(data = data_4_model) |>
+      fit_fims(optimize = FALSE),
+    regexp = "log_q size mismatch"
+  )
   clear()
 })
 

@@ -455,7 +455,179 @@ test_that("`initialize_fleet()` works with correct inputs", {
       "GetObservedCatchDataID"
     ) %in% names(result$.refClassDef@refMethods)
   ))
+  #' @description Test that `initialize_fleet()` leaves weight at age empty for a fleet without its own rows, so the population weight is used.
+  expect_equal(result$weight_at_age$size(), 0)
+  #' @description Test that `initialize_fleet()` sets catch in mt to be fit as weight.
+  expect_equal(result$observed_catch_units$get(), "weight")
   clear()
+})
+
+test_that("`initialize_fims()` fits catch and index to the expected quantity matching their units", {
+  get_fleet_report <- function(data) {
+    frame <- FIMSFrame(data)
+    report <- setup_default_parameters(frame) |>
+      initialize_fims(data = frame) |>
+      fit_fims(optimize = FALSE) |>
+      get_report()
+    clear()
+    report
+  }
+  weight_report <- get_fleet_report(data_big)
+  number_report <- get_fleet_report(dplyr::mutate(
+    data_big,
+    unit = dplyr::if_else(type %in% c("catch", "index"), "number", unit)
+  ))
+
+  #' @description Test that catch and index in mt are fit to expected weight.
+  expect_equal(weight_report[["catch_expected"]][[1]], weight_report[["catch_weight"]][[1]])
+  expect_equal(weight_report[["index_expected"]][[2]], weight_report[["index_weight"]][[2]])
+  #' @description Test that catch and index in numbers are fit to expected numbers.
+  expect_equal(number_report[["catch_expected"]][[1]], number_report[["catch_numbers"]][[1]])
+  expect_equal(number_report[["index_expected"]][[2]], number_report[["index_numbers"]][[2]])
+  #' @description Test that expected numbers differ from expected weight, so the checks above can tell the 2 units apart.
+  expect_false(isTRUE(all.equal(
+    number_report[["catch_numbers"]][[1]],
+    number_report[["catch_weight"]][[1]]
+  )))
+  expect_false(isTRUE(all.equal(
+    number_report[["index_numbers"]][[2]],
+    number_report[["index_weight"]][[2]]
+  )))
+})
+
+test_that("`initialize_fims()` errors for a catch unit it cannot map", {
+  #' @description Test that `initialize_fims()` errors rather than fitting a catch unit with no mapping, e.g., one added to FIMSFrame() but not to initialize_fleet().
+  frame <- FIMSFrame(data_big)
+  # FIMSFrame() rejects this unit, so it is set on the stored data directly
+  frame@data[["unit"]][frame@data[["type"]] == "catch"] <- "t"
+  expect_error(
+    object = setup_default_parameters(frame) |>
+      initialize_fims(data = frame),
+    regexp = "has no rule for the catch or index unit"
+  )
+  clear()
+})
+
+test_that("`initialize_fleet()` passes a fleet's own weight at age to the model", {
+  get_fleet_report <- function(data) {
+    frame <- FIMSFrame(data)
+    report <- setup_default_parameters(frame) |>
+      initialize_fims(data = frame) |>
+      fit_fims(optimize = FALSE) |>
+      get_report()
+    clear()
+    report
+  }
+  fleet_default_rows <- dplyr::filter(
+    data_big,
+    type == "weight_at_age",
+    timing == 1
+  ) |>
+    dplyr::mutate(fleet = "fleet1", timing = NA_integer_, observed = observed * 2)
+  fleet_year_5_rows <- dplyr::mutate(
+    fleet_default_rows,
+    timing = 5L,
+    observed = observed / 2 * 3
+  )
+  base_report <- get_fleet_report(data_big)
+  fleet_report <- get_fleet_report(
+    dplyr::bind_rows(data_big, fleet_default_rows, fleet_year_5_rows)
+  )
+  n_ages <- get_n_ages(data)
+  year_5_index <- (5 - get_start_year(data)) * n_ages + seq_len(n_ages)
+  base_catch_weight <- base_report[["catch_weight_at_age"]][[1]]
+  fleet_catch_weight <- fleet_report[["catch_weight_at_age"]][[1]]
+
+  #' @description Test that a fleet's weight at age sets its catch weight at age, with year 5 using that year's rows and other years the fleet default.
+  expect_equal(fleet_catch_weight[year_5_index], 3 * base_catch_weight[year_5_index])
+  expect_equal(fleet_catch_weight[-year_5_index], 2 * base_catch_weight[-year_5_index])
+  #' @description Test that another fleet without its own weight at age keeps the population weight for its index weight.
+  expect_equal(
+    fleet_report[["index_weight_at_age"]][[2]],
+    base_report[["index_weight_at_age"]][[2]]
+  )
+  #' @description Test that a fleet's weight at age does not change population biomass.
+  expect_equal(fleet_report[["biomass"]], base_report[["biomass"]])
+})
+
+test_that("`initialize_fleet()` uses a fleet's own age-to-length conversion rows", {
+  # fleet1 gets a uniform table and survey1 keeps the shared table.
+  conversion <- dplyr::filter(data_big, type == "age_to_length_conversion")
+  uniform_probability <- 1 / dplyr::n_distinct(conversion[["length"]])
+  fleet_data <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(conversion, fleet = "fleet1", observed = uniform_probability)
+  ))
+  fleet_values <- function(fleet, fleet_data) {
+    selectivity <- FIMS:::initialize_selectivity(
+      parameters = default_parameters,
+      data = fleet_data,
+      fleet = fleet
+    )
+    module <- FIMS:::initialize_fleet(
+      parameters = default_parameters,
+      data = fleet_data,
+      fleet = fleet,
+      # Only the conversion is checked, so the data ids are placeholders.
+      linked_ids = c(
+        selectivity = selectivity$get_id(),
+        catch = 1,
+        index = 1,
+        age_comp = 1,
+        length_comp = 1
+      )
+    )
+    purrr::map_dbl(
+      seq_along(module$age_to_length_conversion),
+      \(i) module$age_to_length_conversion[i]$value
+    )
+  }
+  shared_values <- model_age_to_length_conversion(data)
+  #' @description Test that `initialize_fleet()` uses a fleet's own age-to-length conversion rows when it has them.
+  expect_equal(
+    fleet_values("fleet1", fleet_data),
+    rep(uniform_probability, length(shared_values))
+  )
+  #' @description Test that `initialize_fleet()` uses the shared age-to-length conversion rows for a fleet without its own.
+  expect_equal(fleet_values("survey1", fleet_data), shared_values)
+
+  # Year 5 gets a uniform table and every other year keeps the default.
+  year_data <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(conversion, timing = 5, observed = uniform_probability)
+  ))
+  by_year <- matrix(
+    fleet_values("fleet1", year_data),
+    ncol = get_n_years(year_data)
+  )
+  #' @description Test that `initialize_fleet()` passes 1 age-to-length conversion table per year when a year has its own rows.
+  expect_equal(by_year[, 5], rep(uniform_probability, length(shared_values)))
+  #' @description Test that `initialize_fleet()` passes the default age-to-length conversion table for years without their own rows.
+  expect_equal(by_year[, 4], shared_values)
+  clear()
+
+  # Expected length compositions for fleet1, 1 column per year.
+  fleet1_length_comp <- function(fims_frame) {
+    fit <- suppressWarnings(fit_fims(
+      initialize_fims(setup_default_parameters(data = fims_frame), fims_frame),
+      optimize = FALSE
+    ))
+    on.exit(clear())
+    matrix(
+      get_report(fit)[["lengthcomp_proportion"]][[1]],
+      ncol = get_n_years(fims_frame)
+    )
+  }
+  base_comp <- fleet1_length_comp(data)
+  year_comp <- fleet1_length_comp(year_data)
+  #' @description Test that a uniform year-5 age-to-length conversion table gives a uniform expected length composition in year 5 only.
+  expect_equal(
+    year_comp[, 5],
+    rep(uniform_probability, nrow(year_comp)),
+    tolerance = 1e-8
+  )
+  #' @description Test that a year-5 age-to-length conversion table leaves the expected length composition in other years unchanged.
+  expect_equal(year_comp[, 4], base_comp[, 4])
 })
 
 # test_initialize_catch ----

@@ -78,6 +78,10 @@ IF(BUILD_DOC)
   set(DOXYGEN_AUTOLINK_SUPPORT YES)
   set(DOXYGEN_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/doxygen")
   set(DOXYGEN_HTML_OUTPUT "html")
+  set(DOXYGEN_EXCLUDE_SYMBOLS
+    "id_g"
+    "fims_model"
+  )
 
   doxygen_add_docs(fims_doxygen
     inst/include

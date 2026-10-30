@@ -120,6 +120,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
 
     module_fields <- setdiff(module_fields, c(
       "age_to_length_conversion",
+      "weight_at_age",
       "lengthcomp_expected",
       "lengthcomp_proportion",
       "n_lengths",
@@ -513,27 +514,46 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
 
   module$n_lengths$set(length(fleet_length_bins))
   module$lengths[] <- fleet_length_bins
+
+  # A fleet with its own weight-at-age rows uses them for its catch and index
+  # weight. Other fleets keep an empty vector and use the population weight.
+  input_data <- get_data(data)
+  has_fleet_weight_at_age <- any(
+    input_data[["type"]] == "weight_at_age" &
+      input_data[["fleet"]] %in% fleet
+  )
+  if (has_fleet_weight_at_age) {
+    module$weight_at_age[] <- model_weight_at_age(data, fleet = fleet)
+  }
   module$SetRequiresAgeLengthMapping(requires_age_length_mapping)
 
   module$SetSelectivityID(linked_ids[["selectivity"]])
 
   if (use_age_to_length_conversion_fixed_path) {
     age_to_length_conversion_fixed_data <- get_data(data) |>
-      dplyr::filter(.data$type == "age_to_length_conversion") |>
-      rescale_age_to_length_conversion() |>
-      dplyr::filter(.data$length %in% fleet_length_bins) |>
+      resolve_age_to_length_conversion(
+        years = get_start_year(data):get_end_year(data),
+        fleet = fleet,
+        lengths = fleet_length_bins
+      ) |>
       dplyr::mutate(
         age_order = match(.data$age, get_ages(data)),
         length_order = match(.data$length, fleet_length_bins)
       ) |>
-      dplyr::arrange(.data$age_order, .data$length_order)
+      dplyr::arrange(.data$timing, .data$age_order, .data$length_order)
 
-    expected_age_to_length_conversion_rows <- get_n_ages(data) * length(fleet_length_bins)
+    # The C++ reads 1 table for every year, or 1 table per year.
+    n_tables <- if (all(is.na(age_to_length_conversion_fixed_data[["timing"]]))) {
+      1
+    } else {
+      get_n_years(data)
+    }
+    expected_age_to_length_conversion_rows <- n_tables * get_n_ages(data) * length(fleet_length_bins)
 
     if (nrow(age_to_length_conversion_fixed_data) != expected_age_to_length_conversion_rows) {
       cli::cli_abort(c(
         "Fleet `{fleet}` fixed age-to-length data do not match its resolved fleet bins.",
-        "i" = "Expected {expected_age_to_length_conversion_rows} age-length cells from {get_n_ages(data)} ages x {length(fleet_length_bins)} fleet bins.",
+        "i" = "Expected {expected_age_to_length_conversion_rows} age-length cells from {n_tables} table{?s} x {get_n_ages(data)} ages x {length(fleet_length_bins)} fleet bins.",
         "i" = "Found {nrow(age_to_length_conversion_fixed_data)} matching fixed age-to-length cells after filtering to the fleet bins."
       ))
     }
@@ -545,14 +565,43 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     module$age_to_length_conversion$resize(0)
   }
 
+  # FIMSFrame() allows only "mt" or "number" as the unit of catch and index,
+  # with 1 unit per fleet for each type. The fleet fits "number" to expected
+  # numbers and "weight" to expected weight.
+  fleet_units <- get_data(data) |>
+    dplyr::filter(
+      .data$fleet == .env$fleet,
+      .data$type %in% c("catch", "index")
+    ) |>
+    dplyr::select(dplyr::all_of(c("type", "unit"))) |>
+    dplyr::distinct()
+  model_units <- dplyr::case_when(
+    fleet_units[["unit"]] == "number" ~ "number",
+    fleet_units[["unit"]] == "mt" ~ "weight"
+  )
+  # A unit allowed by FIMSFrame() but not mapped here would otherwise be fit as
+  # the wrong quantity.
+  if (anyNA(model_units)) {
+    cli::cli_abort(c(
+      "x" = "{.fn initialize_fleet} has no rule for the catch or index unit
+        {.val {fleet_units[['unit']][is.na(model_units)]}} of fleet
+        {.val {fleet}}.",
+      "i" = "Map the unit to {.val number} or {.val weight} in
+        {.fn initialize_fleet}."
+    ))
+  }
+  fleet_units <- stats::setNames(model_units, fleet_units[["type"]])
+
   # Link the observed catch data to the fleet module using its associated ID.
   if ("catch" %in% fleet_types) {
     module$SetObservedCatchDataID(linked_ids[["catch"]])
+    module$observed_catch_units$set(fleet_units[["catch"]])
   }
 
   # Link the observed index data to the fleet module using its associated ID
   if ("index" %in% fleet_types) {
     module$SetObservedIndexDataID(linked_ids[["index"]])
+    module$observed_index_units$set(fleet_units[["index"]])
   }
 
   # Link the observed age-composition data to the fleet module using its
