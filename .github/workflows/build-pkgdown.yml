@@ -92,6 +92,12 @@ jobs:
         with:
           name: pkgdown-site-with-reports
           path: docs/
+
+      - name: Check links in pkgdown output
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --accept 200,403,503 docs/**/*.html
+          fail: true
   
       - name: Deploy package
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'NOAA-FIMS/FIMS'
