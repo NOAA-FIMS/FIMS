@@ -859,6 +859,11 @@ initialize_comp <- function(data,
 #' It is important that you only have one FIMS model initialized in your R
 #' workspace at a time. Thus, after you initialize and fit the model, you should
 #' run [clear()].
+#' @param subpopulations Optional list of named biological-group configurations.
+#'   Each entry must contain `name`, `initial_fraction`, `recruitment_fraction`,
+#'   and `reproductive_contribution`. Fractions are fixed configuration values.
+#'   `NULL` (default) retains pooled dynamics. Growth, maturity, and fleet
+#'   selectivity are shared in this initial implementation.
 #' @export
 #' @seealso
 #' * [setup_default_parameters()]
@@ -875,7 +880,7 @@ initialize_comp <- function(data,
 #'   initialize_fims(data = data_4_model)
 #' clear()
 #' }
-initialize_fims <- function(parameters, data) {
+initialize_fims <- function(parameters, data, subpopulations = NULL) {
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
@@ -1221,6 +1226,10 @@ initialize_fims <- function(parameters, data) {
     # parameters tibble
     linked_ids = population_module_ids
   )
+
+  if (!is.null(subpopulations)) {
+    population$SetSubpopulations(subpopulations)
+  }
 
   # Set-up TMB
   # Hard code to be a catch-at-age model

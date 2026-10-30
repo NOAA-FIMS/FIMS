@@ -56,5 +56,8 @@ void register_population(Rcpp::Module& m) {
       .method("SetRecruitmentID", &PopulationInterface::SetRecruitmentID)
       .method("AddFleet", &PopulationInterface::AddFleet)
       .method("SetName", &PopulationInterface::SetName)
-      .method("GetName", &PopulationInterface::GetName);
+      .method("GetName", &PopulationInterface::GetName)
+      .method("SetSubpopulations", &PopulationInterface::SetSubpopulations)
+      .method("GetSubpopulations", &PopulationInterface::GetSubpopulations)
+      .method("SetTwoSex", &PopulationInterface::SetTwoSex);
 }

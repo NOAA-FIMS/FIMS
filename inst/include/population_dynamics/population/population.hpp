@@ -16,12 +16,13 @@
 #include "../maturity/maturity.hpp"
 #include "../size/size_distribution_provider_base.hpp"
 #include "../size/size_grid.hpp"
+#include "subpopulation.hpp"
 
 namespace fims_popdy {
 
 /**
- * @brief Population class. Contains subpopulations
- * that are divided into generic partitions (e.g., sex, area).
+ * @brief Population with optional named biological subpopulations.
+ * Empty subpopulation configuration retains pooled dynamics.
  */
 template <typename Type>
 struct Population : public fims_model_object::FIMSObject<Type> {
@@ -76,6 +77,9 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
   std::set<uint32_t> fleet_ids; /*!< id of fleet model object*/
   std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
       fleets; /*!< shared pointer to fleet module */
+
+  /** @brief Empty preserves pooled dynamics; otherwise each group has state. */
+  std::vector<Subpopulation> subpopulations;
 
   /**
    * @brief Constructor.

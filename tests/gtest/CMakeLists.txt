@@ -471,3 +471,8 @@ target_link_libraries(population_CatchAtAge_CalculateCatchWeightAA
 )
 
 gtest_discover_tests(population_CatchAtAge_CalculateCatchWeightAA)
+
+add_executable(population_Subpopulation test_population_Subpopulation.cpp)
+add_as_invoker_manifest(population_Subpopulation)
+target_link_libraries(population_Subpopulation gtest_main fims_test)
+gtest_discover_tests(population_Subpopulation)

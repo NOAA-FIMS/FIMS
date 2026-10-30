@@ -4,9 +4,15 @@
 \alias{initialize_fims}
 \title{Initialize C++ modules via Rcpp for a FIMS model}
 \usage{
-initialize_fims(parameters, data)
+initialize_fims(parameters, data, subpopulations = NULL)
 }
 \arguments{
+\item{subpopulations}{Optional list of group configurations, each containing
+\code{name}, \code{initial_fraction}, \code{recruitment_fraction}, and
+\code{reproductive_contribution}. Fractions are fixed configuration values.
+\code{NULL} retains pooled dynamics. Growth, maturity, and fleet selectivity
+are shared in this initial implementation.}
+
 \item{parameters}{A tibble returned from \code{\link[=setup_default_parameters]{setup_default_parameters()}}. It
 is the primary source of information for what is initialized. That is, if a
 fleet exists in the data but parameter information for how to specify

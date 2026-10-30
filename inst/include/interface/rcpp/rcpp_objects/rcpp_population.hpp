@@ -144,6 +144,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    * Out-of-range inputs are logged as warnings.
    */
   VariableVector proportion_female;
+
+  /** @brief Shared configuration so the registered Rcpp object sees edits. */
+  std::shared_ptr<std::vector<fims_popdy::Subpopulation>> subpopulations =
+      std::make_shared<std::vector<fims_popdy::Subpopulation>>();
   /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
@@ -261,6 +265,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
         proportion_female(other.proportion_female),
+        subpopulations(other.subpopulations),
         ages(other.ages),
         name(other.name),
         total_catch_weight(other.total_catch_weight),
@@ -288,6 +293,50 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
+
+  /** @brief Configure explicit groups; an empty list restores pooled dynamics.
+   */
+  void SetSubpopulations(Rcpp::List values) {
+    std::vector<fims_popdy::Subpopulation> groups;
+    for (int i = 0; i < values.size(); ++i) {
+      Rcpp::List item = Rcpp::as<Rcpp::List>(values[i]);
+      for (const char* key :
+           {"name", "initial_fraction", "recruitment_fraction",
+            "reproductive_contribution"}) {
+        if (!item.containsElementNamed(key)) {
+          throw std::invalid_argument(
+              std::string("Missing subpopulation field: ") + key);
+        }
+      }
+      groups.push_back({Rcpp::as<std::string>(item["name"]),
+                        Rcpp::as<double>(item["initial_fraction"]),
+                        Rcpp::as<double>(item["recruitment_fraction"]),
+                        Rcpp::as<double>(item["reproductive_contribution"])});
+    }
+    fims_popdy::ValidateSubpopulations(groups);
+    *subpopulations = std::move(groups);
+  }
+
+  /** @brief Configure females and males, with separate entry fractions. */
+  void SetTwoSex(double initial_female, double recruitment_female) {
+    *subpopulations = fims_popdy::MakeTwoSexSubpopulations(initial_female,
+                                                       recruitment_female);
+  }
+
+  /** @brief Return groups in the same order used by parameters and outputs. */
+  Rcpp::List GetSubpopulations() const {
+    Rcpp::List result(subpopulations->size());
+    for (size_t i = 0; i < subpopulations->size(); ++i) {
+      const auto& group = (*subpopulations)[i];
+      result[i] = Rcpp::List::create(
+          Rcpp::Named("name") = group.name,
+          Rcpp::Named("initial_fraction") = group.initial_fraction,
+          Rcpp::Named("recruitment_fraction") = group.recruitment_fraction,
+          Rcpp::Named("reproductive_contribution") =
+              group.reproductive_contribution);
+    }
+    return result;
+  }
 
   /**
    * @brief Sets the name of the population.
@@ -409,6 +458,7 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     // set relative info
     population->id = this->id;
+    population->subpopulations = *this->subpopulations;
     population->n_years = this->n_years.get();
     population->n_fleets = this->n_fleets.get();
     // only define ages if n_ages greater than 0
@@ -546,6 +596,12 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
       population->proportion_female[i] =
           this->proportion_female[i].initial_value_m;
+      if (!subpopulations->empty() &&
+          this->proportion_female[i].estimation_type_m.get() != "constant") {
+        throw std::invalid_argument(
+            "proportion_female is unused with explicit "
+            "subpopulations and must be constant");
+      }
       if (this->proportion_female[i].estimation_type_m.get() ==
           "fixed_effects") {
         ss.str("");

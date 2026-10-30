@@ -395,8 +395,17 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"id\":" << population_interface->log_M.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [" << "\"n_years\", \"n_ages\"" << "],\n";
-      ss << "  \"dimensions\": [" << population_interface->n_years.get() << ", "
+      const bool group_m =
+          !pop->subpopulations.empty() &&
+          pop->log_M.size() !=
+              static_cast<size_t>(population_interface->n_years.get() *
+                                  population_interface->n_ages.get());
+      ss << "  \"header\": [";
+      if (group_m) ss << "\"n_subpopulations\", ";
+      ss << "\"n_years\", \"n_ages\"],\n";
+      ss << "  \"dimensions\": [";
+      if (group_m) ss << pop->subpopulations.size() << ", ";
+      ss << population_interface->n_years.get() << ", "
          << population_interface->n_ages.get() << "]\n},\n";
       ss << " \"values\": " << population_interface->log_M << "\n\n";
       ss << "},\n";
@@ -441,9 +450,16 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << "  \"id\":" << population_interface->log_init_naa.id_m << ",\n";
       ss << "  \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [" << "\"n_ages\"" << "],\n";
-      ss << "  \"dimensions\": [" << population_interface->n_ages.get()
-         << "]\n},\n";
+      const bool group_initial =
+          !pop->subpopulations.empty() &&
+          pop->log_init_naa.size() !=
+              static_cast<size_t>(population_interface->n_ages.get());
+      ss << "  \"header\": [";
+      if (group_initial) ss << "\"n_subpopulations\", ";
+      ss << "\"n_ages\"],\n";
+      ss << "  \"dimensions\": [";
+      if (group_initial) ss << pop->subpopulations.size() << ", ";
+      ss << population_interface->n_ages.get() << "]\n},\n";
 
       ss << "  \"values\":" << population_interface->log_init_naa << "\n";
       ss << "},\n";
