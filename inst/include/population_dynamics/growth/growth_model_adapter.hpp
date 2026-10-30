@@ -132,6 +132,19 @@ class VonBertalanffyGrowthModelAdapter
       throw std::runtime_error(message.str());
     }
 
+    if (use_log_distance_age_at_zero_length_ &&
+        minimum_required_age != minimum_required_age_) {
+      std::ostringstream message;
+      message << std::setprecision(17)
+              << "Cannot change the configured age limit for estimated "
+                 "age_at_zero_length (t0) from "
+              << minimum_required_age_ << " to " << minimum_required_age
+              << ". Changing this limit would reinterpret the stored "
+                 "parameter. Reinitialize the model using the intended "
+                 "population and interpolation reference ages.";
+      throw std::runtime_error(message.str());
+    }
+
     if (age_offset_set_) {
       if (!std::isfinite(age_offset_)) {
         std::ostringstream message;
