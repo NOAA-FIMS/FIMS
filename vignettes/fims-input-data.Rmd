@@ -227,7 +227,11 @@ FIMS::data_big |>
 
 ## Age-to-length conversion (`type == "age_to_length_conversion"`)
 
-The age-to-length conversion data type contains the distribution of lengths for each age. The `age` and `length` columns contain all the combinations of age and length bins, and the `observed` column contains the proportion of fish at each age that are in each length bin. FIMS rescales the values for each age to sum to 1, so they can be entered as proportions or counts, and warns when it does. The `unit` column is not used for this type, and "proportion" is the convention even for counts. A single set of the age-to-length conversion data is required, rather than separate copies for each fleet (name) or time step. The age-to-length conversion data are not currently included in the likelihood but are used to convert numbers at age to numbers at length for the population dynamics calculations when length compositions are included in the model.
+The age-to-length conversion data describe how individuals at each age are distributed across length bins. In this table, the `age` and `length` columns define every age-length bin combination, and the `observed` column gives the proportion (`unit = "proportion"`) or count (`unit = "number"`) of individuals at that age in each length bin. For each age, FIMS rescales the observed values so they sum to 1, and it warns when proportion inputs do not already sum to 1.
+
+These data can be shared across fleets and years, or specified individually. Rows with `fleet = NA` are treated as shared across fleets that do not have fleet-specific information, while rows with `timing = NA` are treated as defaults across years that do not have their own timing. For a given fleet and year, FIMS uses rows in this order: (1) that fleet and year, (2) that fleet with `timing = NA`, (3) shared rows with `fleet = NA` for that year, and (4) shared rows with both `fleet = NA` and `timing = NA`. Each fleet-timing-age-length combination must appear at most once.
+
+Age-to-length conversion data are not part of the likelihood. Instead, they are used in the population dynamics calculations to convert numbers at age to numbers at length when length-composition data are included and growth is not estimated internally.
 
 Note: purely age-based models which have no length-composition data can omit the age-to-length conversion data as well.
 
