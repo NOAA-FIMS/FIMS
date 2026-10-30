@@ -32,9 +32,9 @@ on.exit(
 saved <- new.env(parent = emptyenv())
 if (file.exists(file.path("R", "sysdata.rda"))) {
   load(file.path("R", "sysdata.rda"), envir = saved)
-  saved_fit <- saved[["fit_big_unoptimized"]]
-  saved_estimates <- saved[["estimates_big_unoptimized"]]
 }
+saved_fit <- saved[["fit_big_unoptimized"]]
+saved_estimates <- saved[["estimates_big_unoptimized"]]
 internal_data_changed <- is.null(saved_fit) ||
   !identical(
     FIMS::get_version(fit_big_unoptimized),
@@ -56,4 +56,4 @@ if (internal_data_changed) {
     compress = "xz"
   )
 }
-rm(saved, internal_data_changed)
+rm(saved, saved_fit, saved_estimates, internal_data_changed)
