@@ -598,9 +598,9 @@ test_that("`FIMSFrame()` returns correct error messages", {
     FIMSFrame(dplyr::bind_rows(
       data_big,
       dplyr::filter(data_big, type == "age_to_length_conversion") |>
-        dplyr::mutate(fleet = "flet1")
+        dplyr::mutate(fleet = "bad1")
     )),
-    regexp = "no catch, index, or composition\\s+data:\\s+\"flet1\""
+    regexp = "no catch, index, or composition\\s+data:\\s+\"bad1\""
   )
 
   #' @description Test that `FIMSFrame()` errors on age-to-length conversion timings outside the model years.
@@ -901,7 +901,7 @@ test_that("`model_*()` returns correct outputs for edge cases", {
 
   #' @description Test that `model_age_to_length_conversion()` errors on a fleet name that is not in the data.
   expect_error(
-    model_age_to_length_conversion(fleet_data, "flet1"),
+    model_age_to_length_conversion(fleet_data, "bad1"),
     regexp = "is not present in"
   )
 
