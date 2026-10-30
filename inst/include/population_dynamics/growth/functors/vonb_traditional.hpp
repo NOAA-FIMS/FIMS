@@ -111,8 +111,8 @@ struct VonBertalanffyTraditionalGrowth : public GrowthBase<Type> {
   }
 
   /**
-   * @brief Evaluate the gradient of log mean length at age with respect to the
-   * natural-scale traditional Von Bertalanffy parameters.
+   * @brief Differentiate log_length_at_age(), including its smoothing, with
+   * respect to the natural-scale traditional Von Bertalanffy parameters.
    * @param age Age on the natural scale.
    * @param d_log_laa_d_asymptotic_length Output derivative with respect to
    * asymptotic_length.
@@ -120,18 +120,28 @@ struct VonBertalanffyTraditionalGrowth : public GrowthBase<Type> {
    * growth_coefficient.
    * @param d_log_laa_d_age_at_zero_length Output derivative with respect to
    * age_at_zero_length.
+   * @throws std::runtime_error If age is below age_at_zero_length.
    */
   void log_length_at_age_gradient(
       const Type& age, Type& d_log_laa_d_asymptotic_length,
       Type& d_log_laa_d_growth_coefficient,
       Type& d_log_laa_d_age_at_zero_length) const {
+    const Type length = length_at_age(age);
     const Type age_delta = age - age_at_zero_length;
     const Type survival_like =
         fims_math::exp(-growth_coefficient * age_delta);
     const Type one_minus_survival_like = Type(1.0) - survival_like;
-    const Type length = asymptotic_length * one_minus_survival_like;
-    const Type length_safe =
-        fims_math::ad_max(length, static_cast<Type>(1e-8));
+    const Type length_floor = Type(1e-8);
+    const Type length_safe = fims_math::ad_max(length, length_floor);
+
+    // Differentiate the same smooth maximum used by log_length_at_age().
+    const Type length_difference = length - length_floor;
+    const Type smoothing_derivative =
+        Type(0.5) *
+        (Type(1.0) +
+         length_difference / fims_math::ad_fabs(length_difference));
+    const Type log_length_derivative =
+        smoothing_derivative / length_safe;
 
     const Type d_length_d_asymptotic_length = one_minus_survival_like;
     const Type d_length_d_growth_coefficient =
@@ -140,11 +150,11 @@ struct VonBertalanffyTraditionalGrowth : public GrowthBase<Type> {
         -asymptotic_length * growth_coefficient * survival_like;
 
     d_log_laa_d_asymptotic_length =
-        d_length_d_asymptotic_length / length_safe;
+        log_length_derivative * d_length_d_asymptotic_length;
     d_log_laa_d_growth_coefficient =
-        d_length_d_growth_coefficient / length_safe;
+        log_length_derivative * d_length_d_growth_coefficient;
     d_log_laa_d_age_at_zero_length =
-        d_length_d_age_at_zero_length / length_safe;
+        log_length_derivative * d_length_d_age_at_zero_length;
   }
 
   /**
