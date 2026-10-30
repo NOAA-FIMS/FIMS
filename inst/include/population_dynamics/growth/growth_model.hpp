@@ -50,7 +50,7 @@ class GrowthModel : public GrowthModelBase<Type> {
         n_sexes_(n_sexes),
         products_(n_years, n_ages, n_sexes) {}
 
-  /// Set fixed VonBertalanffySchnute parameters.
+  /// Set natural-scale VonBertalanffySchnute mean-growth parameters.
   void SetVonBertalanffySchnuteParameters(Type mean_length_young,
                                           Type mean_length_old,
                                           Type growth_coefficient,
@@ -67,7 +67,7 @@ class GrowthModel : public GrowthModelBase<Type> {
     needs_update_ = true;
   }
 
-  /// Set fixed traditional Von Bertalanffy parameters.
+  /// Set natural-scale traditional Von Bertalanffy mean-growth parameters.
   void SetVonBertalanffyTraditionalParameters(Type asymptotic_length,
                                               Type growth_coefficient,
                                               Type age_at_zero_length) {
@@ -78,7 +78,7 @@ class GrowthModel : public GrowthModelBase<Type> {
     needs_update_ = true;
   }
 
-  /// fixed length-weight params (phase 1)
+  /// Set natural-scale length-weight parameters.
   void SetLengthWeightParameters(Type length_weight_a, Type length_weight_b) {
     vb_.length_weight_a = length_weight_a;
     vb_.length_weight_b = length_weight_b;

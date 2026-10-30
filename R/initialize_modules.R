@@ -150,6 +150,27 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
     "ages", "weights"
   )
 
+  optional_growth_fields <- character()
+
+  if (module_class_name == "VonBertalanffySchnuteGrowth") {
+    optional_growth_fields <- c(
+      "length_at_age_sd_young",
+      "length_at_age_sd_old"
+    )
+  }
+
+  if (module_class_name == "VonBertalanffyTraditionalGrowth") {
+    optional_growth_fields <- c(
+      "reference_age_for_length_young",
+      "reference_age_for_length_old",
+      "length_at_age_sd_young",
+      "length_at_age_sd_old",
+      "log_sd_asymptotic_length",
+      "log_sd_growth_coefficient",
+      "asymptotic_length_growth_coefficient_logit_corr"
+    )
+  }
+
   for (field in module_fields) {
     if (field %in% integer_fields) {
       module[[field]]$set(
@@ -177,27 +198,6 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       )
       module[[field]][] <- get_value_function(data)
     } else {
-      optional_growth_fields <- character()
-
-      if (module_class_name == "VonBertalanffySchnuteGrowth") {
-        optional_growth_fields <- c(
-          "length_at_age_sd_young",
-          "length_at_age_sd_old"
-        )
-      }
-
-      if (module_class_name == "VonBertalanffyTraditionalGrowth") {
-        optional_growth_fields <- c(
-          "reference_age_for_length_young",
-          "reference_age_for_length_old",
-          "length_at_age_sd_young",
-          "length_at_age_sd_old",
-          "log_sd_asymptotic_length",
-          "log_sd_growth_coefficient",
-          "asymptotic_length_growth_coefficient_logit_corr"
-        )
-      }
-
       if (field %in% optional_growth_fields && !(field %in% module_input$label)) {
         next
       }
@@ -692,7 +692,7 @@ initialize_comp <- function(data,
         dplyr::pull(.data$module_type) %in% c(
           "VonBertalanffySchnute",
           "VonBertalanffyTraditional"
-          )
+        )
     )
 
   if (identical(type, "LengthComp")) {
