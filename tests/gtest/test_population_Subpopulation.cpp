@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "test_population_test_fixture.hpp"
+#include "common/information.hpp"
 
 TEST(Subpopulation, ValidatesConservationAndNames) {
   auto groups = fims_popdy::MakeTwoSexSubpopulations(0.6, 0.4);
@@ -172,6 +173,7 @@ TEST_F(ExplicitSubpopulationTest, RepeatedEvaluationDoesNotAccumulateState) {
 
 TEST_F(ExplicitSubpopulationTest, SupportsThirdGroupAndRejectsInvalidShapes) {
   Configure();
+  population->subpopulation_biology.clear();
   population->subpopulations = {{"female", 0.4, 0.3, 1.0},
                                 {"male", 0.4, 0.4, 0.0},
                                 {"other", 0.2, 0.3, 0.0}};
@@ -281,4 +283,142 @@ TEST_F(ExplicitSubpopulationTest, FleetWeightsAffectObservationsNotBiomass) {
     biomass += pdq["numbers_at_age"][a] *
                catch_at_age_model->PopulationMeanWeightAA(population, 0, a);
   EXPECT_NEAR(pdq["biomass"][0], biomass, 1e-7);
+}
+
+TEST_F(ExplicitSubpopulationTest,
+       DifferentBiologyDrivesBiomassReproductionAndCatch) {
+  Configure(true);
+  auto growth = std::make_shared<fims_popdy::EWAAGrowth<double>>();
+  for (int y = 0; y <= n_years; ++y) {
+    for (int a = 0; a < n_ages; ++a)
+      growth->ewaa[y][population->ages[a]] = 2.0 + 0.1 * a;
+  }
+  auto maturity = std::make_shared<fims_popdy::LogisticMaturity<double>>();
+  maturity->inflection_point = fims::Vector<double>(1, 3.0);
+  maturity->slope = fims::Vector<double>(1, 0.7);
+  auto selectivity =
+      std::make_shared<fims_popdy::LogisticSelectivity<double>>();
+  selectivity->inflection_point = fims::Vector<double>(1, 2.0);
+  selectivity->slope = fims::Vector<double>(1, 0.9);
+  auto& biology = population->subpopulation_biology[0];
+  biology.growth = growth;
+  biology.maturity = maturity;
+  biology.selectivity[population->fleets[0]->GetId()] = selectivity;
+  Run();
+  auto& dq =
+      catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
+  const size_t state_plane = (n_years + 1) * n_ages;
+  double expected_sb = 0.0;
+  double expected_biomass = 0.0;
+  double expected_phi = 0.0;
+  for (int a = 0; a < n_ages; ++a) {
+    const double weight = 2.0 + 0.1 * a;
+    const double mature = maturity->evaluate(population->ages[a], 0);
+    const double nf = dq["numbers_at_age_by_subpopulation"][a];
+    const double nm = dq["numbers_at_age_by_subpopulation"][state_plane + a];
+    expected_sb += nf * weight * mature;
+    expected_biomass +=
+        nf * weight +
+        nm * catch_at_age_model->PopulationMeanWeightAA(population, 0, a);
+    double spr = 0.4 * std::exp(-0.2 * a);
+    if (a == n_ages - 1) spr /= 1.0 - std::exp(-0.2);
+    expected_phi += spr * weight * mature;
+    EXPECT_DOUBLE_EQ(dq["weight_at_age_by_subpopulation"][a], weight);
+    EXPECT_DOUBLE_EQ(dq["proportion_mature_at_age_by_subpopulation"][a],
+                     mature);
+  }
+  EXPECT_NEAR(dq["biomass"][0], expected_biomass, 1e-7);
+  EXPECT_NEAR(dq["spawning_biomass"][0], expected_sb, 1e-7);
+  EXPECT_NEAR(catch_at_age_model->CalculateSBPR0(population), expected_phi,
+              1e-10);
+  const auto& fleet = population->fleets[0];
+  auto& fdq = catch_at_age_model->GetFleetDerivedQuantities(fleet->GetId());
+  const double f = fleet->Fmort[0] * population->f_multiplier[0] *
+                   selectivity->evaluate(population->ages[0], 0);
+  const double z = dq["mortality_Z_by_subpopulation"][0];
+  const double nf = dq["numbers_at_age_by_subpopulation"][0];
+  EXPECT_NEAR(fdq["catch_numbers_at_age_by_subpopulation"][0],
+              nf * f / z * (1 - std::exp(-z)), 1e-8);
+  EXPECT_NEAR(fdq["catch_weight_at_age_by_subpopulation"][0],
+              fdq["catch_numbers_at_age_by_subpopulation"][0] * 2, 1e-8);
+  EXPECT_NEAR(
+      fdq["index_weight_at_age_by_subpopulation"][0],
+      nf * fleet->q[0] * selectivity->evaluate(population->ages[0], 0) * 2,
+      1e-8);
+  const double zm = dq["mortality_Z_by_subpopulation"][n_years * n_ages];
+  EXPECT_NEAR(
+      dq["numbers_at_age_by_subpopulation"][n_ages + 1] /
+          dq["numbers_at_age_by_subpopulation"][state_plane + n_ages + 1],
+      1.5 * std::exp(zm - z), 1e-12);
+}
+
+TEST_F(ExplicitSubpopulationTest,
+       ModuleLinksValidateAndPreserveSharedReferences) {
+  Configure();
+  fims_info::Information<double> info;
+  auto& config = population->subpopulations[0];
+  config.growth_id = 10;
+  EXPECT_THROW(info.SetSubpopulationBiology(population), std::invalid_argument);
+  info.growth_models[10] = population->growth;
+  config.maturity_id = 20;
+  EXPECT_THROW(info.SetSubpopulationBiology(population), std::invalid_argument);
+  info.maturity_models[20] = population->maturity;
+  config.selectivity_ids[999999] = 30;
+  EXPECT_THROW(info.SetSubpopulationBiology(population), std::invalid_argument);
+  config.selectivity_ids.clear();
+  const auto& fleet = population->fleets[0];
+  config.selectivity_ids[fleet->GetId()] = 30;
+  EXPECT_THROW(info.SetSubpopulationBiology(population), std::invalid_argument);
+  info.selectivity_models[30] = fleet->selectivity;
+  info.SetSubpopulationBiology(population);
+  EXPECT_EQ(population->subpopulation_biology[0].growth, population->growth);
+  EXPECT_EQ(population->subpopulation_biology[0].maturity,
+            population->maturity);
+  EXPECT_EQ(population->subpopulation_biology[0].selectivity.at(fleet->GetId()),
+            fleet->selectivity);
+  EXPECT_EQ(population->subpopulation_biology[1].growth, nullptr);
+  EXPECT_EQ(population->subpopulation_biology[1].maturity, nullptr);
+  EXPECT_TRUE(population->subpopulation_biology[1].selectivity.empty());
+}
+
+TEST_F(ExplicitSubpopulationTest,
+       DerivedGrowthRefreshesAndRejectsIncompatibleLengthMapping) {
+  Configure();
+  auto growth = std::make_shared<
+      fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
+  growth->MeanLengthYoungVector() = fims::Vector<double>(1, std::log(20.0));
+  growth->MeanLengthOldVector() = fims::Vector<double>(1, std::log(80.0));
+  growth->GrowthCoefficientVector() = fims::Vector<double>(1, std::log(0.2));
+  growth->ReferenceAgeForLengthYoungVector() = fims::Vector<double>(1, 1.0);
+  growth->ReferenceAgeForLengthOldVector() = fims::Vector<double>(1, 12.0);
+  growth->LengthWeightAVector() = fims::Vector<double>(1, std::log(1e-5));
+  growth->LengthWeightBVector() = fims::Vector<double>(1, std::log(3.0));
+  growth->LengthAtAgeSdAtRefAgesVector() =
+      fims::Vector<double>(2, std::log(2.0));
+  population->subpopulations[0].growth_id = 60;
+  fims_info::Information<double> info;
+  info.growth_models[60] = growth;
+  info.SetSubpopulationBiology(population);
+  catch_at_age_model->PreparePopulationGrowthProducts();
+  const double before =
+      catch_at_age_model->SubpopulationWeightAA(population, 0, 0, 0);
+  EXPECT_GT(before, 0.0);
+  growth->LengthWeightAVector()[0] += std::log(2.0);
+  catch_at_age_model->PreparePopulationGrowthProducts();
+  EXPECT_NEAR(catch_at_age_model->SubpopulationWeightAA(population, 0, 0, 0),
+              2 * before, 1e-12);
+  EXPECT_NEAR(
+      catch_at_age_model->SubpopulationWeightAA(population, 0, n_years, 0),
+      2 * before, 1e-12);
+  auto provider =
+      std::make_shared<fims_popdy::GrowthDerivedSizeProvider<double>>(growth);
+  auto& fleet = population->fleets[0];
+  fleet->requires_age_length_mapping = true;
+  fleet->n_lengths = 2;
+  fleet->lengths = fims::Vector<double>{100.0, 200.0};
+  fleet->length_bin_edges = fims::Vector<double>{50.0, 150.0, 250.0};
+  fleet->age_to_length_conversion_model =
+      std::make_shared<fims_popdy::AgeToLengthConversionDerived<double>>(
+          fleet, growth, provider);
+  EXPECT_THROW(info.SetSubpopulationBiology(population), std::invalid_argument);
 }

@@ -20,6 +20,14 @@
 
 namespace fims_popdy {
 
+/** @brief Resolved optional module references for one biological group. */
+template <typename Type>
+struct SubpopulationBiology {
+  std::shared_ptr<GrowthBase<Type>> growth;
+  std::shared_ptr<MaturityBase<Type>> maturity;
+  std::map<uint32_t, std::shared_ptr<SelectivityBase<Type>>> selectivity;
+};
+
 /**
  * @brief Population with optional named biological subpopulations.
  * Empty subpopulation configuration retains pooled dynamics.
@@ -80,6 +88,7 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
 
   /** @brief Empty preserves pooled dynamics; otherwise each group has state. */
   std::vector<Subpopulation> subpopulations;
+  std::vector<SubpopulationBiology<Type>> subpopulation_biology;
 
   /**
    * @brief Constructor.

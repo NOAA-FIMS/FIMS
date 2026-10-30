@@ -862,8 +862,13 @@ initialize_comp <- function(data,
 #' @param subpopulations Optional list of named biological-group configurations.
 #'   Each entry must contain `name`, `initial_fraction`, `recruitment_fraction`,
 #'   and `reproductive_contribution`. Fractions are fixed configuration values.
-#'   `NULL` (default) retains pooled dynamics. Growth, maturity, and fleet
-#'   selectivity are shared in this initial implementation.
+#'   `NULL` (default) retains pooled dynamics. Optional `growth` and `maturity`
+#'   overrides are lists containing a parameter tibble (`parameters`) and/or
+#'   FIMSFrame (`data`); omitted settings use the population inputs. EWAA growth
+#'   also accepts `weights`. Optional `selectivity` is a list named by fleet,
+#'   with the same `parameters`/`data` settings. Unspecified modules are shared.
+#'   Module IDs are for direct Rcpp construction only; this function rebuilds
+#'   its module registry before constructing overrides.
 #' @export
 #' @seealso
 #' * [setup_default_parameters()]
@@ -1228,7 +1233,9 @@ initialize_fims <- function(parameters, data, subpopulations = NULL) {
   )
 
   if (!is.null(subpopulations)) {
-    population$SetSubpopulations(subpopulations)
+    population$SetSubpopulations(initialize_subpopulation_modules(
+      subpopulations, parameters, data, stats::setNames(fleet, fleets)
+    ))
   }
 
   # Set-up TMB

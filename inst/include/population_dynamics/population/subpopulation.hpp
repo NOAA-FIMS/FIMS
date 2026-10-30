@@ -7,6 +7,8 @@
 #define FIMS_POPULATION_DYNAMICS_POPULATION_SUBPOPULATION_HPP
 
 #include <cmath>
+#include <cstdint>
+#include <map>
 #include <set>
 #include <stdexcept>
 #include <string>
@@ -26,6 +28,10 @@ struct Subpopulation {
   double initial_fraction = 1.0;
   double recruitment_fraction = 1.0;
   double reproductive_contribution = 1.0;
+  int growth_id = -999;   /*!< omitted => population growth */
+  int maturity_id = -999; /*!< omitted => population maturity */
+  std::map<uint32_t, uint32_t>
+      selectivity_ids; /*!< fleet id -> selectivity id */
 };
 
 /** @brief Validate named groups and conservation of entry allocations. */

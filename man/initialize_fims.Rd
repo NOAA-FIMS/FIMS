@@ -10,8 +10,12 @@ initialize_fims(parameters, data, subpopulations = NULL)
 \item{subpopulations}{Optional list of group configurations, each containing
 \code{name}, \code{initial_fraction}, \code{recruitment_fraction}, and
 \code{reproductive_contribution}. Fractions are fixed configuration values.
-\code{NULL} retains pooled dynamics. Growth, maturity, and fleet selectivity
-are shared in this initial implementation.}
+\code{NULL} retains pooled dynamics. Optional \code{growth} and \code{maturity}
+settings are lists containing \code{parameters} (a parameter tibble) and/or
+\code{data} (a FIMSFrame), defaulting to the population inputs. EWAA growth
+also accepts \code{weights}. Optional \code{selectivity} is a list named by
+fleet, with the same parameter/data settings. Unspecified modules are shared.
+Use configurations rather than IDs, because this function rebuilds its registry.}
 
 \item{parameters}{A tibble returned from \code{\link[=setup_default_parameters]{setup_default_parameters()}}. It
 is the primary source of information for what is initialized. That is, if a

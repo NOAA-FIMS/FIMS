@@ -1005,6 +1005,78 @@ class Information {
     }
   }
 
+  /** @brief Resolve optional subpopulation modules after population/fleet
+   * links. */
+  void SetSubpopulationBiology(
+      std::shared_ptr<fims_popdy::Population<Type>> p) {
+    p->subpopulation_biology.clear();
+    p->subpopulation_biology.resize(p->subpopulations.size());
+    for (size_t group = 0; group < p->subpopulations.size(); ++group) {
+      const auto& config = p->subpopulations[group];
+      auto& biology = p->subpopulation_biology[group];
+      const std::string context = "Subpopulation " + config.name + ": ";
+      if (config.growth_id != -999) {
+        auto it = growth_models.find(config.growth_id);
+        if (it == growth_models.end() || it->second == nullptr) {
+          throw std::invalid_argument(context + "unknown growth_id");
+        }
+        biology.growth = it->second;
+        auto derived = std::dynamic_pointer_cast<
+            fims_popdy::GrowthDerivedObservationBase<Type>>(biology.growth);
+        if (derived != nullptr) {
+          if (p->ages.empty() || p->n_ages == 0 || p->n_years == 0) {
+            throw std::invalid_argument(
+                context + "growth requires modeled ages and years");
+          }
+          derived->Initialize(p->n_years, p->n_ages, 1);
+          double min_age = p->ages[0];
+          for (size_t age = 1; age < p->ages.size(); ++age) {
+            min_age = (std::min)(min_age, p->ages[age]);
+          }
+          derived->SetAgeOffset(min_age);
+        }
+        if (biology.growth != p->growth) {
+          for (const auto& fleet : p->fleets) {
+            auto mapping = std::dynamic_pointer_cast<
+                fims_popdy::AgeToLengthConversionDerived<Type>>(
+                fleet->age_to_length_conversion_model);
+            if (mapping != nullptr && mapping->IsActive() &&
+                fleet->requires_age_length_mapping) {
+              throw std::invalid_argument(
+                  context +
+                  "growth overrides require a fixed age-to-length mapping "
+                  "for length observations; group-specific derived mappings "
+                  "are not yet supported");
+            }
+          }
+        }
+      }
+      if (config.maturity_id != -999) {
+        auto it = maturity_models.find(config.maturity_id);
+        if (it == maturity_models.end() || it->second == nullptr) {
+          throw std::invalid_argument(context + "unknown maturity_id");
+        }
+        biology.maturity = it->second;
+      }
+      for (const auto& link : config.selectivity_ids) {
+        bool found_fleet = false;
+        for (const auto& fleet : p->fleets) {
+          if (fleet->GetId() == link.first) found_fleet = true;
+        }
+        if (!found_fleet) {
+          throw std::invalid_argument(
+              context +
+              "selectivity fleet_id does not belong to this population");
+        }
+        auto it = selectivity_models.find(link.second);
+        if (it == selectivity_models.end() || it->second == nullptr) {
+          throw std::invalid_argument(context + "unknown selectivity_id");
+        }
+        biology.selectivity[link.first] = it->second;
+      }
+    }
+  }
+
   /**
    * @brief Loop over all density components and set pointers to data objects
    *
@@ -1100,6 +1172,7 @@ class Information {
       }
 
       SetMaturity(valid_model, p);
+      SetSubpopulationBiology(p);
     }
   }
 

@@ -188,6 +188,31 @@ class CatchAtAge : public FisheryModelBase<Type> {
               "[year, age] or [subpopulation, year, age], and log_init_naa "
               "shaped as [age] or [subpopulation, age]");
         }
+        if (population->subpopulation_biology.empty()) {
+          population->subpopulation_biology.resize(count);
+        }
+        if (population->subpopulation_biology.size() != count) {
+          throw std::invalid_argument(
+              "Subpopulation biology must match group count");
+        }
+        for (size_t group = 0; group < count; ++group) {
+          const auto& config = population->subpopulations[group];
+          const auto& biology = population->subpopulation_biology[group];
+          if ((config.growth_id != -999 && biology.growth == nullptr) ||
+              (config.maturity_id != -999 && biology.maturity == nullptr)) {
+            throw std::invalid_argument(
+                "Subpopulation module references must be resolved before "
+                "Initialize");
+          }
+          for (const auto& link : config.selectivity_ids) {
+            auto it = biology.selectivity.find(link.first);
+            if (it == biology.selectivity.end() || it->second == nullptr) {
+              throw std::invalid_argument(
+                  "Subpopulation selectivity references must be resolved "
+                  "before Initialize");
+            }
+          }
+        }
         InitializeSubpopulationDerivedQuantities(population);
       }
       population->M.resize(population->subpopulations.empty()
@@ -1200,6 +1225,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
       if (growth_observation != nullptr) {
         growth_observation->PrepareGrowthProducts();
       }
+      std::set<GrowthBase<Type>*> prepared{population->growth.get()};
+      for (const auto& biology : population->subpopulation_biology) {
+        if (biology.growth == nullptr ||
+            !prepared.insert(biology.growth.get()).second)
+          continue;
+        auto derived =
+            std::dynamic_pointer_cast<GrowthDerivedObservationBase<Type>>(
+                biology.growth);
+        if (derived != nullptr) derived->PrepareGrowthProducts();
+      }
     }
   }
 
@@ -1486,7 +1521,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
     for (const std::string name :
          {"numbers_at_age_by_subpopulation",
           "unfished_numbers_at_age_by_subpopulation",
-          "proportion_at_age_by_subpopulation", "mortality_M_by_subpopulation",
+          "proportion_at_age_by_subpopulation",
+          "weight_at_age_by_subpopulation",
+          "proportion_mature_at_age_by_subpopulation",
+          "mortality_F_by_subpopulation", "mortality_M_by_subpopulation",
           "mortality_Z_by_subpopulation"}) {
       const bool mortality = name.find("mortality_") == 0;
       const size_t years = population->n_years + (mortality ? 0 : 1);
@@ -1558,6 +1596,46 @@ class CatchAtAge : public FisheryModelBase<Type> {
     return numbers;
   }
 
+  /** @brief Biological weight from the group's growth or shared default. */
+  Type SubpopulationWeightAA(
+      const std::shared_ptr<Population<Type>>& population, size_t group,
+      size_t year, size_t age) {
+    const auto& growth = population->subpopulation_biology.at(group).growth;
+    if (growth == nullptr) return PopulationMeanWeightAA(population, year, age);
+    auto derived =
+        std::dynamic_pointer_cast<GrowthDerivedObservationBase<Type>>(growth);
+    if (derived != nullptr) {
+      return BiologicalMeanWeightFromPreparedGrowthProducts(population, derived,
+                                                            year, age);
+    }
+    return growth->evaluate(year, population->ages[age]);
+  }
+
+  /** @brief Biological maturity; reproductive contribution is applied
+   * separately. */
+  Type SubpopulationMaturityAA(
+      const std::shared_ptr<Population<Type>>& population, size_t group,
+      size_t year, size_t age) {
+    const auto& override = population->subpopulation_biology.at(group).maturity;
+    const auto& maturity =
+        override == nullptr ? population->maturity : override;
+    return maturity->evaluate(population->ages[age],
+                              (std::min)(year, population->n_years - 1));
+  }
+
+  /** @brief Fleet selectivity for this group, falling back to the fleet module.
+   */
+  Type SubpopulationSelectivityAA(
+      const std::shared_ptr<Population<Type>>& population, size_t group,
+      const std::shared_ptr<Fleet<Type>>& fleet, size_t year, size_t age) {
+    const auto& overrides =
+        population->subpopulation_biology.at(group).selectivity;
+    auto it = overrides.find(fleet->GetId());
+    const auto& selectivity =
+        it == overrides.end() ? fleet->selectivity : it->second;
+    return selectivity->evaluate(population->ages[age], year);
+  }
+
   /** @brief SBPR from group-specific unfished survival and reproduction. */
   Type SubpopulationSBPR0(std::shared_ptr<Population<Type>>& population) {
     Type phi = 0.0;
@@ -1566,8 +1644,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       for (size_t age = 0; age < population->n_ages; ++age) {
         phi += numbers[age] *
                population->subpopulations[group].reproductive_contribution *
-               population->maturity->evaluate(population->ages[age], 0) *
-               PopulationMeanWeightAA(population, 0, age);
+               SubpopulationMaturityAA(population, group, 0, age) *
+               SubpopulationWeightAA(population, group, 0, age);
       }
     }
     return phi;
@@ -1576,9 +1654,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
   /**
    * @brief Explicit abundance and survival with population-level recruitment.
    *
-   * Growth, maturity, fleet selectivity and catchability are shared in this
-   * first implementation. M and initial abundance may be shared or supplied
-   * separately for each group. Pooled observations sum group predictions.
+   * Growth, maturity and fleet selectivity use optional group overrides.
+   * M and initial abundance may be shared or supplied separately for each
+   * group. Pooled observations sum group predictions; catchability is shared.
    */
   void EvaluateSubpopulations(std::shared_ptr<Population<Type>>& population) {
     auto& dq = this->GetPopulationDerivedQuantities(population->GetId());
@@ -1601,28 +1679,20 @@ class CatchAtAge : public FisheryModelBase<Type> {
       if (year > 0) CalculateRecruitment(population, year * ages, year, year);
       for (size_t age = 0; age < ages; ++age) {
         const size_t pooled = year * ages + age;
-        Type fishing = 0.0;
-        if (year < years) {
-          for (const auto& fleet : population->fleets) {
-            Type selectivity =
-                fleet->selectivity->evaluate(population->ages[age], year);
-            fishing += fleet->Fmort[year] * population->f_multiplier[year] *
-                       selectivity;
-            dq["sum_selectivity"][pooled] += selectivity;
-          }
-          dq["mortality_F"][pooled] = fishing;
-        }
-        const Type weight = PopulationMeanWeightAA(population, year, age);
-        const Type mature = population->maturity->evaluate(
-            population->ages[age], (std::min)(year, years - 1));
-        dq["proportion_mature_at_age"][pooled] = mature;
         Type total = 0.0;
         Type total_unfished = 0.0;
         Type weighted_m = 0.0;
+        Type weighted_f = 0.0;
+        Type weighted_selectivity = 0.0;
+        Type weighted_maturity = 0.0;
         for (size_t group = 0; group < population->subpopulations.size();
              ++group) {
           const auto& config = population->subpopulations[group];
           const size_t i = state.index(group, year, age);
+          const Type weight =
+              SubpopulationWeightAA(population, group, year, age);
+          const Type mature =
+              SubpopulationMaturityAA(population, group, year, age);
           if (year == 0) {
             const bool shared = population->log_init_naa.size() == ages;
             numbers[i] =
@@ -1650,6 +1720,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
           }
           total += numbers[i];
           total_unfished += unfished[i];
+          weighted_maturity += numbers[i] * mature;
+          dq["biomass"][year] += numbers[i] * weight;
+          dq["unfished_biomass"][year] += unfished[i] * weight;
+          dq["weight_at_age_by_subpopulation"][i] = weight;
+          dq["proportion_mature_at_age_by_subpopulation"][i] = mature;
           dq["spawning_biomass"][year] +=
               numbers[i] * weight * mature * config.reproductive_contribution;
           dq["unfished_spawning_biomass"][year] +=
@@ -1657,14 +1732,26 @@ class CatchAtAge : public FisheryModelBase<Type> {
           if (year < years) {
             const size_t j = rates.index(group, year, age);
             const Type m = SubpopulationMortality(population, group, year, age);
+            Type fishing = 0.0;
+            Type sum_selectivity = 0.0;
+            for (const auto& fleet : population->fleets) {
+              const Type selectivity = SubpopulationSelectivityAA(
+                  population, group, fleet, year, age);
+              fishing += fleet->Fmort[year] * population->f_multiplier[year] *
+                         selectivity;
+              sum_selectivity += selectivity;
+            }
             const Type z = m + fishing;
+            weighted_f += numbers[i] * fishing;
+            weighted_selectivity += numbers[i] * sum_selectivity;
+            dq["mortality_F_by_subpopulation"][j] = fishing;
             mortality[j] = m;
             total_mortality[j] = z;
             weighted_m += numbers[i] * m;
             for (const auto& fleet : population->fleets) {
               auto& fdq = this->GetFleetDerivedQuantities(fleet->GetId());
-              const Type selectivity =
-                  fleet->selectivity->evaluate(population->ages[age], year);
+              const Type selectivity = SubpopulationSelectivityAA(
+                  population, group, fleet, year, age);
               const Type f = fleet->Fmort[year] *
                              population->f_multiplier[year] * selectivity;
               const Type fleet_weight = fleet->weight_at_age.size() > 0
@@ -1694,13 +1781,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
           const size_t i = state.index(group, year, age);
           dq["proportion_at_age_by_subpopulation"][i] = numbers[i] / total;
         }
-        dq["biomass"][year] += total * weight;
-        dq["unfished_biomass"][year] += total_unfished * weight;
+        dq["proportion_mature_at_age"][pooled] = weighted_maturity / total;
         if (year == 0 && age == 0) dq["expected_recruitment"][0] = total;
         if (year < years) {
           // Abundance-weighted summaries only; survival always uses group Z.
           dq["mortality_M"][pooled] = weighted_m / total;
-          dq["mortality_Z"][pooled] = weighted_m / total + fishing;
+          dq["mortality_F"][pooled] = weighted_f / total;
+          dq["sum_selectivity"][pooled] = weighted_selectivity / total;
+          dq["mortality_Z"][pooled] = (weighted_m + weighted_f) / total;
           CalculateCatch(population, year, age);
           CalculateIndex(population, pooled, year, age);
         }
@@ -2145,7 +2233,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
            {"numbers_at_age_by_subpopulation",
             "unfished_numbers_at_age_by_subpopulation",
             "proportion_at_age_by_subpopulation",
-            "mortality_M_by_subpopulation", "mortality_Z_by_subpopulation"}) {
+            "weight_at_age_by_subpopulation",
+            "proportion_mature_at_age_by_subpopulation",
+            "mortality_F_by_subpopulation", "mortality_M_by_subpopulation",
+            "mortality_Z_by_subpopulation"}) {
         vector<vector<Type>> values(n_pops);
         bool present = false;
         for (size_t p = 0; p < this->populations.size(); ++p) {

@@ -9,6 +9,8 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 
+#include <limits>
+
 #include "rcpp_interface_base.hpp"
 #include "../../../population_dynamics/population/population.hpp"
 
@@ -308,10 +310,65 @@ class PopulationInterface : public PopulationInterfaceBase {
               std::string("Missing subpopulation field: ") + key);
         }
       }
-      groups.push_back({Rcpp::as<std::string>(item["name"]),
-                        Rcpp::as<double>(item["initial_fraction"]),
-                        Rcpp::as<double>(item["recruitment_fraction"]),
-                        Rcpp::as<double>(item["reproductive_contribution"])});
+      const std::set<std::string> allowed{"name",
+                                          "initial_fraction",
+                                          "recruitment_fraction",
+                                          "reproductive_contribution",
+                                          "growth_id",
+                                          "maturity_id",
+                                          "selectivity_ids"};
+      std::set<std::string> seen;
+      Rcpp::CharacterVector fields = item.names();
+      for (int j = 0; j < fields.size(); ++j) {
+        const std::string field = Rcpp::as<std::string>(fields[j]);
+        if (!allowed.count(field) || !seen.insert(field).second) {
+          throw std::invalid_argument(
+              "Unknown or duplicate subpopulation field: " + field);
+        }
+      }
+      auto read_id = [](double value) {
+        if (!std::isfinite(value) || value < 0.0 ||
+            value != std::floor(value) ||
+            value > std::numeric_limits<int>::max()) {
+          throw std::invalid_argument(
+              "Module and fleet IDs must be nonnegative integers");
+        }
+        return static_cast<int>(value);
+      };
+      fims_popdy::Subpopulation group{
+          Rcpp::as<std::string>(item["name"]),
+          Rcpp::as<double>(item["initial_fraction"]),
+          Rcpp::as<double>(item["recruitment_fraction"]),
+          Rcpp::as<double>(item["reproductive_contribution"])};
+      if (item.containsElementNamed("growth_id")) {
+        group.growth_id = read_id(Rcpp::as<double>(item["growth_id"]));
+      }
+      if (item.containsElementNamed("maturity_id")) {
+        group.maturity_id = read_id(Rcpp::as<double>(item["maturity_id"]));
+      }
+      if (item.containsElementNamed("selectivity_ids")) {
+        Rcpp::NumericVector ids =
+            Rcpp::as<Rcpp::NumericVector>(item["selectivity_ids"]);
+        if (!ids.hasAttribute("names")) {
+          throw std::invalid_argument(
+              "selectivity_ids must be named by fleet ID");
+        }
+        Rcpp::CharacterVector names = ids.names();
+        for (int j = 0; j < ids.size(); ++j) {
+          const std::string name = Rcpp::as<std::string>(names[j]);
+          if (name.empty() ||
+              name.find_first_not_of("0123456789") != std::string::npos) {
+            throw std::invalid_argument(
+                "selectivity_ids names must be fleet IDs");
+          }
+          const int fleet_id = read_id(std::stod(name));
+          if (!group.selectivity_ids.emplace(fleet_id, read_id(ids[j]))
+                   .second) {
+            throw std::invalid_argument("Duplicate fleet in selectivity_ids");
+          }
+        }
+      }
+      groups.push_back(std::move(group));
     }
     fims_popdy::ValidateSubpopulations(groups);
     *subpopulations = std::move(groups);
@@ -328,12 +385,26 @@ class PopulationInterface : public PopulationInterfaceBase {
     Rcpp::List result(subpopulations->size());
     for (size_t i = 0; i < subpopulations->size(); ++i) {
       const auto& group = (*subpopulations)[i];
-      result[i] = Rcpp::List::create(
+      Rcpp::List item = Rcpp::List::create(
           Rcpp::Named("name") = group.name,
           Rcpp::Named("initial_fraction") = group.initial_fraction,
           Rcpp::Named("recruitment_fraction") = group.recruitment_fraction,
           Rcpp::Named("reproductive_contribution") =
               group.reproductive_contribution);
+      if (group.growth_id != -999) item["growth_id"] = group.growth_id;
+      if (group.maturity_id != -999) item["maturity_id"] = group.maturity_id;
+      if (!group.selectivity_ids.empty()) {
+        Rcpp::IntegerVector ids(group.selectivity_ids.size());
+        Rcpp::CharacterVector names(group.selectivity_ids.size());
+        size_t j = 0;
+        for (const auto& link : group.selectivity_ids) {
+          ids[j] = link.second;
+          names[j++] = std::to_string(link.first);
+        }
+        ids.attr("names") = names;
+        item["selectivity_ids"] = ids;
+      }
+      result[i] = item;
     }
     return result;
   }
