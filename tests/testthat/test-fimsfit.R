@@ -166,7 +166,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
       tibble::tibble(
         label = "log_devs",
         timing = 2:get_n_years(data_age_comp),
-        estimation_type = "fixed_effects"
+        estimation_status = "fixed_effects"
       ),
       by = c("label", "timing")
     ) |>
@@ -174,7 +174,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
       tibble::tibble(
         module_name = "Recruitment",
         label = "log_sd",
-        estimation_type = "constant"
+        estimation_status = "not_estimated"
       ),
       by = c("module_name", "label")
     )
@@ -205,7 +205,7 @@ test_that("fit_fims() errors when optimization fails to converge", {
       tibble::tibble(
         fleet = "fleet1",
         label = "log_q",
-        estimation_type = "fixed_effects"
+        estimation_status = "fixed_effects"
       ),
       by = c("fleet", "label")
     )

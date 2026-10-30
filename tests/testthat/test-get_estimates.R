@@ -20,7 +20,7 @@ expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
   "parameter_id", "fleet", "year_i", "age", "length",
   "input", "estimated", "expected", "observed",
-  "estimation_type", "uncertainty",
+  "estimation_status", "uncertainty",
   "distribution", "input_type",
   "lpdf", "likelihood", "log_sd", "log_like_cv", "gradient"
 )
@@ -71,10 +71,10 @@ test_that("`get_estimates()` reports distribution parameters by id", {
   data_4_model <- FIMSFrame(data_big)
   parameters <- setup_default_parameters(data = data_4_model) |>
     dplyr::mutate(
-      estimation_type = dplyr::if_else(
+      estimation_status = dplyr::if_else(
         .data$module_name == "Recruitment" & .data$label == "log_sd",
         "fixed_effects",
-        .data$estimation_type
+        .data$estimation_status
       )
     )
   fit <- parameters |>
@@ -98,14 +98,14 @@ test_that("`get_estimates()` reports distribution parameters by id", {
     unique()
   expect_equal(
     object = unlist(log_sd_rows[c(
-      "module_name", "module_id", "label", "distribution", "estimation_type"
+      "module_name", "module_id", "label", "distribution", "estimation_status"
     )]),
     expected = c(
       module_name = "Recruitment",
       module_id = as.character(log_devs_module_id),
       label = "log_sd",
       distribution = "normal",
-      estimation_type = "fixed_effects"
+      estimation_status = "fixed_effects"
     )
   )
   #' @description Test that `get_estimates()` does not report the fixed `log_sd` of the landings and index distributions as parameters.
@@ -155,7 +155,7 @@ test_that("`get_estimates()` handles non-finite derived quantities", {
     parameters[["fleet"]] == "fleet1" & parameters[["label"]] == "log_Fmort"
   )[1]
   parameters[["value"]][first_log_fmort] <- -1000
-  parameters[["estimation_type"]][first_log_fmort] <- "constant"
+  parameters[["estimation_status"]][first_log_fmort] <- "not_estimated"
   fit <- parameters |>
     initialize_fims(data = data_4_model) |>
     fit_fims(optimize = FALSE)
@@ -175,14 +175,14 @@ test_that("`get_estimates()` works for a model without random effects", {
   data_4_model <- FIMSFrame(data_big)
   # Without a distribution on the recruitment deviations, the model has no
   # random-effect distribution and so no distribution parameters to report.
-  # initialize_fims() requires the deviations to be constant in that case.
+  # initialize_fims() requires the deviations to be not_estimated in that case.
   recruitment_deviations <- c("log_devs", "log_sd")
   parameters <- setup_default_parameters(data = data_4_model) |>
     dplyr::mutate(
-      estimation_type = dplyr::if_else(
+      estimation_status = dplyr::if_else(
         .data$module_name == "Recruitment" & .data$label == "log_devs",
-        "constant",
-        .data$estimation_type
+        "not_estimated",
+        .data$estimation_status
       ),
       distribution_type = dplyr::if_else(
         .data$module_name == "Recruitment" &
@@ -226,7 +226,7 @@ test_that("`get_estimates()` works with time-varying age-specific selectivity", 
     dplyr::mutate(
       value = rep(seq_len(n_years), each = n_ages) / 10 +
         rep(seq_len(n_ages), times = n_years) / 100,
-      estimation_type = "constant"
+      estimation_status = "not_estimated"
     )
   parameters <- setup_default_parameters(data = data_4_model) |>
     dplyr::filter(

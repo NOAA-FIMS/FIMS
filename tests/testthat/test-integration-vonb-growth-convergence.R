@@ -213,7 +213,7 @@ make_vonb_model_comparison_context <- function() {
   base_parameters <- FIMS::parameters_big |>
     dplyr::mutate(
       value = dplyr::if_else(
-        estimation_type != "constant",
+        estimation_status != "not_estimated",
         value * initial_value_scale,
         value
       )

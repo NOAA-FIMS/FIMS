@@ -49,7 +49,7 @@ reshape_json_estimates <- function(model_output) {
       dplyr::left_join(
         y = random_effects,
         by = c(
-          "estimation_type" = "input_type", "type_id", "density_position"
+          "estimation_status" = "input_type", "type_id", "density_position"
         ),
         na_matches = "never"
       ) |>
@@ -77,7 +77,7 @@ reshape_json_estimates <- function(model_output) {
   distribution_information <- NULL
   if ("parameters" %in% names(density_components)) {
     # Only random-effect distributions for now. The log_sd of a data
-    # distribution is set from the data uncertainty, held constant, and
+    # distribution is set from the data uncertainty, not estimated, and
     # already reported next to each observation, and a prior's parameters are
     # fixed inputs.
     random_effect_distributions <- density_components |>
@@ -303,7 +303,7 @@ reshape_json_estimates <- function(model_output) {
       estimated = "estimated_value",
       "expected" = expected_values,
       "observed" = observed_values,
-      dplyr::all_of(c("estimation_type", "distribution", "input_type")),
+      dplyr::all_of(c("estimation_status", "distribution", "input_type")),
       lpdf = "lpdf_value", dplyr::all_of("likelihood"),
       "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
@@ -485,7 +485,7 @@ dimension_folded_to_tibble <- function(section) {
     temp |>
       dplyr::bind_cols(
         estimated_value = unlist(section[["value"]]),
-        estimation_type = "derived_quantity"
+        estimation_status = "derived_quantity"
       )
   }
 }
