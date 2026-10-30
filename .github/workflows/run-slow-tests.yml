@@ -45,6 +45,7 @@ jobs:
           - integration-caa
           - integration-fims-bayesian
           - integration-fims-estimation-random-effects
+          - integration-properties
           - integration-proportion
           - integration-unfished-equilibrium
           - integration-vonb-growth-convergence
