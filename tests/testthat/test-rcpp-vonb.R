@@ -993,6 +993,47 @@ test_that("rcpp von Bertalanffy Traditional delta variability requires constant 
   }
 })
 
+test_that("rcpp Traditional interpolation rejects non-finite reference ages", {
+  ctx <- make_vonb_traditional_test_context()
+  vb <- new_vonb_traditional(ctx)
+
+  on.exit(
+    {
+      rm(vb, ctx)
+      gc()
+      FIMS::clear()
+    },
+    add = TRUE
+  )
+
+  vb$age_at_zero_length[1]$estimation_type$set("constant")
+
+  fields <- c(
+    "reference_age_for_length_young",
+    "reference_age_for_length_old"
+  )
+
+  #' @description Test that interpolation reference ages must be finite
+  #' even when t0 is constant.
+  for (field in fields) {
+    original_value <- vb[[field]][1]$value
+
+    for (invalid_value in c(NA_real_, NaN, Inf, -Inf)) {
+      vb[[field]][1]$value <- invalid_value
+
+      expect_error(
+        vb$add_to_fims_tmb(),
+        regexp = paste0(
+          field,
+          " is .*Supply a finite numeric value\\."
+        )
+      )
+    }
+
+    vb[[field]][1]$value <- original_value
+  }
+})
+
 test_that("rcpp von Bertalanffy Traditional interpolation requires constant reference ages", {
   ctx <- make_vonb_traditional_test_context()
   vb <- new_vonb_traditional(ctx)

@@ -1205,20 +1205,6 @@ class VonBertalanffyTraditionalGrowthInterface
       const double reference_age_old =
           this->reference_age_for_length_old[0].initial_value_m;
 
-      if (!std::isfinite(reference_age_young)) {
-        Rcpp::stop(
-            "reference_age_for_length_young is %.17g. "
-            "Supply a finite numeric value.",
-            reference_age_young);
-      }
-
-      if (!std::isfinite(reference_age_old)) {
-        Rcpp::stop(
-            "reference_age_for_length_old is %.17g. "
-            "Supply a finite numeric value.",
-            reference_age_old);
-      }
-
       if (reference_age_old <= reference_age_young) {
         Rcpp::stop(
             "Older interpolation reference age %.17g must be greater "
@@ -1412,6 +1398,27 @@ class VonBertalanffyTraditionalGrowthInterface
           "reference-age input");
     }
 
+
+    if (has_sd) {
+      const double reference_age_young =
+          this->reference_age_for_length_young[0].initial_value_m;
+      const double reference_age_old =
+          this->reference_age_for_length_old[0].initial_value_m;
+
+      if (!std::isfinite(reference_age_young)) {
+        Rcpp::stop(
+            "reference_age_for_length_young is %.17g. "
+            "Supply a finite numeric value.",
+            reference_age_young);
+      }
+
+      if (!std::isfinite(reference_age_old)) {
+        Rcpp::stop(
+            "reference_age_for_length_old is %.17g. "
+            "Supply a finite numeric value.",
+            reference_age_old);
+      }
+    }
     if (has_sd &&
         (this->reference_age_for_length_young[0].estimation_type_m.get() !=
              "constant" ||
