@@ -35,7 +35,9 @@ see all available slots.
 
 The input data are both sorted (see the section below on sorting) and
 expanded to include -999 observations for all missing rows before
-returning them in the data slot.
+returning them in the data slot. Weight-at-age rows are not expanded.
+See
+[`model_weight_at_age()`](https://NOAA-FIMS.github.io/FIMS/reference/model_.md).
 
 #### Ages
 

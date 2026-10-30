@@ -42,13 +42,13 @@ model_length_comp(x, fleet)
 # S4 method for class 'data.frame'
 model_length_comp(x, fleet)
 
-model_weight_at_age(x)
+model_weight_at_age(x, fleet = NA_character_)
 
 # S4 method for class 'FIMSFrame'
-model_weight_at_age(x)
+model_weight_at_age(x, fleet = NA_character_)
 
 # S4 method for class 'data.frame'
-model_weight_at_age(x)
+model_weight_at_age(x, fleet = NA_character_)
 
 model_age_to_length_conversion(x)
 
@@ -109,10 +109,25 @@ age-to-length conversion data are present in the `FIMSFrame` object.
 
 ### `model_weight_at_age()`
 
-Returns a numeric vector of weight-at-age observations (type
-`"weight_at_age"`), ordered by age and year (plus one additional year)
-and using `-999` to indicate missing observations When multiple fleets
-are present, values are averaged across fleets.
+Returns a numeric vector of weight at age (type `"weight_at_age"`),
+ordered by year and then age. Rows with `timing = NA` apply to every
+year and rows with a `timing` replace that default for that year. With
+the default `fleet = NA`, the function returns the population weight at
+age from `fleet = NA` rows, including the year after the last modeled
+year. For the population, this additional year is needed to calculate
+biomass after all fishing for the terminal year has occurred. When users
+specify `fleet = NA` but no population-level information exists and
+information is only supplied for a single fleet, then this fleet-level
+information will be used for both the population and the fleet. The
+function will error though if population-level information is absent and
+information for more than one fleet exists. When a fleet name is
+specified, the function returns that fleet's weight at age for the model
+years if available. For years without fleet- and year-specific
+information, then the fleet-specific information without any timing
+attached to it is returned. If no fleet-specific information is
+available for the missing years, then the population's rows for that
+year will be returned; and, finally population-level information with
+`timing = NA` rows is returned for all other missing rows.
 
 ### `model_age_to_length_conversion()`
 

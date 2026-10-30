@@ -91,7 +91,7 @@ data_big_with_extra_year <- dplyr::add_row(
     !(type == "age_to_length_conversion" | type == "length_comp")
   )
 data_4_projections <- data_big_with_extra_year |>
-  # Add on weight_at_age because you don't want these filled with -999
+  # Add weight_at_age for the projection years, which are now model years
   dplyr::bind_rows(
     dplyr::filter(
       data_big,
@@ -316,7 +316,7 @@ projection_fit <- parameters_projection |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 13.23511 seconds
+    ## ℹ Total run time was 12.7638 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00023
     ## ℹ Negative log likelihood (NLL):

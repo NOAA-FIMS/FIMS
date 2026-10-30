@@ -182,7 +182,7 @@ manipulation of the data is needed.</p>
 <span>    <span class="op">!</span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"age_to_length_conversion"</span> <span class="op">|</span> <span class="va">type</span> <span class="op">==</span> <span class="st">"length_comp"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="va">data_4_projections</span> <span class="op">&lt;-</span> <span class="va">data_big_with_extra_year</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># Add on weight_at_age because you don't want these filled with -999</span></span>
+<span>  <span class="co"># Add weight_at_age for the projection years, which are now model years</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
 <span>      <span class="va">data_big</span>,</span>
@@ -395,7 +395,7 @@ output will be in the same format that users are used to.</p>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 13.23511 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 12.7638 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 0.00023</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>

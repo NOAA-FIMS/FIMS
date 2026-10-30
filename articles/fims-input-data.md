@@ -112,7 +112,7 @@ data_4_model
 
     ## tbl_df of class 'FIMSFrame'
 
-    ## with the following 'types': age_comp, catch, length_comp, weight_at_age, index, age_to_length_conversion
+    ## with the following 'types': age_comp, catch, length_comp, index, age_to_length_conversion, weight_at_age
 
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
 
@@ -376,20 +376,28 @@ are just used for converting from numbers to biomass in the population
 dynamics. The `unit` column should be `mt` and the uncertainty should be
 `NA`.
 
-Two key features of the weight-at-age data are
+The population weight at age has `fleet = NA`. It is used for biomass
+and spawning biomass, and for the catch and index weight of any fleet
+without its own weight at age. Rows with a fleet name are that fleet’s
+weight at age for its catch and index weight, for example from port
+samples or survey samples. For each year, a fleet uses its own rows for
+that year, then its own `timing = NA` rows, then the population weight
+at age, so a fleet only needs rows for the years that differ. If there
+are no `fleet = NA` rows and only 1 fleet has weight rows, those rows
+are used as the population weight at age, with a warning.
 
-1.  these data are required for the one additional time step (final
-    observation for timing + 1), and
-2.  the observations are currently shared among fleets and throughout
-    the dynamics (so only need to be provided once).
-
-The final timing + 1 observations are required because FIMS reports
-spawning biomass at the beginning of the year for every year, including
-the year after the last catches are removed from the population.
+Rows with `timing = NA` are the default for every year, and rows with a
+`timing` replace that default for that year only. Timings outside the
+model years and the year after the last are an error. Every timing that
+is used needs 1 row for each model age, and rows are never averaged.
+Without `timing = NA` rows, every model year needs its own rows, plus
+the year after the last model year, because FIMS reports spawning
+biomass at the beginning of the year for every year, including the year
+after the last catches are removed from the population.
 
 The weight-at-age observations for the `data_big` are identical across
-time steps, and are provided for timing = 1 to 31 and associated with
-name = “fleet1”.
+time steps and are provided for timing = 1 to 31 with `fleet = NA`. The
+same weights could be given as 1 set of rows with `timing = NA`.
 
 ``` r
 
@@ -399,10 +407,10 @@ FIMS::data_big |>
   head(3)
 ```
 
-    ##            type  fleet age length timing     observed unit uncertainty
-    ## 1 weight_at_age fleet1   1     NA      1 0.0005306555   mt        <NA>
-    ## 2 weight_at_age fleet1   1     NA      2 0.0005306555   mt        <NA>
-    ## 3 weight_at_age fleet1   1     NA      3 0.0005306555   mt        <NA>
+    ##            type fleet age length timing     observed unit uncertainty
+    ## 1 weight_at_age  <NA>   1     NA      1 0.0005306555   mt        <NA>
+    ## 2 weight_at_age  <NA>   1     NA      2 0.0005306555   mt        <NA>
+    ## 3 weight_at_age  <NA>   1     NA      3 0.0005306555   mt        <NA>
 
 ``` r
 
@@ -411,10 +419,10 @@ FIMS::data_big |>
   tail(3)
 ```
 
-    ##              type  fleet age length timing    observed unit uncertainty
-    ## 370 weight_at_age fleet1  12     NA     29 0.009636695   mt        <NA>
-    ## 371 weight_at_age fleet1  12     NA     30 0.009636695   mt        <NA>
-    ## 372 weight_at_age fleet1  12     NA     31 0.009636695   mt        <NA>
+    ##              type fleet age length timing    observed unit uncertainty
+    ## 370 weight_at_age  <NA>  12     NA     29 0.009636695   mt        <NA>
+    ## 371 weight_at_age  <NA>  12     NA     30 0.009636695   mt        <NA>
+    ## 372 weight_at_age  <NA>  12     NA     31 0.009636695   mt        <NA>
 
 ``` r
 

@@ -248,13 +248,15 @@ make_vonb_demo_data <- function(
   # Use the known growth curve to create weight-at-age inputs.
   # These values give the generated example a truth-based weight-at-age source
   # that can be compared with the growth-derived WAA reported after fitting.
+  # Population weight at age (fleet = NA) with timing = NA is used in every
+  # year.
   weight_at_age_rows <- true_curve |>
     dplyr::transmute(
       type = "weight_at_age",
-      fleet = fleet,
+      fleet = NA_character_,
       age = age,
       length = NA_real_,
-      timing = min(years),
+      timing = NA_real_,
       observed = true_weight_at_age,
       unit = "mt",
       uncertainty = NA_character_
@@ -534,7 +536,7 @@ fit <- FIMS::fit_fims(
 #> ℹ Maximum gradient went from 0.00116 to 1e-04 after 5 steps.
 #> ✔ Finished optimization
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 2.96362 seconds
+#> ℹ Total run time was 2.95093 seconds
 #> ℹ Number of parameters: fixed_effects=39, random_effects=1, and total=40
 #> ℹ Maximum gradient= 1e-04
 #> ℹ Negative log likelihood (NLL):

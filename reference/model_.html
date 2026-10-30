@@ -117,13 +117,13 @@ indexing.</p>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
 <span><span class="fu">model_length_comp</span><span class="op">(</span><span class="va">x</span>, <span class="va">fleet</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">model_weight_at_age</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="fu">model_weight_at_age</span><span class="op">(</span><span class="va">x</span>, fleet <span class="op">=</span> <span class="cn">NA_character_</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'FIMSFrame'</span></span>
-<span><span class="fu">model_weight_at_age</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="fu">model_weight_at_age</span><span class="op">(</span><span class="va">x</span>, fleet <span class="op">=</span> <span class="cn">NA_character_</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'data.frame'</span></span>
-<span><span class="fu">model_weight_at_age</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="fu">model_weight_at_age</span><span class="op">(</span><span class="va">x</span>, fleet <span class="op">=</span> <span class="cn">NA_character_</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">model_age_to_length_conversion</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
@@ -197,10 +197,23 @@ conversion data are present in the <code>FIMSFrame</code> object.</p>
 <h3 id="model-weight-at-age-"><code>model_weight_at_age()</code><a class="anchor" aria-label="anchor" href="#model-weight-at-age-"></a></h3>
 
 
-<p>Returns a numeric vector of weight-at-age observations (type
-<code>"weight_at_age"</code>), ordered by age and year (plus one additional year) and
-using <code>-999</code> to indicate missing observations When multiple fleets are
-present, values are averaged across fleets.</p>
+<p>Returns a numeric vector of weight at age (type <code>"weight_at_age"</code>), ordered
+by year and then age. Rows with <code>timing = NA</code> apply to every year and rows
+with a <code>timing</code> replace that default for that year. With the default <code>fleet = NA</code>, the function returns the population weight at age from <code>fleet = NA</code>
+rows, including the year after the last modeled year. For the population,
+this additional year is needed to calculate biomass after all fishing for
+the terminal year has occurred. When users specify <code>fleet = NA</code> but no
+population-level information exists and information is only supplied for a
+single fleet, then this fleet-level information will be used for both the
+population and the fleet. The function will error though if population-level
+information is absent and information for more than one fleet exists. When a
+fleet name is specified, the function returns that fleet's weight at age for
+the model years if available. For years without fleet- and year-specific
+information, then the fleet-specific information without any timing attached
+to it is returned. If no fleet-specific information is available for the
+missing years, then the population's rows for that year will be returned;
+and, finally population-level information with <code>timing = NA</code> rows is
+returned for all other missing rows.</p>
 </div>
 
 <div class="section">

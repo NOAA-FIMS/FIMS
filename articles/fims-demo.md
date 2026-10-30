@@ -131,7 +131,7 @@ methods::show(data_4_model)
 
     ## tbl_df of class 'FIMSFrame'
 
-    ## with the following 'types': age_comp, catch, length_comp, weight_at_age, index, age_to_length_conversion
+    ## with the following 'types': age_comp, catch, length_comp, index, age_to_length_conversion, weight_at_age
 
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
 
@@ -201,8 +201,8 @@ get_data(data_4_model) |>
 
 The data contains the following fleets:
 
-- A single fishery fleet with age- and length-composition,
-  weight-at-age, and catch data
+- A single fishery fleet with age- and length-composition and catch
+  data, plus population weight at age
 - A single survey with age- and length-composition and index data
 
 You can use the base R function `plot(data_4_model)` to see the data
@@ -512,6 +512,56 @@ FIMS:::setup_default_log_init_naa(
     ##  [1] 13.81551 13.61551 13.41551 13.21551 13.01551 12.81551 12.61551 12.41551
     ##  [9] 12.21551 12.01551 11.81551 13.32328
 
+### Time-varying parameters
+
+Catchability (`log_q`) can vary by year, with 1 value specified for each
+year instead of using a single value for all years. Give 1 row per year,
+in year order, because FIMS uses the rows in the order they appear
+rather than sorting by `timing`. Years without index data for that fleet
+do not inform `log_q`, so set those rows to
+`estimation_type = "constant"`. The value does not change the fit,
+because `log_q` in a year without index data is not included in the
+likelihood. It only affects the expected index for that year. Estimating
+them would make the Hessian singular, and then no parameter gets a
+standard error. In the output from
+[`get_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md),
+each `log_q` value is labeled with its year. Sharing 1 estimated value
+across a block of years is not yet available.
+
+``` r
+
+# 1 log_q per year for survey1, estimated only in years with index data
+years <- FIMS::get_start_year(data_4_model):FIMS::get_end_year(data_4_model)
+index_years <- FIMS::get_data(data_4_model) |>
+  dplyr::filter(type == "index", fleet == "survey1", observed != -999) |>
+  dplyr::pull(timing)
+log_q_by_year <- parameters_4_model |>
+  dplyr::filter(fleet == "survey1", label == "log_q") |>
+  dplyr::slice(rep(1, length(years))) |>
+  dplyr::mutate(
+    timing = years,
+    estimation_type = dplyr::if_else(
+      timing %in% index_years, "fixed_effects", "constant"
+    )
+  ) |>
+  dplyr::arrange(timing)
+parameters_time_varying_q <- parameters_4_model |>
+  dplyr::filter(!(fleet == "survey1" & label == "log_q")) |>
+  dplyr::bind_rows(log_q_by_year)
+parameters_time_varying_q |>
+  dplyr::filter(label == "log_q") |>
+  dplyr::count(fleet, estimation_type)
+```
+
+    ## # A tibble: 2 × 3
+    ##   fleet   estimation_type     n
+    ##   <chr>   <chr>           <int>
+    ## 1 fleet1  constant            1
+    ## 2 survey1 fixed_effects      30
+
+In `data_big` the survey has index data in every year, so every `log_q`
+for `survey1` is estimated.
+
 ## Fit
 
 With data and parameters in place, we can now initialize modules using
@@ -757,7 +807,7 @@ high_slope_fit <- parameters_high_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 59.36791 seconds
+    ## ℹ Total run time was 57.55253 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00024
     ## ℹ Negative log likelihood (NLL):
@@ -780,7 +830,7 @@ low_slope_fit <- parameters_low_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 58.03165 seconds
+    ## ℹ Total run time was 55.81931 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 5e-04
     ## ℹ Negative log likelihood (NLL):
@@ -891,7 +941,7 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 58.9809 seconds
+    ## ℹ Total run time was 57.04741 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00051
     ## ℹ Negative log likelihood (NLL):
@@ -990,7 +1040,7 @@ age_only_fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 10.45911 seconds
+    ## ℹ Total run time was 10.40296 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00022
     ## ℹ Negative log likelihood (NLL):
@@ -1026,7 +1076,7 @@ length_only_fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.3093 minutes
+    ## ℹ Total run time was 1.27318 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00027
     ## ℹ Negative log likelihood (NLL):

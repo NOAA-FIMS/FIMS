@@ -2,7 +2,7 @@ var searchData=
 [
   ['warning_5fmessage_0',['warning_message',['../classfims_1_1FIMSLog.html#a3d2755bc4efa212c6c5c975f16132376',1,'fims::FIMSLog']]],
   ['wd_1',['wd',['../structfims_1_1LogEntry.html#a035f661c2f0a1c9d0b0f50b1ff01c394',1,'fims::LogEntry']]],
-  ['weight_5fat_5fage_2',['weight_at_age',['../structfims__popdy_1_1VonBertalanffySchnuteGrowth.html#a666d790516d94d0777abbf1fbd9ae55c',1,'fims_popdy::VonBertalanffySchnuteGrowth']]],
+  ['weight_5fat_5fage_2',['weight_at_age',['../classFleetInterface.html#a65fb51860a89f7af1af6cbdbb3dd1213',1,'FleetInterface::weight_at_age'],['../structfims__popdy_1_1Fleet.html#a67aefc5b8a15bd53a3d03b65e5891599',1,'fims_popdy::Fleet::weight_at_age'],['../structfims__popdy_1_1VonBertalanffySchnuteGrowth.html#a666d790516d94d0777abbf1fbd9ae55c',1,'fims_popdy::VonBertalanffySchnuteGrowth::weight_at_age()']]],
   ['weight_5fiterator_3',['weight_iterator',['../structfims__popdy_1_1EWAAGrowth.html#a9790142135568ea1e69c6666f44ae090',1,'fims_popdy::EWAAGrowth']]],
   ['weights_4',['weights',['../classEWAAGrowthInterface.html#ab8265890b9f73d9f75f80c0eb81f561f',1,'EWAAGrowthInterface']]],
   ['with_5flibtmb_5',['WITH_LIBTMB',['../TMB_8h.html#a284a3c52326ee2f4337f13213cd5e004',1,'TMB.h']]],
