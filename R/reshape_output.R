@@ -254,7 +254,12 @@ reshape_json_estimates <- function(model_output) {
       values_to = "parameters"
     ) |>
     # TODO: Think about these ids when we have more than one population
-    dplyr::select(-dplyr::all_of("delete_me"), -dplyr::ends_with("_id"), -dplyr::any_of(c("population", "age"))) |>
+    dplyr::select(
+      -dplyr::all_of(c(
+        "delete_me", "recruitment_id", "growth_id", "maturity_id"
+      )),
+      -dplyr::any_of(c("population", "age"))
+    ) |>
     dplyr::mutate(
       parameters = purrr::map(
         .data$parameters,

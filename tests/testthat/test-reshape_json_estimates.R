@@ -39,35 +39,36 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
 
   # Reshape the TMB output into a standardized data frame.
   # This serves as the "expected" result to compare against.
-  tmb_output <- FIMS:::reshape_tmb_estimates(
+  tmb_estimates <- FIMS:::reshape_tmb_estimates(
     obj = obj,
     sdreport = sdreport,
     opt = opt,
     parameter_names = parameter_names
   ) |>
-    # Select only the columns needed for the comparison to ensure a clean test.
-    dplyr::select(
-      module_name, label
-    ) |>
-    # Remove any duplicate rows.
-    dplyr::distinct() |>
     # TODO: The test fails for fit objects from estimation runs because the TMB
     # output includes the label "log_r," which is not present in the JSON output.
     # For now, manually remove `log_r` here and create a new issue to track this.
     dplyr::filter(label != "log_r") |>
     # TODO: Allow for comparison of random effects
-    dplyr::filter(label != "re")
+    dplyr::filter(label != "re") |>
+    dplyr::filter(label != "log_devs")
+
+  tmb_summary <- tmb_estimates |>
+    dplyr::select(module_name, label) |>
+    dplyr::distinct()
 
   # Extract the model_output, which contains the JSON-like structure.
   model_output <- get_model_output(fit)
   # Reshape the output from the JSON structure into a data frame.
-  json_output <- FIMS:::reshape_json_estimates(model_output)
+  # TODO: get random effects from json output
+  json_estimates <- FIMS:::reshape_json_estimates(model_output) |>
+    dplyr::filter(label != "log_devs")
 
   # Check for any duplicated parameter_id entries in the JSON output, which
   # would indicate a problem in the reshaping logic.
   # Use a tryCatch block to provide a more informative error message if the
   # comparison using testthat::expect_equal fails.
-  duplicated_parameter_ids <- json_output |>
+  duplicated_parameter_ids <- json_estimates |>
     dplyr::count(parameter_id) |>
     # TODO: check if we need to exclude -999
     dplyr::filter(n > 1 & !is.na(parameter_id))
@@ -93,7 +94,7 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
   # Compare the structure of the JSON output against the TMB output.
   # Prepare the JSON summary for comparison by selecting, filtering, and sorting
   # it in the same way as the TMB summary.
-  json_output <- json_output |>
+  json_summary <- json_estimates |>
     dplyr::select(module_name, label) |>
     dplyr::distinct()
 
@@ -101,25 +102,25 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
   # anti_join() returns rows in the first data frame that do not have a match
   # in the second data frame based on the specified column.
   missing_module_name_in_json <- dplyr::anti_join(
-    tmb_output |>
+    tmb_summary |>
       # remove log_sd b/c this is a column in the json_output rather than a
       # label with an entire row as it is in the tmb_output
       dplyr::filter(label != "log_sd") |>
       dplyr::filter(!is.na(module_name)) |>
       dplyr::select(module_name),
-    json_output |>
+      json_summary |>
       dplyr::select(module_name)
   )
 
 
   # Find labels that are present in TMB output but missing in JSON output.
   missing_label_in_json <- dplyr::anti_join(
-    tmb_output |>
+    tmb_summary |>
       # remove log_sd b/c this is a column in the json_output rather than a
       # label with an entire row as it is in the tmb_output
       dplyr::filter(label != "log_sd") |>
       dplyr::select(label),
-    json_output |>
+    json_summary |>
       dplyr::select(label)
   )
 
@@ -160,6 +161,71 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
       )
     }
   )
+
+  value_keys <- c("module_name", "module_id", "label", "parameter_id")
+  tmb_values <- tmb_estimates |>
+    dplyr::filter(
+      !is.na(.data$parameter_id),
+      !.data$label %in% c("log_sd")
+    ) |>
+    dplyr::select(
+      dplyr::all_of(value_keys),
+      tmb_estimate = .data$estimate
+    )
+  json_values <- json_estimates |>
+    # only keep estimated parameters
+    dplyr::filter(estimation_type != "constant") |>
+    dplyr::filter(
+      !is.na(.data$parameter_id),
+      !.data$label %in% c("log_r", "re", "log_sd")
+    ) |>
+    dplyr::select(
+      dplyr::all_of(value_keys),
+      json_estimate = .data$estimated
+    )
+  value_comparison <- dplyr::inner_join(
+    tmb_values,
+    json_values,
+    by = value_keys
+  ) |>
+    dplyr::arrange(dplyr::across(dplyr::all_of(value_keys)))
+  missing_values_in_json <- dplyr::anti_join(
+    tmb_values,
+    json_values,
+    by = value_keys
+  )
+  missing_values_in_tmb <- dplyr::anti_join(
+    json_values,
+    tmb_values,
+    by = value_keys
+  )
+
+  tryCatch(
+    {
+      #' @description Test that JSON parameter estimates align with TMB estimates by parameter ID.
+      expect_equal(nrow(missing_values_in_json), 0)
+      expect_equal(nrow(missing_values_in_tmb), 0)
+      #' @description Test that JSON parameter estimates match TMB estimates.
+      expect_equal(
+        object = value_comparison[["json_estimate"]],
+        expected = value_comparison[["tmb_estimate"]] |> unname(),
+        tolerance = 1e-6
+      )
+    },
+    error = function(e) {
+      cli::cli_abort(
+        c(
+          "x" = "Parameter estimates in the JSON and TMB outputs do not match!",
+          "i" = "Parameter missing from JSON: {.val {missing_values_in_json[, value_keys]}}",
+          "i" = "Parameter missing from TMB: {.val {missing_values_in_tmb[, value_keys]}}",
+          "i" = "Model fit object: {.val {model_fit_path}}",
+          "!" = "Original error: {.emph {e$message}}"
+        ),
+        .call = NULL
+      )
+    }
+  )
+
 }
 
 ## IO correctness ----

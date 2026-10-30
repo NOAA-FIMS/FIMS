@@ -124,6 +124,8 @@ inline double sanitize_val(double x) {
  * @return std::ostream&
  */
 inline std::ostream& operator<<(std::ostream& out, const Variable& p) {
+  out << std::defaultfloat
+      << std::setprecision(std::numeric_limits<double>::max_digits10);
   out << "{\"id\": " << p.id_m
       << ",\n\"value\": " << sanitize_val(p.initial_value_m)
       << ",\n\"estimated_value\": " << sanitize_val(p.final_value_m);
@@ -703,7 +705,9 @@ class FIMSRcppInterfaceBase {
       ss << "-999";
     } else {
       // Set precision (R default is 16)
-      ss << std::fixed << std::setprecision(16) << value;
+      ss << std::defaultfloat
+      << std::setprecision(std::numeric_limits<double>::max_digits10)
+      << value;
     }
     return ss.str();
   }

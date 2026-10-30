@@ -671,7 +671,8 @@ fit_fims <- function(input,
     parameter_names = parameter_names
   )
 
-  FIMS::set_fixed(opt[["par"]])
+  mle <- obj[["env"]][["last.par.best"]]
+  FIMS::set_fixed(mle[names(mle) == "p"])
 
   time_sdreport <- NA
   if (get_sd) {
