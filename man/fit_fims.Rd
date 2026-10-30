@@ -17,7 +17,15 @@ fit_fims(
 )
 }
 \arguments{
-\item{input}{Input list as returned by \code{\link[=initialize_fims]{initialize_fims()}}.}
+\item{input}{Input list as returned by \code{\link[=initialize_fims]{initialize_fims()}}. An optional
+\code{map} entry is a named list of factors for \code{p} (fixed effects) and/or \code{re}
+(random effects), in the order of the corresponding \code{parameters} vector.
+Each factor must have one entry per parameter. \code{NA} holds a parameter at
+its starting value; repeated levels share one estimated value. Shared
+entries must have identical starting values. Factor levels determine the
+reduced parameter order; unused levels are dropped. Levels in \code{p} and \code{re}
+are independent; sharing
+across these vectors is not supported.}
 
 \item{get_sd}{A boolean specifying if the \code{\link[TMB:sdreport]{TMB::sdreport()}} should be
 calculated?}
@@ -63,6 +71,15 @@ Fit a FIMS model (BETA)
 \details{
 This function is a beta version still and subject to change
 without warning.
+Mapped parameters are expanded to their full FIMS vectors for reporting.
+Shared parameters receive the same estimate and standard error in
+\code{\link[=get_estimates]{get_estimates()}}. Mapped-off parameters retain their starting values and
+have \code{NA} standard errors. Gradients describe reduced fixed-effect
+optimization variables and are reported only on the first full parameter
+in each shared level. Parameter counts describe the reduced vectors.
+With no active fixed effects, TMB evaluates the random-effects model without
+running an outer optimizer. If no parameters remain active, use
+\code{optimize = FALSE}.
 }
 \seealso{
 \itemize{

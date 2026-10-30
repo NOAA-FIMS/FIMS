@@ -245,7 +245,8 @@ methods::setMethod(
       sdreport = sdreport,
       opt = opt,
       parameter_names = parameter_names,
-      precomputed_gradient = get_gradient(x)
+      precomputed_gradient = get_gradient(x),
+      mapping = get_input(x)[["tmb_mapping"]]
     ) |>
       add_unique_id()
 
@@ -365,9 +366,10 @@ is.FIMSFit <- function(x) {
 # joint parameter vector. The named par argument includes random effects;
 # parList's first argument accepts only the reduced fixed effects.
 restore_tmb_parameters <- function(obj) {
-  parameters <- obj[["env"]]$parList(par = obj[["env"]][["last.par.best"]])
+  parameters <- obj[["env"]][["parList"]](par = obj[["env"]][["last.par.best"]])
   FIMS::set_fixed(parameters[["p"]])
   FIMS::set_random(parameters[["re"]])
+  invisible(parameters)
 }
 
 # Apply TMB's factor map to names from FIMS's full parameter registry.
@@ -387,23 +389,49 @@ tmb_mapped_parameter_names <- function(parameter_names, map = NULL) {
     ))
   }
 
-  # Remove NAs in map because NAs indicate a parameter is fixed at its initial
-  # value, and therefore is not active.
-  keep <- !is.na(map)
-  active_map <- droplevels(map[keep])
-  active_names <- parameter_names[keep]
+  active_map <- droplevels(map)
+  parameter_names[match(seq_len(nlevels(active_map)), as.integer(active_map))]
+}
 
-  # Return one representative FIMS parameter name for each active TMB map level.
-  # When multiple parameters share a level, TMB optimizes one value, so use the
-  # first corresponding FIMS name. Factor levels determine the output order.
-  vapply(
-    X = levels(active_map),
-    FUN = function(level, XX = active_names, YY = active_map) {
-      XX[as.character(YY) == level][[1L]]
-    },
-    FUN.VALUE = character(1L),
-    USE.NAMES = FALSE
-  )
+tmb_parameter_mapping <- function(input) {
+  maps <- input[["map"]]
+  if (!is.null(maps) &&
+    (!is.list(maps) || (length(maps) > 0 &&
+      (is.null(names(maps)) || anyDuplicated(names(maps)) ||
+        any(!names(maps) %in% c("p", "re")))))) {
+    cli::cli_abort("TMB maps must be a named list with entries p and/or re.")
+  }
+
+  mapping <- list()
+  for (effect in c("p", "re")) {
+    initial <- input[["parameters"]][[effect]]
+    full_names <- if (effect == "p") {
+      names(get_parameter_names(as.list(initial)))
+    } else {
+      names(get_random_names(as.list(initial)))
+    }
+    map <- maps[[effect]]
+    if (effect %in% names(maps) && !is.factor(map)) {
+      cli::cli_abort("A TMB parameter map must be a factor.")
+    }
+    reduced_names <- tmb_mapped_parameter_names(full_names, map)
+    index <- if (is.null(map)) seq_along(initial) else as.integer(droplevels(map))
+    for (level in seq_along(reduced_names)) {
+      values <- initial[which(index == level)]
+      if (!isTRUE(all(values == values[[1L]]))) {
+        cli::cli_abort(
+          "Shared TMB map entries in {effect} must have identical starting values."
+        )
+      }
+    }
+    mapping[[effect]] <- list(
+      full_names = full_names,
+      reduced_names = reduced_names,
+      index = index,
+      initial = unname(initial)
+    )
+  }
+  mapping
 }
 
 #' Class constructors for class `FIMSFit` and associated child classes
@@ -473,6 +501,11 @@ FIMSFit <- function(
   run_time = c("time_total" = as.difftime(0, units = "secs")),
   version = utils::packageVersion("FIMS")
 ) {
+  mapping <- input[["tmb_mapping"]]
+  if (is.null(mapping)) {
+    mapping <- tmb_parameter_mapping(input)
+    input[["tmb_mapping"]] <- mapping
+  }
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
@@ -495,17 +528,16 @@ FIMSFit <- function(
   } else {
     rep(NA_real_, length(obj[["par"]]))
   }
-  max_gradient <- if (length(opt) > 0) max(abs(gradient_vector)) else NA_real_
+  max_gradient <- if (length(opt) == 0) {
+    NA_real_
+  } else if (length(gradient_vector) == 0) {
+    0
+  } else {
+    max(abs(gradient_vector))
+  }
 
-  # get_parameter_names() describes the full FIMS vector. Reduce those names
-  # using the same factor map that TMB used to construct obj$par.
-  full_parameter_names <- names(get_parameter_names(
-    as.list(input[["parameters"]][["p"]])
-  ))
-  parameter_names <- tmb_mapped_parameter_names(
-    full_parameter_names,
-    input[["map"]][["p"]]
-  )
+  parameter_names <- mapping[["p"]][["reduced_names"]]
+  random_effects_names <- mapping[["re"]][["reduced_names"]]
   if (length(parameter_names) != length(obj[["par"]])) {
     cli::cli_abort(c(
       "x" = "TMB and FIMS produced different numbers of fixed parameters.",
@@ -514,21 +546,23 @@ FIMSFit <- function(
     ))
   }
   names(obj[["par"]]) <- parameter_names
+  if (length(opt) > 0) {
+    names(opt[["par"]]) <- parameter_names
+  }
 
   # Get the report
-  report <- if (length(opt) == 0) {
-    obj[["report"]](obj[["env"]][["last.par.best"]])
-  } else {
-    obj[["report"]]()
+  report <- obj[["report"]](obj[["env"]][["last.par.best"]])
+  parameters <- restore_tmb_parameters(obj)
+  for (effect in c("p", "re")) {
+    mapping[[effect]][["estimate"]] <- unname(parameters[[effect]])
   }
+  input[["tmb_mapping"]] <- mapping
 
   if (length(sdreport) > 0) {
     # rename the sdreport
     names(sdreport[["par.fixed"]]) <- parameter_names
     dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
-    # Skipped when there are no random effects or some are mapped off
-    if (length(sdreport[["par.random"]]) > 0 &&
-      length(random_effects_names) == length(sdreport[["par.random"]])) {
+    if (length(sdreport[["par.random"]]) > 0) {
       names(sdreport[["par.random"]]) <- random_effects_names
     }
   }
@@ -555,7 +589,15 @@ FIMSFit <- function(
 
 #' Fit a FIMS model (BETA)
 #'
-#' @param input Input list as returned by [initialize_fims()].
+#' @param input Input list as returned by [initialize_fims()]. An optional
+#'   `map` entry is a named list of factors for `p` (fixed effects) and/or `re`
+#'   (random effects), in the order of the corresponding `parameters` vector.
+#'   Each factor must have one entry per parameter. `NA` holds a parameter at
+#'   its starting value; repeated levels share one estimated value. Shared
+#'   entries must have identical starting values. Factor levels determine the
+#'   reduced parameter order; unused levels are dropped. Levels in `p` and `re`
+#'   are independent; sharing
+#'   across these vectors is not supported.
 #' @param get_sd A boolean specifying if the [TMB::sdreport()] should be
 #'   calculated?
 #' @param save_sd A logical, with the default `TRUE`, indicating whether the
@@ -589,6 +631,15 @@ FIMSFit <- function(
 #' * [FIMSFit()]
 #' @details This function is a beta version still and subject to change
 #'   without warning.
+#' Mapped parameters are expanded to their full FIMS vectors for reporting.
+#' Shared parameters receive the same estimate and standard error in
+#' [get_estimates()]. Mapped-off parameters retain their starting values and
+#' have `NA` standard errors. Gradients describe reduced fixed-effect
+#' optimization variables and are reported only on the first full parameter
+#' in each shared level. Parameter counts describe the reduced vectors.
+#' With no active fixed effects, TMB evaluates the random-effects model without
+#' running an outer optimizer. If no parameters remain active, use
+#' `optimize = FALSE`.
 #' @keywords fit_fims
 #' @export
 fit_fims <- function(input,
@@ -623,7 +674,13 @@ fit_fims <- function(input,
   }
   # If the estimation_type of all parameters is constant, FIMS will abort if
   # optimize is set to TRUE
-  if (optimize == TRUE & all(purrr::map_vec(input[["parameters"]], length) == 0)) {
+  input[["tmb_mapping"]] <- tmb_parameter_mapping(input)
+  for (effect in names(input[["map"]])) {
+    input[["map"]][[effect]] <- droplevels(input[["map"]][[effect]])
+  }
+  parameter_names <- input[["tmb_mapping"]][["p"]][["reduced_names"]]
+  random_effects_names <- input[["tmb_mapping"]][["re"]][["reduced_names"]]
+  if (optimize && length(parameter_names) + length(random_effects_names) == 0) {
     cli::cli_abort("FIMS must have at least one parameter to optimize.")
   }
 
@@ -668,8 +725,8 @@ fit_fims <- function(input,
   }
 
   gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
-  maxgrad0 <- maxgrad <- max(abs(gradient))
-  if (number_of_loops > 0) {
+  maxgrad0 <- maxgrad <- if (length(gradient) > 0) max(abs(gradient)) else 0
+  if (number_of_loops > 0 && length(obj[["par"]]) > 0) {
     cli::cli_inform(c(
       "i" = "Restarting optimizer {number_of_loops} time{?s} to improve
             gradient."
@@ -702,7 +759,7 @@ fit_fims <- function(input,
         return(failed_fit)
       }
       gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
-      maxgrad <- max(abs(gradient))
+      maxgrad <- if (length(gradient) > 0) max(abs(gradient)) else 0
     }
     div_digit <- cli::cli_div(theme = list(.val = list(digits = 5)))
     cli::cli_inform(c(
@@ -713,13 +770,11 @@ fit_fims <- function(input,
   }
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
+  opt[["par"]] <- obj[["env"]][["last.par.best"]][obj[["env"]][["lfixed"]]()]
+  opt[["objective"]] <- obj[["fn"]](opt[["par"]])
+  gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
+  maxgrad <- if (length(gradient) > 0) max(abs(gradient)) else 0
 
-  # Named here while the C++ Information object is still populated; TMB names
-  # every fixed effect "p" and every random effect "re"
-  parameter_names <- names(get_parameter_names(obj[["par"]]))
-  random_effects_names <- if (length(obj[["env"]][["random"]]) > 0) {
-    names(get_random_names(obj[["env"]]$parList()[["re"]]))
-  }
   check_mle_convergence(
     input,
     obj,
@@ -736,6 +791,7 @@ fit_fims <- function(input,
     t2 <- Sys.time()
     sdreport <- TMB::sdreport(
       obj,
+      par.fixed = opt[["par"]],
       getReportCovariance = getReportCovariance
     )
     cli::cli_inform(c("v" = "Finished sdreport"))
@@ -797,15 +853,24 @@ methods::setMethod("as.list", signature(x = "FIMSFit"), function(x) {
 try_nlminb <- function(object, control_list, starting_values) {
   optimized <- tryCatch(
     {
-      with(
-        object,
-        nlminb(
-          start = starting_values,
-          objective = fn,
-          gradient = gr,
-          control = control_list
+      if (length(starting_values) == 0) {
+        list(
+          par = starting_values,
+          objective = object[["fn"]](starting_values),
+          convergence = 0L,
+          message = "No fixed effects to optimize"
         )
-      )
+      } else {
+        with(
+          object,
+          nlminb(
+            start = starting_values,
+            objective = fn,
+            gradient = gr,
+            control = control_list
+          )
+        )
+      }
     },
     error = function(e) {
       cli::cli_rule(left = "{.fun stats::nlminb} failure details")
@@ -850,7 +915,7 @@ return_failed_nlminb <- function(object) {
       time_total = as.difftime(0, units = "secs")
     ),
     opt = list(
-      par = object[["par"]],
+      par = object[["env"]][["last.par.best"]][object[["env"]][["lfixed"]]()],
       objective = NA_real_,
       convergence = 1L,
       message = "Optimization failed"

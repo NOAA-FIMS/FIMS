@@ -351,13 +351,16 @@ reshape_json_estimates <- function(model_output) {
 #'   a second call to `obj[["gr"]]()`, which would crash after [clear()] has
 #'   freed the C++ memory. If `NULL` (default), the gradient is computed
 #'   directly from `obj[["gr"]](opt[["par"]])`.
+#' @param mapping Full-to-reduced parameter metadata saved during fitting, or
+#'   `NULL` for fits created before mapping metadata was available.
 #' @return A tibble containing the reshaped estimates (i.e., parameters and
 #' derived quantities).
 reshape_tmb_estimates <- function(obj,
                                   sdreport = NULL,
                                   opt = NULL,
                                   parameter_names,
-                                  precomputed_gradient = NULL) {
+                                  precomputed_gradient = NULL,
+                                  mapping = NULL) {
   # Outline for the estimates table
   estimates_outline <- tibble::tibble(
     # The FIMS Rcpp module
@@ -417,6 +420,32 @@ reshape_tmb_estimates <- function(obj,
         initial = unname(obj[["par"]]),
         estimate = unname(estimate_values)
       )
+  }
+
+  if (!is.null(mapping)) {
+    expanded <- list()
+    reduced_names <- character()
+    for (effect in c("p", "re")) {
+      metadata <- mapping[[effect]]
+      index <- metadata[["index"]]
+      rows <- match(metadata[["reduced_names"]][index], estimates[["label"]])
+      gradient <- estimates[["gradient"]][rows]
+      gradient[is.na(index) | duplicated(index)] <- NA_real_
+      expanded[[effect]] <- estimates_outline |>
+        tibble::add_row(
+          label = metadata[["full_names"]],
+          initial = metadata[["initial"]],
+          estimate = metadata[["estimate"]],
+          uncertainty = estimates[["uncertainty"]][rows],
+          log_like_cv = estimates[["log_like_cv"]][rows],
+          gradient = gradient
+        )
+      reduced_names <- c(reduced_names, metadata[["reduced_names"]])
+    }
+    estimates <- dplyr::bind_rows(c(
+      expanded,
+      list(estimates[!estimates[["label"]] %in% reduced_names, ])
+    ))
   }
 
   estimates <- estimates |>

@@ -259,7 +259,9 @@ check_sdreport_convergence <- function(
     {
       se_issues <- c()
 
-      fixed_summary <- summary(sdreport, "fixed")
+      fixed_summary <- if (length(opt[["par"]]) > 0) {
+        summary(sdreport, "fixed")
+      }
 
       if (!is.null(fixed_summary) && nrow(fixed_summary) > 0) {
         issue <- format_na_se_issue(
