@@ -968,9 +968,9 @@ find_table_sources <- function(data, fleets, years) {
     paste(is.na(fleet), fleet, as.numeric(timing))
   }
   supplied <- unique(table_key(data[["fleet"]], data[["timing"]]))
-  tibble::tibble(
-    fleet = rep(as.character(fleets), each = length(years)),
-    year = rep(years, times = length(fleets))
+  tidyr::expand_grid(
+    fleet = as.character(fleets),
+    year = years
   ) |>
     dplyr::mutate(
       source_fleet = dplyr::if_else(
