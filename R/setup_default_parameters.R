@@ -336,14 +336,16 @@ choose_default_Growth_module_type <- function(data) {
 #' @param data A `FIMSFrame` object returned from running [FIMSFrame()] on
 #'   your long input data. Required when `module_type = "VonBertalanffySchnute"`
 #'   or when `module_type = "VonBertalanffyTraditional"` and
-#'   `variability_type = "interpolation"`.
+#'   `variability_type = "linear_interpolation"`.
 #' @param module_type A character string specifying the type of growth module.
 #'   The default is `"EWAA"`.
 #' @param variability_type A character string specifying the variability
 #'   parameterization for growth-derived length-at-age products. Traditional
 #'   Von Bertalanffy growth defaults to `"delta_method"` and also supports
-#'   `"interpolation"`. Schnute growth supports `"interpolation"` only. This
-#'   argument is ignored for `"EWAA"`.
+#'   `"linear_interpolation"`. Schnute growth supports
+#'   `"linear_interpolation"` only. Linear interpolation specifies length SD
+#'   at two reference ages and interpolates SD in mean-length space, not age
+#'   space. This argument is ignored for `"EWAA"`.
 #' @details
 #' Traditional growth uses the same age units as the model for
 #' `age_at_zero_length` (`t0`) inputs and finalized estimates.
@@ -351,7 +353,7 @@ choose_default_Growth_module_type <- function(data) {
 #' `"constant"` and describes between-fish variability in `log(Linf)`
 #' and `log(K)`, including their covariance.
 #'
-#' With interpolation variability, `t0` may be constant or estimated.
+#' With linear interpolation variability, `t0` may be constant or estimated.
 #' Both interpolation reference ages must be constant. Estimated `t0`
 #' is stored internally as `log(age_limit - t0)`, where `age_limit` is
 #' the smaller of the population minimum age and the younger interpolation
@@ -388,7 +390,7 @@ setup_default_Growth <- function(
   if (!is.null(variability_type)) {
     variability_type <- rlang::arg_match(
       variability_type,
-      c("delta_method", "interpolation")
+      c("delta_method", "linear_interpolation")
     )
   }
 
@@ -424,10 +426,11 @@ setup_default_Growth <- function(
   }
 
   if (identical(module_type, "VonBertalanffySchnute")) {
-    if (!is.null(variability_type) && !identical(variability_type, "interpolation")) {
+    if (!is.null(variability_type) &&
+      !identical(variability_type, "linear_interpolation")) {
       cli::cli_abort(c(
-        "VonBertalanffySchnute growth supports interpolation variability only.",
-        "i" = "Use {.code variability_type = \"interpolation\"} or omit {.var variability_type}."
+        "VonBertalanffySchnute growth supports linear interpolation variability only.",
+        "i" = "Use {.code variability_type = \"linear_interpolation\"} or omit {.var variability_type}."
       ))
     }
 
@@ -437,15 +440,15 @@ setup_default_Growth <- function(
         "i" = "VonBertalanffySchnute defaults use the model ages to choose reference ages."
       ))
     }
-  } else if (identical(variability_type, "interpolation") && is.null(data)) {
+  } else if (identical(variability_type, "linear_interpolation") && is.null(data)) {
     cli::cli_abort(c(
-      "{.fn setup_default_Growth} requires {.var data} when using traditional Von Bertalanffy interpolation variability.",
-      "i" = "Interpolation defaults use the model ages to choose reference ages."
+      "{.fn setup_default_Growth} requires {.var data} when using traditional Von Bertalanffy linear interpolation variability.",
+      "i" = "Linear interpolation defaults use the model ages to choose reference ages."
     ))
   }
 
   if (identical(module_type, "VonBertalanffySchnute") ||
-    identical(variability_type, "interpolation")) {
+    identical(variability_type, "linear_interpolation")) {
     is.FIMSFrame(data)
 
     ages <- get_ages(data)
@@ -518,7 +521,7 @@ setup_default_Growth <- function(
       variability_type <- "delta_method"
     }
 
-    if (identical(variability_type, "interpolation")) {
+    if (identical(variability_type, "linear_interpolation")) {
       default <- setup_default_parameters_template(n_parameters = 9) |>
         dplyr::mutate(
           module_name = "Growth",

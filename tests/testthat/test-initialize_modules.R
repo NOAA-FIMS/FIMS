@@ -293,7 +293,7 @@ test_that("`initialize_growth()` supports traditional von Bertalanffy variabilit
   traditional_interpolation <- setup_default_Growth(
     data = data,
     module_type = "VonBertalanffyTraditional",
-    variability_type = "interpolation"
+    variability_type = "linear_interpolation"
   )
 
   traditional_interpolation_growth <- initialize_growth(
@@ -320,7 +320,7 @@ test_that("`initialize_growth()` receives the youngest population age", {
     growth_data <- FIMSFrame(shifted_data)
     expect_equal(min(get_ages(growth_data)), minimum_age)
 
-    for (variability_type in c("delta_method", "interpolation")) {
+    for (variability_type in c("delta_method", "linear_interpolation")) {
       parameters <- setup_default_Growth(
         data = growth_data,
         module_type = "VonBertalanffyTraditional",

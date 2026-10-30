@@ -362,7 +362,7 @@ test_that("rcpp Traditional interpolation finalizes transformed t0 in years", {
   growth_parameters <- FIMS::setup_default_Growth(
     data = fims_frame,
     module_type = "VonBertalanffyTraditional",
-    variability_type = "interpolation"
+    variability_type = "linear_interpolation"
   ) |>
     dplyr::mutate(
       value = dplyr::if_else(

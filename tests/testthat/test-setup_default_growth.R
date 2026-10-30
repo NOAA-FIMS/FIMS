@@ -85,7 +85,7 @@ test_that("`setup_default_Growth()` supports traditional von Bertalanffy interpo
   result <- setup_default_Growth(
     data = fims_frame,
     module_type = "VonBertalanffyTraditional",
-    variability_type = "interpolation"
+    variability_type = "linear_interpolation"
   )
 
   #' @description Test that traditional Von Bertalanffy can use interpolation variability defaults.
@@ -140,14 +140,14 @@ test_that("`setup_default_Growth()` rejects unsupported growth variability confi
       module_type = "VonBertalanffySchnute",
       variability_type = "delta_method"
     ),
-    regexp = "supports interpolation variability only"
+    regexp = "supports linear interpolation variability only"
   )
 
   #' @description Test that traditional interpolation defaults require data.
   expect_error(
     setup_default_Growth(
       module_type = "VonBertalanffyTraditional",
-      variability_type = "interpolation"
+      variability_type = "linear_interpolation"
     ),
     regexp = "requires .*data"
   )
