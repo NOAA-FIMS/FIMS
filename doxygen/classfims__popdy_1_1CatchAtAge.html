@@ -2117,7 +2117,7 @@ template&lt;typename Type&gt; </div>
 </div><div class="memdoc">
 
 <p>Calculates population-level mean weight-at-age. </p>
-<p>This function returns the biological mean weight at age for a population. If the growth object does not support the growth-derived observation interface, it uses the historical direct growth evaluation path. If the growth object does support that interface, it reads biological mean weight-at-age directly from the prepared growth products and does not require any fleet observation-bin mapping.</p>
+<p>This function returns the biological mean weight at age for a population. If the growth object does not support the growth-derived observation interface, it uses the historical direct growth evaluation path. If the growth object does support that interface and the population has a size grid, it returns weight averaged over the population length-at-age distribution. Without a size grid, it reads weight at the mean length from the prepared growth products. Neither requires fleet observation-bin mapping.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">population</td><td>Shared pointer to the population object. </td></tr>

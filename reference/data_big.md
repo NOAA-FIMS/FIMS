@@ -56,10 +56,11 @@ A data frame with 2808 observations of 8 variables:
 - unit:
 
   A character string specifying the units of `observed`. Allowed units
-  for each data type are as follows. `mt` is used for `index`, `catch`,
-  and `weight_at_age` data. `number` or `proportion` are each viable
-  units for the composition data, where the former is the preferred unit
-  of measurement.
+  for each data type are as follows. `mt` or `number` are used for
+  `index` and `catch` data, with 1 unit per fleet for each type. `mt` is
+  used for `weight_at_age` data. `number` or `proportion` are each
+  viable units for the composition data, where the former is the
+  preferred unit of measurement.
 
 - uncertainty:
 

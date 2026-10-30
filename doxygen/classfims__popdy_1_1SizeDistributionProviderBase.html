@@ -247,6 +247,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a1198d00320d69350b06eafddb06fb473"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read prepared spread of length-at-age.  <br /></td></tr>
 <tr class="memitem:ac652091701db8486c77113cbbf528643" id="r_ac652091701db8486c77113cbbf528643"><td class="memItemLeft" align="right" valign="top">virtual const Type &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac652091701db8486c77113cbbf528643">ProbSize</a> (std::size_t year_index, std::size_t age_index, std::size_t size_bin_index) const =0</td></tr>
 <tr class="memdesc:ac652091701db8486c77113cbbf528643"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read prepared age-to-size probability on the population grid.  <br /></td></tr>
+<tr class="memitem:a427c5999f182c628281e71bd01ae4a95" id="r_a427c5999f182c628281e71bd01ae4a95"><td class="memItemLeft" align="right" valign="top">virtual const Type &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a427c5999f182c628281e71bd01ae4a95">MeanWeightAtAge</a> (std::size_t year_index, std::size_t age_index) const =0</td></tr>
+<tr class="memdesc:a427c5999f182c628281e71bd01ae4a95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read prepared mean weight-at-age averaged over the population size bins.  <br /></td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename Type&gt;<br />
@@ -331,6 +333,49 @@ template&lt;typename Type&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>Read-only mean length-at-age value. </dd></dl>
 
 <p>Implemented in <a class="el" href="classfims__popdy_1_1GrowthDerivedSizeProvider.html#a62bf1c8667430a26fc14825661206bc0">fims_popdy::GrowthDerivedSizeProvider&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<a id="a427c5999f182c628281e71bd01ae4a95" name="a427c5999f182c628281e71bd01ae4a95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a427c5999f182c628281e71bd01ae4a95">&#9670;&#160;</a></span>MeanWeightAtAge()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual const Type &amp; <a class="el" href="classfims__popdy_1_1SizeDistributionProviderBase.html">fims_popdy::SizeDistributionProviderBase</a>&lt; Type &gt;::MeanWeightAtAge </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>year_index</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t</td>          <td class="paramname"><span class="paramname"><em>age_index</em></span>&#160;) const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel pure-virtual">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read prepared mean weight-at-age averaged over the population size bins. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">year_index</td><td>Year index. </td></tr>
+    <tr><td class="paramname">age_index</td><td>Age index. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Read-only mean weight-at-age value. </dd></dl>
+
+<p>Implemented in <a class="el" href="classfims__popdy_1_1GrowthDerivedSizeProvider.html#a2458e4450a32c066f4234151158c730e">fims_popdy::GrowthDerivedSizeProvider&lt; Type &gt;</a>.</p>
 
 </div>
 </div>

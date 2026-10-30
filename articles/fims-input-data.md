@@ -151,17 +151,23 @@ data_4_model
 
 ## Catch (`type == "catch"`)
 
-The catch data type contains the total catch in weight for each time
-step. FIMS does not yet include the option to model discards internally,
-so “catch” should account for all catch. The catch are not associated
-with an age or length so those columns should only contain `NA` values.
-The `unit` column should currently always be `mt`. The `uncertainty`
-column should be the standard deviation of the logged observations if
-you are using the lognormal distribution to fit your data. `log_Fmort`
-parameters for each fleet and time step with catch can be estimated to
-fit the model to the catch data, informed by the uncertainty values.
-Common practice is to set the uncertainty to a small number, like 0.001,
-so the catch data are fit closely.
+The catch data type contains the total catch in weight or numbers for
+each time step. FIMS does not yet include the option to model discards
+internally, so “catch” should account for all catch. The catch are not
+associated with an age or length so those columns should only contain
+`NA` values. The `unit` column should be `mt` for catch in weight or
+`number` for catch in numbers, and all catch rows of a fleet must use
+the same unit. FIMS fits `mt` catch to the expected catch in weight and
+`number` catch to the expected catch in numbers. FIMS does not rescale
+catch, so catch in numbers must be on the same scale as numbers at age
+in the model. For example, when weight at age is in mt per fish, catch
+in numbers is the number of fish, not thousands of fish. The
+`uncertainty` column should be the standard deviation of the logged
+observations if you are using the lognormal distribution to fit your
+data. `log_Fmort` parameters for each fleet and time step with catch can
+be estimated to fit the model to the catch data, informed by the
+uncertainty values. Common practice is to set the uncertainty to a small
+number, like 0.001, so the catch data are fit closely.
 
 ``` r
 
@@ -199,8 +205,9 @@ noisy but stable values until the final bar at timing equals
 
 The index data type contains the relative or absolute abundance index
 for each time step. The inputs are similar to catch, in having `NA`
-values for age and length, `mt` for `unit`, and index uncertainty as the
-standard deviation of the logged observations.
+values for age and length, `mt` or `number` for `unit` (1 unit for all
+index rows of a fleet), and index uncertainty as the standard deviation
+of the logged observations.
 
 ``` r
 
@@ -264,7 +271,9 @@ survey in each age bin. The `unit` column should be either “number” or
 “proportion”. If “proportion” is used, the observations are checked at a
 later step to confirm that they sum to 1.0. The `uncertainty` column
 should be the input sample size for the time step (equal across all ages
-within that time step).
+within that time step). When the unit is set to a proportion, the sample
+size is multiplied by the proportion; however, when it is set to a
+number, the sample size is ignored.
 
 ``` r
 
@@ -313,7 +322,9 @@ identifies the length bin for each observation. The `observed` column
 contains either the number or the proportion of fish in each length bin.
 The `unit` column should be either “number” or “proportion”. The
 `uncertainty` column should be the input sample size for the time step,
-repeated across all length bins in that time step.
+repeated across all length bins in that time step. When the unit is set
+to a proportion, the sample size is multiplied by the proportion;
+however, when it is set to a number, the sample size is ignored.
 
 When length compositions are included, FIMS needs a way to convert
 numbers at age into numbers at length. This can come from fixed

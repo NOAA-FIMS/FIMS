@@ -227,18 +227,25 @@ overview vignette</a> for more information.</p>
 <div class="section level2">
 <h2 id="catch-type-catch">Catch (<code>type == "catch"</code>)<a class="anchor" aria-label="anchor" href="#catch-type-catch"></a>
 </h2>
-<p>The catch data type contains the total catch in weight for each time
-step. FIMS does not yet include the option to model discards internally,
-so “catch” should account for all catch. The catch are not associated
-with an age or length so those columns should only contain
-<code>NA</code> values. The <code>unit</code> column should currently
-always be <code>mt</code>. The <code>uncertainty</code> column should be
-the standard deviation of the logged observations if you are using the
-lognormal distribution to fit your data. <code>log_Fmort</code>
-parameters for each fleet and time step with catch can be estimated to
-fit the model to the catch data, informed by the uncertainty values.
-Common practice is to set the uncertainty to a small number, like 0.001,
-so the catch data are fit closely.</p>
+<p>The catch data type contains the total catch in weight or numbers for
+each time step. FIMS does not yet include the option to model discards
+internally, so “catch” should account for all catch. The catch are not
+associated with an age or length so those columns should only contain
+<code>NA</code> values. The <code>unit</code> column should be
+<code>mt</code> for catch in weight or <code>number</code> for catch in
+numbers, and all catch rows of a fleet must use the same unit. FIMS fits
+<code>mt</code> catch to the expected catch in weight and
+<code>number</code> catch to the expected catch in numbers. FIMS does
+not rescale catch, so catch in numbers must be on the same scale as
+numbers at age in the model. For example, when weight at age is in mt
+per fish, catch in numbers is the number of fish, not thousands of fish.
+The <code>uncertainty</code> column should be the standard deviation of
+the logged observations if you are using the lognormal distribution to
+fit your data. <code>log_Fmort</code> parameters for each fleet and time
+step with catch can be estimated to fit the model to the catch data,
+informed by the uncertainty values. Common practice is to set the
+uncertainty to a small number, like 0.001, so the catch data are fit
+closely.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first three rows of the catch data</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
@@ -267,9 +274,10 @@ so the catch data are fit closely.</p>
 </h2>
 <p>The index data type contains the relative or absolute abundance index
 for each time step. The inputs are similar to catch, in having
-<code>NA</code> values for age and length, <code>mt</code> for
-<code>unit</code>, and index uncertainty as the standard deviation of
-the logged observations.</p>
+<code>NA</code> values for age and length, <code>mt</code> or
+<code>number</code> for <code>unit</code> (1 unit for all index rows of
+a fleet), and index uncertainty as the standard deviation of the logged
+observations.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first three rows of the index data</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
@@ -325,7 +333,9 @@ column should be either “number” or “proportion”. If “proportion” is
 used, the observations are checked at a later step to confirm that they
 sum to 1.0. The <code>uncertainty</code> column should be the input
 sample size for the time step (equal across all ages within that time
-step).</p>
+step). When the unit is set to a proportion, the sample size is
+multiplied by the proportion; however, when it is set to a number, the
+sample size is ignored.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first three rows of the age composition data</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
@@ -364,7 +374,10 @@ length bin for each observation. The <code>observed</code> column
 contains either the number or the proportion of fish in each length bin.
 The <code>unit</code> column should be either “number” or “proportion”.
 The <code>uncertainty</code> column should be the input sample size for
-the time step, repeated across all length bins in that time step.</p>
+the time step, repeated across all length bins in that time step. When
+the unit is set to a proportion, the sample size is multiplied by the
+proportion; however, when it is set to a number, the sample size is
+ignored.</p>
 <p>When length compositions are included, FIMS needs a way to convert
 numbers at age into numbers at length. This can come from fixed
 <code>age_to_length_conversion</code> rows or from a growth-derived
