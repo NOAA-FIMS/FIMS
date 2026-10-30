@@ -24,76 +24,14 @@
 */
 var NAVTREE =
 [
-  [ "FIMS", "index.html", [
-    [ "Glossary", "glossary.html", [
-      [ "Population and Recruitment", "glossary.html#autotoc_md0", null ],
-      [ "Mortality", "glossary.html#autotoc_md1", null ],
-      [ "Biomass", "glossary.html#autotoc_md2", null ],
-      [ "Stock–Recruitment (Beverton–Holt)", "glossary.html#autotoc_md3", null ],
-      [ "Growth", "glossary.html#autotoc_md4", null ],
-      [ "Catch", "glossary.html#autotoc_md5", null ],
-      [ "Index of Abundance", "glossary.html#autotoc_md6", null ],
-      [ "Index Variables", "glossary.html#autotoc_md7", null ],
-      [ "Statistical", "glossary.html#autotoc_md8", null ],
-      [ "Common Abbreviations", "glossary.html#autotoc_md9", null ]
-    ] ],
-    [ "C++ Directory Structure", "md_inst_2include_2README.html", [
-      [ "inst/include/", "md_inst_2include_2README.html#autotoc_md11", [
-        [ "inst/include/common/", "md_inst_2include_2README.html#autotoc_md12", null ],
-        [ "inst/include/distributions/", "md_inst_2include_2README.html#autotoc_md13", null ],
-        [ "inst/include/interface/", "md_inst_2include_2README.html#autotoc_md14", [
-          [ "inst/include/interface/interface.hpp", "md_inst_2include_2README.html#autotoc_md15", null ],
-          [ "inst/include/interface/rcpp", "md_inst_2include_2README.html#autotoc_md16", null ],
-          [ "inst/include/interface/TMB", "md_inst_2include_2README.html#autotoc_md17", null ]
-        ] ],
-        [ "inst/include/models/", "md_inst_2include_2README.html#autotoc_md18", null ],
-        [ "inst/include/population_dynamics/", "md_inst_2include_2README.html#autotoc_md19", null ],
-        [ "inst/include/utilities/", "md_inst_2include_2README.html#autotoc_md20", null ]
-      ] ]
-    ] ],
-    [ "Namespaces", "namespaces.html", [
-      [ "Namespace List", "namespaces.html", "namespaces_dup" ],
-      [ "Namespace Members", "namespacemembers.html", [
-        [ "All", "namespacemembers.html", null ],
-        [ "Functions", "namespacemembers_func.html", null ]
-      ] ]
-    ] ],
-    [ "Classes", "annotated.html", [
-      [ "Class List", "annotated.html", "annotated_dup" ],
-      [ "Class Index", "classes.html", null ],
-      [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
-      [ "Class Members", "functions.html", [
-        [ "All", "functions.html", "functions_dup" ],
-        [ "Functions", "functions_func.html", "functions_func" ],
-        [ "Variables", "functions_vars.html", "functions_vars" ],
-        [ "Typedefs", "functions_type.html", null ],
-        [ "Enumerations", "functions_enum.html", null ],
-        [ "Related Symbols", "functions_rela.html", null ]
-      ] ]
-    ] ],
-    [ "Files", "files.html", [
-      [ "File List", "files.html", "files_dup" ],
-      [ "File Members", "globals.html", [
-        [ "All", "globals.html", null ],
-        [ "Functions", "globals_func.html", null ],
-        [ "Typedefs", "globals_type.html", null ],
-        [ "Macros", "globals_defs.html", null ]
-      ] ]
-    ] ]
-  ] ]
+  [ "FIMS", "index.html", ]
 ];
 
 var NAVTREEINDEX =
 [
-"TMB_8cpp.html",
-"classGrowthDerivedObservationInterfaceBase.html#a76acce6192ceac36979896026a699701",
-"classSharedReal.html#a6fa65a1797de01a4ed3f1c17a297f03d",
-"classfims__info_1_1Information.html#ad6b814e85fe0f43684f775cb46eb808a",
-"classfims__popdy_1_1SizeDistributionProviderBase.html#a1198d00320d69350b06eafddb06fb473",
-"globals_func.html",
-"structfims__data__object_1_1DataObject.html#a9564db3e53b2c512b80342c6ae62c46d",
-"structfims__popdy_1_1GrowthProducts.html#abbb2071e2ada0b2d65a14eb0598dabf2"
+"index.html"
 ];
 
-var SYNCONMSG = 'click to disable panel synchronisation';
-var SYNCOFFMSG = 'click to enable panel synchronisation';
+var SYNCONMSG = 'click to disable panel synchronization';
+var SYNCOFFMSG = 'click to enable panel synchronization';
+var LISTOFALLMEMBERS = 'List of all members';
