@@ -70,7 +70,7 @@ Definitions of mathematical symbols used in FIMS equations.
 ## Common Abbreviations
 
 - **NAA** — Numbers at age
-- **SSB** — Spawning stock biomass
+- **SB** — Spawning biomass
 - **SBPR** — Spawning biomass per recruit
 - **EWAA** — Empirical weight at age
 - **BH** — Beverton--Holt
