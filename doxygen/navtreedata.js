@@ -24,12 +24,61 @@
 */
 var NAVTREE =
 [
-  [ "FIMS", "index.html", ]
+  [ "FIMS", "index.html", [
+    [ "Glossary", "glossary.html", [
+      [ "Population and Recruitment", "glossary.html#autotoc_md0", null ],
+      [ "Mortality", "glossary.html#autotoc_md1", null ],
+      [ "Biomass", "glossary.html#autotoc_md2", null ],
+      [ "Stock&ndash;Recruitment (Beverton&ndash;Holt)", "glossary.html#autotoc_md3", null ],
+      [ "Growth", "glossary.html#autotoc_md4", null ],
+      [ "Catch", "glossary.html#autotoc_md5", null ],
+      [ "Index of Abundance", "glossary.html#autotoc_md6", null ],
+      [ "Index Variables", "glossary.html#autotoc_md7", null ],
+      [ "Statistical", "glossary.html#autotoc_md8", null ],
+      [ "Common Abbreviations", "glossary.html#autotoc_md9", null ]
+    ] ],
+    [ "Namespaces", "namespaces.html", [
+      [ "Namespace List", "namespaces.html", "namespaces_dup" ],
+      [ "Namespace Members", "namespacemembers.html", [
+        [ "All", "namespacemembers.html", null ],
+        [ "Functions", "namespacemembers_func.html", null ]
+      ] ]
+    ] ],
+    [ "Classes", "annotated.html", [
+      [ "Class List", "annotated.html", "annotated_dup" ],
+      [ "Class Index", "classes.html", null ],
+      [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
+      [ "Class Members", "functions.html", [
+        [ "All", "functions.html", "functions_dup" ],
+        [ "Functions", "functions_func.html", "functions_func" ],
+        [ "Variables", "functions_vars.html", "functions_vars" ],
+        [ "Typedefs", "functions_type.html", null ],
+        [ "Enumerations", "functions_enum.html", null ],
+        [ "Related Symbols", "functions_rela.html", null ]
+      ] ]
+    ] ],
+    [ "Files", "files.html", [
+      [ "File List", "files.html", "files_dup" ],
+      [ "File Members", "globals.html", [
+        [ "All", "globals.html", null ],
+        [ "Functions", "globals_func.html", null ],
+        [ "Typedefs", "globals_type.html", null ],
+        [ "Macros", "globals_defs.html", null ]
+      ] ]
+    ] ]
+  ] ]
 ];
 
 var NAVTREEINDEX =
 [
-"index.html"
+"TMB_8cpp.html",
+"classGrowthDerivedObservationInterfaceBase.html",
+"classSharedReal.html#a6b93223dfba022bb5ed8249ff5eb18bb",
+"classfims__info_1_1Information.html#ad35271c481119df45a855ac00f1957fb",
+"classfims__popdy_1_1SizeDistributionProviderBase.html#a1198d00320d69350b06eafddb06fb473",
+"growth__products_8hpp.html",
+"structfims__distributions_1_1MultinomialLPMF.html#a8f53d2cb377f00bdc112f4ca704da24d",
+"structfims__popdy_1_1LogisticSelectivity.html#ac4f5ab8f67acd93af04f1b3c771498c1"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

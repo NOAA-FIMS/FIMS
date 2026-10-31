@@ -206,10 +206,6 @@ html {
   color: #0e6876cc !important;
 }
 
-.arrow {
-  display: none !important;
-}
-
 div.toc li, div.toc h3 {
     font-family: Outfit, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
 }
