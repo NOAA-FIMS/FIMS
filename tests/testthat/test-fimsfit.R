@@ -11,6 +11,16 @@
 ## Setup ----
 fit_big_optimized <- FIMS::fit_big_optimized
 fit_big_unoptimized <- FIMS:::fit_big_unoptimized
+if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
+  suppressWarnings(
+    suppressMessages(
+      prepare_test_data()
+    )
+  )
+}
+fit_age_length_comp <- readRDS(
+  testthat::test_path("fixtures", "fit_age_length_comp.RDS")
+)
 
 ## IO correctness ----
 test_that("`is.FIMSFit()` works with correct inputs", {
