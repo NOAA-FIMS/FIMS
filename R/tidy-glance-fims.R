@@ -276,18 +276,18 @@ glance.FIMSFit <- function(x, ...) {
   run_time <- as.numeric(run_time[["time_total"]], units = "secs")
 
   tibble::tibble(
-    logLik       = log_lik,
-    AIC          = aic,
-    BIC          = bic,
-    nobs         = nobs,
-    npar_fixed   = npar_fixed,
-    npar_random  = npar_random,
+    logLik = log_lik,
+    AIC = aic,
+    BIC = bic,
+    nobs = nobs,
+    npar_fixed = npar_fixed,
+    npar_random = npar_random,
     marginal_nll = marginal_nll,
-    total_nll    = total_nll,
+    total_nll = total_nll,
     max_gradient = max_grad,
-    converged    = converged,
+    converged = converged,
     terminal_sb = terminal_sb,
     fims_version = as.character(get_version(x)),
-    run_time     = run_time
+    run_time = run_time
   )
 }
