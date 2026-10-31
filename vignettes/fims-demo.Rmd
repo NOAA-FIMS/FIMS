@@ -364,8 +364,8 @@ clear()
 
 To see what the checks look like for a model that did not converge, the model below is fit again but `nlminb()` is stopped after 5 iterations. `fit_fims()` warns that the optimization failed, and because the maximum gradient is above 0.01, the standard errors are not calculated.
 
-```{r nonconverged-fit}
-nonconverged_fit <- parameters_4_model |>
+```{r unconverged-fit}
+unconverged_fit <- parameters_4_model |>
   initialize_fims(data = data_4_model) |>
   fit_fims(
     optimize = TRUE,
@@ -375,9 +375,9 @@ nonconverged_fit <- parameters_4_model |>
 
 `get_convergence()` shows that the optimizer and maximum gradient checks failed and that the Hessian was not checked. The `parameter` column of `max_gradient` names the 3 parameters with the largest gradients, which are a good place to start looking.
 
-```{r nonconverged-checks}
-get_convergence(nonconverged_fit)
-sanity <- sanity_fims(nonconverged_fit)
+```{r unconverged-checks}
+get_convergence(unconverged_fit)
+sanity <- sanity_fims(unconverged_fit)
 sanity[["all_ok"]]
 clear()
 ```
