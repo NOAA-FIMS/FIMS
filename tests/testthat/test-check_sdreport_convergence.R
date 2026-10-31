@@ -245,7 +245,7 @@ test_that("check_sdreport_convergence() works with correct inputs", {
 test_that("check_sdreport_convergence() returns correct outputs for edge cases", {
   #' @description Test that `check_sdreport_convergence()` gracefully handles when summary extraction throws an error.
   obj <- make_mock_obj(random = 1)
-  opt <- list(par = numeric())
+  opt <- list(par = c(0, 0))
   sdreport <- make_mock_sdreport(
     pdHess = TRUE,
     fail_on = "fixed"

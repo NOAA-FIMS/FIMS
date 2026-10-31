@@ -14,7 +14,15 @@ FIMSFit(
 )
 }
 \arguments{
-\item{input}{Input list as returned by \code{\link[=initialize_fims]{initialize_fims()}}.}
+\item{input}{Input list as returned by \code{\link[=initialize_fims]{initialize_fims()}}. An optional
+\code{map} entry is a named list of factors for \code{p} (fixed effects) and/or \code{re}
+(random effects), in the order of the corresponding \code{parameters} vector.
+Each factor must have one entry per parameter. \code{NA} holds a parameter at
+its starting value; repeated levels share one estimated value. Shared
+entries must have identical starting values. Factor levels determine the
+reduced parameter order; unused levels are dropped. Levels in \code{p} and \code{re}
+are independent; sharing
+across these vectors is not supported.}
 
 \item{obj}{An object returned from \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}.}
 
