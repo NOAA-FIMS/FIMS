@@ -23,7 +23,7 @@ withr::local_options(list(
 
 Projections in FIMS can occur during the model-fitting process. That is, you can extend your time series as many years into the future that you wish with fixed values of catch or fixed fishing mortality values to project the population forward in time while estimating parameters. This dual process during the estimation phase allows you to set priors on future values and integrate estimated uncertainty into the projection period.
 
-As we work to set up various inputs and outputs for necessary management quantities for each region, we encourage you to join the [FIMS Discussion Board](https://github.com/orgs/NOAA-FIMS/discussions) to voice your thoughts about quantities that should be included. Second, please report bugs in the code to our [Issues page](https://github.com/NOAA-FIMS/FIMS/Issues).
+As we work to set up various inputs and outputs for necessary management quantities for each region, we encourage you to join the [FIMS Discussion Board](https://github.com/orgs/NOAA-FIMS/discussions) to voice your thoughts about quantities that should be included. Second, please report bugs in the code to our [Issues page](https://github.com/NOAA-FIMS/FIMS/issues).
 
 ```{r memory, warning=FALSE, message=FALSE}
 library(FIMS)

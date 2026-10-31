@@ -8,7 +8,7 @@
 An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) with 474 rows and 11 columns.
 }
 \source{
-\url{www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
+\url{https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
 }
 \usage{
 parameters_big

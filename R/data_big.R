@@ -3,7 +3,7 @@
 #' A data frame containing the information needed to run an age-structured stock
 #' assessment model in FIMS. This data was generated using
 #' the `ASSAMC` package written for the [model comparison project](
-#' www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison).
+#' https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison).
 #' The source code to make this dataset is in `data-raw/data_big.R` which is on
 #' GitHub but will not be in your local installation because it is in the
 #' .Rbuildignore file.
@@ -39,7 +39,7 @@
 #'     information about this column.
 #' }
 #' }
-#' @source \url{www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
+#' @source \url{https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
 #' @seealso
 #' * [FIMSFrame()]
 "data_big"
@@ -50,7 +50,7 @@
 #' the example data set. The parameter table uses the same columns and
 #' structure returned by [setup_default_parameters()].
 #'
-#' @source \url{www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
+#' @source \url{https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
 #' @seealso [setup_default_parameters()]
 "parameters_big"
 

@@ -1,0 +1,17 @@
+extensions = ["html"]
+exclude_path = ['(^|[/\\])doxygen_crawl\.html$']
+index_files = ["index.html"]
+max_retries = 3
+exclude = [
+	'^https://docs\.google\.com/document/d/1nziPdPULoRWOYQ9WKzISNUgJvANACvfYpFr1z3Ro2Bc(?:[/?#]|$)',
+	'^https://docs\.google\.com/document/d/1U1PzGS7G70xsXtD6F6WxkjTSCw7bwNVyZ-YnFyOLOqU(?:[/?#]|$)',
+	'^https://en\.cppreference\.com/w/cpp/container/vector/?$',
+	'^https://deepwiki\.com/badge\.svg$',
+	'^https://deepwiki\.com/NOAA-FIMS/FIMS/?$',
+	'^https://www\.commerce\.gov/?$',
+	'^https://www\.noaa\.gov/?$',
+]
+
+[hosts."deepwiki.com"]
+concurrency = 1
+request_interval = "2s"

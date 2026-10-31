@@ -37,7 +37,7 @@ information about this column.
 }
 }
 \source{
-\url{www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
+\url{https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
 }
 \usage{
 data_big
@@ -45,7 +45,7 @@ data_big
 \description{
 A data frame containing the information needed to run an age-structured stock
 assessment model in FIMS. This data was generated using
-the \code{ASSAMC} package written for the \href{www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}{model comparison project}.
+the \code{ASSAMC} package written for the \href{https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}{model comparison project}.
 The source code to make this dataset is in \code{data-raw/data_big.R} which is on
 GitHub but will not be in your local installation because it is in the
 .Rbuildignore file.

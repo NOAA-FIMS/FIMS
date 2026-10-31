@@ -11,8 +11,11 @@ on:
       - 'man/**'
       - 'vignettes/**'
       - 'inst/**'
+      - 'doxygen/**'
       - 'README.md'
+      - 'CONTRIBUTING.md'
       - 'pkgdown/**'
+      - '.github/lychee.toml'
       - '.github/workflows/build-pkgdown.yml'
       - 'CMakeLists.txt'
       - 'src/**'
@@ -77,27 +80,49 @@ jobs:
         # Do not run -DDOXYGEN_WARN_AS_ERROR=YES locally
         # FIX? run cmake --build build --parallel 16
         run: |
+          doxygen --version
           cmake -S . -B build -G Ninja -DDOXYGEN_WARN_AS_ERROR=FAIL_ON_WARNINGS
           cmake --build build
 
-      - name: Deploy html documentation with Doxygen
-        # Do not run mkdir doxygen and mv build/html doxygen locally
-        if: ${{ github.ref == 'refs/heads/main' }}
+      - name: Stage Doxygen documentation
         run: |
           mkdir -p docs/doxygen
           cp -a doxygen/html/. docs/doxygen/
 
-      - name: save pkgdown output
+      - name: Check local site links
+        id: local-links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          lycheeVersion: v0.24.2
+          args: >-
+            --config .github/lychee.toml
+            --offline
+            --remap '^https?://(?i:noaa-fims\.github\.io)/(?i:FIMS)([/?#]|$) file://${{ github.workspace }}/docs$1'
+            docs/
+          output: lychee/local.md
+          fail: true
+
+      - name: Check external links
+        if: ${{ !cancelled() && (steps.local-links.outcome == 'success' || steps.local-links.outcome == 'failure') }}
+        uses: lycheeverse/lychee-action@v2
+        with:
+          lycheeVersion: v0.24.2
+          args: >-
+            --config .github/lychee.toml
+            --scheme http --scheme https
+            --exclude '^https?://(?i:noaa-fims\.github\.io)/(?i:FIMS)([/?#]|$)'
+            docs/
+          output: lychee/external.md
+          fail: true
+
+      - name: Save site and link reports
+        if: ${{ always() }}
         uses: actions/upload-artifact@v7
         with:
           name: pkgdown-site-with-reports
-          path: docs/
-
-      - name: Check links in pkgdown output
-        uses: lycheeverse/lychee-action@v2
-        with:
-          args: --accept 200,403,503 docs/**/*.html
-          fail: true
+          path: |
+            docs/
+            lychee/
   
       - name: Deploy package
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'NOAA-FIMS/FIMS'
