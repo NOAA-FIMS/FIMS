@@ -240,7 +240,7 @@ methods::setMethod("get_convergence", "FIMSFit", function(x) {
   # A FIMSFit without a convergence slot, e.g., read from an older saved file,
   # has no checks to return
   if (!methods::.hasSlot(x, "convergence")) {
-    return(convergence_check(character(0), character(0)))
+    return(convergence_tibble(character(0), character(0)))
   }
   x@convergence
 })
@@ -481,7 +481,7 @@ FIMSFit <- function(
   sdreport = list(),
   run_time = c("time_total" = as.difftime(0, units = "secs")),
   version = utils::packageVersion("FIMS"),
-  convergence = convergence_check(character(0), character(0))
+  convergence = convergence_tibble(character(0), character(0))
 ) {
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
@@ -742,7 +742,7 @@ fit_fims <- function(input,
     time_sdreport <- as.difftime(0, units = "secs")
     # Without this row a fit with no sdreport would look like it passed the
     # Hessian checks rather than skipped them.
-    sdreport_convergence <- convergence_check(
+    sdreport_convergence <- convergence_tibble(
       check = "sdreport",
       severity = "NOTE",
       message = if (gradient_failed) {
@@ -885,7 +885,7 @@ failed_fims_fit <- function(input, obj) {
     run_time = failed_nlminb_object[["run_time"]]
   )
   fit@convergence <- dplyr::bind_rows(
-    convergence_check(
+    convergence_tibble(
       check = "optimizer",
       severity = "FAIL",
       value = 1,
@@ -893,7 +893,7 @@ failed_fims_fit <- function(input, obj) {
       message = "nlminb failed or returned an objective that is not finite."
     ),
     check_nll_convergence(get_opt(fit), get_report(fit), get_model_output(fit)),
-    convergence_check(
+    convergence_tibble(
       check = "sdreport",
       severity = "NOTE",
       message = "Hessian not checked because the optimization failed."

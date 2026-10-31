@@ -11,7 +11,7 @@ FIMSFit(
   sdreport = list(),
   run_time = c(time_total = as.difftime(0, units = "secs")),
   version = utils::packageVersion("FIMS"),
-  convergence = convergence_check(character(0), character(0))
+  convergence = convergence_tibble(character(0), character(0))
 )
 }
 \arguments{
