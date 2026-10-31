@@ -94,9 +94,9 @@ class JsonValue {
 
  private:
   JsonValueType type; /**< Type of the JSON value. */
-  double number;      /**< Numeric value. */
+  double number = 0.0; /**< Numeric value. */
   std::string str;    /**< String value. */
-  bool boolean;       /**< Boolean value. */
+  bool boolean = false; /**< Boolean value. */
   JsonObject object;  /**< JSON object. */
   JsonArray array;    /**< JSON array. */
 };
