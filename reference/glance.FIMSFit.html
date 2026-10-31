@@ -3,11 +3,11 @@
 generics::glance() convention.  Standard information-criterion columns
 (logLik, AIC, BIC, nobs) are included alongside FIMS-specific
 diagnostics (max_gradient, marginal_nll, total_nll, converged,
-terminal_ssb)."><meta property="og:description" content="Returns a single-row tibble of model-level diagnostics following the
+terminal_sb)."><meta property="og:description" content="Returns a single-row tibble of model-level diagnostics following the
 generics::glance() convention.  Standard information-criterion columns
 (logLik, AIC, BIC, nobs) are included alongside FIMS-specific
 diagnostics (max_gradient, marginal_nll, total_nll, converged,
-terminal_ssb)."><meta property="og:image" content="https://NOAA-FIMS.github.io/FIMS/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;display=swap" rel="stylesheet"></head><body>
+terminal_sb)."><meta property="og:image" content="https://NOAA-FIMS.github.io/FIMS/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;display=swap" rel="stylesheet"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -77,7 +77,7 @@ terminal_ssb)."><meta property="og:image" content="https://NOAA-FIMS.github.io/F
 <code><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">generics::glance()</a></code> convention.  Standard information-criterion columns
 (<code>logLik</code>, <code>AIC</code>, <code>BIC</code>, <code>nobs</code>) are included alongside FIMS-specific
 diagnostics (<code>max_gradient</code>, <code>marginal_nll</code>, <code>total_nll</code>, <code>converged</code>,
-<code>terminal_ssb</code>).</p>
+<code>terminal_sb</code>).</p>
     </div>
 
     <div class="section level2">
@@ -136,8 +136,8 @@ below 0.001 are generally considered well-converged.</p></dd>
 <dd><p>Logical; <code>TRUE</code> when <code>opt$convergence == 0</code> <strong>and</strong>
 <code>max_gradient &lt; 0.001</code>.</p></dd>
 
-<dt><code>terminal_ssb</code></dt>
-<dd><p>Spawning stock biomass at the terminal year,
+<dt><code>terminal_sb</code></dt>
+<dd><p>Spawning biomass at the terminal year,
 extracted from the TMB report. Returns a list-column when multiple
 populations are present.</p></dd>
 

@@ -40,7 +40,7 @@ base_model <- parameters |>
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 1.04553 minutes
+#> ℹ Total run time was 1.05528 minutes
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00022
 #> ℹ Negative log likelihood (NLL):
@@ -188,7 +188,7 @@ retro_fit <- run_fims_retrospective(
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 1.10752 minutes
+#> ℹ Total run time was 1.05868 minutes
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00022
 #> ℹ Negative log likelihood (NLL):
@@ -203,7 +203,7 @@ retro_fit <- run_fims_retrospective(
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 1.12323 minutes
+#> ℹ Total run time was 1.07232 minutes
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00038
 #> ℹ Negative log likelihood (NLL):
@@ -218,7 +218,7 @@ retro_fit <- run_fims_retrospective(
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 1.0804 minutes
+#> ℹ Total run time was 1.03758 minutes
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00034
 #> ℹ Negative log likelihood (NLL):
@@ -248,7 +248,7 @@ axes labels and the legend title.
 
 ``` r
 
-fig_retrospective_ssb <- stockplotr::plot_spawning_biomass(
+fig_retrospective_sb <- stockplotr::plot_spawning_biomass(
   retro_fit$estimates |>
     dplyr::rename(
       year = year_i,
@@ -259,7 +259,7 @@ fig_retrospective_ssb <- stockplotr::plot_spawning_biomass(
     ),
   group = "retrospective_peel"
 )
-print(fig_retrospective_ssb)
+print(fig_retrospective_sb)
 ```
 
 ![Plot of spawning biomass showing a small negative bias with removed

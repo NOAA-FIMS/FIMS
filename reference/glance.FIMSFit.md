@@ -5,7 +5,7 @@ Returns a single-row tibble of model-level diagnostics following the
 convention. Standard information-criterion columns (`logLik`, `AIC`,
 `BIC`, `nobs`) are included alongside FIMS-specific diagnostics
 (`max_gradient`, `marginal_nll`, `total_nll`, `converged`,
-`terminal_ssb`).
+`terminal_sb`).
 
 ## Usage
 
@@ -77,10 +77,10 @@ with one row and the following columns:
   Logical; `TRUE` when `opt$convergence == 0` **and**
   `max_gradient < 0.001`.
 
-- `terminal_ssb`:
+- `terminal_sb`:
 
-  Spawning stock biomass at the terminal year, extracted from the TMB
-  report. Returns a list-column when multiple populations are present.
+  Spawning biomass at the terminal year, extracted from the TMB report.
+  Returns a list-column when multiple populations are present.
 
 - `fims_version`:
 
