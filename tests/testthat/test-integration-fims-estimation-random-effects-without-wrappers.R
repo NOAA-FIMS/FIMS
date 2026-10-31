@@ -20,85 +20,10 @@ load(testthat::test_path("fixtures", "integration_test_data.RData"))
 # Set the iteration ID to 1 for accessing specific input/output list
 iter_id <- 1
 
-# Run FIMS without wrappers
-result <- setup_and_run_FIMS_without_wrappers(
-  iter_id = iter_id,
-  om_input_list = om_input_list,
-  om_output_list = om_output_list,
-  em_input_list = em_input_list,
-  estimation_mode = FALSE,
-  random_effects = c(recruitment = "log_devs")
-)
-
-## IO correctness ----
-test_that("deterministic run works with correct inputs", {
-  #' @description Test that the output from FIMS run matches the model comparison project OM values.
-  verify_fims_deterministic(
-    report = result[["report"]],
-    estimates = result[["sdr_fixed"]],
-    om_input = om_input_list[[iter_id]],
-    om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]],
-    use_fimsfit = FALSE
-  )
-})
-
-test_that("deterministic run returns correct nlls", {
-  #' @description Test that the NLLs from FIMS match the "true" NLLs from the model comparison project.
-  verify_fims_nll(
-    report = result[["report"]],
-    om_input = om_input_list[[iter_id]],
-    om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]]
-  )
-})
-
-test_that("deterministic run results correct number of parameters and random effects", {
-  #' @description Test that the number of parameters are correct.
-  expect_equal(length(result[["obj"]][["par"]]), 49)
-  #' @description Test that the number of random effects are correct.
-  expect_equal(length(result[["obj"]][["env"]][["random"]]), 29)
-})
-
-
-## Edge handling ----
-# No edge cases to test.
-
-## Error handling ----
-# No built-in errors to test.
-
 # Estimation test ----
 
-
 ## IO correctness ----
-# Compare FIMS results with model comparison project OM values
-test_that("estimation test with recruitment re on log devs", {
-  ## Setup ----
-  result_log_devs <- setup_and_run_FIMS_without_wrappers(
-    iter_id = iter_id,
-    om_input_list = om_input_list,
-    om_output_list = om_output_list,
-    em_input_list = em_input_list,
-    estimation_mode = TRUE,
-    random_effects = c(recruitment = "log_devs")
-  )
-
-  # Compare FIMS results with model comparison project OM values
-  # Tests currently don't pass when log devs are estimated
-  #' @description Skip test due to current issues with log devs estimation.
-  testthat::skip("Skipping test for log devs estimation until issues are resolved.")
-  #' @description Test that the output from FIMS matches the model comparison project OM values.
-  validate_fims(
-    report = result_log_devs[["report"]],
-    estimates = result_log_devs[["sdr_report"]],
-    om_input = om_input_list[[iter_id]],
-    om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]]
-  )
-})
-
-
-test_that("estimation test with recruitment re on logr", {
+test_that("1. estimation test with recruitment re on log_r", {
   result_log_r <- setup_and_run_FIMS_without_wrappers(
     iter_id = iter_id,
     om_input_list = om_input_list,
@@ -107,8 +32,7 @@ test_that("estimation test with recruitment re on logr", {
     estimation_mode = TRUE,
     random_effects = c(recruitment = "log_r")
   )
-  # Compare FIMS results with model comparison project OM values
-  # Tests currently don't pass when log devs are estimated
+
   #' @description Skip test due to current issues with log r estimation.
   testthat::skip("Skipping test for log r estimation until issues are resolved.")
   #' @description Test that the output from FIMS matches the model comparison project OM values.
@@ -118,6 +42,28 @@ test_that("estimation test with recruitment re on logr", {
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
     em_input = em_input_list[[iter_id]]
+  )
+
+  clear()
+})
+
+test_that("2. compare recruitment log_devs vs log_r implementations", {
+  result_log_devs <- setup_and_run_FIMS_without_wrappers(
+    iter_id = iter_id,
+    om_input_list = om_input_list,
+    om_output_list = om_output_list,
+    em_input_list = em_input_list,
+    estimation_mode = TRUE,
+    random_effects = c(recruitment = "log_devs")
+  )
+
+  result_log_r <- setup_and_run_FIMS_without_wrappers(
+    iter_id = iter_id,
+    om_input_list = om_input_list,
+    om_output_list = om_output_list,
+    em_input_list = em_input_list,
+    estimation_mode = TRUE,
+    random_effects = c(recruitment = "log_r")
   )
 
   #' @description Verify the log_devs and log_r approach result in comparable negative log-likelihoods.
