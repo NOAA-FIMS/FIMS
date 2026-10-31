@@ -28,162 +28,214 @@ label_values <- function(values, value_labels = NULL, fallback = "p") {
   ifelse(repeated, sprintf("%s[%d]", value_labels, position), value_labels)
 }
 
+#' Build rows of the convergence table
+#'
+#' Returns the rows stored in the `convergence` slot of a FIMSFit object, so
+#' the result of each check can be read after the warnings have scrolled by,
+#' e.g., in a simulation with hundreds of fits.
+#'
+#' @param check A character vector naming each check, e.g., `"max_gradient"`.
+#' @param severity A character vector with one of `"OK"`, `"NOTE"`, `"WARN"`,
+#'   or `"FAIL"` per check. `"NOTE"` marks a check that did not run.
+#' @param value The value that was checked, e.g., the maximum gradient.
+#' @param threshold The threshold that `value` was compared with.
+#' @param parameter The parameter the check points to, e.g., the parameter
+#'   with the largest gradient.
+#' @param message A short description of the result.
+#' @return
+#' A tibble with one row per check and the columns `check`, `severity`,
+#' `value`, `threshold`, `parameter`, and `message`.
+#' @noRd
+convergence_tibble <- function(
+  check,
+  severity,
+  value = NA_real_,
+  threshold = NA_real_,
+  parameter = NA_character_,
+  message = NA_character_
+) {
+  tibble::tibble(
+    check = check,
+    severity = severity,
+    value = as.numeric(value),
+    threshold = as.numeric(threshold),
+    parameter = as.character(parameter),
+    message = as.character(message)
+  )
+}
+
 #' Check convergence of nlminb optimization
 #'
 #' Checks the convergence of the nlminb optimization by evaluating the
-#' convergence code and maximum gradient. If convergence issues are detected,
-#' appropriate warnings are issued and the fit is returned for diagnostic
-#' purposes. If the optimizer converged but the maximum gradient is above
-#' certain thresholds, warnings are issued about potential convergence concerns.
+#' convergence code and maximum gradient. A non-zero convergence code or a
+#' maximum gradient above 0.01 gives a warning that the optimization failed. A
+#' maximum gradient of 0.001 or more gives a warning that the model might not
+#' be converged. These match `sdmTMB::sanity()` and the `converged` column of
+#' [glance()].
 #'
-#' @param input The FIMS input object used for fitting, containing model
-#' configuration and data.
-#' @param obj The TMB object used for fitting, containing the model environment
-#' and random effects.
 #' @param opt The optimization output from nlminb, containing convergence
 #' information.
 #' @param maxgrad The maximum absolute gradient from the optimization, used to
 #' assess convergence quality.
 #' @param gradient The gradient vector of the fixed effects at the optimum, used
-#' to name the parameter with the largest absolute gradient. The default of
-#' `NULL` leaves the name out of the messages.
+#' to name the 3 parameters with the largest absolute gradients. The default
+#' of `NULL` leaves the names out of the messages.
 #' @param parameter_names A character vector of fixed-effect names, e.g., from
 #' [get_parameter_names()], in the same order as `gradient`. If `NULL`, labels
 #' such as `"p[2]"` are used.
 #' @return
-#' If convergence issues are detected, a FIMSFit object is returned for
-#' diagnostics. Otherwise, the function returns NULL.
+#' A tibble from `convergence_tibble()` with the rows `"optimizer"` and
+#' `"max_gradient"`. The `threshold` of `"max_gradient"` is always 0.001, so
+#' it can be compared across fits. [fit_fims()] skips sdreport when
+#' `"max_gradient"` fails.
 #' @noRd
 check_mle_convergence <- function(
-  input,
-  obj,
   opt,
   maxgrad,
   gradient = NULL,
   parameter_names = NULL
 ) {
-  # Check convergence status
-  convergence_issues <- c()
-  convergence_warnings <- c()
+  optimizer_failed <- opt[["convergence"]] != 0
+  # A gradient that is not finite cannot be compared with the thresholds and
+  # means the fit failed.
+  gradient_severity <- if (!is.finite(maxgrad) || maxgrad > 0.01) {
+    "FAIL"
+  } else if (maxgrad >= 0.001) {
+    "WARN"
+  } else {
+    "OK"
+  }
 
-  # which.max() drops NA and NaN, so an all-NaN gradient would give an empty
-  # label
+  # order() puts NA and NaN last, and they are dropped so an all-NaN gradient
+  # gives no labels
   largest_gradient_message <- NULL
+  largest_gradient_labels <- character(0)
   if (length(gradient) > 0 && any(!is.na(gradient))) {
-    largest_gradient_label <- label_values(gradient, parameter_names)[
-      which.max(abs(gradient))
-    ]
+    ranked <- order(abs(gradient), decreasing = TRUE)
+    ranked <- utils::head(ranked[!is.na(gradient[ranked])], 3)
+    largest_gradient_labels <- label_values(gradient, parameter_names)[ranked]
     largest_gradient_message <- cli::format_inline(
-      "Largest absolute gradient is on {.val {largest_gradient_label}}."
+      "Largest absolute gradient{?s} {?is/are} on
+      {.val {largest_gradient_labels}}."
     )
   }
 
-  # Check 1: nlminb convergence flag
-  if (opt[["convergence"]] != 0) {
-    convergence_message <- if (!is.null(opt[["message"]])) {
-      c(
-        cli::format_inline("Convergence code = {.val {opt[['convergence']]}}."),
-        cli::format_inline("Message = {.val {opt[['message']]}}.")
-      )
-    } else {
-      cli::format_inline("Convergence code = {.val {opt[['convergence']]}}.")
-    }
+  convergence_issues <- c()
+  if (optimizer_failed) {
     convergence_issues <- c(
       convergence_issues,
-      convergence_message,
-      largest_gradient_message
+      cli::format_inline("Convergence code = {.val {opt[['convergence']]}}."),
+      if (!is.null(opt[["message"]])) {
+        cli::format_inline("Message = {.val {opt[['message']]}}.")
+      }
     )
-  } else {
-    # if optimizer converged, check the gradient to see if it is close enough
-    # to zero
-    # Check 2: Maximum gradient threshold (warning only)
-    if (maxgrad > 1) {
-      convergence_issues <- c(
-        convergence_issues,
-        cli::format_inline(
-          "Maximum absolute gradient
-          ({.val {format(maxgrad, scientific = TRUE)}})
-          is higher than {.val {1}}. Model does not seem converged."
-        ),
-        largest_gradient_message
-      )
-    } else if (maxgrad > 0.01) {
-      convergence_warnings <- c(
-        convergence_warnings,
-        cli::format_inline(
-          "Maximum absolute gradient
-          ({.val {format(maxgrad, scientific = TRUE)}})
-          is higher than {.val {0.01}}. Model might not be converged."
-        ),
-        largest_gradient_message
-      )
-    }
   }
+  if (gradient_severity == "FAIL") {
+    convergence_issues <- c(
+      convergence_issues,
+      cli::format_inline(
+        "Maximum absolute gradient
+        ({.val {format(maxgrad, scientific = TRUE)}})
+        is higher than {.val {0.01}} or not finite. Model does not seem
+        converged."
+      )
+    )
+  } else if (gradient_severity == "WARN") {
+    convergence_issues <- c(
+      convergence_issues,
+      cli::format_inline(
+        "Maximum absolute gradient
+        ({.val {format(maxgrad, scientific = TRUE)}})
+        is {.val {0.001}} or higher. Model might not be converged."
+      )
+    )
+  }
+  convergence_issues <- c(convergence_issues, largest_gradient_message)
 
-  # If optimizer did not converge, skip sdreport, warn, and return fit for
-  # diagnostics
-  if (length(convergence_issues) > 0) {
-    warning_bullets <- c(
+  if (optimizer_failed || gradient_severity == "FAIL") {
+    cli::cli_warn(c(
       "x" = "Optimization failed convergence checks.",
-      setNames(convergence_issues, rep("i", length(convergence_issues))),
-      "i" = "Skipping sdreport. Consider adjusting control parameters
-        (eval.max, iter.max) or model structure.",
+      stats::setNames(
+        convergence_issues,
+        rep("i", length(convergence_issues))
+      ),
+      # Standard errors are still worth having when only the convergence code
+      # failed, e.g., a false convergence with a small gradient.
+      "i" = if (gradient_severity == "FAIL") {
+        "Skipping sdreport. Consider adjusting control parameters
+        (eval.max, iter.max) or model structure."
+      } else {
+        "Consider adjusting control parameters (eval.max, iter.max) or model
+        structure."
+      },
       "i" = "Model fit returned for diagnostic purposes only. Results are not
         reliable."
-    )
-    cli::cli_warn(warning_bullets)
-  }
-
-  if (length(convergence_warnings) > 0) {
-    warning_bullets <- c(
+    ))
+  } else if (gradient_severity == "WARN") {
+    cli::cli_warn(c(
       "!" = "Optimization resulted in high gradients.",
-      setNames(convergence_warnings, rep("i", length(convergence_warnings))),
+      stats::setNames(
+        convergence_issues,
+        rep("i", length(convergence_issues))
+      ),
       "i" = "Results may be less reliable than results with a smaller gradient,
         where the target gradient is close to {.val {0}}.",
       "i" = "Consider adjusting model structure, control parameters, or
         starting values.",
       "i" = "Model fit returned for diagnostic purposes only. Results might not
         be reliable."
-    )
-    cli::cli_warn(warning_bullets)
-    fit <- FIMSFit(
-      input = input,
-      obj = obj,
-      opt = opt,
-      sdreport = list(),
-      run_time = c(
-        time_optimization = as.difftime(0, units = "secs"),
-        time_sdreport = as.difftime(0, units = "secs"),
-        time_total = as.difftime(0, units = "secs")
+    ))
+  }
+
+  invisible(dplyr::bind_rows(
+    convergence_tibble(
+      check = "optimizer",
+      severity = if (optimizer_failed) "FAIL" else "OK",
+      value = opt[["convergence"]],
+      threshold = 0,
+      message = if (is.null(opt[["message"]])) NA else opt[["message"]]
+    ),
+    convergence_tibble(
+      check = "max_gradient",
+      severity = gradient_severity,
+      value = maxgrad,
+      threshold = 0.001,
+      parameter = if (length(largest_gradient_labels) > 0) {
+        paste(largest_gradient_labels, collapse = ", ")
+      } else {
+        NA
+      },
+      message = switch(gradient_severity,
+        "FAIL" = "Maximum absolute gradient is above 0.01 or not finite.",
+        "WARN" = "Maximum absolute gradient is 0.001 or higher.",
+        "OK" = "Maximum absolute gradient is below 0.001."
       )
     )
-    print(fit)
-    return(fit)
-  }
+  ))
 }
 
 #' Check convergence of sdreport and standard errors
 #'
 #' Checks the convergence of the sdreport step by evaluating the positive
-#' definiteness of the Hessian, the presence of NA standard errors, and the
-#' condition number of the Hessian. If convergence issues are detected
-#' (e.g., non-positive definite Hessian, NA standard errors), appropriate
-#' warnings are issued and the fit is returned for diagnostic purposes.
-#' If the Hessian is near singular (high condition number), a warning is issued
-#' about potential unreliability of standard errors and MLEs.
+#' definiteness of the Hessian, the presence of NA standard errors, the size of
+#' the standard errors, and the condition number of the Hessian. A Hessian
+#' that is not positive definite or NA standard errors give a warning that the
+#' standard errors failed. A fixed or random effect with a standard error above
+#' 1000 or a condition number above the threshold gives a warning that the
+#' model may be weakly identified.
 #' @inheritParams check_mle_convergence
+#' @param obj The TMB object used for fitting, used to compute the Hessian.
 #' @param sdreport The sdreport output from TMB, containing standard errors and
 #' Hessian information.
 #' @param random_effects_names A character vector of random-effect names, e.g.,
 #' from [get_random_names()], in the same order as the random effects in
 #' `sdreport`. If `NULL`, labels such as `"re[2]"` are used.
 #' @return
-#' If convergence issues are detected, a FIMSFit object is returned for
-#' diagnostics. Otherwise, the function returns NULL and allows the fitting
-#' process to continue to sdreport.
+#' A tibble from `convergence_tibble()` with the row `"hessian"` and, when the
+#' Hessian is positive definite, the rows `"standard_errors"`,
+#' `"large_standard_errors"`, and `"condition_number"`.
 #' @noRd
 check_sdreport_convergence <- function(
-  input,
   obj,
   opt,
   sdreport,
@@ -191,6 +243,9 @@ check_sdreport_convergence <- function(
   random_effects_names = NULL
 ) {
   condition_number_threshold <- 1e5
+  # Most parameters are on the log or logit scale, so a standard error this
+  # large means the data say almost nothing about the parameter.
+  large_se_threshold <- 1e3
   has_random_effects <- length(obj[["env"]][["random"]]) > 0
   # TMB labels every fixed effect "p" and every random effect "re", so prefer
   # the FIMS names and only fall back to the summary row names without them.
@@ -238,19 +293,11 @@ check_sdreport_convergence <- function(
         reliable."
     ))
     # Skip the rest of the sdreport checks
-    fit <- FIMSFit(
-      input = input,
-      obj = obj,
-      opt = opt,
-      sdreport = sdreport,
-      run_time = c(
-        time_optimization = as.difftime(0, units = "secs"),
-        time_sdreport = as.difftime(0, units = "secs"),
-        time_total = as.difftime(0, units = "secs")
-      )
-    )
-    print(fit)
-    return(fit)
+    return(invisible(convergence_tibble(
+      check = "hessian",
+      severity = "FAIL",
+      message = "Hessian is not positive definite."
+    )))
   }
 
   # Check 2: Validate standard errors
@@ -258,50 +305,89 @@ check_sdreport_convergence <- function(
   se_check_result <- tryCatch(
     {
       se_issues <- c()
+      na_se_labels <- character(0)
+      large_se_labels <- character(0)
 
       fixed_summary <- summary(sdreport, "fixed")
 
       if (!is.null(fixed_summary) && nrow(fixed_summary) > 0) {
+        fixed_labels <- summary_labels(fixed_summary, parameter_names, "p")
         issue <- format_na_se_issue(
           fixed_summary[, "Std. Error"],
-          summary_labels(fixed_summary, parameter_names, "p"),
+          fixed_labels,
           "fixed effect"
         )
         if (!is.null(issue)) {
           se_issues <- c(se_issues, issue)
+          na_se_labels <- c(
+            na_se_labels,
+            fixed_labels[is.na(fixed_summary[, "Std. Error"])]
+          )
         }
+        large_se_labels <- c(
+          large_se_labels,
+          fixed_labels[fixed_summary[, "Std. Error"] > large_se_threshold &
+            !is.na(fixed_summary[, "Std. Error"])]
+        )
       }
 
       if (has_random_effects) {
         random_summary <- summary(sdreport, "random")
         if (!is.null(random_summary) && nrow(random_summary) > 0) {
+          random_labels <- summary_labels(
+            random_summary,
+            random_effects_names,
+            "re"
+          )
           issue <- format_na_se_issue(
             random_summary[, "Std. Error"],
-            summary_labels(random_summary, random_effects_names, "re"),
+            random_labels,
             "random effect"
           )
           if (!is.null(issue)) {
             se_issues <- c(se_issues, issue)
+            na_se_labels <- c(
+              na_se_labels,
+              random_labels[is.na(random_summary[, "Std. Error"])]
+            )
           }
+          large_se_labels <- c(
+            large_se_labels,
+            random_labels[random_summary[, "Std. Error"] > large_se_threshold &
+              !is.na(random_summary[, "Std. Error"])]
+          )
         }
       }
 
 
       derived_summary <- summary(sdreport, "report")
       if (!is.null(derived_summary) && nrow(derived_summary) > 0) {
+        derived_labels <- summary_labels(derived_summary, NULL, "report")
         issue <- format_na_se_issue(
           derived_summary[, "Std. Error"],
-          summary_labels(derived_summary, NULL, "report"),
+          derived_labels,
           "derived value"
         )
         if (!is.null(issue)) {
           se_issues <- c(se_issues, issue)
+          na_se_labels <- c(
+            na_se_labels,
+            derived_labels[is.na(derived_summary[, "Std. Error"])]
+          )
         }
       }
-      list(issues = se_issues)
+      list(
+        issues = se_issues,
+        na_se_labels = na_se_labels,
+        large_se_labels = large_se_labels
+      )
     },
     error = function(e) {
-      list(issues = c("Unable to extract summary from sdreport"))
+      list(
+        issues = c("Unable to extract summary from sdreport"),
+        na_se_labels = NULL,
+        large_se_labels = NULL
+      )
     }
   )
 
@@ -402,14 +488,15 @@ check_sdreport_convergence <- function(
           "Standard errors and MLEs may be unreliable."
         )
 
-        list(warnings = warning_bullets)
+        list(warnings = warning_bullets, condition_number = condition_number)
       } else {
-        list(warnings = c())
+        list(warnings = c(), condition_number = condition_number)
       }
     },
     error = function(e) {
       list(
-        warnings = c("Unable to extract Hessian for condition number check.")
+        warnings = c("Unable to extract Hessian for condition number check."),
+        condition_number = NA_real_
       )
     }
   )
@@ -435,4 +522,200 @@ check_sdreport_convergence <- function(
       )
     ))
   }
+
+  # NULL when the summary could not be extracted, so the count is unknown
+  na_se_labels <- se_check_result[["na_se_labels"]]
+  large_se_labels <- se_check_result[["large_se_labels"]]
+  if (length(large_se_labels) > 0) {
+    cli::cli_warn(c(
+      "!" = "{length(large_se_labels)} fixed or random
+        effect{?s} {?has/have} a standard error above
+        {.val {large_se_threshold}}: {.val {utils::head(large_se_labels, 5)}}.",
+      "i" = "The data may not inform these parameters. Consider fixing them,
+        adding a prior, or simplifying the model.",
+      "i" = "Run {.code sanity_fims(fit)} to see every convergence check."
+    ))
+  }
+  condition_number <- hessian_check_result[["condition_number"]]
+  condition_severity <- if (is.na(condition_number)) {
+    "NOTE"
+  } else if (condition_number > condition_number_threshold) {
+    "WARN"
+  } else {
+    "OK"
+  }
+  invisible(dplyr::bind_rows(
+    convergence_tibble(
+      check = "hessian",
+      severity = "OK",
+      message = "Hessian is positive definite."
+    ),
+    convergence_tibble(
+      check = "standard_errors",
+      severity = if (is.null(na_se_labels)) {
+        "NOTE"
+      } else if (length(se_check_result[["issues"]]) > 0) {
+        "FAIL"
+      } else {
+        "OK"
+      },
+      value = if (is.null(na_se_labels)) NA else length(na_se_labels),
+      threshold = 0,
+      parameter = if (length(na_se_labels) > 0) {
+        paste(utils::head(na_se_labels, 5), collapse = ", ")
+      } else {
+        NA
+      },
+      # The stored message is read outside the console, e.g., saved to a file,
+      # so it is kept free of terminal colors.
+      message = if (length(se_check_result[["issues"]]) > 0) {
+        cli::ansi_strip(paste(se_check_result[["issues"]], collapse = " "))
+      } else {
+        "No standard errors are NA."
+      }
+    ),
+    convergence_tibble(
+      check = "large_standard_errors",
+      severity = if (is.null(large_se_labels)) {
+        "NOTE"
+      } else if (length(large_se_labels) > 0) {
+        "WARN"
+      } else {
+        "OK"
+      },
+      value = if (is.null(large_se_labels)) NA else length(large_se_labels),
+      threshold = large_se_threshold,
+      parameter = if (length(large_se_labels) > 0) {
+        paste(utils::head(large_se_labels, 5), collapse = ", ")
+      } else {
+        NA
+      },
+      message = if (is.null(large_se_labels)) {
+        "Unable to extract standard errors from sdreport."
+      } else if (length(large_se_labels) > 0) {
+        "Some fixed or random effects have a large standard error."
+      } else {
+        "No fixed or random effect has a standard error above the threshold."
+      }
+    ),
+    convergence_tibble(
+      check = "condition_number",
+      severity = condition_severity,
+      value = condition_number,
+      threshold = condition_number_threshold,
+      parameter = if (is.null(largest_se)) NA else largest_se[["label"]][1],
+      message = switch(condition_severity,
+        "NOTE" = "Unable to extract the Hessian for the condition number.",
+        "WARN" = "Condition number of the Hessian is above the threshold.",
+        "OK" = "Condition number of the Hessian is at or below the threshold."
+      )
+    )
+  ))
+}
+
+#' Label negative log-likelihood components
+#'
+#' Names each value of `nll_components` in the report from the density
+#' components in the model output. `Model::Evaluate()` in
+#' `inst/include/common/model.hpp` adds the components in the order priors,
+#' random effects, then data, and within each type in order of module id
+#' because the density components are stored in a map keyed by id.
+#'
+#' @param model_output The model output as a JSON string, e.g., from
+#' [get_model_output()].
+#' @param n_components The length of `nll_components`.
+#' @return
+#' A character vector of length `n_components`, e.g., `"fleet1_catch"` for a
+#' data component or `"random_effects_4"` for the random effects of density
+#' module 4. Labels such as `"nll[2]"` are used if the model output does not
+#' line up with `n_components`.
+#' @noRd
+label_nll_components <- function(model_output, n_components) {
+  fallback <- sprintf("nll[%d]", seq_len(n_components))
+  output <- tryCatch(
+    jsonlite::fromJSON(model_output, simplifyVector = FALSE),
+    error = function(e) NULL
+  )
+  densities <- output[["density_components"]]
+  if (length(densities) != n_components) {
+    return(fallback)
+  }
+
+  # Each fleet lists the id of each of its data types, e.g., catch = 2
+  data_labels <- output[["fleets"]] |>
+    purrr::map(function(fleet) {
+      data_ids <- unlist(fleet[["data_ids"]])
+      stats::setNames(
+        paste(fleet[["fleet"]], names(data_ids), sep = "_"),
+        data_ids
+      )
+    }) |>
+    unlist()
+
+  input_type <- purrr::map_chr(densities, "input_type")
+  module_id <- purrr::map_int(densities, "module_id")
+  labels <- purrr::map2_chr(densities, input_type, function(density, type) {
+    if (type == "data") {
+      label <- data_labels[as.character(density[["observed_data_id"]])]
+      if (!is.na(label)) {
+        return(unname(label))
+      }
+    }
+    paste(type, density[["module_id"]], sep = "_")
+  })
+  labels[order(
+    match(input_type, c("prior", "random_effects", "data")),
+    module_id
+  )]
+}
+
+#' Check the negative log-likelihood
+#'
+#' Checks that the objective from nlminb, the total negative log-likelihood,
+#' and each negative log-likelihood component are finite. A value that is not
+#' finite gives a warning that names the components that are not finite.
+#'
+#' @inheritParams check_mle_convergence
+#' @param report The report from the TMB object, e.g., from [get_report()].
+#' @inheritParams label_nll_components
+#' @return
+#' A tibble from `convergence_tibble()` with the row `"nll"`.
+#' @noRd
+check_nll_convergence <- function(opt, report, model_output) {
+  nll_components <- report[["nll_components"]]
+  component_labels <- label_nll_components(
+    model_output,
+    length(nll_components)
+  )
+  not_finite <- c(
+    objective = !is.finite(opt[["objective"]]),
+    jnll = !is.finite(report[["jnll"]]),
+    stats::setNames(!is.finite(nll_components), component_labels)
+  )
+  not_finite_labels <- names(not_finite)[not_finite]
+
+  if (length(not_finite_labels) > 0) {
+    cli::cli_warn(c(
+      "x" = "Negative log-likelihood is not finite for
+        {.val {not_finite_labels}}.",
+      "i" = "Check the data and starting values for these components.",
+      "i" = "Run {.code sanity_fims(fit)} to see every convergence check."
+    ))
+  }
+
+  convergence_tibble(
+    check = "nll",
+    severity = if (length(not_finite_labels) > 0) "FAIL" else "OK",
+    value = opt[["objective"]],
+    parameter = if (length(not_finite_labels) > 0) {
+      paste(not_finite_labels, collapse = ", ")
+    } else {
+      NA
+    },
+    message = if (length(not_finite_labels) > 0) {
+      "Negative log-likelihood is not finite."
+    } else {
+      "Negative log-likelihood and its components are finite."
+    }
+  )
 }
