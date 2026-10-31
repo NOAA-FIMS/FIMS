@@ -46,7 +46,7 @@ label_values <- function(values, value_labels = NULL, fallback = "p") {
 #' A tibble with one row per check and the columns `check`, `severity`,
 #' `value`, `threshold`, `parameter`, and `message`.
 #' @noRd
-convergence_check <- function(
+convergence_tibble <- function(
   check,
   severity,
   value = NA_real_,
@@ -84,7 +84,7 @@ convergence_check <- function(
 #' [get_parameter_names()], in the same order as `gradient`. If `NULL`, labels
 #' such as `"p[2]"` are used.
 #' @return
-#' A tibble from `convergence_check()` with the rows `"optimizer"` and
+#' A tibble from `convergence_tibble()` with the rows `"optimizer"` and
 #' `"max_gradient"`. The `threshold` of `"max_gradient"` is always 0.001, so
 #' it can be compared across fits. [fit_fims()] skips sdreport when
 #' `"max_gradient"` fails.
@@ -188,14 +188,14 @@ check_mle_convergence <- function(
   }
 
   invisible(dplyr::bind_rows(
-    convergence_check(
+    convergence_tibble(
       check = "optimizer",
       severity = if (optimizer_failed) "FAIL" else "OK",
       value = opt[["convergence"]],
       threshold = 0,
       message = if (is.null(opt[["message"]])) NA else opt[["message"]]
     ),
-    convergence_check(
+    convergence_tibble(
       check = "max_gradient",
       severity = gradient_severity,
       value = maxgrad,
@@ -231,7 +231,7 @@ check_mle_convergence <- function(
 #' from [get_random_names()], in the same order as the random effects in
 #' `sdreport`. If `NULL`, labels such as `"re[2]"` are used.
 #' @return
-#' A tibble from `convergence_check()` with the row `"hessian"` and, when the
+#' A tibble from `convergence_tibble()` with the row `"hessian"` and, when the
 #' Hessian is positive definite, the rows `"standard_errors"`,
 #' `"large_standard_errors"`, and `"condition_number"`.
 #' @noRd
@@ -293,7 +293,7 @@ check_sdreport_convergence <- function(
         reliable."
     ))
     # Skip the rest of the sdreport checks
-    return(invisible(convergence_check(
+    return(invisible(convergence_tibble(
       check = "hessian",
       severity = "FAIL",
       message = "Hessian is not positive definite."
@@ -531,8 +531,8 @@ check_sdreport_convergence <- function(
       "!" = "{length(large_se_labels)} fixed or random
         effect{?s} {?has/have} a standard error above
         {.val {large_se_threshold}}: {.val {utils::head(large_se_labels, 5)}}.",
-      "i" = "The data may not inform these parameters. Consider fixing them or
-        adding a prior.",
+      "i" = "The data may not inform these parameters. Consider fixing them,
+        adding a prior, or simplifying the model.",
       "i" = "Run {.code sanity_fims(fit)} to see every convergence check."
     ))
   }
@@ -545,12 +545,12 @@ check_sdreport_convergence <- function(
     "OK"
   }
   invisible(dplyr::bind_rows(
-    convergence_check(
+    convergence_tibble(
       check = "hessian",
       severity = "OK",
       message = "Hessian is positive definite."
     ),
-    convergence_check(
+    convergence_tibble(
       check = "standard_errors",
       severity = if (is.null(na_se_labels)) {
         "NOTE"
@@ -574,7 +574,7 @@ check_sdreport_convergence <- function(
         "No standard errors are NA."
       }
     ),
-    convergence_check(
+    convergence_tibble(
       check = "large_standard_errors",
       severity = if (is.null(large_se_labels)) {
         "NOTE"
@@ -598,7 +598,7 @@ check_sdreport_convergence <- function(
         "No fixed or random effect has a standard error above the threshold."
       }
     ),
-    convergence_check(
+    convergence_tibble(
       check = "condition_number",
       severity = condition_severity,
       value = condition_number,
@@ -679,7 +679,7 @@ label_nll_components <- function(model_output, n_components) {
 #' @param report The report from the TMB object, e.g., from [get_report()].
 #' @inheritParams label_nll_components
 #' @return
-#' A tibble from `convergence_check()` with the row `"nll"`.
+#' A tibble from `convergence_tibble()` with the row `"nll"`.
 #' @noRd
 check_nll_convergence <- function(opt, report, model_output) {
   nll_components <- report[["nll_components"]]
@@ -703,7 +703,7 @@ check_nll_convergence <- function(opt, report, model_output) {
     ))
   }
 
-  convergence_check(
+  convergence_tibble(
     check = "nll",
     severity = if (length(not_finite_labels) > 0) "FAIL" else "OK",
     value = opt[["objective"]],
