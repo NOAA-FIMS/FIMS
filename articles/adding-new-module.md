@@ -552,7 +552,7 @@ constructs the TMB-ready objects:
 
 **Relevant files**
 
-- [R/setup_default_parameters.R](https://NOAA-FIMS.github.io/FIMS/R/setup_default_parameters.R)
+- [R/setup_default_parameters.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/setup_default_parameters.R)
 
 If you add a new module type that users should be able to request by
 default, update:
@@ -576,7 +576,7 @@ existing helper rather than add a brand new top-level function.
 #### 4.2 Update `initialize_modules.R`
 
 **Relevant file**:
-[R/initialize_modules.R](https://NOAA-FIMS.github.io/FIMS/R/initialize_modules.R)
+[R/initialize_modules.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/initialize_modules.R)
 
 `initialize_module()` currently builds the Rcpp class name by combining
 `module_type` and `module_name`:
@@ -871,8 +871,8 @@ Study these existing modules as templates:
 - **Recruitment**:
   [inst/include/population_dynamics/recruitment/](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/recruitment/)
 - **R parameter workflow**:
-  - [R/setup_default_parameters.R](https://NOAA-FIMS.github.io/FIMS/R/setup_default_parameters.R)
-  - [R/initialize_modules.R](https://NOAA-FIMS.github.io/FIMS/R/initialize_modules.R)
+  - [R/setup_default_parameters.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/setup_default_parameters.R)
+  - [R/initialize_modules.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/initialize_modules.R)
 
 ### Documentation resources
 

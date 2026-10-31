@@ -257,6 +257,9 @@ fit <- readRDS(file.path(folder_path, "fit.RDS"))
 
 🗂️ Cloud Computing Documentation (Click to expand)
 
+The Cloud Program guide and Pilot Participant FAQ below require
+authorized NOAA access.
+
 - [NOAA Fisheries Cloud
   Program](https://docs.google.com/document/d/1nziPdPULoRWOYQ9WKzISNUgJvANACvfYpFr1z3Ro2Bc/edit?usp=sharing)
   began a Cloud Compute Accelerator Pilot in early 2025: Enhancing NOAA

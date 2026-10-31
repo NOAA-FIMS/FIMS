@@ -18,7 +18,7 @@ rows and 11 columns.
 
 ## Source
 
-[www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison](https://NOAA-FIMS.github.io/FIMS/reference/www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)
+<https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison>
 
 ## See also
 

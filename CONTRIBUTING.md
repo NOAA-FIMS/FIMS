@@ -59,7 +59,7 @@ guide](https://github.com/NOAA-FIMS/noaa-fims.github.io/blob/main/CONTRIBUTING.m
 If you are adding a new C++ module to FIMS (e.g., a new selectivity
 function, recruitment model, or other population dynamics component),
 start with the guide titled [Adding a New C++
-Module](https://NOAA-FIMS.github.io/FIMS/vignettes/adding-new-module.Rmd).
+Module](https://noaa-fims.github.io/FIMS/articles/adding-new-module.html).
 
 That guide explains the current architecture in detail. The quick
 checklist below is intended to help you keep track of the files and
@@ -111,9 +111,6 @@ Register the class in `src/fims_modules.hpp`.
 Export the class in `R/FIMS-package.R` and run
 [`devtools::document()`](https://devtools.r-lib.org/reference/document.html).
 
-Update `R/create_default_configurations.R` if the new module type should
-appear in the default configuration workflow.
-
 Update `R/setup_default_parameters.R` so default values and estimation
 types are generated correctly.
 
@@ -138,7 +135,7 @@ Complete the tasks found in the [Standard contributor
 checks](#standard-contributor-checks) section
 
 Update the [Adding a New C++ Module
-vignette](https://NOAA-FIMS.github.io/FIMS/vignettes/adding-new-module.Rmd)
+vignette](https://noaa-fims.github.io/FIMS/articles/adding-new-module.html)
 itself if your changes alter the recommended workflow.
 
 Provide feedback to the developers on how helpful the vignette was to

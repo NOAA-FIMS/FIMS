@@ -15,7 +15,7 @@ quantities for each region, we encourage you to join the [FIMS
 Discussion Board](https://github.com/orgs/NOAA-FIMS/discussions) to
 voice your thoughts about quantities that should be included. Second,
 please report bugs in the code to our [Issues
-page](https://github.com/NOAA-FIMS/FIMS/Issues).
+page](https://github.com/NOAA-FIMS/FIMS/issues).
 
 ``` r
 
@@ -316,7 +316,7 @@ projection_fit <- parameters_projection |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 9.48452 seconds
+    ## ℹ Total run time was 9.88385 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00026
     ## ℹ Negative log likelihood (NLL):

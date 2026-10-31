@@ -186,7 +186,7 @@ C++ code in <code><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html" class=
 <span><span class="co"># after compiling, add works like a regular R function</span></span>
 <span><span class="va">add</span></span></code></pre></div>
 <pre><code><span><span class="co">## function (x, y, z) </span></span>
-<span><span class="co">## .Call(&lt;pointer: 0x7a35b9edf4b0&gt;, x, y, z)</span></span></code></pre>
+<span><span class="co">## .Call(&lt;pointer: 0x743fd81f84b0&gt;, x, y, z)</span></span></code></pre>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">add</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 6</span></span></code></pre>
@@ -291,9 +291,9 @@ compiled <code>meanC</code> function against the R function
 <span>  <span class="fu">meanC</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Unit: microseconds</span></span>
-<span><span class="co">##      expr     min      lq     mean   median       uq      max neval</span></span>
-<span><span class="co">##   mean(x) 373.253 380.143 384.3581 382.6220 387.6845  446.351   100</span></span>
-<span><span class="co">##  meanC(x)  82.141  82.332 164.1286  82.6925  83.0530 8135.944   100</span></span></code></pre>
+<span><span class="co">##      expr     min      lq    mean   median       uq      max neval</span></span>
+<span><span class="co">##   mean(x) 365.202 382.342 385.039 383.1685 389.9885  444.099   100</span></span>
+<span><span class="co">##  meanC(x)  82.032  82.282 162.018  82.6930  83.0885 7917.042   100</span></span></code></pre>
 </details>
 </div>
 <div class="section level3">
@@ -569,12 +569,12 @@ functions.</p>
 <div class="section level3">
 <h3 id="modules-in-fims">Modules in FIMS<a class="anchor" aria-label="anchor" href="#modules-in-fims"></a>
 </h3>
-<p>Within FIMS, we first use <code>RCPP_EXPOSED_CLASS()</code> to expose
-all of our new type classes, e.g.,
-<code>RCPP_EXPOSED_CLASS(Variable)</code> in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/src/fims_modules.hpp" class="external-link"><code>src/fims_modules.hpp</code></a>.
-Once all of the type classes are exposed, we then use a single instance
-of <code>RCPP_MODULE</code> to expose the C++ to R in that same
-file.</p>
+<p>Within FIMS, classes and functions are exposed through
+module-specific registration functions, such as
+<code>register_variable()</code> in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/src/rcpp_variable.cpp" class="external-link"><code>src/rcpp_variable.cpp</code></a>.
+The central <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/interface/rcpp/fims_modules.hpp" class="external-link"><code>inst/include/interface/rcpp/fims_modules.hpp</code></a>
+defines <code>RCPP_MODULE(fims)</code> and calls these registration
+functions to expose the C++ to R.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

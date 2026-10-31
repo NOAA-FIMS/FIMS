@@ -10,9 +10,9 @@ clear()
 
 ## Set up FIMS model
 
-Following the [minimal FIMS demo
-vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo-minimal.html),
-we will set up a FIMS model and run it. This model will contain the all
+Following the [FIMS demo
+vignette](https://noaa-fims.github.io/FIMS/articles/fims-demo.html), we
+will set up a FIMS model and run it. This model will contain the all
 years of data and will be our reference model (see section below for
 more information about reference models). We need to run it initially to
 get the MLE parameter estimates. For this example we are using the
@@ -40,7 +40,7 @@ base_model <- parameters |>
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 51.30865 seconds
+#> ℹ Total run time was 53.89443 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00028
 #> ℹ Negative log likelihood (NLL):
@@ -188,7 +188,7 @@ retro_fit <- run_fims_retrospective(
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 52.66075 seconds
+#> ℹ Total run time was 51.37451 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00028
 #> ℹ Negative log likelihood (NLL):
@@ -203,7 +203,7 @@ retro_fit <- run_fims_retrospective(
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 51.17869 seconds
+#> ℹ Total run time was 50.45761 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00033
 #> ℹ Negative log likelihood (NLL):
@@ -218,7 +218,7 @@ retro_fit <- run_fims_retrospective(
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 48.45964 seconds
+#> ℹ Total run time was 47.79661 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00054
 #> ℹ Negative log likelihood (NLL):

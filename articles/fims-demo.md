@@ -807,7 +807,7 @@ high_slope_fit <- parameters_high_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 43.33327 seconds
+    ## ℹ Total run time was 45.63772 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00027
     ## ℹ Negative log likelihood (NLL):
@@ -830,7 +830,7 @@ low_slope_fit <- parameters_low_slope |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 43.06939 seconds
+    ## ℹ Total run time was 45.38978 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 4e-04
     ## ℹ Negative log likelihood (NLL):
@@ -941,7 +941,7 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 43.43775 seconds
+    ## ℹ Total run time was 45.52586 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00028
     ## ℹ Negative log likelihood (NLL):
@@ -1040,7 +1040,7 @@ age_only_fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 8.15302 seconds
+    ## ℹ Total run time was 8.27714 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00024
     ## ℹ Negative log likelihood (NLL):
@@ -1084,7 +1084,7 @@ length_only_fit <- parameters_4_model |>
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 58.34774 seconds
+    ## ℹ Total run time was 1.01058 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00027
     ## ℹ Negative log likelihood (NLL):

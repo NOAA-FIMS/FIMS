@@ -3,7 +3,7 @@
 A data frame containing the information needed to run an age-structured
 stock assessment model in FIMS. This data was generated using the
 `ASSAMC` package written for the [model comparison
-project](https://NOAA-FIMS.github.io/FIMS/reference/www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison).
+project](https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison).
 The source code to make this dataset is in `data-raw/data_big.R` which
 is on GitHub but will not be in your local installation because it is in
 the .Rbuildignore file.
@@ -71,7 +71,7 @@ A data frame with 2808 observations of 8 variables:
 
 ## Source
 
-[www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison](https://NOAA-FIMS.github.io/FIMS/reference/www.github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison)
+<https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison>
 
 ## See also
 

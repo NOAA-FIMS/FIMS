@@ -26,9 +26,12 @@ to length-composition data. So, growth-derived refers to the fact that
 the conversion is estimated from growth parameters rather than user
 input.
 
-This vignette uses the interpolation-based variability pathway that
-supplies the standard deviation at the two reference ages through
-`length_at_age_sd_at_reference_ages`.
+This vignette uses interpolation-based variability, with
+`length_at_age_sd_young` and `length_at_age_sd_old` supplying the
+standard deviations of length at the younger and older reference ages.
+These SDs use the same length units as the growth inputs. Their `age`
+entries are `NA` because their ages come from
+`reference_age_for_length_young` and `reference_age_for_length_old`.
 
 > Note: The delta-method variability pathway is wired into FIMS, but it
 > is not used here because it depends on using von Bertalanffy growth,
@@ -447,26 +450,8 @@ the values used to generate the data.
 
 ``` r
 
-# Pull out the default VonBertalanffySchnute interpolation SD rows.
-growth_sd_rows <- parameters |>
-  dplyr::filter(
-    module_name == "Growth",
-    label == "length_at_age_sd_at_reference_ages"
-  ) |>
-  dplyr::mutate(
-    # Move the interpolation ages to the demo reference ages.
-    age = c(1, 12),
-    # Match the generated-truth SD values for this example.
-    value = c(30, 73)
-  )
-
-# Replace the defaults with the demo settings.
+# Set the curve starting values, reference ages, and length-at-age SDs.
 parameters <- parameters |>
-  dplyr::filter(
-    !(module_name == "Growth" &
-      label == "length_at_age_sd_at_reference_ages")
-  ) |>
-  dplyr::bind_rows(growth_sd_rows) |>
   dplyr::rows_update(
     tibble::tibble(
       module_name = "Growth",
@@ -475,9 +460,11 @@ parameters <- parameters |>
         "mean_length_old",
         "growth_coefficient",
         "reference_age_for_length_young",
-        "reference_age_for_length_old"
+        "reference_age_for_length_old",
+        "length_at_age_sd_young",
+        "length_at_age_sd_old"
       ),
-      value = c(150, 800, 0.22, 1, 12)
+      value = c(150, 800, 0.22, 1, 12, 30, 73)
     ),
     by = c("module_name", "label")
   )
@@ -488,17 +475,17 @@ parameters |>
   dplyr::arrange(label, age) |>
   dplyr::select(label, age, value, estimation_type)
 #> # A tibble: 9 × 4
-#>   label                                age   value estimation_type
-#>   <chr>                              <dbl>   <dbl> <chr>          
-#> 1 growth_coefficient                    NA 2.2e- 1 fixed_effects  
-#> 2 length_at_age_sd_at_reference_ages     1 3  e+ 1 constant       
-#> 3 length_at_age_sd_at_reference_ages    12 7.3e+ 1 constant       
-#> 4 length_weight_a                       NA 2.5e-11 constant       
-#> 5 length_weight_b                       NA 3  e+ 0 constant       
-#> 6 mean_length_old                       NA 8  e+ 2 fixed_effects  
-#> 7 mean_length_young                     NA 1.5e+ 2 fixed_effects  
-#> 8 reference_age_for_length_old          NA 1.2e+ 1 constant       
-#> 9 reference_age_for_length_young        NA 1  e+ 0 constant
+#>   label                            age   value estimation_type
+#>   <chr>                          <dbl>   <dbl> <chr>          
+#> 1 growth_coefficient                NA 2.2e- 1 fixed_effects  
+#> 2 length_at_age_sd_old              NA 7.3e+ 1 constant       
+#> 3 length_at_age_sd_young            NA 3  e+ 1 constant       
+#> 4 length_weight_a                   NA 2.5e-11 constant       
+#> 5 length_weight_b                   NA 3  e+ 0 constant       
+#> 6 mean_length_old                   NA 8  e+ 2 fixed_effects  
+#> 7 mean_length_young                 NA 1.5e+ 2 fixed_effects  
+#> 8 reference_age_for_length_old      NA 1.2e+ 1 constant       
+#> 9 reference_age_for_length_young    NA 1  e+ 0 constant
 ```
 
 You can change the three starting values and rerun the fit to examine
@@ -536,7 +523,7 @@ fit <- FIMS::fit_fims(
 #> ℹ Maximum gradient went from 0.00237 to 1e-04 after 5 steps.
 #> ✔ Finished optimization
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 4.35455 seconds
+#> ℹ Total run time was 4.2517 seconds
 #> ℹ Number of parameters: fixed_effects=39, random_effects=1, and total=40
 #> ℹ Maximum gradient= 1e-04
 #> ℹ Negative log likelihood (NLL):

@@ -754,7 +754,7 @@ Rcpp modules.</p>
 <span id="cb24-52"><a href="#cb24-52" tabindex="-1"></a>    <span class="op">.</span>derives<span class="op">&lt;</span>Shape<span class="op">&gt;(</span><span class="st">"Shape"</span><span class="op">)</span></span>
 <span id="cb24-53"><a href="#cb24-53" tabindex="-1"></a>    <span class="op">.</span>constructor<span class="op">&lt;</span><span class="dt">double</span><span class="op">,</span> <span class="dt">double</span><span class="op">&gt;();</span></span>
 <span id="cb24-54"><a href="#cb24-54" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-</details><p>We can load this code, which is stored in <a href="(https://github.com/NOAA-FIMS/FIMS/blob/main/vignettes/cpp/my_polymorphism.cpp)" class="external-link"><code>cpp/my_polymorphism.cpp</code></a>
+</details><p>We can load this code, which is stored in <a href="https://github.com/NOAA-FIMS/FIMS/blob/main/vignettes/cpp/my_polymorphism.cpp" class="external-link"><code>cpp/my_polymorphism.cpp</code></a>
 using <code><a href="https://rdrr.io/pkg/Rcpp/man/sourceCpp.html" class="external-link">Rcpp::sourceCpp()</a></code> and <code><a href="https://rdrr.io/pkg/Rcpp/man/loadModule.html" class="external-link">Rcpp::loadModule()</a></code>
 where the second argument is <code>TRUE</code> so that all objects are
 loaded into the R environment. <code><a href="https://rdrr.io/r/methods/new.html" class="external-link">methods::new()</a></code> is used to
@@ -812,8 +812,8 @@ will explore later.</p>
 <span></span>
 <span><span class="fu">pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## x is equal to the address of y</span></span>
-<span><span class="co">## x is: 0x7ffed5d922a4</span></span>
-<span><span class="co">## The address of y is: 0x7ffed5d922a4</span></span>
+<span><span class="co">## x is: 0x7ffcd7db4d04</span></span>
+<span><span class="co">## The address of y is: 0x7ffcd7db4d04</span></span>
 <span><span class="co">## *x returns the value of y: 3.1459</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
@@ -852,8 +852,8 @@ e.g., <code>&amp;y</code>.</p>
 <span><span class="fu">reference</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## x is: 3</span></span>
 <span><span class="co">## y is: 3</span></span>
-<span><span class="co">## The memory address of x is: 0x7ffed5d922a4</span></span>
-<span><span class="co">## The memory address of y is: 0x7ffed5d922a4</span></span></code></pre>
+<span><span class="co">## The memory address of x is: 0x7ffcd7db4d04</span></span>
+<span><span class="co">## The memory address of y is: 0x7ffcd7db4d04</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
 </div>
@@ -917,9 +917,9 @@ following example?</p>
 <span></span>
 <span><span class="fu">reassign_pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## c now equals the address of b</span></span>
-<span><span class="co">## &amp;a = 0x7ffed5d922a0</span></span>
-<span><span class="co">## &amp;b = 0x7ffed5d922a4</span></span>
-<span><span class="co">## c = 0x7ffed5d922a4</span></span>
+<span><span class="co">## &amp;a = 0x7ffcd7db4d00</span></span>
+<span><span class="co">## &amp;b = 0x7ffcd7db4d04</span></span>
+<span><span class="co">## c = 0x7ffcd7db4d04</span></span>
 <span><span class="co">## a = 100</span></span>
 <span><span class="co">## b = 10</span></span>
 <span><span class="co">## *c = 10</span></span></code></pre>
@@ -1032,9 +1032,9 @@ automatically deleted.</p>
 <span><span class="fu">shared_pointer</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ptr1: 42</span></span>
 <span><span class="co">## ptr2: 24</span></span>
-<span><span class="co">## ptr1 = 0x60b3d5c29040</span></span>
-<span><span class="co">## ptr2 = 0x60b3d73425b0</span></span>
-<span><span class="co">## ptr3 = 0x60b3d5c29040</span></span></code></pre>
+<span><span class="co">## ptr1 = 0x60c8e8b8aa60</span></span>
+<span><span class="co">## ptr2 = 0x60c8ed09fad0</span></span>
+<span><span class="co">## ptr3 = 0x60c8e8b8aa60</span></span></code></pre>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
 </details>
 </div>
