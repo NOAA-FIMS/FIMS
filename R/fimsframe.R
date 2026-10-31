@@ -231,7 +231,8 @@ methods::setMethod(
 )
 
 #' @return
-#' [get_lengths()] returns a vector of length bins used in the model.
+#' [get_lengths()] returns a vector of the lower edges of the length bins used
+#' in the model.
 #' @export
 #' @rdname get_FIMSFrame
 #' @keywords FIMSFrame

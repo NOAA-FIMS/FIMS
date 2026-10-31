@@ -101,23 +101,23 @@ void ConfigureAdapter(
 }
 
 /**
- * @brief Build a fleet with caller-supplied observation-bin centers.
+ * @brief Build a fleet with caller-supplied observation-bin lower edges.
  */
 std::shared_ptr<fims_popdy::Fleet<double>> MakeFleet(
-    const std::vector<double>& length_centers) {
+    const std::vector<double>& length_lower_edges) {
   auto fleet = std::make_shared<fims_popdy::Fleet<double>>();
   fleet->n_years = 1;
   fleet->n_ages = 3;
-  fleet->n_lengths = length_centers.size();
+  fleet->n_lengths = length_lower_edges.size();
   fleet->requires_age_length_mapping = true;
-  fleet->lengths.resize(length_centers.size());
+  fleet->lengths.resize(length_lower_edges.size());
 
-  for (std::size_t i = 0; i < length_centers.size(); ++i) {
-    fleet->lengths[i] = length_centers[i];
+  for (std::size_t i = 0; i < length_lower_edges.size(); ++i) {
+    fleet->lengths[i] = length_lower_edges[i];
   }
 
   fleet->length_bin_edges =
-      fims_popdy::SizeGridBuilder::BuildObservationEdgesFromCenters(
+      fims_popdy::SizeGridBuilder::BuildObservationEdgesFromLowerEdges(
           fleet->lengths);
   return fleet;
 }
@@ -393,7 +393,7 @@ TEST(AgeToLengthConversionRuntime,
 
 TEST(
     AgeToLengthConversionRuntime,
-    GrowthDerivedFleetMeanWeightAAMatchesAgeToLengthConversionWeightedBinCenterWeights) {
+    GrowthDerivedFleetMeanWeightAAMatchesAgeToLengthConversionWeightedBinMidpointWeights) {
   fims_popdy::CatchAtAge<double> model;
   auto fleet = MakeFleet();
 
@@ -423,9 +423,12 @@ TEST(
       0, 1, row));
   ASSERT_EQ(row.size(), fleet->n_lengths);
 
+  // The fleet lower edges are 200, 300, 400 and 500, so weight is taken at
+  // the bin midpoints. The last bin has the same width as the bin before it.
+  const std::vector<double> bin_midpoints = {250.0, 350.0, 450.0, 550.0};
   double expected_mean_weight = 0.0;
   for (std::size_t i = 0; i < row.size(); ++i) {
-    expected_mean_weight += row[i] * 2.5e-11 * std::pow(fleet->lengths[i], 3.0);
+    expected_mean_weight += row[i] * 2.5e-11 * std::pow(bin_midpoints[i], 3.0);
   }
 
   const double observed_mean_weight =
@@ -725,6 +728,47 @@ TEST(AgeToLengthConversionDerived,
   }
 
   EXPECT_NEAR(row_sum, 1.0, 1e-5);
+}
+
+TEST(AgeToLengthConversionDerived,
+     BuildAgeToLengthConversionRowTreatsFleetLengthsAsLowerEdges) {
+  auto fleet = MakeFleet();
+  auto growth = std::make_shared<FakeGrowthDerivedObservation>();
+
+  growth->Initialize(1, fleet->n_ages, 1);
+  const double mean_length = 350.0;
+  const double sd_length = 50.0;
+  growth->products.MeanLAA(0, 1, 0) = mean_length;
+  growth->products.SdLAA(0, 1, 0) = sd_length;
+
+  const fims_popdy::SizeGrid population_size_grid =
+      MakePopulationSizeGridForFleet(fleet);
+  std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
+      size_provider = MakeConfiguredSizeProvider(growth, &population_size_grid,
+                                                 fleet->n_years, fleet->n_ages);
+
+  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(
+      fleet, growth, size_provider);
+  fims::Vector<double> row;
+
+  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
+  ASSERT_TRUE(
+      age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row));
+  ASSERT_EQ(row.size(), 4u);
+
+  // With lower edges 200, 300, 400 and 500, bin i holds lengths from its own
+  // lower edge to the next one. The first bin is a minus group and the last
+  // is a plus group, so no probability is lost below 200 or above 600. The
+  // tolerance allows for the 1e-12 floor on each of the 401 population bins
+  // before the row is rescaled to sum to 1.
+  auto normal_cdf = [&](double length) {
+    return 0.5 *
+           std::erfc(-(length - mean_length) / (sd_length * std::sqrt(2.0)));
+  };
+  EXPECT_NEAR(row[0], normal_cdf(300.0), 1e-8);
+  EXPECT_NEAR(row[1], normal_cdf(400.0) - normal_cdf(300.0), 1e-8);
+  EXPECT_NEAR(row[2], normal_cdf(500.0) - normal_cdf(400.0), 1e-8);
+  EXPECT_NEAR(row[3], 1.0 - normal_cdf(500.0), 1e-8);
 }
 
 }  // namespace

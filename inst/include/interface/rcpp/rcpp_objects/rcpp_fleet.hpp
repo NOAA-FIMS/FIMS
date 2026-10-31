@@ -115,7 +115,7 @@ class FleetInterface : public FleetInterfaceBase {
    */
   SharedInt n_lengths = 0;
   /**
-   * @brief Fleet-specific observation-bin centers.
+   * @brief Fleet-specific observation-bin lower edges.
    */
   RealVector lengths;
   /**
