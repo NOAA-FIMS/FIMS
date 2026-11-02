@@ -62,7 +62,7 @@ FIMS distinguishes three \code{estimation_type} values:
 log_Fmort, log_q, etc.).}
 \item{\code{"random_effects"}}{Integrated-out random effects (log_devs, etc.).}
 \item{\code{"derived_quantity"}}{Model outputs that are not parameters
-(spawning biomass, expected catches, etc.). Uncertainty here comes from
+(mature biomass, expected catches, etc.). Uncertainty here comes from
 the delta method via \code{\link[TMB:sdreport]{TMB::sdreport()}}.}
 }
 Pass any subset of these strings to \code{parameters} to control which rows are

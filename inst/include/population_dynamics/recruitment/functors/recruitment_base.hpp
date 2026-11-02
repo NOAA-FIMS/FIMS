@@ -80,7 +80,7 @@ struct RecruitmentBase : public fims_model_object::FIMSObject<Type> {
    * the default value of zero.
    *
    * @param spawners Spawning output at the time step being evaluated, such as
-   * spawning biomass or another model-specific measure of reproductive output.
+   * mature biomass or another model-specific measure of reproductive output.
    * @param phi_0 Spawners per recruit at unfished equilibrium, used to scale
    * the stock--recruitment relationship relative to unfished conditions.
    * @return Expected recruitment before recruitment-process deviations or

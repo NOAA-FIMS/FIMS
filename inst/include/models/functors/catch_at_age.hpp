@@ -221,7 +221,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       this->populations[p]->f_multiplier.resize(this->populations[p]->n_years);
 
-      this->populations[p]->spawning_biomass_ratio.resize(
+      this->populations[p]->mature_biomass_ratio.resize(
           (this->populations[p]->n_years + 1));
     }
 
@@ -559,9 +559,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculates spawning biomass for a population.
+   * @brief Calculates mature biomass for a population.
    *
-   * This function computes yearly \f$y\f$ spawning biomass \f$SB_y\f$ by
+   * This function computes yearly \f$y\f$ mature biomass \f$SB_y\f$ by
    * summing the contributions from each age \f$a\f$, accounting for proportion
    * female, proportion mature, and weight at age \f$w_a\f$:
    * \f[
@@ -574,13 +574,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
    */
-  void CalculateSpawningBiomass(
+  void CalculateMatureBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    dq_["spawning_biomass"][year] +=
+    dq_["mature_biomass"][year] +=
         population->proportion_female.get_force_scalar(age) *
         dq_["numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
@@ -588,9 +588,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculated unfished spawning biomass for a population
+   * @brief Calculated unfished mature biomass for a population
    *
-   * Updates unfished spawning biomass \f$SB^U_y\f$ by adding the biomass of age
+   * Updates unfished mature biomass \f$SB^U_y\f$ by adding the biomass of age
    * \f$a\f$ in year \f$y\f$:
    * \f[
    * SB^U_y \mathrel{+}= N^U_{a,y} \times w_a \times p_{female,a} \times
@@ -602,13 +602,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
    */
-  void CalculateUnfishedSpawningBiomass(
+  void CalculateUnfishedMatureBiomass(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
       size_t i_age_year, size_t year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    dq_["unfished_spawning_biomass"][year] +=
+    dq_["unfished_mature_biomass"][year] +=
         population->proportion_female.get_force_scalar(age) *
         dq_["unfished_numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
@@ -616,32 +616,32 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Calculate the spawning biomass ratio for a population and year.
+   * @brief Calculate the mature biomass ratio for a population and year.
    *
-   * This method computes the ratio of spawning biomass in a given year to the
-   * spawning biomass at year zero (typically unfished), for the specified
+   * This method computes the ratio of mature biomass in a given year to the
+   * mature biomass at year zero (typically unfished), for the specified
    * population:
    * \f[
    * \text{ratio}_y = \frac{SB_y}{SB^U_0}
    * \f]
    *
-   * The result is stored in the population's spawning_biomass_ratio vector.
+   * The result is stored in the population's mature_biomass_ratio vector.
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    */
-  void CalculateSpawningBiomassRatio(
+  void CalculateMatureBiomassRatio(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
-    population->spawning_biomass_ratio[year] =
-        dq_["spawning_biomass"][year] / dq_["unfished_spawning_biomass"][0];
+    population->mature_biomass_ratio[year] =
+        dq_["mature_biomass"][year] / dq_["unfished_mature_biomass"][0];
   }
 
   /**
-   * @brief Calculates equilibrium spawning biomass per recruit.
+   * @brief Calculates equilibrium mature biomass per recruit.
    *
-   * This function calculates the spawning biomass per recruit \f$\phi_0\f$ at
+   * This function calculates the mature biomass per recruit \f$\phi_0\f$ at
    * equilibrium, assuming an unfished stock. The biomass is calculated as the
    * sum of the biomass contributions from each age \f$a\f$:
    * \f[
@@ -701,8 +701,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
   /**
    * @brief Calculates expected recruitment for a population.
    *
-   * Calculates expected recruitment as a function of spawning biomass and
-   * equilibrium spawning biomass per recruit \f$\phi_0\f$.
+   * Calculates expected recruitment as a function of mature biomass and
+   * equilibrium mature biomass per recruit \f$\phi_0\f$.
    *
    * The expected recruitment \f$R_y\f$ in year \f$y\f$ is given by:
    * \f[
@@ -713,7 +713,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \end{cases}
    * \f]
    *
-   * Where \f$f()\f$ evaluates mean recruitment based on spawning biomass and
+   * Where \f$f()\f$ evaluates mean recruitment based on mature biomass and
    * \f$\phi_0\f$, and \f$g(y-1)\f$ evaluates recruitment deviations.
    *
    * @snippet{doc} this param_population
@@ -732,7 +732,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     if (i_dev == population->n_years) {
       dq_["numbers_at_age"][i_age_year] =
           population->recruitment->evaluate_mean(
-              dq_["spawning_biomass"][year - 1], phi_0);
+              dq_["mature_biomass"][year - 1], phi_0);
       /*the final year of the time series has no data to inform recruitment
       devs, so this value is set to the mean recruitment.*/
     } else {
@@ -741,7 +741,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // evaluate_process (see below)
       population->recruitment->log_expected_recruitment[year - 1] =
           fims_math::log(population->recruitment->evaluate_mean(
-              dq_["spawning_biomass"][year - 1], phi_0));
+              dq_["mature_biomass"][year - 1], phi_0));
 
       dq_["numbers_at_age"][i_age_year] = fims_math::exp(
           population->recruitment->process->evaluate_process(year - 1));
@@ -1725,9 +1725,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
           dq["unfished_biomass"][year] += unfished[i] * weight;
           dq["weight_at_age_by_subpopulation"][i] = weight;
           dq["proportion_mature_at_age_by_subpopulation"][i] = mature;
-          dq["spawning_biomass"][year] +=
+          dq["mature_biomass"][year] +=
               numbers[i] * weight * mature * config.reproductive_contribution;
-          dq["unfished_spawning_biomass"][year] +=
+          dq["unfished_mature_biomass"][year] +=
               unfished[i] * weight * mature * config.reproductive_contribution;
           if (year < years) {
             const size_t j = rates.index(group, year, age);
@@ -1793,7 +1793,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
           CalculateIndex(population, pooled, year, age);
         }
       }
-      CalculateSpawningBiomassRatio(population, year);
+      CalculateMatureBiomassRatio(population, year);
     }
   }
 
@@ -1907,14 +1907,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
           CalculateUnfishedBiomass(population, i_age_year, y, a);
 
           /*
-            Fished and unfished spawning biomass vectors are summing biomass at
+            Fished and unfished mature biomass vectors are summing biomass at
             age across ages to allow calculation of recruitment in the next
             year.
           */
 
-          CalculateSpawningBiomass(population, i_age_year, y, a);
+          CalculateMatureBiomass(population, i_age_year, y, a);
 
-          CalculateUnfishedSpawningBiomass(population, i_age_year, y, a);
+          CalculateUnfishedMatureBiomass(population, i_age_year, y, a);
 
           /*
           Here composition, total catch, and index values are calculated for all
@@ -1932,8 +1932,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
             CalculateIndex(population, i_age_year, y, a);
           }
         }
-        /* Calculate spawning biomass depletion ratio */
-        CalculateSpawningBiomassRatio(population, y);
+        /* Calculate mature biomass depletion ratio */
+        CalculateMatureBiomassRatio(population, y);
       }
     }
     evaluate_age_comp();
@@ -1968,14 +1968,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
       vector<vector<Type>> mortality_Z_p(n_pops);
       vector<vector<Type>> numbers_at_age_p(n_pops);
       vector<vector<Type>> proportion_mature_at_age_p(n_pops);
-      vector<vector<Type>> spawning_biomass_p(n_pops);
+      vector<vector<Type>> mature_biomass_p(n_pops);
       vector<vector<Type>> sum_selectivity_p(n_pops);
       vector<vector<Type>> total_catch_numbers_p(n_pops);
       vector<vector<Type>> total_catch_weight_p(n_pops);
       vector<vector<Type>> unfished_biomass_p(n_pops);
       vector<vector<Type>> unfished_numbers_at_age_p(n_pops);
-      vector<vector<Type>> unfished_spawning_biomass_p(n_pops);
-      vector<vector<Type>> spawning_biomass_ratio_p(n_pops);
+      vector<vector<Type>> unfished_mature_biomass_p(n_pops);
+      vector<vector<Type>> mature_biomass_ratio_p(n_pops);
       vector<vector<Type>> growth_mean_LAA_p(n_pops);
       vector<vector<Type>> growth_sd_LAA_p(n_pops);
       vector<vector<Type>> growth_mean_WAA_p(n_pops);
@@ -2019,8 +2019,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
             derived_quantities["numbers_at_age"].to_tmb();
         proportion_mature_at_age_p(pop_idx) =
             derived_quantities["proportion_mature_at_age"].to_tmb();
-        spawning_biomass_p(pop_idx) =
-            derived_quantities["spawning_biomass"].to_tmb();
+        mature_biomass_p(pop_idx) =
+            derived_quantities["mature_biomass"].to_tmb();
         sum_selectivity_p(pop_idx) =
             derived_quantities["sum_selectivity"].to_tmb();
         total_catch_numbers_p(pop_idx) =
@@ -2031,10 +2031,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
             derived_quantities["unfished_biomass"].to_tmb();
         unfished_numbers_at_age_p(pop_idx) =
             derived_quantities["unfished_numbers_at_age"].to_tmb();
-        unfished_spawning_biomass_p(pop_idx) =
-            derived_quantities["unfished_spawning_biomass"].to_tmb();
-        spawning_biomass_ratio_p(pop_idx) =
-            this->populations[pop_idx]->spawning_biomass_ratio.to_tmb();
+        unfished_mature_biomass_p(pop_idx) =
+            derived_quantities["unfished_mature_biomass"].to_tmb();
+        mature_biomass_ratio_p(pop_idx) =
+            this->populations[pop_idx]->mature_biomass_ratio.to_tmb();
 
         if (std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
                 growth_observation = std::dynamic_pointer_cast<
@@ -2190,17 +2190,17 @@ class CatchAtAge : public FisheryModelBase<Type> {
       vector<Type> numbers_at_age = ADREPORTvector(numbers_at_age_p);
       vector<Type> proportion_mature_at_age =
           ADREPORTvector(proportion_mature_at_age_p);
-      vector<Type> spawning_biomass = ADREPORTvector(spawning_biomass_p);
+      vector<Type> mature_biomass = ADREPORTvector(mature_biomass_p);
       vector<Type> sum_selectivity = ADREPORTvector(sum_selectivity_p);
       vector<Type> total_catch_numbers = ADREPORTvector(total_catch_numbers_p);
       vector<Type> total_catch_weight = ADREPORTvector(total_catch_weight_p);
       vector<Type> unfished_biomass = ADREPORTvector(unfished_biomass_p);
       vector<Type> unfished_numbers_at_age =
           ADREPORTvector(unfished_numbers_at_age_p);
-      vector<Type> unfished_spawning_biomass =
-          ADREPORTvector(unfished_spawning_biomass_p);
-      vector<Type> spawning_biomass_ratio =
-          ADREPORTvector(spawning_biomass_ratio_p);
+      vector<Type> unfished_mature_biomass =
+          ADREPORTvector(unfished_mature_biomass_p);
+      vector<Type> mature_biomass_ratio =
+          ADREPORTvector(mature_biomass_ratio_p);
 
       vector<Type> agecomp_expected = ADREPORTvector(agecomp_expected_f);
       vector<Type> agecomp_proportion = ADREPORTvector(agecomp_proportion_f);
@@ -2278,16 +2278,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
       FIMS_REPORT_F_("numbers_at_age", numbers_at_age_p, this->of);
       FIMS_REPORT_F_("proportion_mature_at_age", proportion_mature_at_age_p,
                      this->of);
-      FIMS_REPORT_F_("spawning_biomass", spawning_biomass_p, this->of);
+      FIMS_REPORT_F_("mature_biomass", mature_biomass_p, this->of);
       FIMS_REPORT_F_("sum_selectivity", sum_selectivity_p, this->of);
       FIMS_REPORT_F_("total_catch_numbers", total_catch_numbers_p, this->of);
       FIMS_REPORT_F_("total_catch_weight", total_catch_weight_p, this->of);
       FIMS_REPORT_F_("unfished_biomass", unfished_biomass_p, this->of);
       FIMS_REPORT_F_("unfished_numbers_at_age", unfished_numbers_at_age_p,
                      this->of);
-      FIMS_REPORT_F_("unfished_spawning_biomass", unfished_spawning_biomass_p,
+      FIMS_REPORT_F_("unfished_mature_biomass", unfished_mature_biomass_p,
                      this->of);
-      FIMS_REPORT_F_("spawning_biomass_ratio", spawning_biomass_ratio_p,
+      FIMS_REPORT_F_("mature_biomass_ratio", mature_biomass_ratio_p,
                      this->of);
       FIMS_REPORT_F_("growth_mean_LAA", growth_mean_LAA_p, this->of);
       FIMS_REPORT_F_("growth_sd_LAA", growth_sd_LAA_p, this->of);
@@ -2301,14 +2301,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
       ADREPORT_F(mortality_Z, this->of);
       ADREPORT_F(numbers_at_age, this->of);
       ADREPORT_F(proportion_mature_at_age, this->of);
-      ADREPORT_F(spawning_biomass, this->of);
+      ADREPORT_F(mature_biomass, this->of);
       ADREPORT_F(sum_selectivity, this->of);
       ADREPORT_F(total_catch_numbers, this->of);
       ADREPORT_F(total_catch_weight, this->of);
       ADREPORT_F(unfished_biomass, this->of);
       ADREPORT_F(unfished_numbers_at_age, this->of);
-      ADREPORT_F(unfished_spawning_biomass, this->of);
-      ADREPORT_F(spawning_biomass_ratio, this->of);
+      ADREPORT_F(unfished_mature_biomass, this->of);
+      ADREPORT_F(mature_biomass_ratio, this->of);
 
       // fleets
       // report

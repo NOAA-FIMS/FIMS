@@ -41,7 +41,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
   if (module_class_name == "Population") {
     module_fields <- setdiff(module_fields, c(
       "log_f_multiplier",
-      "spawning_biomass_ratio",
+      "mature_biomass_ratio",
       "total_catch_weight",
       "total_catch_numbers",
       "mortality_F",
@@ -50,9 +50,9 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       "numbers_at_age",
       "unfished_numbers_at_age",
       "biomass",
-      "spawning_biomass",
+      "mature_biomass",
       "unfished_biomass",
-      "unfished_spawning_biomass",
+      "unfished_mature_biomass",
       "proportion_mature_at_age",
       "expected_recruitment",
       "sum_selectivity"

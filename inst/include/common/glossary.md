@@ -26,16 +26,16 @@ Definitions of mathematical symbols used in FIMS equations.
 
 - \f$B_y\f$ — Total biomass in year \f$y\f$
 - \f$B^U_y\f$ — Unfished biomass in year \f$y\f$
-- \f$SB_y\f$ — Spawning biomass in year \f$y\f$
-- \f$SB^U_y\f$ — Unfished spawning biomass in year \f$y\f$
-- \f$SB^U_0\f$ — Unfished spawning biomass in the initial year 0
-- \f$\text{ratio}_y = SB_y / SB^U_0\f$ — Spawning biomass ratio in year \f$y\f$
+- \f$SB_y\f$ — Mature biomass in year \f$y\f$
+- \f$SB^U_y\f$ — Unfished mature biomass in year \f$y\f$
+- \f$SB^U_0\f$ — Unfished mature biomass in the initial year 0
+- \f$\text{ratio}_y = SB_y / SB^U_0\f$ — Mature biomass ratio in year \f$y\f$
 
 ## Stock--Recruitment (Beverton--Holt)
 
 - \f$h\f$ — Steepness, recruitment relative to \f$R_0\f$ at 20% of \f$SB^U_0\f$; range (0.2, 1.0]
-- \f$\phi_0\f$ — Spawning biomass per recruit in the initial year 0
-- \f$SB_{y-1}\f$ — Spawning biomass in the previous year
+- \f$\phi_0\f$ — Mature biomass per recruit in the initial year 0
+- \f$SB_{y-1}\f$ — Mature biomass in the previous year
 
 ## Growth
 
@@ -71,7 +71,7 @@ Definitions of mathematical symbols used in FIMS equations.
 
 - **NAA** — Numbers at age
 - **SSB** — Spawning stock biomass
-- **SBPR** — Spawning biomass per recruit
+- **SBPR** — Mature biomass per recruit
 - **EWAA** — Empirical weight at age
 - **BH** — Beverton--Holt
 - **LPDF** — Log probability density function

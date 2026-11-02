@@ -60,7 +60,7 @@ A list with two named elements:
 \item \code{estimates} - Data frame containing model estimates for each profiled value,
 with the following key columns:
 \itemize{
-\item \code{label} - Type of estimate (e.g., "spawning_biomass", "recruitment")
+\item \code{label} - Type of estimate (e.g., "mature_biomass", "recruitment")
 \item \code{year_i} - Year index for the estimate
 \item \code{age} - Age from the data (if applicable)
 \item \code{estimated} - Point estimate value

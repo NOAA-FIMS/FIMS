@@ -375,7 +375,7 @@ knitr::include_graphics("figures/fims-path-maturity-3.png")
 
 ## Population class
 
-The `Population` class defined in [inst/include/population_dynamics/population/population.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/population/population.hpp) is where all the biological calculations happen, producing expected values used in likelihood equations and derived quantities that are important for management (e.g., spawning biomass). A shared pointer that links the maturity module to population must be set up before the model can evaluate maturity within the `Population` class.
+The `Population` class defined in [inst/include/population_dynamics/population/population.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/population/population.hpp) is where all the biological calculations happen, producing expected values used in likelihood equations and derived quantities that are important for management (e.g., mature biomass). A shared pointer that links the maturity module to population must be set up before the model can evaluate maturity within the `Population` class.
 
 ```{Rcpp,  class.source = "fimschunk", eval = FALSE}
 // file: inst/include/population_dynamics/population/population.hpp

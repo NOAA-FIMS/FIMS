@@ -1,5 +1,14 @@
 # FIMS 0.11.0
 
+## Breaking changes
+
+* Rename `spawning_biomass`, `unfished_spawning_biomass`, and
+  `spawning_biomass_ratio` to `mature_biomass`, `unfished_mature_biomass`,
+  and `mature_biomass_ratio`, including Rcpp fields and C++ calculation methods.
+  Update output filters and derived-quantity prior names and rebuild saved models.
+  Equations and reproductive-contribution weighting are unchanged.
+
+
 ## Bug Fixes
 
 * *(CatchAtAge)* Build expected length comps from age comp proportions (#1751)

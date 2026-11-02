@@ -36,8 +36,8 @@ TEST_F(CAAInitializeTestFixture, HandlesCorrectInput_Population_InitializeCAA) {
   EXPECT_EQ(dq["total_catch_numbers"].size(), n_years);
   EXPECT_EQ(dq["biomass"].size(), (n_years + 1));
   EXPECT_EQ(dq["unfished_biomass"].size(), (n_years + 1));
-  EXPECT_EQ(dq["unfished_spawning_biomass"].size(), (n_years + 1));
-  EXPECT_EQ(dq["spawning_biomass"].size(), n_years + 1);
+  EXPECT_EQ(dq["unfished_mature_biomass"].size(), (n_years + 1));
+  EXPECT_EQ(dq["mature_biomass"].size(), n_years + 1);
   EXPECT_EQ(catch_at_age_model->populations[0]->proportion_female.size(),
             n_ages);
   EXPECT_EQ(catch_at_age_model->populations[0]->M.size(), n_years * n_ages);
@@ -61,9 +61,9 @@ TEST_F(CAAPrepareTestFixture,
   EXPECT_EQ(dq["unfished_numbers_at_age"],
             fims::Vector<double>((n_years + 1) * n_ages, 0));
   EXPECT_EQ(dq["biomass"], fims::Vector<double>(n_years + 1, 0));
-  EXPECT_EQ(dq["spawning_biomass"], fims::Vector<double>(n_years + 1, 0));
+  EXPECT_EQ(dq["mature_biomass"], fims::Vector<double>(n_years + 1, 0));
   EXPECT_EQ(dq["unfished_biomass"], fims::Vector<double>(n_years + 1, 0));
-  EXPECT_EQ(dq["unfished_spawning_biomass"],
+  EXPECT_EQ(dq["unfished_mature_biomass"],
             fims::Vector<double>(n_years + 1, 0));
   EXPECT_EQ(dq["proportion_mature_at_age"],
             fims::Vector<double>((n_years + 1) * n_ages, 0));

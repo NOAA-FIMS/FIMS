@@ -33,7 +33,7 @@ r0 <- exp(get_input("log_rzero"))
 m <- exp(unique(get_input("log_M")))
 n_ages <- get_n_ages(data_4_model)
 unfished_numbers <- report[["unfished_numbers_at_age"]][[1]]
-unfished_spawning_biomass <- report[["unfished_spawning_biomass"]][[1]]
+unfished_mature_biomass <- report[["unfished_mature_biomass"]][[1]]
 
 ## IO correctness ----
 test_that("unfished numbers at age start at the equilibrium age structure", {
@@ -53,19 +53,19 @@ test_that("unfished numbers at age start at the equilibrium age structure", {
   )
 })
 
-test_that("unfished spawning biomass is constant when natural mortality is", {
-  #' @description Test that unfished spawning biomass is the same in every year when natural mortality does not vary.
+test_that("unfished mature biomass is constant when natural mortality is", {
+  #' @description Test that unfished mature biomass is the same in every year when natural mortality does not vary.
   expect_equal(
-    object = unfished_spawning_biomass,
-    expected = rep(unfished_spawning_biomass[1], length(unfished_spawning_biomass)),
+    object = unfished_mature_biomass,
+    expected = rep(unfished_mature_biomass[1], length(unfished_mature_biomass)),
     tolerance = 1e-8
   )
 
-  #' @description Test that the spawning biomass ratio divides spawning biomass by first-year unfished spawning biomass.
-  spawning_biomass <- report[["spawning_biomass"]][[1]]
+  #' @description Test that the mature biomass ratio divides mature biomass by first-year unfished mature biomass.
+  mature_biomass <- report[["mature_biomass"]][[1]]
   expect_equal(
-    object = report[["spawning_biomass_ratio"]][[1]],
-    expected = spawning_biomass / unfished_spawning_biomass[1],
+    object = report[["mature_biomass_ratio"]][[1]],
+    expected = mature_biomass / unfished_mature_biomass[1],
     tolerance = 1e-8
   )
 })

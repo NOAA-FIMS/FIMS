@@ -34,6 +34,8 @@ test_that("explicit groups run through R, TMB and output reshaping", {
   input <- initialize_fims(parameters, data, subpopulations = groups)
   fit <- fit_fims(input, optimize = FALSE)
   report <- get_report(fit)
+  expect_true(all(c("mature_biomass", "unfished_mature_biomass", "mature_biomass_ratio") %in% names(report)))
+  expect_false("spawning_biomass" %in% names(report))
   expect_true(all(is.finite(fit@obj$gr())))
   n <- report$numbers_at_age_by_subpopulation[[1]]
   pooled <- report$numbers_at_age[[1]]
@@ -186,7 +188,7 @@ test_that("high-level biological overrides affect state and retain derivatives",
   expect_equal(w[female], rep(0.1 * ages^2, plane / length(ages)))
   expect_equal(mature[female], rep(plogis(0.7 * (ages - 3)), plane / length(ages)))
   expect_equal(report$biomass[[1]], rowSums(matrix(n[female] * w[female] + n[male] * w[male], ncol = length(ages), byrow = TRUE)))
-  expect_equal(report$spawning_biomass[[1]], rowSums(matrix(n[female] * w[female] * mature[female], ncol = length(ages), byrow = TRUE)))
+  expect_equal(report$mature_biomass[[1]], rowSums(matrix(n[female] * w[female] * mature[female], ncol = length(ages), byrow = TRUE)))
   expect_false(isTRUE(all.equal(n[length(ages) + 2], n[plane + length(ages) + 2])))
   obj <- get_obj(fit)
   gradient <- obj$gr(obj$par)

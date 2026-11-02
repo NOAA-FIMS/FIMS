@@ -425,20 +425,20 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"values\": " << population_interface->log_f_multiplier << "\n\n";
       ss << "},\n";
 
-      for (size_t i = 0; i < pop->spawning_biomass_ratio.size(); i++) {
-        population_interface_ptr->spawning_biomass_ratio[i].final_value_m =
-            pop->spawning_biomass_ratio[i];
+      for (size_t i = 0; i < pop->mature_biomass_ratio.size(); i++) {
+        population_interface_ptr->mature_biomass_ratio[i].final_value_m =
+            pop->mature_biomass_ratio[i];
       }
 
-      ss << "{\n \"name\": \"spawning_biomass_ratio\",\n";
-      ss << " \"id\":" << population_interface->spawning_biomass_ratio.id_m
+      ss << "{\n \"name\": \"mature_biomass_ratio\",\n";
+      ss << " \"id\":" << population_interface->mature_biomass_ratio.id_m
          << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
       ss << "  \"header\": [" << "\"n_years\"" << "],\n";
       ss << "  \"dimensions\": [" << (population_interface->n_years.get() + 1)
          << "]\n},\n";
-      ss << " \"values\": " << population_interface->spawning_biomass_ratio
+      ss << " \"values\": " << population_interface->mature_biomass_ratio
          << "\n\n";
       ss << "},\n";
 
@@ -1150,15 +1150,15 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       info->variable_map[population_interface->biomass.id_m] =
           &derived_quantities["biomass"];
 
-      derived_quantities["spawning_biomass"] =
+      derived_quantities["mature_biomass"] =
           fims::Vector<Type>((population_interface->n_years.get() + 1));
-      derived_quantities_dim_info["spawning_biomass"] =
+      derived_quantities_dim_info["mature_biomass"] =
           fims_popdy::DimensionInfo(
-              "spawning_biomass",
+              "mature_biomass",
               fims::Vector<int>{(population_interface->n_years.get() + 1)},
               fims::Vector<std::string>{"n_years+1"});
-      info->variable_map[population_interface->spawning_biomass.id_m] =
-          &derived_quantities["spawning_biomass"];
+      info->variable_map[population_interface->mature_biomass.id_m] =
+          &derived_quantities["mature_biomass"];
 
       derived_quantities["unfished_biomass"] =
           fims::Vector<Type>((population_interface->n_years.get() + 1));
@@ -1170,15 +1170,15 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       info->variable_map[population_interface->unfished_biomass.id_m] =
           &derived_quantities["unfished_biomass"];
 
-      derived_quantities["unfished_spawning_biomass"] =
+      derived_quantities["unfished_mature_biomass"] =
           fims::Vector<Type>((population_interface->n_years.get() + 1));
-      derived_quantities_dim_info["unfished_spawning_biomass"] =
+      derived_quantities_dim_info["unfished_mature_biomass"] =
           fims_popdy::DimensionInfo(
-              "unfished_spawning_biomass",
+              "unfished_mature_biomass",
               fims::Vector<int>{(population_interface->n_years.get() + 1)},
               fims::Vector<std::string>{"n_years+1"});
-      info->variable_map[population_interface->unfished_spawning_biomass.id_m] =
-          &derived_quantities["unfished_spawning_biomass"];
+      info->variable_map[population_interface->unfished_mature_biomass.id_m] =
+          &derived_quantities["unfished_mature_biomass"];
 
       derived_quantities["proportion_mature_at_age"] =
           fims::Vector<Type>((population_interface->n_years.get() + 1) *

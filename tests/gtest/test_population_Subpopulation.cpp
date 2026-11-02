@@ -82,7 +82,7 @@ TEST_F(ExplicitSubpopulationTest, UnfishedEquilibriumAndSBPRAgree) {
   auto& dq =
       catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
   const double r0 = std::exp(population->recruitment->log_rzero[0]);
-  EXPECT_NEAR(dq["unfished_spawning_biomass"][0] / r0,
+  EXPECT_NEAR(dq["unfished_mature_biomass"][0] / r0,
               catch_at_age_model->CalculateSBPR0(population), 1e-10);
   const fims_popdy::SubpopulationLayout layout{size_t(n_years + 1),
                                                size_t(n_ages)};
@@ -138,9 +138,9 @@ TEST_F(ExplicitSubpopulationTest, EqualBiologyMatchesPooledFishedDynamics) {
   auto& dq =
       catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
   const auto explicit_numbers = dq["numbers_at_age"];
-  const auto explicit_sb = dq["spawning_biomass"];
+  const auto explicit_sb = dq["mature_biomass"];
   const auto explicit_unfished = dq["unfished_numbers_at_age"];
-  const auto explicit_unfished_sb = dq["unfished_spawning_biomass"];
+  const auto explicit_unfished_sb = dq["unfished_mature_biomass"];
   population->subpopulations.clear();
   catch_at_age_model->Initialize();
   catch_at_age_model->Evaluate();
@@ -149,8 +149,8 @@ TEST_F(ExplicitSubpopulationTest, EqualBiologyMatchesPooledFishedDynamics) {
     EXPECT_NEAR(explicit_unfished[i], dq["unfished_numbers_at_age"][i], 1e-7);
   }
   for (size_t i = 0; i < explicit_sb.size(); ++i) {
-    EXPECT_NEAR(explicit_sb[i], dq["spawning_biomass"][i], 1e-7);
-    EXPECT_NEAR(explicit_unfished_sb[i], dq["unfished_spawning_biomass"][i],
+    EXPECT_NEAR(explicit_sb[i], dq["mature_biomass"][i], 1e-7);
+    EXPECT_NEAR(explicit_unfished_sb[i], dq["unfished_mature_biomass"][i],
                 1e-7);
   }
 }
@@ -247,7 +247,7 @@ TEST_F(ExplicitSubpopulationTest, UsesTimeVaryingMaturityThroughTerminalYear) {
                   mature *
                   catch_at_age_model->PopulationMeanWeightAA(population, y, a);
     }
-    EXPECT_NEAR(dq["spawning_biomass"][y], spawning, 1e-7);
+    EXPECT_NEAR(dq["mature_biomass"][y], spawning, 1e-7);
   }
 }
 
@@ -328,7 +328,7 @@ TEST_F(ExplicitSubpopulationTest,
                      mature);
   }
   EXPECT_NEAR(dq["biomass"][0], expected_biomass, 1e-7);
-  EXPECT_NEAR(dq["spawning_biomass"][0], expected_sb, 1e-7);
+  EXPECT_NEAR(dq["mature_biomass"][0], expected_sb, 1e-7);
   EXPECT_NEAR(catch_at_age_model->CalculateSBPR0(population), expected_phi,
               1e-10);
   const auto& fleet = population->fleets[0];

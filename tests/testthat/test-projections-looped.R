@@ -352,7 +352,7 @@ run_FIMS_projection_scenario <- function(om_input,
 
   if (!is.null(ssb_ratio_target)) {
     # Setup log_f_multiplier to allow F_mort values in the projection period
-    # to be scaled to achieve the target spawning biomass ratio. log_Fmort will
+    # to be scaled to achieve the target mature biomass ratio. log_Fmort will
     # be constant in years where log_f_multiplier is estimated and
     # log_f_multiplier will be constant in the years where log_Fmort is
     # estimated to avoid confounding of the estimates.
@@ -380,7 +380,7 @@ run_FIMS_projection_scenario <- function(om_input,
       # mapping off parameters through TMB. The convoluted process below of
       # setting up various log_sd values was to maintain constant values without
       # having the estimator get stuck fitting the mean rather than the
-      # spawning biomass ratio target.
+      # mature biomass ratio target.
 
       F_mult_distribution$set_distribution_mean(1)
       # F_mult_distribution$set_distribution_mean(-0.6931472)
@@ -418,7 +418,7 @@ run_FIMS_projection_scenario <- function(om_input,
 
     # Setup projection prior target
     # Similar issues occur here as with log_f_multiplier in that a prior has to
-    # be set for all spawning biomass ratios rather than for just a single year.
+    # be set for all mature biomass ratios rather than for just a single year.
     # This is being improved/replaced in ongoing development.
     SSB_ratio_prior <- methods::new(DnormDistribution)
     SSB_ratio_prior$expected_values$resize((om_input[["nyr"]] + n_projection_years + 1))
@@ -442,7 +442,7 @@ run_FIMS_projection_scenario <- function(om_input,
         SSB_ratio_prior$log_sd[y]$value <- -5
       }
     }
-    SSB_ratio_prior$set_distribution_links("prior", population$spawning_biomass_ratio$get_id())
+    SSB_ratio_prior$set_distribution_links("prior", population$mature_biomass_ratio$get_id())
   }
   # Set up catch at age model
   caa <- methods::new(CatchAtAge)
@@ -598,7 +598,7 @@ sdr_fixed_10_year_project_SSB_target <- ssb_ratio_target_projection_outputs[[2]]
 sdr_report_10_year_project_SSB_target <- ssb_ratio_target_projection_outputs[[1]]
 ## Section 3: Compare scenario results
 
-# important_row_names <- c("spawning_biomass","spawning_biomass_ratio","log_devs","log_Fmort")
+# important_row_names <- c("mature_biomass","mature_biomass_ratio","log_devs","log_Fmort")
 
 # sdr_report_5_year_project[which((abs(sdr_report_5_year_project[row.names(sdr_report_5_year_project)=="log_devs","Estimate"]-sdr_report_no_project[row.names(sdr_report_no_project)=="log_devs","Estimate"])/abs(sdr_report_no_project[row.names(sdr_report_no_project)=="log_devs","Estimate"]))>0.01),]
 # Compare fixed parameter estimates between control and fixed F runs
@@ -682,13 +682,13 @@ estimation_error <- max(abs(sdr_fixed_10_year_project_SSB_target[-c(50), "Estima
 
 sd_error <- max(abs(sdr_fixed_10_year_project_SSB_target[-c(50), "Std. Error"] - sdr_fixed_no_project[, "Std. Error"]) / abs(sdr_fixed_no_project[, "Std. Error"]))
 
-ssb_ratio_estimation_error <- max(abs(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target) == "spawning_biomass_ratio", "Estimate"][1:31] -
-  sdr_report_no_project[rownames(sdr_report_no_project) == "spawning_biomass_ratio", "Estimate"][1:31]) / abs(sdr_report_no_project[rownames(sdr_report_no_project) == "spawning_biomass_ratio", "Estimate"][1:31]))
+ssb_ratio_estimation_error <- max(abs(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target) == "mature_biomass_ratio", "Estimate"][1:31] -
+  sdr_report_no_project[rownames(sdr_report_no_project) == "mature_biomass_ratio", "Estimate"][1:31]) / abs(sdr_report_no_project[rownames(sdr_report_no_project) == "mature_biomass_ratio", "Estimate"][1:31]))
 
 
-ssb_ratio_target_error <- abs(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target) == "spawning_biomass_ratio", "Estimate"][length(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target) == "spawning_biomass_ratio", "Estimate"])] - ssb_ratio_target) / ssb_ratio_target
+ssb_ratio_target_error <- abs(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target) == "mature_biomass_ratio", "Estimate"][length(sdr_report_10_year_project_SSB_target[rownames(sdr_report_10_year_project_SSB_target) == "mature_biomass_ratio", "Estimate"])] - ssb_ratio_target) / ssb_ratio_target
 
-test_that("projections with spawning biomass ratio target achieve same estimates and no projection model run", {
+test_that("projections with mature biomass ratio target achieve same estimates and no projection model run", {
   #' @description Test that the maximum parameter estimate difference between a low catch projection run and no projection run is less than 10%.
   # A projection target should not change the hindcast, but it does until the
   # likelihood refactor (#1758). The limit only guards against larger changes.

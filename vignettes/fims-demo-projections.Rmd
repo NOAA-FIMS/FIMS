@@ -243,9 +243,9 @@ parameters_projection <- setup_default_parameters(data = data_4_projections) |>
   )
 ```
 
-Reference-point targets are currently achieved by specifying a prior on `spawning_biomass_ratio`, a derived population quantity, in the final year/s of the projection period. Additionally, a prior can be specified on `log_f_multiplier`, which is a simple annual multiplier of fishing mortality, i.e., `F_mort` that allows the total fishing mortality for the population to be adjusted while keeping relative fleet effort constant by fixing `log_Fmort`. This approach allows the annual `log_f_multiplier` to be estimated while ensuring that total fishing mortality is held constant during the projection period and achieves the spawning biomass target.
+Reference-point targets are currently achieved by specifying a prior on `mature_biomass_ratio`, a derived population quantity, in the final year/s of the projection period. Additionally, a prior can be specified on `log_f_multiplier`, which is a simple annual multiplier of fishing mortality, i.e., `F_mort` that allows the total fishing mortality for the population to be adjusted while keeping relative fleet effort constant by fixing `log_Fmort`. This approach allows the annual `log_f_multiplier` to be estimated while ensuring that total fishing mortality is held constant during the projection period and achieves the mature biomass target.
   
-The wrapper functions used in this vignette are not yet capable of setting up priors so the full projection approach is not included here. This is a high-priority development goal that is in progress. Examples of setting up constraints on `log_f_multiplier` and a prior on `spawning_biomass_ratio` can be found in the test-projections-looped.R test files used to verify this approach.  
+The wrapper functions used in this vignette are not yet capable of setting up priors so the full projection approach is not included here. This is a high-priority development goal that is in progress. Examples of setting up constraints on `log_f_multiplier` and a prior on `mature_biomass_ratio` can be found in the test-projections-looped.R test files used to verify this approach.
 
 ### Model fit
 
@@ -265,7 +265,7 @@ We use {stockplotr} to plot the model results. In the code below, we pass a sing
 
 ```{r fit-plot-projections}
 #| fig.alt: >
-#|   Plot of spawning biomass for projection model.
+#|   Plot of mature biomass for projection model.
 stockplotr::plot_biomass(
   list(
     "age" = get_estimates(projection_fit) |>

@@ -60,8 +60,8 @@ Adult group proportions are derived from abundance. The legacy
 recruitment and initial fractions are configured explicitly instead.
 
 Maturity remains biological maturity for both sexes. Reproductive contribution
-is a separate multiplier on mature biomass. Female-only spawning biomass uses
-contributions 1 and 0. Unfished initial abundance and spawning biomass per
+is a separate multiplier on mature biomass. Female-only mature biomass uses
+contributions 1 and 0. Unfished initial abundance and mature biomass per
 recruit use each group's first-year M, including the equilibrium plus group.
 Later unfished abundance advances with the corresponding year's M.
 
@@ -171,3 +171,15 @@ Tests also cover mixed growth, mortality, maturity and selectivity; shared-modul
 fallback and invalid references; derived-growth cache refresh; and derivatives
 through growth, maturity and selectivity overrides. The full package test suite
 has not been run.
+
+## Mature biomass naming
+
+The population reports `mature_biomass`, `unfished_mature_biomass`, and
+`mature_biomass_ratio` replace the former `spawning_biomass` names. This is a
+name change only: explicit groups still multiply mature biomass by
+`reproductive_contribution`, and the pooled path still applies
+`proportion_female`. Thus the reported quantity is reproductive-contribution-
+weighted mature biomass, not necessarily the mature biomass of all individuals.
+Update output filters and derived-quantity priors and rebuild previously saved
+models. The existing `glance()` summary column `terminal_ssb` retains its name
+for compatibility but reads the new `mature_biomass` report.

@@ -480,7 +480,7 @@ setup_default_Growth <- function(
 #' \deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}
 #' @param proportion_female A numeric value or vector (length equal to the
 #' number of ages) between 0 and 1 specifying the proportion of each age that
-#' is female, which scales spawning biomass. Default is `0.5`.
+#' is female, which scales mature biomass. Default is `0.5`.
 #' @inheritParams setup_default_parameters
 #' @return
 #' A tibble of default population configurations, including initial numbers at

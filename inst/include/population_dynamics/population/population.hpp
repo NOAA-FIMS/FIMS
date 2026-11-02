@@ -49,7 +49,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       1, static_cast<Type>(0.5));            /*!< proportion female by age */
   fims::Vector<Type> log_f_multiplier;       /*!< estimated parameter: vector of
     annual fishing mortality multipliers to scale total mortality of all fleets*/
-  fims::Vector<Type> spawning_biomass_ratio; /*!< estimated parameter: vector of
+  fims::Vector<Type> mature_biomass_ratio; /*!< estimated parameter: vector of
 annual fishing mortality multipliers to scale total mortality of all fleets*/
 
   // Transformed values

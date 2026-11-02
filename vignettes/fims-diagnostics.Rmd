@@ -95,11 +95,11 @@ clear()
 
 ## Retrospective analysis
 
-A retrospective analysis is a common model diagnostic used to assess the stability of estimates of parameters and derived quantities, such as fishing mortality and spawning biomass, and if there is a consistent pattern in the estimates as years of data are removed. The process involves removing *n* years of data from the end of the time series and refitting the model. This is an iterative process where the user typically runs 5--10 models, with each run (often called "peels") progressively removing another year of data. Estimates from these peels are then compared to the model run with the full dataset (reference model). The Mohn's rho statistic can be used to compare the relative difference between the reference model and each peel. Mohn's rho statistic is calculated as: 
+A retrospective analysis is a common model diagnostic used to assess the stability of estimates of parameters and derived quantities, such as fishing mortality and mature biomass, and if there is a consistent pattern in the estimates as years of data are removed. The process involves removing *n* years of data from the end of the time series and refitting the model. This is an iterative process where the user typically runs 5--10 models, with each run (often called "peels") progressively removing another year of data. Estimates from these peels are then compared to the model run with the full dataset (reference model). The Mohn's rho statistic can be used to compare the relative difference between the reference model and each peel. Mohn's rho statistic is calculated as:
 
 $$\rho = \frac{1}{n} \sum_{i=1}^{n} \frac{x_{p,y} - x_{base,y}}{x_{base,y}}$$
 
-where $n$ is the number of retrospective peels, $x_{p, y}$ is the estimated value (e.g., spawning biomass, fishing mortality, etc.) from peel $p$ at its terminal year $y$, and $x_{base,y}$ is the value from the reference model, $base$, at that same year $y$.
+where $n$ is the number of retrospective peels, $x_{p, y}$ is the estimated value (e.g., mature biomass, fishing mortality, etc.) from peel $p$ at its terminal year $y$, and $x_{base,y}$ is the value from the reference model, $base$, at that same year $y$.
 
 Some things to note about `run_fims_retrospective()` is that you can provide data that is already a `FIMSFrame` object or you can give it one that is not. In the example below, we are using the `FIMSFrame` data object (`data_4_model`) created above. Additionally, it expects a vector of positive values of `years_to_remove` from the base model, starting from 0. If you are running many peels, it may be more efficient to use multiple cores, which can be specified with the `n_cores` argument. 
 
@@ -116,19 +116,19 @@ retro_fit <- run_fims_retrospective(
 
 ### Mohn's Rho
 
-Once you have run a retrospective, you can then calculate the Mohn's rho statistic for spawning biomass by: 
+Once you have run a retrospective, you can then calculate the Mohn's rho statistic for mature biomass by:
 
 ```{r, mohns_rho}
-rho_sb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
+rho_sb <- calculate_mohns_rho(retro_fit, quantity = "mature_biomass")
 ```
 
 ### Visualize the results
 
-To visualize the results of the retrospective analysis, we can use `plot_retrospective()` to display the quantity of interest. Below, we want to assess the impact on spawning biomass. The function returns a `ggplot` object, which you can customize by adding add layers as you normally would to a `ggplot`. For example, below, we specify the x and y axes labels and the legend title.
+To visualize the results of the retrospective analysis, we can use `plot_retrospective()` to display the quantity of interest. Below, we want to assess the impact on mature biomass. The function returns a `ggplot` object, which you can customize by adding add layers as you normally would to a `ggplot`. For example, below, we specify the x and y axes labels and the legend title.
 
 ```{r, plot-spawning-biomass, message = FALSE, warning = FALSE}
 #| fig.alt: >
-#|   Plot of spawning biomass showing a small negative bias with removed years.
+#|   Plot of mature biomass showing a small negative bias with removed years.
 fig_retrospective_ssb <- stockplotr::plot_spawning_biomass(
   retro_fit$estimates |>
     dplyr::rename(
@@ -136,6 +136,8 @@ fig_retrospective_ssb <- stockplotr::plot_spawning_biomass(
       estimate = estimated
     ) |>
     dplyr::mutate(
+      # Translate the report label for stockplotr.
+      label = dplyr::if_else(label == "mature_biomass", "spawning_biomass", label),
       uncertainty_label = "se"
     ),
   group = "retrospective_peel"
@@ -143,10 +145,10 @@ fig_retrospective_ssb <- stockplotr::plot_spawning_biomass(
 print(fig_retrospective_ssb)
 ```
 
-We can compare the spawning biomass estimates from the reference model and each peel for the last six years. 
+We can compare the mature biomass estimates from the reference model and each peel for the last six years.
 ```{r}
 retro_fit[["estimates"]] |>
-  dplyr::filter(label == "spawning_biomass") |>
+  dplyr::filter(label == "mature_biomass") |>
   dplyr::select(label, year_i, estimated, retrospective_peel) |>
   tidyr::pivot_wider(
     names_from = retrospective_peel,

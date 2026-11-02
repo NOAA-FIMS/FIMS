@@ -126,9 +126,9 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   VariableVector log_M;
   /**
-   * @brief The population spawning biomass ratio for each year.
+   * @brief The population mature biomass ratio for each year.
    */
-  VariableVector spawning_biomass_ratio;
+  VariableVector mature_biomass_ratio;
   /**
    * @brief Log of the population annual fishing mortality multiplier.
    */
@@ -140,7 +140,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief Proportion of females in the population.
    *
-   * Used to calculate spawning biomass and other sex-specific derived
+   * Used to calculate mature biomass and other sex-specific derived
    * quantities. Supplied from R as a single constant (length 1) and applied
    * to all ages during model evaluation. Values should be in [0, 1].
    * Out-of-range inputs are logged as warnings.
@@ -206,7 +206,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   /**
    * @brief Total weight of mature fish in the population.
    */
-  VariableVector spawning_biomass;
+  VariableVector mature_biomass;
   /**
    * @brief Total theoretical weight of all fish in the population if no fishing
    * had occurred.
@@ -216,7 +216,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief Total theoretical weight of mature fish in the population if no
    * fishing had occurred.
    */
-  VariableVector unfished_spawning_biomass;
+  VariableVector unfished_mature_biomass;
   /**
    * @brief Fraction of all fish at a given age that are sexually mature at
    * each age.
@@ -263,7 +263,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         recruitment_id(other.recruitment_id),
         recruitment_err_id(other.recruitment_id),
         log_M(other.log_M),
-        spawning_biomass_ratio(other.spawning_biomass_ratio),
+        mature_biomass_ratio(other.mature_biomass_ratio),
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
         proportion_female(other.proportion_female),
@@ -278,9 +278,9 @@ class PopulationInterface : public PopulationInterfaceBase {
         numbers_at_age(other.numbers_at_age),
         unfished_numbers_at_age(other.unfished_numbers_at_age),
         biomass(other.biomass),
-        spawning_biomass(other.spawning_biomass),
+        mature_biomass(other.mature_biomass),
         unfished_biomass(other.unfished_biomass),
-        unfished_spawning_biomass(other.unfished_spawning_biomass),
+        unfished_mature_biomass(other.unfished_mature_biomass),
         proportion_mature_at_age(other.proportion_mature_at_age),
         expected_recruitment(other.expected_recruitment),
         sum_selectivity(other.sum_selectivity) {}
@@ -569,19 +569,19 @@ class PopulationInterface : public PopulationInterfaceBase {
       population->log_f_multiplier.resize(this->log_f_multiplier.size());
     }
 
-    if (this->spawning_biomass_ratio.size() ==
+    if (this->mature_biomass_ratio.size() ==
         static_cast<size_t>(this->n_years.get() + 1)) {
-      population->spawning_biomass_ratio.resize(
-          this->spawning_biomass_ratio.size());
+      population->mature_biomass_ratio.resize(
+          this->mature_biomass_ratio.size());
     } else {
       FIMS_WARNING_LOG(
-          "Setting spawning_biomass_ratio vector to size n_years + 1.");
-      this->spawning_biomass_ratio.resize((this->n_years.get() + 1));
-      population->spawning_biomass_ratio.resize(
-          this->spawning_biomass_ratio.size());
+          "Setting mature_biomass_ratio vector to size n_years + 1.");
+      this->mature_biomass_ratio.resize((this->n_years.get() + 1));
+      population->mature_biomass_ratio.resize(
+          this->mature_biomass_ratio.size());
     }
-    info->variable_map[this->spawning_biomass_ratio.id_m] =
-        &(population)->spawning_biomass_ratio;
+    info->variable_map[this->mature_biomass_ratio.id_m] =
+        &(population)->mature_biomass_ratio;
 
     population->log_init_naa.resize(this->log_init_naa.size());
     for (size_t i = 0; i < log_M.size(); i++) {

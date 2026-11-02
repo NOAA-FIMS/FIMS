@@ -86,13 +86,13 @@ class CAAInitializeTestFixture : public testing::Test {
       derived_quantities["biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
-      derived_quantities["spawning_biomass"] = fims::Vector<double>(
+      derived_quantities["mature_biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
       derived_quantities["unfished_biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
-      derived_quantities["unfished_spawning_biomass"] = fims::Vector<double>(
+      derived_quantities["unfished_mature_biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
       derived_quantities["proportion_mature_at_age"] = fims::Vector<double>(
@@ -113,7 +113,7 @@ class CAAInitializeTestFixture : public testing::Test {
         this->catch_at_age_model->populations[p]->proportion_female[a] = 0.5;
       }
 
-      this->catch_at_age_model->populations[p]->spawning_biomass_ratio.resize(
+      this->catch_at_age_model->populations[p]->mature_biomass_ratio.resize(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
       this->catch_at_age_model->populations[p]->M.resize(
@@ -449,13 +449,13 @@ class CAAEvaluateTestFixture : public testing::Test {
       derived_quantities["biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
-      derived_quantities["spawning_biomass"] = fims::Vector<double>(
+      derived_quantities["mature_biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
       derived_quantities["unfished_biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
-      derived_quantities["unfished_spawning_biomass"] = fims::Vector<double>(
+      derived_quantities["unfished_mature_biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
       derived_quantities["proportion_mature_at_age"] = fims::Vector<double>(
@@ -476,7 +476,7 @@ class CAAEvaluateTestFixture : public testing::Test {
         this->catch_at_age_model->populations[p]->proportion_female[a] = 0.5;
       }
 
-      this->catch_at_age_model->populations[p]->spawning_biomass_ratio.resize(
+      this->catch_at_age_model->populations[p]->mature_biomass_ratio.resize(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
       this->catch_at_age_model->populations[p]->M.resize(
@@ -749,13 +749,13 @@ class CAAPrepareTestFixture : public testing::Test {
       derived_quantities["biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
-      derived_quantities["spawning_biomass"] = fims::Vector<double>(
+      derived_quantities["mature_biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
       derived_quantities["unfished_biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
-      derived_quantities["unfished_spawning_biomass"] = fims::Vector<double>(
+      derived_quantities["unfished_mature_biomass"] = fims::Vector<double>(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
       derived_quantities["proportion_mature_at_age"] = fims::Vector<double>(
@@ -776,7 +776,7 @@ class CAAPrepareTestFixture : public testing::Test {
         this->catch_at_age_model->populations[p]->proportion_female[a] = 0.5;
       }
 
-      this->catch_at_age_model->populations[p]->spawning_biomass_ratio.resize(
+      this->catch_at_age_model->populations[p]->mature_biomass_ratio.resize(
           this->catch_at_age_model->populations[p]->n_years + 1);
 
       this->catch_at_age_model->populations[p]->M.resize(

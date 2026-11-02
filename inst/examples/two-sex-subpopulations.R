@@ -52,7 +52,7 @@ stopifnot(isTRUE(all.equal(
   ))
 )))
 stopifnot(isTRUE(all.equal(
-  report$spawning_biomass[[1]],
+  report$mature_biomass[[1]],
   rowSums(matrix(n[female] * weights[female] * maturity[female],
     ncol = length(ages), byrow = TRUE
   ))
