@@ -29,9 +29,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   size_t n_ages;        /*!< the number of ages in the model*/
   size_t n_lengths; /*!< the number of fleet observation bins for this fleet */
   fims::Vector<double>
-      lengths; /*!< Fleet observation-bin centers for this fleet. */
+      lengths; /*!< Fleet observation-bin lower edges for this fleet. */
   fims::Vector<double>
-      length_bin_edges; /*!< Resolved observation-bin edges for this fleet. */
+      length_bin_edges; /*!< Bin lower edges plus the last bin's upper edge. */
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/

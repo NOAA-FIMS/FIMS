@@ -665,7 +665,7 @@ class Information {
 
   /**
    * @brief Build canonical fleet observation-bin edge vectors from fleet
-   * length_bin centers.
+   * length_bin lower edges.
    *
    * @param p Shared pointer to population module.
    * @return Prepared fleet observation-bin edge vectors for active fleets.
@@ -690,11 +690,11 @@ class Information {
 
       if (fleet->lengths.size() != fleet->n_lengths) {
         throw std::runtime_error(
-            "Fleet length_bin centers are not consistent with n_lengths");
+            "Fleet length_bin lower edges are not consistent with n_lengths");
       }
 
       fleet->length_bin_edges =
-          fims_popdy::SizeGridBuilder::BuildObservationEdgesFromCenters(
+          fims_popdy::SizeGridBuilder::BuildObservationEdgesFromLowerEdges(
               fleet->lengths);
 
       fleet_edges.emplace_back(fleet->length_bin_edges);
@@ -764,11 +764,11 @@ class Information {
    * @brief Ensure a population has a usable biological size grid.
    *
    * @details Prepare canonical fleet observation-bin geometry from valid fleet
-   * length_bin centers whenever that geometry is available. If a user provides
-   * a valid biological size grid, keep it only if its bins are not coarser
-   * than any overlapping active fleet observation bins; otherwise, report an
-   * error and invalidate the model. If no biological size grid has been
-   * provided, build the built-in default from the prepared fleet
+   * length_bin lower edges whenever that geometry is available. If a user
+   * provides a valid biological size grid, keep it only if its bins are not
+   * coarser than any overlapping active fleet observation bins; otherwise,
+   * report an error and invalidate the model. If no biological size grid has
+   * been provided, build the built-in default from the prepared fleet
    * observation-bin geometry, enforce the same fleet-bin compatibility rule,
    * and warn when the built-in default creates more than 200 regular bins. If
    * a user provides an invalid or partially specified grid, report the problem

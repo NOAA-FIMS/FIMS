@@ -23,9 +23,15 @@
 #'     In this dataset, ages start at one, therefore recruitment happens at age
 #'     one not age zero.}
 #'   \item{length}{A numeric length. Entry can be `NA` if information doesn't
-#'     pertain to length. For `length_comp` rows, this identifies the observed
-#'     length bin. For `length_bin` rows, this defines length-bin values used
-#'     for age-to-length conversion.}
+#'     pertain to length. For `length_comp`, `length_bin`, and
+#'     `age_to_length_conversion` rows, this is the lower edge of the length
+#'     bin. A bin holds lengths from its lower edge up to the next lower edge.
+#'     When growth is estimated in FIMS, the first bin also holds all smaller
+#'     fish and the last bin holds all larger fish. With fixed
+#'     `age_to_length_conversion` rows, those rows set what each bin holds. In
+#'     this dataset, the bins are 50 mm wide, so `length = 250` is the bin from
+#'     250 to 300 mm, and the conversion puts all fish under 50 mm in the first
+#'     bin and all fish of 1100 mm or more in the last.}
 #'   \item{timing}{The timing, i.e., year the data was collected.}
 #'   \item{observed}{The observed measurement of interest.}
 #'   \item{unit}{A character string specifying the units of `observed`. Allowed

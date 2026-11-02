@@ -205,21 +205,33 @@ make_vonb_demo_data <- function(
       uncertainty
     )
 
-  # Calculate the probability of each modeled length conditional on age.
+  # Length labels are lower bin edges. The first and last bins
+  # include the lower and upper tails, respectively.
   age_length_probabilities <- tidyr::expand_grid(
     age = ages,
     length = lengths
   ) |>
     dplyr::left_join(true_curve, by = "age") |>
     dplyr::group_by(age) |>
+    dplyr::arrange(length, .by_group = TRUE) |>
     dplyr::mutate(
-      conditional_probability = stats::dnorm(
-        x = length,
-        mean = true_mean_length,
-        sd = true_sd_length
+      lower_edge = dplyr::if_else(
+        dplyr::row_number() == 1L,
+        -Inf,
+        length
       ),
+      upper_edge = dplyr::lead(length, default = Inf),
       conditional_probability =
-        conditional_probability / sum(conditional_probability)
+        stats::pnorm(
+          q = upper_edge,
+          mean = true_mean_length,
+          sd = true_sd_length
+        ) -
+          stats::pnorm(
+            q = lower_edge,
+            mean = true_mean_length,
+            sd = true_sd_length
+          )
     ) |>
     dplyr::ungroup()
 
@@ -695,7 +707,7 @@ The final plot is not meant to duplicate the test suite. It shows one visible do
 #|   growth curve is mapped into fleet observation-bin probabilities.
 #| fig.alt: >
 #|   Bar plot of one realized growth-derived age-to-length row across fleet
-#|   observation-bin centers for a representative age.
+#|   observation bins labeled by their lower edges for a representative age.
 
 # Pull the report here because the realized age-to-length conversion tensor and path flags are
 # only available there.
