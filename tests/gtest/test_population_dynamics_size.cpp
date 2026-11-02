@@ -98,12 +98,6 @@ double NormalCdf(double x, double mean, double sd) {
   return 0.5 * (1.0 + std::erf((x - mean) / (sd * std::sqrt(2.0))));
 }
 
-// Normal CDF written out here so the expected values do not reuse the
-// provider's own probabilities.
-double NormalCdf(double x, double mean, double sd) {
-  return 0.5 * (1.0 + std::erf((x - mean) / (sd * std::sqrt(2.0))));
-}
-
 TEST(SizeGridBuilder, BuildObservationEdgesFromLowerEdgesAddsLastBinUpperEdge) {
   fims::Vector<double> lower_edges = {1.0, 2.0, 4.0};
 
