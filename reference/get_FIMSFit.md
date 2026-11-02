@@ -43,6 +43,11 @@ get_sdreport(x)
 # S4 method for class 'FIMSFit'
 get_sdreport(x)
 
+get_convergence(x)
+
+# S4 method for class 'FIMSFit'
+get_convergence(x)
+
 get_estimates(x)
 
 # S4 method for class 'FIMSFit'
@@ -106,6 +111,13 @@ objective function.
 
 `get_sdreport()` returns the list from
 [`TMB::sdreport()`](https://rdrr.io/pkg/TMB/man/sdreport.html).
+
+`get_convergence()` returns a tibble with one row per convergence check
+run by
+[`fit_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.md):
+`check`, `severity` (`"OK"`, `"NOTE"` for a check that did not run,
+`"WARN"`, or `"FAIL"`), `value`, `threshold`, `parameter`, and
+`message`. It has no rows when the model was not optimized.
 
 `get_estimates()` returns a tibble of parameter values and their
 uncertainties from a fitted model. The `year_i` column is a position

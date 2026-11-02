@@ -262,6 +262,7 @@ Primary functions used when setting up or running a FIMS model.
   [`get_max_gradient()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_gradient()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_sdreport()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+  [`get_convergence()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_number_of_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
   [`get_run_time()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
@@ -271,6 +272,9 @@ Primary functions used when setting up or running a FIMS model.
 
 - [`is.FIMSFit()`](https://NOAA-FIMS.github.io/FIMS/reference/is.FIMSFit.md)
   : Check if an object is of class FIMSFit
+
+- [`sanity_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/sanity_fims.md)
+  : Check whether a fitted FIMS model is ready to use
 
 - [`is_fims_verbose()`](https://NOAA-FIMS.github.io/FIMS/reference/is_fims_verbose.md)
   : Should FIMS be verbose?

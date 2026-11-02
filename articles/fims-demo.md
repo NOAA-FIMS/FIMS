@@ -607,25 +607,74 @@ fit <- parameters_4_model |>
   fit_fims(optimize = TRUE)
 ```
 
+### Model sanity check
+
+[`fit_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.md)
+checks the fit and warns about any problem it finds.
+[`sanity_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/sanity_fims.md)
+prints the result of every check in one place, similar to
+`sdmTMB::sanity()`:
+
+- `optimizer`: the [`nlminb()`](https://rdrr.io/r/stats/nlminb.html)
+  convergence code is 0.
+- `max_gradient`: the maximum absolute gradient is below 0.001. It fails
+  above 0.01, and then the standard errors are not calculated.
+- `nll`: the negative log-likelihood and each of its components are
+  finite. Components that are not finite are named, e.g.,
+  `fleet1_catch`.
+- `hessian`, `standard_errors`, and `large_standard_errors`: the Hessian
+  is positive definite, no standard error is `NA`, and no fixed or
+  random effect has a standard error above 1000.
+- `condition_number`: the condition number of the Hessian is at or below
+  1e5. Larger values mean some parameters are weakly identified.
+
+``` r
+
+sanity <- sanity_fims(fit)
+```
+
+    ## ✖ No convergence checks were run because the model was not optimized.
+
+    ## ℹ Use `fit_fims(optimize = TRUE)`.
+
+``` r
+
+sanity[["all_ok"]]
+```
+
+    ## [1] FALSE
+
+The same checks are stored on the fit and returned as a tibble by
+[`get_convergence()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md).
+Each row is 1 check, with its `severity` (`"OK"`, `"NOTE"` for a check
+that did not run, `"WARN"`, or `"FAIL"`), the `value` that was checked,
+the `threshold` it was compared with, the `parameter` it points to, and
+a `message`. Because the tibble is stored on the fit, it can be
+collected across many fits, e.g., in a simulation.
+
+``` r
+
+get_convergence(fit)
+```
+
+    ## # A tibble: 0 × 6
+    ## # ℹ 6 variables: check <chr>, severity <chr>, value <dbl>, threshold <dbl>,
+    ## #   parameter <chr>, message <chr>
+
 ### Oh no! My model didn’t converge! 😨 HELP‼️
 
 If you find yourself in the unfortunate situation where your model
-didn’t converge, there are several things that you can look at.
+didn’t converge, start with `sanity_fims(fit)`. It names the parameters
+with the largest gradients and any negative log-likelihood components
+that are not finite. See [Checking a fit that did not
+converge](#checking-a-fit-that-did-not-converge) below for an example.
 
-#### Getting the non-converged fit output
-
-One of the things you can do is to inspect the fit output. You can start
-with the NLL (We are sorry these aren’t named yet, it’s in the list of
-things to add) by running `get_report(fit)$nll_components` which will
-give you a clue as to which part of these components might have caused
-your model to not converge.
-
-You can then do `names(get_report(fit))` to see the names of all the
-information you can look into specifically and then look at that. You
-can also look in `View(get_estimates(fit))` to look through the tibble
-and identify problem data. Also, see the [Viewing
-results](#viewing-results) section for more information on how to view
-and filter the results.
+To dig further, `get_report(fit)[["nll_components"]]` shows each
+negative log-likelihood component, and `names(get_report(fit))` lists
+everything else in the report. You can also look through
+`View(get_estimates(fit))` to identify problem data. See the [Viewing
+results](#viewing-results) section for how to view and filter the
+results.
 
 #### Logging system
 
@@ -658,6 +707,117 @@ dim(log_data_frame)
 dplyr::count(log_data_frame, level)
 # Subset for just the warnings
 log_data_frame |> dplyr::filter(level == "warning")
+
+clear()
+```
+
+#### Checking a fit that did not converge
+
+To see what the checks look like for a model that did not converge, the
+model below is fit again but
+[`nlminb()`](https://rdrr.io/r/stats/nlminb.html) is stopped after 5
+iterations.
+[`fit_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/fit_fims.md)
+warns that the optimization failed, and because the maximum gradient is
+above 0.01, the standard errors are not calculated.
+
+``` r
+
+unconverged_fit <- parameters_4_model |>
+  initialize_fims(data = data_4_model) |>
+  fit_fims(
+    optimize = TRUE,
+    control = list(eval.max = 5, iter.max = 5, trace = 0)
+  )
+```
+
+    ## ✔ Starting optimization ...
+    ## ℹ Restarting optimizer 3 times to improve gradient.
+    ## ℹ Maximum gradient went from 57.15698 to 27.41724 after 3 steps.
+    ## ✔ Finished optimization
+
+    ## Warning: ✖ Optimization failed convergence checks.
+    ## ℹ Convergence code = 1.
+    ## ℹ Message = "function evaluation limit reached without convergence (9)".
+    ## ℹ Maximum absolute gradient ("2.741724e+01") is higher than 0.01 or not finite.
+    ##   Model does not seem converged.
+    ## ℹ Largest absolute gradients are on "dnorm.7.log_sd.763",
+    ##   "Population.1.log_init_naa.1210", and "Fleet.1.log_Fmort.4".
+    ## ℹ Skipping sdreport. Consider adjusting control parameters (eval.max, iter.max)
+    ##   or model structure.
+    ## ℹ Model fit returned for diagnostic purposes only. Results are not reliable.
+
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## Also defined by 'tibble'
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## Also defined by 'tibble'
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## Also defined by 'tibble'
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## Also defined by 'tibble'
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## Also defined by 'tibble'
+    ## ✖ Convergence: "FAIL" from "optimizer", "max_gradient", and "sdreport". Use
+    ##   `sanity_fims(fit)` to see each check.
+    ## ℹ FIMS model version: 0.11.0.9000
+    ## ℹ Total run time was 2.47635 seconds
+    ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
+    ## ℹ Maximum gradient= 27.41724
+    ## ℹ Negative log likelihood (NLL):
+    ## • Marginal NLL= 3262.81027
+    ## • Total NLL= 3196.75596
+    ## ℹ Terminal SB= 1618.3345
+
+[`get_convergence()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+shows that the optimizer and maximum gradient checks failed and that the
+Hessian was not checked. The `parameter` column of `max_gradient` names
+the 3 parameters with the largest gradients, which are a good place to
+start looking.
+
+``` r
+
+get_convergence(unconverged_fit)
+```
+
+    ## # A tibble: 4 × 6
+    ##   check        severity  value threshold parameter                       message
+    ##   <chr>        <chr>     <dbl>     <dbl> <chr>                           <chr>  
+    ## 1 optimizer    FAIL        1       0     <NA>                            functi…
+    ## 2 max_gradient FAIL       27.4     0.001 dnorm.7.log_sd.763, Population… Maximu…
+    ## 3 nll          OK       3263.     NA     <NA>                            Negati…
+    ## 4 sdreport     NOTE       NA      NA     <NA>                            Hessia…
+
+``` r
+
+sanity <- sanity_fims(unconverged_fit)
+```
+
+    ## ── FIMS sanity check ───────────────────────────────────────────────────────────
+
+    ## ✖ optimizer: function evaluation limit reached without convergence (9)
+
+    ## ✖ max_gradient: Maximum absolute gradient is above 0.01 or not finite.
+    ##   (dnorm.7.log_sd.763, Population.1.log_init_naa.1210, Fleet.1.log_Fmort.4)
+
+    ## ✔ nll: Negative log-likelihood and its components are finite.
+
+    ## ℹ sdreport: Hessian not checked because the maximum gradient failed.
+
+    ## ────────────────────────────────────────────────────────────────────────────────
+
+    ## ✖ 2 of 4 checks need attention:
+    ## "optimizer" and "max_gradient".
+
+    ## ℹ 1 check did not run: "sdreport".
+
+``` r
+
+sanity[["all_ok"]]
+```
+
+    ## [1] FALSE
+
+``` r
 
 clear()
 ```
@@ -803,17 +963,30 @@ high_slope_fit <- parameters_high_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00234 to 0.00024 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00272 to 0.00027 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 57.33317 seconds
+    ## ℹ Total run time was 47.60648 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00024
+    ## ℹ Maximum gradient= 0.00027
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.5989
+    ## ℹ Terminal SB= 1791.598
 
 ``` r
 
@@ -826,17 +999,30 @@ low_slope_fit <- parameters_low_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00243 to 5e-04 after 3 steps.
+    ## ℹ Maximum gradient went from 0.0028 to 4e-04 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 55.93958 seconds
+    ## ℹ Total run time was 46.72388 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 5e-04
+    ## ℹ Maximum gradient= 4e-04
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
-    ## • Total NLL= 3164.83638
-    ## ℹ Terminal SB= 1791.59369
+    ## • Total NLL= 3164.83637
+    ## ℹ Terminal SB= 1791.58274
 
 ``` r
 
@@ -937,17 +1123,30 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00393 to 0.00051 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00712 to 0.00028 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 58.08978 seconds
+    ## ℹ Total run time was 46.48664 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00051
+    ## ℹ Maximum gradient= 0.00028
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.29832
     ## • Total NLL= 3164.88132
-    ## ℹ Terminal SB= 1791.0139
+    ## ℹ Terminal SB= 1791.01628
 
 ``` r
 
@@ -1036,17 +1235,30 @@ age_only_fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00465 to 0.00022 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00296 to 0.00024 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 10.48382 seconds
+    ## ℹ Total run time was 8.76267 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00022
+    ## ℹ Maximum gradient= 0.00024
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 1627.76704
     ## • Total NLL= 1564.08529
-    ## ℹ Terminal SB= 1740.954
+    ## ℹ Terminal SB= 1740.95407
 
 ``` r
 
@@ -1080,17 +1292,30 @@ length_only_fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00409 to 0.00027 after 3 steps.
+    ## ℹ Maximum gradient went from 0.01688 to 0.00027 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
+    ## 
+    ## Also defined by 'tibble'
+    ## 
+    ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.27767 minutes
+    ## ℹ Total run time was 1.02891 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00027
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 1568.32685
-    ## • Total NLL= 1518.62644
-    ## ℹ Terminal SB= 1722.35493
+    ## • Marginal NLL= 1568.32686
+    ## • Total NLL= 1518.62645
+    ## ℹ Terminal SB= 1722.35862
 
 ``` r
 

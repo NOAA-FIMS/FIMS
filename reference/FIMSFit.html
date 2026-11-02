@@ -82,7 +82,8 @@ user if they have used their own bespoke code to fit a FIMS model.</p>
 <span>  opt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  sdreport <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  run_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>time_total <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">as.difftime</a></span><span class="op">(</span><span class="fl">0</span>, units <span class="op">=</span> <span class="st">"secs"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  version <span class="op">=</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"FIMS"</span><span class="op">)</span></span>
+<span>  version <span class="op">=</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"FIMS"</span><span class="op">)</span>,</span>
+<span>  convergence <span class="op">=</span> <span class="fu">convergence_tibble</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -121,6 +122,12 @@ by subtracting two <code><a href="https://rdrr.io/r/base/Sys.time.html" class="e
 <code><a href="fit_fims.html">fit_fims()</a></code> was not used to optimize the model, then the default is to
 use the current version of the package that is loaded.</p></dd>
 
+
+<dt id="arg-convergence">convergence<a class="anchor" aria-label="anchor" href="#arg-convergence"></a></dt>
+<dd><p>A data frame with one row per convergence check, as
+returned by <code><a href="get_FIMSFit.html">get_convergence()</a></code>. <code><a href="fit_fims.html">fit_fims()</a></code> fills it in. The default has
+no rows, which means no checks were run.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -155,6 +162,10 @@ if you are running this function yourself.</p></dd>
 
 <dt><code>model_output</code>:</dt>
 <dd><p>The FIMS model output as a JSON string.</p></dd>
+
+<dt><code>convergence</code>:</dt>
+<dd><p>A tibble with the result of each convergence check. See
+<code><a href="get_FIMSFit.html">get_convergence()</a></code>.</p></dd>
 
 
 </dl></div>

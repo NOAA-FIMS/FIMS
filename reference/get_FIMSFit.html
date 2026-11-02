@@ -114,6 +114,11 @@ to access objects stored in the available slots.</p>
 <span><span class="co"># S4 method for class 'FIMSFit'</span></span>
 <span><span class="fu">get_sdreport</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu">get_convergence</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S4 method for class 'FIMSFit'</span></span>
+<span><span class="fu">get_convergence</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu">get_estimates</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'FIMSFit'</span></span>
@@ -164,6 +169,10 @@ stored during fitting. Unlike calling <code>get_obj(x)[["gr"]](get_opt(x)[["par"
 this function is safe to call after <code><a href="Cpp_functions.html">clear()</a></code> because it reads
 from a stored R vector rather than the compiled C++ objective function.</p>
 <p><code>get_sdreport()</code> returns the list from <code><a href="https://rdrr.io/pkg/TMB/man/sdreport.html" class="external-link">TMB::sdreport()</a></code>.</p>
+<p><code>get_convergence()</code> returns a tibble with one row per convergence check
+run by <code><a href="fit_fims.html">fit_fims()</a></code>: <code>check</code>, <code>severity</code> (<code>"OK"</code>, <code>"NOTE"</code> for a check that
+did not run, <code>"WARN"</code>, or <code>"FAIL"</code>), <code>value</code>, <code>threshold</code>, <code>parameter</code>,
+and <code>message</code>. It has no rows when the model was not optimized.</p>
 <p><code>get_estimates()</code> returns a tibble of parameter values and their
 uncertainties from a fitted model. The <code>year_i</code> column is a position that
 starts at 1, and the <code>age</code> and <code>length</code> columns are the ages and length bins

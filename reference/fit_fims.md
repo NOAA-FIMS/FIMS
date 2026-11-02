@@ -29,7 +29,9 @@ fit_fims(
 
   A boolean specifying if the
   [`TMB::sdreport()`](https://rdrr.io/pkg/TMB/man/sdreport.html) should
-  be calculated?
+  be calculated? It is skipped when the maximum gradient is above 0.01
+  or not finite, because standard errors far from the optimum are not
+  meaningful.
 
 - save_sd:
 
@@ -82,7 +84,9 @@ fit_fims(
 
 An object of class `FIMSFit` is returned, where the structure is the
 same regardless if `optimize = TRUE` or not. Uncertainty information is
-only included in the `estimates` slot if `get_sd = TRUE`.
+only included in the `estimates` slot if `get_sd = TRUE`. The result of
+each convergence check is stored on the object and returned by
+[`get_convergence()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md).
 
 ## Details
 
