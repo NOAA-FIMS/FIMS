@@ -33,7 +33,8 @@ methods::setClass(
     number_of_parameters = "integer",
     run_time = "difftime",
     version = "package_version",
-    model_output = "character"
+    model_output = "character",
+    convergence = "data.frame"
   )
 )
 
@@ -88,7 +89,33 @@ methods::setMethod(
       x@report[["spawning_biomass"]],
       function(y) utils::tail(y, 1)
     )
+    # The overall status is the most severe check, so a failed check cannot be
+    # missed at the top of the summary.
+    convergence <- get_convergence(x)
+    severity_levels <- c("OK", "NOTE", "WARN", "FAIL")
+    convergence_status <- if (NROW(convergence) == 0) {
+      "not checked"
+    } else {
+      severity_levels[max(match(convergence[["severity"]], severity_levels))]
+    }
+    flagged_checks <- convergence[["check"]][convergence[["severity"]] != "OK"]
+    convergence_bullet <- stats::setNames(
+      if (length(flagged_checks) > 0) {
+        "Convergence: {.val {convergence_status}} from
+        {.val {flagged_checks}}. Use {.code sanity_fims(fit)} to see each
+        check."
+      } else {
+        "Convergence: {.val {convergence_status}}"
+      },
+      switch(convergence_status,
+        "FAIL" = "x",
+        "WARN" = "!",
+        "OK" = "v",
+        "i"
+      )
+    )
     cli::cli_inform(c(
+      convergence_bullet,
       "i" = "FIMS model version: {.val {x@version}}",
       "i" = "Total run time was {.val {rt}} {ru}",
       "i" = "Number of parameters: {all_parameters_info}",
@@ -197,6 +224,26 @@ methods::setGeneric("get_sdreport", function(x) standardGeneric("get_sdreport"))
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
 methods::setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
+
+#' @return
+#' [get_convergence()] returns a tibble with one row per convergence check
+#' run by [fit_fims()]: `check`, `severity` (`"OK"`, `"NOTE"` for a check that
+#' did not run, `"WARN"`, or `"FAIL"`), `value`, `threshold`, `parameter`,
+#' and `message`. It has no rows when the model was not optimized.
+#' @export
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setGeneric("get_convergence", function(x) standardGeneric("get_convergence"))
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setMethod("get_convergence", "FIMSFit", function(x) {
+  # A FIMSFit without a convergence slot, e.g., read from an older saved file,
+  # has no checks to return
+  if (!methods::.hasSlot(x, "convergence")) {
+    return(convergence_tibble(character(0), character(0)))
+  }
+  x@convergence
+})
 
 #' @return
 #' [get_estimates()] returns a tibble of parameter values and their
@@ -381,6 +428,9 @@ is.FIMSFit <- function(x) {
 #' @param version The version of FIMS that was used to optimize the model. If
 #'   [fit_fims()] was not used to optimize the model, then the default is to
 #'   use the current version of the package that is loaded.
+#' @param convergence A data frame with one row per convergence check, as
+#'   returned by [get_convergence()]. [fit_fims()] fills it in. The default has
+#'   no rows, which means no checks were run.
 #'
 #' @return
 #' An object with an S4 class of `FIMSFit` is returned. The object will have the
@@ -417,6 +467,10 @@ is.FIMSFit <- function(x) {
 #'     \item{\code{model_output}:}{
 #'       The FIMS model output as a JSON string.
 #'     }
+#'     \item{\code{convergence}:}{
+#'       A tibble with the result of each convergence check. See
+#'       [get_convergence()].
+#'     }
 #'   }
 #' @keywords fit_fims
 #' @export
@@ -426,7 +480,8 @@ FIMSFit <- function(
   opt = list(),
   sdreport = list(),
   run_time = c("time_total" = as.difftime(0, units = "secs")),
-  version = utils::packageVersion("FIMS")
+  version = utils::packageVersion("FIMS"),
+  convergence = convergence_tibble(character(0), character(0))
 ) {
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
@@ -490,7 +545,8 @@ FIMSFit <- function(
     number_of_parameters = number_of_parameters,
     run_time = run_time,
     version = version,
-    model_output = model_output
+    model_output = model_output,
+    convergence = convergence
   )
   fit
 }
@@ -499,7 +555,8 @@ FIMSFit <- function(
 #'
 #' @param input Input list as returned by [initialize_fims()].
 #' @param get_sd A boolean specifying if the [TMB::sdreport()] should be
-#'   calculated?
+#'   calculated? It is skipped when the maximum gradient is above 0.01 or not
+#'   finite, because standard errors far from the optimum are not meaningful.
 #' @param save_sd A logical, with the default `TRUE`, indicating whether the
 #'   sdreport is returned in the output. If `FALSE`, the slot for the report
 #'   will be empty.
@@ -526,7 +583,9 @@ FIMSFit <- function(
 #' @return
 #' An object of class `FIMSFit` is returned, where the structure is the same
 #' regardless if `optimize = TRUE` or not. Uncertainty information is only
-#' included in the `estimates` slot if `get_sd = TRUE`.
+#' included in the `estimates` slot if `get_sd = TRUE`. The result of each
+#' convergence check is stored on the object and returned by
+#' [get_convergence()].
 #' @seealso
 #' * [FIMSFit()]
 #' @details This function is a beta version still and subject to change
@@ -598,15 +657,7 @@ fit_fims <- function(input,
   )
 
   if (is.null(opt)) {
-    failed_nlminb_object <- return_failed_nlminb(obj)
-    failed_fit <- fit <- FIMSFit(
-      input = input,
-      obj = obj,
-      opt = failed_nlminb_object[["opt"]],
-      sdreport = list(),
-      run_time = failed_nlminb_object[["run_time"]]
-    )
-    return(failed_fit)
+    return(failed_fims_fit(input, obj))
   }
 
   gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
@@ -633,15 +684,7 @@ fit_fims <- function(input,
           "i" = "The model successfully converged before this loop.",
           "i" = "The failed results are being returned."
         ))
-        failed_nlminb_object <- return_failed_nlminb(obj)
-        failed_fit <- fit <- FIMSFit(
-          input = input,
-          obj = obj,
-          opt = failed_nlminb_object[["opt"]],
-          sdreport = list(),
-          run_time = failed_nlminb_object[["run_time"]]
-        )
-        return(failed_fit)
+        return(failed_fims_fit(input, obj))
       }
       gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
       maxgrad <- max(abs(gradient))
@@ -662,19 +705,24 @@ fit_fims <- function(input,
   random_effects_names <- if (length(obj[["env"]][["random"]]) > 0) {
     names(get_random_names(obj[["env"]]$parList()[["re"]]))
   }
-  check_mle_convergence(
-    input,
-    obj,
+  mle_convergence <- check_mle_convergence(
     opt,
     maxgrad,
     gradient = gradient,
     parameter_names = parameter_names
   )
+  # Standard errors at a point far from the optimum are not meaningful, so
+  # sdreport is skipped when the gradient fails. A failed convergence code with
+  # a small gradient, e.g., a false convergence, still gets standard errors.
+  gradient_failed <- any(
+    mle_convergence[["check"]] == "max_gradient" &
+      mle_convergence[["severity"]] == "FAIL"
+  )
 
   FIMS::set_fixed(opt[["par"]])
 
   time_sdreport <- NA
-  if (get_sd) {
+  if (get_sd && !gradient_failed) {
     t2 <- Sys.time()
     sdreport <- TMB::sdreport(
       obj,
@@ -682,8 +730,7 @@ fit_fims <- function(input,
     )
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
-    check_sdreport_convergence(
-      input,
+    sdreport_convergence <- check_sdreport_convergence(
       obj,
       opt,
       sdreport,
@@ -693,6 +740,17 @@ fit_fims <- function(input,
   } else {
     sdreport <- list()
     time_sdreport <- as.difftime(0, units = "secs")
+    # Without this row a fit with no sdreport would look like it passed the
+    # Hessian checks rather than skipped them.
+    sdreport_convergence <- convergence_tibble(
+      check = "sdreport",
+      severity = "NOTE",
+      message = if (gradient_failed) {
+        "Hessian not checked because the maximum gradient failed."
+      } else {
+        "Hessian not checked because get_sd = FALSE."
+      }
+    )
   }
 
   run_time <- c(
@@ -706,6 +764,12 @@ fit_fims <- function(input,
     opt = opt,
     sdreport = sdreport,
     run_time = run_time
+  )
+  # The NLL check reads the report and model output that FIMSFit() builds
+  fit@convergence <- dplyr::bind_rows(
+    mle_convergence,
+    check_nll_convergence(opt, get_report(fit), get_model_output(fit)),
+    sdreport_convergence
   )
   print(fit)
   if (!is.null(filename)) {
@@ -777,10 +841,12 @@ return_failed_nlminb <- function(object) {
     not accurate or stable and should not be used for management.",
     "i" = "A {.cls FIMSFit} object containing partial results is returned.",
     "i" = "Type the name of the variable you assigned it (e.g.,
-           {.code fit <- ...}) to inspect the model inputs and configuration.
-           Additionally, try running {.code FIMS::fit_fims(optimize = FALSE)}
-           and inspecting the output through {.code get_report(fit)} or by
-           viewing the tabular output from {.code View(get_estimates(fit))}."
+           {.code fit <- ...}) to inspect the model inputs and configuration.",
+    "i" = "Run {.code sanity_fims(fit)} to see each convergence check, or
+           {.code get_convergence(fit)} for the same checks as a tibble.",
+    "i" = "To check the starting values, run
+           {.code fit_fims(optimize = FALSE)} and look at
+           {.code get_report(fit)}."
   )
   cli::cli_warn(message = failed_nlminb_message)
   # Construct a fallback optimizer result with consistent structure, i.e.,
@@ -798,4 +864,40 @@ return_failed_nlminb <- function(object) {
       message = "Optimization failed"
     )
   ))
+}
+
+#' Build the FIMSFit returned when nlminb fails
+#'
+#' @param input Input list as returned by [initialize_fims()].
+#' @param obj The TMB object used for fitting.
+#' @return
+#' A FIMSFit object with the partial results and the convergence checks. The
+#' report is from the last parameters nlminb tried, so the `"nll"` check names
+#' the negative log-likelihood components that were not finite there.
+#' @noRd
+failed_fims_fit <- function(input, obj) {
+  failed_nlminb_object <- return_failed_nlminb(obj)
+  fit <- FIMSFit(
+    input = input,
+    obj = obj,
+    opt = failed_nlminb_object[["opt"]],
+    sdreport = list(),
+    run_time = failed_nlminb_object[["run_time"]]
+  )
+  fit@convergence <- dplyr::bind_rows(
+    convergence_tibble(
+      check = "optimizer",
+      severity = "FAIL",
+      value = 1,
+      threshold = 0,
+      message = "nlminb failed or returned an objective that is not finite."
+    ),
+    check_nll_convergence(get_opt(fit), get_report(fit), get_model_output(fit)),
+    convergence_tibble(
+      check = "sdreport",
+      severity = "NOTE",
+      message = "Hessian not checked because the optimization failed."
+    )
+  )
+  fit
 }

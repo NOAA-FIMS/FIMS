@@ -9,14 +9,6 @@
 
 # check_mle_convergence ----
 ## Setup ----
-make_mock_mle_input <- function() {
-  list(dummy = TRUE)
-}
-
-make_mock_mle_obj <- function() {
-  list(env = list(random = numeric()))
-}
-
 make_mock_mle_opt <- function(convergence = 0, message = NULL, par = numeric()) {
   list(
     convergence = convergence,
@@ -25,61 +17,60 @@ make_mock_mle_opt <- function(convergence = 0, message = NULL, par = numeric()) 
   )
 }
 
-mock_gradient <- c(0.001, 0.5, -0.02)
+mock_gradient <- c(0.001, 0.005, -0.002)
 mock_parameter_names <- c(
   "Recruitment.1.log_rzero.1",
   "Selectivity.2.slope.47",
   "Fleet.1.log_q.3"
 )
 
-mock_fimsfit <- function(input, obj, opt, sdreport, run_time) {
-  list(
-    tag = "mock_fit",
-    input = input,
-    obj = obj,
-    opt = opt,
-    sdreport = sdreport,
-    run_time = run_time
-  )
-}
-
 ## IO correctness ----
 test_that("check_mle_convergence() works with correct inputs", {
-  #' @description Test that `check_mle_convergence()` returns NULL when convergence code is zero and the gradient is low.
-  input <- make_mock_mle_input()
-  obj <- make_mock_mle_obj()
+  #' @description Test that `check_mle_convergence()` returns OK rows when convergence code is zero and the gradient is low.
   opt <- make_mock_mle_opt(convergence = 0)
 
   expect_no_warning(
-    out <- FIMS:::check_mle_convergence(input, obj, opt, maxgrad = 1e-4)
+    out <- FIMS:::check_mle_convergence(opt, maxgrad = 1e-4)
   )
-  expect_null(out)
+  expect_equal(out[["check"]], c("optimizer", "max_gradient"))
+  expect_equal(out[["severity"]], c("OK", "OK"))
+  expect_equal(out[["value"]], c(0, 1e-4))
 
-  #' @description Test that `check_mle_convergence()` names the parameter with the largest absolute gradient when the gradient is above 1.
+  #' @description Test that `check_mle_convergence()` names the parameters with the largest absolute gradients when the gradient is above 0.01.
   expect_warning(
     object = FIMS:::check_mle_convergence(
-      input,
-      obj,
       opt,
       maxgrad = 5,
       gradient = c(0.001, 5, -0.02),
       parameter_names = mock_parameter_names
     ),
-    regexp = "Largest absolute gradient is on \"Selectivity.2.slope.47\"",
+    regexp = "Largest absolute gradients are on \"Selectivity.2.slope.47\"",
     fixed = TRUE
   )
 
-  #' @description Test that `check_mle_convergence()` names the parameter with the largest absolute gradient when nlminb did not converge.
+  #' @description Test that `check_mle_convergence()` names the parameters with the largest absolute gradients when nlminb did not converge.
   expect_warning(
     object = FIMS:::check_mle_convergence(
-      input,
-      obj,
       make_mock_mle_opt(convergence = 1, message = "iteration limit reached"),
       maxgrad = 0.03,
       gradient = c(0.001, 0.01, -0.03),
       parameter_names = mock_parameter_names
     ),
-    regexp = "Largest absolute gradient is on \"Fleet.1.log_q.3\"",
+    regexp = "Largest absolute gradients are on \"Fleet.1.log_q.3\"",
+    fixed = TRUE
+  )
+})
+
+test_that("check_mle_convergence() uses the singular for 1 gradient", {
+  #' @description Test that `check_mle_convergence()` says "gradient is on" when there is only 1 fixed effect.
+  expect_warning(
+    object = FIMS:::check_mle_convergence(
+      make_mock_mle_opt(),
+      maxgrad = 0.05,
+      gradient = 0.05,
+      parameter_names = "Recruitment.1.log_rzero.1"
+    ),
+    regexp = "Largest absolute gradient is on \"Recruitment.1.log_rzero.1\"",
     fixed = TRUE
   )
 })
@@ -87,18 +78,22 @@ test_that("check_mle_convergence() works with correct inputs", {
 ## Edge handling ----
 test_that("check_mle_convergence() returns correct outputs for edge cases", {
   #' @description Test that `check_mle_convergence()` warns when nlminb convergence code is non-zero.
-  input <- make_mock_mle_input()
-  obj <- make_mock_mle_obj()
   opt <- make_mock_mle_opt(convergence = 1, message = "false convergence")
 
   expect_warning(
-    object = FIMS:::check_mle_convergence(input, obj, opt, maxgrad = 1e-4),
+    object = out <- FIMS:::check_mle_convergence(opt, maxgrad = 1e-4),
     regexp = "Optimization failed convergence checks"
+  )
+  #' @description Test that `check_mle_convergence()` records a non-zero convergence code as a failed optimizer check with the nlminb message.
+  expect_equal(out[["severity"]][out[["check"]] == "optimizer"], "FAIL")
+  expect_equal(
+    out[["message"]][out[["check"]] == "optimizer"],
+    "false convergence"
   )
 
   #' @description Test that `check_mle_convergence()` leaves out the gradient name when no gradient is supplied, as in calls made before names were added.
   warning_text <- tryCatch(
-    FIMS:::check_mle_convergence(input, obj, make_mock_mle_opt(), maxgrad = 5),
+    FIMS:::check_mle_convergence(make_mock_mle_opt(), maxgrad = 5),
     warning = conditionMessage
   )
   expect_match(warning_text, "Model does not seem converged")
@@ -107,22 +102,18 @@ test_that("check_mle_convergence() returns correct outputs for edge cases", {
   #' @description Test that `check_mle_convergence()` falls back to indexed labels when the names do not line up with the gradient.
   expect_warning(
     object = FIMS:::check_mle_convergence(
-      input,
-      obj,
       make_mock_mle_opt(),
       maxgrad = 5,
       gradient = c(0.001, 5, -0.02),
       parameter_names = mock_parameter_names[1:2]
     ),
-    regexp = "Largest absolute gradient is on \"p[2]\"",
+    regexp = "Largest absolute gradients are on \"p[2]\"",
     fixed = TRUE
   )
 
   #' @description Test that `check_mle_convergence()` leaves out the gradient name when every gradient is NaN.
   warning_text <- tryCatch(
     FIMS:::check_mle_convergence(
-      input,
-      obj,
       make_mock_mle_opt(),
       maxgrad = 5,
       gradient = c(NaN, NaN, NaN),
@@ -135,46 +126,67 @@ test_that("check_mle_convergence() returns correct outputs for edge cases", {
 
 ## Error handling ----
 test_that("check_mle_convergence() returns correct error messages", {
-  #' @description Test that `check_mle_convergence()` warns for moderately high gradients and returns a diagnostic fit object.
-  input <- make_mock_mle_input()
-  obj <- make_mock_mle_obj()
+  #' @description Test that `check_mle_convergence()` warns for moderately high gradients and records them as a WARN row.
   opt <- make_mock_mle_opt(convergence = 0)
-  maxgrad <- 0.1
-  out <- NULL
+  maxgrad <- 0.005
 
-  testthat::with_mocked_bindings(
-    FIMSFit = mock_fimsfit,
-    print = function(x, ...) invisible(x),
-    {
-      expect_warning(
-        object = out <- FIMS:::check_mle_convergence(input, obj, opt, maxgrad),
-        regexp = "Optimization resulted in high gradients"
-      )
-    },
-    .package = "FIMS"
+  expect_warning(
+    object = out <- FIMS:::check_mle_convergence(opt, maxgrad),
+    regexp = "Optimization resulted in high gradients"
+  )
+  expect_equal(out[["severity"]][out[["check"]] == "max_gradient"], "WARN")
+  expect_equal(out[["threshold"]][out[["check"]] == "max_gradient"], 0.001)
+
+  #' @description Test that `check_mle_convergence()` records a gradient of exactly 0.001 as WARN and a gradient just below it as OK, as in `glance()`.
+  expect_warning(
+    object = out <- FIMS:::check_mle_convergence(opt, maxgrad = 0.001),
+    regexp = "Optimization resulted in high gradients"
+  )
+  expect_equal(out[["severity"]][out[["check"]] == "max_gradient"], "WARN")
+  expect_no_warning(
+    out <- FIMS:::check_mle_convergence(opt, maxgrad = 0.000999)
+  )
+  expect_equal(out[["severity"]][out[["check"]] == "max_gradient"], "OK")
+
+  #' @description Test that `check_mle_convergence()` names the parameters with the largest absolute gradients for moderately high gradients.
+  expect_warning(
+    object = out <- FIMS:::check_mle_convergence(
+      opt,
+      maxgrad = 0.005,
+      gradient = mock_gradient,
+      parameter_names = mock_parameter_names
+    ),
+    regexp = "Largest absolute gradients are on \"Selectivity.2.slope.47\"",
+    fixed = TRUE
+  )
+  #' @description Test that `check_mle_convergence()` stores the 3 parameters with the largest absolute gradients, largest first.
+  expect_equal(
+    out[["parameter"]][out[["check"]] == "max_gradient"],
+    "Selectivity.2.slope.47, Fleet.1.log_q.3, Recruitment.1.log_rzero.1"
   )
 
-  expect_equal(object = out$tag, expected = "mock_fit")
-  expect_identical(object = out$input, expected = input)
-
-  #' @description Test that `check_mle_convergence()` names the parameter with the largest absolute gradient for moderately high gradients.
-  testthat::with_mocked_bindings(
-    FIMSFit = mock_fimsfit,
-    print = function(x, ...) invisible(x),
-    {
-      expect_warning(
-        object = FIMS:::check_mle_convergence(
-          input,
-          obj,
-          opt,
-          maxgrad = 0.5,
-          gradient = mock_gradient,
-          parameter_names = mock_parameter_names
-        ),
-        regexp = "Largest absolute gradient is on \"Selectivity.2.slope.47\"",
-        fixed = TRUE
-      )
-    },
-    .package = "FIMS"
+  #' @description Test that `check_mle_convergence()` records a gradient above 0.01 as FAIL.
+  expect_warning(
+    object = out <- FIMS:::check_mle_convergence(opt, maxgrad = 0.05),
+    regexp = "Model does not seem converged"
   )
+  expect_equal(out[["severity"]][out[["check"]] == "max_gradient"], "FAIL")
+
+  #' @description Test that `check_mle_convergence()` records a gradient that is not finite as FAIL instead of erroring.
+  expect_warning(
+    object = out <- FIMS:::check_mle_convergence(opt, maxgrad = NaN),
+    regexp = "Optimization failed convergence checks"
+  )
+  expect_equal(out[["severity"]][out[["check"]] == "max_gradient"], "FAIL")
+
+  #' @description Test that `check_mle_convergence()` does not say sdreport is skipped when only the convergence code failed and the gradient is small.
+  warning_text <- tryCatch(
+    FIMS:::check_mle_convergence(
+      make_mock_mle_opt(convergence = 1, message = "false convergence (8)"),
+      maxgrad = 1e-5
+    ),
+    warning = conditionMessage
+  )
+  expect_match(warning_text, "Optimization failed convergence checks")
+  expect_no_match(warning_text, "Skipping sdreport")
 })
