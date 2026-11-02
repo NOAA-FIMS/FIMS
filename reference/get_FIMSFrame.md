@@ -124,7 +124,8 @@ model.
 `get_n_ages()` returns an integer specifying the number of age bins used
 in the model.
 
-`get_lengths()` returns a vector of length bins used in the model.
+`get_lengths()` returns a vector of the lower edges of the length bins
+used in the model.
 
 `get_n_lengths()` returns an integer specifying the number of length
 bins used in the model.

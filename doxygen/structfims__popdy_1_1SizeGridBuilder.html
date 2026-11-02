@@ -226,8 +226,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memdesc:a58eeabb72ee2f2871b3a17cf8456fc17"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a size grid from an explicit vector of bin edges.  <br /></td></tr>
 <tr class="memitem:a8c41cec68337d0583f9726967df87c90" id="r_a8c41cec68337d0583f9726967df87c90"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structfims__popdy_1_1SizeGrid.html">SizeGrid</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8c41cec68337d0583f9726967df87c90">BuildRegularGrid</a> (double lower_edge, double upper_edge, double bin_width)</td></tr>
 <tr class="memdesc:a8c41cec68337d0583f9726967df87c90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a regular size grid from lower edge, upper edge, and bin width.  <br /></td></tr>
-<tr class="memitem:aa0afb9baed63d3c2ea7a4aade4987cba" id="r_aa0afb9baed63d3c2ea7a4aade4987cba"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa0afb9baed63d3c2ea7a4aade4987cba">BuildObservationEdgesFromCenters</a> (const <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; double &gt; &amp;centers)</td></tr>
-<tr class="memdesc:aa0afb9baed63d3c2ea7a4aade4987cba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build one fleet observation-bin edge vector from stored bin centers.  <br /></td></tr>
+<tr class="memitem:a51245098aaff3c7f421da801e77bbf1c" id="r_a51245098aaff3c7f421da801e77bbf1c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a51245098aaff3c7f421da801e77bbf1c">BuildObservationEdgesFromLowerEdges</a> (const <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; double &gt; &amp;lower_edges)</td></tr>
+<tr class="memdesc:a51245098aaff3c7f421da801e77bbf1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build one fleet observation-bin edge vector from stored bin lower edges.  <br /></td></tr>
 <tr class="memitem:ad2804bc5d08e4daa32a17ffb345a3007" id="r_ad2804bc5d08e4daa32a17ffb345a3007"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="structfims__popdy_1_1SizeGrid.html">SizeGrid</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad2804bc5d08e4daa32a17ffb345a3007">BuildDefaultFromFleetEdges</a> (const <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; double &gt; &gt; &amp;fleet_edges)</td></tr>
 <tr class="memdesc:ad2804bc5d08e4daa32a17ffb345a3007"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build the default population biological size grid from resolved fleet observation-bin edges.  <br /></td></tr>
 </table>
@@ -304,8 +304,8 @@ Static Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aa0afb9baed63d3c2ea7a4aade4987cba" name="aa0afb9baed63d3c2ea7a4aade4987cba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa0afb9baed63d3c2ea7a4aade4987cba">&#9670;&#160;</a></span>BuildObservationEdgesFromCenters()</h2>
+<a id="a51245098aaff3c7f421da801e77bbf1c" name="a51245098aaff3c7f421da801e77bbf1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51245098aaff3c7f421da801e77bbf1c">&#9670;&#160;</a></span>BuildObservationEdgesFromLowerEdges()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -314,9 +314,9 @@ Static Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; double &gt; fims_popdy::SizeGridBuilder::BuildObservationEdgesFromCenters </td>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; double &gt; fims_popdy::SizeGridBuilder::BuildObservationEdgesFromLowerEdges </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; double &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>centers</em></span></td><td>)</td>
+          <td class="paramtype">const <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; double &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>lower_edges</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -327,15 +327,15 @@ Static Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Build one fleet observation-bin edge vector from stored bin centers. </p>
-<p>For multiple centers, edges are inferred from adjacent midpoints. A single center is not enough information to infer observation-bin geometry consistently, so this helper requires at least 2 strictly increasing centers.</p>
+<p>Build one fleet observation-bin edge vector from stored bin lower edges. </p>
+<p><a class="el" href="structfims__popdy_1_1Fleet.html" title="Base class for all fleets.">Fleet</a> lengths are the lower edge of each observation bin, as in SS3 and WHAM. The edges are those values plus 1 upper edge for the last bin, which gets the same width as the bin before it. The first and last bins are open-ended when the population grid is mapped onto them, so they act as minus and plus groups. That upper edge only sets the range of the default population grid and the representative length of the last bin. At least 2 strictly increasing lower edges are required because 1 value gives no bin width.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">centers</td><td><a class="el" href="structfims__popdy_1_1Fleet.html" title="Base class for all fleets.">Fleet</a> observation-bin centers. </td></tr>
+    <tr><td class="paramname">lower_edges</td><td><a class="el" href="structfims__popdy_1_1Fleet.html" title="Base class for all fleets.">Fleet</a> observation-bin lower edges. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Strictly increasing observation-bin edges inferred from the centers. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Strictly increasing observation-bin edges, 1 longer than <span class="tt">lower_edges</span>. </dd></dl>
 
 </div>
 </div>

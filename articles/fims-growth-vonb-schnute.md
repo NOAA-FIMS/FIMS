@@ -199,21 +199,33 @@ make_vonb_demo_data <- function(
       uncertainty
     )
 
-  # Calculate the probability of each modeled length conditional on age.
+  # Length labels are lower bin edges. The first and last bins
+  # include the lower and upper tails, respectively.
   age_length_probabilities <- tidyr::expand_grid(
     age = ages,
     length = lengths
   ) |>
     dplyr::left_join(true_curve, by = "age") |>
     dplyr::group_by(age) |>
+    dplyr::arrange(length, .by_group = TRUE) |>
     dplyr::mutate(
-      conditional_probability = stats::dnorm(
-        x = length,
-        mean = true_mean_length,
-        sd = true_sd_length
+      lower_edge = dplyr::if_else(
+        dplyr::row_number() == 1L,
+        -Inf,
+        length
       ),
+      upper_edge = dplyr::lead(length, default = Inf),
       conditional_probability =
-        conditional_probability / sum(conditional_probability)
+        stats::pnorm(
+          q = upper_edge,
+          mean = true_mean_length,
+          sd = true_sd_length
+        ) -
+          stats::pnorm(
+            q = lower_edge,
+            mean = true_mean_length,
+            sd = true_sd_length
+          )
     ) |>
     dplyr::ungroup()
 
@@ -520,7 +532,7 @@ fit <- FIMS::fit_fims(
 )
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 5 times to improve gradient.
-#> ℹ Maximum gradient went from 0.00237 to 1e-04 after 5 steps.
+#> ℹ Maximum gradient went from 0.00615 to 9e-05 after 5 steps.
 #> ✔ Finished optimization
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
 #> 
@@ -545,13 +557,13 @@ fit <- FIMS::fit_fims(
 #> ℹ Convergence: "NOTE" from "sdreport". Use `sanity_fims(fit)` to see each
 #>   check.
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 4.31178 seconds
+#> ℹ Total run time was 5.54363 seconds
 #> ℹ Number of parameters: fixed_effects=39, random_effects=1, and total=40
-#> ℹ Maximum gradient= 1e-04
+#> ℹ Maximum gradient= 9e-05
 #> ℹ Negative log likelihood (NLL):
-#> • Marginal NLL= 187.51983
-#> • Total NLL= 135.9478
-#> ℹ Terminal SB= 29998.679
+#> • Marginal NLL= 186.44652
+#> • Total NLL= 41.45583
+#> ℹ Terminal SB= 22305.49616
 
 # Keep only the core VonBertalanffySchnute Growth estimates.
 growth_estimates <- FIMS::get_estimates(fit) |>
@@ -580,9 +592,9 @@ growth_comparison
 #> # A tibble: 3 × 4
 #>   label               input estimated true_value
 #>   <chr>               <dbl>     <dbl>      <dbl>
-#> 1 mean_length_young  150      181.        180   
-#> 2 growth_coefficient   0.22     0.185       0.18
-#> 3 mean_length_old    800      849.        850
+#> 1 mean_length_young  150      179.        180   
+#> 2 growth_coefficient   0.22     0.182       0.18
+#> 3 mean_length_old    800      848.        850
 ```
 
 Check both the optimizer convergence code and the maximum gradient:
@@ -596,7 +608,7 @@ tibble::tibble(
 #> # A tibble: 1 × 2
 #>   convergence max_gradient
 #>         <int>        <dbl>
-#> 1           0     0.000103
+#> 1           0    0.0000938
 ```
 
 A convergence code of `0` indicates normal optimizer convergence. The
@@ -872,7 +884,7 @@ ggplot2::ggplot(
 ```
 
 ![Bar plot of one realized growth-derived age-to-length row across fleet
-observation-bin centers for a representative
+observation bins labeled by their lower edges for a representative
 age.](fims-growth-vonb-schnute_files/figure-html/growth-size-handoff-plot-1.png)
 
 One realized growth-derived age-to-length row, showing how the fitted

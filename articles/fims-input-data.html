@@ -370,14 +370,23 @@ sample size is ignored.</p>
 <p>The length-composition data are similar to the age compositions,
 except with values in the <code>length</code> column and
 <code>age = NA</code>. The <code>length</code> column identifies the
-length bin for each observation. The <code>observed</code> column
-contains either the number or the proportion of fish in each length bin.
-The <code>unit</code> column should be either “number” or “proportion”.
-The <code>uncertainty</code> column should be the input sample size for
-the time step, repeated across all length bins in that time step. When
-the unit is set to a proportion, the sample size is multiplied by the
-proportion; however, when it is set to a number, the sample size is
-ignored.</p>
+length bin for each observation by its lower edge. A bin holds lengths
+from its lower edge up to the next lower edge. For example, with
+<code>length</code> values of 0, 50, …, 1100, the bin labeled
+<code>250</code> includes fish measuring at least 250 mm but less than
+300 mm (250–299 mm for whole-number measurements). The next bin, labeled
+<code>300</code>, includes fish measuring at least 300 mm but less than
+350 mm (i.e. <code>[300, 350)</code> in interval notation). When growth
+is estimated in FIMS, the first bin also holds all smaller fish and the
+last bin holds all larger fish. With fixed
+<code>age_to_length_conversion</code> rows, those rows set what each bin
+holds. The <code>observed</code> column contains either the number or
+the proportion of fish in each length bin. The <code>unit</code> column
+should be either “number” or “proportion”. The <code>uncertainty</code>
+column should be the input sample size for the time step, repeated
+across all length bins in that time step. When the unit is set to a
+proportion, the sample size is multiplied by the proportion; however,
+when it is set to a number, the sample size is ignored.</p>
 <p>When length compositions are included, FIMS needs a way to convert
 numbers at age into numbers at length. This can come from fixed
 <code>age_to_length_conversion</code> rows or from a growth-derived
@@ -418,11 +427,12 @@ model needs length-bin geometry for a growth-derived age-to-length
 conversion, but the user is not fitting length-composition data for that
 fleet.</p>
 <p>For <code>length_bin</code> rows, the <code>length</code> column
-contains the length-bin values. The <code>observed</code>,
-<code>age</code>, and <code>uncertainty</code> columns should usually be
-<code>NA</code>. The <code>fleet</code> column identifies which fleet or
-survey the length bins apply to, and <code>timing</code> can be
-<code>NA</code> unless fleet-specific timing is needed.</p>
+contains the lower edge of each length bin, the same as for length
+compositions. The <code>observed</code>, <code>age</code>, and
+<code>uncertainty</code> columns should usually be <code>NA</code>. The
+<code>fleet</code> column identifies which fleet or survey the length
+bins apply to, and <code>timing</code> can be <code>NA</code> unless
+fleet-specific timing is needed.</p>
 </div>
 <div class="section level2">
 <h2 id="weight-at-age-data-type-weight_at_age">Weight-at-age data (<code>type == "weight_at_age"</code>)<a class="anchor" aria-label="anchor" href="#weight-at-age-data-type-weight_at_age"></a>

@@ -10,7 +10,7 @@ var searchData=
   ['builddefaultfromfleetedges_7',['BuildDefaultFromFleetEdges',['../structfims__popdy_1_1SizeGridBuilder.html#ad2804bc5d08e4daa32a17ffb345a3007',1,'fims_popdy::SizeGridBuilder']]],
   ['buildfromedges_8',['BuildFromEdges',['../structfims__popdy_1_1SizeGridBuilder.html#a58eeabb72ee2f2871b3a17cf8456fc17',1,'fims_popdy::SizeGridBuilder']]],
   ['buildmappedfleetagetolengthconversionrow_9',['BuildMappedFleetAgeToLengthConversionRow',['../structfims__popdy_1_1AgeToLengthConversionDerived.html#afb2ae25765c865882041d94c496a5530',1,'fims_popdy::AgeToLengthConversionDerived']]],
-  ['buildobservationedgesfromcenters_10',['BuildObservationEdgesFromCenters',['../structfims__popdy_1_1SizeGridBuilder.html#aa0afb9baed63d3c2ea7a4aade4987cba',1,'fims_popdy::SizeGridBuilder']]],
+  ['buildobservationedgesfromloweredges_10',['BuildObservationEdgesFromLowerEdges',['../structfims__popdy_1_1SizeGridBuilder.html#a51245098aaff3c7f421da801e77bbf1c',1,'fims_popdy::SizeGridBuilder']]],
   ['buildpopulationprobsizerow_11',['BuildPopulationProbSizeRow',['../structfims__popdy_1_1AgeToLengthConversionDerived.html#a29f32357de8524848cbff2989c3a61fd',1,'fims_popdy::AgeToLengthConversionDerived']]],
   ['buildrebinweights_12',['BuildRebinWeights',['../structfims__popdy_1_1SizeBinMapping.html#a4215d06b070248ea58f6950beb2c541c',1,'fims_popdy::SizeBinMapping']]],
   ['buildregulargrid_13',['BuildRegularGrid',['../structfims__popdy_1_1SizeGridBuilder.html#a8c41cec68337d0583f9726967df87c90',1,'fims_popdy::SizeGridBuilder']]]

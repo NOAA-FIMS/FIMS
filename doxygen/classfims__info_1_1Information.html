@@ -275,7 +275,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetupData</b> ()</td>
 <tr class="memitem:a7da455d8f48af95add1a75bf1b495f8a" id="r_a7da455d8f48af95add1a75bf1b495f8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7da455d8f48af95add1a75bf1b495f8a">SetRecruitmentProcess</a> (bool &amp;valid_model, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; Type &gt; &gt; p)</td></tr>
 <tr class="memdesc:a7da455d8f48af95add1a75bf1b495f8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pointers to the recruitment process module referenced in the population module.  <br /></td></tr>
 <tr class="memitem:a040874e667271c381e2c525be5094a3e" id="r_a040874e667271c381e2c525be5094a3e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; double &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a040874e667271c381e2c525be5094a3e">PrepareFleetObservationBinEdges</a> (const std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; Type &gt; &gt; &amp;p)</td></tr>
-<tr class="memdesc:a040874e667271c381e2c525be5094a3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build canonical fleet observation-bin edge vectors from fleet length_bin centers.  <br /></td></tr>
+<tr class="memdesc:a040874e667271c381e2c525be5094a3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build canonical fleet observation-bin edge vectors from fleet length_bin lower edges.  <br /></td></tr>
 <tr class="memitem:a32de8e7fde0b3ed6f3368b4e41b60b59" id="r_a32de8e7fde0b3ed6f3368b4e41b60b59"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a32de8e7fde0b3ed6f3368b4e41b60b59">EnforcePopulationGridNotCoarserThanFleetBins</a> (const <a class="el" href="structfims__popdy_1_1SizeGrid.html">fims_popdy::SizeGrid</a> &amp;size_grid, const <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; double &gt; &gt; &amp;fleet_edges)</td></tr>
 <tr class="memdesc:a32de8e7fde0b3ed6f3368b4e41b60b59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enforce that biological size bins are not coarser than overlapping active fleet observation bins.  <br /></td></tr>
 <tr class="memitem:a4783cbaabf5f95b110f68bd52b7a573e" id="r_a4783cbaabf5f95b110f68bd52b7a573e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4783cbaabf5f95b110f68bd52b7a573e">EnsurePopulationSizeGrid</a> (bool &amp;valid_model, std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; Type &gt; &gt; p)</td></tr>
@@ -777,7 +777,7 @@ template&lt;typename Type&gt; </div>
 </div><div class="memdoc">
 
 <p>Ensure a population has a usable biological size grid. </p>
-<p>Prepare canonical fleet observation-bin geometry from valid fleet length_bin centers whenever that geometry is available. If a user provides a valid biological size grid, keep it only if its bins are not coarser than any overlapping active fleet observation bins; otherwise, report an error and invalidate the model. If no biological size grid has been provided, build the built-in default from the prepared fleet observation-bin geometry, enforce the same fleet-bin compatibility rule, and warn when the built-in default creates more than 200 regular bins. If a user provides an invalid or partially specified grid, report the problem and invalidate the model.</p>
+<p>Prepare canonical fleet observation-bin geometry from valid fleet length_bin lower edges whenever that geometry is available. If a user provides a valid biological size grid, keep it only if its bins are not coarser than any overlapping active fleet observation bins; otherwise, report an error and invalidate the model. If no biological size grid has been provided, build the built-in default from the prepared fleet observation-bin geometry, enforce the same fleet-bin compatibility rule, and warn when the built-in default creates more than 200 regular bins. If a user provides an invalid or partially specified grid, report the problem and invalidate the model.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">valid_model</td><td>Reference to model-validity flag. </td></tr>
@@ -993,7 +993,7 @@ template&lt;typename Type&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Build canonical fleet observation-bin edge vectors from fleet length_bin centers. </p>
+<p>Build canonical fleet observation-bin edge vectors from fleet length_bin lower edges. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">p</td><td>Shared pointer to population module. </td></tr>
