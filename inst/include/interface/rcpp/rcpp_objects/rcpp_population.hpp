@@ -145,6 +145,19 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   VariableVector proportion_female;
   /**
+   * @brief Weight at age used for spawning output, ordered by year and then
+   * age, with (n_years + 1) x n_ages values. It is empty when the population
+   * weight at age is used. It is data, so it is never registered as a
+   * parameter.
+   */
+  RealVector spawning_weight_at_age;
+  /**
+   * @brief Spawning output per unit of spawning weight at age, ordered by year
+   * and then age, with (n_years + 1) x n_ages values. It is empty when
+   * fecundity is 1. It is data, so it is never registered as a parameter.
+   */
+  RealVector fecundity_at_age;
+  /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
    */
@@ -231,6 +244,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief The constructor.
    */
   PopulationInterface() : PopulationInterfaceBase() {
+    // RealVector starts with 1 value, but an empty vector is how the
+    // population says it uses the default
+    this->spawning_weight_at_age.resize(0);
+    this->fecundity_at_age.resize(0);
     this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
     this->proportion_female[0].estimation_type_m.set("constant");
     this->fleet_ids = std::make_shared<std::set<uint32_t>>();
@@ -261,6 +278,8 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
         proportion_female(other.proportion_female),
+        spawning_weight_at_age(other.spawning_weight_at_age),
+        fecundity_at_age(other.fecundity_at_age),
         ages(other.ages),
         name(other.name),
         total_catch_weight(other.total_catch_weight),
@@ -565,6 +584,44 @@ class PopulationInterface : public PopulationInterfaceBase {
     }
     info->variable_map[this->proportion_female.id_m] =
         &(population)->proportion_female;
+
+    // Spawning weight and fecundity are needed for the year after the last
+    // model year, as spawning biomass is
+    const size_t expected_spawning_size =
+        static_cast<size_t>((this->n_years.get() + 1) * this->n_ages.get());
+    if (this->spawning_weight_at_age.size() != 0 &&
+        this->spawning_weight_at_age.size() != expected_spawning_size) {
+      FIMS_ERROR_LOG(
+          "The size of `spawning_weight_at_age` does not match "
+          "(n_years + 1) x n_ages: " +
+          fims::to_string(this->spawning_weight_at_age.size()) +
+          " != " + fims::to_string(expected_spawning_size));
+      throw std::invalid_argument(
+          "Population spawning_weight_at_age size mismatch. Expected 0 or " +
+          fims::to_string(expected_spawning_size) + " values, found " +
+          fims::to_string(this->spawning_weight_at_age.size()) + ".");
+    }
+    if (this->fecundity_at_age.size() != 0 &&
+        this->fecundity_at_age.size() != expected_spawning_size) {
+      FIMS_ERROR_LOG(
+          "The size of `fecundity_at_age` does not match "
+          "(n_years + 1) x n_ages: " +
+          fims::to_string(this->fecundity_at_age.size()) +
+          " != " + fims::to_string(expected_spawning_size));
+      throw std::invalid_argument(
+          "Population fecundity_at_age size mismatch. Expected 0 or " +
+          fims::to_string(expected_spawning_size) + " values, found " +
+          fims::to_string(this->fecundity_at_age.size()) + ".");
+    }
+    population->spawning_weight_at_age.resize(
+        this->spawning_weight_at_age.size());
+    for (size_t i = 0; i < population->spawning_weight_at_age.size(); i++) {
+      population->spawning_weight_at_age[i] = this->spawning_weight_at_age[i];
+    }
+    population->fecundity_at_age.resize(this->fecundity_at_age.size());
+    for (size_t i = 0; i < population->fecundity_at_age.size(); i++) {
+      population->fecundity_at_age[i] = this->fecundity_at_age[i];
+    }
 
     for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
