@@ -706,8 +706,8 @@ class FIMSRcppInterfaceBase {
     } else {
       // Set precision (R default is 16)
       ss << std::defaultfloat
-      << std::setprecision(std::numeric_limits<double>::max_digits10)
-      << value;
+         << std::setprecision(std::numeric_limits<double>::max_digits10)
+         << value;
     }
     return ss.str();
   }
