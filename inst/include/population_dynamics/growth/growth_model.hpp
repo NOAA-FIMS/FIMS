@@ -359,7 +359,7 @@ class GrowthModel : public GrowthModelBase<Type> {
   Type ComputeLengthSdAtAge(const Type& age, const Type& laa,
                             const Type& laa_min, const Type& slope) const {
     if (use_delta_method_variability_) {
-      return LengthSdFromVariance(ComputeLengthVarianceAtAge(age));
+      return LengthSdFromVariance(ComputeTraditionalLengthVarianceAtAge(age));
     }
 
     const Type sd_laa =
@@ -368,11 +368,6 @@ class GrowthModel : public GrowthModelBase<Type> {
             : length_at_age_sd_at_reference_age_young_;
 
     return fims_math::ad_max(sd_laa, static_cast<Type>(1e-8));
-  }
-
-  /// Compute delta-method variance on the natural length scale.
-  Type ComputeLengthVarianceAtAge(const Type& age) const {
-    return ComputeTraditionalLengthVarianceAtAge(age);
   }
 
   /// Propagate covariance of [log(Linf), log(K), t0] into length variance.

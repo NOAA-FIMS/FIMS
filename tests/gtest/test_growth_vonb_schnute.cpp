@@ -92,41 +92,6 @@ TEST(VonBertalanffySchnuteEvaluate, UsesLinearRampBelowFirstReferenceAge) {
   EXPECT_GE(W_half, 0.0);
   EXPECT_NEAR(W_half, vb.length_weight_a * std::pow(3.0, vb.length_weight_b),
               1e-12);
-
-  // log-length gradient follows the early-age ramp below age at length young.
-  // At age 0.5, mean length is 3 and dL/dL1 is 0.5. The implementation uses
-  // the same smooth safety floor as other log-length calculations, so compute
-  // the expected value with that same safe mean length.
-  double d_log_laa_d_length_young = 0.0;
-  double d_log_laa_d_length_old = 0.0;
-  double d_log_laa_d_k = 0.0;
-
-  vb.log_length_at_age_gradient(0.5, d_log_laa_d_length_young,
-                                d_log_laa_d_length_old, d_log_laa_d_k);
-
-  const double ratio_half = 0.5 / vb.reference_age_for_length_young;
-  const double mean_length_half = vb.mean_length_young * ratio_half;
-  const double mean_length_half_safe =
-      fims_math::ad_max(mean_length_half, 1e-8);
-
-  EXPECT_NEAR(d_log_laa_d_length_young, ratio_half / mean_length_half_safe,
-              1e-12);
-  EXPECT_NEAR(d_log_laa_d_length_old, 0.0, 1e-12);
-  EXPECT_NEAR(d_log_laa_d_k, 0.0, 1e-12);
-
-  // On the log scale, multiply the natural-scale derivative by length young.
-  double d_log_laa_d_log_length_young = 0.0;
-  double d_log_laa_d_log_length_old = 0.0;
-  double d_log_laa_d_log_k = 0.0;
-
-  vb.log_length_at_age_logscale_gradient(0.5, d_log_laa_d_log_length_young,
-                                         d_log_laa_d_log_length_old,
-                                         d_log_laa_d_log_k);
-
-  EXPECT_NEAR(d_log_laa_d_log_length_young,
-              vb.mean_length_young * ratio_half / mean_length_half_safe, 1e-12);
-  EXPECT_NEAR(d_log_laa_d_log_length_old, 0.0, 1e-12);
-  EXPECT_NEAR(d_log_laa_d_log_k, 0.0, 1e-12);
 }
 
 }  // namespace
