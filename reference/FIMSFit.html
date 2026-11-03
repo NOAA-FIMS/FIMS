@@ -92,7 +92,17 @@ user if they have used their own bespoke code to fit a FIMS model.</p>
 
 
 <dl><dt id="arg-input">input<a class="anchor" aria-label="anchor" href="#arg-input"></a></dt>
-<dd><p>Input list as returned by <code><a href="initialize_fims.html">initialize_fims()</a></code>.</p></dd>
+<dd><p>Input list as returned by <code><a href="initialize_fims.html">initialize_fims()</a></code>. An optional
+<code>map</code> entry is a named list of factors for <code>p</code> (fixed effects) and/or <code>re</code>
+(random effects), in the order of the corresponding <code>parameters</code> vector.
+Each factor must have one entry per parameter. <code>NA</code> holds a parameter at
+its starting value; repeated levels share one estimated value. Shared
+entries must have identical starting values; otherwise, the error lists
+each parameter's name, 1-based index in <code>p</code> or <code>re</code>, and initial value.
+Factor levels determine the
+reduced parameter order; unused levels are dropped. Levels in <code>p</code> and <code>re</code>
+are independent; sharing
+across these vectors is not supported.</p></dd>
 
 
 <dt id="arg-obj">obj<a class="anchor" aria-label="anchor" href="#arg-obj"></a></dt>

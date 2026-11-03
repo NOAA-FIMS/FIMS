@@ -26,6 +26,16 @@ FIMSFit(
 
   Input list as returned by
   [`initialize_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_fims.md).
+  An optional `map` entry is a named list of factors for `p` (fixed
+  effects) and/or `re` (random effects), in the order of the
+  corresponding `parameters` vector. Each factor must have one entry per
+  parameter. `NA` holds a parameter at its starting value; repeated
+  levels share one estimated value. Shared entries must have identical
+  starting values; otherwise, the error lists each parameter's name,
+  1-based index in `p` or `re`, and initial value. Factor levels
+  determine the reduced parameter order; unused levels are dropped.
+  Levels in `p` and `re` are independent; sharing across these vectors
+  is not supported.
 
 - obj:
 

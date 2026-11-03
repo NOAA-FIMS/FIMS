@@ -11,7 +11,8 @@ reshape_tmb_estimates(
   sdreport = NULL,
   opt = NULL,
   parameter_names,
-  precomputed_gradient = NULL
+  precomputed_gradient = NULL,
+  mapping = NULL
 )
 ```
 
@@ -47,6 +48,11 @@ reshape_tmb_estimates(
   [`clear()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
   has freed the C++ memory. If `NULL` (default), the gradient is
   computed directly from `obj[["gr"]](opt[["par"]])`.
+
+- mapping:
+
+  Full-to-reduced parameter metadata saved during fitting, or `NULL` for
+  fits created before mapping metadata was available.
 
 ## Value
 

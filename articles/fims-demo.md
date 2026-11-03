@@ -525,8 +525,8 @@ likelihood. It only affects the expected index for that year. Estimating
 them would make the Hessian singular, and then no parameter gets a
 standard error. In the output from
 [`get_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md),
-each `log_q` value is labeled with its year. Sharing 1 estimated value
-across a block of years is not yet available.
+each `log_q` value is labeled with its year. A TMB parameter map can
+share 1 estimated value across a block of years, as described below.
 
 ``` r
 
@@ -591,6 +591,49 @@ will not actually be optimized but instead just checked to ensure it is
 a viable model. When `optimize = TRUE`, the model will be fit using
 [`stats::nlminb()`](https://rdrr.io/r/stats/nlminb.html) and an object
 of the class `FIMSFit` will be returned.
+
+### Parameter maps
+
+Add a named `map` list to the initialized input to fix or share
+parameters using TMB’s factor maps. The `p` map applies to fixed effects
+and the `re` map applies to random effects. Each factor must have the
+same length and order as its corresponding vector in
+`input[["parameters"]]`. Missing maps leave that vector unchanged. An
+`NA` entry holds a parameter at its starting value; repeated levels
+share one estimated value. Shared entries must have identical starting
+values. Levels are independent between the fixed and random vectors.
+
+For example, share the first two estimated fishing-mortality parameters:
+
+``` r
+
+mapped_input <- initialize_fims(parameters_4_model, data = data_4_model)
+fixed_names <- names(get_parameter_names(
+  as.list(mapped_input[["parameters"]][["p"]])
+))
+shared <- utils::head(which(grepl("log_Fmort", fixed_names)), 2)
+fixed_map <- seq_along(fixed_names)
+fixed_map[shared[2]] <- fixed_map[shared[1]]
+mapped_input[["parameters"]][["p"]][shared[2]] <-
+  mapped_input[["parameters"]][["p"]][shared[1]]
+mapped_input[["map"]] <- list(p = factor(fixed_map))
+mapped_fit <- fit_fims(mapped_input)
+```
+
+Use the same approach with `re` to map random effects. Mapping holds or
+shares parameters but does not remove their likelihood contributions.
+For example, fixing every recruitment deviation at zero while estimating
+its process variance can make the variance estimate degenerate; fix the
+variance too if it is not informed by other data.
+
+[`get_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md)
+retains all original parameter rows and gives shared parameters the same
+estimate and standard error. Mapped-off parameters have `NA` standard
+errors. Gradients are reported only on the first parameter in each
+shared fixed-effect level; parameter counts refer to the reduced vectors
+optimized by TMB. If all fixed effects are mapped off, TMB evaluates the
+random-effects model without an outer optimizer. If every fixed and
+random effect is mapped off, use `optimize = FALSE`.
 
 ### Example
 
@@ -760,7 +803,7 @@ unconverged_fit <- parameters_4_model |>
     ## ✖ Convergence: "FAIL" from "optimizer", "max_gradient", and "sdreport". Use
     ##   `sanity_fims(fit)` to see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 2.98447 seconds
+    ## ℹ Total run time was 2.95136 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 27.41724
     ## ℹ Negative log likelihood (NLL):
@@ -980,7 +1023,7 @@ high_slope_fit <- parameters_high_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.03629 minutes
+    ## ℹ Total run time was 57.29892 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00024
     ## ℹ Negative log likelihood (NLL):
@@ -1016,7 +1059,7 @@ low_slope_fit <- parameters_low_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.00074 minutes
+    ## ℹ Total run time was 55.73468 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 5e-04
     ## ℹ Negative log likelihood (NLL):
@@ -1140,7 +1183,7 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.02535 minutes
+    ## ℹ Total run time was 57.62173 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00051
     ## ℹ Negative log likelihood (NLL):
@@ -1252,7 +1295,7 @@ age_only_fit <- parameters_4_model |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 11.15024 seconds
+    ## ℹ Total run time was 10.71518 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00022
     ## ℹ Negative log likelihood (NLL):
@@ -1311,7 +1354,7 @@ length_only_fit <- parameters_4_model |>
     ## ! Convergence: "WARN" from "large_standard_errors". Use `sanity_fims(fit)` to
     ##   see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.34309 minutes
+    ## ℹ Total run time was 1.27843 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00027
     ## ℹ Negative log likelihood (NLL):

@@ -245,7 +245,15 @@ fit your data. <code>log_Fmort</code> parameters for each fleet and time
 step with catch can be estimated to fit the model to the catch data,
 informed by the uncertainty values. Common practice is to set the
 uncertainty to a small number, like 0.001, so the catch data are fit
-closely.</p>
+closely. A catch of 0 means the fleet did not fish in that time step.
+<code><a href="../reference/setup_default_parameters.html">setup_default_parameters()</a></code> fixes <code>log_Fmort</code> for
+that fleet and year at -200, so fishing mortality is effectively 0, and
+the 0 is left out of the likelihood. It is reported as -999 in the
+output, the same as missing data. If you estimate <code>log_Fmort</code>
+in that year instead, <code><a href="../reference/initialize_fims.html">initialize_fims()</a></code> warns, because
+nothing in the data informs it. A fleet with a catch of 0 in every year
+and no composition data gives no information on its selectivity. Use
+-999, not 0, for a missing catch.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first three rows of the catch data</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
@@ -277,7 +285,9 @@ for each time step. The inputs are similar to catch, in having
 <code>NA</code> values for age and length, <code>mt</code> or
 <code>number</code> for <code>unit</code> (1 unit for all index rows of
 a fleet), and index uncertainty as the standard deviation of the logged
-observations.</p>
+observations. An index of 0 or less cannot be fit with the lognormal
+distribution, and <code><a href="../reference/FIMSFrame.html">FIMSFrame()</a></code> returns an error for it. Use
+-999 for a missing index, or a distribution that allows 0.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first three rows of the index data</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>

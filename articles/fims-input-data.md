@@ -167,7 +167,17 @@ observations if you are using the lognormal distribution to fit your
 data. `log_Fmort` parameters for each fleet and time step with catch can
 be estimated to fit the model to the catch data, informed by the
 uncertainty values. Common practice is to set the uncertainty to a small
-number, like 0.001, so the catch data are fit closely.
+number, like 0.001, so the catch data are fit closely. A catch of 0
+means the fleet did not fish in that time step.
+[`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)
+fixes `log_Fmort` for that fleet and year at -200, so fishing mortality
+is effectively 0, and the 0 is left out of the likelihood. It is
+reported as -999 in the output, the same as missing data. If you
+estimate `log_Fmort` in that year instead,
+[`initialize_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_fims.md)
+warns, because nothing in the data informs it. A fleet with a catch of 0
+in every year and no composition data gives no information on its
+selectivity. Use -999, not 0, for a missing catch.
 
 ``` r
 
@@ -207,7 +217,11 @@ The index data type contains the relative or absolute abundance index
 for each time step. The inputs are similar to catch, in having `NA`
 values for age and length, `mt` or `number` for `unit` (1 unit for all
 index rows of a fleet), and index uncertainty as the standard deviation
-of the logged observations.
+of the logged observations. An index of 0 or less cannot be fit with the
+lognormal distribution, and
+[`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)
+returns an error for it. Use -999 for a missing index, or a distribution
+that allows 0.
 
 ``` r
 

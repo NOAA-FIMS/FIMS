@@ -24,6 +24,16 @@ fit_fims(
 
   Input list as returned by
   [`initialize_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_fims.md).
+  An optional `map` entry is a named list of factors for `p` (fixed
+  effects) and/or `re` (random effects), in the order of the
+  corresponding `parameters` vector. Each factor must have one entry per
+  parameter. `NA` holds a parameter at its starting value; repeated
+  levels share one estimated value. Shared entries must have identical
+  starting values; otherwise, the error lists each parameter's name,
+  1-based index in `p` or `re`, and initial value. Factor levels
+  determine the reduced parameter order; unused levels are dropped.
+  Levels in `p` and `re` are independent; sharing across these vectors
+  is not supported.
 
 - get_sd:
 
@@ -91,7 +101,17 @@ each convergence check is stored on the object and returned by
 ## Details
 
 This function is a beta version still and subject to change without
-warning.
+warning. Mapped parameters are expanded to their full FIMS vectors for
+reporting. Shared parameters receive the same estimate and standard
+error in
+[`get_estimates()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md).
+Mapped-off parameters retain their starting values and have `NA`
+standard errors. Gradients describe reduced fixed-effect optimization
+variables and are reported only on the first full parameter in each
+shared level. Parameter counts describe the reduced vectors. With no
+active fixed effects, TMB evaluates the random-effects model without
+running an outer optimizer. If no parameters remain active, use
+`optimize = FALSE`.
 
 ## See also
 

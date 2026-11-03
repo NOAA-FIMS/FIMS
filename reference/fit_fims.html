@@ -88,7 +88,17 @@
 
 
 <dl><dt id="arg-input">input<a class="anchor" aria-label="anchor" href="#arg-input"></a></dt>
-<dd><p>Input list as returned by <code><a href="initialize_fims.html">initialize_fims()</a></code>.</p></dd>
+<dd><p>Input list as returned by <code><a href="initialize_fims.html">initialize_fims()</a></code>. An optional
+<code>map</code> entry is a named list of factors for <code>p</code> (fixed effects) and/or <code>re</code>
+(random effects), in the order of the corresponding <code>parameters</code> vector.
+Each factor must have one entry per parameter. <code>NA</code> holds a parameter at
+its starting value; repeated levels share one estimated value. Shared
+entries must have identical starting values; otherwise, the error lists
+each parameter's name, 1-based index in <code>p</code> or <code>re</code>, and initial value.
+Factor levels determine the
+reduced parameter order; unused levels are dropped. Levels in <code>p</code> and <code>re</code>
+are independent; sharing
+across these vectors is not supported.</p></dd>
 
 
 <dt id="arg-get-sd">get_sd<a class="anchor" aria-label="anchor" href="#arg-get-sd"></a></dt>
@@ -152,7 +162,16 @@ convergence check is stored on the object and returned by
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function is a beta version still and subject to change
-without warning.</p>
+without warning.
+Mapped parameters are expanded to their full FIMS vectors for reporting.
+Shared parameters receive the same estimate and standard error in
+<code><a href="get_FIMSFit.html">get_estimates()</a></code>. Mapped-off parameters retain their starting values and
+have <code>NA</code> standard errors. Gradients describe reduced fixed-effect
+optimization variables and are reported only on the first full parameter
+in each shared level. Parameter counts describe the reduced vectors.
+With no active fixed effects, TMB evaluates the random-effects model without
+running an outer optimizer. If no parameters remain active, use
+<code>optimize = FALSE</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

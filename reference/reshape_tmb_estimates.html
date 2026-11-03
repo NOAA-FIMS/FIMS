@@ -78,7 +78,8 @@ tibble for easier analysis and manipulation.</p>
 <span>  sdreport <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  opt <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">parameter_names</span>,</span>
-<span>  precomputed_gradient <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  precomputed_gradient <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  mapping <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -112,6 +113,11 @@ at the MLE, typically from <code>get_gradient(x)</code>. When provided, this avo
 a second call to <code>obj[["gr"]]()</code>, which would crash after <code><a href="Cpp_functions.html">clear()</a></code> has
 freed the C++ memory. If <code>NULL</code> (default), the gradient is computed
 directly from <code>obj[["gr"]](opt[["par"]])</code>.</p></dd>
+
+
+<dt id="arg-mapping">mapping<a class="anchor" aria-label="anchor" href="#arg-mapping"></a></dt>
+<dd><p>Full-to-reduced parameter metadata saved during fitting, or
+<code>NULL</code> for fits created before mapping metadata was available.</p></dd>
 
 </dl></div>
     <div class="section level2">
