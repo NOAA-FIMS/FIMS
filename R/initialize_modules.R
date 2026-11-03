@@ -591,10 +591,8 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
       years = get_start_year(data):get_end_year(data)
     )
   }
-  module$ageing_error$resize(NROW(ageing_error))
   if (NROW(ageing_error) > 0) {
     module$ageing_error[] <- ageing_error[["observed"]]
-    module$ageing_error$set_estimation_types("constant")
   }
 
   # Link the observed catch data to the fleet module using its associated ID.

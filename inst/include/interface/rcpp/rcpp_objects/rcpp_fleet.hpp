@@ -158,10 +158,10 @@ class FleetInterface : public FleetInterfaceBase {
 
   /**
    * @brief Ageing error matrices, 1 for all years or 1 per year, with true age
-   * as rows and observed age varying fastest. The default single value means
-   * no ageing error.
+   * as rows and observed age varying fastest. It is empty when the fleet has
+   * no ageing error. It is data, so it is never registered as a parameter.
    */
-  VariableVector ageing_error;
+  RealVector ageing_error;
 
   // Fleet based derived quantities
   /**
@@ -250,6 +250,8 @@ class FleetInterface : public FleetInterfaceBase {
     // RealVector starts with 1 value, but an empty weight_at_age is how a
     // fleet says it uses the population weight at age
     this->weight_at_age.resize(0);
+    // Likewise, an empty ageing_error means no ageing error
+    this->ageing_error.resize(0);
     std::shared_ptr<FleetInterface> fleet =
         std::make_shared<FleetInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(fleet);
@@ -488,12 +490,6 @@ class FleetInterface : public FleetInterfaceBase {
               fleet->age_to_length_conversion[i];
         }
       }
-
-      // Ageing error is always constant, so its final values are its inputs.
-      for (size_t i = 0; i < fleet->ageing_error.size(); i++) {
-        this->ageing_error[i].final_value_m =
-            this->ageing_error[i].initial_value_m;
-      }
     }
   }
 
@@ -684,9 +680,7 @@ class FleetInterface : public FleetInterfaceBase {
           &(fleet)->age_to_length_conversion;
     }
 
-    // A single value is the default, or a 1-age model's entry of 1, so it
-    // means no ageing error.
-    if (this->ageing_error.size() > 1) {
+    if (this->ageing_error.size() != 0) {
       const size_t matrix_size =
           static_cast<size_t>(this->n_ages.get() * this->n_ages.get());
       const size_t supplied_size = this->ageing_error.size();
@@ -702,13 +696,10 @@ class FleetInterface : public FleetInterfaceBase {
             fims::to_string(matrix_size * this->n_years.get()) +
             " values but received " + fims::to_string(supplied_size) + ".");
       }
-
-      // Ageing error is known, so it is never registered as a parameter.
-      fleet->ageing_error.resize(supplied_size);
-      for (size_t i = 0; i < supplied_size; i++) {
-        fleet->ageing_error[i] = this->ageing_error[i].initial_value_m;
-      }
-      info->variable_map[this->ageing_error.id_m] = &(fleet)->ageing_error;
+    }
+    fleet->ageing_error.resize(this->ageing_error.size());
+    for (size_t i = 0; i < fleet->ageing_error.size(); i++) {
+      fleet->ageing_error[i] = this->ageing_error[i];
     }
 
     // add to Information
