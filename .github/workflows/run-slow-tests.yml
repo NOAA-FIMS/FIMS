@@ -42,6 +42,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         test_type:
           - slow
+          - integration-ageing-error
           - integration-caa
           - integration-fims-bayesian
           - integration-fims-estimation-random-effects

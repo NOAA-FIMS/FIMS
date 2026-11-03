@@ -9,6 +9,11 @@
 
 # integration_ageing_error ----
 ## Setup ----
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 data("data_big")
 data_4_model <- FIMSFrame(data_big)
 ages <- get_ages(data_4_model)
@@ -142,11 +147,6 @@ test_that("each fleet and year uses its own ageing error matrix", {
 
 ## Edge handling ----
 test_that("retrospective runs keep ageing_error rows", {
-  #' @description Skip the test unless explicitly enabled for heavy integration testing.
-  testthat::skip_if_not(
-    testthat:::env_var_is_true("RUN_SLOW_TESTS"),
-    message = "Skipping: RUN_SLOW_TESTS is not set to true."
-  )
   data_with_ageing_error <- dplyr::bind_rows(data_big, ageing_error_rows())
   parameters <- suppressMessages(
     setup_default_parameters(FIMSFrame(data_with_ageing_error))
