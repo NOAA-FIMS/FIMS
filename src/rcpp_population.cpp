@@ -37,6 +37,7 @@ void register_population(Rcpp::Module& m) {
              &PopulationInterface::spawning_weight_at_age)
       .field("fecundity_at_age", &PopulationInterface::fecundity_at_age)
       .field("ages", &PopulationInterface::ages)
+      .field("lengths", &PopulationInterface::lengths)
       .field("total_catch_weight", &PopulationInterface::total_catch_weight)
       .field("total_catch_numbers", &PopulationInterface::total_catch_numbers)
       .field("mortality_F", &PopulationInterface::mortality_F)

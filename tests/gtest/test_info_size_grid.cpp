@@ -175,6 +175,54 @@ TEST(InformationSizeGrid,
 }
 
 TEST(InformationSizeGrid,
+     EnsurePopulationSizeGridBuildsGridFromPopulationLowerEdges) {
+  fims::FIMSLog::fims_log->clear();
+
+  fims_info::Information<double> info;
+  bool valid_model = true;
+
+  // No length-based fleets, so the grid can only come from the population
+  auto population = MakePopulation();
+  population->lengths = fims::Vector<double>{0.0, 10.0, 20.0, 30.0};
+
+  ASSERT_NO_THROW(info.EnsurePopulationSizeGrid(valid_model, population));
+
+  // The last bin is as wide as the bin before it, as for fleet lower edges
+  EXPECT_TRUE(valid_model);
+  EXPECT_EQ(population->size_grid.n_bins, 4u);
+  ASSERT_EQ(population->size_grid.edges.size(), 5u);
+  EXPECT_DOUBLE_EQ(population->size_grid.edges[0], 0.0);
+  EXPECT_DOUBLE_EQ(population->size_grid.edges[4], 40.0);
+  EXPECT_DOUBLE_EQ(population->size_grid.centers[3], 35.0);
+
+  fims::FIMSLog::fims_log->clear();
+}
+
+TEST(
+    InformationSizeGrid,
+    EnsurePopulationSizeGridFailsWhenPopulationLowerEdgesAreCoarserThanFleetBins) {
+  fims::FIMSLog::fims_log->clear();
+
+  fims_info::Information<double> info;
+  bool valid_model = true;
+
+  auto population = MakePopulation();
+  auto fleet = MakeFleetWithLowerEdges({0.0, 1.0, 2.0, 3.0});
+  population->fleets.push_back(fleet);
+  population->n_fleets = population->fleets.size();
+  population->lengths = fims::Vector<double>{0.0, 2.0};
+
+  ASSERT_NO_THROW(info.EnsurePopulationSizeGrid(valid_model, population));
+
+  EXPECT_FALSE(valid_model);
+  EXPECT_NE(fims::FIMSLog::fims_log->get_errors().find(
+                "coarser than an overlapping active fleet observation bin"),
+            std::string::npos);
+
+  fims::FIMSLog::fims_log->clear();
+}
+
+TEST(InformationSizeGrid,
      EnsurePopulationSizeGridFailsWhenUserSuppliesInvalidBiologicalGrid) {
   fims::FIMSLog::fims_log->clear();
 
