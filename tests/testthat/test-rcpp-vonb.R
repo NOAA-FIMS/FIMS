@@ -753,31 +753,9 @@ test_that("rcpp von Bertalanffy Schnute growth allows above-reference ages", {
 ## Error handling ----
 test_that("rcpp von Bertalanffy Schnute growth requires interpolation variability inputs", {
   ctx <- make_vonb_schnute_test_context()
-  vb <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
-
-  vb$mean_length_young$resize(1)
-  vb$mean_length_young[1]$value <- ctx$mean_length_young
-
-  vb$mean_length_old$resize(1)
-  vb$mean_length_old[1]$value <- ctx$mean_length_old
-
-  vb$growth_coefficient$resize(1)
-  vb$growth_coefficient[1]$value <- ctx$growth_coefficient
-
-  vb$reference_age_for_length_young$resize(1)
-  vb$reference_age_for_length_young[1]$value <- ctx$reference_age_for_length_young
-
-  vb$reference_age_for_length_old$resize(1)
-  vb$reference_age_for_length_old[1]$value <- ctx$reference_age_for_length_old
-
-  vb$length_weight_a$resize(1)
-  vb$length_weight_a[1]$value <- ctx$length_weight_a
-
-  vb$length_weight_b$resize(1)
-  vb$length_weight_b[1]$value <- ctx$length_weight_b
-
-  vb$n_ages$set(FIMS::get_n_ages(ctx$fims_frame))
-
+  vb <- new_vonb_schnute(ctx)
+  vb$length_at_age_sd_young$resize(0)
+  vb$length_at_age_sd_old$resize(0)
   on.exit(
     {
       rm(vb, ctx)
