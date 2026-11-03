@@ -1289,46 +1289,69 @@ validate_ageing_error <- function(data, ages, years) {
   }
   if (!"age" %in% colnames(data) || any(is.na(data[["age"]])) ||
     any(data[["age"]] != round(data[["age"]]))) {
-    cli::cli_abort(
-      "{.var ageing_error} rows must have the observed age, a whole number, in
-      {.var age}."
-    )
+    cli::cli_abort(c(
+      "x" = "{.var ageing_error} has observed ages in {.var age} that are
+      missing or not whole numbers.",
+      "i" = "Each {.var ageing_error} row needs the observed age, a whole
+      number, in {.var age}.",
+      "i" = "Use {.code dplyr::filter(data, type == 'ageing_error', is.na(age)
+      | age != round(age))} to find the rows."
+    ))
   }
   if (!"uncertainty" %in% colnames(data) ||
     any(!grepl("^[0-9]+$", trimws(as.character(data[["uncertainty"]]))))) {
     cli::cli_abort(c(
-      "{.var ageing_error} rows must have the true age, a whole number, in
-      {.var uncertainty}.",
-      "i" = "For example, use {.code uncertainty = as.character(true_age)}."
+      "x" = "{.var ageing_error} has true ages in {.var uncertainty} that are
+      missing or not whole numbers.",
+      "i" = "Each {.var ageing_error} row needs the true age, a whole number,
+      in {.var uncertainty}. For example, use
+      {.code uncertainty = as.character(true_age)}.",
+      "i" = "Use {.code dplyr::distinct(dplyr::filter(data, type ==
+      'ageing_error'), uncertainty)} to see the values."
     ))
   }
   observed <- data[["observed"]]
-  if (any(is.na(observed) | observed < 0 | observed > 1 + rounding_tolerance)) {
+  invalid_values <- observed[
+    is.na(observed) | observed < 0 | observed > 1 + rounding_tolerance
+  ]
+  if (length(invalid_values) > 0) {
     cli::cli_abort(c(
-      "{.var ageing_error} values in {.var observed} must be probabilities
-      between 0 and 1.",
-      "i" = "Missing values, including -999, are not allowed."
+      "x" = "{.var ageing_error} has values in {.var observed} that are
+      missing or are not probabilities: {.val {unique(invalid_values)}}.",
+      "i" = "Each value is the probability of reading a true age as an
+      observed age, so it must be between 0 and 1. Missing values, including
+      -999, are not allowed.",
+      "i" = "Use {.code dplyr::filter(data, type == 'ageing_error',
+      is.na(observed) | observed < 0 | observed > 1)} to find the rows."
     ))
   }
-  if (any(is.na(data[["unit"]]) | data[["unit"]] != "proportion")) {
-    cli::cli_abort(
-      "{.var ageing_error} rows must have {.code unit = \"proportion\"}."
-    )
+  invalid_units <- data[["unit"]][
+    is.na(data[["unit"]]) | data[["unit"]] != "proportion"
+  ]
+  if (length(invalid_units) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var ageing_error} has units other than {.val proportion}:
+      {.val {unique(invalid_units)}}.",
+      "i" = "Ageing error values are probabilities, so every row needs
+      {.code unit = \"proportion\"}.",
+      "i" = "Use {.code dplyr::count(dplyr::filter(data, type ==
+      'ageing_error'), unit)} to see the units."
+    ))
   }
   unused_fleets <- setdiff(stats::na.omit(data[["fleet"]]), age_comp_fleets)
   if (length(unused_fleets) > 0) {
     cli::cli_warn(c(
-      "{.var ageing_error} rows are not used for fleets without
-      {.var age_comp} data: {unused_fleets}.",
+      "!" = "{.var ageing_error} rows are not used for fleets without
+      {.var age_comp} data: {.val {unused_fleets}}.",
       "i" = "Use {.code fleet = NA} for rows that apply to every fleet with
       age-composition data."
     ))
   }
   if (any(is.na(data[["fleet"]])) && length(age_comp_fleets) == 0) {
-    cli::cli_warn(
-      "{.var ageing_error} rows are not used because no fleet has
+    cli::cli_warn(c(
+      "!" = "{.var ageing_error} rows are not used because no fleet has
       {.var age_comp} data."
-    )
+    ))
   }
   # Rows that are not used cannot change the model, so the checks below that
   # compare rows within a fleet and timing skip them.
@@ -1343,9 +1366,13 @@ validate_ageing_error <- function(data, ages, years) {
   bad_timings <- setdiff(stats::na.omit(data[["timing"]]), years)
   if (length(bad_timings) > 0) {
     cli::cli_abort(c(
-      "{.var ageing_error} has timings outside the model years
-      ({min(years)}-{max(years)}): {bad_timings}.",
-      "i" = "Use {.code timing = NA} rows as the default for every year."
+      "x" = "{.var ageing_error} has timings outside the model years
+      ({min(years)}-{max(years)}): {.val {bad_timings}}.",
+      "i" = "Ageing error applies to expected age compositions, which exist
+      only in the model years. Use {.code timing = NA} rows as the default for
+      every year.",
+      "i" = "Use {.code dplyr::distinct(dplyr::filter(data, type ==
+      'ageing_error'), timing)} to see the timings."
     ))
   }
 
@@ -1364,9 +1391,13 @@ validate_ageing_error <- function(data, ages, years) {
     unique()
   if (length(duplicated_groups) > 0) {
     cli::cli_abort(c(
-      "{.var ageing_error} must have one row for each true age and observed
+      "x" = "{.var ageing_error} has more than 1 row for the same true age and
+      observed age in: {duplicated_groups}.",
+      "i" = "Each fleet and timing needs 1 row for each true age and observed
       age.",
-      "x" = "Check the duplicated rows for: {duplicated_groups}."
+      "i" = "Use {.code dplyr::filter(dplyr::count(dplyr::filter(data, type ==
+      'ageing_error'), fleet, timing, uncertainty, age), n > 1)} to find the
+      rows."
     ))
   }
   # Each row is the probability of an observed age given a true age.
@@ -1374,13 +1405,11 @@ validate_ageing_error <- function(data, ages, years) {
   # ages, which are unknown, so rows outside the model ages are not used.
   outside_true_ages <- sort(setdiff(data[["true_age"]], ages))
   if (length(outside_true_ages) > 0) {
-    cli::cli_warn(
-      "{.var ageing_error} rows for true ages outside the model ages
-      ({min(ages)}-{max(ages)}) are not used: {outside_true_ages}."
-    )
+    cli::cli_warn(c(
+      "!" = "{.var ageing_error} rows for true ages outside the model ages
+      ({min(ages)}-{max(ages)}) are not used: {.val {outside_true_ages}}."
+    ))
   }
-  span_message <- "{.var ageing_error} must span the model ages
-    ({min(ages)}-{max(ages)})."
   # Check every supplied group before filtering, including groups containing
   # only true ages outside the model ages.
   groups_missing_true_ages <- data |>
@@ -1392,9 +1421,13 @@ validate_ageing_error <- function(data, ages, years) {
     dplyr::pull(.data[["group"]])
   if (length(groups_missing_true_ages) > 0) {
     cli::cli_abort(c(
-      span_message,
-      "x" = "Every model age needs rows as a true age in {.var uncertainty}
-      for: {groups_missing_true_ages}."
+      "x" = "{.var ageing_error} is missing true ages for:
+      {groups_missing_true_ages}.",
+      "i" = "{.var ageing_error} must span the model ages
+      ({min(ages)}-{max(ages)}). Every model age needs rows as a true age in
+      {.var uncertainty}.",
+      "i" = "Use {.code dplyr::distinct(dplyr::filter(data, type ==
+      'ageing_error'), fleet, timing, uncertainty)} to see the true ages."
     ))
   }
   data <- dplyr::filter(data, .data[["true_age"]] %in% ages)
@@ -1408,9 +1441,14 @@ validate_ageing_error <- function(data, ages, years) {
     unique()
   if (length(groups_missing_observed_ages) > 0) {
     cli::cli_abort(c(
-      span_message,
-      "x" = "Each true age needs a row for every model age as an observed age
-      for: {groups_missing_observed_ages}."
+      "x" = "{.var ageing_error} is missing observed ages for:
+      {groups_missing_observed_ages}.",
+      "i" = "{.var ageing_error} must span the model ages
+      ({min(ages)}-{max(ages)}). Each true age needs a row for every model age
+      as an observed age.",
+      "i" = "Use {.code dplyr::count(dplyr::filter(data, type ==
+      'ageing_error'), fleet, timing, uncertainty)} to see the number of
+      observed ages for each true age."
     ))
   }
   outside_observed <- data[["age"]] < min(ages) | data[["age"]] > max(ages)
@@ -1427,7 +1465,7 @@ validate_ageing_error <- function(data, ages, years) {
     )
     names(moved_messages) <- rep("*", length(moved_messages))
     cli::cli_warn(c(
-      "{.var ageing_error} has observed ages outside the model ages
+      "!" = "{.var ageing_error} has observed ages outside the model ages
       ({min(ages)}-{max(ages)}).",
       "i" = "Their probabilities are added to the youngest and oldest model
       ages.",
@@ -1448,12 +1486,15 @@ validate_ageing_error <- function(data, ages, years) {
       paste(bad_sums[["group"]], "true age", bad_sums[["true_age"]])
     )
     cli::cli_abort(c(
-      "{.var ageing_error} probabilities across observed ages must sum to 1
-      for each true age.",
-      "x" = "Check these true ages: {bad_rows}.",
-      "i" = "Check that {.var uncertainty} holds the true age and {.var age} the
-      observed age. If the values were rounded, divide each true age's
-      probabilities by their total."
+      "x" = "{.var ageing_error} probabilities across observed ages do not sum
+      to 1 for: {bad_rows}.",
+      "i" = "For each true age, the probabilities across observed ages must sum
+      to 1 within {rounding_tolerance}. Check that {.var uncertainty} holds the
+      true age and {.var age} the observed age. If the values were rounded,
+      divide each true age's probabilities by their total.",
+      "i" = "Use {.code dplyr::summarize(dplyr::filter(data, type ==
+      'ageing_error'), total = sum(observed), .by = c(fleet, timing,
+      uncertainty))} to see the sums."
     ))
   }
   # fold_ageing_error() rescales sums within the tolerance to exactly 1. Sums
@@ -1466,7 +1507,8 @@ validate_ageing_error <- function(data, ages, years) {
     )
     names(sum_messages) <- rep("*", length(sum_messages))
     cli::cli_warn(c(
-      "{.var ageing_error} values are rescaled to sum to 1 for each true age.",
+      "!" = "{.var ageing_error} values are rescaled to sum to 1 for each true
+      age.",
       sum_messages
     ))
   }
@@ -1490,9 +1532,14 @@ validate_ageing_error <- function(data, ages, years) {
     ))
     minimum_total <- format(rounding_tolerance, scientific = FALSE)
     cli::cli_abort(c(
-      "{.var ageing_error} must give every observed age a total probability of
-      at least {minimum_total} across true ages.",
-      "x" = "Check these observed ages: {bad_rows}."
+      "x" = "{.var ageing_error} gives these observed ages a total probability
+      below {minimum_total} across true ages: {bad_rows}.",
+      "i" = "Every observed age needs a total of at least {minimum_total},
+      because an expected proportion of 0 makes the multinomial likelihood
+      NaN.",
+      "i" = "Use {.code dplyr::summarize(dplyr::filter(data, type ==
+      'ageing_error'), total = sum(observed), .by = c(fleet, timing, age))} to
+      see the totals."
     ))
   }
 
@@ -1507,10 +1554,12 @@ validate_ageing_error <- function(data, ages, years) {
       missing_years[["fleet"]], " (", missing_years[["years"]], ")"
     )
     cli::cli_abort(c(
-      "{.var ageing_error} is missing years for some fleets.",
-      "x" = "Fleets and the years without a matrix: {fleet_years}.",
+      "x" = "{.var ageing_error} is missing years for these fleets:
+      {fleet_years}.",
       "i" = "Add rows for the missing years, or add {.code timing = NA} rows
-      to use as the default for any year without its own rows."
+      to use as the default for any year without its own rows.",
+      "i" = "Use {.code dplyr::distinct(dplyr::filter(data, type ==
+      'ageing_error'), fleet, timing)} to see the timings with rows."
     ))
   }
   invisible(TRUE)

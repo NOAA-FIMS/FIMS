@@ -332,7 +332,7 @@ test_that("validate_ageing_error() returns correct error messages", {
 
   #' @description Test that a duplicated row returns an error.
   rows <- ageing_error_rows()
-  expect_error(check(rows, rows[1, ]), "one row for each true age")
+  expect_error(check(rows, rows[1, ]), "1 row for each true age")
 
   #' @description Test that a matrix missing a true age returns an error.
   expect_error(
