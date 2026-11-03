@@ -1623,6 +1623,91 @@ resolve_fleet_length_bins <- function(
   out
 }
 
+# Population length bins are the lower edges in length_bin rows with
+# fleet = NA. Without them, FIMS builds the population length bins from the
+# fleet bins.
+population_length_bins <- function(data) {
+  if (!all(c("fleet", "type", "length") %in% colnames(data))) {
+    return(numeric())
+  }
+  data |>
+    dplyr::filter(.data[["type"]] == "length_bin", is.na(.data[["fleet"]])) |>
+    dplyr::pull(.data[["length"]]) |>
+    sort()
+}
+
+# Adds the upper edge of the last bin to a vector of lower edges. As in C++
+# (SizeGridBuilder::BuildObservationEdgesFromLowerEdges()), the last bin is as
+# wide as the bin before it.
+length_bin_edges <- function(lower_edges) {
+  n_bins <- length(lower_edges)
+  c(lower_edges, 2 * lower_edges[n_bins] - lower_edges[n_bins - 1])
+}
+
+# Growth puts no fish outside the population length bins. A fleet bin outside
+# them would get an expected proportion of 0, and a likelihood of -Inf if fish
+# were observed there, so the population length bins must cover every fleet
+# bin.
+validate_population_length_bins <- function(data, fleet_length_bins) {
+  population_rows <- dplyr::filter(
+    data,
+    .data[["type"]] == "length_bin",
+    is.na(.data[["fleet"]])
+  )
+  if (NROW(population_rows) == 0) {
+    return(invisible(TRUE))
+  }
+
+  if (any(!is.na(population_rows[["timing"]]))) {
+    cli::cli_abort(c(
+      "x" = "{.var length_bin} rows with {.code fleet = NA} have a
+      {.var timing}: {.val {unique(stats::na.omit(population_rows[['timing']]))}}.",
+      "i" = "These rows set the population length bins, which are the same in
+      every year, so they need {.code timing = NA}.",
+      "i" = "Use {.code dplyr::filter(data, type == 'length_bin', is.na(fleet),
+      !is.na(timing))} to find the rows."
+    ))
+  }
+
+  lengths <- population_rows[["length"]]
+  if (anyNA(lengths) || anyDuplicated(lengths) > 0 || length(lengths) < 2) {
+    cli::cli_abort(c(
+      "x" = "{.var length_bin} rows with {.code fleet = NA} need at least 2
+      different lengths and no missing lengths.",
+      "i" = "Each row gives the lower edge of 1 population length bin.",
+      "i" = "Use {.code dplyr::count(dplyr::filter(data, type == 'length_bin',
+      is.na(fleet)), length)} to see the lengths."
+    ))
+  }
+
+  population_edges <- length_bin_edges(sort(lengths))
+  uncovered_fleets <- fleet_length_bins |>
+    purrr::keep(\(bins) {
+      if (length(bins) < 2) {
+        return(FALSE)
+      }
+      fleet_edges <- length_bin_edges(bins)
+      population_edges[1] > fleet_edges[1] ||
+        population_edges[length(population_edges)] <
+          fleet_edges[length(fleet_edges)]
+    }) |>
+    names()
+  if (length(uncovered_fleets) > 0) {
+    cli::cli_abort(c(
+      "x" = "The population length bins
+      ({population_edges[1]}-{population_edges[length(population_edges)]}) do
+      not cover the length bins of {cli::qty(length(uncovered_fleets))}
+      fleet{?s} {.val {uncovered_fleets}}.",
+      "i" = "Fleet length bins outside the population length bins would get an
+      expected proportion of 0. The population length bins, including the
+      upper edge of the last bin, must span every fleet's length bins.",
+      "i" = "Use {.code dplyr::filter(data, type %in% c('length_bin',
+      'length_comp'))} to compare the population and fleet lengths."
+    ))
+  }
+  invisible(TRUE)
+}
+
 # Constructors ----
 
 # All constructors in this file are documented in 1 roxygen file via @rdname.
@@ -1816,6 +1901,7 @@ FIMSFrame <- function(data) {
     } else {
       resolved_fleet_length_bins <- resolve_fleet_length_bins(data)
       lengths <- sort(unique(unlist(resolved_fleet_length_bins, use.names = FALSE)))
+      validate_population_length_bins(data, resolved_fleet_length_bins)
 
       # Check that the age column exists b/c conversion data depends on it
       if (!"age" %in% colnames(data)) {

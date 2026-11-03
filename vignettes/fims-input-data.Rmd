@@ -181,6 +181,8 @@ The `length_bin` data type defines length bins without providing length-composit
 
 For `length_bin` rows, the `length` column contains the lower edge of each length bin, the same as for length compositions. The `observed`, `age`, and `uncertainty` columns should usually be `NA`. The `fleet` column identifies which fleet or survey the length bins apply to, and `timing` can be `NA` unless fleet-specific timing is needed.
 
+`length_bin` rows with `fleet = NA` and `timing = NA` set the population length bins instead. Growth uses these bins for the distribution of length at age, and the expected length compositions of each fleet are built from them. These rows never set fleet bins, even though `fleet = NA` means "shared by all fleets" for `age_to_length_conversion` rows. The population length bins must cover every fleet's length bins, including the upper edge of the last bin, which is as wide as the bin before it. The first and last population length bins hold all smaller and all larger fish, so the bins should extend past the largest fish. Without these rows, FIMS uses bins 1 unit wide (e.g., 1 mm for `data_big`) from the smallest to the largest fleet bin. Population length bins need a growth module that gives length at age, so they are not used with `EWAA` growth.
+
 ## Weight-at-age data (`type == "weight_at_age"`)
 
 The weight-at-age data are not currently included in the likelihood and are just used for converting from numbers to biomass in the population dynamics. The `unit` column should be `mt` and the uncertainty should be `NA`.

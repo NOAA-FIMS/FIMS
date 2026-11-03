@@ -774,6 +774,10 @@ class Information {
    * a user provides an invalid or partially specified grid, report the problem
    * and invalidate the model.
    *
+   * Population length bins given as lower edges (`Population::lengths`) are
+   * the user-supplied grid. As for fleets, the last bin is as wide as the bin
+   * before it.
+   *
    * @param valid_model Reference to model-validity flag.
    * @param p Shared pointer to population module.
    */
@@ -789,6 +793,20 @@ class Information {
           "Failed to prepare fleet observation-bin geometry for population " +
           fims::to_string(p->id) + ": " + e.what());
       return;
+    }
+
+    if (p->lengths.size() > 0 && p->size_grid.n_bins == 0) {
+      try {
+        p->size_grid = fims_popdy::SizeGridBuilder::BuildFromEdges(
+            fims_popdy::SizeGridBuilder::BuildObservationEdgesFromLowerEdges(
+                p->lengths));
+      } catch (const std::exception& e) {
+        valid_model = false;
+        FIMS_ERROR_LOG(
+            "Failed to build the population length bins for population " +
+            fims::to_string(p->id) + ": " + e.what());
+        return;
+      }
     }
 
     if (p->size_grid.IsConsistent() && p->size_grid.n_bins > 0) {
@@ -909,8 +927,8 @@ class Information {
           }
 
           const bool population_has_size_grid_input =
-              p->size_grid.n_bins > 0 || p->size_grid.edges.size() > 0 ||
-              p->size_grid.centers.size() > 0;
+              p->lengths.size() > 0 || p->size_grid.n_bins > 0 ||
+              p->size_grid.edges.size() > 0 || p->size_grid.centers.size() > 0;
 
           bool any_length_based_fleet = false;
           for (std::size_t i = 0; i < p->fleets.size(); ++i) {
