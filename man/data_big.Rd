@@ -27,7 +27,13 @@ fish and the last bin holds all larger fish. With fixed
 \code{age_to_length_conversion} rows, those rows set what each bin holds. In
 this dataset, the bins are 50 mm wide, so \code{length = 250} is the bin from
 250 to 300 mm, and the conversion puts all fish under 50 mm in the first
-bin and all fish of 1100 mm or more in the last.}
+bin and all fish of 1100 mm or more in the last. \code{length_bin} rows with
+a \code{fleet} give that fleet's length bins. \code{length_bin} rows with
+\code{fleet = NA} and \code{timing = NA} give the population length bins, which
+growth uses for the distribution of length at age. They never set fleet
+bins, and they must cover every fleet's length bins. Without them, FIMS
+uses bins 1 unit wide that span the fleet length bins. Population length
+bins are not used with \code{EWAA} growth.}
 \item{timing}{The timing, i.e., year the data was collected.}
 \item{observed}{The observed measurement of interest.}
 \item{unit}{A character string specifying the units of \code{observed}. Allowed

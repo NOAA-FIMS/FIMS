@@ -744,6 +744,57 @@ test_that("`FIMSFrame()` returns correct error messages", {
   )
 })
 
+test_that("`FIMSFrame()` checks population length bins", {
+  # The data_big fleet length bins are 0-1100 by 50, so they span 0-1150
+  population_length_bins <- function(lengths, timing = NA_real_) {
+    tibble::tibble(
+      type = "length_bin",
+      fleet = NA_character_,
+      age = NA_real_,
+      length = lengths,
+      timing = timing,
+      observed = NA_real_,
+      unit = NA_character_,
+      uncertainty = NA_character_
+    )
+  }
+  with_bins <- function(lengths, timing = NA_real_) {
+    dplyr::bind_rows(data_big, population_length_bins(lengths, timing))
+  }
+
+  #' @description Test that population length bins that cover the fleet length bins are accepted and do not change the fleet lengths.
+  covering_frame <- FIMSFrame(with_bins(seq(0, 1150, by = 25)))
+  expect_equal(get_lengths(covering_frame), get_lengths(fims_frame))
+  #' @description Test that population length bins whose last bin only reaches the upper edge of the last fleet bin are accepted.
+  expect_s4_class(FIMSFrame(with_bins(seq(0, 1100, by = 50))), "FIMSFrame")
+
+  #' @description Test that `FIMSFrame()` errors when population length bins start above the fleet length bins.
+  expect_error(
+    FIMSFrame(with_bins(seq(100, 1150, by = 50))),
+    "do\\s+not cover the length bins"
+  )
+  #' @description Test that `FIMSFrame()` errors when population length bins end below the upper edge of the fleet length bins.
+  expect_error(
+    FIMSFrame(with_bins(seq(0, 1050, by = 50))),
+    "do\\s+not cover the length bins"
+  )
+  #' @description Test that `FIMSFrame()` errors when population length bins have a timing.
+  expect_error(
+    FIMSFrame(with_bins(seq(0, 1150, by = 50), timing = 1)),
+    "need\\s+`timing = NA`"
+  )
+  #' @description Test that `FIMSFrame()` errors when there is only 1 population length bin.
+  expect_error(
+    FIMSFrame(with_bins(0)),
+    "at least 2"
+  )
+  #' @description Test that `FIMSFrame()` errors when population length bins repeat a length.
+  expect_error(
+    FIMSFrame(with_bins(c(0, 0, seq(50, 1150, by = 50)))),
+    "at least 2"
+  )
+})
+
 # model_* ----
 ## Setup ----
 fims_frame <- FIMS::FIMSFrame(data_big)
