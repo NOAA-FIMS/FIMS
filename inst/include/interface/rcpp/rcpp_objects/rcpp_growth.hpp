@@ -1078,14 +1078,17 @@ class VonBertalanffyTraditionalGrowthInterface
                             vb->LengthWeightBVector(), true);
 
     const bool has_interpolation_variability =
-        this->length_at_age_sd_at_reference_ages.size() > 0;
+        this->length_at_age_sd_young.size() > 0 ||
+        this->length_at_age_sd_old.size() > 0;
     if (has_interpolation_variability) {
       SetFinalParameterValues(this->reference_age_for_length_young,
                               vb->ReferenceAgeForLengthYoungVector(), false);
       SetFinalParameterValues(this->reference_age_for_length_old,
                               vb->ReferenceAgeForLengthOldVector(), false);
-      SetFinalParameterValues(this->length_at_age_sd_at_reference_ages,
-                              vb->LengthAtAgeSdAtRefAgesVector(), true);
+      SetFinalParameterValues(this->length_at_age_sd_young,
+                              vb->LengthAtAgeSdYoungVector(), true);
+      SetFinalParameterValues(this->length_at_age_sd_old,
+                              vb->LengthAtAgeSdOldVector(), true);
     }
 
     const bool has_delta_method_variability =
