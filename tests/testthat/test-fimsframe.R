@@ -477,6 +477,24 @@ test_that("`FIMSFrame()` returns correct error messages", {
     regexp = "units that FIMS does not\\s+use: \"Proportion\""
   )
 
+  #' @description Test that `FIMSFrame()` returns an error when an index of 0 is fit with dlnorm.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      observed = dplyr::if_else(type == "index" & timing == 3, 0, observed)
+    )),
+    regexp = "an index of 0 or less:\\s+\"index survey1 3\""
+  )
+
+  #' @description Test that `FIMSFrame()` returns an error when a negative catch is fit with dlnorm.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      observed = dplyr::if_else(type == "catch" & timing == 3, -1, observed)
+    )),
+    regexp = "an index of 0 or less:\\s+\"catch fleet1 3\""
+  )
+
   terminal_weight <- dplyr::filter(
     data_big,
     type == "weight_at_age",
