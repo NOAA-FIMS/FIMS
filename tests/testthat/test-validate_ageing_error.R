@@ -467,6 +467,19 @@ test_that("validate_ageing_error() warns when ageing_error rows are not used", {
     ),
     "not used for fleets without"
   )
+  rows_that_do_not_sum_to_1 <- ageing_error_rows(fleet = "survey1") |>
+    dplyr::mutate(observed = dplyr::if_else(
+      dplyr::row_number() == 1, 0.5, .data[["observed"]]
+    ))
+  #' @description Test that rows for a fleet without age-composition data are not checked against the other rows in their fleet and timing, since they are not used.
+  expect_warning(
+    validate_ageing_error(
+      dplyr::bind_rows(no_survey_age_comp, rows_that_do_not_sum_to_1),
+      ages,
+      years
+    ),
+    "not used for fleets without"
+  )
 
   no_age_comp <- dplyr::filter(data_big, .data[["type"]] != "age_comp")
   #' @description Test that fleet = NA rows give a warning when no fleet has age-composition data.

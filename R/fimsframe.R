@@ -1330,6 +1330,16 @@ validate_ageing_error <- function(data, ages, years) {
       {.var age_comp} data."
     )
   }
+  # Rows that are not used cannot change the model, so the checks below that
+  # compare rows within a fleet and timing skip them.
+  data <- dplyr::filter(
+    data,
+    .data[["fleet"]] %in% age_comp_fleets |
+      (is.na(.data[["fleet"]]) & length(age_comp_fleets) > 0)
+  )
+  if (NROW(data) == 0) {
+    return(invisible(TRUE))
+  }
   bad_timings <- setdiff(stats::na.omit(data[["timing"]]), years)
   if (length(bad_timings) > 0) {
     cli::cli_abort(c(
