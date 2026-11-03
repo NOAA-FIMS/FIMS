@@ -31,7 +31,7 @@ empty if the model has no random effects.
 These vectors follow the initialized C++ parameter order, not necessarily
 the row order of the input \code{parameters} tibble. They contain values on the
 model's estimation scale (for example, log scale for log parameters).
-Parameters with \code{estimation_type = "constant"} are stored in the modules,
+Parameters with \code{estimation_status = "not_estimated"} are stored in the modules,
 not in these vectors. This nested list is not the input tibble.
 \item \code{model}: The instantiated C++ model module. Currently this is the
 catch-at-age model created with \code{methods::new(CatchAtAge)}.
