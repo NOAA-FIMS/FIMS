@@ -338,16 +338,18 @@ const Type ad_fabs(const Type &x, Type C = 1e-5) {
  *
  * Returns the minimum between a and b in a continuous manner using:
  *
- * (a + b - fims_math::ad_fabs(a - b))*.5;
+ * (a + b - fims_math::ad_fabs(a - b, C))*.5;
  * Reference: \ref fims_math::ad_fabs()
  *
- * The result is always below the true minimum. The error is
- * \f$ \sqrt{C} / 2 \f$ when a = b and about \f$ C / (4|a - b|) \f$ otherwise.
- * Use a smaller C when values near a or b matter.
+ * The result is never above the true minimum. The error is largest,
+ * \f$ \sqrt{C} / 2 \f$, when a = b. It is about \f$ C / (4|a - b|) \f$ when
+ * \f$ |a - b| \f$ is much larger than \f$ \sqrt{C} \f$. Use a smaller C when
+ * a and b can be close.
  *
- * @param a first value
- * @param b second value
- * @param C default = 1e-5
+ * @param a The first value.
+ * @param b The second value.
+ * @param C A positive constant that sets how smooth the result is. A smaller
+ * C gives a smaller error but a sharper bend at a = b. Default is 1e-5.
  * @return A smooth approximation of the minimum of a and b.
  */
 
@@ -359,18 +361,19 @@ inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
 /**
  * Returns the maximum between a and b in a continuous manner using:
  *
- * (a + b + fims_math::ad_fabs(a - b)) *.5;
+ * (a + b + fims_math::ad_fabs(a - b, C)) *.5;
  * Reference: \ref fims_math::ad_fabs()
  *
- * The result is always above the true maximum. The error is
- * \f$ \sqrt{C} / 2 \f$ when a = b and about \f$ C / (4|a - b|) \f$ otherwise.
- * With the default C, ad_max(x, 1e-8) is about 0.0016 at x = 0, not 1e-8,
- * and is 2.4% above x at x = 0.01. Use a smaller C when values near the
- * floor matter.
+ * The result is never below the true maximum. The error is largest,
+ * \f$ \sqrt{C} / 2 \f$, when a = b. It is about \f$ C / (4|a - b|) \f$ when
+ * \f$ |a - b| \f$ is much larger than \f$ \sqrt{C} \f$. With the default C,
+ * ad_max(x, 1e-8) is about 0.0016 at x = 0, not 1e-8, and is 2.4% above x
+ * at x = 0.01. Use a smaller C when values near the floor matter.
  *
- * @param a first value
- * @param b second value
- * @param C default = 1e-5
+ * @param a The first value.
+ * @param b The second value.
+ * @param C A positive constant that sets how smooth the result is. A smaller
+ * C gives a smaller error but a sharper bend at a = b. Default is 1e-5.
  * @return A smooth approximation of the maximum of a and b.
  */
 template <typename Type>
