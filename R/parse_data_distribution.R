@@ -138,11 +138,10 @@ parse_one_data_distribution <- function(expr) {
   dist_name <- as.character(right_hand[[1]])
   dist_formals <- names(formals(dist_name))
   args_list <- as.list(right_hand[-1])
-  link_name <- dplyr::filter(
-    FIMS::fims_distributions,
-    family == dist_name
-  ) |>
-    dplyr::pull(.data$central_parameter)
+  # This lookup runs for each observation. Avoid constructing a dplyr data
+  # mask and temporary tibble for the small distribution registry.
+  registry <- FIMS::fims_distributions
+  link_name <- registry$central_parameter[which(registry$family == dist_name)]
 
   # Checks
   if (!dist_name %in% FIMS::fims_distributions[["family"]]) {
