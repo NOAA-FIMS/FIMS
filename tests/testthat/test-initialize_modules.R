@@ -522,6 +522,8 @@ test_that("`initialize_fleet()` works with correct inputs", {
   ))
   #' @description Test that `initialize_fleet()` leaves weight at age empty for a fleet without its own rows, so the population weight is used.
   expect_equal(result$weight_at_age$size(), 0)
+  #' @description Test that `initialize_fleet()` leaves ageing error empty for a fleet without ageing error rows.
+  expect_equal(result$ageing_error$size(), 0)
   #' @description Test that `initialize_fleet()` sets catch in mt to be fit as weight.
   expect_equal(result$observed_catch_units$get(), "weight")
   clear()
