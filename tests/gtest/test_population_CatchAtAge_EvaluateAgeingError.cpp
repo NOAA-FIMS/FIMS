@@ -41,7 +41,7 @@ TEST_F(CAAInitializeTestFixture, EvaluateAgeingErrorHandlesCorrectInput) {
     }
   }
 
-  // In every year, all fish are age 5 and 100 were sampled.
+  // In every year, all fish are in age index 5 and 100 were sampled.
   const int all_fish_age = 5;
   for (auto& fleet : population->fleets) {
     auto& dq_fleet =

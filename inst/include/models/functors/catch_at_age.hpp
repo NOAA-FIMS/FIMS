@@ -1439,8 +1439,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * @brief Apply each fleet's ageing error to its expected age composition.
    *
    * @details
-   * Moves the expected age composition from true age to the ages readers
-   * assign. Rows sum to 1, so expected numbers keep the observed sample size.
+   * Moves the expected age composition from true age to observed age. Rows
+   * sum to 1, so expected numbers keep the observed sample size.
    * Runs after evaluate_length_comp(), which needs true ages.
    */
   void evaluate_ageing_error() {

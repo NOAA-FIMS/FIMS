@@ -1472,7 +1472,7 @@ validate_ageing_error <- function(data, ages, years) {
   }
 
   # An expected proportion of 0 makes the multinomial likelihood NaN in TMB,
-  # even where nothing was observed, because 0 * log(0) is not 0.
+  # even where nothing was observed, because 0 * log(0) is NaN.
   zero_columns <- fold_ageing_error(data, ages) |>
     dplyr::summarize(
       total = sum(.data[["observed"]]),
@@ -1520,7 +1520,8 @@ validate_ageing_error <- function(data, ages, years) {
 # match the label for fleet = NA.
 ageing_error_group_label <- function(fleet, timing) {
   paste0(
-    "fleet ", ifelse(is.na(fleet), "NA (all fleets)", paste0("\"", fleet, "\"")),
+    "fleet ",
+    ifelse(is.na(fleet), "NA (all fleets)", paste0("\"", fleet, "\"")),
     " timing ", dplyr::coalesce(as.character(timing), "NA")
   )
 }

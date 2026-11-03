@@ -369,8 +369,8 @@ inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
 }
 
 /**
- * @brief Converts proportions at true age to proportions at observed age
- * using an ageing error matrix.
+ * @brief Converts values at true age, proportions or expected numbers, to
+ * values at observed age using an ageing error matrix.
  *
  * @details
  * Ageing error spreads fish of one true age across several observed ages, so
@@ -383,11 +383,11 @@ inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
  * is unchanged. The caller checks the length of `ageing_error`.
  *
  * @tparam Type The scalar type, a TMB AD type or double.
- * @param proportion_at_true_age Proportions at true age, one per model age.
+ * @param proportion_at_true_age Values at true age, 1 per model age.
  * @param ageing_error 1 matrix for all years or 1 per year, with true age as
  * rows and observed age varying fastest.
  * @param year Year index, used only when there is 1 matrix per year.
- * @return Proportions at observed age, one per model age.
+ * @return Values at observed age, 1 per model age.
  */
 template <typename Type>
 inline fims::Vector<Type> apply_ageing_error(

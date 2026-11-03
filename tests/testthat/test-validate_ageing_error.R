@@ -76,7 +76,7 @@ test_that("validate_ageing_error() works with correct inputs", {
     validate_ageing_error(with_data(ageing_error_rows()), ages, years)
   )
 
-  #' @description Test that a default plus year-specific and fleet-specific matrices is valid.
+  #' @description Test that a default plus year-specific and fleet-specific matrices are valid.
   expect_true(validate_ageing_error(
     with_data(
       ageing_error_rows(),
@@ -406,7 +406,7 @@ test_that("validate_ageing_error() rejects groups with no model true ages", {
     dplyr::filter(.data[["uncertainty"]] == min(ages)) |>
     dplyr::mutate(uncertainty = as.character(max(ages) + 1))
 
-  #' @description Test that a matrix with only outside true ages cannot disappear during validation.
+  #' @description Test that validate_ageing_error() returns an error when every true age of a matrix is outside the model ages.
   expect_error(
     suppressWarnings(validate_ageing_error(with_data(outside_rows), ages, years)),
     "Every model age needs rows as a true age"
@@ -498,7 +498,7 @@ test_that("validate_ageing_error() is silent for fleets without ageing error", {
   withr::local_options(rlib_message_verbosity = "default")
   #' @description Test that data without ageing_error rows give no message or warning.
   expect_silent(validate_ageing_error(data_big, ages, years))
-  #' @description Test that a fleet without rows of its own uses the identity matrix with no message or warning.
+  #' @description Test that a fleet without rows of its own has no ageing error and gives no message or warning.
   expect_silent(
     validate_ageing_error(
       with_data(ageing_error_rows(fleet = "survey1")),
