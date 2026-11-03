@@ -1373,9 +1373,9 @@ validate_at_age_input <- function(data, type, ages, years) {
       "i" = "Remove these rows of {type_label} data, or extend the modeled
       years by adding a row of catches row for invalid years.",
       "i" = "Remember that you only need additional {type_label} data for
-      one year beyond which you have other data so you can estimate the
-      biomass on January 01 after all catches have been removed from the
-      previous year."
+      one year beyond which you have other data so FIMS can calculate biomass
+      and spawning output on January 01 after all catches have been removed
+      from the previous year."
     ))
   }
 
@@ -1469,21 +1469,27 @@ validate_at_age_input <- function(data, type, ages, years) {
     ))
   }
 
-  # A value of 0 at every age makes spawning output 0 in that year, and then
-  # recruitment and the objective function are undefined (NaN)
-  all_zero_timings <- input_rows |>
-    dplyr::summarize(
-      all_zero = all(.data[["observed"]] == 0),
-      .by = dplyr::all_of(c("fleet", "timing"))
-    ) |>
-    dplyr::filter(.data[["all_zero"]]) |>
-    dplyr::pull(.data[["timing"]])
+  # Spawning weight and fecundity only feed spawning output, so a value of 0 at
+  # every age makes spawning output 0 in that year, and then recruitment and
+  # the objective function are undefined (NaN). Weight at age also feeds
+  # biomass and catch and index weight, so it is not checked here.
+  all_zero_timings <- if (type == "weight_at_age") {
+    NULL
+  } else {
+    input_rows |>
+      dplyr::summarize(
+        all_zero = all(.data[["observed"]] == 0),
+        .by = dplyr::all_of("timing")
+      ) |>
+      dplyr::filter(.data[["all_zero"]]) |>
+      dplyr::pull(.data[["timing"]])
+  }
   if (length(all_zero_timings) > 0) {
     cli::cli_abort(c(
       "x" = "{.var {type}} is 0 at every age for these timings:
       {.val {all_zero_timings}}.",
-      "i" = "Biomass or spawning output would be 0, which makes recruitment
-      and the objective function undefined.",
+      "i" = "Spawning output would be 0, which makes recruitment and the
+      objective function undefined.",
       "i" = "Use {.code dplyr::filter(data, type == '{type}', observed == 0)}
       to find the rows."
     ))

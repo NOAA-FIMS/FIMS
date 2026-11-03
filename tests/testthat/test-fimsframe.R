@@ -388,6 +388,17 @@ test_that("`FIMSFrame()` returns correct outputs for edge cases", {
     ) |>
       dplyr::select(-length)
   ))
+
+  #' @description Test that `FIMSFrame()` accepts weight at age of 0 at every age in a year, because only spawning weight and fecundity are checked for all zeros.
+  expect_s4_class(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      observed = dplyr::if_else(
+        type == "weight_at_age" & timing == 5, 0, observed
+      )
+    )),
+    "FIMSFrame"
+  )
 })
 
 ## Error handling ----
@@ -691,6 +702,14 @@ test_that("`FIMSFrame()` returns correct error messages", {
       dplyr::mutate(fecundity_rows, type = "spawning_weight_at_age")
     )),
     regexp = "spawning_weight_at_age` is missing these years"
+  )
+  #' @description Test that `FIMSFrame()` returns an error when fecundity at age is 0 at every age in a timing, because spawning output would be 0.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::mutate(fecundity_rows, timing = NA_integer_, observed = 0)
+    )),
+    regexp = "fecundity_at_age` is 0 at every age"
   )
 
   #' @description Test that `FIMSFrame()` returns an error when a weight-at-age timing is missing an age.

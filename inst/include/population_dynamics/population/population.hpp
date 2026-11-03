@@ -47,7 +47,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   /**
    * @brief Spawning output per unit of spawning weight at age, e.g., eggs per
    * mt, ordered by year and then age. When it is empty, it is 1, so spawning
-   * output is spawning weight.
+   * output is spawning biomass.
    */
   fims::Vector<Type> fecundity_at_age;
   fims::Vector<Type> log_f_multiplier;       /*!< estimated parameter: vector of

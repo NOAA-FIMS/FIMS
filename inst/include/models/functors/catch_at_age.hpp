@@ -555,8 +555,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
   /**
    * @brief Calculates spawning biomass for a population.
    *
-   * This function computes yearly \f$y\f$ spawning biomass \f$SB_y\f$ by
-   * summing the contributions from each age \f$a\f$, accounting for proportion
+   * This function computes yearly \f$y\f$ spawning output \f$SB_y\f$, which is
+   * spawning biomass when fecundity is 1, by summing the contributions from
+   * each age \f$a\f$, accounting for proportion
    * female, proportion mature, spawning weight at age \f$w^S_{a,y}\f$, and
    * fecundity at age \f$f_{a,y}\f$ (see SpawningOutputAA()):
    * \f[
@@ -585,8 +586,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
   /**
    * @brief Calculated unfished spawning biomass for a population
    *
-   * Updates unfished spawning biomass \f$SB^U_y\f$ by adding the biomass of age
-   * \f$a\f$ in year \f$y\f$:
+   * Updates unfished spawning output \f$SB^U_y\f$ by adding the spawning output
+   * of age \f$a\f$ in year \f$y\f$:
    * \f[
    * SB^U_y \mathrel{+}= N^U_{a,y} \times p_{female,a} \times p_{mature,a,y}
    * \times w^S_{a,y} \times f_{a,y}

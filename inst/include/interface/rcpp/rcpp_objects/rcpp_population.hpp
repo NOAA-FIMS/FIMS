@@ -586,7 +586,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         &(population)->proportion_female;
 
     // Spawning weight and fecundity are needed for the year after the last
-    // model year, as spawning biomass is
+    // model year because spawning output is reported for that year
     const size_t expected_spawning_size =
         static_cast<size_t>((this->n_years.get() + 1) * this->n_ages.get());
     if (this->spawning_weight_at_age.size() != 0 &&

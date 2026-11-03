@@ -149,7 +149,7 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
     data_mod <- data_to_use
   } else {
     # These inputs can run to the year after the last model year, so they are
-    # left out of the last year of data
+    # not used to find the last year of data
     max_timing <- data_to_use |>
       dplyr::filter(!.data[["type"]] %in% inputs_kept) |>
       dplyr::pull(.data[["timing"]]) |>
