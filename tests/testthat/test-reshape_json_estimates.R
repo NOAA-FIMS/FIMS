@@ -105,7 +105,7 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
       dplyr::filter(label != "log_sd") |>
       dplyr::filter(!is.na(module_name)) |>
       dplyr::select(module_name),
-      json_summary |>
+    json_summary |>
       dplyr::select(module_name)
   )
 
@@ -222,7 +222,6 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
       )
     }
   )
-
 }
 
 ## IO correctness ----
