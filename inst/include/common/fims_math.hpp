@@ -322,9 +322,12 @@ inline const Type double_logistic(const Type &inflection_point_asc,
  *
  * \f$ (x^2+C)^.5 \f$
  *
+ * The result is never below \f$ \sqrt{C} \f$, so ad_fabs(0) is about 0.0032
+ * with the default C.
+ *
  * @param x value to keep positive
  * @param C default = 1e-5
- * @return
+ * @return A smooth approximation of the absolute value of x.
  */
 template <class Type>
 const Type ad_fabs(const Type &x, Type C = 1e-5) {
@@ -338,12 +341,14 @@ const Type ad_fabs(const Type &x, Type C = 1e-5) {
  * (a + b - fims_math::ad_fabs(a - b))*.5;
  * Reference: \ref fims_math::ad_fabs()
  *
- * This is an approximation with minimal error.
+ * The result is always below the true minimum. The error is
+ * \f$ \sqrt{C} / 2 \f$ when a = b and about \f$ C / (4|a - b|) \f$ otherwise.
+ * Use a smaller C when values near a or b matter.
  *
- * @param a
- * @param b
+ * @param a first value
+ * @param b second value
  * @param C default = 1e-5
- * @return
+ * @return A smooth approximation of the minimum of a and b.
  */
 
 template <typename Type>
@@ -356,12 +361,17 @@ inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
  *
  * (a + b + fims_math::ad_fabs(a - b)) *.5;
  * Reference: \ref fims_math::ad_fabs()
- * This is an approximation with minimal error.
  *
- * @param a
- * @param b
+ * The result is always above the true maximum. The error is
+ * \f$ \sqrt{C} / 2 \f$ when a = b and about \f$ C / (4|a - b|) \f$ otherwise.
+ * With the default C, ad_max(x, 1e-8) is about 0.0016 at x = 0, not 1e-8,
+ * and is 2.4% above x at x = 0.01. Use a smaller C when values near the
+ * floor matter.
+ *
+ * @param a first value
+ * @param b second value
  * @param C default = 1e-5
- * @return
+ * @return A smooth approximation of the maximum of a and b.
  */
 template <typename Type>
 inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
