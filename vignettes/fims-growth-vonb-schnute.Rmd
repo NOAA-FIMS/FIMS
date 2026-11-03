@@ -46,7 +46,7 @@ FIMS uses the fitted growth curve and supplied variability in length-at-age to p
 
 This vignette uses interpolation-based variability, with `length_at_age_sd_young` and `length_at_age_sd_old` supplying the standard deviations of length at the younger and older reference ages. These SDs use the same length units as the growth inputs. Their `age` entries are `NA` because their ages come from `reference_age_for_length_young` and `reference_age_for_length_old`.
 
-> Note:  The delta-method variability pathway is wired into FIMS, but it is not used here because it depends on using von Bertalanffy growth, which is not yet available in FIMS.
+> Note: This vignette uses interpolation-based variability with Schnute growth. Traditional von Bertalanffy growth also supports delta-method variability, with `age_at_zero_length` (`t0`) held constant.
 
 ## Main Example: Estimable VonBertalanffySchnute With Generated Data
 

@@ -683,6 +683,96 @@ test_that("traditional von bertalanffy uses the growth-derived age-to-length pat
   expect_gt(length(report[["growth_derived_mean_WAA"]][[1]]), 0)
 })
 
+test_that("traditional growth automatic derivatives match numerical differences", {
+  on.exit(FIMS::clear(), add = TRUE)
+
+  for (variability in c("delta_method", "linear_interpolation")) {
+    FIMS::clear()
+    ctx <- make_vonb_traditional_context()
+
+    parameters <- ctx[["parameters"]] |>
+      dplyr::filter(.data[["module_name"]] != "Growth") |>
+      dplyr::bind_rows(
+        FIMS::setup_default_Growth(
+          data = ctx[["data"]],
+          module_type = "VonBertalanffyTraditional",
+          variability_type = variability
+        )
+      )
+
+    fit <- FIMS::initialize_fims(
+      parameters = parameters,
+      data = ctx[["data"]]
+    ) |>
+      FIMS::fit_fims(optimize = FALSE, get_sd = FALSE)
+
+    obj <- FIMS::get_obj(fit)
+    starting <- obj[["par"]]
+
+    fields <- c("asymptotic_length", "growth_coefficient")
+    if (variability == "linear_interpolation") {
+      fields <- c(fields, "age_at_zero_length")
+    }
+
+    indices <- vapply(fields, function(field) {
+      index <- grep(
+        paste0("^Growth\\..*\\.", field, "\\."),
+        names(starting)
+      )
+      stopifnot(length(index) == 1L)
+      index
+    }, integer(1))
+
+    changed <- starting
+    changed[indices] <- changed[indices] +
+      c(0.02, -0.03, 0.01)[seq_along(indices)]
+    points <- list(starting = starting, changed = changed)
+
+    for (setting in names(points)) {
+      point <- points[[setting]]
+      invisible(obj[["fn"]](point))
+      automatic <- as.numeric(obj[["gr"]](point))
+
+      for (field in fields) {
+        index <- indices[[field]]
+        step <- 1e-5
+        plus <- minus <- point
+        plus[index] <- plus[index] + step
+        minus[index] <- minus[index] - step
+
+        # Reset the inner random-effect solution before each perturbation.
+        invisible(obj[["fn"]](point))
+        value_plus <- as.numeric(obj[["fn"]](plus))
+        invisible(obj[["fn"]](point))
+        value_minus <- as.numeric(obj[["fn"]](minus))
+
+        numerical <- (value_plus - value_minus) / (2 * step)
+        case <- paste(variability, setting, field)
+
+        #' @description Traditional growth derivatives remain finite at starting and changed working parameters.
+        expect_true(
+          is.finite(automatic[index]) && is.finite(numerical),
+          info = case
+        )
+
+        #' @description TMB derivatives agree with central numerical differences for each estimated traditional mean-growth parameter.
+        expect_true(
+          abs(automatic[index] - numerical) <=
+            1e-4 * max(1, abs(automatic[index]), abs(numerical)),
+          info = paste(
+            case,
+            "automatic =", automatic[index],
+            "numerical =", numerical
+          )
+        )
+      }
+    }
+
+    TMB::FreeADFun(obj)
+    rm(obj, fit)
+  }
+})
+
 test_that("von bertalanffy uses fleet length-comp bins when fixed fleet age-to-length conversion rows are absent", {
   ctx <- make_vonb_no_age_to_length_conversion_fixed_context()
   on.exit(
