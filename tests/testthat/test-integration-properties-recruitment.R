@@ -22,7 +22,7 @@ n_years <- get_n_years(data_4_model)
 weight_at_age <- weight_at_age_matrix(data_big)
 
 ## IO correctness ----
-test_that("maturity in one year changes spawning biomass in that year only", {
+test_that("maturity in one year is used in that year only", {
   changed_year <- 16
   changed_inflection_point <- 6
   slope <- pull_input(default_parameters, "Maturity", "slope")
@@ -75,6 +75,24 @@ test_that("maturity in one year changes spawning biomass in that year only", {
   expect_lt(
     spawning_biomass[changed_year],
     default_spawning_biomass[changed_year]
+  )
+  # Numbers at age after the changed year differ from the default run because
+  # recruitment depends on spawning biomass, so the check uses this run's
+  # numbers at age with the default maturity ogive.
+  default_maturity <- stats::plogis(
+    ages,
+    pull_input(default_parameters, "Maturity", "inflection_point"),
+    1 / slope
+  )
+  later_years <- seq(changed_year + 1, n_years + 1)
+  expected_later_spawning_biomass <- as.vector(
+    (numbers_at_age[later_years, ] * weight_at_age[later_years, ]) %*%
+      (proportion_female * default_maturity)
+  )
+  #' @description Test that spawning biomass after the changed maturity year uses the default maturity ogive.
+  expect_equal(
+    object = spawning_biomass[later_years],
+    expected = expected_later_spawning_biomass
   )
 })
 
