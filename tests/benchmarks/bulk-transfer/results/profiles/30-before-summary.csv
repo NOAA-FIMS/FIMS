@@ -1,0 +1,4 @@
+"years","phase","elapsed","allocated_mib","allocations"
+30,"frame",0.26,20.9417724609375,14371
+30,"parameters",0.0569999999999999,3.30232238769531,2280
+30,"modules",0.714,10.1461639404297,6319

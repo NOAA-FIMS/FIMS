@@ -1281,12 +1281,19 @@ set_param_vector <- function(field, module, module_input, module_class_name) {
       module {.var {module_class_name}}."
     ))
   }
-  # Resize the field in the module
-  module[[field]]$resize(length(field_value))
-
-  # Assign each value to the corresponding position in the parameter vector
-  for (i in seq_along(field_value)) {
-    module[[field]][i][["value"]] <- field_value[i]
-    module[[field]][i][["estimation_type"]]$set(field_estimation_type[i])
+  # Transfer whole vectors through the existing Rcpp interface. These setters
+  # update the existing Variables without replacing their identities.
+  target <- module[[field]]
+  target$resize(length(field_value))
+  target$set_values(field_value)
+  if (anyNA(field_estimation_type)) {
+    # Missing types are handled by an existing initialization warning path.
+    # Preserve its scalar-setter semantics; the bulk setter rejects NA.
+    for (i in seq_along(field_estimation_type)) {
+      target$get(i - 1L)$estimation_type$set(field_estimation_type[i])
+    }
+  } else {
+    target$set_estimation_types(field_estimation_type)
   }
+  invisible(NULL)
 }
