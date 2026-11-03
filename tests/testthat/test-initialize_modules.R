@@ -429,6 +429,87 @@ test_that("`initialize_population()` works with correct inputs", {
   clear()
 })
 
+test_that("`initialize_population()` multiplies spawning output by spawning weight and fecundity", {
+  get_population_report <- function(data) {
+    frame <- FIMSFrame(data)
+    report <- setup_default_parameters(frame) |>
+      initialize_fims(data = frame) |>
+      fit_fims(optimize = FALSE) |>
+      get_report()
+    clear()
+    report
+  }
+  population_weight_rows <- dplyr::filter(data_big, type == "weight_at_age")
+  default_rows <- dplyr::filter(population_weight_rows, timing == 1) |>
+    dplyr::mutate(timing = NA_integer_)
+  base_report <- get_population_report(data_big)
+
+  fecundity_report <- get_population_report(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(default_rows, type = "fecundity_at_age", observed = 2)
+  ))
+  #' @description Test that a fecundity of 2 at every age doubles spawning output in every year.
+  expect_equal(
+    fecundity_report[["spawning_biomass"]][[1]],
+    2 * base_report[["spawning_biomass"]][[1]]
+  )
+  #' @description Test that a fecundity of 2 at every age doubles unfished spawning output.
+  expect_equal(
+    fecundity_report[["unfished_spawning_biomass"]][[1]],
+    2 * base_report[["unfished_spawning_biomass"]][[1]]
+  )
+  # Spawning output per recruit doubles too, so recruitment and the spawning
+  # biomass ratio do not change
+  #' @description Test that a constant fecundity does not change the spawning biomass ratio.
+  expect_equal(
+    fecundity_report[["spawning_biomass_ratio"]],
+    base_report[["spawning_biomass_ratio"]]
+  )
+  #' @description Test that a constant fecundity does not change the objective.
+  expect_equal(fecundity_report[["jnll"]], base_report[["jnll"]])
+
+  year_5_fecundity_report <- get_population_report(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(
+      population_weight_rows,
+      type = "fecundity_at_age",
+      observed = dplyr::if_else(timing == 5, 2, 1)
+    )
+  ))
+  year_5 <- 5 - get_start_year(data) + 1
+  #' @description Test that a fecundity of 2 in year 5 doubles spawning output in year 5 only.
+  expect_equal(
+    year_5_fecundity_report[["spawning_biomass"]][[1]][year_5],
+    2 * base_report[["spawning_biomass"]][[1]][year_5]
+  )
+  #' @description Test that a fecundity of 2 in year 5 leaves spawning output in earlier years unchanged.
+  expect_equal(
+    year_5_fecundity_report[["spawning_biomass"]][[1]][seq_len(year_5 - 1)],
+    base_report[["spawning_biomass"]][[1]][seq_len(year_5 - 1)]
+  )
+
+  spawning_weight_report <- get_population_report(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(
+      population_weight_rows,
+      type = "spawning_weight_at_age",
+      observed = observed * 2
+    )
+  ))
+  #' @description Test that spawning weight at age of 2 times the population weight doubles spawning output.
+  expect_equal(
+    spawning_weight_report[["spawning_biomass"]][[1]],
+    2 * base_report[["spawning_biomass"]][[1]]
+  )
+  #' @description Test that spawning weight at age does not change biomass.
+  expect_equal(spawning_weight_report[["biomass"]], base_report[["biomass"]])
+  #' @description Test that spawning weight at age does not change catch weight.
+  expect_equal(
+    spawning_weight_report[["catch_weight"]],
+    base_report[["catch_weight"]]
+  )
+})
+
 ## Error handling ----
 test_that("`initialize_population()` returns correct error messages", {
   #' @description Test that `initialize_population()` handles missing linked_ids correctly.

@@ -93,4 +93,25 @@ test_that("rcpp population interface works with correct inputs", {
 # No Edge handling for now.
 
 ## Error handling ----
-# No built in errors or warnings to test for now.
+test_that("rcpp population rejects spawning weight and fecundity of the wrong size", {
+  for (field in c("spawning_weight_at_age", "fecundity_at_age")) {
+    population <- methods::new(Population)
+    population$n_years$set(3)
+    population$n_ages$set(2)
+    population$ages[] <- c(1, 2)
+    # Only n_years x n_ages values, without the year after the last model year
+    population[[field]][] <- rep(1, 6)
+    #' @description Test that spawning weight or fecundity without (n_years + 1) x n_ages values returns an error.
+    expect_error(CreateTMBModel(), paste(field, "size mismatch"))
+    clear()
+
+    population <- methods::new(Population)
+    population$n_years$set(3)
+    population$n_ages$set(2)
+    population$ages[] <- c(1, 2)
+    population[[field]][] <- rep(1, 8)
+    #' @description Test that spawning weight or fecundity with (n_years + 1) x n_ages values is accepted.
+    expect_no_error(CreateTMBModel())
+    clear()
+  }
+})
