@@ -127,7 +127,9 @@ data_4_projections <- data_big_with_extra_year |>
 
 The default configuration from a model without projections can be used as the default configuration. After the parameter configuration is created it must be manipulated to alter the default parameters for things like selectivity, fishing mortality, etc. We believe that it is easier to alter default configurations rather than creating your own from scratch. So, much of what is done below for projections was also done in the [introductory vignette](fims-demo.html).
 
-The major difference below compared to a model without projections is that the recruitment deviations for the projection period are fixed at zero. Because the new data object has all years, `FIMS::setup_default_parameters()` will ensure that all time-series parameters, e.g., natural mortality, have the correct dimensions.
+The major difference below compared to a model without projections is that fishing mortality is fixed for the projection years. Because the new data object has all years, `FIMS::setup_default_parameters()` will ensure that all time-series parameters, e.g., natural mortality, have the correct dimensions.
+
+The recruitment deviations for the projection years are random effects, as in the other years. No data or priors inform them in this example, so they are estimated at zero and do not change the estimates for the years with data. Their variability is included in the standard errors of projected quantities such as spawning biomass. Do not fix them at zero when the recruitment standard deviation (`log_sd`) is estimated. The recruitment likelihood includes every deviation, so deviations fixed at zero would bias `log_sd` low.
 
 ```{r projection-model}
 # Take the default configuration with the new data to create some default
@@ -191,22 +193,10 @@ parameters_projection <- setup_default_parameters(data = data_4_projections) |>
         0.24094126, -0.54480751, -0.23680557, -0.58483386, 0.30122785,
         0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
         -0.19556523, 0.20094360, 0.37248740, -0.07163145,
-        # recruitment deviations are fixed at zero for the projections
+        # projection recruitment deviations start at zero
         rep(0, years_of_projection)
       ),
       estimation_type = "random_effects"
-    ),
-    by = c("label", "timing")
-  ) |>
-  # Fix the projection log recruitment deviations at zero
-  dplyr::rows_update(
-    tibble::tibble(
-      label = "log_devs",
-      timing = (get_end_year(data_4_projections) - years_of_projection + 1):
-      get_end_year(data_4_projections),
-      estimation_type = rep("constant", years_of_projection),
-      distribution_type = rep(NA, years_of_projection),
-      distribution = rep(NA, years_of_projection)
     ),
     by = c("label", "timing")
   ) |>
@@ -243,7 +233,7 @@ parameters_projection <- setup_default_parameters(data = data_4_projections) |>
   )
 ```
 
-Reference-point targets are currently achieved by specifying a prior on `spawning_biomass_ratio`, a derived population quantity, in the final year/s of the projection period. Additionally, a prior can be specified on `log_f_multiplier`, which is a simple annual multiplier of fishing mortality, i.e., `F_mort` that allows the total fishing mortality for the population to be adjusted while keeping relative fleet effort constant by fixing `log_Fmort`. This approach allows the annual `log_f_multiplier` to be estimated while ensuring that total fishing mortality is held constant during the projection period and achieves the spawning biomass target.
+Reference-point targets are currently achieved by specifying a prior on `spawning_biomass_ratio`, a derived population quantity, in the final year/s of the projection period. Additionally, a prior can be specified on `log_f_multiplier`, which is a simple annual multiplier of fishing mortality, i.e., `F_mort` that allows the total fishing mortality for the population to be adjusted while keeping relative fleet effort constant by fixing `log_Fmort`. This approach allows the annual `log_f_multiplier` to be estimated while ensuring that total fishing mortality is held constant during the projection period and achieves the spawning biomass target. A prior on `spawning_biomass_ratio` would also move the projection recruitment deviations toward the target because they are random effects.
   
 The wrapper functions used in this vignette are not yet capable of setting up priors so the full projection approach is not included here. This is a high-priority development goal that is in progress. Examples of setting up constraints on `log_f_multiplier` and a prior on `spawning_biomass_ratio` can be found in the test-projections-looped.R test files used to verify this approach.  
 
