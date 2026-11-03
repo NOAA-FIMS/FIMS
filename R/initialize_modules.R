@@ -397,7 +397,6 @@ initialize_population <- function(parameters, data, linked_ids) {
     dplyr::filter(.data[["module_name"]] == "Growth") |>
     dplyr::pull(.data[["module_type"]]) |>
     unique()
-  # EWAA growth has no length distribution at age, so the bins are not used
   if (length(population_lengths) > 0 && "EWAA" %in% growth_type) {
     cli::cli_warn(c(
       "!" = "The population length bins ({.var length_bin} rows with

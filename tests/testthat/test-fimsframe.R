@@ -746,20 +746,8 @@ test_that("`FIMSFrame()` returns correct error messages", {
 
 test_that("`FIMSFrame()` checks population length bins", {
   # The data_big fleet length bins are 0-1100 by 50, so they span 0-1150
-  population_length_bins <- function(lengths, timing = NA_real_) {
-    tibble::tibble(
-      type = "length_bin",
-      fleet = NA_character_,
-      age = NA_real_,
-      length = lengths,
-      timing = timing,
-      observed = NA_real_,
-      unit = NA_character_,
-      uncertainty = NA_character_
-    )
-  }
   with_bins <- function(lengths, timing = NA_real_) {
-    dplyr::bind_rows(data_big, population_length_bins(lengths, timing))
+    dplyr::bind_rows(data_big, population_length_bin_rows(lengths, timing))
   }
 
   #' @description Test that population length bins that cover the fleet length bins are accepted and do not change the fleet lengths.
@@ -771,12 +759,12 @@ test_that("`FIMSFrame()` checks population length bins", {
   #' @description Test that `FIMSFrame()` errors when population length bins start above the fleet length bins.
   expect_error(
     FIMSFrame(with_bins(seq(100, 1150, by = 50))),
-    "do\\s+not cover the length bins"
+    "does\\s+not\\s+cover the length bins"
   )
   #' @description Test that `FIMSFrame()` errors when population length bins end below the upper edge of the fleet length bins.
   expect_error(
     FIMSFrame(with_bins(seq(0, 1050, by = 50))),
-    "do\\s+not cover the length bins"
+    "does\\s+not\\s+cover the length bins"
   )
   #' @description Test that `FIMSFrame()` errors when population length bins have a timing.
   expect_error(
@@ -792,6 +780,21 @@ test_that("`FIMSFrame()` checks population length bins", {
   expect_error(
     FIMSFrame(with_bins(c(0, 0, seq(50, 1150, by = 50)))),
     "at least 2"
+  )
+
+  #' @description Test that population length bins that end exactly at the last fleet edge are accepted when the edges are not exact in floating point.
+  expect_no_error(validate_population_length_bins(
+    population_length_bin_rows(seq(0.1, 1.15, by = 0.05)),
+    list(fleet1 = seq(0.1, 1.1, by = 0.1))
+  ))
+  #' @description Test that `FIMSFrame()` errors when a population length bin is wider than a fleet length bin it overlaps.
+  expect_error(
+    validate_population_length_bins(
+      population_length_bin_rows(seq(0, 1150, by = 50)),
+      list(fleet1 = seq(0, 1100, by = 50), survey1 = seq(200, 800, by = 10))
+    ),
+    "(?s)wider than the length bins.*fleet\\s+\"survey1\"\\.",
+    perl = TRUE
   )
 })
 

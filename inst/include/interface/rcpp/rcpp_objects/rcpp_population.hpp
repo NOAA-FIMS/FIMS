@@ -152,7 +152,7 @@ class PopulationInterface : public PopulationInterfaceBase {
   RealVector ages;
   /**
    * @brief Lower edges of the population length bins, from `length_bin` rows
-   * with `fleet = NA`. The length of this vector should equal "n_lengths".
+   * with `fleet = NA`. The length of this vector should equal \"n_lengths\".
    */
   RealVector lengths;
   /**
@@ -579,6 +579,9 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     if (this->n_lengths.get() > 0) {
       if (this->lengths.size() != static_cast<size_t>(this->n_lengths.get())) {
+        FIMS_ERROR_LOG("The size of `lengths` does not match `n_lengths`: " +
+                       fims::to_string(this->lengths.size()) +
+                       " != " + fims::to_string(this->n_lengths.get()));
         throw std::invalid_argument(
             "The size of the lengths vector for population " +
             fims::to_string(this->id) + " is not equal to n_lengths.");

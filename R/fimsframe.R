@@ -231,8 +231,8 @@ methods::setMethod(
 )
 
 #' @return
-#' [get_lengths()] returns a vector of the lower edges of the length bins used
-#' in the model.
+#' [get_lengths()] returns a vector of the lower edges of the fleet length bins
+#' used in the model. Population length bins are not included.
 #' @export
 #' @rdname get_FIMSFrame
 #' @keywords FIMSFrame
@@ -249,8 +249,8 @@ methods::setMethod(
 )
 
 #' @return
-#' [get_n_lengths()] returns an integer specifying the number of length bins
-#' used in the model.
+#' [get_n_lengths()] returns an integer specifying the number of fleet length
+#' bins used in the model.
 #' @export
 #' @rdname get_FIMSFrame
 #' @keywords FIMSFrame
@@ -1926,9 +1926,8 @@ resolve_fleet_length_bins <- function(
   out
 }
 
-# Population length bins are the lower edges in length_bin rows with
-# fleet = NA. Without them, FIMS builds the population length bins from the
-# fleet bins.
+# An empty vector means FIMS builds the population length bins from the fleet
+# bins.
 population_length_bins <- function(data) {
   if (!all(c("fleet", "type", "length") %in% colnames(data))) {
     return(numeric())
@@ -1948,9 +1947,9 @@ length_bin_edges <- function(lower_edges) {
 }
 
 # Growth puts no fish outside the population length bins. A fleet bin outside
-# them would get an expected proportion of 0, and a likelihood of -Inf if fish
-# were observed there, so the population length bins must cover every fleet
-# bin.
+# them gets an expected proportion of 0. Observed fish there would give a
+# likelihood of -Inf. C++ also rejects a population bin that is wider than a
+# fleet bin it overlaps, and this check gives the user a clearer message.
 validate_population_length_bins <- function(data, fleet_length_bins) {
   population_rows <- dplyr::filter(
     data,
@@ -1963,8 +1962,9 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
 
   if (any(!is.na(population_rows[["timing"]]))) {
     cli::cli_abort(c(
-      "x" = "{.var length_bin} rows with {.code fleet = NA} have a
-      {.var timing}: {.val {unique(stats::na.omit(population_rows[['timing']]))}}.",
+      "x" = "{.var length_bin} rows with {.code fleet = NA} have non-missing
+      {.var timing} values:
+      {.val {unique(stats::na.omit(population_rows[['timing']]))}}.",
       "i" = "These rows set the population length bins, which are the same in
       every year, so they need {.code timing = NA}.",
       "i" = "Use {.code dplyr::filter(data, type == 'length_bin', is.na(fleet),
@@ -1975,37 +1975,66 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
   lengths <- population_rows[["length"]]
   if (anyNA(lengths) || anyDuplicated(lengths) > 0 || length(lengths) < 2) {
     cli::cli_abort(c(
-      "x" = "{.var length_bin} rows with {.code fleet = NA} need at least 2
-      different lengths and no missing lengths.",
-      "i" = "Each row gives the lower edge of 1 population length bin.",
+      "x" = "{.var length_bin} rows with {.code fleet = NA} have
+      {length(lengths)} length{?s}, with missing or repeated values:
+      {.val {sort(lengths, na.last = TRUE)}}.",
+      "i" = "These rows need at least 2 different lengths and no missing
+      lengths. Each row gives the lower edge of 1 population length bin.",
       "i" = "Use {.code dplyr::count(dplyr::filter(data, type == 'length_bin',
       is.na(fleet)), length)} to see the lengths."
     ))
   }
 
   population_edges <- length_bin_edges(sort(lengths))
-  uncovered_fleets <- fleet_length_bins |>
-    purrr::keep(\(bins) {
-      if (length(bins) < 2) {
-        return(FALSE)
-      }
-      fleet_edges <- length_bin_edges(bins)
-      population_edges[1] > fleet_edges[1] ||
-        population_edges[length(population_edges)] <
-          fleet_edges[length(fleet_edges)]
+  first_edge <- population_edges[1]
+  last_edge <- population_edges[length(population_edges)]
+  # Edges are computed, so compare them with a tolerance, as C++ does
+  tolerance <- 1e-8 * max(1, last_edge - first_edge)
+  fleet_edges <- fleet_length_bins |>
+    purrr::keep(\(bins) length(bins) >= 2) |>
+    purrr::map(length_bin_edges)
+
+  uncovered_fleets <- fleet_edges |>
+    purrr::keep(\(edges) {
+      first_edge > edges[1] + tolerance ||
+        last_edge < edges[length(edges)] - tolerance
     }) |>
     names()
   if (length(uncovered_fleets) > 0) {
     cli::cli_abort(c(
-      "x" = "The population length bins
-      ({population_edges[1]}-{population_edges[length(population_edges)]}) do
-      not cover the length bins of {cli::qty(length(uncovered_fleets))}
-      fleet{?s} {.val {uncovered_fleets}}.",
-      "i" = "Fleet length bins outside the population length bins would get an
-      expected proportion of 0. The population length bins, including the
-      upper edge of the last bin, must span every fleet's length bins.",
-      "i" = "Use {.code dplyr::filter(data, type %in% c('length_bin',
-      'length_comp'))} to compare the population and fleet lengths."
+      "x" = "The population length bins span {.val {first_edge}} to
+      {.val {last_edge}}. This does not cover the length bins of
+      {cli::qty(length(uncovered_fleets))}fleet{?s}
+      {.val {uncovered_fleets}}.",
+      "i" = "The population length bins must span every fleet's length bins.
+      The last bin of each set is as wide as the bin before it, so its upper
+      edge is its lower edge plus that width.",
+      "i" = "Use {.code dplyr::distinct(dplyr::filter(data, type %in%
+      c('length_bin', 'length_comp')), fleet, length)} to compare the
+      population and fleet lengths."
+    ))
+  }
+
+  coarser_fleets <- fleet_edges |>
+    purrr::keep(\(edges) {
+      n_population <- length(population_edges)
+      n_fleet <- length(edges)
+      overlap <- outer(population_edges[-1], edges[-1], pmin) -
+        outer(population_edges[-n_population], edges[-n_fleet], pmax)
+      wider <- outer(diff(population_edges), diff(edges), "-")
+      any(overlap > tolerance & wider > tolerance)
+    }) |>
+    names()
+  if (length(coarser_fleets) > 0) {
+    cli::cli_abort(c(
+      "x" = "Some population length bins are wider than the length bins they
+      overlap for {cli::qty(length(coarser_fleets))}fleet{?s}
+      {.val {coarser_fleets}}.",
+      "i" = "Each population length bin must be no wider than any fleet length
+      bin it overlaps.",
+      "i" = "Use {.code dplyr::distinct(dplyr::filter(data, type %in%
+      c('length_bin', 'length_comp')), fleet, length)} to compare the
+      population and fleet lengths."
     ))
   }
   invisible(TRUE)
