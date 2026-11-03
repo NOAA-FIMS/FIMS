@@ -85,7 +85,6 @@ class Model {  // may need singleton
          m_it != this->fims_information->models_map.end(); ++m_it) {
       //(*m_it).second points to the Model module
       std::shared_ptr<fims_popdy::FisheryModelBase<Type>> m = (*m_it).second;
-      m->Prepare();
       m->Evaluate();
     }
 

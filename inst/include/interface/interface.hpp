@@ -45,7 +45,7 @@
   if (F != nullptr) F->reportvector.push(name, #name);
 
 template <typename Type>
-vector<Type> ADREPORTvector(vector<vector<Type> > x) {
+vector<Type> ADREPORTvector(const vector<vector<Type> > &x) {
   int outer_dim = x.size();
   int dim = 0;
   for (int i = 0; i < outer_dim; i++) {

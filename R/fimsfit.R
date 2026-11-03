@@ -518,11 +518,23 @@ FIMSFit <- function(
 #'   indicates not to save it. If specified, it must end in .RDS. The file is
 #'   written to folder given by `input[["path"]]`. Not yet implemented.
 #' @param getReportCovariance A logical passed to [TMB::sdreport()], with the
-#'   default `FALSE`. Standard errors of all parameters and derived quantities
+#'   default `FALSE`. Standard errors of all parameters and selected derived quantities
 #'   are calculated either way. If `TRUE`, the full covariance matrix of the
 #'   derived quantities is also calculated and stored as `cov` in the
 #'   `sdreport`; it grows with the square of the number of derived quantities
 #'   and can use several GB of memory. If `FALSE`, `cov` is `NA`.
+#' @param uncertainty_reports Character vector of derived-quantity names for
+#'   which standard errors should be calculated, for example
+#'   `c("spawning_biomass", "biomass", "expected_recruitment",
+#'   "catch_expected", "index_expected")`. The default `NULL` includes all
+#'   uncertainty reports. Use `character(0)` for parameter uncertainty only.
+#'   Names apply to all populations/fleets and must name an existing uncertainty
+#'   report; unknown names are errors. Duplicate names are ignored and results
+#'   retain the model's report order. Ordinary reports and derived estimates
+#'   remain complete; unselected derived quantities have `NA` uncertainty in
+#'   `get_estimates()`. This option does not change fitting or parameter standard
+#'   errors. It is recorded in the TMB object's data, including when
+#'   `optimize = FALSE`, for subsequent `TMB::sdreport()` calls.
 #' @return
 #' An object of class `FIMSFit` is returned, where the structure is the same
 #' regardless if `optimize = TRUE` or not. Uncertainty information is only
@@ -545,7 +557,8 @@ fit_fims <- function(input,
                        trace = 0
                      ),
                      filename = NULL,
-                     getReportCovariance = FALSE) {
+                     getReportCovariance = FALSE,
+                     uncertainty_reports = NULL) {
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
   # NOTE: When we add implementation for newton step we need to
@@ -569,8 +582,16 @@ fit_fims <- function(input,
     cli::cli_abort("FIMS must have at least one parameter to optimize.")
   }
 
+  if (!is.null(uncertainty_reports) &&
+      (!is.character(uncertainty_reports) || !is.null(dim(uncertainty_reports)) ||
+       anyNA(uncertainty_reports) || any(!nzchar(uncertainty_reports)))) {
+    cli::cli_abort("uncertainty_reports must be NULL or a character vector without missing or empty names.")
+  }
+  uncertainty_reports <- unique(uncertainty_reports)
+
   obj <- TMB::MakeADFun(
-    data = list(),
+    data = if (is.null(uncertainty_reports)) list() else
+      list(uncertainty_reports = as.list(uncertainty_reports)),
     parameters = input$parameters,
     map = input$map,
     random = "re",

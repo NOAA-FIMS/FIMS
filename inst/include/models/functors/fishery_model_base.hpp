@@ -364,6 +364,8 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
 
   /**
    * @brief Evaluate the model.
+   * @details Implementations must prepare their state before calculating results,
+   * so evaluation also works when called directly.
    *
    */
   virtual void Evaluate() {}

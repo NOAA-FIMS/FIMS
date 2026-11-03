@@ -287,7 +287,11 @@ check_sdreport_convergence <- function(
       }
 
 
-      derived_summary <- summary(sdreport, "report")
+      derived_summary <- if (!is.null(sdreport$value) && length(sdreport$value) == 0) {
+        NULL
+      } else {
+        summary(sdreport, "report")
+      }
       if (!is.null(derived_summary) && nrow(derived_summary) > 0) {
         issue <- format_na_se_issue(
           derived_summary[, "Std. Error"],

@@ -13,7 +13,8 @@ fit_fims(
   number_of_newton_steps = 0,
   control = list(eval.max = 10000, iter.max = 10000, trace = 0),
   filename = NULL,
-  getReportCovariance = FALSE
+  getReportCovariance = FALSE,
+  uncertainty_reports = NULL
 )
 }
 \arguments{
@@ -46,11 +47,23 @@ indicates not to save it. If specified, it must end in .RDS. The file is
 written to folder given by \code{input[["path"]]}. Not yet implemented.}
 
 \item{getReportCovariance}{A logical passed to \code{\link[TMB:sdreport]{TMB::sdreport()}}, with the
-default \code{FALSE}. Standard errors of all parameters and derived quantities
+default \code{FALSE}. Standard errors of all parameters and selected derived quantities
 are calculated either way. If \code{TRUE}, the full covariance matrix of the
 derived quantities is also calculated and stored as \code{cov} in the
 \code{sdreport}; it grows with the square of the number of derived quantities
 and can use several GB of memory. If \code{FALSE}, \code{cov} is \code{NA}.}
+
+\item{uncertainty_reports}{Character vector of derived-quantity names for
+which standard errors should be calculated, for example
+\code{c("spawning_biomass", "biomass", "expected_recruitment", "catch_expected", "index_expected")}.
+The default \code{NULL} includes all uncertainty reports. Use \code{character(0)}
+for parameter uncertainty only. Names apply to all populations/fleets and must
+name an existing uncertainty report; unknown names are errors. Duplicate names
+are ignored and results retain the model's report order. Ordinary reports and
+derived estimates remain complete; unselected derived quantities have \code{NA}
+uncertainty in \code{get_estimates()}. This option does not change fitting or
+parameter standard errors. It is recorded in the TMB object's data, including
+when \code{optimize = FALSE}, for subsequent \code{TMB::sdreport()} calls.}
 }
 \value{
 An object of class \code{FIMSFit} is returned, where the structure is the same

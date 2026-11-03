@@ -1,0 +1,5 @@
+"label","mode","fits","wall_seconds","peak_rss_mib","exit_code"
+"1-full","full",20,20.0041698749992,2506.84375,0
+"2-compact","compact",20,25.6815099160303,1092.015625,0
+"3-compact","compact",20,24.5373790410231,1187.296875,0
+"4-full","full",20,20.2163574169972,2660.5,0
