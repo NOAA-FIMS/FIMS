@@ -20,7 +20,9 @@ FIMSFit(
 (random effects), in the order of the corresponding \code{parameters} vector.
 Each factor must have one entry per parameter. \code{NA} holds a parameter at
 its starting value; repeated levels share one estimated value. Shared
-entries must have identical starting values. Factor levels determine the
+entries must have identical starting values; otherwise, the error lists
+each parameter's name, 1-based index in \code{p} or \code{re}, and initial value.
+Factor levels determine the
 reduced parameter order; unused levels are dropped. Levels in \code{p} and \code{re}
 are independent; sharing
 across these vectors is not supported.}

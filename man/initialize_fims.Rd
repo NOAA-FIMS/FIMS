@@ -38,14 +38,15 @@ catch-at-age model created with \code{methods::new(CatchAtAge)}.
 }
 
 The structure is:
-\preformatted{list(
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{list(
   parameters = list(
     p = get_fixed(),
     re = get_random()
   ),
   model = fims_model
 )
-}
+}\if{html}{\out{</div>}}
 
 If the returned list is assigned to \code{initialized}, pass the entire list as
 \code{fit_fims(input = initialized)}. For manual fitting, pass only
