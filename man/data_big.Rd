@@ -35,10 +35,13 @@ units for each data type are as follows. \code{mt} or \code{number} are used for
 \code{index} and \code{catch} data, with 1 unit per fleet for each type. \code{mt} is
 used for \code{weight_at_age} data. \code{number} or \code{proportion} are each viable
 units for the composition data, where the former is the preferred unit
-of measurement.}
-\item{uncertainty}{A right-handed formula specifying the distributional
-assumptions for the entry in \code{observed}. See \code{\link[=FIMSFrame]{FIMSFrame()}} for more
-information about this column.
+of measurement. \code{proportion} is also used for \code{ageing_error} data, the
+probability that a fish of a given true age is read as the age in
+\code{age}.}
+\item{uncertainty}{A character string with a right-handed formula
+specifying the distributional assumptions for the entry in \code{observed}.
+See \code{\link[=FIMSFrame]{FIMSFrame()}} for more information about this column. For
+\code{ageing_error} rows, the string is the true age, e.g., \code{"5"}.
 }
 }
 }

@@ -121,6 +121,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
     module_fields <- setdiff(module_fields, c(
       "age_to_length_conversion",
       "weight_at_age",
+      "ageing_error",
       "lengthcomp_expected",
       "lengthcomp_proportion",
       "n_lengths",
@@ -580,6 +581,21 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     ))
   }
   fleet_units <- stats::setNames(model_units, fleet_units[["type"]])
+
+  # Ageing error only changes expected age compositions.
+  ageing_error <- if ("age_comp" %in% fleet_types) {
+    resolve_ageing_error(
+      get_data(data),
+      fleets = fleet,
+      ages = get_ages(data),
+      years = get_start_year(data):get_end_year(data)
+    )
+  }
+  module$ageing_error$resize(NROW(ageing_error))
+  if (NROW(ageing_error) > 0) {
+    module$ageing_error[] <- ageing_error[["observed"]]
+    module$ageing_error$set_estimation_types("constant")
+  }
 
   # Link the observed catch data to the fleet module using its associated ID.
   if ("catch" %in% fleet_types) {

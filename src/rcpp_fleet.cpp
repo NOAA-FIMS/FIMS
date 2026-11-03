@@ -33,6 +33,7 @@ void register_fleet(Rcpp::Module& m) {
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
       .field("weight_at_age", &FleetInterface::weight_at_age)
+      .field("ageing_error", &FleetInterface::ageing_error)
       .field("catch_numbers_at_age", &FleetInterface::catch_numbers_at_age)
       .field("catch_weight_at_age", &FleetInterface::catch_weight_at_age)
       .field("catch_numbers_at_length",
