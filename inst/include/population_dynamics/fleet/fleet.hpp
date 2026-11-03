@@ -83,6 +83,12 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   fims::Vector<Type> age_to_length_conversion; /*!< derived quantity age to
                                                 length conversion matrix*/
   /**
+   * @brief Ageing error matrices, 1 for all years or 1 per year, with true age
+   * as rows and observed age varying fastest. When it is empty, the fleet has
+   * no ageing error.
+   */
+  fims::Vector<Type> ageing_error;
+  /**
    * @brief Weight at age for this fleet's catch and index weight, ordered by
    * year and then age. When it is empty, the population weight at age is
    * used, e.g., when the fleet has no weight-at-age data of its own.

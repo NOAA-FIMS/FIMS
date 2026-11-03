@@ -39,10 +39,13 @@
 #'     `index` and `catch` data, with 1 unit per fleet for each type. `mt` is
 #'     used for `weight_at_age` data. `number` or `proportion` are each viable
 #'     units for the composition data, where the former is the preferred unit
-#'     of measurement.}
-#'   \item{uncertainty}{A right-handed formula specifying the distributional
-#'     assumptions for the entry in `observed`. See [FIMSFrame()] for more
-#'     information about this column.
+#'     of measurement. `proportion` is also used for `ageing_error` data, the
+#'     probability that a fish of a given true age is read as the age in
+#'     `age`.}
+#'   \item{uncertainty}{A character string with a right-handed formula
+#'     specifying the distributional assumptions for the entry in `observed`.
+#'     See [FIMSFrame()] for more information about this column. For
+#'     `ageing_error` rows, the string is the true age, e.g., `"5"`.
 #' }
 #' }
 #' @source \url{https://github.com/NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison}
