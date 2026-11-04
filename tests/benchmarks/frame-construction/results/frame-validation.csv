@@ -1,0 +1,15 @@
+"case","valid_frame","identical"
+"complete",TRUE,TRUE
+"missing_index_year",TRUE,TRUE
+"missing_age_year",TRUE,TRUE
+"missing_length_year",TRUE,TRUE
+"missing_all_compositions",TRUE,TRUE
+"duplicate_annual",TRUE,TRUE
+"missing_unit",TRUE,TRUE
+"metadata",TRUE,TRUE
+"factors",FALSE,TRUE
+"annual_only",FALSE,TRUE
+"no_age_column",TRUE,TRUE
+"no_length_column",TRUE,TRUE
+"incomplete_age_year",FALSE,TRUE
+"incomplete_length_year",FALSE,TRUE

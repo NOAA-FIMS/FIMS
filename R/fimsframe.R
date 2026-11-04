@@ -1412,11 +1412,9 @@ FIMSFrame <- function(data) {
     c("fleet", "type", "timing", "age", "length"),
     colnames(formatted_data)
   )
-  complete_data <- dplyr::full_join(
-    formatted_data,
-    missing_data,
-    by = colnames(missing_data)
-  ) |>
+  # Each generated row is absent from formatted_data by its observation keys.
+  # Append these disjoint rows without building another join index.
+  complete_data <- dplyr::bind_rows(formatted_data, missing_data) |>
     dplyr::arrange(!!!rlang::parse_exprs(sort_order))
 
   # Fill the empty data frames with data extracted from the data file
@@ -1444,41 +1442,29 @@ create_missing_data <- function(
   bin_column <- if (!missing(column)) {
     rlang::sym(column)
   }
+  keys <- c("type", "fleet", "unit", "timing",
+            if (!missing(bins)) rlang::as_string(bin_column))
+  # Expansion and matching only need keys for the requested observation types.
   use_this_data <- data |>
+    dplyr::select(dplyr::all_of(keys)) |>
+    dplyr::filter(.data$type %in% types) |>
     dplyr::group_by(.data$type, .data$fleet)
   out_data <- if (missing(bins)) {
     # This only pertains to annual data without bins
     use_this_data |>
-      dplyr::filter(.data$type %in% types) |>
       tidyr::expand(
         !!rlang::sym("unit"),
         !!rlang::sym("timing") := timings
       ) |>
-      dplyr::anti_join(
-        y = dplyr::select(
-          use_this_data,
-          dplyr::all_of(c("type", "fleet", "unit", "timing"))
-        ),
-        by = c("type", "fleet", "unit", "timing")
-      )
+      dplyr::anti_join(y = use_this_data, by = keys)
   } else {
     use_this_data |>
-      dplyr::group_by(.data$type, .data$fleet) |>
-      dplyr::filter(.data$type %in% types) |>
       tidyr::expand(
         !!rlang::sym("unit"),
         !!rlang::sym("timing") := timings,
         !!bin_column := bins
       ) |>
-      dplyr::anti_join(
-        y = dplyr::select(
-          use_this_data,
-          dplyr::all_of(
-            c("type", "fleet", "unit", "timing", rlang::as_string(bin_column))
-          )
-        ),
-        by = c("type", "fleet", "unit", "timing", rlang::as_string(bin_column))
-      )
+      dplyr::anti_join(y = use_this_data, by = keys)
   }
   out_data |>
     dplyr::mutate(
