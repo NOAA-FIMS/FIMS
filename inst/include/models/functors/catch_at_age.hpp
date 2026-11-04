@@ -550,6 +550,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
     Type spawning_output;
     if (population->fecundity_at_length.size() > 0) {
       if (population->size_distribution_provider == nullptr) {
+        FIMS_ERROR_LOG(
+            "Population fecundity_at_length needs growth that gives length at "
+            "age and population length bins.");
         throw std::runtime_error(
             "Population fecundity_at_length needs growth that gives length at "
             "age and population length bins.");
