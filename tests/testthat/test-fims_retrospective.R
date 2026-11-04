@@ -106,9 +106,9 @@ test_that("run_fims_retrospective() works with correct inputs", {
 test_that("run_modified_data_fims() keeps length_bin rows", {
   # The fleet1 length_bin rows are the only length data. They set the population
   # length bins that mean weight at age is averaged over, so the jnll changes if
-  # they are dropped. Growth gives length at age, so the
-  # age_to_length_conversion rows are not needed. The bins are few and narrow to
-  # keep the fits fast.
+  # they are dropped. Von Bertalanffy growth gives length at age, so the
+  # age_to_length_conversion rows are not needed. The 3 bins cover a narrow
+  # range to keep the fits fast.
   bins_data <- dplyr::bind_rows(
     dplyr::filter(
       data_big,
@@ -126,33 +126,35 @@ test_that("run_modified_data_fims() keeps length_bin rows", {
     )
   )
   bins_frame <- FIMSFrame(bins_data)
-  vonb_parameters <- setup_default_parameters(bins_frame) |>
+  growth_parameters <- setup_default_parameters(bins_frame) |>
     dplyr::filter(module_name != "Growth") |>
     dplyr::bind_rows(setup_default_Growth(
       data = bins_frame,
       module_type = "VonBertalanffySchnute"
     ))
-  # Peeling 1 year removes the year-30 observations but keeps catch and inputs
+  # Peeling 1 year removes the year-30 index and age_comp rows but keeps the
+  # catch, weight_at_age and length_bin rows
   peeled_data <- dplyr::filter(
     bins_data,
-    !(timing %in% 30 & type %in% c("index", "age_comp", "length_comp"))
+    !(timing %in% 30 & type %in% c("index", "age_comp"))
   )
 
-  retro_fit <- run_modified_data_fims(
+  retrospective_fit <- run_modified_data_fims(
     years_to_remove = 1,
     data = bins_data,
-    parameters = vonb_parameters
+    parameters = growth_parameters
   )
   clear()
-  peeled_fit <- vonb_parameters |>
+  peeled_fit <- growth_parameters |>
     initialize_fims(data = FIMSFrame(peeled_data)) |>
     fit_fims(optimize = TRUE)
   clear()
 
-  #' @description Test that a retrospective peel keeps the length_bin rows, so it matches a fit to the peeled data with those rows.
+  #' @description Test that run_modified_data_fims() keeps length_bin rows, so
+  #' a 1-year peel gives the same jnll as a fit to the peeled data.
   expect_equal(
-    get_report(retro_fit)[["jnll"]],
-    get_report(peeled_fit)[["jnll"]]
+    object = get_report(retrospective_fit)[["jnll"]],
+    expected = get_report(peeled_fit)[["jnll"]]
   )
 })
 
