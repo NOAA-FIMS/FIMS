@@ -9,6 +9,7 @@
 \alias{DmultinomDistribution}
 \alias{DnormDistribution}
 \alias{DoubleLogisticSelectivity}
+\alias{EmpiricalMaturity}
 \alias{EWAAGrowth}
 \alias{VonBertalanffySchnuteGrowth}
 \alias{Fleet}
@@ -41,6 +42,7 @@ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDmultinomDistributionsInterface.html}{DmultinomDistribution}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDnormDistributionsInterface.html}{DnormDistribution}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classDoubleLogisticSelectivityInterface.html}{DoubleLogisticSelectivity}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classEmpiricalMaturityInterface.html}{EmpiricalMaturity}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classEWAAGrowthInterface.html}{EWAAGrowth}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classVonBertalanffySchnuteGrowthInterface.html}{VonBertalanffySchnuteGrowth}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classFleetInterface.html}{Fleet}

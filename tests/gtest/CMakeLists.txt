@@ -471,3 +471,16 @@ target_link_libraries(population_CatchAtAge_CalculateCatchWeightAA
 )
 
 gtest_discover_tests(population_CatchAtAge_CalculateCatchWeightAA)
+
+# test_maturityEmpirical_EmpiricalMaturity_evaluate.cpp
+add_executable(maturityEmpirical_EmpiricalMaturity_evaluate
+  test_maturityEmpirical_EmpiricalMaturity_evaluate.cpp
+)
+add_as_invoker_manifest(maturityEmpirical_EmpiricalMaturity_evaluate)
+
+target_link_libraries(maturityEmpirical_EmpiricalMaturity_evaluate
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(maturityEmpirical_EmpiricalMaturity_evaluate)

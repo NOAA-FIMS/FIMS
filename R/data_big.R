@@ -31,15 +31,21 @@
 #'     `age_to_length_conversion` rows, those rows set what each bin holds. In
 #'     this dataset, the bins are 50 mm wide, so `length = 250` is the bin from
 #'     250 to 300 mm, and the conversion puts all fish under 50 mm in the first
-#'     bin and all fish of 1100 mm or more in the last.}
+#'     bin and all fish of 1100 mm or more in the last. `length_bin` rows with
+#'     `fleet = NA` and `timing = NA` set the population length bins (see
+#'     `vignette("fims-input-data", package = "FIMS")`).}
 #'   \item{timing}{The timing, i.e., year the data was collected.}
 #'   \item{observed}{The observed measurement of interest.}
 #'   \item{unit}{A character string specifying the units of `observed`. Allowed
 #'     units for each data type are as follows. `mt` or `number` are used for
 #'     `index` and `catch` data, with 1 unit per fleet for each type. `mt` is
-#'     used for `weight_at_age` data. `number` or `proportion` are each viable
-#'     units for the composition data, where the former is the preferred unit
-#'     of measurement.}
+#'     used for `weight_at_age` and `spawning_weight_at_age` data.
+#'     `fecundity_at_age` is spawning output per unit of spawning weight, e.g.,
+#'     `eggs/mt`. `fecundity_at_length` is spawning output per fish, e.g.,
+#'     `eggs`. `number` or `proportion` are each viable units for the
+#'     composition data, where the former is the preferred unit of
+#'     measurement. `proportion` is used for `maturity_at_age` and
+#'     `maturity_at_length` data.}
 #'   \item{uncertainty}{A right-handed formula specifying the distributional
 #'     assumptions for the entry in `observed`. See [FIMSFrame()] for more
 #'     information about this column.

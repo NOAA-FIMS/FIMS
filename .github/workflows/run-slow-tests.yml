@@ -43,6 +43,7 @@ jobs:
         test_type:
           - slow
           - integration-caa
+          - integration-empirical-maturity
           - integration-fims-bayesian
           - integration-fims-estimation-random-effects
           - integration-proportion

@@ -4,14 +4,17 @@
 \alias{setup_default_Maturity}
 \title{Set up default maturity parameters}
 \usage{
-setup_default_Maturity(data, module_type = c("Logistic"))
+setup_default_Maturity(data, module_type = c("Logistic", "Empirical"))
 }
 \arguments{
 \item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
 your long input data.}
 
 \item{module_type}{A string specifying the type of maturity module. The
-available options are Logistic.}
+available options are Logistic, Empirical.
+\code{"Empirical"} uses the proportion mature at age from \code{maturity_at_age}
+rows in \code{data}, or 1 at every age when \code{data} has only
+\code{maturity_at_length} rows.}
 }
 \value{
 A tibble containing default maturity parameters. See \code{\link{setup_default_parameters}}
@@ -30,6 +33,13 @@ updating maturity and selectivity parameter values).
 Growth defaults are chosen from the data. Models with empirical weight-at-age
 data default to \code{"EWAA"}. Models without empirical weight-at-age data but with
 length-composition data default to \code{"VonBertalanffySchnute"}.
+
+Maturity defaults are also chosen from the data. Models with
+\code{maturity_at_age} data default to \code{"Empirical"} maturity. Models with
+\code{maturity_at_length} data, no \code{maturity_at_age} data, and growth that gives
+length at age default to \code{"Empirical"} maturity of 1 at every age, because
+maturity at length gives the proportion mature. All other models default to
+\code{"Logistic"} maturity.
 
 To create the default initial numbers at age, this function uses the defaults
 from \code{setup_default_Population()} and \code{setup_default_Recruitment()}, which

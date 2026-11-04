@@ -11,6 +11,7 @@
 #' @export DmultinomDistribution
 #' @export DnormDistribution
 #' @export DoubleLogisticSelectivity
+#' @export EmpiricalMaturity
 #' @export EWAAGrowth
 #' @export VonBertalanffySchnuteGrowth
 #' @export Fleet

@@ -27,6 +27,13 @@
 #' data default to `"EWAA"`. Models without empirical weight-at-age data but with
 #' length-composition data default to `"VonBertalanffySchnute"`.
 #'
+#' Maturity defaults are also chosen from the data. Models with
+#' `maturity_at_age` data default to `"Empirical"` maturity. Models with
+#' `maturity_at_length` data, no `maturity_at_age` data, and growth that gives
+#' length at age default to `"Empirical"` maturity of 1 at every age, because
+#' maturity at length gives the proportion mature. All other models default to
+#' `"Logistic"` maturity.
+#'
 #' To create the default initial numbers at age, this function uses the defaults
 #' from `setup_default_Population()` and `setup_default_Recruitment()`, which
 #' are passed to `setup_default_init_naa()` to calculate initial numbers at age.
@@ -129,15 +136,35 @@ setup_default_parameters <- function(data) {
   # Create recruitment parameters
   recruitment_defaults <- setup_default_Recruitment(data = data)
 
-  # Create maturity parameters
-  maturity_defaults <- setup_default_Maturity(data = data)
-
-  # Create growth parameters
+  # Create growth parameters before maturity, because maturity at length is
+  # only used with growth that gives length at age
   growth_module_type <- choose_default_Growth_module_type(data = data)
 
   growth_defaults <- setup_default_Growth(
     data = data,
     module_type = growth_module_type
+  )
+
+  # Create maturity parameters, using empirical maturity-at-age data if present.
+  # Without maturity-at-age rows but with maturity-at-length rows and growth that
+  # gives length at age, empirical maturity at age is 1.
+  input_types <- get_data(data)[["type"]]
+  has_maturity_at_age <- any(input_types == "maturity_at_age", na.rm = TRUE)
+  uses_maturity_at_length <- !has_maturity_at_age &&
+    any(input_types == "maturity_at_length", na.rm = TRUE) &&
+    growth_module_type != "EWAA"
+  if (has_maturity_at_age) {
+    cli::cli_inform(
+      "Maturity-at-age rows found. Maturity defaults to {.val Empirical}."
+    )
+  }
+  maturity_defaults <- setup_default_Maturity(
+    data = data,
+    module_type = if (has_maturity_at_age || uses_maturity_at_length) {
+      "Empirical"
+    } else {
+      "Logistic"
+    }
   )
 
   # Suppress the known informational alert about log_init_naa being NA here,
@@ -821,6 +848,9 @@ setup_default_Fleet <- function(
 #' This function sets up default parameters for a maturity module.
 #' @param module_type A string specifying the type of maturity module. The
 #'   available options are `r toString(eval(formals(setup_default_Maturity)[["module_type"]]))`.
+#'   `"Empirical"` uses the proportion mature at age from `maturity_at_age`
+#'   rows in `data`, or 1 at every age when `data` has only
+#'   `maturity_at_length` rows.
 #' @inherit setup_default_parameters
 #' @return
 #' A tibble containing default maturity parameters. See \code{\link{setup_default_parameters}}
@@ -838,7 +868,7 @@ setup_default_Fleet <- function(
 #' }
 setup_default_Maturity <- function(
   data,
-  module_type = c("Logistic")
+  module_type = c("Logistic", "Empirical")
 ) {
   # Input checks
   is.FIMSFrame(data)
@@ -848,15 +878,84 @@ setup_default_Maturity <- function(
   # arguments for `module_type` and their methods but be placed below in the call to
   # `switch`
   default <- switch(module_type,
-    "Logistic" = setup_default_Logistic()
+    "Logistic" = setup_default_Logistic(),
+    "Empirical" = setup_default_EmpiricalMaturity(data)
   ) |>
-    # We don't have an option to input maturity data into FIMS, so the maturity
-    # parameters aren't really estimable. The parameters should be constant for
-    # now. See more details from
+    # Maturity is not in the likelihood, so its parameters cannot be estimated
+    # and are set to constant. See
     # https://github.com/orgs/NOAA-FIMS/discussions/944.
     dplyr::mutate(
       estimation_type = "constant",
       module_name = "Maturity"
+    )
+}
+
+#' Set up default empirical maturity parameters
+#'
+#' @description
+#' This function turns `maturity_at_age` data into the proportion mature at
+#' each age for the Empirical maturity module. Rows with
+#' `timing = NA` apply to all years and rows with a `timing` replace that
+#' default for that year. If every row has `timing = NA`, there is one value
+#' per age that is used in every year. Otherwise there is one value per age
+#' and year for the model years and the year after the last, ordered by year
+#' and then age. Without `maturity_at_age` rows but with `maturity_at_length`
+#' rows, maturity at age is 1 at every age.
+#' @inheritParams setup_default_parameters
+#' @return
+#' A tibble containing the empirical maturity parameters. See
+#' \code{\link{setup_default_parameters}} for full column descriptions.
+#' @seealso
+#' * [setup_default_Maturity()]
+#' @noRd
+setup_default_EmpiricalMaturity <- function(data) {
+  maturity_data <- get_data(data) |>
+    dplyr::filter(.data[["type"]] == "maturity_at_age")
+  # Maturity at length gives the proportion mature, so maturity at age is 1
+  if (NROW(maturity_data) == 0 &&
+    any(get_data(data)[["type"]] == "maturity_at_length")) {
+    cli::cli_inform(
+      "{.var maturity_at_length} rows found, so maturity at age defaults to 1."
+    )
+    maturity_data <- tibble::tibble(
+      timing = NA_real_,
+      age = get_ages(data),
+      observed = 1
+    )
+  }
+  if (NROW(maturity_data) == 0) {
+    cli::cli_abort(c(
+      "x" = "The data have no {.code type = \"maturity_at_age\"} rows.",
+      "i" = "{.val Empirical} maturity needs these rows. Add them, or use
+      {.code module_type = \"Logistic\"}.",
+      "i" = "Use {.code dplyr::count(get_data(data), type)} to see the types
+      in the data."
+    ))
+  }
+
+  ages <- get_ages(data)
+  if (all(is.na(maturity_data[["timing"]]))) {
+    maturity <- maturity_data |>
+      dplyr::select(dplyr::all_of(c("timing", "age", "observed"))) |>
+      dplyr::arrange(.data[["age"]])
+  } else {
+    # Spawning output is also calculated at the start of the year after the
+    # last model year, so that year needs maturity too
+    years <- get_start_year(data):(get_end_year(data) + 1)
+    maturity <- tibble::tibble(
+      timing = rep(years, each = length(ages)),
+      age = rep(ages, times = length(years)),
+      observed = at_age_by_year(maturity_data, ages = ages, years = years)
+    )
+  }
+
+  setup_default_parameters_template(n_parameters = NROW(maturity)) |>
+    dplyr::mutate(
+      module_type = "Empirical",
+      label = "maturity_at_age",
+      age = maturity[["age"]],
+      timing = as.integer(maturity[["timing"]]),
+      value = maturity[["observed"]]
     )
 }
 

@@ -520,14 +520,106 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
+   * @brief Spawning output of a female of age \f$a\f$ in year \f$y\f$,
+   * before maturity at age.
+   *
+   * Spawning weight at age times fecundity at age:
+   * \f[
+   * w^S_{a,y} \times f_{a,y}
+   * \f]
+   * Spawning weight defaults to the population weight at age and fecundity
+   * defaults to 1, so without either input this is the population weight at
+   * age and spawning output is spawning biomass.
+   *
+   * With fecundity at length \f$\phi_{l,y}\f$ or maturity at length
+   * \f$m_{l,y}\f$, spawning weight is replaced by their product averaged over
+   * the distribution of length at age on the population length bins \f$l\f$:
+   * \f[
+   * f_{a,y} \sum_{l} P(l \mid a, y) m_{l,y} \phi_{l,y}
+   * \f]
+   * Maturity at length defaults to 1, and fecundity at length defaults to
+   * weight at the bin center. Maturity at length is applied inside the sum
+   * because the longer fish of an age are both heavier and more often mature,
+   * so applying it after averaging would make spawning output too low.
+   *
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_year
+   * @snippet{doc} this param_age
+   * @return Spawning output per female before maturity at age.
+   */
+  Type SpawningOutputAA(
+      std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
+      size_t age) {
+    size_t i_age_year = year * population->n_ages + age;
+    Type spawning_output;
+    if (population->fecundity_at_length.size() > 0 ||
+        population->maturity_at_length.size() > 0) {
+      if (population->size_distribution_provider == nullptr) {
+        FIMS_ERROR_LOG(
+            "Population fecundity_at_length and maturity_at_length need growth "
+            "that gives length at age and population length bins.");
+        throw std::runtime_error(
+            "Population fecundity_at_length and maturity_at_length need growth "
+            "that gives length at age and population length bins.");
+      }
+      // Weight at length is only needed without fecundity at length
+      std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+          growth_observation;
+      if (population->fecundity_at_length.size() == 0) {
+        growth_observation = std::dynamic_pointer_cast<
+            fims_popdy::GrowthDerivedObservationBase<Type>>(population->growth);
+        if (growth_observation == nullptr) {
+          FIMS_ERROR_LOG(
+              "Population maturity_at_length without fecundity_at_length needs "
+              "growth that gives weight at length.");
+          throw std::runtime_error(
+              "Population maturity_at_length without fecundity_at_length needs "
+              "growth that gives weight at length.");
+        }
+      }
+      // The year after the last model year uses the length at age of the last
+      // model year, as PopulationMeanWeightAA() does
+      size_t size_year = (std::min)(year, population->n_years - 1);
+      size_t n_bins = population->size_grid.n_bins;
+      spawning_output = static_cast<Type>(0.0);
+      for (size_t l = 0; l < n_bins; l++) {
+        size_t i_length_year = year * n_bins + l;
+        Type length_output;
+        if (population->fecundity_at_length.size() > 0) {
+          length_output = population->fecundity_at_length[i_length_year];
+        } else {
+          length_output = growth_observation->EvaluateWeightAtLength(
+              population->size_grid.centers[l]);
+        }
+        if (population->maturity_at_length.size() > 0) {
+          length_output *= population->maturity_at_length[i_length_year];
+        }
+        spawning_output += population->size_distribution_provider->ProbSize(
+                               size_year, age, l) *
+                           length_output;
+      }
+    } else if (population->spawning_weight_at_age.size() > 0) {
+      spawning_output = population->spawning_weight_at_age[i_age_year];
+    } else {
+      spawning_output = PopulationMeanWeightAA(population, year, age);
+    }
+    if (population->fecundity_at_age.size() > 0) {
+      spawning_output *= population->fecundity_at_age[i_age_year];
+    }
+    return spawning_output;
+  }
+
+  /**
    * @brief Calculates spawning biomass for a population.
    *
-   * This function computes yearly \f$y\f$ spawning biomass \f$SB_y\f$ by
-   * summing the contributions from each age \f$a\f$, accounting for proportion
-   * female, proportion mature, and weight at age \f$w_a\f$:
+   * This function computes yearly \f$y\f$ spawning output \f$SB_y\f$, which is
+   * spawning biomass when fecundity is 1, by summing the contributions from
+   * each age \f$a\f$, accounting for proportion
+   * female, proportion mature, spawning weight at age \f$w^S_{a,y}\f$, and
+   * fecundity at age \f$f_{a,y}\f$ (see SpawningOutputAA()):
    * \f[
-   * SB_y \mathrel{+}= N_{a,y} \times w_a \times p_{female,a} \times
-   * p_{mature,a}
+   * SB_y \mathrel{+}= N_{a,y} \times p_{female,a} \times p_{mature,a,y}
+   * \times w^S_{a,y} \times f_{a,y}
    * \f]
    *
    * @snippet{doc} this param_population
@@ -545,17 +637,17 @@ class CatchAtAge : public FisheryModelBase<Type> {
         population->proportion_female.get_force_scalar(age) *
         dq_["numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
-        PopulationMeanWeightAA(population, year, age);
+        SpawningOutputAA(population, year, age);
   }
 
   /**
    * @brief Calculated unfished spawning biomass for a population
    *
-   * Updates unfished spawning biomass \f$SB^U_y\f$ by adding the biomass of age
-   * \f$a\f$ in year \f$y\f$:
+   * Updates unfished spawning output \f$SB^U_y\f$ by adding the spawning output
+   * of age \f$a\f$ in year \f$y\f$:
    * \f[
-   * SB^U_y \mathrel{+}= N^U_{a,y} \times w_a \times p_{female,a} \times
-   * p_{mature,a}
+   * SB^U_y \mathrel{+}= N^U_{a,y} \times p_{female,a} \times p_{mature,a,y}
+   * \times w^S_{a,y} \times f_{a,y}
    * \f]
    *
    * @snippet{doc} this param_population
@@ -573,7 +665,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         population->proportion_female.get_force_scalar(age) *
         dq_["unfished_numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
-        PopulationMeanWeightAA(population, year, age);
+        SpawningOutputAA(population, year, age);
   }
 
   /**
@@ -606,9 +698,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * equilibrium, assuming an unfished stock. The biomass is calculated as the
    * sum of the biomass contributions from each age \f$a\f$:
    * \f[
-   * \phi_0 = \sum_{a=0}^{A} N_a \times p_{female,a} \times p_{mature,a} \times
-   * w_a
+   * \phi_0 = \sum_{a=0}^{A} N_a \times p_{female,a} \times p_{mature,a}
+   * \times w^S_a \times f_a
    * \f]
+   * using spawning weight and fecundity in the first model year (see
+   * SpawningOutputAA()).
    *
    * The numbers at age \f$N_a\f$ are calculated recursively with the natural
    * mortality of the age being left, as in the population dynamics:
@@ -630,17 +724,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     std::vector<Type> numbers_spr(population->n_ages, 1.0);
     Type phi_0 = 0.0;
-    phi_0 += numbers_spr[0] *
-             population->proportion_female.get_force_scalar(0) *
-             dq_["proportion_mature_at_age"][0] *
-             PopulationMeanWeightAA(population, 0, 0);
+    phi_0 +=
+        numbers_spr[0] * population->proportion_female.get_force_scalar(0) *
+        dq_["proportion_mature_at_age"][0] * SpawningOutputAA(population, 0, 0);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
       numbers_spr[a] =
           numbers_spr[a - 1] * fims_math::exp(-population->M[a - 1]);
       phi_0 += numbers_spr[a] *
                population->proportion_female.get_force_scalar(a) *
                dq_["proportion_mature_at_age"][a] *
-               PopulationMeanWeightAA(population, 0, a);
+               SpawningOutputAA(population, 0, a);
     }
 
     numbers_spr[population->n_ages - 1] =
@@ -651,7 +744,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         numbers_spr[population->n_ages - 1] *
         population->proportion_female.get_force_scalar(population->n_ages - 1) *
         dq_["proportion_mature_at_age"][population->n_ages - 1] *
-        PopulationMeanWeightAA(population, 0, population->n_ages - 1);
+        SpawningOutputAA(population, 0, population->n_ages - 1);
 
     return phi_0;
   }
@@ -714,8 +807,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This function evaluates the maturity ogive at the specified age and year
    * to estimate the proportion of individuals that are mature:
    * \f[
-   * p_{mature,a,y} = \text{maturity}(a, \min(y, n_{years} - 1))
+   * p_{mature,a,y} = \text{maturity}(a, y)
    * \f]
+   *
+   * Year n_years is the start of the year after the last model year. The
+   * maturity module decides which values that year uses.
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
@@ -728,11 +824,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    // Year n_years is the start-of-year state after the last data year, so it
-    // reuses that year's maturity.
     dq_["proportion_mature_at_age"][i_age_year] =
-        population->maturity->evaluate(
-            population->ages[age], (std::min)(year, population->n_years - 1));
+        population->maturity->evaluate(population->ages[age], year);
   }
 
   /**

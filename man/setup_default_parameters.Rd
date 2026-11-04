@@ -63,6 +63,13 @@ Growth defaults are chosen from the data. Models with empirical weight-at-age
 data default to \code{"EWAA"}. Models without empirical weight-at-age data but with
 length-composition data default to \code{"VonBertalanffySchnute"}.
 
+Maturity defaults are also chosen from the data. Models with
+\code{maturity_at_age} data default to \code{"Empirical"} maturity. Models with
+\code{maturity_at_length} data, no \code{maturity_at_age} data, and growth that gives
+length at age default to \code{"Empirical"} maturity of 1 at every age, because
+maturity at length gives the proportion mature. All other models default to
+\code{"Logistic"} maturity.
+
 To create the default initial numbers at age, this function uses the defaults
 from \code{setup_default_Population()} and \code{setup_default_Recruitment()}, which
 are passed to \code{setup_default_init_naa()} to calculate initial numbers at age.

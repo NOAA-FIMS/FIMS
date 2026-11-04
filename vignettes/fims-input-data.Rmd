@@ -35,7 +35,7 @@ The input data for a FIMS model is a single long data frame with the following c
 
 Two drawbacks of the long format are (1) some information is duplicated, and (2) the long format is harder to read and understand by looking at the raw data frame. To meet this second challenge, the FIMS team is working on functions to summarize, visualize, and check for errors in the input data.
 
-The currently available values for the `type` column are `r glue::glue_collapse(glue::glue('\"{FIMS::fims_input_types}\"'), sep = ", ", last = ", and ")`. The "weight_at_age" and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
+The currently available values for the `type` column are `r glue::glue_collapse(glue::glue('\"{FIMS::fims_input_types}\"'), sep = ", ", last = ", and ")`. The "weight_at_age", "spawning_weight_at_age", "fecundity_at_age", "maturity_at_age", "fecundity_at_length", "maturity_at_length", and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
 
 The individual data types are described in more detail below after introducing the example data set that is included in the package.
 
@@ -181,11 +181,37 @@ The `length_bin` data type defines length bins without providing length-composit
 
 For `length_bin` rows, the `length` column contains the lower edge of each length bin, the same as for length compositions. The `observed`, `age`, and `uncertainty` columns should usually be `NA`. The `fleet` column identifies which fleet or survey the length bins apply to, and `timing` can be `NA` unless fleet-specific timing is needed.
 
+`length_bin` rows with `fleet = NA` and `timing = NA` set the population length bins instead. Growth uses these bins for the distribution of length at age, and the expected length compositions of each fleet are built from them. These rows never set fleet bins, even though `fleet = NA` means "shared by all fleets" for `age_to_length_conversion` rows. The population length bins must span every fleet's length bins, and no population bin can be wider than a fleet bin it overlaps. As for fleet bins, the last population bin is as wide as the bin before it. A population bin that crosses a fleet bin edge is split between the 2 fleet bins as if its fish were spread evenly within it, so fleet bin edges should also be population bin edges.
+
+The first and last population length bins hold all smaller and all larger fish, so the last bin should start above the length of nearly all fish. Without these rows, FIMS uses bins 1 unit wide (1 mm for `data_big`) from the smallest fleet lower edge to the largest fleet upper edge, plus 1 more bin. Adding these rows can change weight at age, and so biomass, even without length compositions, because weight at age is then averaged over the length distribution at age. Population length bins need a growth module that gives length at age, so they are not used with `EWAA` growth.
+
+```{r data_big-population-length-bins}
+# population length bins 10 mm wide with lower edges from 0 to 1190 mm, which
+# span the data_big fleet length bins (0 to 1150 mm)
+population_length_bins <- tibble::tibble(
+  type = "length_bin",
+  fleet = NA_character_,
+  age = NA_integer_,
+  length = seq(0, 1190, by = 10),
+  timing = NA_real_,
+  observed = NA_real_,
+  unit = NA_character_,
+  uncertainty = NA_character_
+)
+data_with_population_bins <- dplyr::bind_rows(
+  FIMS::data_big,
+  population_length_bins
+)
+FIMSFrame(data_with_population_bins)
+```
+
 ## Weight-at-age data (`type == "weight_at_age"`)
 
 The weight-at-age data are not currently included in the likelihood and are just used for converting from numbers to biomass in the population dynamics. The `unit` column should be `mt` and the uncertainty should be `NA`.
 
-The population weight at age has `fleet = NA`. It is used for biomass and spawning biomass, and for the catch and index weight of any fleet without its own weight at age. Rows with a fleet name are that fleet's weight at age for its catch and index weight, for example from port samples or survey samples. For each year, a fleet uses its own rows for that year, then its own `timing = NA` rows, then the population weight at age, so a fleet only needs rows for the years that differ. If there are no `fleet = NA` rows and only 1 fleet has weight rows, those rows are used as the population weight at age, with a warning.
+Population weight-at-age rows should use `fleet = NA`. These values are used for total biomass, and also for spawning output unless separate `spawning_weight_at_age` rows are provided. They are also used as the default catch and index weights for any fleet that does not have its own weight-at-age data.
+
+Rows with a fleet name provide the weight-at-age used for that fleet's catch and index calculations, such as weights measured from port samples or survey samples. For each year, FIMS uses values in this order: the fleet's own rows for that year, then that fleet's `timing = NA` rows, then the population weight-at-age rows. This means a fleet only needs to provide rows for years where its weights differ from the default. If there are no `fleet = NA` rows and only 1 fleet has weight-at-age rows, FIMS will use that fleet's rows as the population default, but it will issue a warning.
 
 Rows with `timing = NA` are the default for every year, and rows with a `timing` replace that default for that year only. Timings outside the model years and the year after the last are an error. Every timing that is used needs 1 row for each model age, and rows are never averaged. Without `timing = NA` rows, every model year needs its own rows, plus the year after the last model year, because FIMS reports spawning biomass at the beginning of the year for every year, including the year after the last catches are removed from the population.
 
@@ -223,6 +249,122 @@ FIMS::data_big |>
   ggplot2::scale_x_continuous(breaks = get_ages(data_4_model)) +
   geom_hline(yintercept = 0) +
   ggtitle("Weight-at-age by time step in data_big example data set")
+```
+
+## Maturity-at-age data (`type == "maturity_at_age"`)
+
+Maturity-at-age data are optional. When they are present, `setup_default_parameters()` uses them in place of the default logistic maturity curve, and they are used as the proportion mature at age when calculating spawning output.
+
+Each row gives the proportion mature (between 0 and 1) in the `observed` column for one age. The `unit` column must be `proportion` and the `fleet` must be `NA`, because maturity applies to the population rather than to a fleet. The `uncertainty` should be `NA`.
+
+Maturity can be constant or vary by year:
+
+  1. rows with `timing = NA` apply to every year, and
+  2. rows with a `timing` replace those values for that year.
+
+Maturity in the first model year also sets unfished spawning biomass per recruit, so it affects the stock--recruitment curve and the spawning biomass ratio in every year. Maturity in a later year changes spawning biomass in that year and, through the stock--recruitment relationship, recruitment in the following year.
+
+Every model age needs a value for each `timing` that is used. Without `timing = NA` rows, every model year needs its own rows. As for weight-at-age data, so does the year after the last model year, because spawning output is calculated at the start of that year after the last catches are removed. Those rows do not add a model year. Projection years are model years, so they use their own rows or the `timing = NA` rows, not the maturity from the last data year.
+
+`data_big` does not include maturity-at-age data. The example below adds a constant maturity ogive and a different ogive for the second year.
+
+```{r data_big-maturity_at_age}
+maturity_ages <- get_ages(data_4_model)
+maturity_at_age <- tibble::tibble(
+  type = "maturity_at_age",
+  fleet = NA_character_,
+  age = rep(maturity_ages, times = 2),
+  length = NA_real_,
+  timing = rep(
+    c(NA, get_start_year(data_4_model) + 1),
+    each = length(maturity_ages)
+  ),
+  observed = c(plogis(maturity_ages - 2), plogis(maturity_ages - 3)),
+  unit = "proportion",
+  uncertainty = NA_character_
+)
+data_with_maturity <- FIMSFrame(dplyr::bind_rows(data_big, maturity_at_age))
+setup_default_Maturity(data_with_maturity, module_type = "Empirical") |>
+  head(3)
+```
+
+## Spawning weight and fecundity (`type == "spawning_weight_at_age"` and `type == "fecundity_at_age"`)
+
+Spawning output in each year is the sum over ages of numbers at age times proportion female, maturity, spawning weight at age, and fecundity at age. Each of the last 3 has a default, and rows for 1 of them replace the default for that factor only:
+
+- Maturity comes from the maturity module. With `maturity_at_age` rows, `setup_default_parameters()` uses Empirical maturity, which takes its values from those rows.
+- Spawning weight at age defaults to the population weight at age. It can be given separately, for example weight at the time of spawning.
+- Fecundity at age defaults to 1. It is spawning output per unit of spawning weight, for example eggs per mt.
+
+Without `spawning_weight_at_age` or `fecundity_at_age` rows, spawning output is spawning biomass. Both types are inputs for the population, so their rows need `fleet = NA`, and they use the same `timing` rule as weight at age: rows with `timing = NA` are the default for every year, rows with a `timing` replace that default for that year, and without `timing = NA` rows every model year and the year after the last need rows. The `unit` column describes the input, for example `mt` for spawning weight or `eggs/mt` for fecundity. Unfished spawning output and spawning output per recruit use the same product, with the values for the first model year for spawning output per recruit.
+
+Because the 3 values are multiplied, a combined vector can be put in 1 of them with the others set to 1. For example, the Stock Synthesis empirical input of weight times maturity times eggs per weight can be entered as `fecundity_at_age`, with `spawning_weight_at_age` rows of 1 and `maturity_at_age` rows of 1 at every age. Stock Synthesis one-sex models count every fish as female, so also set `proportion_female = 1` (or the female fraction, `FracFemale_GP_1`, when the number of sexes is set to -1). The `spawning_biomass` output is then in the units of that vector.
+
+## Fecundity at length (`type == "fecundity_at_length"`)
+
+`fecundity_at_length` gives the spawning output of 1 fish in each population length bin, for example eggs per fish. FIMS averages it over the distribution of length at age, so it replaces spawning weight at age in spawning output. The `length` column gives the lower edge of each population length bin, and each timing needs 1 row for every population length bin. The rows need `fleet = NA` and follow the same `timing` rule as fecundity at age.
+
+Fecundity at length needs population length bins (`length_bin` rows with `fleet = NA`) and growth that gives length at age, such as von Bertalanffy growth. With `EWAA` growth the rows are not used and FIMS warns. They cannot be combined with `spawning_weight_at_age` rows. `fecundity_at_age` rows still multiply spawning output, with a warning, so do not also use the combined-vector recipe above. Doubling fecundity at length doubles spawning output and unfished spawning output, so the spawning biomass ratio and recruitment do not change.
+
+The Stock Synthesis fecundity options can be tabulated at the center of each population length bin, as Stock Synthesis does. Here `a` and `b` are the Stock Synthesis fecundity parameters, and `weight` is weight at the bin center in kg, the unit Stock Synthesis uses for fecundity. Options 4 and 5 can be negative for small fish, so they are set to 0. With length-based maturity in Stock Synthesis (maturity options 1 and 6), give maturity as `maturity_at_length`, described next.
+
+```{r fecundity-at-length-ss3}
+# Example values. Option 1 with a = 1 and b = 0 gives weight, so spawning
+# output is spawning biomass in kg.
+ss3_fecundity_option <- 1
+a <- 1
+b <- 0
+# Length-weight parameters for length in mm and weight in kg
+length_weight_a <- 2.5e-8
+length_weight_b <- 3
+population_lengths <- seq(0, 1150, by = 50)
+length_midpoints <- population_lengths + 25
+weight <- length_weight_a * length_midpoints^length_weight_b
+fecundity <- switch(ss3_fecundity_option,
+  weight * (a + b * weight), # 1: eggs = weight x (a + b x weight)
+  a * length_midpoints^b, # 2: eggs = a x length^b
+  a * weight^b, # 3: eggs = a x weight^b
+  pmax(a + b * length_midpoints, 0), # 4: eggs = a + b x length
+  pmax(a + b * weight, 0) # 5: eggs = a + b x weight
+)
+fecundity_rows <- tibble::tibble(
+  type = "fecundity_at_length",
+  fleet = NA_character_,
+  age = NA_real_,
+  length = population_lengths,
+  timing = NA_real_,
+  observed = fecundity,
+  unit = "eggs",
+  uncertainty = NA_character_
+)
+```
+
+## Maturity at length (`type == "maturity_at_length"`)
+
+`maturity_at_length` gives the proportion mature in each population length bin. Rows need `fleet = NA` and 1 row per population length bin in each timing, and they follow the same `timing` rule as `fecundity_at_length`. The model needs population length bins and growth that gives length at age. As for `maturity_at_age`, values are from 0 to 1 and `unit = "proportion"`.
+
+Spawning output at age is the sum over length bins of the probability of each length at that age times maturity at length times fecundity at length, or weight at the bin center without `fecundity_at_length`. This sum is then multiplied by maturity at age and fecundity at age. Maturity at length is applied inside the sum because the longer fish of an age are both heavier and more often mature. Applying maturity after averaging over length would miss that, so spawning output would be too low. Stock Synthesis also applies length-based maturity inside the sum over length, but at the time of spawning, where FIMS uses the start of the year.
+
+With `maturity_at_length` rows and no `maturity_at_age` rows, `setup_default_parameters()` sets maturity at age to 1 when growth gives length at age, and `setup_default_Maturity(data, module_type = "Empirical")` does the same. A maturity at age of only 0 and 1, such as Stock Synthesis's first mature age, can be combined with maturity at length. Values between 0 and 1 give a warning, because maturity would then be counted twice. Maturity parameters cannot be estimated. The `proportion_mature_at_age` output reports maturity at age only, not maturity at length.
+
+A logistic maturity ogive in length, such as Stock Synthesis maturity option 1, can be tabulated at the bin centers. Here `mat_50` and `mat_slope` are the Stock Synthesis parameters, and `mat_slope` is negative.
+
+```{r maturity-at-length-logistic}
+# Example values: 50% mature at 500 mm
+mat_50 <- 500
+mat_slope <- -0.02
+population_lengths <- seq(0, 1150, by = 50)
+length_midpoints <- population_lengths + 25
+maturity_rows <- tibble::tibble(
+  type = "maturity_at_length",
+  fleet = NA_character_,
+  age = NA_real_,
+  length = population_lengths,
+  timing = NA_real_,
+  observed = 1 / (1 + exp(mat_slope * (length_midpoints - mat_50))),
+  unit = "proportion",
+  uncertainty = NA_character_
+)
 ```
 
 ## Age-to-length conversion (`type == "age_to_length_conversion"`)

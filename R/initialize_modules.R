@@ -40,6 +40,8 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
 
   if (module_class_name == "Population") {
     module_fields <- setdiff(module_fields, c(
+      "n_lengths",
+      "lengths",
       "log_f_multiplier",
       "spawning_biomass_ratio",
       "total_catch_weight",
@@ -54,6 +56,10 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       "unfished_biomass",
       "unfished_spawning_biomass",
       "proportion_mature_at_age",
+      "spawning_weight_at_age",
+      "fecundity_at_age",
+      "fecundity_at_length",
+      "maturity_at_length",
       "expected_recruitment",
       "sum_selectivity"
     ))
@@ -343,6 +349,167 @@ initialize_growth <- function(parameters, data) {
 #' The initialized maturity module as an object.
 #' @noRd
 initialize_maturity <- function(parameters, data) {
+  maturity_type <- parameters |>
+    dplyr::filter(.data[["module_name"]] == "Maturity") |>
+    dplyr::pull(.data[["module_type"]]) |>
+    unique() |>
+    stats::na.omit()
+
+  if (length(maturity_type) == 1 &&
+    identical(maturity_type[[1]], "Empirical")) {
+    # set_param_vector() fills maturity_at_age in row order, so sort the rows
+    # by year then age to match how the values are indexed in C++.
+    maturity_rows <- parameters |>
+      dplyr::filter(
+        .data[["module_name"]] == "Maturity",
+        .data[["label"]] == "maturity_at_age"
+      ) |>
+      dplyr::arrange(.data[["timing"]], .data[["age"]])
+
+    estimation_types <- unique(maturity_rows[["estimation_type"]])
+    if (any(estimation_types != "constant")) {
+      cli::cli_abort(c(
+        "x" = "Empirical maturity has estimation types other than
+        {.val constant}: {.val {setdiff(estimation_types, 'constant')}}.",
+        "i" = "FIMS does not fit maturity to data, so empirical maturity cannot
+        be estimated. Every {.var maturity_at_age} row needs
+        {.code estimation_type = \"constant\"}.",
+        "i" = "Use {.code dplyr::filter(parameters, module_name == 'Maturity',
+        estimation_type != 'constant')} to find the rows."
+      ))
+    }
+    maturity_values <- maturity_rows[["value"]]
+    invalid_values <- maturity_values[
+      is.na(maturity_values) | maturity_values < 0 | maturity_values > 1
+    ]
+    if (length(invalid_values) > 0) {
+      cli::cli_abort(c(
+        "x" = "Empirical maturity has values that are missing or outside 0 to
+        1: {.val {unique(invalid_values)}}.",
+        "i" = "Every {.var maturity_at_age} value is a proportion mature, so it
+        must be from 0 to 1.",
+        "i" = "Use {.code dplyr::filter(parameters, label == 'maturity_at_age',
+        is.na(value) | value < 0 | value > 1)} to find the rows."
+      ))
+    }
+
+    ages <- get_ages(data)
+    # By year, maturity is also needed for the year after the last model year
+    years <- get_start_year(data):(get_end_year(data) + 1)
+    expected_keys <- if (all(is.na(maturity_rows[["timing"]]))) {
+      paste(NA, ages)
+    } else {
+      paste(rep(years, each = length(ages)), rep(ages, times = length(years)))
+    }
+    maturity_keys <- paste(maturity_rows[["timing"]], maturity_rows[["age"]])
+    if (length(maturity_keys) != length(expected_keys) ||
+      !setequal(maturity_keys, expected_keys)) {
+      cli::cli_abort(c(
+        "x" = "Empirical maturity has {NROW(maturity_rows)}
+        {.var maturity_at_age} rows, which do not match the model ages and
+        years.",
+        "i" = "Empirical maturity needs 1 {.var maturity_at_age} value per age,
+        or 1 per age and year. That is {length(ages)} rows with
+        {.code timing = NA}, or {length(ages) * length(years)} rows for years
+        {min(years)}-{max(years)}, which include the year after the last model
+        year.",
+        "i" = "Use {.code dplyr::count(dplyr::filter(parameters, label ==
+        'maturity_at_age'), timing)} to see the years.",
+        "i" = "Use {.fn setup_default_Maturity} with
+        {.code module_type = \"Empirical\"} to build these rows from the same
+        {.var data}."
+      ))
+    }
+
+    all_zero_timings <- maturity_rows |>
+      dplyr::summarize(
+        all_zero = all(.data[["value"]] == 0),
+        .by = dplyr::all_of("timing")
+      ) |>
+      dplyr::filter(.data[["all_zero"]]) |>
+      dplyr::pull(.data[["timing"]])
+    if (length(all_zero_timings) > 0) {
+      cli::cli_abort(c(
+        "x" = "Empirical maturity is 0 at every age for these timings:
+        {.val {all_zero_timings}}.",
+        "i" = "Spawning output would be 0, which makes recruitment and the
+        objective function undefined.",
+        "i" = "Use {.code dplyr::filter(parameters, label == 'maturity_at_age',
+        value == 0)} to find the rows."
+      ))
+    }
+
+    parameters <- parameters |>
+      dplyr::filter(!(
+        .data[["module_name"]] == "Maturity" &
+          .data[["label"]] == "maturity_at_age"
+      )) |>
+      dplyr::bind_rows(maturity_rows)
+  }
+
+  # Maturity at age multiplies maturity at length, so a maturity at age between
+  # 0 and 1 counts maturity twice. Values of only 0 and 1, such as a first
+  # mature age, do not. Under EWAA growth maturity at length is not used.
+  growth_type <- parameters |>
+    dplyr::filter(.data[["module_name"]] == "Growth") |>
+    dplyr::pull(.data[["module_type"]]) |>
+    unique()
+  input_types <- get_data(data)[["type"]]
+  # EWAA growth does not use maturity at length, so maturity at age of 1 from
+  # maturity-at-length rows would make every fish mature
+  if (any(input_types == "maturity_at_length") && "EWAA" %in% growth_type &&
+    !any(input_types == "maturity_at_age") &&
+    identical(as.character(maturity_type), "Empirical")) {
+    cli::cli_abort(c(
+      "x" = "Empirical maturity at age has no {.var maturity_at_age} rows, and
+      growth is {.val EWAA}, which does not use the {.var maturity_at_length}
+      rows.",
+      "i" = "Every fish would be mature. Use growth that gives length at age,
+      such as {.code setup_default_Growth(module_type =
+      \"VonBertalanffySchnute\")}, or {.val Logistic} maturity.",
+      "i" = "Use {.code dplyr::distinct(parameters, module_name,
+      module_type)} to see the modules."
+    ))
+  }
+  if (any(input_types == "maturity_at_length") &&
+    !"EWAA" %in% growth_type) {
+    maturity_parameters <- dplyr::filter(
+      parameters,
+      .data[["module_name"]] == "Maturity"
+    )
+    estimated_labels <- maturity_parameters |>
+      dplyr::filter(.data[["estimation_type"]] != "constant") |>
+      dplyr::pull(.data[["label"]]) |>
+      unique()
+    if (length(estimated_labels) > 0) {
+      cli::cli_abort(c(
+        "x" = "Maturity parameters {.val {estimated_labels}} are estimated,
+        and the data have {.var maturity_at_length} rows.",
+        "i" = "FIMS does not fit maturity to data, so maturity parameters need
+        {.code estimation_type = \"constant\"}.",
+        "i" = "Use {.code dplyr::filter(parameters, module_name == 'Maturity',
+        estimation_type != 'constant')} to find the rows."
+      ))
+    }
+    at_age_values <- maturity_parameters |>
+      dplyr::filter(.data[["label"]] == "maturity_at_age") |>
+      dplyr::pull(.data[["value"]])
+    if (!identical(as.character(maturity_type), "Empirical") ||
+      any(at_age_values > 0 & at_age_values < 1)) {
+      cli::cli_warn(c(
+        "!" = "Maturity at age has values between 0 and 1, and it multiplies
+        the {.var maturity_at_length} values.",
+        "i" = "Use a maturity at age of only 0 and 1 unless maturity at a
+        given length also changes with age.",
+        "i" = "{.code setup_default_Maturity(data, module_type =
+        \"Empirical\")} gives 1 at every age when there are no
+        {.var maturity_at_age} rows.",
+        "i" = "Use {.code dplyr::filter(parameters, module_name == 'Maturity',
+        value > 0, value < 1)} to find the values."
+      ))
+    }
+  }
+
   module <- initialize_module(
     parameters = parameters,
     data = data,
@@ -385,6 +552,87 @@ initialize_population <- function(parameters, data, linked_ids) {
   # Link fleets to module
   for (i in which(grepl("fleet", names(linked_ids)))) {
     module$AddFleet(linked_ids[[i]])
+  }
+
+  # Spawning weight and fecundity at age are only filled when there are rows.
+  # Empty vectors mean spawning weight is the population weight at age and
+  # fecundity is 1.
+  input_data <- get_data(data)
+  spawning_years <- get_start_year(data):(get_end_year(data) + 1)
+  for (field in c("spawning_weight_at_age", "fecundity_at_age")) {
+    field_rows <- dplyr::filter(input_data, .data[["type"]] == .env[["field"]])
+    if (NROW(field_rows) > 0) {
+      module[[field]][] <- at_age_by_year(
+        field_rows,
+        ages = get_ages(data),
+        years = spawning_years
+      )
+    }
+  }
+
+  population_lengths <- population_length_bins(get_data(data))
+  module$n_lengths$set(length(population_lengths))
+  module$lengths[] <- population_lengths
+  growth_type <- parameters |>
+    dplyr::filter(.data[["module_name"]] == "Growth") |>
+    dplyr::pull(.data[["module_type"]]) |>
+    unique()
+  if (length(population_lengths) > 0 && "EWAA" %in% growth_type) {
+    cli::cli_warn(c(
+      "!" = "The population length bins ({.var length_bin} rows with
+      {.code fleet = NA}) are not used because growth is {.val EWAA}.",
+      "i" = "Population length bins need a growth module that gives length at
+      age, such as {.code setup_default_Growth(module_type =
+      \"VonBertalanffySchnute\")}."
+    ))
+  }
+
+  # Fecundity and maturity at length are averaged over the length distribution
+  # at age, which EWAA growth does not have, so the rows are only used with
+  # growth that gives length at age
+  length_input_types <- intersect(
+    c("fecundity_at_length", "maturity_at_length"),
+    input_data[["type"]]
+  )
+  if (length(length_input_types) > 0) {
+    if ("EWAA" %in% growth_type) {
+      cli::cli_warn(c(
+        "!" = "The {.var {length_input_types}} rows are not used because
+        growth is {.val EWAA}.",
+        "i" = "Inputs at length need a growth module that gives length at
+        age, such as {.code setup_default_Growth(module_type =
+        \"VonBertalanffySchnute\")}.",
+        "i" = "Without these rows, spawning output uses the at-age inputs
+        only."
+      ))
+    } else {
+      if (any(input_data[["type"]] == "spawning_weight_at_age")) {
+        cli::cli_abort(c(
+          "x" = "The data have both {.var {length_input_types}} and
+          {.var spawning_weight_at_age} rows.",
+          "i" = "Spawning output from inputs at length replaces spawning
+          weight at age, so they cannot be combined.",
+          "i" = "Use {.code dplyr::count(data, type)} to see the types."
+        ))
+      }
+      if ("fecundity_at_length" %in% length_input_types &&
+        any(input_data[["type"]] == "fecundity_at_age")) {
+        cli::cli_warn(c(
+          "!" = "{.var fecundity_at_age} multiplies spawning output from
+          {.var fecundity_at_length}.",
+          "i" = "Remove the {.var fecundity_at_age} rows unless spawning output
+          per fish also changes with age at a given length."
+        ))
+      }
+      for (field in length_input_types) {
+        module[[field]][] <- at_age_by_year(
+          dplyr::filter(input_data, .data[["type"]] == .env[["field"]]),
+          ages = population_lengths,
+          years = spawning_years,
+          column = "length"
+        )
+      }
+    }
   }
 
   return(module)

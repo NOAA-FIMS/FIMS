@@ -382,7 +382,85 @@ test_that("`initialize_maturity()` works with correct inputs", {
   clear()
 })
 
+## Error handling ----
+test_that("`initialize_maturity()` checks maturity at age with maturity at length", {
+  population_lengths <- seq(0, 1150, by = 50)
+  maturity_frame <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    population_length_bin_rows(population_lengths),
+    maturity_at_length_rows(population_lengths, 0.5)
+  ))
+  logistic_parameters <- setup_default_parameters(maturity_frame) |>
+    dplyr::filter(module_name != "Growth") |>
+    dplyr::bind_rows(setup_default_Growth(
+      data = maturity_frame,
+      module_type = "VonBertalanffySchnute"
+    ))
+  #' @description Test that `initialize_maturity()` warns that a logistic maturity at age multiplies maturity at length.
+  expect_warning(
+    initialize_maturity(logistic_parameters, maturity_frame),
+    "multiplies\\s+the `maturity_at_length` values"
+  )
+  clear()
+
+  estimated_parameters <- logistic_parameters |>
+    dplyr::mutate(estimation_type = dplyr::if_else(
+      module_name == "Maturity" & label == "inflection_point",
+      "fixed_effects",
+      estimation_type
+    ))
+  #' @description Test that `initialize_maturity()` errors when maturity parameters are estimated with maturity at length.
+  expect_error(
+    initialize_maturity(estimated_parameters, maturity_frame),
+    "are estimated"
+  )
+  clear()
+
+  ewaa_parameters <- setup_default_parameters(maturity_frame) |>
+    dplyr::filter(module_name != "Maturity") |>
+    dplyr::bind_rows(
+      setup_default_Maturity(maturity_frame, module_type = "Empirical")
+    )
+  #' @description Test that `initialize_maturity()` errors when maturity at age of 1 comes from maturity-at-length rows that EWAA growth does not use.
+  expect_error(
+    initialize_maturity(ewaa_parameters, maturity_frame),
+    "Every fish would be mature"
+  )
+  clear()
+})
+
 # test_initialize_population ----
+## Setup ----
+setup_vonb_parameters <- function(frame) {
+  setup_default_parameters(frame) |>
+    dplyr::filter(module_name != "Growth") |>
+    dplyr::bind_rows(
+      setup_default_Growth(data = frame, module_type = "VonBertalanffySchnute")
+    )
+}
+
+initialize_test_population <- function(parameters, data) {
+  linked_ids <- c(
+    recruitment = initialize_recruitment(parameters, data)$get_id(),
+    growth = initialize_growth(parameters, data)$get_id(),
+    maturity = initialize_maturity(parameters, data)$get_id()
+  )
+  initialize_population(parameters, data, linked_ids)
+}
+
+get_population_report <- function(data, parameters) {
+  report <- parameters |>
+    initialize_fims(data = data) |>
+    fit_fims(optimize = FALSE) |>
+    get_report()
+  clear()
+  report
+}
+
+# The data_big fleet length bins are 0-1100 by 50, so they span 0-1150. The
+# bins FIMS builds by default are 1 unit wide from 0 to 1150, plus 1 more.
+default_population_lengths <- seq(0, 1150, by = 1)
+
 ## IO correctness ----
 test_that("`initialize_population()` works with correct inputs", {
   # Setup modules needed for population
@@ -429,6 +507,370 @@ test_that("`initialize_population()` works with correct inputs", {
   clear()
 })
 
+test_that("`initialize_population()` multiplies spawning output by spawning weight and fecundity", {
+  get_population_report <- function(data) {
+    frame <- FIMSFrame(data)
+    report <- setup_default_parameters(frame) |>
+      initialize_fims(data = frame) |>
+      fit_fims(optimize = FALSE) |>
+      get_report()
+    clear()
+    report
+  }
+  population_weight_rows <- dplyr::filter(data_big, type == "weight_at_age")
+  default_rows <- dplyr::filter(population_weight_rows, timing == 1) |>
+    dplyr::mutate(timing = NA_integer_)
+  base_report <- get_population_report(data_big)
+
+  fecundity_report <- get_population_report(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(default_rows, type = "fecundity_at_age", observed = 2)
+  ))
+  #' @description Test that a fecundity of 2 at every age doubles spawning output in every year.
+  expect_equal(
+    fecundity_report[["spawning_biomass"]][[1]],
+    2 * base_report[["spawning_biomass"]][[1]]
+  )
+  #' @description Test that a fecundity of 2 at every age doubles unfished spawning output.
+  expect_equal(
+    fecundity_report[["unfished_spawning_biomass"]][[1]],
+    2 * base_report[["unfished_spawning_biomass"]][[1]]
+  )
+  # Spawning output per recruit doubles too, so recruitment and the spawning
+  # biomass ratio do not change
+  #' @description Test that a constant fecundity does not change the spawning biomass ratio.
+  expect_equal(
+    fecundity_report[["spawning_biomass_ratio"]],
+    base_report[["spawning_biomass_ratio"]]
+  )
+  #' @description Test that a constant fecundity does not change the objective.
+  expect_equal(fecundity_report[["jnll"]], base_report[["jnll"]])
+
+  year_5_fecundity_report <- get_population_report(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(
+      population_weight_rows,
+      type = "fecundity_at_age",
+      observed = dplyr::if_else(timing == 5, 2, 1)
+    )
+  ))
+  year_5 <- 5 - get_start_year(data) + 1
+  #' @description Test that a fecundity of 2 in year 5 doubles spawning output in year 5 only.
+  expect_equal(
+    year_5_fecundity_report[["spawning_biomass"]][[1]][year_5],
+    2 * base_report[["spawning_biomass"]][[1]][year_5]
+  )
+  #' @description Test that a fecundity of 2 in year 5 leaves spawning output in earlier years unchanged.
+  expect_equal(
+    year_5_fecundity_report[["spawning_biomass"]][[1]][seq_len(year_5 - 1)],
+    base_report[["spawning_biomass"]][[1]][seq_len(year_5 - 1)]
+  )
+
+  spawning_weight_report <- get_population_report(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(
+      population_weight_rows,
+      type = "spawning_weight_at_age",
+      observed = observed * 2
+    )
+  ))
+  #' @description Test that spawning weight at age of 2 times the population weight doubles spawning output.
+  expect_equal(
+    spawning_weight_report[["spawning_biomass"]][[1]],
+    2 * base_report[["spawning_biomass"]][[1]]
+  )
+  #' @description Test that spawning weight at age does not change biomass.
+  expect_equal(spawning_weight_report[["biomass"]], base_report[["biomass"]])
+  #' @description Test that spawning weight at age does not change catch weight.
+  expect_equal(
+    spawning_weight_report[["catch_weight"]],
+    base_report[["catch_weight"]]
+  )
+})
+
+test_that("`initialize_population()` passes population length bins to the model", {
+  bins_frame <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    population_length_bin_rows(seq(0, 1150, by = 50))
+  ))
+
+  population <- initialize_test_population(
+    setup_vonb_parameters(bins_frame),
+    bins_frame
+  )
+  #' @description Test that `initialize_population()` sets the population lengths from `length_bin` rows with `fleet = NA`.
+  expect_equal(population$lengths$get_values(), seq(0, 1150, by = 50))
+  #' @description Test that `initialize_population()` sets the number of population length bins.
+  expect_equal(population$n_lengths$get(), 24)
+  clear()
+
+  population <- initialize_test_population(default_parameters, data)
+  #' @description Test that `initialize_population()` sets no population lengths when there are no `length_bin` rows with `fleet = NA`.
+  expect_equal(population$n_lengths$get(), 0)
+  clear()
+
+  #' @description Test that `initialize_population()` warns that population length bins are not used with EWAA growth.
+  expect_warning(
+    initialize_test_population(setup_default_parameters(bins_frame), bins_frame),
+    "not used because growth is"
+  )
+  clear()
+})
+
+test_that("`initialize_fims()` builds the length distribution at age on the population length bins", {
+  vonb_parameters <- setup_vonb_parameters(data)
+  base_report <- get_population_report(data, vonb_parameters)
+  default_bins_frame <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    population_length_bin_rows(default_population_lengths)
+  ))
+  default_bins_report <- get_population_report(
+    default_bins_frame,
+    vonb_parameters
+  )
+
+  no_length_data <- dplyr::filter(
+    data_big,
+    !type %in% c("length_comp", "age_to_length_conversion")
+  )
+  no_length_bins_frame <- FIMSFrame(dplyr::bind_rows(
+    no_length_data,
+    population_length_bin_rows(default_population_lengths)
+  ))
+  no_length_bins_report <- get_population_report(
+    no_length_bins_frame,
+    setup_vonb_parameters(no_length_bins_frame)
+  )
+
+  #' @description Test that population length bins equal to the bins FIMS builds by default give the same model as no population length bins.
+  expect_equal(default_bins_report[["jnll"]], base_report[["jnll"]])
+  expect_equal(default_bins_report[["biomass"]], base_report[["biomass"]])
+  #' @description Test that, with the same population length bins, biomass is the same with and without length compositions.
+  expect_equal(
+    no_length_bins_report[["biomass"]],
+    default_bins_report[["biomass"]]
+  )
+})
+
+test_that("`initialize_population()` uses fecundity at length for spawning output", {
+  population_lengths <- seq(0, 1150, by = 50)
+  bins_data <- dplyr::bind_rows(
+    data_big,
+    population_length_bin_rows(population_lengths)
+  )
+  growth <- setup_default_Growth(
+    data = FIMSFrame(bins_data),
+    module_type = "VonBertalanffySchnute"
+  )
+  growth_value <- function(label) growth[["value"]][growth[["label"]] == label]
+  # Weight at each bin center. Without fecundity at length, spawning output at
+  # age is this weight averaged over the length distribution at age.
+  weight_at_length <- growth_value("length_weight_a") *
+    (population_lengths + 25)^growth_value("length_weight_b")
+  get_report_with <- function(...) {
+    frame <- FIMSFrame(dplyr::bind_rows(bins_data, ...))
+    get_population_report(frame, setup_vonb_parameters(frame))
+  }
+  base_report <- get_report_with()
+  weight_report <- get_report_with(
+    fecundity_at_length_rows(population_lengths, weight_at_length)
+  )
+  double_report <- get_report_with(
+    fecundity_at_length_rows(population_lengths, 2 * weight_at_length)
+  )
+  year_5_report <- get_report_with(
+    fecundity_at_length_rows(population_lengths, weight_at_length),
+    fecundity_at_length_rows(population_lengths, 2 * weight_at_length, 5)
+  )
+
+  #' @description Test that fecundity at length equal to weight at length gives the same spawning output as no fecundity at length.
+  expect_equal(
+    object = weight_report[["spawning_biomass"]],
+    expected = base_report[["spawning_biomass"]]
+  )
+  #' @description Test that doubling fecundity at length doubles spawning output.
+  expect_equal(
+    object = double_report[["spawning_biomass"]][[1]],
+    expected = 2 * weight_report[["spawning_biomass"]][[1]]
+  )
+  #' @description Test that doubling fecundity at length does not change the jnll, because recruitment depends on spawning output relative to unfished.
+  expect_equal(
+    object = double_report[["jnll"]],
+    expected = weight_report[["jnll"]]
+  )
+  #' @description Test that fecundity-at-length rows for year 5 leave spawning output in years 1-4 unchanged.
+  expect_equal(
+    object = year_5_report[["spawning_biomass"]][[1]][1:4],
+    expected = weight_report[["spawning_biomass"]][[1]][1:4]
+  )
+  #' @description Test that doubling fecundity at length for year 5 doubles spawning output in year 5, because numbers at age in year 5 depend only on spawning output in earlier years.
+  expect_equal(
+    object = year_5_report[["spawning_biomass"]][[1]][5],
+    expected = 2 * weight_report[["spawning_biomass"]][[1]][5]
+  )
+
+  fecundity_at_age_rows <- tibble::tibble(
+    type = "fecundity_at_age",
+    fleet = NA_character_,
+    age = get_ages(FIMSFrame(data_big)),
+    length = NA_real_,
+    timing = NA_real_,
+    observed = 2,
+    unit = NA_character_,
+    uncertainty = NA_character_
+  )
+  #' @description Test that `initialize_population()` warns that fecundity at age multiplies fecundity at length.
+  expect_warning(
+    fecundity_at_age_report <- get_report_with(
+      fecundity_at_length_rows(population_lengths, weight_at_length),
+      fecundity_at_age_rows
+    ),
+    "multiplies spawning output"
+  )
+  #' @description Test that fecundity at age of 2 doubles spawning output from fecundity at length.
+  expect_equal(
+    object = fecundity_at_age_report[["spawning_biomass"]][[1]],
+    expected = 2 * weight_report[["spawning_biomass"]][[1]]
+  )
+
+  ewaa_frame <- FIMSFrame(dplyr::bind_rows(
+    bins_data,
+    fecundity_at_length_rows(population_lengths, weight_at_length)
+  ))
+  ewaa_report <- get_population_report(data, default_parameters)
+  #' @description Test that `initialize_population()` warns that fecundity at length is not used with EWAA growth.
+  expect_warning(
+    expect_warning(
+      ewaa_fecundity_report <- get_population_report(
+        ewaa_frame,
+        setup_default_parameters(ewaa_frame)
+      ),
+      "fecundity_at_length` rows are not used"
+    ),
+    "population length bins"
+  )
+  #' @description Test that fecundity at length does not change spawning output with EWAA growth.
+  expect_equal(
+    object = ewaa_fecundity_report[["spawning_biomass"]],
+    expected = ewaa_report[["spawning_biomass"]]
+  )
+})
+
+test_that("`initialize_population()` uses maturity at length for spawning output", {
+  population_lengths <- seq(0, 1150, by = 50)
+  bins_data <- dplyr::bind_rows(
+    data_big,
+    population_length_bin_rows(population_lengths)
+  )
+  growth <- setup_default_Growth(
+    data = FIMSFrame(bins_data),
+    module_type = "VonBertalanffySchnute"
+  )
+  growth_value <- function(label) growth[["value"]][growth[["label"]] == label]
+  weight_at_length <- growth_value("length_weight_a") *
+    (population_lengths + 25)^growth_value("length_weight_b")
+  maturity_at_age_rows <- tibble::tibble(
+    type = "maturity_at_age",
+    fleet = NA_character_,
+    age = get_ages(FIMSFrame(data_big)),
+    length = NA_real_,
+    timing = NA_real_,
+    observed = 1,
+    unit = "proportion",
+    uncertainty = NA_character_
+  )
+  # Maturity at age is 1 in every run, from maturity_at_age rows or from the
+  # Empirical default with maturity_at_length rows
+  get_report_with <- function(...) {
+    frame <- FIMSFrame(dplyr::bind_rows(bins_data, ...))
+    parameters <- setup_vonb_parameters(frame) |>
+      dplyr::filter(module_name != "Maturity") |>
+      dplyr::bind_rows(setup_default_Maturity(frame, module_type = "Empirical"))
+    get_population_report(frame, parameters)
+  }
+  base_report <- get_report_with(maturity_at_age_rows)
+  one_report <- get_report_with(
+    maturity_at_length_rows(population_lengths, 1)
+  )
+  half_report <- get_report_with(
+    maturity_at_length_rows(population_lengths, 0.5)
+  )
+  half_double_report <- get_report_with(
+    maturity_at_length_rows(population_lengths, 0.5),
+    fecundity_at_length_rows(population_lengths, 2 * weight_at_length)
+  )
+
+  #' @description Test that maturity at length of 1 gives the same spawning output as no inputs at length, because weight at the bin centers averaged over length at age is the population weight at age.
+  expect_equal(
+    object = one_report[["spawning_biomass"]],
+    expected = base_report[["spawning_biomass"]]
+  )
+  #' @description Test that maturity at length of 0.5 halves spawning output.
+  expect_equal(
+    object = half_report[["spawning_biomass"]],
+    expected = lapply(one_report[["spawning_biomass"]], \(x) 0.5 * x)
+  )
+  #' @description Test that maturity at length of 0.5 and fecundity at length of twice the weight at length give the spawning output of maturity 1 and weight at length.
+  expect_equal(
+    object = half_double_report[["spawning_biomass"]],
+    expected = one_report[["spawning_biomass"]]
+  )
+
+  # Fish of 500 mm or more are mature. Within an age, maturity then changes with
+  # length, so applying it after averaging over length would give another value.
+  mature_at_length <- as.numeric(population_lengths >= 500)
+  maturity_report <- get_report_with(
+    maturity_at_length_rows(population_lengths, mature_at_length)
+  )
+  folded_report <- get_report_with(
+    maturity_at_length_rows(population_lengths, 1),
+    fecundity_at_length_rows(
+      population_lengths,
+      mature_at_length * weight_at_length
+    )
+  )
+  #' @description Test that maturity at length is applied to each length bin before averaging over length at age, so it equals fecundity at length of maturity times weight.
+  expect_equal(
+    object = maturity_report[["spawning_biomass"]],
+    expected = folded_report[["spawning_biomass"]]
+  )
+
+  year_5_report <- get_report_with(
+    maturity_at_length_rows(population_lengths, 1),
+    maturity_at_length_rows(population_lengths, 0.5, 5)
+  )
+  #' @description Test that maturity-at-length rows for year 5 leave spawning output in years 1-4 unchanged.
+  expect_equal(
+    object = year_5_report[["spawning_biomass"]][[1]][1:4],
+    expected = one_report[["spawning_biomass"]][[1]][1:4]
+  )
+  #' @description Test that maturity at length of 0.5 for year 5 halves spawning output in year 5.
+  expect_equal(
+    object = year_5_report[["spawning_biomass"]][[1]][5],
+    expected = 0.5 * one_report[["spawning_biomass"]][[1]][5]
+  )
+
+  # Maturity at age of 0 at ages 1 and 2 and 1 above, as for a first mature age
+  first_mature_rows <- dplyr::mutate(
+    maturity_at_age_rows,
+    observed = as.numeric(age > 2)
+  )
+  first_mature_frame <- FIMSFrame(dplyr::bind_rows(
+    bins_data,
+    first_mature_rows,
+    maturity_at_length_rows(population_lengths, 0.5)
+  ))
+  first_mature_parameters <- setup_vonb_parameters(first_mature_frame) |>
+    dplyr::filter(module_name != "Maturity") |>
+    dplyr::bind_rows(
+      setup_default_Maturity(first_mature_frame, module_type = "Empirical")
+    )
+  #' @description Test that a maturity at age of only 0 and 1 with maturity at length does not warn.
+  expect_no_warning(
+    get_population_report(first_mature_frame, first_mature_parameters)
+  )
+})
+
 ## Error handling ----
 test_that("`initialize_population()` returns correct error messages", {
   #' @description Test that `initialize_population()` handles missing linked_ids correctly.
@@ -439,6 +881,25 @@ test_that("`initialize_population()` returns correct error messages", {
       linked_ids = c(growth = 1)
     ),
     "`linked_ids` for population must include `growth`, `maturity`, and"
+  )
+  clear()
+
+  population_lengths <- seq(0, 1150, by = 50)
+  spawning_weight_rows <- dplyr::filter(data_big, type == "weight_at_age") |>
+    dplyr::mutate(type = "spawning_weight_at_age", fleet = NA_character_)
+  fecundity_frame <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    population_length_bin_rows(population_lengths),
+    fecundity_at_length_rows(population_lengths, population_lengths),
+    spawning_weight_rows
+  ))
+  #' @description Test that `initialize_population()` errors when there are both fecundity-at-length and spawning-weight-at-age rows.
+  expect_error(
+    initialize_test_population(
+      setup_vonb_parameters(fecundity_frame),
+      fecundity_frame
+    ),
+    "both `fecundity_at_length` and\\s+`spawning_weight_at_age`"
   )
   clear()
 })

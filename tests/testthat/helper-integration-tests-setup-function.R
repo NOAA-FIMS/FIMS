@@ -560,3 +560,61 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   # Return the results as a list
   return(fit)
 }
+
+# Population length bins ----
+#' Make `length_bin` rows that set the population length bins
+#'
+#' @param lengths A numeric vector of the lower edges of the population length
+#'   bins.
+#' @param timing A numeric timing for the rows. Population length bins need
+#'   `NA`, so other values are only for testing errors.
+#'
+#' @return A tibble with the columns of `data_big`.
+population_length_bin_rows <- function(lengths, timing = NA_real_) {
+  tibble::tibble(
+    type = "length_bin",
+    fleet = NA_character_,
+    age = NA_real_,
+    length = lengths,
+    timing = timing,
+    observed = NA_real_,
+    unit = NA_character_,
+    uncertainty = NA_character_
+  )
+}
+
+#' Make `fecundity_at_length` rows on the population length bins
+#'
+#' @param lengths A numeric vector of the lower edges of the population length
+#'   bins.
+#' @param values A numeric vector of fecundity at each length.
+#' @param timing A numeric timing for the rows. `NA` gives the default for every
+#'   year.
+#'
+#' @return A tibble with the columns of `data_big`.
+fecundity_at_length_rows <- function(lengths, values, timing = NA_real_) {
+  tibble::tibble(
+    type = "fecundity_at_length",
+    fleet = NA_character_,
+    age = NA_real_,
+    length = lengths,
+    timing = timing,
+    observed = values,
+    unit = "eggs",
+    uncertainty = NA_character_
+  )
+}
+
+#' Make `maturity_at_length` rows on the population length bins
+#'
+#' @param lengths A numeric vector of the lower edges of the population length
+#'   bins.
+#' @param values A numeric vector of the proportion mature at each length.
+#' @param timing A numeric timing for the rows. `NA` gives the default for every
+#'   year.
+#'
+#' @return A tibble with the columns of `data_big`.
+maturity_at_length_rows <- function(lengths, values, timing = NA_real_) {
+  fecundity_at_length_rows(lengths, values, timing) |>
+    dplyr::mutate(type = "maturity_at_length", unit = "proportion")
+}
