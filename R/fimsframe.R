@@ -1950,8 +1950,8 @@ length_bin_edges <- function(lower_edges) {
 }
 
 # Growth puts no fish outside the population length bins. A fleet bin outside
-# them gets an expected proportion of 0. Observed fish there would give a
-# likelihood of -Inf. C++ also rejects a population bin that is wider than a
+# them gets an expected proportion near 0, so observed fish there give a very
+# large likelihood penalty. C++ also rejects a population bin that is wider than a
 # fleet bin it overlaps, and this check gives the user a clearer message.
 validate_population_length_bins <- function(data, fleet_length_bins) {
   population_rows <- dplyr::filter(
@@ -2010,8 +2010,7 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
       {cli::qty(length(uncovered_fleets))}fleet{?s}
       {.val {uncovered_fleets}}.",
       "i" = "The population length bins must span every fleet's length bins.
-      The last bin of each set is as wide as the bin before it, so its upper
-      edge is its lower edge plus that width.",
+      The last bin of each set is as wide as the bin before it.",
       "i" = "Use {.code dplyr::distinct(dplyr::filter(data, type %in%
       c('length_bin', 'length_comp')), fleet, length)} to compare the
       population and fleet lengths."
@@ -2019,7 +2018,8 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
   }
 
   # Same rule and tolerance as EnforcePopulationGridNotCoarserThanFleetBins()
-  # in C++, so R passes exactly the bins that C++ accepts
+  # in C++, which runs only with growth that gives length at age. R also checks
+  # with EWAA growth, so invalid bins are caught before they are ignored.
   population_widths <- diff(population_edges)
   width_tolerance <- 1e-12 * pmax(population_widths, 1)
   coarser_fleets <- fleet_edges |>
@@ -2034,7 +2034,7 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
     names()
   if (length(coarser_fleets) > 0) {
     cli::cli_abort(c(
-      "x" = "Some population length bins are wider than the length bins they
+      "x" = "Some population length bins are wider than a length bin they
       overlap for {cli::qty(length(coarser_fleets))}fleet{?s}
       {.val {coarser_fleets}}.",
       "i" = "Each population length bin must be no wider than any fleet length

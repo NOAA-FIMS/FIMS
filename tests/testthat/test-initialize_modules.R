@@ -383,6 +383,37 @@ test_that("`initialize_maturity()` works with correct inputs", {
 })
 
 # test_initialize_population ----
+## Setup ----
+setup_vonb_parameters <- function(frame) {
+  setup_default_parameters(frame) |>
+    dplyr::filter(module_name != "Growth") |>
+    dplyr::bind_rows(
+      setup_default_Growth(data = frame, module_type = "VonBertalanffySchnute")
+    )
+}
+
+initialize_test_population <- function(parameters, data) {
+  linked_ids <- c(
+    recruitment = initialize_recruitment(parameters, data)$get_id(),
+    growth = initialize_growth(parameters, data)$get_id(),
+    maturity = initialize_maturity(parameters, data)$get_id()
+  )
+  initialize_population(parameters, data, linked_ids)
+}
+
+get_population_report <- function(data, parameters) {
+  report <- parameters |>
+    initialize_fims(data = data) |>
+    fit_fims(optimize = FALSE) |>
+    get_report()
+  clear()
+  report
+}
+
+# The data_big fleet length bins are 0-1100 by 50, so they span 0-1150. The
+# bins FIMS builds by default are 1 unit wide from 0 to 1150, plus 1 more.
+default_population_lengths <- seq(0, 1150, by = 1)
+
 ## IO correctness ----
 test_that("`initialize_population()` works with correct inputs", {
   # Setup modules needed for population
@@ -429,36 +460,6 @@ test_that("`initialize_population()` works with correct inputs", {
   clear()
 })
 
-setup_vonb_parameters <- function(frame) {
-  setup_default_parameters(frame) |>
-    dplyr::filter(module_name != "Growth") |>
-    dplyr::bind_rows(
-      setup_default_Growth(data = frame, module_type = "VonBertalanffySchnute")
-    )
-}
-
-initialize_test_population <- function(parameters, data) {
-  linked_ids <- c(
-    recruitment = initialize_recruitment(parameters, data)$get_id(),
-    growth = initialize_growth(parameters, data)$get_id(),
-    maturity = initialize_maturity(parameters, data)$get_id()
-  )
-  initialize_population(parameters, data, linked_ids)
-}
-
-get_population_report <- function(data, parameters) {
-  report <- parameters |>
-    initialize_fims(data = data) |>
-    fit_fims(optimize = FALSE) |>
-    get_report()
-  clear()
-  report
-}
-
-# The data_big fleet length bins are 0-1100 by 50, so they span 0-1150. The
-# bins FIMS builds by default are 1 unit wide from 0 to 1150, plus 1 more.
-default_population_lengths <- seq(0, 1150, by = 1)
-
 test_that("`initialize_population()` passes population length bins to the model", {
   bins_frame <- FIMSFrame(dplyr::bind_rows(
     data_big,
@@ -469,8 +470,9 @@ test_that("`initialize_population()` passes population length bins to the model"
     setup_vonb_parameters(bins_frame),
     bins_frame
   )
-  #' @description Test that `initialize_population()` sets the population lengths and their number from `length_bin` rows with `fleet = NA`.
+  #' @description Test that `initialize_population()` sets the population lengths from `length_bin` rows with `fleet = NA`.
   expect_equal(population$lengths$get_values(), seq(0, 1150, by = 50))
+  #' @description Test that `initialize_population()` sets the number of population length bins.
   expect_equal(population$n_lengths$get(), 24)
   clear()
 
@@ -515,7 +517,7 @@ test_that("`initialize_fims()` builds the length distribution at age on the popu
   #' @description Test that population length bins equal to the bins FIMS builds by default give the same model as no population length bins.
   expect_equal(default_bins_report[["jnll"]], base_report[["jnll"]])
   expect_equal(default_bins_report[["biomass"]], base_report[["biomass"]])
-  #' @description Test that population length bins without length compositions give the same biomass as length compositions with the same population length bins.
+  #' @description Test that, with the same population length bins, biomass is the same with and without length compositions.
   expect_equal(
     no_length_bins_report[["biomass"]],
     default_bins_report[["biomass"]]
