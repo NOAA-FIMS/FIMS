@@ -649,8 +649,7 @@ class PopulationInterface : public PopulationInterfaceBase {
           " != " + fims::to_string(expected_length_input_size));
       throw std::invalid_argument(
           "Population fecundity_at_length size mismatch. Expected 0 or " +
-          fims::to_string(expected_length_input_size) +
-          " values, found " +
+          fims::to_string(expected_length_input_size) + " values, found " +
           fims::to_string(this->fecundity_at_length.size()) + ".");
     }
     population->fecundity_at_length.resize(this->fecundity_at_length.size());
