@@ -496,7 +496,7 @@ run_FIMS_projection_scenario <- function(om_input,
 n_projection_years <- 0
 projected_catch <- rep(-999, n_projection_years)
 projected_F <- rep(om_output[["f"]][om_input$nyr], n_projection_years)
-estimate_projected_F <- rep("not_estimated", n_projection_years)
+estimation_status_projected_F <- rep("not_estimated", n_projection_years)
 projected_index <- rep(-999, n_projection_years)
 
 no_projection_outputs <- run_FIMS_projection_scenario(om_input,
