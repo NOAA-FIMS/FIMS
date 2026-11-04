@@ -43,10 +43,12 @@ struct MaturityBase : public fims_model_object::FIMSObject<Type> {
    */
   virtual const Type evaluate(const Type& x) = 0;
   /**
-   * @brief Calculates the selectivity.
-   * @param x The independent variable in the logistic function (e.g., age or
-   * size in selectivity).
-   * @param pos Position index, e.g., which year.
+   * @brief Calculates the maturity in a year.
+   * @param x The independent variable in the maturity function (e.g., age or
+   * size).
+   * @param pos Position index, e.g., which year. CatchAtAge also passes
+   * n_years, the year after the last model year, so each module decides which
+   * values that year uses.
    */
   virtual const Type evaluate(const Type& x, size_t pos) = 0;
 };

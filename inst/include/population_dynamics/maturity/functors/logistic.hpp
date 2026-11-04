@@ -56,13 +56,23 @@ struct LogisticMaturity : public MaturityBase<Type> {
    *
    * \f[ \frac{1.0}{ 1.0 + exp(-1.0 * slope_t (x - {inflection\_point}_t))} \f]
    *
+   * Time-varying parameters have 1 value per model year. The year after the
+   * last model year (`pos` equal to the number of values) uses the last
+   * year's values.
+   *
    * @param x  The independent variable in the logistic function (e.g., age or
    * size in selectivity).
    * @param pos Position index, e.g., which year.
    */
   virtual const Type evaluate(const Type& x, size_t pos) {
-    return fims_math::logistic<Type>(inflection_point.get_force_scalar(pos),
-                                     slope.get_force_scalar(pos), x);
+    // Only the position 1 past the end is moved back, so a parameter with too
+    // few values still throws in get_force_scalar() for later years.
+    size_t inflection_point_pos =
+        (pos == inflection_point.size()) ? pos - 1 : pos;
+    size_t slope_pos = (pos == slope.size()) ? pos - 1 : pos;
+    return fims_math::logistic<Type>(
+        inflection_point.get_force_scalar(inflection_point_pos),
+        slope.get_force_scalar(slope_pos), x);
   }
 };
 
