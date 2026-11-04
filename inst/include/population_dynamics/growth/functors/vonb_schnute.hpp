@@ -18,15 +18,30 @@ namespace fims_popdy {
  * @brief VonBertalanffySchnute growth functor for length-at-age and
  * weight-at-age.
  *
- * Parameterization using length at two reference ages:
- * L(a) = mean_length_young +
- *        (mean_length_old - mean_length_young) *
- *        (1 - exp(-growth_coefficient * (a - reference_age_for_length_young)))
- * / (1 - exp(-growth_coefficient * (reference_age_for_length_old -
- * reference_age_for_length_young)))
- * @note Users can anchor at t0 by setting reference_age_for_length_young = 0
- * and mean_length_young = L(0). This is valid as long as
- * reference_age_for_length_old > reference_age_for_length_young.
+ * The main growth curve is parameterized using lengths at two reference ages:
+ * \f[
+ * L(a) = L_y + (L_o - L_y)
+ * \frac{1 - \exp[-K(a-a_y)]}{1 - \exp[-K(a_o-a_y)]}
+ * \f]
+ *
+ * where:
+ * - \f$a\f$ is age.
+ * - \f$L_y\f$ is length at the young reference age (`mean_length_young`).
+ * - \f$L_o\f$ is length at the old reference age (`mean_length_old`).
+ * - \f$a_y\f$ is the young reference age
+ *   (`reference_age_for_length_young`).
+ * - \f$a_o\f$ is the old reference age
+ *   (`reference_age_for_length_old`).
+ * - \f$K\f$ is the growth coefficient (`growth_coefficient`).
+ *
+ * @details When the young reference age is positive, ages below that
+ * reference age use a linear ramp, with age bounded below by zero.
+ * The curved branch also applies a numerical floor to its denominator.
+ * The equation above describes the nominal curved relationship.
+ *
+ * @note Setting reference_age_for_length_young = 0 makes
+ * mean_length_young the length at age zero, L(0). This is not necessarily
+ * the conventional von Bertalanffy zero-length age parameter, t0.
  */
 template <typename Type>
 struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
