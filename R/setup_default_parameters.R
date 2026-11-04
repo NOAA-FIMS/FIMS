@@ -915,7 +915,7 @@ setup_default_EmpiricalMaturity <- function(data) {
   if (NROW(maturity_data) == 0 &&
     any(get_data(data)[["type"]] == "maturity_at_length")) {
     cli::cli_inform(
-      "Maturity-at-length rows found. Maturity at age defaults to 1."
+      "{.var maturity_at_length} rows found, so maturity at age defaults to 1."
     )
     maturity_data <- tibble::tibble(
       timing = NA_real_,

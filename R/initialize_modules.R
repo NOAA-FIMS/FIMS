@@ -454,7 +454,24 @@ initialize_maturity <- function(parameters, data) {
     dplyr::filter(.data[["module_name"]] == "Growth") |>
     dplyr::pull(.data[["module_type"]]) |>
     unique()
-  if (any(get_data(data)[["type"]] == "maturity_at_length") &&
+  input_types <- get_data(data)[["type"]]
+  # EWAA growth does not use maturity at length, so maturity at age of 1 from
+  # maturity-at-length rows would make every fish mature
+  if (any(input_types == "maturity_at_length") && "EWAA" %in% growth_type &&
+    !any(input_types == "maturity_at_age") &&
+    identical(as.character(maturity_type), "Empirical")) {
+    cli::cli_abort(c(
+      "x" = "Empirical maturity at age has no {.var maturity_at_age} rows, and
+      growth is {.val EWAA}, which does not use the {.var maturity_at_length}
+      rows.",
+      "i" = "Every fish would be mature. Use growth that gives length at age,
+      such as {.code setup_default_Growth(module_type =
+      \"VonBertalanffySchnute\")}, or {.val Logistic} maturity.",
+      "i" = "Use {.code dplyr::distinct(parameters, module_name,
+      module_type)} to see the modules."
+    ))
+  }
+  if (any(input_types == "maturity_at_length") &&
     !"EWAA" %in% growth_type) {
     maturity_parameters <- dplyr::filter(
       parameters,
@@ -585,8 +602,8 @@ initialize_population <- function(parameters, data, linked_ids) {
         "i" = "Inputs at length need a growth module that gives length at
         age, such as {.code setup_default_Growth(module_type =
         \"VonBertalanffySchnute\")}.",
-        "i" = "Without them, spawning output uses maturity at age only, so
-        check the maturity module."
+        "i" = "Without these rows, spawning output uses the at-age inputs
+        only."
       ))
     } else {
       if (any(input_data[["type"]] == "spawning_weight_at_age")) {

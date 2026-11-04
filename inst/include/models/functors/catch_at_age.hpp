@@ -568,6 +568,14 @@ class CatchAtAge : public FisheryModelBase<Type> {
       if (population->fecundity_at_length.size() == 0) {
         growth_observation = std::dynamic_pointer_cast<
             fims_popdy::GrowthDerivedObservationBase<Type>>(population->growth);
+        if (growth_observation == nullptr) {
+          FIMS_ERROR_LOG(
+              "Population maturity_at_length without fecundity_at_length needs "
+              "growth that gives weight at length.");
+          throw std::runtime_error(
+              "Population maturity_at_length without fecundity_at_length needs "
+              "growth that gives weight at length.");
+        }
       }
       // The year after the last model year uses the length at age of the last
       // model year, as PopulationMeanWeightAA() does

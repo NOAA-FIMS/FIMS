@@ -86,25 +86,33 @@ test_that("`setup_default_Maturity()` gives maturity at age of 1 with maturity a
     maturity_at_length_rows(population_lengths, 0.5)
   )
   length_data <- FIMS::FIMSFrame(dplyr::bind_rows(data_big, length_rows))
-  #' @description Test that Empirical maturity is 1 at every age when the data have maturity-at-length rows and no maturity-at-age rows.
   result <- setup_default_Maturity(length_data, module_type = "Empirical")
+  #' @description Test that Empirical maturity is 1 at every age when the data have maturity-at-length rows and no maturity-at-age rows.
   expect_equal(object = result[["value"]], expected = rep(1, length(ages)))
+  #' @description Test that Empirical maturity from maturity-at-length rows has 1 value per age for every year.
   expect_true(all(is.na(result[["timing"]])))
 
-  #' @description Test that `setup_default_parameters()` picks Empirical maturity with maturity-at-length rows and growth that gives length at age.
   vonb_data <- FIMS::FIMSFrame(dplyr::bind_rows(
     dplyr::filter(data_big, type != "weight_at_age"),
     length_rows
   ))
   maturity <- setup_default_parameters(data = vonb_data) |>
     dplyr::filter(.data[["module_name"]] == "Maturity")
-  expect_true(all(maturity[["module_type"]] == "Empirical"))
+  #' @description Test that `setup_default_parameters()` picks Empirical maturity with maturity-at-length rows and growth that gives length at age.
+  expect_equal(
+    object = unique(maturity[["module_type"]]),
+    expected = "Empirical"
+  )
+  #' @description Test that the Empirical maturity picked with maturity-at-length rows is 1 at every age.
   expect_equal(object = maturity[["value"]], expected = rep(1, length(ages)))
 
-  #' @description Test that `setup_default_parameters()` keeps Logistic maturity with maturity-at-length rows and EWAA growth, because maturity at length is not used.
   maturity <- setup_default_parameters(data = length_data) |>
     dplyr::filter(.data[["module_name"]] == "Maturity")
-  expect_true(all(maturity[["module_type"]] == "Logistic"))
+  #' @description Test that `setup_default_parameters()` keeps Logistic maturity with maturity-at-length rows and EWAA growth, because maturity at length is not used.
+  expect_equal(
+    object = unique(maturity[["module_type"]]),
+    expected = "Logistic"
+  )
 
   clear()
 })

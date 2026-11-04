@@ -308,7 +308,15 @@ Fecundity at length needs population length bins (`length_bin` rows with `fleet 
 
 The Stock Synthesis fecundity options can be tabulated at the center of each population length bin, as Stock Synthesis does. Here `a` and `b` are the Stock Synthesis fecundity parameters, and `weight` is weight at the bin center in kg, the unit Stock Synthesis uses for fecundity. Options 4 and 5 can be negative for small fish, so they are set to 0. With length-based maturity in Stock Synthesis (maturity options 1 and 6), give maturity as `maturity_at_length`, described next.
 
-```{r fecundity-at-length-ss3, eval = FALSE}
+```{r fecundity-at-length-ss3}
+# Example values. Option 1 with a = 1 and b = 0 gives weight, so spawning
+# output is spawning biomass in kg.
+ss3_fecundity_option <- 1
+a <- 1
+b <- 0
+# Length-weight parameters for length in mm and weight in kg
+length_weight_a <- 2.5e-8
+length_weight_b <- 3
 population_lengths <- seq(0, 1150, by = 50)
 length_midpoints <- population_lengths + 25
 weight <- length_weight_a * length_midpoints^length_weight_b
@@ -341,7 +349,10 @@ With `maturity_at_length` rows and no `maturity_at_age` rows, `setup_default_par
 
 A logistic maturity ogive in length, such as Stock Synthesis maturity option 1, can be tabulated at the bin centers. Here `mat_50` and `mat_slope` are the Stock Synthesis parameters, and `mat_slope` is negative.
 
-```{r maturity-at-length-logistic, eval = FALSE}
+```{r maturity-at-length-logistic}
+# Example values: 50% mature at 500 mm
+mat_50 <- 500
+mat_slope <- -0.02
 population_lengths <- seq(0, 1150, by = 50)
 length_midpoints <- population_lengths + 25
 maturity_rows <- tibble::tibble(

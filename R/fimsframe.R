@@ -1305,8 +1305,8 @@ population_weight_at_age_rows <- function(weight_data) {
   }
 }
 
-# Weight, spawning weight, fecundity, and maturity at age, and fecundity at
-# length, are not fit to data, so a missing age, length, or year would change
+# Weight, spawning weight, fecundity, and maturity at age, and fecundity and
+# maturity at length, are not fit to data, so a missing age, length, or year would change
 # biomass or spawning output instead of adding a -999 observation. Rows with
 # timing = NA are the default for every year, and rows with a timing replace
 # that default for that year. Nothing is averaged. With column = "length", ages

@@ -415,6 +415,18 @@ test_that("`initialize_maturity()` checks maturity at age with maturity at lengt
     "are estimated"
   )
   clear()
+
+  ewaa_parameters <- setup_default_parameters(maturity_frame) |>
+    dplyr::filter(module_name != "Maturity") |>
+    dplyr::bind_rows(
+      setup_default_Maturity(maturity_frame, module_type = "Empirical")
+    )
+  #' @description Test that `initialize_maturity()` errors when maturity at age of 1 comes from maturity-at-length rows that EWAA growth does not use.
+  expect_error(
+    initialize_maturity(ewaa_parameters, maturity_frame),
+    "Every fish would be mature"
+  )
+  clear()
 })
 
 # test_initialize_population ----
