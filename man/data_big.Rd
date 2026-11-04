@@ -28,7 +28,7 @@ fish and the last bin holds all larger fish. With fixed
 this dataset, the bins are 50 mm wide, so \code{length = 250} is the bin from
 250 to 300 mm, and the conversion puts all fish under 50 mm in the first
 bin and all fish of 1100 mm or more in the last. \code{length_bin} rows with
-\code{fleet = NA} and \code{timing = NA} give the population length bins (see
+\code{fleet = NA} and \code{timing = NA} set the population length bins (see
 \code{vignette("fims-input-data", package = "FIMS")}).}
 \item{timing}{The timing, i.e., year the data was collected.}
 \item{observed}{The observed measurement of interest.}
