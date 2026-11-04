@@ -195,10 +195,10 @@ test_that("`reshape_json_estimates()` reports the ages and lengths from the data
   data_4_model <- FIMSFrame(shifted_data)
   fit <- setup_default_parameters(data = data_4_model) |>
     dplyr::mutate(
-      estimation_type = dplyr::if_else(
-        .data$estimation_type == "random_effects",
+      estimation_status = dplyr::if_else(
+        .data$estimation_status == "random_effects",
         "fixed_effects",
-        .data$estimation_type
+        .data$estimation_status
       )
     ) |>
     initialize_fims(data = data_4_model) |>

@@ -245,9 +245,9 @@ test_that("TMB mapped values remain aligned in FIMS output", {
   selectivities <- lapply(seq_len(2), function(index) {
     selectivity <- methods::new(LogisticSelectivity)
     selectivity$inflection_point[1]$value <- 0.1
-    selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
+    selectivity$inflection_point[1]$estimation_status$set("fixed_effects")
     selectivity$slope[1]$value <- 0.1
-    selectivity$slope[1]$estimation_type$set("fixed_effects")
+    selectivity$slope[1]$estimation_status$set("fixed_effects")
     selectivity
   })
   CreateTMBModel()
@@ -296,9 +296,9 @@ for (random_map in list(factor(c(1, NA, 1, 2)), factor(rep(NA, 4)))) {
     selectivities <- lapply(seq_len(4), function(index) {
       selectivity <- methods::new(LogisticSelectivity)
       selectivity$inflection_point[1]$value <- 10
-      selectivity$inflection_point[1]$estimation_type$set("fixed_effects")
+      selectivity$inflection_point[1]$estimation_status$set("fixed_effects")
       selectivity$slope[1]$value <- 0.1
-      selectivity$slope[1]$estimation_type$set("random_effects")
+      selectivity$slope[1]$estimation_status$set("random_effects")
       selectivity
     })
     CreateTMBModel()
@@ -428,14 +428,14 @@ test_that("optimized random maps expand shared values and standard errors", {
   expect_equal(get_random()[1], get_random()[3])
   expect_equal(get_random()[2], input[["parameters"]][["re"]][2])
   output <- get_estimates(fit) |>
-    dplyr::filter(.data[["estimation_type"]] == "random_effects")
+    dplyr::filter(.data[["estimation_status"]] == "random_effects")
   expect_equal(nrow(output), 4L)
   expect_equal(output[["uncertainty"]][1], output[["uncertainty"]][3])
   expect_true(is.finite(output[["uncertainty"]][1]))
   expect_true(is.na(output[["uncertainty"]][2]))
   clear()
   expect_equal(
-    get_estimates(fit) |> dplyr::filter(.data[["estimation_type"]] == "random_effects"),
+    get_estimates(fit) |> dplyr::filter(.data[["estimation_status"]] == "random_effects"),
     output
   )
 })
@@ -447,7 +447,7 @@ test_that("unmapped random effects still fit and report uncertainty", {
   fit <- make_mapping_input() |> fit_fims(number_of_loops = 0)
   expect_equal(unname(get_number_of_parameters(fit)), c(24L, 4L))
   output <- get_estimates(fit) |>
-    dplyr::filter(.data[["estimation_type"]] == "random_effects")
+    dplyr::filter(.data[["estimation_status"]] == "random_effects")
   expect_true(all(is.finite(output[["uncertainty"]])))
 })
 
@@ -490,7 +490,7 @@ test_that("fully mapped-off random effects support fitting without sdreport", {
   expect_length(get_sdreport(fit_with_sd)[["par.random"]], 0L)
   expect_true(all(is.na(
     get_estimates(fit_with_sd) |>
-      dplyr::filter(.data[["estimation_type"]] == "random_effects") |>
+      dplyr::filter(.data[["estimation_status"]] == "random_effects") |>
       dplyr::pull("uncertainty")
   )))
   initial <- fit_fims(input, optimize = FALSE)

@@ -455,7 +455,7 @@ class FleetInterface : public FleetInterfaceBase {
           std::dynamic_pointer_cast<fims_popdy::Fleet<double>>(it->second);
 
       for (size_t i = 0; i < this->log_Fmort.size(); i++) {
-        if (this->log_Fmort[i].estimation_type_m.get() == "constant") {
+        if (this->log_Fmort[i].estimation_status_m.get() == "not_estimated") {
           this->log_Fmort[i].final_value_m = this->log_Fmort[i].initial_value_m;
         } else {
           this->log_Fmort[i].final_value_m = fleet->log_Fmort[i];
@@ -463,7 +463,7 @@ class FleetInterface : public FleetInterfaceBase {
       }
 
       for (size_t i = 0; i < this->log_q.size(); i++) {
-        if (this->log_q[i].estimation_type_m.get() == "constant") {
+        if (this->log_q[i].estimation_status_m.get() == "not_estimated") {
           this->log_q[i].final_value_m = this->log_q[i].initial_value_m;
         } else {
           this->log_q[i].final_value_m = fleet->log_q[i];
@@ -471,8 +471,8 @@ class FleetInterface : public FleetInterfaceBase {
       }
 
       for (size_t i = 0; i < fleet->age_to_length_conversion.size(); i++) {
-        if (this->age_to_length_conversion[i].estimation_type_m.get() ==
-            "constant") {
+        if (this->age_to_length_conversion[i].estimation_status_m.get() ==
+            "not_estimated") {
           this->age_to_length_conversion[i].final_value_m =
               this->age_to_length_conversion[i].initial_value_m;
         } else {
@@ -534,13 +534,13 @@ class FleetInterface : public FleetInterfaceBase {
     for (size_t i = 0; i < this->log_q.size(); i++) {
       fleet->log_q[i] = this->log_q[i].initial_value_m;
 
-      if (this->log_q[i].estimation_type_m.get() == "fixed_effects") {
+      if (this->log_q[i].estimation_status_m.get() == "fixed_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_q[i]);
       }
-      if (this->log_q[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_q[i].estimation_status_m.get() == "random_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_q." << this->log_q[i].id_m;
         info->RegisterRandomEffectName(ss.str());
@@ -565,13 +565,13 @@ class FleetInterface : public FleetInterfaceBase {
     for (size_t i = 0; i < log_Fmort.size(); i++) {
       fleet->log_Fmort[i] = this->log_Fmort[i].initial_value_m;
 
-      if (this->log_Fmort[i].estimation_type_m.get() == "fixed_effects") {
+      if (this->log_Fmort[i].estimation_status_m.get() == "fixed_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
         info->RegisterParameterName(ss.str());
         info->RegisterParameter(fleet->log_Fmort[i]);
       }
-      if (this->log_Fmort[i].estimation_type_m.get() == "random_effects") {
+      if (this->log_Fmort[i].estimation_status_m.get() == "random_effects") {
         ss.str("");
         ss << "Fleet." << this->id << ".log_Fmort." << this->log_Fmort[i].id_m;
         info->RegisterRandomEffectName(ss.str());
@@ -651,7 +651,7 @@ class FleetInterface : public FleetInterfaceBase {
         fleet->age_to_length_conversion[i] =
             this->age_to_length_conversion[i].initial_value_m;
 
-        if (this->age_to_length_conversion[i].estimation_type_m.get() ==
+        if (this->age_to_length_conversion[i].estimation_status_m.get() ==
             "fixed_effects") {
           ss.str("");
           ss << "Fleet." << this->id << ".age_to_length_conversion."
@@ -659,7 +659,7 @@ class FleetInterface : public FleetInterfaceBase {
           info->RegisterParameterName(ss.str());
           info->RegisterParameter(fleet->age_to_length_conversion[i]);
         }
-        if (this->age_to_length_conversion[i].estimation_type_m.get() ==
+        if (this->age_to_length_conversion[i].estimation_status_m.get() ==
             "random_effects") {
           FIMS_ERROR_LOG(
               "age_to_length_conversion cannot be set to random effects");

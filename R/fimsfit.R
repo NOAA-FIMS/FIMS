@@ -312,7 +312,7 @@ methods::setMethod(
       by = c("unique_id")
     ) |>
       dplyr::select(-dplyr::all_of("unique_id")) |>
-      dplyr::relocate(dplyr::all_of("uncertainty"), .after = dplyr::all_of("estimation_type"))
+      dplyr::relocate(dplyr::all_of("uncertainty"), .after = dplyr::all_of("estimation_status"))
   }
 )
 
@@ -744,7 +744,7 @@ fit_fims <- function(input,
   if (number_of_loops < 0) {
     cli::cli_abort("number_of_loops ({.par {number_of_loops}}) must be >= 0.")
   }
-  # If the estimation_type of all parameters is constant, FIMS will abort if
+  # If the estimation_status of all parameters is not_estimated, FIMS will abort if
   # optimize is set to TRUE
   input[["tmb_mapping"]] <- tmb_parameter_mapping(input)
   for (effect in names(input[["map"]])) {
