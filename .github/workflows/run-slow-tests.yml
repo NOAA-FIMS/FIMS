@@ -15,6 +15,7 @@ on:
       - 'inst/**'
       - 'data/**'
       - 'data-raw/**'
+      - '.github/workflows/run-slow-tests.yml'
   push:
     branches:
       - main
@@ -99,6 +100,16 @@ jobs:
             any::devtools
             any::snowfall
           needs: check
+
+      # The {snowfall} workers in test-slow-parallel-caa-mle-wrappers.R call
+      # library(FIMS), so FIMS must be installed from this checkout.
+      # devtools::test() only loads it in the main R process.
+      # quick = TRUE builds in src/, so load_all() in the next step reuses this
+      # build and the serial and parallel runs use the same compiled FIMS.
+      - name: Install FIMS for Parallel Workers
+        if: matrix.test_type == 'slow'
+        shell: Rscript {0}
+        run: devtools::install(quick = TRUE)
 
       - name: Run Slow Tests Only
         env:
