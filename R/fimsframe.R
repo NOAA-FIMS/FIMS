@@ -1488,9 +1488,9 @@ validate_at_age_input <- function(data, type, ages, years, column = "age") {
   }
 
   # Spawning weight and fecundity only feed spawning output, so a value of 0 at
-  # every age or length makes spawning output 0 in that year, and then recruitment and
-  # the objective function are undefined (NaN). Weight at age also feeds
-  # biomass and catch and index weight, so it is not checked here.
+  # every age or length makes spawning output 0 in that year, and then
+  # recruitment and the objective function are undefined (NaN). Weight at age
+  # also feeds biomass and catch and index weight, so it is not checked here.
   all_zero_timings <- if (type == "weight_at_age") {
     NULL
   } else {

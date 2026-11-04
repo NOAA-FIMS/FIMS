@@ -638,18 +638,18 @@ class PopulationInterface : public PopulationInterfaceBase {
     for (size_t i = 0; i < population->fecundity_at_age.size(); i++) {
       population->fecundity_at_age[i] = this->fecundity_at_age[i];
     }
-    const size_t expected_fecundity_at_length_size =
+    const size_t expected_length_input_size =
         static_cast<size_t>((this->n_years.get() + 1) * this->n_lengths.get());
     if (this->fecundity_at_length.size() != 0 &&
-        this->fecundity_at_length.size() != expected_fecundity_at_length_size) {
+        this->fecundity_at_length.size() != expected_length_input_size) {
       FIMS_ERROR_LOG(
           "The size of `fecundity_at_length` does not match "
           "(n_years + 1) x n_lengths: " +
           fims::to_string(this->fecundity_at_length.size()) +
-          " != " + fims::to_string(expected_fecundity_at_length_size));
+          " != " + fims::to_string(expected_length_input_size));
       throw std::invalid_argument(
           "Population fecundity_at_length size mismatch. Expected 0 or " +
-          fims::to_string(expected_fecundity_at_length_size) +
+          fims::to_string(expected_length_input_size) +
           " values, found " +
           fims::to_string(this->fecundity_at_length.size()) + ".");
     }
