@@ -13,6 +13,7 @@
 #ifndef FIMS_POPULATION_DYNAMICS_MATURITY_HPP
 #define FIMS_POPULATION_DYNAMICS_MATURITY_HPP
 
+#include "functors/empirical.hpp"
 #include "functors/logistic.hpp"
 #include "functors/maturity_base.hpp"
 

@@ -41,7 +41,7 @@
 #'     `fecundity_at_age` is spawning output per unit of spawning weight, e.g.,
 #'     `eggs/mt`. `number` or `proportion` are each viable units for the
 #'     composition data, where the former is the preferred unit of
-#'     measurement.}
+#'     measurement. `proportion` is used for `maturity_at_age` data.}
 #'   \item{uncertainty}{A right-handed formula specifying the distributional
 #'     assumptions for the entry in `observed`. See [FIMSFrame()] for more
 #'     information about this column.

@@ -35,7 +35,7 @@ The input data for a FIMS model is a single long data frame with the following c
 
 Two drawbacks of the long format are (1) some information is duplicated, and (2) the long format is harder to read and understand by looking at the raw data frame. To meet this second challenge, the FIMS team is working on functions to summarize, visualize, and check for errors in the input data.
 
-The currently available values for the `type` column are `r glue::glue_collapse(glue::glue('\"{FIMS::fims_input_types}\"'), sep = ", ", last = ", and ")`. The "weight_at_age", "spawning_weight_at_age", "fecundity_at_age", and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
+The currently available values for the `type` column are `r glue::glue_collapse(glue::glue('\"{FIMS::fims_input_types}\"'), sep = ", ", last = ", and ")`. The "weight_at_age", "spawning_weight_at_age", "fecundity_at_age", "maturity_at_age", and "age_to_length_conversion" types are not currently treated as data in the sense that they are not included in the likelihood, just used within the population dynamics calculations.
 
 The individual data types are described in more detail below after introducing the example data set that is included in the package.
 
@@ -227,17 +227,54 @@ FIMS::data_big |>
   ggtitle("Weight-at-age by time step in data_big example data set")
 ```
 
+## Maturity-at-age data (`type == "maturity_at_age"`)
+
+Maturity-at-age data are optional. When they are present, `setup_default_parameters()` uses them in place of the default logistic maturity curve, and they are used as the proportion mature at age when calculating spawning output.
+
+Each row gives the proportion mature (between 0 and 1) in the `observed` column for one age. The `unit` column must be `proportion` and the `fleet` must be `NA`, because maturity applies to the population rather than to a fleet. The `uncertainty` should be `NA`.
+
+Maturity can be constant or vary by year:
+
+  1. rows with `timing = NA` apply to every year, and
+  2. rows with a `timing` replace those values for that year.
+
+Maturity in the first model year also sets unfished spawning biomass per recruit, so it affects the stock--recruitment curve and the spawning biomass ratio in every year. Maturity in a later year changes spawning biomass in that year and, through the stock--recruitment relationship, recruitment in the following year.
+
+Every model age needs a value for each `timing` that is used. Without `timing = NA` rows, every model year needs its own rows. As for weight-at-age data, so does the year after the last model year, because spawning output is calculated at the start of that year after the last catches are removed. Those rows do not add a model year. Projection years are model years, so they use their own rows or the `timing = NA` rows, not the maturity from the last data year.
+
+`data_big` does not include maturity-at-age data. The example below adds a constant maturity ogive and a different ogive for the second year.
+
+```{r data_big-maturity_at_age}
+maturity_ages <- get_ages(data_4_model)
+maturity_at_age <- tibble::tibble(
+  type = "maturity_at_age",
+  fleet = NA_character_,
+  age = rep(maturity_ages, times = 2),
+  length = NA_real_,
+  timing = rep(
+    c(NA, get_start_year(data_4_model) + 1),
+    each = length(maturity_ages)
+  ),
+  observed = c(plogis(maturity_ages - 2), plogis(maturity_ages - 3)),
+  unit = "proportion",
+  uncertainty = NA_character_
+)
+data_with_maturity <- FIMSFrame(dplyr::bind_rows(data_big, maturity_at_age))
+setup_default_Maturity(data_with_maturity, module_type = "Empirical") |>
+  head(3)
+```
+
 ## Spawning weight and fecundity (`type == "spawning_weight_at_age"` and `type == "fecundity_at_age"`)
 
 Spawning output in each year is the sum over ages of numbers at age times proportion female, maturity, spawning weight at age, and fecundity at age. Each of the last 3 has a default, and rows for 1 of them replace the default for that factor only:
 
-- Maturity comes from the maturity module.
+- Maturity comes from the maturity module. With `maturity_at_age` rows, `setup_default_parameters()` uses Empirical maturity, which takes its values from those rows.
 - Spawning weight at age defaults to the population weight at age. It can be given separately, for example weight at the time of spawning.
 - Fecundity at age defaults to 1. It is spawning output per unit of spawning weight, for example eggs per mt.
 
 Without `spawning_weight_at_age` or `fecundity_at_age` rows, spawning output is spawning biomass. Both types are inputs for the population, so their rows need `fleet = NA`, and they use the same `timing` rule as weight at age: rows with `timing = NA` are the default for every year, rows with a `timing` replace that default for that year, and without `timing = NA` rows every model year and the year after the last need rows. The `unit` column describes the input, for example `mt` for spawning weight or `eggs/mt` for fecundity. Unfished spawning output and spawning output per recruit use the same product, with the values for the first model year for spawning output per recruit.
 
-Because the 3 values are multiplied, a combined vector can be put in 1 of them with the others set to 1. For example, the Stock Synthesis empirical input of weight times maturity times eggs per weight can be entered as `fecundity_at_age`, with `spawning_weight_at_age` rows of 1 and maturity set to 1 at every age, e.g., a logistic maturity with `inflection_point = -100`. Stock Synthesis one-sex models count every fish as female, so also set `proportion_female = 1` (or the female fraction, `FracFemale_GP_1`, when the number of sexes is set to -1). The `spawning_biomass` output is then in the units of that vector.
+Because the 3 values are multiplied, a combined vector can be put in 1 of them with the others set to 1. For example, the Stock Synthesis empirical input of weight times maturity times eggs per weight can be entered as `fecundity_at_age`, with `spawning_weight_at_age` rows of 1 and `maturity_at_age` rows of 1 at every age. Stock Synthesis one-sex models count every fish as female, so also set `proportion_female = 1` (or the female fraction, `FracFemale_GP_1`, when the number of sexes is set to -1). The `spawning_biomass` output is then in the units of that vector.
 
 ## Age-to-length conversion (`type == "age_to_length_conversion"`)
 
