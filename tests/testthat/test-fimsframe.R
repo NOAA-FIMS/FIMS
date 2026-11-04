@@ -21,6 +21,12 @@ save_png <- function(code, width = 1000, height = 1000) {
   dev.off()
 }
 
+# data_big with population length bins. The data_big fleet length bins are
+# 0-1100 by 50, so they span 0-1150.
+with_population_bins <- function(lengths, timing = NA_real_) {
+  dplyr::bind_rows(data_big, population_length_bin_rows(lengths, timing))
+}
+
 ## IO correctness ----
 test_that("`fims_frame()` works with the correct inputs", {
   #' @description Test that `fims_frame()` creates the S4 `FIMSFrame` classes.
@@ -326,6 +332,35 @@ test_that("`model_weight_at_age()` returns a fleet's own weight at age with the 
   )
 })
 
+test_that("`FIMSFrame()` accepts population length bins that cover the fleet length bins", {
+  #' @description Test that population length bins that cover the fleet length bins are accepted and do not change the fleet lengths.
+  covering_frame <- FIMSFrame(with_population_bins(seq(0, 1150, by = 25)))
+  expect_equal(get_lengths(covering_frame), get_lengths(fims_frame))
+  #' @description Test that population length bins whose last bin only reaches the upper edge of the last fleet bin are accepted.
+  expect_s4_class(
+    FIMSFrame(with_population_bins(seq(0, 1100, by = 50))),
+    "FIMSFrame"
+  )
+  #' @description Test that `validate_population_length_bins()` accepts 0.05-wide population length bins that end at the last fleet edge despite rounding.
+  expect_no_error(validate_population_length_bins(
+    population_length_bin_rows(seq(0.1, 1.15, by = 0.05)),
+    list(fleet1 = seq(0.1, 1.1, by = 0.1))
+  ))
+})
+
+test_that("`FIMSFrame()` accepts fecundity at length on the population length bins", {
+  population_lengths <- seq(0, 1150, by = 50)
+  #' @description Test that `FIMSFrame()` accepts fecundity at length with a `timing = NA` default and a row set for 1 year.
+  expect_s4_class(
+    FIMSFrame(dplyr::bind_rows(
+      with_population_bins(population_lengths),
+      fecundity_at_length_rows(population_lengths, population_lengths),
+      fecundity_at_length_rows(population_lengths, population_lengths, 5)
+    )),
+    "FIMSFrame"
+  )
+})
+
 ## Edge handling ----
 test_that("`FIMSFrame()` returns correct outputs for edge cases", {
   #' @description Test that `get_data()` retrieves the data slot as a data frame when passed a data frame rather than a FIMSFrame object.
@@ -388,6 +423,17 @@ test_that("`FIMSFrame()` returns correct outputs for edge cases", {
     ) |>
       dplyr::select(-length)
   ))
+
+  #' @description Test that `FIMSFrame()` accepts weight at age of 0 at every age in a year, because only spawning weight and fecundity are checked for all zeros.
+  expect_s4_class(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      observed = dplyr::if_else(
+        type == "weight_at_age" & timing == 5, 0, observed
+      )
+    )),
+    "FIMSFrame"
+  )
 })
 
 ## Error handling ----
@@ -670,6 +716,37 @@ test_that("`FIMSFrame()` returns correct error messages", {
     regexp = "missing these years:\\s+5"
   )
 
+  fecundity_rows <- dplyr::filter(
+    data_big,
+    type == "weight_at_age",
+    timing == 1
+  ) |>
+    dplyr::mutate(type = "fecundity_at_age", observed = 1, unit = "eggs/mt")
+  #' @description Test that `FIMSFrame()` returns an error when fecundity-at-age rows have a fleet.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::mutate(fecundity_rows, fleet = "fleet1", timing = NA_integer_)
+    )),
+    regexp = "has rows for\\s+fleet\\s+\"fleet1\""
+  )
+  #' @description Test that `FIMSFrame()` returns an error when spawning-weight-at-age rows skip years and have no `timing = NA` default.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::mutate(fecundity_rows, type = "spawning_weight_at_age")
+    )),
+    regexp = "spawning_weight_at_age` is missing these years"
+  )
+  #' @description Test that `FIMSFrame()` returns an error when fecundity at age is 0 at every age in a timing, because spawning output would be 0.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      data_big,
+      dplyr::mutate(fecundity_rows, timing = NA_integer_, observed = 0)
+    )),
+    regexp = "fecundity_at_age` is 0 at every age"
+  )
+
   #' @description Test that `FIMSFrame()` returns an error when a weight-at-age timing is missing an age.
   expect_error(
     FIMSFrame(dplyr::filter(
@@ -741,6 +818,90 @@ test_that("`FIMSFrame()` returns correct error messages", {
   expect_error(
     FIMSFrame(dplyr::select(data_big, -length)),
     "is a required column"
+  )
+})
+
+test_that("`FIMSFrame()` returns errors for invalid population length bins", {
+  #' @description Test that `FIMSFrame()` errors when population length bins start above the fleet length bins.
+  expect_error(
+    FIMSFrame(with_population_bins(seq(100, 1150, by = 50))),
+    "does\\s+not\\s+cover the length bins"
+  )
+  #' @description Test that `FIMSFrame()` errors when population length bins end below the upper edge of the fleet length bins.
+  expect_error(
+    FIMSFrame(with_population_bins(seq(0, 1050, by = 50))),
+    "does\\s+not\\s+cover the length bins"
+  )
+  #' @description Test that `FIMSFrame()` errors when population length bins have a timing.
+  expect_error(
+    FIMSFrame(with_population_bins(seq(0, 1150, by = 50), timing = 1)),
+    "need\\s+`timing = NA`"
+  )
+  #' @description Test that `FIMSFrame()` errors when there is only 1 population length bin.
+  expect_error(
+    FIMSFrame(with_population_bins(0)),
+    "at least 2"
+  )
+  #' @description Test that `FIMSFrame()` errors when population length bins repeat a length.
+  expect_error(
+    FIMSFrame(with_population_bins(c(0, 0, seq(50, 1150, by = 50)))),
+    "at least 2"
+  )
+  #' @description Test that `validate_population_length_bins()` errors when a population length bin is wider than a fleet length bin it overlaps.
+  expect_error(
+    validate_population_length_bins(
+      population_length_bin_rows(seq(0, 1150, by = 50)),
+      list(fleet1 = seq(0, 1100, by = 50), survey1 = seq(200, 800, by = 10))
+    ),
+    "(?s)wider than a length bin.*fleet\\s+\"survey1\"\\.",
+    perl = TRUE
+  )
+})
+
+test_that("`FIMSFrame()` returns errors for invalid fecundity at length", {
+  population_lengths <- seq(0, 1150, by = 50)
+  with_fecundity <- function(rows) {
+    dplyr::bind_rows(with_population_bins(population_lengths), rows)
+  }
+  fecundity_rows <- fecundity_at_length_rows(
+    population_lengths,
+    population_lengths
+  )
+
+  #' @description Test that `FIMSFrame()` errors when there are fecundity-at-length rows but no population length bins.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(data_big, fecundity_rows)),
+    "need population length bins"
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity-at-length rows have a fleet.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::mutate(fecundity_rows, fleet = "fleet1"))),
+    "has rows for\\s+fleet\\s+\"fleet1\""
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity-at-length rows have a timing after the year after the last model year.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::mutate(fecundity_rows, timing = 40))),
+    "years outside"
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity at length is negative.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::mutate(fecundity_rows, observed = -1))),
+    "missing or\\s+negative"
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity at length is missing a population length bin.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::filter(fecundity_rows, length > 0))),
+    "is missing lengths for these timings"
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity at length is 0 at every length, because spawning output would be 0.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::mutate(fecundity_rows, observed = 0))),
+    "is 0 at every length"
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity at length skips years and has no `timing = NA` default.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::mutate(fecundity_rows, timing = 1))),
+    "fecundity_at_length` is missing these years"
   )
 })
 

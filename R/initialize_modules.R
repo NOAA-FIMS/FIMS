@@ -40,6 +40,8 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
 
   if (module_class_name == "Population") {
     module_fields <- setdiff(module_fields, c(
+      "n_lengths",
+      "lengths",
       "log_f_multiplier",
       "spawning_biomass_ratio",
       "total_catch_weight",
@@ -54,6 +56,9 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       "unfished_biomass",
       "unfished_spawning_biomass",
       "proportion_mature_at_age",
+      "spawning_weight_at_age",
+      "fecundity_at_age",
+      "fecundity_at_length",
       "expected_recruitment",
       "sum_selectivity"
     ))
@@ -385,6 +390,82 @@ initialize_population <- function(parameters, data, linked_ids) {
   # Link fleets to module
   for (i in which(grepl("fleet", names(linked_ids)))) {
     module$AddFleet(linked_ids[[i]])
+  }
+
+  # Spawning weight and fecundity at age are only filled when there are rows.
+  # Empty vectors mean spawning weight is the population weight at age and
+  # fecundity is 1.
+  input_data <- get_data(data)
+  spawning_years <- get_start_year(data):(get_end_year(data) + 1)
+  for (field in c("spawning_weight_at_age", "fecundity_at_age")) {
+    field_rows <- dplyr::filter(input_data, .data[["type"]] == .env[["field"]])
+    if (NROW(field_rows) > 0) {
+      module[[field]][] <- at_age_by_year(
+        field_rows,
+        ages = get_ages(data),
+        years = spawning_years
+      )
+    }
+  }
+
+  population_lengths <- population_length_bins(get_data(data))
+  module$n_lengths$set(length(population_lengths))
+  module$lengths[] <- population_lengths
+  growth_type <- parameters |>
+    dplyr::filter(.data[["module_name"]] == "Growth") |>
+    dplyr::pull(.data[["module_type"]]) |>
+    unique()
+  if (length(population_lengths) > 0 && "EWAA" %in% growth_type) {
+    cli::cli_warn(c(
+      "!" = "The population length bins ({.var length_bin} rows with
+      {.code fleet = NA}) are not used because growth is {.val EWAA}.",
+      "i" = "Population length bins need a growth module that gives length at
+      age, such as {.code setup_default_Growth(module_type =
+      \"VonBertalanffySchnute\")}."
+    ))
+  }
+
+  # Fecundity at length is averaged over the length distribution at age, which
+  # EWAA growth does not have, so the rows are only used with growth that gives
+  # length at age
+  fecundity_rows <- dplyr::filter(
+    input_data,
+    .data[["type"]] == "fecundity_at_length"
+  )
+  if (NROW(fecundity_rows) > 0) {
+    if ("EWAA" %in% growth_type) {
+      cli::cli_warn(c(
+        "!" = "The {.var fecundity_at_length} rows are not used because growth
+        is {.val EWAA}, so spawning output is in weight units.",
+        "i" = "Fecundity at length needs a growth module that gives length at
+        age, such as {.code setup_default_Growth(module_type =
+        \"VonBertalanffySchnute\")}."
+      ))
+    } else {
+      if (any(input_data[["type"]] == "spawning_weight_at_age")) {
+        cli::cli_abort(c(
+          "x" = "The data have both {.var fecundity_at_length} and
+          {.var spawning_weight_at_age} rows.",
+          "i" = "Fecundity at length replaces spawning weight at age in
+          spawning output, so only 1 of them can be given.",
+          "i" = "Use {.code dplyr::count(data, type)} to see the types."
+        ))
+      }
+      if (any(input_data[["type"]] == "fecundity_at_age")) {
+        cli::cli_warn(c(
+          "!" = "{.var fecundity_at_age} multiplies spawning output from
+          {.var fecundity_at_length}.",
+          "i" = "Remove the {.var fecundity_at_age} rows unless spawning output
+          per fish also changes with age at a given length."
+        ))
+      }
+      module[["fecundity_at_length"]][] <- at_age_by_year(
+        fecundity_rows,
+        ages = population_lengths,
+        years = spawning_years,
+        column = "length"
+      )
+    }
   }
 
   return(module)

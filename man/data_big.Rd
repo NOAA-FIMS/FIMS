@@ -9,7 +9,7 @@ A data frame with 2808 observations of 8
 variables:
 \describe{
 \item{type}{The type of input the row contains. Allowed types include
-age_comp, age_to_length_conversion, index, catch, length_bin, length_comp, and weight_at_age.}
+age_comp, age_to_length_conversion, index, catch, length_bin, length_comp, weight_at_age, spawning_weight_at_age, fecundity_at_age, and fecundity_at_length.}
 \item{fleet}{A character string providing the name of the information
 source that the input was collected from, e.g., \code{"Trawl fishery"} or
 \code{"age_zero_survey"}. Entries can be \code{NA} for information that is not
@@ -27,15 +27,20 @@ fish and the last bin holds all larger fish. With fixed
 \code{age_to_length_conversion} rows, those rows set what each bin holds. In
 this dataset, the bins are 50 mm wide, so \code{length = 250} is the bin from
 250 to 300 mm, and the conversion puts all fish under 50 mm in the first
-bin and all fish of 1100 mm or more in the last.}
+bin and all fish of 1100 mm or more in the last. \code{length_bin} rows with
+\code{fleet = NA} and \code{timing = NA} set the population length bins (see
+\code{vignette("fims-input-data", package = "FIMS")}).}
 \item{timing}{The timing, i.e., year the data was collected.}
 \item{observed}{The observed measurement of interest.}
 \item{unit}{A character string specifying the units of \code{observed}. Allowed
 units for each data type are as follows. \code{mt} or \code{number} are used for
 \code{index} and \code{catch} data, with 1 unit per fleet for each type. \code{mt} is
-used for \code{weight_at_age} data. \code{number} or \code{proportion} are each viable
-units for the composition data, where the former is the preferred unit
-of measurement.}
+used for \code{weight_at_age} and \code{spawning_weight_at_age} data.
+\code{fecundity_at_age} is spawning output per unit of spawning weight, e.g.,
+\code{eggs/mt}. \code{fecundity_at_length} is spawning output per fish, e.g.,
+\code{eggs}. \code{number} or \code{proportion} are each viable units for the
+composition data, where the former is the preferred unit of
+measurement.}
 \item{uncertainty}{A right-handed formula specifying the distributional
 assumptions for the entry in \code{observed}. See \code{\link[=FIMSFrame]{FIMSFrame()}} for more
 information about this column.
