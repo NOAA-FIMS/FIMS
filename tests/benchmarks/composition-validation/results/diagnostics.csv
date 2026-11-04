@@ -1,0 +1,8 @@
+"case","identical"
+"valid",TRUE
+"bad_sum",TRUE
+"bad_units",TRUE
+"counts",TRUE
+"missing",TRUE
+"missing_unit",TRUE
+"empty",TRUE

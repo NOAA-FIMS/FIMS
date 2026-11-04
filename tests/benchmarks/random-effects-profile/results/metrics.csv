@@ -1,0 +1,13 @@
+"metric","value"
+"fixed_parameters",49
+"random_parameters",29
+"fit_elapsed_seconds",17.902
+"time_optimization",8.94834995269775
+"time_sdreport",8.86575698852539
+"time_total",17.8257098197937
+"extract_elapsed_seconds",0.661000000000001
+"objective",3231.28735372779
+"optimizer_code",0
+"max_abs_gradient",0.000389922123169129
+"positive_definite_hessian",1
+"estimate_rows",13997

@@ -798,18 +798,9 @@ validate_data_colnames <- function(data) {
 }
 
 validate_composition_data <- function(data) {
-  composition_type <- pretty_type(unique(data[["type"]]))
   if (all(data[["observed"]] == -999)) {
     return(0)
   }
-  groupings <- names(data)[
-    sapply(
-      data,
-      function(x) dplyr::n_distinct(x, na.rm = FALSE) == 1 & !all(is.na(x))
-    )
-  ]
-  grouping_message <- glue::glue("{groupings} = {data[1, groupings]}")
-  names(grouping_message) <- rep("*", length(grouping_message))
   units <- unique(data[["unit"]])
   errors <- vector()
   if (length(units) != 1) {
@@ -826,6 +817,16 @@ validate_composition_data <- function(data) {
     )
   }
   if (length(errors) > 0) {
+    # Build detailed group descriptions only when validation fails.
+    composition_type <- pretty_type(unique(data[["type"]]))
+    groupings <- names(data)[
+      sapply(
+        data,
+        function(x) dplyr::n_distinct(x, na.rm = FALSE) == 1 & !all(is.na(x))
+      )
+    ]
+    grouping_message <- glue::glue("{groupings} = {data[1, groupings]}")
+    names(grouping_message) <- rep("*", length(grouping_message))
     cli::cli_bullets(c(
       " " = "Group-level information for {composition_type} errors",
       grouping_message,
