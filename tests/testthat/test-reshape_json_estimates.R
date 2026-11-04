@@ -39,11 +39,14 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
 
   # Reshape the TMB output into a standardized data frame.
   # This serves as the "expected" result to compare against.
+  # Use the saved gradient because obj[["gr"]]() on a fit read from disk
+  # retapes against C++ objects that no longer exist.
   tmb_output <- FIMS:::reshape_tmb_estimates(
     obj = obj,
     sdreport = sdreport,
     opt = opt,
-    parameter_names = parameter_names
+    parameter_names = parameter_names,
+    precomputed_gradient = get_gradient(fit)
   ) |>
     # Select only the columns needed for the comparison to ensure a clean test.
     dplyr::select(
