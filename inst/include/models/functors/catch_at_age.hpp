@@ -520,8 +520,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Spawning output of a female of age \f$a\f$ in year \f$y\f$ if
-   * she is mature.
+   * @brief Spawning output of a female of age \f$a\f$ in year \f$y\f$,
+   * before maturity at age.
    *
    * Spawning weight at age times fecundity at age:
    * \f[
@@ -539,13 +539,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \f]
    * Maturity at length defaults to 1, and fecundity at length defaults to
    * weight at the bin center. Maturity at length is applied inside the sum
-   * because a fish's maturity depends on its length, so applying it after
-   * averaging would undercount the larger fish of an age.
+   * because the longer fish of an age are both heavier and more often mature,
+   * so applying it after averaging would make spawning output too low.
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
-   * @return Spawning output per mature female.
+   * @return Spawning output per female before maturity at age.
    */
   Type SpawningOutputAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
@@ -554,15 +554,20 @@ class CatchAtAge : public FisheryModelBase<Type> {
     Type spawning_output;
     if (population->fecundity_at_length.size() > 0 ||
         population->maturity_at_length.size() > 0) {
-      std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
-          growth_observation = std::dynamic_pointer_cast<
-              fims_popdy::GrowthDerivedObservationBase<Type>>(
-              population->growth);
-      if (population->size_distribution_provider == nullptr ||
-          growth_observation == nullptr) {
+      if (population->size_distribution_provider == nullptr) {
+        FIMS_ERROR_LOG(
+            "Population fecundity_at_length and maturity_at_length need growth "
+            "that gives length at age and population length bins.");
         throw std::runtime_error(
             "Population fecundity_at_length and maturity_at_length need growth "
             "that gives length at age and population length bins.");
+      }
+      // Weight at length is only needed without fecundity at length
+      std::shared_ptr<fims_popdy::GrowthDerivedObservationBase<Type>>
+          growth_observation;
+      if (population->fecundity_at_length.size() == 0) {
+        growth_observation = std::dynamic_pointer_cast<
+            fims_popdy::GrowthDerivedObservationBase<Type>>(population->growth);
       }
       // The year after the last model year uses the length at age of the last
       // model year, as PopulationMeanWeightAA() does

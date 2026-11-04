@@ -333,13 +333,13 @@ fecundity_rows <- tibble::tibble(
 
 ## Maturity at length (`type == "maturity_at_length"`)
 
-`maturity_at_length` gives the proportion mature in each population length bin. It follows the same rules as `fecundity_at_length`: rows need `fleet = NA`, 1 row for every population length bin in each timing, population length bins, and growth that gives length at age. As for `maturity_at_age`, values are from 0 to 1 and `unit = "proportion"`.
+`maturity_at_length` gives the proportion mature in each population length bin. Rows need `fleet = NA` and 1 row per population length bin in each timing, and they follow the same `timing` rule as `fecundity_at_length`. The model needs population length bins and growth that gives length at age. As for `maturity_at_age`, values are from 0 to 1 and `unit = "proportion"`.
 
-Spawning output at age is the sum over length bins of the probability of each length at that age times maturity at length times fecundity at length, or weight at the bin center without `fecundity_at_length`. This sum is then multiplied by maturity at age and fecundity at age. Maturity at length is applied inside the sum because a fish's maturity depends on its length. Applying a maturity at age after averaging over length would undercount the larger fish of an age. This matches how Stock Synthesis uses length-based maturity.
+Spawning output at age is the sum over length bins of the probability of each length at that age times maturity at length times fecundity at length, or weight at the bin center without `fecundity_at_length`. This sum is then multiplied by maturity at age and fecundity at age. Maturity at length is applied inside the sum because the longer fish of an age are both heavier and more often mature. Applying maturity after averaging over length would miss that, so spawning output would be too low. Stock Synthesis also applies length-based maturity inside the sum over length, but at the time of spawning, where FIMS uses the start of the year.
 
-Maturity at age still multiplies the result. With `maturity_at_length` rows and no `maturity_at_age` rows, `setup_default_parameters()` sets maturity at age to 1 when growth gives length at age, and `setup_default_Maturity(data, module_type = "Empirical")` does the same. A maturity at age of only 0 and 1, such as Stock Synthesis's first mature age, can be combined with maturity at length. Values between 0 and 1 give a warning, because maturity would then be counted twice. Maturity parameters cannot be estimated. The `proportion_mature_at_age` output reports maturity at age only, not maturity at length.
+With `maturity_at_length` rows and no `maturity_at_age` rows, `setup_default_parameters()` sets maturity at age to 1 when growth gives length at age, and `setup_default_Maturity(data, module_type = "Empirical")` does the same. A maturity at age of only 0 and 1, such as Stock Synthesis's first mature age, can be combined with maturity at length. Values between 0 and 1 give a warning, because maturity would then be counted twice. Maturity parameters cannot be estimated. The `proportion_mature_at_age` output reports maturity at age only, not maturity at length.
 
-A logistic maturity ogive in length can be tabulated at the bin centers:
+A logistic maturity ogive in length, such as Stock Synthesis maturity option 1, can be tabulated at the bin centers. Here `mat_50` and `mat_slope` are the Stock Synthesis parameters, and `mat_slope` is negative.
 
 ```{r maturity-at-length-logistic, eval = FALSE}
 population_lengths <- seq(0, 1150, by = 50)
@@ -350,7 +350,7 @@ maturity_rows <- tibble::tibble(
   age = NA_real_,
   length = population_lengths,
   timing = NA_real_,
-  observed = 1 / (1 + exp(-slope * (length_midpoints - length_at_50_percent))),
+  observed = 1 / (1 + exp(mat_slope * (length_midpoints - mat_50))),
   unit = "proportion",
   uncertainty = NA_character_
 )

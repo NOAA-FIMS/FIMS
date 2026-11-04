@@ -67,7 +67,7 @@ Maturity defaults are also chosen from the data. Models with
 \code{maturity_at_age} data default to \code{"Empirical"} maturity. Models with
 \code{maturity_at_length} data, no \code{maturity_at_age} data, and growth that gives
 length at age default to \code{"Empirical"} maturity of 1 at every age, because
-maturity at length carries the maturity. All other models default to
+maturity at length gives the proportion mature. All other models default to
 \code{"Logistic"} maturity.
 
 To create the default initial numbers at age, this function uses the defaults

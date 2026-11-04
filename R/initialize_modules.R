@@ -483,9 +483,12 @@ initialize_maturity <- function(parameters, data) {
         "!" = "Maturity at age has values between 0 and 1, and it multiplies
         the {.var maturity_at_length} values.",
         "i" = "Use a maturity at age of only 0 and 1 unless maturity at a
-        given length also changes with age.
-        {.code setup_default_Maturity(data, module_type = \"Empirical\")}
-        gives 1 at every age when there are no {.var maturity_at_age} rows."
+        given length also changes with age.",
+        "i" = "{.code setup_default_Maturity(data, module_type =
+        \"Empirical\")} gives 1 at every age when there are no
+        {.var maturity_at_age} rows.",
+        "i" = "Use {.code dplyr::filter(parameters, module_name == 'Maturity',
+        value > 0, value < 1)} to find the values."
       ))
     }
   }
@@ -581,7 +584,9 @@ initialize_population <- function(parameters, data, linked_ids) {
         growth is {.val EWAA}.",
         "i" = "Inputs at length need a growth module that gives length at
         age, such as {.code setup_default_Growth(module_type =
-        \"VonBertalanffySchnute\")}."
+        \"VonBertalanffySchnute\")}.",
+        "i" = "Without them, spawning output uses maturity at age only, so
+        check the maturity module."
       ))
     } else {
       if (any(input_data[["type"]] == "spawning_weight_at_age")) {

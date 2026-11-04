@@ -31,7 +31,7 @@
 #' `maturity_at_age` data default to `"Empirical"` maturity. Models with
 #' `maturity_at_length` data, no `maturity_at_age` data, and growth that gives
 #' length at age default to `"Empirical"` maturity of 1 at every age, because
-#' maturity at length carries the maturity. All other models default to
+#' maturity at length gives the proportion mature. All other models default to
 #' `"Logistic"` maturity.
 #'
 #' To create the default initial numbers at age, this function uses the defaults
@@ -146,7 +146,8 @@ setup_default_parameters <- function(data) {
   )
 
   # Create maturity parameters, using empirical maturity-at-age data if present.
-  # With maturity-at-length rows, empirical maturity at age is 1.
+  # Without maturity-at-age rows but with maturity-at-length rows and growth that
+  # gives length at age, empirical maturity at age is 1.
   input_types <- get_data(data)[["type"]]
   has_maturity_at_age <- any(input_types == "maturity_at_age", na.rm = TRUE)
   uses_maturity_at_length <- !has_maturity_at_age &&
@@ -910,7 +911,7 @@ setup_default_Maturity <- function(
 setup_default_EmpiricalMaturity <- function(data) {
   maturity_data <- get_data(data) |>
     dplyr::filter(.data[["type"]] == "maturity_at_age")
-  # Maturity at length carries the maturity, so maturity at age is 1
+  # Maturity at length gives the proportion mature, so maturity at age is 1
   if (NROW(maturity_data) == 0 &&
     any(get_data(data)[["type"]] == "maturity_at_length")) {
     cli::cli_inform(
