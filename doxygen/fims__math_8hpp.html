@@ -281,6 +281,7 @@ template&lt;class Type&gt; </div>
 <p>Used when x could evaluate to zero, which will result in a NaN for derivative values.</p>
 <p>Evaluates:</p>
 <p>\( (x^2+C)^.5 \)</p>
+<p>The result is never below \( \sqrt{C} \), so ad_fabs(0) is about 0.0032 with the default C.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">x</td><td>value to keep positive </td></tr>
@@ -288,7 +289,7 @@ template&lt;class Type&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A smooth approximation of the absolute value of x. </dd></dl>
 
 </div>
 </div>
@@ -326,16 +327,17 @@ template&lt;typename Type&gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Returns the maximum between a and b in a continuous manner using:</p>
-<p>(a + b + <a class="el" href="#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a>(a - b)) *.5; Reference: <a class="el" href="#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs()</a> This is an approximation with minimal error.</p>
+<p>(a + b + <a class="el" href="#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a>(a - b, C)) *.5; Reference: <a class="el" href="#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs()</a></p>
+<p>The result is never below the true maximum. The error is largest, \( \sqrt{C} / 2 \), when a = b. It is about \( C / (4|a - b|) \) when \( |a - b| \) is much larger than \( \sqrt{C} \). With the default C, ad_max(x, 1e-8) is about 0.0016 at x = 0, not 1e-8, and is 2.4% above x at x = 0.01. Use a smaller C when values near the floor matter.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">a</td><td></td></tr>
-    <tr><td class="paramname">b</td><td></td></tr>
-    <tr><td class="paramname">C</td><td>default = 1e-5 </td></tr>
+    <tr><td class="paramname">a</td><td>The first value. </td></tr>
+    <tr><td class="paramname">b</td><td>The second value. </td></tr>
+    <tr><td class="paramname">C</td><td>A positive constant that sets how smooth the result is. A smaller C gives a smaller error but a sharper bend at a = b. Default is 1e-5. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A smooth approximation of the maximum of a and b. </dd></dl>
 
 </div>
 </div>
@@ -373,17 +375,17 @@ template&lt;typename Type&gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Returns the minimum between a and b in a continuous manner using:</p>
-<p>(a + b - <a class="el" href="#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a>(a - b))*.5; Reference: <a class="el" href="#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs()</a></p>
-<p>This is an approximation with minimal error.</p>
+<p>(a + b - <a class="el" href="#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a>(a - b, C))*.5; Reference: <a class="el" href="#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs()</a></p>
+<p>The result is never above the true minimum. The error is largest, \( \sqrt{C} / 2 \), when a = b. It is about \( C / (4|a - b|) \) when \( |a - b| \) is much larger than \( \sqrt{C} \). Use a smaller C when a and b can be close.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">a</td><td></td></tr>
-    <tr><td class="paramname">b</td><td></td></tr>
-    <tr><td class="paramname">C</td><td>default = 1e-5 </td></tr>
+    <tr><td class="paramname">a</td><td>The first value. </td></tr>
+    <tr><td class="paramname">b</td><td>The second value. </td></tr>
+    <tr><td class="paramname">C</td><td>A positive constant that sets how smooth the result is. A smaller C gives a smaller error but a sharper bend at a = b. Default is 1e-5. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A smooth approximation of the minimum of a and b. </dd></dl>
 
 </div>
 </div>

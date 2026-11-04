@@ -367,86 +367,86 @@ $(function(){initNavTree('fims__math_8hpp_source.html','',''); });
 <div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>}</div>
 </div>
 <div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span></div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> Type&gt;</div>
-<div class="foldopen" id="foldopen00330" data-start="{" data-end="}">
-<div class="line"><a id="l00330" name="l00330"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">  330</a></span><span class="keyword">const</span> Type <a class="code hl_function" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">ad_fabs</a>(<span class="keyword">const</span> Type &amp;x, Type C = 1e-5) {</div>
-<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>  <span class="keywordflow">return</span> sqrt((x * x) + C);</div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>}</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> Type&gt;</div>
+<div class="foldopen" id="foldopen00333" data-start="{" data-end="}">
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">  333</a></span><span class="keyword">const</span> Type <a class="code hl_function" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">ad_fabs</a>(<span class="keyword">const</span> Type &amp;x, Type C = 1e-5) {</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>  <span class="keywordflow">return</span> sqrt((x * x) + C);</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>}</div>
 </div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span></div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span> </div>
-<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Type&gt;</div>
-<div class="foldopen" id="foldopen00350" data-start="{" data-end="}">
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#a4c3897f03cbc7860a4b73b21f58558f6">  350</a></span><span class="keyword">inline</span> <span class="keyword">const</span> Type <a class="code hl_function" href="fims__math_8hpp.html#a4c3897f03cbc7860a4b73b21f58558f6">ad_min</a>(<span class="keyword">const</span> Type &amp;a, <span class="keyword">const</span> Type &amp;b, Type C = 1e-5) {</div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>  <span class="keywordflow">return</span> (a + b - <a class="code hl_function" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a>(a - b, C)) * <span class="keyword">static_cast&lt;</span>Type<span class="keyword">&gt;</span>(0.5);</div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>}</div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span></div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span> </div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="foldopen" id="foldopen00357" data-start="{" data-end="}">
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#a4c3897f03cbc7860a4b73b21f58558f6">  357</a></span><span class="keyword">inline</span> <span class="keyword">const</span> Type <a class="code hl_function" href="fims__math_8hpp.html#a4c3897f03cbc7860a4b73b21f58558f6">ad_min</a>(<span class="keyword">const</span> Type &amp;a, <span class="keyword">const</span> Type &amp;b, Type C = 1e-5) {</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>  <span class="keywordflow">return</span> (a + b - <a class="code hl_function" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a>(a - b, C)) * <span class="keyword">static_cast&lt;</span>Type<span class="keyword">&gt;</span>(0.5);</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>}</div>
 </div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span></div>
-<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Type&gt;</div>
-<div class="foldopen" id="foldopen00367" data-start="{" data-end="}">
-<div class="line"><a id="l00367" name="l00367"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321">  367</a></span><span class="keyword">inline</span> <span class="keyword">const</span> Type <a class="code hl_function" href="fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321">ad_max</a>(<span class="keyword">const</span> Type &amp;a, <span class="keyword">const</span> Type &amp;b, Type C = 1e-5) {</div>
-<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>  <span class="keywordflow">return</span> (a + b + <a class="code hl_function" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a>(a - b, C)) * <span class="keyword">static_cast&lt;</span>Type<span class="keyword">&gt;</span>(.5);</div>
-<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span>}</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span></div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="foldopen" id="foldopen00380" data-start="{" data-end="}">
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321">  380</a></span><span class="keyword">inline</span> <span class="keyword">const</span> Type <a class="code hl_function" href="fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321">ad_max</a>(<span class="keyword">const</span> Type &amp;a, <span class="keyword">const</span> Type &amp;b, Type C = 1e-5) {</div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>  <span class="keywordflow">return</span> (a + b + <a class="code hl_function" href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a>(a - b, C)) * <span class="keyword">static_cast&lt;</span>Type<span class="keyword">&gt;</span>(.5);</div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>}</div>
 </div>
-<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span></div>
-<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Type&gt;</div>
-<div class="foldopen" id="foldopen00393" data-start="{" data-end="}">
-<div class="line"><a id="l00393" name="l00393"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#a15e62e8fcb8c7f077c332030ee04e70f">  393</a></span><span class="keyword">inline</span> <a class="code hl_class" href="classfims_1_1Vector.html">fims::Vector&lt;Type&gt;</a> <a class="code hl_function" href="fims__math_8hpp.html#a15e62e8fcb8c7f077c332030ee04e70f">apply_ageing_error</a>(</div>
-<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span>    <span class="keyword">const</span> <a class="code hl_class" href="classfims_1_1Vector.html">fims::Vector&lt;Type&gt;</a> &amp;proportion_at_true_age,</div>
-<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span>    <span class="keyword">const</span> <a class="code hl_class" href="classfims_1_1Vector.html">fims::Vector&lt;Type&gt;</a> &amp;ageing_error, <span class="keywordtype">size_t</span> year = 0) {</div>
-<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span>  <span class="keyword">const</span> <span class="keywordtype">size_t</span> n_ages = proportion_at_true_age.<a class="code hl_function" href="classfims_1_1Vector.html#abe2abae6275f702ce15a62f6a63c7062">size</a>();</div>
-<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span>  <span class="keyword">const</span> <span class="keywordtype">size_t</span> matrix_size = n_ages * n_ages;</div>
-<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span>  <span class="keyword">const</span> <span class="keywordtype">size_t</span> matrix_offset =</div>
-<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span>      (ageing_error.<a class="code hl_function" href="classfims_1_1Vector.html#abe2abae6275f702ce15a62f6a63c7062">size</a>() == matrix_size) ? 0 : year * matrix_size;</div>
-<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span> </div>
-<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span>  <a class="code hl_class" href="classfims_1_1Vector.html">fims::Vector&lt;Type&gt;</a> proportion_at_observed_age(n_ages, <span class="keyword">static_cast&lt;</span>Type<span class="keyword">&gt;</span>(0.0));</div>
-<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> true_age = 0; true_age &lt; n_ages; true_age++) {</div>
-<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> observed_age = 0; observed_age &lt; n_ages; observed_age++) {</div>
-<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span>      proportion_at_observed_age[observed_age] +=</div>
-<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span>          proportion_at_true_age[true_age] *</div>
-<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span>          ageing_error[matrix_offset + true_age * n_ages + observed_age];</div>
-<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span>    }</div>
-<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span>  }</div>
-<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span>  <span class="keywordflow">return</span> proportion_at_observed_age;</div>
-<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span>}</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span></div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno">  405</span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Type&gt;</div>
+<div class="foldopen" id="foldopen00406" data-start="{" data-end="}">
+<div class="line"><a id="l00406" name="l00406"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#a15e62e8fcb8c7f077c332030ee04e70f">  406</a></span><span class="keyword">inline</span> <a class="code hl_class" href="classfims_1_1Vector.html">fims::Vector&lt;Type&gt;</a> <a class="code hl_function" href="fims__math_8hpp.html#a15e62e8fcb8c7f077c332030ee04e70f">apply_ageing_error</a>(</div>
+<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span>    <span class="keyword">const</span> <a class="code hl_class" href="classfims_1_1Vector.html">fims::Vector&lt;Type&gt;</a> &amp;proportion_at_true_age,</div>
+<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span>    <span class="keyword">const</span> <a class="code hl_class" href="classfims_1_1Vector.html">fims::Vector&lt;Type&gt;</a> &amp;ageing_error, <span class="keywordtype">size_t</span> year = 0) {</div>
+<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span>  <span class="keyword">const</span> <span class="keywordtype">size_t</span> n_ages = proportion_at_true_age.<a class="code hl_function" href="classfims_1_1Vector.html#abe2abae6275f702ce15a62f6a63c7062">size</a>();</div>
+<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span>  <span class="keyword">const</span> <span class="keywordtype">size_t</span> matrix_size = n_ages * n_ages;</div>
+<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span>  <span class="keyword">const</span> <span class="keywordtype">size_t</span> matrix_offset =</div>
+<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span>      (ageing_error.<a class="code hl_function" href="classfims_1_1Vector.html#abe2abae6275f702ce15a62f6a63c7062">size</a>() == matrix_size) ? 0 : year * matrix_size;</div>
+<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span> </div>
+<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span>  <a class="code hl_class" href="classfims_1_1Vector.html">fims::Vector&lt;Type&gt;</a> proportion_at_observed_age(n_ages, <span class="keyword">static_cast&lt;</span>Type<span class="keyword">&gt;</span>(0.0));</div>
+<div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> true_age = 0; true_age &lt; n_ages; true_age++) {</div>
+<div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span>    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> observed_age = 0; observed_age &lt; n_ages; observed_age++) {</div>
+<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span>      proportion_at_observed_age[observed_age] +=</div>
+<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span>          proportion_at_true_age[true_age] *</div>
+<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>          ageing_error[matrix_offset + true_age * n_ages + observed_age];</div>
+<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span>    }</div>
+<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>  }</div>
+<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>  <span class="keywordflow">return</span> proportion_at_observed_age;</div>
+<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>}</div>
 </div>
-<div class="line"><a id="l00411" name="l00411"></a><span class="lineno">  411</span></div>
-<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
-<div class="foldopen" id="foldopen00421" data-start="{" data-end="}">
-<div class="line"><a id="l00421" name="l00421"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#a2f6d3a9290062d44590350c1bc739217">  421</a></span>T <a class="code hl_function" href="fims__math_8hpp.html#a2f6d3a9290062d44590350c1bc739217">sum</a>(<span class="keyword">const</span> std::vector&lt;T&gt; &amp;v) {</div>
-<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>  T ret = 0.0;</div>
-<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; v.size(); i++) {</div>
-<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span>    ret += v[i];</div>
-<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span>  }</div>
-<div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>  <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a id="l00427" name="l00427"></a><span class="lineno">  427</span>}</div>
+<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span></div>
+<div class="line"><a id="l00433" name="l00433"></a><span class="lineno">  433</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
+<div class="foldopen" id="foldopen00434" data-start="{" data-end="}">
+<div class="line"><a id="l00434" name="l00434"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#a2f6d3a9290062d44590350c1bc739217">  434</a></span>T <a class="code hl_function" href="fims__math_8hpp.html#a2f6d3a9290062d44590350c1bc739217">sum</a>(<span class="keyword">const</span> std::vector&lt;T&gt; &amp;v) {</div>
+<div class="line"><a id="l00435" name="l00435"></a><span class="lineno">  435</span>  T ret = 0.0;</div>
+<div class="line"><a id="l00436" name="l00436"></a><span class="lineno">  436</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; v.size(); i++) {</div>
+<div class="line"><a id="l00437" name="l00437"></a><span class="lineno">  437</span>    ret += v[i];</div>
+<div class="line"><a id="l00438" name="l00438"></a><span class="lineno">  438</span>  }</div>
+<div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span>  <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span>}</div>
 </div>
-<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span></div>
-<div class="line"><a id="l00437" name="l00437"></a><span class="lineno">  437</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
-<div class="foldopen" id="foldopen00438" data-start="{" data-end="}">
-<div class="line"><a id="l00438" name="l00438"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#a60f8fb42e9a4786ca5e30b9fad43afed">  438</a></span>T <a class="code hl_function" href="fims__math_8hpp.html#a2f6d3a9290062d44590350c1bc739217">sum</a>(<span class="keyword">const</span> <a class="code hl_class" href="classfims_1_1Vector.html">fims::Vector&lt;T&gt;</a> &amp;v) {</div>
-<div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span>  T ret = 0.0;</div>
-<div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; v.<a class="code hl_function" href="classfims_1_1Vector.html#abe2abae6275f702ce15a62f6a63c7062">size</a>(); i++) {</div>
-<div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span>    ret += v[i];</div>
-<div class="line"><a id="l00442" name="l00442"></a><span class="lineno">  442</span>  }</div>
-<div class="line"><a id="l00443" name="l00443"></a><span class="lineno">  443</span>  <span class="keywordflow">return</span> ret;</div>
-<div class="line"><a id="l00444" name="l00444"></a><span class="lineno">  444</span>}</div>
+<div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span></div>
+<div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span><span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
+<div class="foldopen" id="foldopen00451" data-start="{" data-end="}">
+<div class="line"><a id="l00451" name="l00451"></a><span class="lineno"><a class="line" href="fims__math_8hpp.html#a60f8fb42e9a4786ca5e30b9fad43afed">  451</a></span>T <a class="code hl_function" href="fims__math_8hpp.html#a2f6d3a9290062d44590350c1bc739217">sum</a>(<span class="keyword">const</span> <a class="code hl_class" href="classfims_1_1Vector.html">fims::Vector&lt;T&gt;</a> &amp;v) {</div>
+<div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span>  T ret = 0.0;</div>
+<div class="line"><a id="l00453" name="l00453"></a><span class="lineno">  453</span>  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; v.<a class="code hl_function" href="classfims_1_1Vector.html#abe2abae6275f702ce15a62f6a63c7062">size</a>(); i++) {</div>
+<div class="line"><a id="l00454" name="l00454"></a><span class="lineno">  454</span>    ret += v[i];</div>
+<div class="line"><a id="l00455" name="l00455"></a><span class="lineno">  455</span>  }</div>
+<div class="line"><a id="l00456" name="l00456"></a><span class="lineno">  456</span>  <span class="keywordflow">return</span> ret;</div>
+<div class="line"><a id="l00457" name="l00457"></a><span class="lineno">  457</span>}</div>
 </div>
-<div class="line"><a id="l00445" name="l00445"></a><span class="lineno">  445</span> </div>
-<div class="line"><a id="l00446" name="l00446"></a><span class="lineno">  446</span>}  <span class="comment">// namespace fims_math</span></div>
-<div class="line"><a id="l00447" name="l00447"></a><span class="lineno">  447</span> </div>
-<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span><span class="preprocessor">#endif </span><span class="comment">/* FIMS_MATH_HPP */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00458" name="l00458"></a><span class="lineno">  458</span> </div>
+<div class="line"><a id="l00459" name="l00459"></a><span class="lineno">  459</span>}  <span class="comment">// namespace fims_math</span></div>
+<div class="line"><a id="l00460" name="l00460"></a><span class="lineno">  460</span> </div>
+<div class="line"><a id="l00461" name="l00461"></a><span class="lineno">  461</span><span class="preprocessor">#endif </span><span class="comment">/* FIMS_MATH_HPP */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="aclassfims_1_1Vector_html"><div class="ttname"><a href="classfims_1_1Vector.html">fims::Vector</a></div><div class="ttdef"><b>Definition</b> fims_vector.hpp:27</div></div>
 <div class="ttc" id="aclassfims_1_1Vector_html_abe2abae6275f702ce15a62f6a63c7062"><div class="ttname"><a href="classfims_1_1Vector.html#abe2abae6275f702ce15a62f6a63c7062">fims::Vector::size</a></div><div class="ttdeci">size_type size() const</div><div class="ttdoc">Returns the number of elements.</div><div class="ttdef"><b>Definition</b> fims_vector.hpp:299</div></div>
 <div class="ttc" id="adef_8hpp_html"><div class="ttname"><a href="def_8hpp.html">def.hpp</a></div><div class="ttdoc">Platform macros and the core FIMS logging system.</div></div>
 <div class="ttc" id="afims__math_8hpp_html_a0fef2c2ffd54b4d023d194653ebeb1f0"><div class="ttname"><a href="fims__math_8hpp.html#a0fef2c2ffd54b4d023d194653ebeb1f0">fims_math::logit</a></div><div class="ttdeci">const Type logit(const Type &amp;a, const Type &amp;b, const Type &amp;x)</div><div class="ttdoc">A logit function for bounding of parameters.</div><div class="ttdef"><b>Definition</b> fims_math.hpp:261</div></div>
-<div class="ttc" id="afims__math_8hpp_html_a15e62e8fcb8c7f077c332030ee04e70f"><div class="ttname"><a href="fims__math_8hpp.html#a15e62e8fcb8c7f077c332030ee04e70f">fims_math::apply_ageing_error</a></div><div class="ttdeci">fims::Vector&lt; Type &gt; apply_ageing_error(const fims::Vector&lt; Type &gt; &amp;proportion_at_true_age, const fims::Vector&lt; Type &gt; &amp;ageing_error, size_t year=0)</div><div class="ttdoc">Converts values at true age, proportions or expected numbers, to values at observed age using an agei...</div><div class="ttdef"><b>Definition</b> fims_math.hpp:393</div></div>
-<div class="ttc" id="afims__math_8hpp_html_a2f6d3a9290062d44590350c1bc739217"><div class="ttname"><a href="fims__math_8hpp.html#a2f6d3a9290062d44590350c1bc739217">fims_math::sum</a></div><div class="ttdeci">T sum(const std::vector&lt; T &gt; &amp;v)</div><div class="ttdef"><b>Definition</b> fims_math.hpp:421</div></div>
-<div class="ttc" id="afims__math_8hpp_html_a4c3897f03cbc7860a4b73b21f58558f6"><div class="ttname"><a href="fims__math_8hpp.html#a4c3897f03cbc7860a4b73b21f58558f6">fims_math::ad_min</a></div><div class="ttdeci">const Type ad_min(const Type &amp;a, const Type &amp;b, Type C=1e-5)</div><div class="ttdef"><b>Definition</b> fims_math.hpp:350</div></div>
+<div class="ttc" id="afims__math_8hpp_html_a15e62e8fcb8c7f077c332030ee04e70f"><div class="ttname"><a href="fims__math_8hpp.html#a15e62e8fcb8c7f077c332030ee04e70f">fims_math::apply_ageing_error</a></div><div class="ttdeci">fims::Vector&lt; Type &gt; apply_ageing_error(const fims::Vector&lt; Type &gt; &amp;proportion_at_true_age, const fims::Vector&lt; Type &gt; &amp;ageing_error, size_t year=0)</div><div class="ttdoc">Converts values at true age, proportions or expected numbers, to values at observed age using an agei...</div><div class="ttdef"><b>Definition</b> fims_math.hpp:406</div></div>
+<div class="ttc" id="afims__math_8hpp_html_a2f6d3a9290062d44590350c1bc739217"><div class="ttname"><a href="fims__math_8hpp.html#a2f6d3a9290062d44590350c1bc739217">fims_math::sum</a></div><div class="ttdeci">T sum(const std::vector&lt; T &gt; &amp;v)</div><div class="ttdef"><b>Definition</b> fims_math.hpp:434</div></div>
+<div class="ttc" id="afims__math_8hpp_html_a4c3897f03cbc7860a4b73b21f58558f6"><div class="ttname"><a href="fims__math_8hpp.html#a4c3897f03cbc7860a4b73b21f58558f6">fims_math::ad_min</a></div><div class="ttdeci">const Type ad_min(const Type &amp;a, const Type &amp;b, Type C=1e-5)</div><div class="ttdef"><b>Definition</b> fims_math.hpp:357</div></div>
 <div class="ttc" id="afims__math_8hpp_html_a4f55d4bf901b546a57ed3a626a445e52"><div class="ttname"><a href="fims__math_8hpp.html#a4f55d4bf901b546a57ed3a626a445e52">fims_math::double_logistic</a></div><div class="ttdeci">const Type double_logistic(const Type &amp;inflection_point_asc, const Type &amp;slope_asc, const Type &amp;inflection_point_desc, const Type &amp;slope_desc, const Type &amp;x)</div><div class="ttdoc">The general double logistic function.</div><div class="ttdef"><b>Definition</b> fims_math.hpp:304</div></div>
-<div class="ttc" id="afims__math_8hpp_html_a54cfbb09833fa0de10e18203526e8321"><div class="ttname"><a href="fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321">fims_math::ad_max</a></div><div class="ttdeci">const Type ad_max(const Type &amp;a, const Type &amp;b, Type C=1e-5)</div><div class="ttdef"><b>Definition</b> fims_math.hpp:367</div></div>
+<div class="ttc" id="afims__math_8hpp_html_a54cfbb09833fa0de10e18203526e8321"><div class="ttname"><a href="fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321">fims_math::ad_max</a></div><div class="ttdeci">const Type ad_max(const Type &amp;a, const Type &amp;b, Type C=1e-5)</div><div class="ttdef"><b>Definition</b> fims_math.hpp:380</div></div>
 <div class="ttc" id="afims__math_8hpp_html_ab0329c7a64173d4612e7a1d0ddb3f3e6"><div class="ttname"><a href="fims__math_8hpp.html#ab0329c7a64173d4612e7a1d0ddb3f3e6">fims_math::inv_logit</a></div><div class="ttdeci">const Type inv_logit(const Type &amp;a, const Type &amp;b, const Type &amp;logit_x)</div><div class="ttdoc">An inverse logit function for bounding of parameters.</div><div class="ttdef"><b>Definition</b> fims_math.hpp:276</div></div>
-<div class="ttc" id="afims__math_8hpp_html_abda4b1b8b7ea34fcde2a05e78217d522"><div class="ttname"><a href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a></div><div class="ttdeci">const Type ad_fabs(const Type &amp;x, Type C=1e-5)</div><div class="ttdef"><b>Definition</b> fims_math.hpp:330</div></div>
+<div class="ttc" id="afims__math_8hpp_html_abda4b1b8b7ea34fcde2a05e78217d522"><div class="ttname"><a href="fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522">fims_math::ad_fabs</a></div><div class="ttdeci">const Type ad_fabs(const Type &amp;x, Type C=1e-5)</div><div class="ttdef"><b>Definition</b> fims_math.hpp:333</div></div>
 <div class="ttc" id="afims__math_8hpp_html_ae8d003754148800ba87fbf228bc7d062"><div class="ttname"><a href="fims__math_8hpp.html#ae8d003754148800ba87fbf228bc7d062">fims_math::logistic</a></div><div class="ttdeci">const Type logistic(const Type &amp;inflection_point, const Type &amp;slope, const Type &amp;x)</div><div class="ttdoc">The general logistic function.</div><div class="ttdef"><b>Definition</b> fims_math.hpp:243</div></div>
 <div class="ttc" id="afims__vector_8hpp_html"><div class="ttname"><a href="fims__vector_8hpp.html">fims_vector.hpp</a></div><div class="ttdoc">Establishes the FIMS Vector class.</div></div>
 <div class="ttc" id="ainterface_8hpp_html"><div class="ttname"><a href="interface_8hpp.html">interface.hpp</a></div><div class="ttdoc">An interface to the modeling platforms, e.g., TMB.</div></div>
