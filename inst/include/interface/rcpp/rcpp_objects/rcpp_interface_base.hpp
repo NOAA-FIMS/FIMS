@@ -352,10 +352,10 @@ class VariableVector {
       if (estimation_status_string != "not_estimated" &&
           estimation_status_string != "fixed_effects" &&
           estimation_status_string != "random_effects") {
-        throw std::invalid_argument("Invalid estimation_status: " + 
-                                    estimation_status_string +
-                                    ". Valid options are: not_estimated, "
-                                    "fixed_effects, or random_effects.");
+        throw std::invalid_argument(
+            "Invalid estimation_status: " + estimation_status_string +
+            ". Valid options are: not_estimated, "
+            "fixed_effects, or random_effects.");
       }
       this->storage_m->at(i).estimation_status_m.set(estimation_status_string);
     }
