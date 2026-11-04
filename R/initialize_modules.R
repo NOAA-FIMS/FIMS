@@ -402,7 +402,7 @@ initialize_population <- function(parameters, data, linked_ids) {
       "!" = "The population length bins ({.var length_bin} rows with
       {.code fleet = NA}) are not used because growth is {.val EWAA}.",
       "i" = "Population length bins need a growth module that gives length at
-      age, e.g., {.code setup_default_Growth(module_type =
+      age, such as {.code setup_default_Growth(module_type =
       \"VonBertalanffySchnute\")}."
     ))
   }
