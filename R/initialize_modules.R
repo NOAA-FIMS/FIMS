@@ -58,6 +58,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       "proportion_mature_at_age",
       "spawning_weight_at_age",
       "fecundity_at_age",
+      "fecundity_at_length",
       "expected_recruitment",
       "sum_selectivity"
     ))
@@ -422,6 +423,48 @@ initialize_population <- function(parameters, data, linked_ids) {
       age, such as {.code setup_default_Growth(module_type =
       \"VonBertalanffySchnute\")}."
     ))
+  }
+
+  # Fecundity at length is averaged over the length distribution at age, which
+  # EWAA growth does not have, so the rows are only used with growth that gives
+  # length at age
+  fecundity_rows <- dplyr::filter(
+    input_data,
+    .data[["type"]] == "fecundity_at_length"
+  )
+  if (NROW(fecundity_rows) > 0) {
+    if ("EWAA" %in% growth_type) {
+      cli::cli_warn(c(
+        "!" = "The {.var fecundity_at_length} rows are not used because growth
+        is {.val EWAA}, so spawning output is in weight units.",
+        "i" = "Fecundity at length needs a growth module that gives length at
+        age, such as {.code setup_default_Growth(module_type =
+        \"VonBertalanffySchnute\")}."
+      ))
+    } else {
+      if (any(input_data[["type"]] == "spawning_weight_at_age")) {
+        cli::cli_abort(c(
+          "x" = "The data have both {.var fecundity_at_length} and
+          {.var spawning_weight_at_age} rows.",
+          "i" = "Fecundity at length replaces spawning weight at age in
+          spawning output, so only 1 of them can be given.",
+          "i" = "Use {.code dplyr::count(data, type)} to see the types."
+        ))
+      }
+      if (any(input_data[["type"]] == "fecundity_at_age")) {
+        cli::cli_warn(c(
+          "!" = "{.var fecundity_at_age} multiplies spawning output from
+          {.var fecundity_at_length}.",
+          "i" = "Remove the {.var fecundity_at_age} rows unless spawning output
+          per fish also changes with age at a given length."
+        ))
+      }
+      module$fecundity_at_length[] <- at_length_by_year(
+        fecundity_rows,
+        lengths = population_lengths,
+        years = spawning_years
+      )
+    }
   }
 
   return(module)

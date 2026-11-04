@@ -159,6 +159,13 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   RealVector fecundity_at_age;
   /**
+   * @brief Spawning output of a fish in each population length bin, ordered
+   * by year and then length bin, with (n_years + 1) x n_lengths values. It is
+   * empty when spawning output uses spawning weight at age. It is data, so it
+   * is never registered as a parameter.
+   */
+  RealVector fecundity_at_length;
+  /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
    */
@@ -254,6 +261,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     // population says it uses the default
     this->spawning_weight_at_age.resize(0);
     this->fecundity_at_age.resize(0);
+    this->fecundity_at_length.resize(0);
     this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
     this->proportion_female[0].estimation_type_m.set("constant");
     this->fleet_ids = std::make_shared<std::set<uint32_t>>();
@@ -286,6 +294,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         proportion_female(other.proportion_female),
         spawning_weight_at_age(other.spawning_weight_at_age),
         fecundity_at_age(other.fecundity_at_age),
+        fecundity_at_length(other.fecundity_at_length),
         ages(other.ages),
         lengths(other.lengths),
         name(other.name),
@@ -628,6 +637,25 @@ class PopulationInterface : public PopulationInterfaceBase {
     population->fecundity_at_age.resize(this->fecundity_at_age.size());
     for (size_t i = 0; i < population->fecundity_at_age.size(); i++) {
       population->fecundity_at_age[i] = this->fecundity_at_age[i];
+    }
+    const size_t expected_fecundity_at_length_size =
+        static_cast<size_t>((this->n_years.get() + 1) * this->n_lengths.get());
+    if (this->fecundity_at_length.size() != 0 &&
+        this->fecundity_at_length.size() != expected_fecundity_at_length_size) {
+      FIMS_ERROR_LOG(
+          "The size of `fecundity_at_length` does not match "
+          "(n_years + 1) x n_lengths: " +
+          fims::to_string(this->fecundity_at_length.size()) +
+          " != " + fims::to_string(expected_fecundity_at_length_size));
+      throw std::invalid_argument(
+          "Population fecundity_at_length size mismatch. Expected 0 or " +
+          fims::to_string(expected_fecundity_at_length_size) +
+          " values, found " +
+          fims::to_string(this->fecundity_at_length.size()) + ".");
+    }
+    population->fecundity_at_length.resize(this->fecundity_at_length.size());
+    for (size_t i = 0; i < population->fecundity_at_length.size(); i++) {
+      population->fecundity_at_length[i] = this->fecundity_at_length[i];
     }
 
     for (size_t i = 0; i < ages.size(); i++) {

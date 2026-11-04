@@ -41,7 +41,8 @@
 #'     `index` and `catch` data, with 1 unit per fleet for each type. `mt` is
 #'     used for `weight_at_age` and `spawning_weight_at_age` data.
 #'     `fecundity_at_age` is spawning output per unit of spawning weight, e.g.,
-#'     `eggs/mt`. `number` or `proportion` are each viable units for the
+#'     `eggs/mt`. `fecundity_at_length` is spawning output per fish, e.g.,
+#'     `eggs`. `number` or `proportion` are each viable units for the
 #'     composition data, where the former is the preferred unit of
 #'     measurement.}
 #'   \item{uncertainty}{A right-handed formula specifying the distributional
