@@ -72,4 +72,35 @@ TEST_F(CAAEvaluateTestFixture,
     }
   }
 }
+
+// Edge handling
+// Empirical maturity by year has its own values for the year after the last
+// model year, so that year does not reuse the last model year's maturity.
+TEST_F(CAAEvaluateTestFixture,
+       HandlesEmpiricalYearAfterLastModelYear_CatchAtAge_CalculateMaturityAA) {
+  const size_t years = static_cast<size_t>(n_years);
+  const size_t ages = static_cast<size_t>(n_ages);
+  auto maturity = std::make_shared<fims_popdy::EmpiricalMaturity<double>>();
+  maturity->n_ages = ages;
+  maturity->min_age = static_cast<size_t>(population->ages[0]);
+  maturity->maturity_at_age.resize((years + 1) * ages);
+  for (size_t i = 0; i < maturity->maturity_at_age.size(); i++) {
+    maturity->maturity_at_age[i] =
+        static_cast<double>(i + 1) / static_cast<double>((years + 1) * ages);
+  }
+  population->maturity = maturity;
+
+  for (size_t age = 0; age < ages; age++) {
+    size_t i_age_year = years * ages + age;
+    catch_at_age_model->CalculateMaturityAA(population, i_age_year, years, age);
+  }
+
+  size_t pop_id = population->GetId();
+  auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
+  for (size_t age = 0; age < ages; age++) {
+    size_t i_age_year = years * ages + age;
+    EXPECT_DOUBLE_EQ(dq["proportion_mature_at_age"][i_age_year],
+                     maturity->maturity_at_age[i_age_year]);
+  }
+}
 }  // namespace

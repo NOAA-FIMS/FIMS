@@ -26,4 +26,32 @@ TEST(LogisticMaturity_evaluate, HandlesCorrectInput) {
   EXPECT_NEAR(maturity.evaluate(maturity_x), expect_maturity, 0.0001);
 }
 
+// Edge handling
+// Test that the year after the last model year uses the last year's values
+// when the parameters vary by year.
+TEST(LogisticMaturity_evaluate, HandlesYearAfterLastModelYear) {
+  fims_popdy::LogisticMaturity<double> maturity;
+  maturity.inflection_point.resize(2);
+  maturity.inflection_point[0] = 3.0;
+  maturity.inflection_point[1] = 5.0;
+  maturity.slope.resize(1);
+  maturity.slope[0] = 0.5;
+  // 1.0/(1.0+exp(-(4.0-5.0)*0.5)) = 0.3775407
+  EXPECT_NEAR(maturity.evaluate(4.0, 1), 0.3775407, 1e-7);
+  EXPECT_DOUBLE_EQ(maturity.evaluate(4.0, 2), maturity.evaluate(4.0, 1));
+}
+
+// Error handling
+// Test that a year 2 or more past the last parameter value still throws, so a
+// parameter with too few values is not filled in silently.
+TEST(LogisticMaturity_evaluate, ThrowsForYearPastYearAfterLast) {
+  fims_popdy::LogisticMaturity<double> maturity;
+  maturity.inflection_point.resize(2);
+  maturity.inflection_point[0] = 3.0;
+  maturity.inflection_point[1] = 5.0;
+  maturity.slope.resize(1);
+  maturity.slope[0] = 0.5;
+  EXPECT_THROW(maturity.evaluate(4.0, 3), std::invalid_argument);
+}
+
 }  // namespace

@@ -508,32 +508,10 @@ methods::setMethod(
     if (!is_population) {
       assert_presence_of_fleet(x, fleet)
     }
-    n_ages <- get_n_ages(x)
     weight_data <- dplyr::filter(
       .data = as.data.frame(x@data),
       .data[["type"]] == "weight_at_age"
-    ) |>
-      dplyr::mutate( # Change a unique fleet to NA for population info
-        fleet = if (
-          is_population && dplyr::n_distinct(.data[["fleet"]]) == 1L &
-            !anyNA(.data[["fleet"]])
-        ) {
-          NA_character_
-        } else {
-          .data[["fleet"]]
-        }
-      ) |>
-      dplyr::filter(.data[["fleet"]] %in% c(NA_character_, .env[["fleet"]])) |>
-      dplyr::mutate(
-        source_priority = dplyr::case_when(
-          is.na(.data[["fleet"]]) & is.na(.data[["timing"]]) ~ 4L,
-          is.na(.data[["fleet"]]) & !is.na(.data[["timing"]]) ~ 3L,
-          .data[["fleet"]] == .env[["fleet"]] &
-            is.na(.data[["timing"]]) ~ 2L,
-          .data[["fleet"]] == .env[["fleet"]] &
-            !is.na(.data[["timing"]]) ~ 1L
-        )
-      )
+    )
     if (NROW(weight_data) == 0) {
       cli::cli_abort(c(
         "x" = "The data have no {.code type = \"weight_at_age\"} rows.",
@@ -541,21 +519,6 @@ methods::setMethod(
         years or 1 set per year plus the year after the last model year.",
         "i" = "Types in the data: {.val {unique(x@data[['type']])}}."
       ))
-    }
-    # Check if looking for non-time-varying population and return early
-    if (is_population && NROW(weight_data) == n_ages) {
-      dplyr::pull(weight_data, .data[["observed"]])
-    }
-    # Check if looking for non-time-varying fleet and return early
-    if (!is_population) {
-      weight_data_fleet <- dplyr::filter(
-        weight_data,
-        .data[["fleet"]] == .env[["fleet"]]
-      )
-      if (all(is.na(weight_data_fleet[["timing"]])) &&
-        NROW(weight_data_fleet) == n_ages) {
-        dplyr::pull(weight_data_fleet, .data[["observed"]])
-      }
     }
     # The population needs the year after the last model year for spawning
     # biomass at the start of that year, after the last catches are removed.
@@ -565,26 +528,25 @@ methods::setMethod(
     } else {
       get_start_year(x):get_end_year(x)
     }
-
-    dplyr::bind_rows(
-      dplyr::filter(weight_data, !is.na(.data[["timing"]])),
-      weight_data |>
-        dplyr::filter(is.na(.data[["timing"]])) |>
-        dplyr::select(-"timing") |>
-        dplyr::cross_join(tibble::tibble(timing = years))
-    ) |>
-      dplyr::filter(.data[["timing"]] %in% .env[["years"]]) |>
-      dplyr::arrange(
-        .data[["timing"]],
-        .data[["age"]],
-        .data[["source_priority"]]
-      ) |>
-      dplyr::distinct(
-        .data[["timing"]],
-        .data[["age"]],
-        .keep_all = TRUE
-      ) |>
-      dplyr::pull(.data[["observed"]])
+    ages <- get_ages(x)
+    population_weight <- at_age_by_year(
+      population_weight_at_age_rows(weight_data),
+      ages = ages,
+      years = years
+    )
+    if (is_population) {
+      return(population_weight)
+    }
+    # A fleet uses its own rows for a year when it has them, and the
+    # population weight otherwise
+    fleet_rows <- dplyr::filter(
+      weight_data,
+      .data[["fleet"]] %in% .env[["fleet"]]
+    )
+    dplyr::coalesce(
+      at_age_by_year(fleet_rows, ages = ages, years = years),
+      population_weight
+    )
   }
 )
 #' @rdname model_
@@ -1343,10 +1305,11 @@ population_weight_at_age_rows <- function(weight_data) {
   }
 }
 
-# Weight, spawning weight, and fecundity at age are not fit to data, so a
-# missing age or year would change biomass or spawning output instead of adding
-# a -999 observation. Rows with timing = NA are the default for every year, and
-# rows with a timing replace that default for that year. Nothing is averaged.
+# Weight, spawning weight, fecundity, and maturity at age are not fit to data,
+# so a missing age or year would change biomass or spawning output instead of
+# adding a -999 observation. Rows with timing = NA are the default for every
+# year, and rows with a timing replace that default for that year. Nothing is
+# averaged.
 validate_at_age_input <- function(data, type, ages, years) {
   # Without ages there is no age dimension to fill
   if (!"age" %in% colnames(data)) {
@@ -1469,10 +1432,10 @@ validate_at_age_input <- function(data, type, ages, years) {
     ))
   }
 
-  # Spawning weight and fecundity only feed spawning output, so a value of 0 at
-  # every age makes spawning output 0 in that year, and then recruitment and
-  # the objective function are undefined (NaN). Weight at age also feeds
-  # biomass and catch and index weight, so it is not checked here.
+  # Spawning weight, fecundity, and maturity only feed spawning output, so a
+  # value of 0 at every age makes spawning output 0 in that year, and then
+  # recruitment and the objective function are undefined (NaN). Weight at age
+  # also feeds biomass and catch and index weight, so it is not checked here.
   all_zero_timings <- if (type == "weight_at_age") {
     NULL
   } else {
@@ -1516,6 +1479,39 @@ validate_at_age_input <- function(data, type, ages, years) {
         '{type}'), timing)} to see the years with rows."
       ))
     }
+  }
+  invisible(TRUE)
+}
+
+# Maturity at age is a proportion mature, so it also needs values of 1 or less
+# and unit = "proportion". validate_at_age_input() checks everything else.
+validate_maturity_at_age <- function(data) {
+  maturity_rows <- dplyr::filter(data, .data[["type"]] == "maturity_at_age")
+  if (NROW(maturity_rows) == 0) {
+    return(invisible(TRUE))
+  }
+  above_one <- maturity_rows[["observed"]][maturity_rows[["observed"]] > 1]
+  if (length(above_one) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var maturity_at_age} has values above 1:
+      {.val {unique(above_one)}}.",
+      "i" = "{.var maturity_at_age} is the proportion mature at age, so every
+      value must be from 0 to 1.",
+      "i" = "Use {.code dplyr::filter(data, type == 'maturity_at_age',
+      observed > 1)} to find the rows."
+    ))
+  }
+  bad_units <- unique(maturity_rows[["unit"]])
+  bad_units <- bad_units[is.na(bad_units) | bad_units != "proportion"]
+  if (length(bad_units) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var maturity_at_age} has units other than {.val proportion}:
+      {.val {bad_units}}.",
+      "i" = "{.var maturity_at_age} is the proportion mature at age, so every
+      row needs {.code unit = \"proportion\"}.",
+      "i" = "Use {.code dplyr::count(dplyr::filter(data, type ==
+      'maturity_at_age'), unit)} to see the units."
+    ))
   }
   invisible(TRUE)
 }
@@ -1752,7 +1748,7 @@ FIMSFrame <- function(data) {
     data,
     !.data$type %in% c(
       "age_to_length_conversion", "weight_at_age", "spawning_weight_at_age",
-      "fecundity_at_age"
+      "fecundity_at_age", "maturity_at_age"
     )
   ) |>
     dplyr::pull(.data$timing)
@@ -1852,7 +1848,8 @@ FIMSFrame <- function(data) {
   n_lengths <- length(lengths)
 
   for (at_age_type in c(
-    "weight_at_age", "spawning_weight_at_age", "fecundity_at_age"
+    "weight_at_age", "spawning_weight_at_age", "fecundity_at_age",
+    "maturity_at_age"
   )) {
     validate_at_age_input(
       data,
@@ -1861,6 +1858,7 @@ FIMSFrame <- function(data) {
       years = start_year:(end_year + 1)
     )
   }
+  validate_maturity_at_age(data)
 
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with model_*() are correct.

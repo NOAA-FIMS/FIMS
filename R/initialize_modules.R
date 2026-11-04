@@ -345,6 +345,104 @@ initialize_growth <- function(parameters, data) {
 #' The initialized maturity module as an object.
 #' @noRd
 initialize_maturity <- function(parameters, data) {
+  maturity_type <- parameters |>
+    dplyr::filter(.data[["module_name"]] == "Maturity") |>
+    dplyr::pull(.data[["module_type"]]) |>
+    unique() |>
+    stats::na.omit()
+
+  if (length(maturity_type) == 1 &&
+    identical(maturity_type[[1]], "Empirical")) {
+    # set_param_vector() fills maturity_at_age in row order, so sort the rows
+    # by year then age to match how the values are indexed in C++.
+    maturity_rows <- parameters |>
+      dplyr::filter(
+        .data[["module_name"]] == "Maturity",
+        .data[["label"]] == "maturity_at_age"
+      ) |>
+      dplyr::arrange(.data[["timing"]], .data[["age"]])
+
+    estimation_types <- unique(maturity_rows[["estimation_type"]])
+    if (any(estimation_types != "constant")) {
+      cli::cli_abort(c(
+        "x" = "Empirical maturity has estimation types other than
+        {.val constant}: {.val {setdiff(estimation_types, 'constant')}}.",
+        "i" = "FIMS does not fit maturity to data, so empirical maturity cannot
+        be estimated. Every {.var maturity_at_age} row needs
+        {.code estimation_type = \"constant\"}.",
+        "i" = "Use {.code dplyr::filter(parameters, module_name == 'Maturity',
+        estimation_type != 'constant')} to find the rows."
+      ))
+    }
+    maturity_values <- maturity_rows[["value"]]
+    invalid_values <- maturity_values[
+      is.na(maturity_values) | maturity_values < 0 | maturity_values > 1
+    ]
+    if (length(invalid_values) > 0) {
+      cli::cli_abort(c(
+        "x" = "Empirical maturity has values that are missing or outside 0 to
+        1: {.val {unique(invalid_values)}}.",
+        "i" = "Every {.var maturity_at_age} value is a proportion mature, so it
+        must be from 0 to 1.",
+        "i" = "Use {.code dplyr::filter(parameters, label == 'maturity_at_age',
+        is.na(value) | value < 0 | value > 1)} to find the rows."
+      ))
+    }
+
+    ages <- get_ages(data)
+    # By year, maturity is also needed for the year after the last model year
+    years <- get_start_year(data):(get_end_year(data) + 1)
+    expected_keys <- if (all(is.na(maturity_rows[["timing"]]))) {
+      paste(NA, ages)
+    } else {
+      paste(rep(years, each = length(ages)), rep(ages, times = length(years)))
+    }
+    maturity_keys <- paste(maturity_rows[["timing"]], maturity_rows[["age"]])
+    if (length(maturity_keys) != length(expected_keys) ||
+      !setequal(maturity_keys, expected_keys)) {
+      cli::cli_abort(c(
+        "x" = "Empirical maturity has {NROW(maturity_rows)}
+        {.var maturity_at_age} rows, which do not match the model ages and
+        years.",
+        "i" = "Empirical maturity needs 1 {.var maturity_at_age} value per age,
+        or 1 per age and year. That is {length(ages)} rows with
+        {.code timing = NA}, or {length(ages) * length(years)} rows for years
+        {min(years)}-{max(years)}, which include the year after the last model
+        year.",
+        "i" = "Use {.code dplyr::count(dplyr::filter(parameters, label ==
+        'maturity_at_age'), timing)} to see the years.",
+        "i" = "Use {.fn setup_default_Maturity} with
+        {.code module_type = \"Empirical\"} to build these rows from the same
+        {.var data}."
+      ))
+    }
+
+    all_zero_timings <- maturity_rows |>
+      dplyr::summarize(
+        all_zero = all(.data[["value"]] == 0),
+        .by = dplyr::all_of("timing")
+      ) |>
+      dplyr::filter(.data[["all_zero"]]) |>
+      dplyr::pull(.data[["timing"]])
+    if (length(all_zero_timings) > 0) {
+      cli::cli_abort(c(
+        "x" = "Empirical maturity is 0 at every age for these timings:
+        {.val {all_zero_timings}}.",
+        "i" = "Spawning output would be 0, which makes recruitment and the
+        objective function undefined.",
+        "i" = "Use {.code dplyr::filter(parameters, label == 'maturity_at_age',
+        value == 0)} to find the rows."
+      ))
+    }
+
+    parameters <- parameters |>
+      dplyr::filter(!(
+        .data[["module_name"]] == "Maturity" &
+          .data[["label"]] == "maturity_at_age"
+      )) |>
+      dplyr::bind_rows(maturity_rows)
+  }
+
   module <- initialize_module(
     parameters = parameters,
     data = data,
