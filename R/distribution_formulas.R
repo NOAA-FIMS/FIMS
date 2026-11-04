@@ -277,9 +277,9 @@ initialize_process_distribution <- function(
     new_module$log_sd[] <- log(sd[["value"]])
 
     # setup whether or not sd parameter is estimated
-    et <- sd[["estimation_status"]]
-    et[is.na(et)] <- "not_estimated"
-    new_module$log_sd$set_estimation_status(et)
+    estimation_status <- sd[["estimation_status"]]
+    estimation_status[is.na(estimation_status)] <- "not_estimated"
+    new_module$log_sd$set_estimation_status(estimation_status)
   }
 
   if (family[["family"]] == "gaussian") {
@@ -293,9 +293,9 @@ initialize_process_distribution <- function(
     }
 
     # setup whether or not sd parameter is estimated
-    et <- sd[["estimation_status"]]
-    et[is.na(et)] <- "not_estimated"
-    new_module$log_sd$set_estimation_status(et)
+    estimation_status <- sd[["estimation_status"]]
+    estimation_status[is.na(estimation_status)] <- "not_estimated"
+    new_module$log_sd$set_estimation_status(estimation_status)
 
     #   if (length(sd[["value"]]) > 1 && length(sd[["estimation_status"]]) == 1) {
     #     if (sd[["estimation_status"]] == "not_estimated") {
