@@ -27,12 +27,26 @@
 #' data default to `"EWAA"`. Models without empirical weight-at-age data but with
 #' length-composition data default to `"VonBertalanffySchnute"`.
 #'
-#' To create the default initial numbers at age, this function uses the defaults
-#' from `setup_default_Population()` and `setup_default_Recruitment()`, which
-#' are passed to `setup_default_init_naa()` to calculate initial numbers at age.
+#' By default, numbers at age in the first year are the unfished equilibrium,
+#' scaled by the recruitment deviations of the cohorts in the first-year age
+#' structure (see [setup_default_Population()]). With
+#' `initial_numbers = "free"`, they are free parameters, `log_init_naa`, whose
+#' starting values come from the defaults of `setup_default_Population()` and
+#' `setup_default_Recruitment()`.
 #'
 #' @param data A `FIMSFrame` object returned from running [FIMSFrame()] on
 #'   your long input data.
+#' @param initial_numbers A string specifying how numbers at age in the first
+#'   year are set. The available options are
+#'   `r toString(eval(formals(setup_default_parameters)[["initial_numbers"]]))`.
+#'   The default is
+#'   `r eval(formals(setup_default_parameters)[["initial_numbers"]])[1]`, the
+#'   unfished equilibrium with recruitment deviations for every cohort in the
+#'   first-year age structure except the plus group. To keep the oldest of
+#'   those cohorts at equilibrium, remove their `log_devs` rows, starting with
+#'   the earliest `timing`. Do not set them to constant instead, because a
+#'   constant deviation still adds a term to the recruitment likelihood.
+#'   `"free"` estimates `log_init_naa` for every age.
 #' @return
 #' A `tibble` containing default parameter values and metadata for your model.
 #' Key columns are listed below:
@@ -98,8 +112,12 @@
 #'     )
 #'   )
 #' }
-setup_default_parameters <- function(data) {
+setup_default_parameters <- function(
+  data,
+  initial_numbers = c("equilibrium", "free")
+) {
   is.FIMSFrame(data)
+  initial_numbers <- rlang::arg_match(initial_numbers)
 
   fleets <- get_fleets(data)
 
@@ -127,7 +145,10 @@ setup_default_parameters <- function(data) {
     dplyr::bind_rows()
 
   # Create recruitment parameters
-  recruitment_defaults <- setup_default_Recruitment(data = data)
+  recruitment_defaults <- setup_default_Recruitment(
+    data = data,
+    initial_numbers = initial_numbers
+  )
 
   # Create maturity parameters
   maturity_defaults <- setup_default_Maturity(data = data)
@@ -143,7 +164,7 @@ setup_default_parameters <- function(data) {
   # Suppress the known informational alert about log_init_naa being NA here,
   # because this function computes and sets log_init_naa immediately below.
   population_defaults <- withCallingHandlers(
-    setup_default_Population(data = data),
+    setup_default_Population(data = data, initial_numbers = initial_numbers),
     message = function(message_condition) {
       message_text <- conditionMessage(message_condition)
       is_log_init_naa_message <-
@@ -156,34 +177,36 @@ setup_default_parameters <- function(data) {
     }
   )
 
-  # Calculate initial numbers at age based on log_rzero and M_value
-  # Set natural mortality rate
-  log_M <- population_defaults |>
-    dplyr::filter(
-      .data[["label"]] == "log_M",
-      .data[["timing"]] == get_start_year(data)
-    ) |>
-    dplyr::pull(.data[["value"]])
+  if (initial_numbers == "free") {
+    # Calculate initial numbers at age based on log_rzero and M_value
+    # Set natural mortality rate
+    log_M <- population_defaults |>
+      dplyr::filter(
+        .data[["label"]] == "log_M",
+        .data[["timing"]] == get_start_year(data)
+      ) |>
+      dplyr::pull(.data[["value"]])
 
-  log_rzero <- recruitment_defaults |>
-    dplyr::filter(.data[["label"]] == "log_rzero") |>
-    dplyr::pull(.data[["value"]])
-  log_init_naa <- setup_default_log_init_naa(
-    n_ages = get_n_ages(data),
-    log_rzero = log_rzero,
-    log_M = log_M
-  )
-
-  # Create population parameters
-  population_defaults <- population_defaults |>
-    dplyr::rows_update(
-      tibble::tibble(
-        label = "log_init_naa",
-        age = get_ages(data),
-        value = log_init_naa
-      ),
-      by = c("label", "age")
+    log_rzero <- recruitment_defaults |>
+      dplyr::filter(.data[["label"]] == "log_rzero") |>
+      dplyr::pull(.data[["value"]])
+    log_init_naa <- setup_default_log_init_naa(
+      n_ages = get_n_ages(data),
+      log_rzero = log_rzero,
+      log_M = log_M
     )
+
+    # Create population parameters
+    population_defaults <- population_defaults |>
+      dplyr::rows_update(
+        tibble::tibble(
+          label = "log_init_naa",
+          age = get_ages(data),
+          value = log_init_naa
+        ),
+        by = c("label", "age")
+      )
+  }
 
   # Compile defaults
   default_parameters <- dplyr::bind_rows(
@@ -454,9 +477,23 @@ setup_default_Growth <- function(
 #' This function sets up default parameters for a population module.
 #' @details
 #' The function creates a tibble of default population configurations, including
-#' log natural mortality rate, log initial numbers at age, and proportion of
-#' females. The function performs input checks to ensure that the provided
-#' arguments are valid.
+#' log natural mortality rate, how initial numbers at age are set, and
+#' proportion of females. The function performs input checks to ensure that the
+#' provided arguments are valid.
+#'
+#' With `initial_numbers = "equilibrium"`, numbers at age in the first year are
+#' the unfished equilibrium \eqn{N^U_a} from unfished recruitment and
+#' first-year natural mortality, scaled by the offset and by the recruitment
+#' deviation \eqn{\epsilon} of each cohort:
+#' \deqn{N_a = N^U_a \exp\left(\delta + \epsilon_{y_1 - a}\right),}
+#' where \eqn{\delta} is `log_init_rzero_offset`, \eqn{a} counts ages from 0
+#' for the youngest age, and \eqn{y_1} is the first year. Cohorts without a
+#' deviation, including the plus group, use \eqn{\epsilon = 0}. The deviations
+#' are part of `log_devs` in the recruitment module (see
+#' [setup_default_Recruitment()]). `log_init_rzero_offset` is on the natural log
+#' scale and is constant at 0 by default, so the first-year age structure is
+#' built from unfished recruitment. With `initial_numbers = "free"`, numbers at
+#' age in the first year are the parameters `log_init_naa`.
 #' @param log_M A numeric value or vector (length equal to the number of ages *
 #' number of years) specifying the log natural mortality rate. Default is `log(0.2)`.
 #' @param log_init_naa A numeric value or vector (length equal to the number of
@@ -468,6 +505,7 @@ setup_default_Growth <- function(
 #' for ages below the plus group, and for the plus group \eqn{A}, which
 #' accumulates survivors each year,
 #' \deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}
+#' Only used when `initial_numbers = "free"`.
 #' @param proportion_female A numeric value or vector (length equal to the
 #' number of ages) between 0 and 1 specifying the proportion of each age that
 #' is female, which scales spawning biomass. Default is `0.5`.
@@ -488,10 +526,12 @@ setup_default_Population <- function(
   data,
   log_M = log(0.2),
   log_init_naa = NA_real_,
-  proportion_female = 0.5
+  proportion_female = 0.5,
+  initial_numbers = c("equilibrium", "free")
 ) {
   # Input checks
   is.FIMSFrame(data)
+  initial_numbers <- rlang::arg_match(initial_numbers)
 
   # Extract necessary values from data
   n_years <- get_n_years(data)
@@ -536,9 +576,21 @@ setup_default_Population <- function(
     ))
   }
 
+  # Values for log_init_naa would be silently dropped under an equilibrium
+  # start
+  if (initial_numbers == "equilibrium" && !all(is.na(log_init_naa))) {
+    cli::cli_abort(c(
+      "x" = "{.var log_init_naa} is only used when
+      {.code initial_numbers = \"free\"}.",
+      "i" = "Set {.code initial_numbers = \"free\"} to use
+      {.var log_init_naa}, or leave it as {.val NA} for the default
+      equilibrium start."
+    ))
+  }
+
   # If log_init_naa is NA, print a message to the user and advise them to set it
   # using dplyr::rows_update() or dplyr::mutate() before running the model
-  if (any(is.na(log_init_naa))) {
+  if (initial_numbers == "free" && any(is.na(log_init_naa))) {
     cli::cli_alert_info(
       "The {.var log_init_naa} parameter is set to {.val NA}.\nPlease set the initial numbers at age using {.code dplyr::rows_update()} or {.code dplyr::mutate()} before running the model."
     )
@@ -555,13 +607,24 @@ setup_default_Population <- function(
       age = rep(ages, n_years),
       timing = rep(years, each = n_ages),
       estimation_type = "constant"
-    ) |>
-    dplyr::add_row(
+    )
+
+  initial_numbers_default <- switch(initial_numbers,
+    "free" = tibble::tibble(
       label = "log_init_naa",
-      age = get_ages(data),
-      value = .env$log_init_naa,
+      age = ages,
+      value = log_init_naa,
       estimation_type = "fixed_effects"
-    ) |>
+    ),
+    "equilibrium" = tibble::tibble(
+      label = "log_init_rzero_offset",
+      value = 0.0,
+      estimation_type = "constant"
+    )
+  )
+
+  default <- default |>
+    dplyr::bind_rows(initial_numbers_default) |>
     dplyr::add_row(
       label = "proportion_female",
       age = if (length(proportion_female) == 1) NA else ages,
@@ -886,9 +949,11 @@ setup_default_Maturity <- function(
 #' }
 setup_default_BevertonHoltRecruitment <- function(
   data,
-  distribution = c("Dnorm")
+  distribution = c("Dnorm"),
+  initial_numbers = c("equilibrium", "free")
 ) {
   is.FIMSFrame(data)
+  initial_numbers <- rlang::arg_match(initial_numbers)
 
   # Set up default parameters for Beverton--Holt recruitment
   log_rzero <- setup_default_parameters_template(
@@ -908,14 +973,25 @@ setup_default_BevertonHoltRecruitment <- function(
       estimation_type = "constant"
     )
 
+  # Free initial numbers at age set the first-year recruitment, so deviations
+  # start in the second year. An equilibrium start also has deviations for the
+  # first year and for every cohort in the first-year age structure except the
+  # plus group, which are the cohorts that recruited up to n_ages - 2 years
+  # before the first year.
+  first_dev_year <- switch(initial_numbers,
+    "free" = get_start_year(data) + 1,
+    "equilibrium" = get_start_year(data) - max(get_n_ages(data) - 2, 0)
+  )
+  dev_years <- first_dev_year:get_end_year(data)
+
   log_devs <- setup_default_parameters_template(
-    n_parameters = get_n_years(data) - 1
+    n_parameters = length(dev_years)
   ) |>
     dplyr::mutate(
       # TODO: should this be log_recruit_dev to match output?
       label = "log_devs",
       value = 0.0,
-      timing = (get_start_year(data) + 1):get_end_year(data),
+      timing = dev_years,
       estimation_type = "random_effects",
       distribution_type = "process",
       distribution = .env$distribution
@@ -925,7 +1001,7 @@ setup_default_BevertonHoltRecruitment <- function(
       dplyr::rows_update(
         tibble::tibble(
           label = "log_devs",
-          timing = (get_start_year(data) + 1):get_end_year(data),
+          timing = dev_years,
           estimation_type = "constant",
           distribution_type = NA_character_
         ),
@@ -1067,7 +1143,8 @@ setup_default_DlnormDistribution <- function(
 setup_default_Recruitment <- function(
   data,
   module_type = c("BevertonHolt"),
-  distribution = c("Dnorm", NA_character_)
+  distribution = c("Dnorm", NA_character_),
+  initial_numbers = c("equilibrium", "free")
 ) {
   # Input checks
   # TODO: extend this code when there is more than one form of recruitment
@@ -1075,13 +1152,18 @@ setup_default_Recruitment <- function(
   is.FIMSFrame(data)
   module_type <- rlang::arg_match(module_type)
   distribution <- rlang::arg_match(distribution)
+  initial_numbers <- rlang::arg_match(initial_numbers)
 
   # Set up default parameters based on the recruitment form
   # NOTE: All new forms of recruitment must be placed in the vector of default
   # arguments for `form` and their methods but be placed below in the call to
   # `switch`
   module_type_default <- switch(module_type,
-    "BevertonHolt" = setup_default_BevertonHoltRecruitment(data, distribution)
+    "BevertonHolt" = setup_default_BevertonHoltRecruitment(
+      data = data,
+      distribution = distribution,
+      initial_numbers = initial_numbers
+    )
   )
 
   # Keep an empty tibble with the same columns so bind_rows() always works.

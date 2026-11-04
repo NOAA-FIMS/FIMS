@@ -136,6 +136,16 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   VariableVector log_init_naa;
   /**
+   * @brief Offset on the natural log of unfished recruitment for the
+   * first-year age structure when initial numbers at age are "equilibrium".
+   */
+  VariableVector log_init_rzero_offset;
+  /**
+   * @brief How numbers at age in the first year are set, either "free" or
+   * "equilibrium".
+   */
+  SharedString initial_numbers = fims::to_string("free");
+  /**
    * @brief Proportion of females in the population.
    *
    * Used to calculate spawning biomass and other sex-specific derived
@@ -260,6 +270,8 @@ class PopulationInterface : public PopulationInterfaceBase {
         spawning_biomass_ratio(other.spawning_biomass_ratio),
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
+        log_init_rzero_offset(other.log_init_rzero_offset),
+        initial_numbers(other.initial_numbers),
         proportion_female(other.proportion_female),
         ages(other.ages),
         name(other.name),
@@ -380,6 +392,17 @@ class PopulationInterface : public PopulationInterfaceBase {
               this->log_init_naa[i].initial_value_m;
         } else {
           this->log_init_naa[i].final_value_m = pop->log_init_naa[i];
+        }
+      }
+
+      for (size_t i = 0; i < this->log_init_rzero_offset.size(); i++) {
+        if (this->log_init_rzero_offset[i].estimation_type_m.get() ==
+            "constant") {
+          this->log_init_rzero_offset[i].final_value_m =
+              this->log_init_rzero_offset[i].initial_value_m;
+        } else {
+          this->log_init_rzero_offset[i].final_value_m =
+              pop->log_init_rzero_offset[i];
         }
       }
 
@@ -521,6 +544,32 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
+
+    population->initial_numbers = this->initial_numbers.get();
+    population->log_init_rzero_offset.resize(
+        this->log_init_rzero_offset.size());
+    for (size_t i = 0; i < log_init_rzero_offset.size(); i++) {
+      population->log_init_rzero_offset[i] =
+          this->log_init_rzero_offset[i].initial_value_m;
+      if (this->log_init_rzero_offset[i].estimation_type_m.get() ==
+          "fixed_effects") {
+        ss.str("");
+        ss << "Population." << this->id << ".log_init_rzero_offset."
+           << this->log_init_rzero_offset[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(population->log_init_rzero_offset[i]);
+      }
+      if (this->log_init_rzero_offset[i].estimation_type_m.get() ==
+          "random_effects") {
+        ss.str("");
+        ss << "Population." << this->id << ".log_init_rzero_offset."
+           << this->log_init_rzero_offset[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(population->log_init_rzero_offset[i]);
+      }
+    }
+    info->variable_map[this->log_init_rzero_offset.id_m] =
+        &(population)->log_init_rzero_offset;
 
     if (this->proportion_female.size() == 1 ||
         this->proportion_female.size() ==

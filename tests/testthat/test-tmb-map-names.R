@@ -7,7 +7,9 @@ make_mapping_input <- function() {
         )
     ) |>
     FIMSFrame()
-  setup_default_parameters(data) |>
+  # Free initial numbers at age keep 4 recruitment deviations, which the maps
+  # below are written for
+  setup_default_parameters(data, initial_numbers = "free") |>
     initialize_fims(data = data)
 }
 

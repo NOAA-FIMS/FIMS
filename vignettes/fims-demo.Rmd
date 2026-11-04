@@ -121,9 +121,14 @@ By just passing the data to `setup_default_parameters()`, the default values for
 - "EWAA" for the Growth module, and
 - "Logistic" for Maturity module.
 
+By default, numbers at age in the first year are the unfished equilibrium, scaled by recruitment deviations for the cohorts that recruited before the first year (see `?setup_default_parameters`). This example instead estimates them as free parameters, `log_init_naa`, by setting `initial_numbers = "free"`.
+
 ```{r parameters, max.height='100px', attr.output='.numberLines'}
 # Set up default parameters based on data
-default_parameters <- setup_default_parameters(data = data_4_model)
+default_parameters <- setup_default_parameters(
+  data = data_4_model,
+  initial_numbers = "free"
+)
 
 default_parameters
 ```

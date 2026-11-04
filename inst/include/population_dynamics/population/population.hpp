@@ -34,6 +34,21 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   // parameter list - in information.hpp (same for initial F in fleet)
   fims::Vector<Type>
       log_init_naa; /*!< estimated parameter: natural log of numbers at age*/
+  /**
+   * @brief How numbers at age in the first year are set: "free" uses
+   * log_init_naa and "equilibrium" uses the unfished equilibrium.
+   */
+  std::string initial_numbers = "free";
+  /**
+   * @brief Estimated parameter: offset on the natural log of unfished
+   * recruitment for the first-year age structure under "equilibrium".
+   */
+  fims::Vector<Type> log_init_rzero_offset;
+  /**
+   * @brief Number of recruitment deviations for cohorts that recruited before
+   * the first year, set from the length of log_recruit_devs.
+   */
+  size_t n_initial_devs = 0;
   fims::Vector<Type>
       log_M; /*!< estimated parameter: natural log of Natural Mortality*/
   fims::Vector<Type> proportion_female = fims::Vector<Type>(

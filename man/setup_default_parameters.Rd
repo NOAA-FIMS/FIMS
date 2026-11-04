@@ -4,11 +4,23 @@
 \alias{setup_default_parameters}
 \title{Set up default parameters for a FIMS model}
 \usage{
-setup_default_parameters(data)
+setup_default_parameters(data, initial_numbers = c("equilibrium", "free"))
 }
 \arguments{
 \item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
 your long input data.}
+
+\item{initial_numbers}{A string specifying how numbers at age in the first
+year are set. The available options are
+equilibrium, free.
+The default is
+equilibrium, the
+unfished equilibrium with recruitment deviations for every cohort in the
+first-year age structure except the plus group. To keep the oldest of
+those cohorts at equilibrium, remove their \code{log_devs} rows, starting with
+the earliest \code{timing}. Do not set them to constant instead, because a
+constant deviation still adds a term to the recruitment likelihood.
+\code{"free"} estimates \code{log_init_naa} for every age.}
 }
 \value{
 A \code{tibble} containing default parameter values and metadata for your model.
@@ -63,9 +75,12 @@ Growth defaults are chosen from the data. Models with empirical weight-at-age
 data default to \code{"EWAA"}. Models without empirical weight-at-age data but with
 length-composition data default to \code{"VonBertalanffySchnute"}.
 
-To create the default initial numbers at age, this function uses the defaults
-from \code{setup_default_Population()} and \code{setup_default_Recruitment()}, which
-are passed to \code{setup_default_init_naa()} to calculate initial numbers at age.
+By default, numbers at age in the first year are the unfished equilibrium,
+scaled by the recruitment deviations of the cohorts in the first-year age
+structure (see \code{\link[=setup_default_Population]{setup_default_Population()}}). With
+\code{initial_numbers = "free"}, they are free parameters, \code{log_init_naa}, whose
+starting values come from the defaults of \code{setup_default_Population()} and
+\code{setup_default_Recruitment()}.
 }
 \examples{
 \dontrun{

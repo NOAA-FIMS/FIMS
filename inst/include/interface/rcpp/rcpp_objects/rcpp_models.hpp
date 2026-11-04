@@ -433,20 +433,45 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
          << "\n\n";
       ss << "},\n";
 
-      for (size_t i = 0; i < pop->log_init_naa.size(); i++) {
-        population_interface_ptr->log_init_naa[i].final_value_m =
-            pop->log_init_naa[i];
-      }
-      ss << " {\n\"name\": \"log_init_naa\",\n";
-      ss << "  \"id\":" << population_interface->log_init_naa.id_m << ",\n";
-      ss << "  \"type\": \"vector\",\n";
-      ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [" << "\"n_ages\"" << "],\n";
-      ss << "  \"dimensions\": [" << population_interface->n_ages.get()
-         << "]\n},\n";
+      // Only one of log_init_naa and log_init_rzero_offset is used, depending
+      // on how initial numbers at age are set. The other keeps the 1
+      // placeholder element that every interface vector starts with, so the
+      // size cannot be used to tell them apart.
+      if (pop->initial_numbers == "free") {
+        for (size_t i = 0; i < pop->log_init_naa.size(); i++) {
+          population_interface_ptr->log_init_naa[i].final_value_m =
+              pop->log_init_naa[i];
+        }
+        ss << " {\n\"name\": \"log_init_naa\",\n";
+        ss << "  \"id\":" << population_interface->log_init_naa.id_m << ",\n";
+        ss << "  \"type\": \"vector\",\n";
+        ss << " \"dimensionality\": {\n";
+        ss << "  \"header\": [" << "\"n_ages\"" << "],\n";
+        ss << "  \"dimensions\": [" << population_interface->n_ages.get()
+           << "]\n},\n";
 
-      ss << "  \"values\":" << population_interface->log_init_naa << "\n";
-      ss << "},\n";
+        ss << "  \"values\":" << population_interface->log_init_naa << "\n";
+        ss << "},\n";
+      }
+
+      if (pop->initial_numbers == "equilibrium") {
+        for (size_t i = 0; i < pop->log_init_rzero_offset.size(); i++) {
+          population_interface_ptr->log_init_rzero_offset[i].final_value_m =
+              pop->log_init_rzero_offset[i];
+        }
+        ss << " {\n\"name\": \"log_init_rzero_offset\",\n";
+        ss << "  \"id\":" << population_interface->log_init_rzero_offset.id_m
+           << ",\n";
+        ss << "  \"type\": \"vector\",\n";
+        ss << " \"dimensionality\": {\n";
+        ss << "  \"header\": [null],\n";
+        ss << "  \"dimensions\": ["
+           << population_interface->log_init_rzero_offset.size() << "]\n},\n";
+
+        ss << "  \"values\":" << population_interface->log_init_rzero_offset
+           << "\n";
+        ss << "},\n";
+      }
 
       for (size_t i = 0; i < population_interface->proportion_female.size();
            i++) {

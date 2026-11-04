@@ -17,13 +17,35 @@ test_that("`setup_default_Population()` works with correct inputs", {
 
   #' @description Test that output is a tibble with expected population labels.
   expect_s3_class(result, "tbl_df")
-  expect_true(all(c("log_M", "log_init_naa", "proportion_female") %in% result[["label"]]))
+  expect_true(all(c("log_M", "log_init_rzero_offset", "proportion_female") %in% result[["label"]]))
+
+  #' @description Test that equilibrium initial numbers at age, the default, have no log_init_naa.
+  expect_false("log_init_naa" %in% result[["label"]])
+
+  #' @description Test that log_init_rzero_offset is fixed at 0 by default so initial recruitment equals unfished recruitment.
+  expect_equal(
+    dplyr::filter(result, .data[["label"]] == "log_init_rzero_offset") |>
+      dplyr::select("value", "estimation_type"),
+    tibble::tibble(value = 0, estimation_type = "constant")
+  )
 
   #' @description Test that row count matches years-by-ages plus extra rows.
   expect_equal(
     nrow(result),
-    get_n_years(data) * get_n_ages(data) + get_n_ages(data) + 1
+    get_n_years(data) * get_n_ages(data) + 2
   )
+
+  free_result <- setup_default_Population(
+    data = data,
+    initial_numbers = "free",
+    log_init_naa = rep(log(1000), get_n_ages(data))
+  )
+  #' @description Test that free initial numbers at age have one log_init_naa per age and no log_init_rzero_offset.
+  expect_equal(
+    dplyr::filter(free_result, .data[["label"]] == "log_init_naa")[["age"]],
+    get_ages(data)
+  )
+  expect_false("log_init_rzero_offset" %in% free_result[["label"]])
 
   clear()
 })
@@ -33,7 +55,8 @@ test_that("`setup_default_Population()` works with edge cases", {
   result <- setup_default_Population(
     data = data,
     log_M = rep(log(0.2), get_n_years(data) * get_n_ages(data)),
-    log_init_naa = rep(log(1000), get_n_ages(data))
+    log_init_naa = rep(log(1000), get_n_ages(data)),
+    initial_numbers = "free"
   )
 
   #' @description Test that vectorized log_M and log_init_naa are accepted.
@@ -70,6 +93,21 @@ test_that("`setup_default_Population()` returns correct error messages", {
   expect_error(
     object = setup_default_Population(data = data, log_M = c(log(0.2), log(0.3), log(0.4))),
     regexp = "log_M"
+  )
+
+  #' @description Test that log_init_naa values with an equilibrium start return an error instead of being dropped.
+  expect_error(
+    object = setup_default_Population(
+      data = data,
+      log_init_naa = rep(log(1000), get_n_ages(data))
+    ),
+    regexp = "initial_numbers = \"free\""
+  )
+
+  #' @description Test that an unknown initial_numbers option returns expected error.
+  expect_error(
+    object = setup_default_Population(data = data, initial_numbers = "fished"),
+    regexp = "initial_numbers"
   )
 
   clear()
