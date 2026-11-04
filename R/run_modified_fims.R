@@ -139,7 +139,7 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
   }
 
   # Remove years from data, but leave catch, weight_at_age,
-  # and age_to_length_conversion (if present)
+  # age_to_length_conversion, and length_bin (if present)
   if (years_to_remove == 0) {
     data_mod <- data_to_use
   } else {
@@ -150,8 +150,9 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
       max(na.rm = TRUE)
     data_mod <- data_to_use |>
       dplyr::filter(
-        (.data[["type"]] %in%
-          c("catch", "age_to_length_conversion", "weight_at_age")) |
+        (.data[["type"]] %in% c(
+          "catch", "age_to_length_conversion", "weight_at_age", "length_bin"
+        )) |
           .data[["timing"]] <= max_timing - years_to_remove
       )
   }
