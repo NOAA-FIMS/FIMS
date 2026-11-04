@@ -442,10 +442,13 @@ initialize_selectivity <- function(parameters, data, fleet) {
 #' @param fleet A character. Name of the fleet to initialize.
 #' @param linked_ids A vector. Named vector of linked IDs required for the
 #'  fleet, including IDs for "selectivity", "catch", "index", "age_comp", and "length_comp".
+#' @param length_bin_layouts Optional precomputed layouts for fixed conversion
+#'   and growth-derived paths, shared during full model initialization.
 #' @return
 #' The initialized fleet module as an object.
 #' @noRd
-initialize_fleet <- function(parameters, data, fleet, linked_ids) {
+initialize_fleet <- function(parameters, data, fleet, linked_ids,
+                             length_bin_layouts = NULL) {
   module <- initialize_module(
     parameters = parameters,
     data = data,
@@ -484,10 +487,14 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
       use_age_to_length_conversion_fixed_path ||
       use_growth_derived_path
 
-  fleet_length_bins <- resolve_fleet_length_bins(
-    get_data(data),
-    allow_global_conversion_fallback = !use_growth_derived_path
-  )[[fleet]]
+  fleet_length_bins <- if (is.null(length_bin_layouts)) {
+    resolve_fleet_length_bins(
+      get_data(data),
+      allow_global_conversion_fallback = !use_growth_derived_path
+    )[[fleet]]
+  } else {
+    length_bin_layouts[[if (use_growth_derived_path) "growth" else "fixed"]][[fleet]]
+  }
 
   fleet_needs_length_bins <- requires_age_length_mapping
 
@@ -642,13 +649,16 @@ initialize_index <- function(data, fleet) {
 #' @param type A character specifying the composition type, where the default
 #'   is `"AgeComp"`. At the moment, one can initialize `"AgeComp"` or
 #'   `"LengthComp"` modules.
+#' @param length_bin_layouts Optional precomputed layouts for fixed conversion
+#'   and growth-derived paths, shared during full model initialization.
 #' @return
 #' The initialized composition module as an object.
 #' @noRd
 initialize_comp <- function(data,
                             fleet,
                             parameters = NULL,
-                            type = c("AgeComp", "LengthComp")) {
+                            type = c("AgeComp", "LengthComp"),
+                            length_bin_layouts = NULL) {
   comp_types <- list(
     "AgeComp" = list(
       "name" = "age_comp",
@@ -679,10 +689,14 @@ initialize_comp <- function(data,
     )
 
   if (identical(type, "LengthComp")) {
-    fleet_length_bins <- resolve_fleet_length_bins(
-      get_data(data),
-      allow_global_conversion_fallback = !uses_growth_derived_path
-    )[[fleet]]
+    fleet_length_bins <- if (is.null(length_bin_layouts)) {
+      resolve_fleet_length_bins(
+        get_data(data),
+        allow_global_conversion_fallback = !uses_growth_derived_path
+      )[[fleet]]
+    } else {
+      length_bin_layouts[[if (uses_growth_derived_path) "growth" else "fixed"]][[fleet]]
+    }
 
     if (is.null(fleet_length_bins) || length(fleet_length_bins) == 0) {
       if (uses_growth_derived_path) {
@@ -903,6 +917,17 @@ initialize_fims <- function(parameters, data) {
     ))
   }
 
+  # Resolve layouts once for all fleets and share them with composition setup.
+  length_bin_layouts <- list(fixed = resolve_fleet_length_bins(
+    get_data(data), allow_global_conversion_fallback = TRUE
+  ))
+  if (any(parameters$module_name == "Growth" &
+          parameters$module_type %in% "VonBertalanffySchnute", na.rm = TRUE)) {
+    length_bin_layouts$growth <- resolve_fleet_length_bins(
+      get_data(data), allow_global_conversion_fallback = FALSE
+    )
+  }
+
   # Initialize lists to store fleet-related objects
   fleet <- fleet_selectivity <-
     fleet_catch <- fleet_catch_distribution <-
@@ -985,7 +1010,8 @@ initialize_fims <- function(parameters, data) {
         data = data,
         fleet = fleets[i],
         parameters = parameters,
-        type = "LengthComp"
+        type = "LengthComp",
+        length_bin_layouts = length_bin_layouts
       )
 
       # Add the module ID for the initialized length composition to the list of fleet module IDs
@@ -1001,7 +1027,8 @@ initialize_fims <- function(parameters, data) {
       fleet = fleets[i],
       # TODO: need to remove linked_ids from the function and add module_id to the
       # parameters tibble
-      linked_ids = fleet_module_ids
+      linked_ids = fleet_module_ids,
+      length_bin_layouts = length_bin_layouts
     )
 
     if ("index" %in% fleet_types) {
