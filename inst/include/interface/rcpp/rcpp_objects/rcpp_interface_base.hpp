@@ -339,20 +339,25 @@ class VariableVector {
           std::to_string(vector_size) + ".");
     }
 
-    auto validate_estimation_status = [&](const std::string& est_status) {
-      if (est_status != "not_estimated" && est_status != "fixed_effects" &&
-          est_status != "random_effects") {
-        throw std::invalid_argument("Invalid estimation_status: " + est_status +
+    for (size_t i = 0; i < vector_size; i++) {
+      size_t index;
+      if (input_size == 1) {
+        index = 0;
+      } else {
+        index = i;
+      }
+      std::string estimation_status_string =
+          Rcpp::as<std::string>(estimation_status[index]);
+
+      if (estimation_status_string != "not_estimated" &&
+          estimation_status_string != "fixed_effects" &&
+          estimation_status_string != "random_effects") {
+        throw std::invalid_argument("Invalid estimation_status: " + 
+                                    estimation_status_string +
                                     ". Valid options are: not_estimated, "
                                     "fixed_effects, or random_effects.");
       }
-    };
-
-    for (size_t i = 0; i < vector_size; i++) {
-      std::string est_status =
-          Rcpp::as<std::string>(estimation_status[input_size == 1 ? 0 : i]);
-      validate_estimation_status(est_status);
-      this->storage_m->at(i).estimation_status_m.set(est_status);
+      this->storage_m->at(i).estimation_status_m.set(estimation_status_string);
     }
   }
 
