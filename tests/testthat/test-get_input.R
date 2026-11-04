@@ -19,7 +19,10 @@ test_that("`get_input()` works with correct inputs", {
     #' @description Test that `get_input()` returns the FIMSFit input slot.
     expect_equal(input, fit@input)
     #' @description Test that `get_input()` returns parameter and model entries.
-    expect_named(input, c("parameters", "model"))
+    # The packaged fits are re-saved only when the FIMS version, estimates, or
+    # input types change, so a fit saved before fit_fims() stored tmb_mapping
+    # does not have that entry.
+    expect_true(all(c("parameters", "model") %in% names(input)))
   }
 })
 
