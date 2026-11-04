@@ -19,7 +19,7 @@ test_that("`get_input()` works with correct inputs", {
     #' @description Test that `get_input()` returns the FIMSFit input slot.
     expect_equal(input, fit@input)
     #' @description Test that `get_input()` returns parameter and model entries.
-    expect_named(input, c("parameters", "model"))
+    expect_named(input, c("parameters", "model", "tmb_mapping"))
   }
 })
 
