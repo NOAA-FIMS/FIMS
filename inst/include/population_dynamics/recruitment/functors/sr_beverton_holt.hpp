@@ -21,7 +21,7 @@ namespace fims_popdy {
  * See the @ref glossary for definitions of mathematical symbols used below.
  *
  * @param logit_steep Recruitment relative to unfished recruitment at 20
- * percent of unfished mature biomass. Steepness is subject to a logit
+ * percent of unfished spawning biomass. Steepness is subject to a logit
  * transformation to keep it between 0.2 and 1.0.
  */
 template <typename Type>
@@ -33,7 +33,7 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
   fims::Vector<Type> logit_steep; /**< Transformed value of recruitment
                                   relative to unfished
                                   recruitment at 20 percent of unfished
-                                  mature biomass.*/
+                                  spawning biomass.*/
 
   SRBevertonHolt() : RecruitmentBase<Type>() {}
 

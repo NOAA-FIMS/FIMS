@@ -3,14 +3,18 @@
 #include "common/information.hpp"
 
 TEST(Subpopulation, ValidatesConservationAndNames) {
-  auto groups = fims_popdy::MakeTwoSexSubpopulations(0.6, 0.4);
+  auto groups = fims_popdy::MakeTwoSexSubpopulations(
+      fims::Vector<double>(2, 0.0), fims::Vector<double>(2, 0.0), 0.4);
   EXPECT_EQ(groups[1].reproductive_contribution, 0.0);
-  EXPECT_THROW(fims_popdy::MakeTwoSexSubpopulations(-0.1, 0.5),
-               std::invalid_argument);
+  EXPECT_THROW(
+      fims_popdy::MakeTwoSexSubpopulations(fims::Vector<double>(2, 0.0),
+                                           fims::Vector<double>(2, 0.0), -0.1),
+      std::invalid_argument);
   groups[1].name = "female";
   EXPECT_THROW(fims_popdy::ValidateSubpopulations(groups),
                std::invalid_argument);
-  groups = fims_popdy::MakeTwoSexSubpopulations();
+  groups = fims_popdy::MakeTwoSexSubpopulations(fims::Vector<double>(2, 0.0),
+                                                fims::Vector<double>(2, 0.0));
   groups[1].recruitment_fraction = 0.4;
   EXPECT_THROW(fims_popdy::ValidateSubpopulations(groups),
                std::invalid_argument);
@@ -22,7 +26,14 @@ TEST(Subpopulation, ValidatesConservationAndNames) {
 class ExplicitSubpopulationTest : public CAAEvaluateTestFixture {
  protected:
   void Configure(bool unequal = false) {
-    population->subpopulations = fims_popdy::MakeTwoSexSubpopulations(0.6, 0.4);
+    auto female = population->log_init_naa;
+    auto male = population->log_init_naa;
+    for (size_t a = 0; a < female.size(); ++a) {
+      female[a] += std::log(0.6);
+      male[a] += std::log(0.4);
+    }
+    population->subpopulations =
+        fims_popdy::MakeTwoSexSubpopulations(female, male, 0.4);
     const size_t plane = n_years * n_ages;
     population->log_M.resize(2 * plane);
     for (size_t i = 0; i < plane; ++i) {
@@ -82,7 +93,7 @@ TEST_F(ExplicitSubpopulationTest, UnfishedEquilibriumAndSBPRAgree) {
   auto& dq =
       catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
   const double r0 = std::exp(population->recruitment->log_rzero[0]);
-  EXPECT_NEAR(dq["unfished_mature_biomass"][0] / r0,
+  EXPECT_NEAR(dq["unfished_spawning_biomass"][0] / r0,
               catch_at_age_model->CalculateSBPR0(population), 1e-10);
   const fims_popdy::SubpopulationLayout layout{size_t(n_years + 1),
                                                size_t(n_ages)};
@@ -129,7 +140,11 @@ TEST_F(ExplicitSubpopulationTest, CatchAndIndexSumGroupPredictions) {
 TEST_F(ExplicitSubpopulationTest, EqualBiologyMatchesPooledFishedDynamics) {
   // Constant M and entry ratio reproduce the legacy fished model exactly.
   Configure();
-  population->subpopulations = fims_popdy::MakeTwoSexSubpopulations();
+  const auto pooled_initial = population->log_init_naa;
+  auto initial = pooled_initial;
+  for (size_t a = 0; a < initial.size(); ++a) initial[a] += std::log(0.5);
+  population->subpopulations =
+      fims_popdy::MakeTwoSexSubpopulations(initial, initial);
   population->proportion_female = fims::Vector<double>(1, 0.5);
   population->log_M.resize(n_years * n_ages);
   catch_at_age_model->Initialize();
@@ -138,10 +153,11 @@ TEST_F(ExplicitSubpopulationTest, EqualBiologyMatchesPooledFishedDynamics) {
   auto& dq =
       catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
   const auto explicit_numbers = dq["numbers_at_age"];
-  const auto explicit_sb = dq["mature_biomass"];
+  const auto explicit_sb = dq["spawning_biomass"];
   const auto explicit_unfished = dq["unfished_numbers_at_age"];
-  const auto explicit_unfished_sb = dq["unfished_mature_biomass"];
+  const auto explicit_unfished_sb = dq["unfished_spawning_biomass"];
   population->subpopulations.clear();
+  population->log_init_naa = pooled_initial;
   catch_at_age_model->Initialize();
   catch_at_age_model->Evaluate();
   for (size_t i = 0; i < explicit_numbers.size(); ++i) {
@@ -149,8 +165,8 @@ TEST_F(ExplicitSubpopulationTest, EqualBiologyMatchesPooledFishedDynamics) {
     EXPECT_NEAR(explicit_unfished[i], dq["unfished_numbers_at_age"][i], 1e-7);
   }
   for (size_t i = 0; i < explicit_sb.size(); ++i) {
-    EXPECT_NEAR(explicit_sb[i], dq["mature_biomass"][i], 1e-7);
-    EXPECT_NEAR(explicit_unfished_sb[i], dq["unfished_mature_biomass"][i],
+    EXPECT_NEAR(explicit_sb[i], dq["spawning_biomass"][i], 1e-7);
+    EXPECT_NEAR(explicit_unfished_sb[i], dq["unfished_spawning_biomass"][i],
                 1e-7);
   }
 }
@@ -174,9 +190,10 @@ TEST_F(ExplicitSubpopulationTest, RepeatedEvaluationDoesNotAccumulateState) {
 TEST_F(ExplicitSubpopulationTest, SupportsThirdGroupAndRejectsInvalidShapes) {
   Configure();
   population->subpopulation_biology.clear();
-  population->subpopulations = {{"female", 0.4, 0.3, 1.0},
-                                {"male", 0.4, 0.4, 0.0},
-                                {"other", 0.2, 0.3, 0.0}};
+  population->subpopulations = {
+      {"female", fims::Vector<double>(n_ages, std::log(40.0)), 0.3, 1.0},
+      {"male", fims::Vector<double>(n_ages, std::log(40.0)), 0.4, 0.0},
+      {"other", fims::Vector<double>(n_ages, std::log(20.0)), 0.3, 0.0}};
   EXPECT_THROW(catch_at_age_model->Initialize(), std::invalid_argument);
   population->log_M.resize(n_years * n_ages);
   catch_at_age_model->Initialize();
@@ -209,12 +226,11 @@ TEST_F(ExplicitSubpopulationTest, MortalityUsesGroupYearAgeOrder) {
   }
 }
 
-TEST_F(ExplicitSubpopulationTest, SeparateInitialAbundanceIgnoresAllocation) {
+TEST_F(ExplicitSubpopulationTest, EachGroupOwnsInitialAbundance) {
   Configure();
-  population->log_init_naa.resize(2 * n_ages);
   for (int a = 0; a < n_ages; ++a) {
-    population->log_init_naa[a] = std::log(100.0 + a);
-    population->log_init_naa[n_ages + a] = std::log(200.0 + a);
+    population->subpopulations[0].log_init_naa[a] = std::log(100.0 + a);
+    population->subpopulations[1].log_init_naa[a] = std::log(200.0 + a);
   }
   catch_at_age_model->Initialize();
   catch_at_age_model->Prepare();
@@ -247,7 +263,7 @@ TEST_F(ExplicitSubpopulationTest, UsesTimeVaryingMaturityThroughTerminalYear) {
                   mature *
                   catch_at_age_model->PopulationMeanWeightAA(population, y, a);
     }
-    EXPECT_NEAR(dq["mature_biomass"][y], spawning, 1e-7);
+    EXPECT_NEAR(dq["spawning_biomass"][y], spawning, 1e-7);
   }
 }
 
@@ -328,7 +344,7 @@ TEST_F(ExplicitSubpopulationTest,
                      mature);
   }
   EXPECT_NEAR(dq["biomass"][0], expected_biomass, 1e-7);
-  EXPECT_NEAR(dq["mature_biomass"][0], expected_sb, 1e-7);
+  EXPECT_NEAR(dq["spawning_biomass"][0], expected_sb, 1e-7);
   EXPECT_NEAR(catch_at_age_model->CalculateSBPR0(population), expected_phi,
               1e-10);
   const auto& fleet = population->fleets[0];

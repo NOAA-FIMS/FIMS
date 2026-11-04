@@ -362,8 +362,6 @@ output <- get_estimates(fit) |>
 data("estimates_big_optimized", package = "FIMS")
 output <- estimates_big_optimized |>
   dplyr::mutate(
-    # Normalize labels in the archived example output.
-    label = sub("spawning_biomass", "mature_biomass", label, fixed = TRUE),
     uncertainty_label = "se",
     year = year_i,
     estimate = estimated
@@ -374,11 +372,9 @@ output <- estimates_big_optimized |>
 #| warning: false
 #| message: false
 #| fig.alt: >
-#|   Plot of mature biomass.
+#|   Plot of spawning biomass.
 stockplotr::plot_spawning_biomass(
-  dplyr::filter(output, label == "mature_biomass") |>
-    # stockplotr uses its existing spawning-biomass label.
-    dplyr::mutate(label = "spawning_biomass")
+  dplyr::filter(output, label == "spawning_biomass")
 ) +
   stockplotr::theme_noaa()
 ```
@@ -568,7 +564,7 @@ clear()
 #| warning: false
 #| message: false
 #| fig.alt: >
-#|   Plot of mature biomass for each sensitivity model.
+#|   Plot of spawning biomass for each sensitivity model.
 stockplotr::plot_biomass(
   list(
     "age" = get_estimates(age_only_fit) |>

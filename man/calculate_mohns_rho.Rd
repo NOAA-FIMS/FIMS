@@ -12,7 +12,7 @@ containing \code{years_to_remove} (vector of years peeled) and \code{estimates}
 (data frame with retrospective results)}
 
 \item{quantity}{Character string specifying which quantity to calculate
-Mohn's rho for (e.g., "mature_biomass", "expected_recruitment")}
+Mohn's rho for (e.g., "spawning_biomass", "expected_recruitment")}
 }
 \value{
 A numeric value representing Mohn's rho. Values close to zero indicate
@@ -56,8 +56,8 @@ retro_fit <- run_fims_retrospective(
   n_cores = 1
 )
 
-# Calculate Mohn's rho for mature biomass
-rho_ssb <- calculate_mohns_rho(retro_fit, quantity = "mature_biomass")
+# Calculate Mohn's rho for spawning biomass
+rho_ssb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
 
 # Calculate Mohn's rho for recruitment
 rho_rec <- calculate_mohns_rho(retro_fit, quantity = "expected_recruitment")

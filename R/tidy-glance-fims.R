@@ -25,7 +25,7 @@ generics::augment
 #'     log_Fmort, log_q, etc.).}
 #'   \item{`"random_effects"`}{Integrated-out random effects (log_devs, etc.).}
 #'   \item{`"derived_quantity"`}{Model outputs that are not parameters
-#'     (mature biomass, expected catches, etc.). Uncertainty here comes from
+#'     (spawning biomass, expected catches, etc.). Uncertainty here comes from
 #'     the delta method via [TMB::sdreport()].}
 #' }
 #' Pass any subset of these strings to `parameters` to control which rows are
@@ -261,10 +261,10 @@ glance.FIMSFit <- function(x, ...) {
     NA
   }
 
-  # terminal mature biomass
-  # mature_biomass is a list, one element per population; take the last
+  # terminal spawning biomass
+  # spawning_biomass is a list, one element per population; take the last
   # value from each and store as a list-column (supports multi-population).
-  ssb_list <- report[["mature_biomass"]]
+  ssb_list <- report[["spawning_biomass"]]
   terminal_ssb <- if (!is.null(ssb_list) && length(ssb_list) > 0) {
     list(vapply(ssb_list, utils::tail, n = 1L, FUN.VALUE = numeric(1L)))
   } else {

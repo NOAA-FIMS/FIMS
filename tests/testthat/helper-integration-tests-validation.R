@@ -17,7 +17,7 @@
 #' @param om_input A list containing the operating model inputs, such as years,
 #' ages, and other parameters.
 #' @param om_output A list containing the operating model outputs, including metrics
-#' such as numbers at age, biomass, mature biomass, fishing mortality, and indices.
+#' such as numbers at age, biomass, spawning biomass, fishing mortality, and indices.
 #' @param em_input A list containing the estimation model inputs, including observed
 #' catch, indices, and other relevant data.
 #' @param use_fimsfit Logical; if `TRUE`, validates using `fit_fims()` results.
@@ -114,10 +114,10 @@ validate_fims <- function(
     use_strict_outlier_check = TRUE
   )
 
-  # Mature biomass
+  # Spawning biomass
   validate_error(
     expected = om_output[["SSB"]],
-    param_name = "mature_biomass",
+    param_name = "spawning_biomass",
     use_fimsfit = use_fimsfit,
     estimates = estimates,
     use_strict_outlier_check = TRUE
@@ -257,7 +257,7 @@ validate_fims <- function(
 #'
 #' This function verifies the output of a deterministic run of the FIMS model
 #' against the known operating model (OM) values. It checks various metrics such
-#' as recruitment, fishing mortality, biomass, mature biomass, and expected
+#' as recruitment, fishing mortality, biomass, spawning biomass, and expected
 #' catch.
 #'
 #' @param report A TMB report where anything that is flagged as reportable in the
@@ -267,7 +267,7 @@ validate_fims <- function(
 #' @param om_input A list containing the operating model inputs, such as years,
 #' ages, and other parameters.
 #' @param om_output A list containing the operating model outputs, including metrics
-#' such as numbers at age, biomass, mature biomass, fishing mortality, and indices.
+#' such as numbers at age, biomass, spawning biomass, fishing mortality, and indices.
 #' @param em_input A list containing the estimation model inputs, including observed
 #' catch, indices, and other relevant data.
 #' @param use_fimsfit Logical; if `TRUE`, validates using `fit_fims()` results.
@@ -324,9 +324,9 @@ verify_fims_deterministic <- function(
     c(t(om_output[["biomass.mt"]]))
   )
 
-  #' @description Test that the mature biomass values from report are equal to the true values.
+  #' @description Test that the spawning biomass values from report are equal to the true values.
   expect_equal(
-    report[["mature_biomass"]][[1]][1:n_years],
+    report[["spawning_biomass"]][[1]][1:n_years],
     c(t(om_output[["SSB"]]))
   )
 
@@ -454,7 +454,7 @@ verify_fims_deterministic <- function(
 #' @param om_input A list containing the operating model inputs, such as years,
 #' ages, and other parameters.
 #' @param om_output A list containing the operating model outputs, including metrics
-#' such as numbers at age, biomass, mature biomass, fishing mortality, and indices.
+#' such as numbers at age, biomass, spawning biomass, fishing mortality, and indices.
 #' @param em_input A list containing the estimation model inputs, including observed
 #' catch, indices, and other relevant data.
 #'

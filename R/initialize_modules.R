@@ -41,7 +41,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
   if (module_class_name == "Population") {
     module_fields <- setdiff(module_fields, c(
       "log_f_multiplier",
-      "mature_biomass_ratio",
+      "spawning_biomass_ratio",
       "total_catch_weight",
       "total_catch_numbers",
       "mortality_F",
@@ -50,9 +50,9 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       "numbers_at_age",
       "unfished_numbers_at_age",
       "biomass",
-      "mature_biomass",
+      "spawning_biomass",
       "unfished_biomass",
-      "unfished_mature_biomass",
+      "unfished_spawning_biomass",
       "proportion_mature_at_age",
       "expected_recruitment",
       "sum_selectivity"
@@ -860,8 +860,14 @@ initialize_comp <- function(data,
 #' workspace at a time. Thus, after you initialize and fit the model, you should
 #' run [clear()].
 #' @param subpopulations Optional list of named biological-group configurations.
-#'   Each entry must contain `name`, `initial_fraction`, `recruitment_fraction`,
-#'   and `reproductive_contribution`. Fractions are fixed configuration values.
+#'   Each entry must contain `name`, `recruitment_fraction`, and
+#'   `reproductive_contribution`, plus its own `init_naa` vector (one strictly
+#'   positive number per modeled age). Initial numbers default to constant;
+#'   `init_estimation_type` accepts a scalar or per-age estimation types.
+#'   Alternatively, supply `log_init_naa` as a parameter tibble with `value`
+#'   and `estimation_type`, ordered by modeled age. Recruitment fractions are
+#'   fixed and must sum to one. Pooled initial-abundance parameters are replaced
+#'   by the group parameters when subpopulations are configured.
 #'   `NULL` (default) retains pooled dynamics. Optional `growth` and `maturity`
 #'   overrides are lists containing a parameter tibble (`parameters`) and/or
 #'   FIMSFrame (`data`); omitted settings use the population inputs. EWAA growth

@@ -16,7 +16,7 @@
 retro_fit <- list(
   years_to_remove = c(0, 1, 2),
   estimates = tibble::tibble(
-    label = "mature_biomass",
+    label = "spawning_biomass",
     year_i = rep(1:10, 3),
     timing = rep(2001:2010, 3),
     retrospective_peel = rep(0:2, each = 10),
@@ -32,7 +32,7 @@ retro_fit <- list(
 test_that("calculate_mohns_rho() works with correct inputs", {
   #' @description Test that peels estimating more than the reference model give a positive rho equal to the mean relative difference at their terminal years.
   expect_equal(
-    object = calculate_mohns_rho(retro_fit, quantity = "mature_biomass"),
+    object = calculate_mohns_rho(retro_fit, quantity = "spawning_biomass"),
     expected = 0.15
   )
 })

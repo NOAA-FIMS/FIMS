@@ -42,16 +42,37 @@ initialize_subpopulation_modules <- function(groups, parameters, data, fleets) {
     module$get_id()
   }
   lapply(groups, function(group) {
-    required <- c("name", "initial_fraction", "recruitment_fraction", "reproductive_contribution")
-    allowed <- c(required, "growth", "maturity", "selectivity")
+    required <- c("name", "recruitment_fraction", "reproductive_contribution")
+    allowed <- c(required, "init_naa", "log_init_naa", "init_estimation_type", "growth", "maturity", "selectivity")
     if (!is.list(group) || !all(required %in% names(group)) ||
       any(!names(group) %in% allowed) || anyDuplicated(names(group))) {
       cli::cli_abort(c(
-        "Each subpopulation needs {.field name}, {.field initial_fraction}, {.field recruitment_fraction}, and {.field reproductive_contribution}.",
+        "Each subpopulation needs {.field name}, {.field recruitment_fraction}, and {.field reproductive_contribution}.",
         "i" = "Optional overrides are {.field growth}, {.field maturity}, and {.field selectivity}. Use module configurations, not IDs: {.fn initialize_fims} rebuilds the registry."
       ))
     }
     result <- group[required]
+    if (is.null(group$init_naa) == is.null(group$log_init_naa)) {
+      cli::cli_abort("Supply exactly one of {.field init_naa} or {.field log_init_naa} for each subpopulation.")
+    }
+    if (!is.null(group$log_init_naa)) {
+      initial <- group$log_init_naa
+      if (!tibble::is_tibble(initial) || !all(c("value", "estimation_type") %in% names(initial))) {
+        cli::cli_abort("{.field log_init_naa} must be a parameter tibble with value and estimation_type, ordered by modeled age.")
+      }
+      if (!is.null(group$init_estimation_type)) {
+        cli::cli_abort("Set estimation_type in the log_init_naa tibble, not init_estimation_type.")
+      }
+      result$init_naa <- exp(initial$value)
+      result$init_estimation_type <- initial$estimation_type
+    } else {
+      result$init_naa <- group$init_naa
+      result$init_estimation_type <- if (is.null(group$init_estimation_type)) "constant" else group$init_estimation_type
+    }
+    if (!is.numeric(result$init_naa) || length(result$init_naa) != length(get_ages(data)) ||
+      any(!is.finite(result$init_naa)) || any(result$init_naa <= 0)) {
+      cli::cli_abort("Each subpopulation's init_naa must contain one finite, strictly positive value per modeled age.")
+    }
     if (!is.null(group[["growth"]])) {
       result[["growth_id"]] <- build(group[["growth"]], "Growth")
     }

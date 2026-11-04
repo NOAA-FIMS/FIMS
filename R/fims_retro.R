@@ -44,7 +44,7 @@
 #' * `years_to_remove` - The input vector of years removed for each peel
 #' * `estimates` - A data frame containing model estimates from all retrospective
 #'   runs, with the following key columns:
-#'   * `label` - Type of estimate (e.g., "mature_biomass")
+#'   * `label` - Type of estimate (e.g., "spawning_biomass")
 #'   * `year_i` - Year index for the estimate
 #'   * `age` - Age from the data (if applicable)
 #'   * `estimated` - Point estimate value

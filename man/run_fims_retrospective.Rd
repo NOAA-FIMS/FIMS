@@ -32,7 +32,7 @@ A list with two named elements:
 \item \code{estimates} - A data frame containing model estimates from all retrospective
 runs, with the following key columns:
 \itemize{
-\item \code{label} - Type of estimate (e.g., "mature_biomass")
+\item \code{label} - Type of estimate (e.g., "spawning_biomass")
 \item \code{year_i} - Year index for the estimate
 \item \code{age} - Age from the data (if applicable)
 \item \code{estimated} - Point estimate value

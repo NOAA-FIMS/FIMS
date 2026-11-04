@@ -147,21 +147,21 @@ test_that("Run FIMS in parallel using {snowfall}", {
   snowfall::sfStop()
 
   # Comparison of results:
-  # Verify that mature biomass values from both runs are equivalent.
+  # Verify that spawning biomass values from both runs are equivalent.
   sb_parallel <- purrr::map(
     results_parallel,
     \(x) get_estimates(x) |>
-      dplyr::filter(label == "mature_biomass") |>
+      dplyr::filter(label == "spawning_biomass") |>
       dplyr::pull(estimated)
   )
 
   sb_serial <- purrr::map(
     estimation_results_serial,
     \(x) get_estimates(x) |>
-      dplyr::filter(label == "mature_biomass") |>
+      dplyr::filter(label == "spawning_biomass") |>
       dplyr::pull(estimated)
   )
-  #' @description Test that mature biomass values from parallel runs equal those from serial runs. We apply a tolerance of 1e-5 to floating-point comparison.
+  #' @description Test that spawning biomass values from parallel runs equal those from serial runs. We apply a tolerance of 1e-5 to floating-point comparison.
   expect_equal(sb_parallel, sb_serial, tolerance = 1e-5)
 
   parameters_parallel <- purrr::map(

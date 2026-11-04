@@ -2,12 +2,12 @@
 
 ## Breaking changes
 
-* Rename `spawning_biomass`, `unfished_spawning_biomass`, and
-  `spawning_biomass_ratio` to `mature_biomass`, `unfished_mature_biomass`,
-  and `mature_biomass_ratio`, including Rcpp fields and C++ calculation methods.
-  Update output filters and derived-quantity prior names and rebuild saved models.
-  Equations and reproductive-contribution weighting are unchanged.
-
+* Explicit subpopulations now own their initial abundance. Replace
+  `initial_fraction` with `init_naa` (a positive vector by age), optionally using
+  `init_estimation_type`, or supply a `log_init_naa` parameter tibble through
+  `initialize_fims()`. `SetTwoSex()` now accepts female and male initial abundance
+  vectors followed by the female recruitment fraction. Recruitment allocation
+  remains separate. Pooled models without explicit subpopulations are unchanged.
 
 ## Bug Fixes
 

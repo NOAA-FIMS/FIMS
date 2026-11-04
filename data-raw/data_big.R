@@ -345,7 +345,7 @@ weights_fishery <- data.frame(
 )
 weight_at_age_data <- merge(
   # Add on one more year for weight_at_age data because the model needs to
-  # compute mature biomass for the beginning of the year following the
+  # compute spawning biomass for the beginning of the year following the
   # terminal year
   dplyr::bind_rows(
     timing_fishery,

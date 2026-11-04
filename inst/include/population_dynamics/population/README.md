@@ -12,10 +12,11 @@ An empty group configuration preserves the existing pooled model.
 library(FIMS)
 data <- FIMSFrame(data_big)
 parameters <- setup_default_parameters(data = data)
+initial <- exp(parameters$value[parameters$label == "log_init_naa"])
 groups <- list(
-  list(name = "female", initial_fraction = 0.5,
+  list(name = "female", init_naa = initial / 2,
        recruitment_fraction = 0.5, reproductive_contribution = 1),
-  list(name = "male", initial_fraction = 0.5,
+  list(name = "male", init_naa = initial / 2,
        recruitment_fraction = 0.5, reproductive_contribution = 0)
 )
 input <- initialize_fims(parameters, data, subpopulations = groups)
@@ -24,19 +25,22 @@ get_report(fit)$numbers_at_age_by_subpopulation
 get_estimates(fit)
 ```
 
-For direct Rcpp model construction, call `population$SetTwoSex(0.5, 0.5)` or
+For direct Rcpp model construction, call `population$SetTwoSex(female_init_naa, male_init_naa, 0.5)` or
 `population$SetSubpopulations(groups)` **before** `CreateTMBModel()`.
 `GetSubpopulations()` returns configurations in parameter/output order.
-`SetSubpopulations(list())` restores pooled configuration before model building.
+`SetSubpopulations(list())` restores pooled configuration before model building;
+when switching from explicit groups, also reset `population$log_init_naa` to
+the desired pooled age vector.
 Rebuild the model after configuration changes.
 
 ## State and parameter contract
 
 Each group has its own abundance, natural and total mortality, unfished
 abundance, and plus group. Population recruitment is calculated once and
-allocated using recruitment fractions. Initial fractions allocate pooled initial
-abundance; they need not equal recruitment fractions. Fractions are fixed
-configuration, not estimated parameters in this increment.
+allocated using fixed recruitment fractions. Each subpopulation owns its own
+`log_init_naa` vector, with one value per modeled age. Initial abundance is not
+allocated from a shared total, and there is no `initial_fraction` setting.
+Initial and recruitment age/sex structures are independent.
 
 `log_M` accepts either `n_years * n_ages` shared entries or
 `n_subpopulations * n_years * n_ages` group-specific entries. Age varies fastest,
@@ -44,24 +48,51 @@ then year, then subpopulation. All entries retain the existing VariableVector
 estimation mechanism. In a manually constructed Rcpp model, for example:
 
 ```r
-population$SetTwoSex(0.5, 0.5)
+population$SetTwoSex(initial / 2, initial / 2, 0.5)
 population$log_M[] <- c(rep(log(0.2), n_years * n_ages),
                       rep(log(0.4), n_years * n_ages))
 ```
 
-`log_init_naa` similarly accepts `n_ages` pooled entries or
-`n_subpopulations * n_ages` separate initial abundances. Initial fractions apply
-only to pooled input. The high-level parameter-table helpers still construct
-shared natural mortality and initial abundance; use direct Rcpp construction for separate M or
-initial abundance in this increment.
+In R, provide each group's initial abundance using either:
 
-Adult group proportions are derived from abundance. The legacy
-`proportion_female` input is unused in explicit dynamics and must be constant;
-recruitment and initial fractions are configured explicitly instead.
+- `init_naa`: a strictly positive numeric vector in modeled-age order. It is
+  constant by default. Set `init_estimation_type` to `"fixed_effects"`,
+  `"random_effects"`, or `"constant"`, either once or once per age.
+- `log_init_naa`: a parameter tibble containing `value` (natural-log abundance)
+  and `estimation_type`, ordered by modeled age. Supply only the initial-abundance
+  rows for that group.
+
+For example, to estimate female initial abundance:
+
+```r
+groups[[1]]$init_naa <- NULL
+groups[[1]]$log_init_naa <- tibble::tibble(
+  value = log(initial / 2),
+  estimation_type = "fixed_effects"
+)
+```
+
+Separate initial abundances can have different age patterns. Their sum determines
+pooled initial abundance. One explicit group uses the same interface and requires
+`recruitment_fraction = 1`; it receives exactly its supplied initial numbers.
+Zero or nonfinite initial abundance is rejected because parameters use a log
+scale. Random effects still require an appropriate distribution model.
+
+The population's pooled initial parameter rows are replaced by the group's
+parameters during high-level setup, so unused pooled initial parameters are not
+estimated. Internally, the Rcpp parameter adapter and output serialization use a
+flattened group/age view for compatibility; the model registers parameters from
+each group's own vector. `get_estimates()` labels these with `subpopulation_i`,
+including for one group. No automatic constraints tie estimated groups together.
+
+The high-level parameter-table helpers still construct shared natural mortality;
+use direct Rcpp construction for separate M in this increment. Adult group
+proportions are derived from abundance. The legacy `proportion_female` input is
+unused in explicit dynamics and must be constant.
 
 Maturity remains biological maturity for both sexes. Reproductive contribution
-is a separate multiplier on mature biomass. Female-only mature biomass uses
-contributions 1 and 0. Unfished initial abundance and mature biomass per
+is a separate multiplier on mature biomass. Female-only spawning biomass uses
+contributions 1 and 0. Unfished initial abundance and spawning biomass per
 recruit use each group's first-year M, including the equilibrium plus group.
 Later unfished abundance advances with the corresponding year's M.
 
@@ -171,15 +202,3 @@ Tests also cover mixed growth, mortality, maturity and selectivity; shared-modul
 fallback and invalid references; derived-growth cache refresh; and derivatives
 through growth, maturity and selectivity overrides. The full package test suite
 has not been run.
-
-## Mature biomass naming
-
-The population reports `mature_biomass`, `unfished_mature_biomass`, and
-`mature_biomass_ratio` replace the former `spawning_biomass` names. This is a
-name change only: explicit groups still multiply mature biomass by
-`reproductive_contribution`, and the pooled path still applies
-`proportion_female`. Thus the reported quantity is reproductive-contribution-
-weighted mature biomass, not necessarily the mature biomass of all individuals.
-Update output filters and derived-quantity priors and rebuild previously saved
-models. The existing `glance()` summary column `terminal_ssb` retains its name
-for compatibility but reads the new `mature_biomass` report.

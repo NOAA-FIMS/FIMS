@@ -21,7 +21,7 @@ data_4_model <- FIMSFrame(data_big)
 
 default_parameters <- setup_default_parameters(data = data_4_model)
 
-mature_biomass_for_prop_female <- function(prop_female) {
+spawning_biomass_for_prop_female <- function(prop_female) {
   parameters_4_model <- default_parameters |>
     dplyr::mutate(
       value = dplyr::if_else(label == "proportion_female", prop_female, value)
@@ -31,31 +31,31 @@ mature_biomass_for_prop_female <- function(prop_female) {
     initialize_fims(data = data_4_model) |>
     fit_fims(optimize = FALSE)
 
-  mature_biomass <- get_estimates(fit) |>
-    dplyr::filter(label == "mature_biomass") |>
+  spawning_biomass <- get_estimates(fit) |>
+    dplyr::filter(label == "spawning_biomass") |>
     dplyr::arrange(year_i) |>
     dplyr::pull(estimated)
 
   clear()
 
-  mature_biomass
+  spawning_biomass
 }
 
 ## IO correctness ----
-test_that("lower proportion_female reduces mature biomass", {
-  #' @description Test that reducing proportion_female lowers mature biomass relative to higher values or the default.
+test_that("lower proportion_female reduces spawning biomass", {
+  #' @description Test that reducing proportion_female lowers spawning biomass relative to higher values or the default.
 
-  mature_biomass_low <- mature_biomass_for_prop_female(0.3)
-  mature_biomass_default <- mature_biomass_for_prop_female(0.5)
-  mature_biomass_high <- mature_biomass_for_prop_female(0.7)
+  spawning_biomass_low <- spawning_biomass_for_prop_female(0.3)
+  spawning_biomass_default <- spawning_biomass_for_prop_female(0.5)
+  spawning_biomass_high <- spawning_biomass_for_prop_female(0.7)
 
-  expect_true(all(mature_biomass_low < mature_biomass_default))
-  expect_true(all(mature_biomass_default < mature_biomass_high))
+  expect_true(all(spawning_biomass_low < spawning_biomass_default))
+  expect_true(all(spawning_biomass_default < spawning_biomass_high))
 })
 
-test_that("proportion_female by age reaches mature biomass", {
+test_that("proportion_female by age reaches spawning biomass", {
   ages <- get_ages(data_4_model)
-  mature_biomass_for_age_vector <- function(prop_female) {
+  spawning_biomass_for_age_vector <- function(prop_female) {
     parameters_4_model <- default_parameters |>
       dplyr::filter(label != "proportion_female") |>
       dplyr::bind_rows(
@@ -70,28 +70,28 @@ test_that("proportion_female by age reaches mature biomass", {
     fit <- parameters_4_model |>
       initialize_fims(data = data_4_model) |>
       fit_fims(optimize = FALSE)
-    mature_biomass <- get_report(fit)[["mature_biomass"]][[1]]
+    spawning_biomass <- get_report(fit)[["spawning_biomass"]][[1]]
     clear()
-    mature_biomass
+    spawning_biomass
   }
   is_young <- ages <= stats::median(ages)
-  mature_biomass_scalar <- mature_biomass_for_age_vector(0.5)
-  mature_biomass_vector <- mature_biomass_for_age_vector(
+  spawning_biomass_scalar <- spawning_biomass_for_age_vector(0.5)
+  spawning_biomass_vector <- spawning_biomass_for_age_vector(
     rep(0.5, length(ages))
   )
-  mature_biomass_young <- mature_biomass_for_age_vector(as.numeric(is_young))
-  mature_biomass_old <- mature_biomass_for_age_vector(as.numeric(!is_young))
-  mature_biomass_all <- mature_biomass_for_age_vector(rep(1, length(ages)))
+  spawning_biomass_young <- spawning_biomass_for_age_vector(as.numeric(is_young))
+  spawning_biomass_old <- spawning_biomass_for_age_vector(as.numeric(!is_young))
+  spawning_biomass_all <- spawning_biomass_for_age_vector(rep(1, length(ages)))
 
-  #' @description Test that a constant proportion_female vector by age gives the same mature biomass as the scalar.
-  expect_equal(mature_biomass_vector, mature_biomass_scalar)
+  #' @description Test that a constant proportion_female vector by age gives the same spawning biomass as the scalar.
+  expect_equal(spawning_biomass_vector, spawning_biomass_scalar)
   # Year-1 numbers at age come from the initial numbers, not from spawning
-  # biomass, so year-1 mature biomass is additive over ages.
-  #' @description Test that year-1 mature biomass from young-only and old-only females sums to that from all females.
+  # biomass, so year-1 spawning biomass is additive over ages.
+  #' @description Test that year-1 spawning biomass from young-only and old-only females sums to that from all females.
   expect_equal(
-    mature_biomass_young[1] + mature_biomass_old[1],
-    mature_biomass_all[1]
+    spawning_biomass_young[1] + spawning_biomass_old[1],
+    spawning_biomass_all[1]
   )
-  #' @description Test that each part of the age vector changes mature biomass.
-  expect_true(mature_biomass_young[1] > 0 && mature_biomass_old[1] > 0)
+  #' @description Test that each part of the age vector changes spawning biomass.
+  expect_true(spawning_biomass_young[1] > 0 && spawning_biomass_old[1] > 0)
 })

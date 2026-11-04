@@ -41,15 +41,15 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
-  fims::Vector<Type>
-      log_init_naa; /*!< estimated parameter: natural log of numbers at age*/
+  fims::Vector<Type> log_init_naa; /*!< pooled initial parameters, or flattened
+                                      view of group-owned initial parameters */
   fims::Vector<Type>
       log_M; /*!< estimated parameter: natural log of Natural Mortality*/
   fims::Vector<Type> proportion_female = fims::Vector<Type>(
       1, static_cast<Type>(0.5));            /*!< proportion female by age */
   fims::Vector<Type> log_f_multiplier;       /*!< estimated parameter: vector of
     annual fishing mortality multipliers to scale total mortality of all fleets*/
-  fims::Vector<Type> mature_biomass_ratio; /*!< estimated parameter: vector of
+  fims::Vector<Type> spawning_biomass_ratio; /*!< estimated parameter: vector of
 annual fishing mortality multipliers to scale total mortality of all fleets*/
 
   // Transformed values
@@ -87,7 +87,7 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
       fleets; /*!< shared pointer to fleet module */
 
   /** @brief Empty preserves pooled dynamics; otherwise each group has state. */
-  std::vector<Subpopulation> subpopulations;
+  std::vector<Subpopulation<Type>> subpopulations;
   std::vector<SubpopulationBiology<Type>> subpopulation_biology;
 
   /**

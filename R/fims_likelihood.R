@@ -59,7 +59,7 @@
 #' * `vec` - Numeric vector of parameter values used in the profile
 #' * `estimates` - Data frame containing model estimates for each profiled value,
 #'   with the following key columns:
-#'   * `label` - Type of estimate (e.g., "mature_biomass", "recruitment")
+#'   * `label` - Type of estimate (e.g., "spawning_biomass", "recruitment")
 #'   * `year_i` - Year index for the estimate
 #'   * `age` - Age from the data (if applicable)
 #'   * `estimated` - Point estimate value

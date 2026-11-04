@@ -18,7 +18,7 @@ namespace {
 // IO correctness
 TEST_F(CAAEvaluateTestFixture,
        HandlesCorrectInput_CatchAtAge_CalculateRecruitment) {
-  // calculating mature biomass for year 4
+  // calculating spawning biomass for year 4
   int sb_year = 4;
   int sb_age = 0;
   int sb_i_age_year = sb_year * population->n_ages + sb_age;
@@ -38,7 +38,7 @@ TEST_F(CAAEvaluateTestFixture,
                                               age);
     }
   }
-  catch_at_age_model->CalculateMatureBiomass(population, sb_i_age_year,
+  catch_at_age_model->CalculateSpawningBiomass(population, sb_i_age_year,
                                                sb_year, sb_age);
 
   // calculating phi_0
@@ -61,9 +61,9 @@ TEST_F(CAAEvaluateTestFixture,
   and is of length n_years - 1 where the first position of the vector
   corresponds to the second year of the time series.*/
   expect_recruitment[r_i_age_year] =
-      (0.8 * rzero * steep * dq["mature_biomass"][sb_year]) /
+      (0.8 * rzero * steep * dq["spawning_biomass"][sb_year]) /
       (0.2 * phi_0 * rzero * (1.0 - steep) +
-       dq["mature_biomass"][sb_year] * (steep - 0.2)) *
+       dq["spawning_biomass"][sb_year] * (steep - 0.2)) *
       fims_math::exp(population->recruitment->log_recruit_devs[r_year - 1]);
 
   // calculate recruitment in population module

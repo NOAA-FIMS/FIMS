@@ -21,14 +21,14 @@ female_selectivity <- parameters |>
 
 groups <- list(
   list(
-    name = "female", initial_fraction = 0.5, recruitment_fraction = 0.5,
+    name = "female", init_naa = exp(parameters$value[parameters$label == "log_init_naa"]) / 2, recruitment_fraction = 0.5,
     reproductive_contribution = 1,
     growth = list(weights = 0.1 * ages^2),
     maturity = list(parameters = female_maturity),
     selectivity = list(fleet1 = list(parameters = female_selectivity))
   ),
   list(
-    name = "male", initial_fraction = 0.5, recruitment_fraction = 0.5,
+    name = "male", init_naa = exp(parameters$value[parameters$label == "log_init_naa"]) / 2, recruitment_fraction = 0.5,
     reproductive_contribution = 0
   )
 )
@@ -52,7 +52,7 @@ stopifnot(isTRUE(all.equal(
   ))
 )))
 stopifnot(isTRUE(all.equal(
-  report$mature_biomass[[1]],
+  report$spawning_biomass[[1]],
   rowSums(matrix(n[female] * weights[female] * maturity[female],
     ncol = length(ages), byrow = TRUE
   ))

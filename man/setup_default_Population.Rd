@@ -30,7 +30,7 @@ accumulates survivors each year,
 
 \item{proportion_female}{A numeric value or vector (length equal to the
 number of ages) between 0 and 1 specifying the proportion of each age that
-is female, which scales mature biomass. Default is \code{0.5}.}
+is female, which scales spawning biomass. Default is \code{0.5}.}
 }
 \value{
 A tibble of default population configurations, including initial numbers at

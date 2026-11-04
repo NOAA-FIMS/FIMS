@@ -44,7 +44,7 @@ test_that("run_fims_retrospective() works with correct inputs", {
 
   #' @description Test that calculate_mohns_rho() returns a numeric value.
 
-  rho_ssb <- calculate_mohns_rho(retro_fit, quantity = "mature_biomass")
+  rho_ssb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
 
   expect_equal(
     object = class(rho_ssb),
@@ -61,8 +61,8 @@ test_that("run_fims_retrospective() works with correct inputs", {
   )
 
   #' @description Test that calculate_mohns_rho() returns consistent results across runs.
-  rho_ssb_1 <- calculate_mohns_rho(retro_fit, quantity = "mature_biomass")
-  rho_ssb_2 <- calculate_mohns_rho(retro_fit, quantity = "mature_biomass")
+  rho_ssb_1 <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
+  rho_ssb_2 <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
 
   expect_equal(
     object = rho_ssb_1,
@@ -88,7 +88,7 @@ test_that("run_fims_retrospective() works with correct inputs", {
   )
 
   retro_ssb <- retro_fit[["estimates"]] |>
-    dplyr::filter(label == "mature_biomass") |>
+    dplyr::filter(label == "spawning_biomass") |>
     dplyr::select(label, year_i, estimated, retrospective_peel) |>
     tidyr::pivot_wider(names_from = retrospective_peel, values_from = estimated) |>
     dplyr::filter(year_i == 31) |>
@@ -185,7 +185,7 @@ test_that("calculate_mohns_rho() returns correct error messages", {
   expect_error(
     object = calculate_mohns_rho(
       retro_fit = "not_a_list",
-      quantity = "mature_biomass"
+      quantity = "spawning_biomass"
     ),
     regexp = "must be a list"
   )
@@ -194,7 +194,7 @@ test_that("calculate_mohns_rho() returns correct error messages", {
   expect_error(
     object = calculate_mohns_rho(
       retro_fit = list(years_to_remove = 0:2),
-      quantity = "mature_biomass"
+      quantity = "spawning_biomass"
     ),
     regexp = "must contain 'years_to_remove' and 'estimates' elements"
   )
@@ -212,7 +212,7 @@ test_that("calculate_mohns_rho() returns correct error messages", {
   expect_error(
     object = calculate_mohns_rho(
       retro_fit = retro_fit,
-      quantity = c("mature_biomass", "expected_recruitment")
+      quantity = c("spawning_biomass", "expected_recruitment")
     ),
     regexp = "must be a single character string"
   )
@@ -224,7 +224,7 @@ test_that("calculate_mohns_rho() returns correct error messages", {
   expect_error(
     object = calculate_mohns_rho(
       retro_fit = retro_fit_invalid,
-      quantity = "mature_biomass"
+      quantity = "spawning_biomass"
     ),
     regexp = "must contain the reference run"
   )
@@ -250,7 +250,7 @@ test_that("calculate_mohns_rho() handles warnings appropriately", {
   # The function should handle this gracefully
   result <- tryCatch(
     {
-      calculate_mohns_rho(retro_fit_na, quantity = "mature_biomass")
+      calculate_mohns_rho(retro_fit_na, quantity = "spawning_biomass")
     },
     warning = function(w) {
       # Check that warning message is appropriate

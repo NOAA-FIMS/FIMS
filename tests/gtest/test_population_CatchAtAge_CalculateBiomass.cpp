@@ -18,10 +18,10 @@ namespace {
 // IO correctness
 TEST_F(
     CAAEvaluateTestFixture,
-    HandlesCorrectInput_CatchAtAge_CalculateBiomass_CalculateMatureBiomass) {
+    HandlesCorrectInput_CatchAtAge_CalculateBiomass_CalculateSpawningBiomass) {
   uint32_t pop_id = population->GetId();
   catch_at_age_model->CalculateMaturityAA(population, i_age_year, year, age);
-  catch_at_age_model->CalculateMatureBiomass(population, i_age_year, year,
+  catch_at_age_model->CalculateSpawningBiomass(population, i_age_year, year,
                                                age);
   catch_at_age_model->CalculateBiomass(population, i_age_year, year, age);
 
@@ -38,8 +38,8 @@ TEST_F(
                   catch_at_age_model->populations[0]->growth->evaluate(
                       year, population->ages[age]);
 
-  EXPECT_EQ(dq["mature_biomass"][year], test_SB[year]);
-  EXPECT_GT(dq["mature_biomass"][year], 0);
+  EXPECT_EQ(dq["spawning_biomass"][year], test_SB[year]);
+  EXPECT_GT(dq["spawning_biomass"][year], 0);
 
   EXPECT_EQ(dq["biomass"][year], test_B[year]);
   EXPECT_GT(dq["biomass"][year], 0);
@@ -47,7 +47,7 @@ TEST_F(
 
 // Edge handling
 TEST_F(CAAEvaluateTestFixture,
-       HandlesCorrectInput_CatchAtAge_CalculateMatureBiomass) {
+       HandlesCorrectInput_CatchAtAge_CalculateSpawningBiomass) {
   uint32_t pop_id = population->GetId();
   int year = population->n_years;
   int age = 6;
@@ -59,7 +59,7 @@ TEST_F(CAAEvaluateTestFixture,
   catch_at_age_model->CalculateMaturityAA(population, i_age_year, year, age);
   catch_at_age_model->CalculateNumbersAA(population, i_age_year, i_agem1_yearm1,
                                          age);
-  catch_at_age_model->CalculateMatureBiomass(population, i_age_year, year,
+  catch_at_age_model->CalculateSpawningBiomass(population, i_age_year, year,
                                                age);
 
   std::vector<double> test_SSB(n_years + 1, 0);
@@ -72,7 +72,7 @@ TEST_F(CAAEvaluateTestFixture,
       catch_at_age_model->populations[0]->growth->evaluate(
           year, population->ages[age]);
 
-  EXPECT_EQ(dq["mature_biomass"][year], test_SSB[year]);
-  EXPECT_GT(dq["mature_biomass"][year], 0);
+  EXPECT_EQ(dq["spawning_biomass"][year], test_SSB[year]);
+  EXPECT_GT(dq["spawning_biomass"][year], 0);
 }
 }  // namespace

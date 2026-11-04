@@ -94,3 +94,12 @@ identify the deferred features listed above.
 - [High-level R configuration helper](../R/initialize_subpopulations.R)
 - [C++ subpopulation tests](../tests/gtest/test_population_Subpopulation.cpp)
 - [R subpopulation tests](../tests/testthat/test-subpopulations.R)
+
+## Follow-up: group-owned initial abundance
+
+The implementation now removes `initial_fraction`. Each subpopulation supplies
+its own initial numbers at age, with fixed or estimated log-abundance parameters.
+This replaces the earlier split-or-override behavior described in the comparison
+above. Recruitment fractions remain separate and fixed. Total initial abundance
+is the sum of group abundances; one group uses the same interface as several.
+See the implementation documentation for the updated R configuration.

@@ -81,13 +81,13 @@ TEST_F(CAAEvaluateTestFixture,
 }
 
 // CatchAtAge_CalculateUnfishedNumbersAA and
-// CatchAtAge_CalculateUnfishedMatureBiomass
+// CatchAtAge_CalculateUnfishedSpawningBiomass
 // IO correctness
 TEST_F(
     CAAEvaluateTestFixture,
-    HandlesCorrectInput_CatchAtAge_CalculateUnfishedNumbersAA_CalculateUnfishedMatureBiomass) {
+    HandlesCorrectInput_CatchAtAge_CalculateUnfishedNumbersAA_CalculateUnfishedSpawningBiomass) {
   std::vector<double> test_unfished_numbers_at_age((n_years + 1) * n_ages, 0);
-  std::vector<double> test_unfished_mature_biomass(n_years + 1, 0);
+  std::vector<double> test_unfished_spawning_biomass(n_years + 1, 0);
 
   size_t pop_id = population->GetId();
   auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
@@ -137,10 +137,10 @@ TEST_F(
 
       catch_at_age_model->CalculateMaturityAA(population, i_age_year, year,
                                               age);
-      catch_at_age_model->CalculateUnfishedMatureBiomass(
+      catch_at_age_model->CalculateUnfishedSpawningBiomass(
           population, i_age_year, year, age);
 
-      test_unfished_mature_biomass[year] +=
+      test_unfished_spawning_biomass[year] +=
           dq["proportion_mature_at_age"][i_age_year] *
           population->proportion_female[age] *
           test_unfished_numbers_at_age[i_age_year] *
@@ -151,9 +151,9 @@ TEST_F(
       EXPECT_GT(dq["unfished_numbers_at_age"][i_age_year], 0.0);
     }
 
-    EXPECT_NEAR(dq["unfished_mature_biomass"][year],
-                test_unfished_mature_biomass[year], 1e-7);
-    EXPECT_GT(dq["unfished_mature_biomass"][year], 0.0);
+    EXPECT_NEAR(dq["unfished_spawning_biomass"][year],
+                test_unfished_spawning_biomass[year], 1e-7);
+    EXPECT_GT(dq["unfished_spawning_biomass"][year], 0.0);
   }
 }
 
@@ -161,7 +161,7 @@ TEST_F(
 // IO correctness
 TEST_F(
     CAAEvaluateTestFixture,
-    HandlesCorrectInput_CatchAtAge_UnfishedMatureBiomassYear0EqualsR0TimesPhi0) {
+    HandlesCorrectInput_CatchAtAge_UnfishedSpawningBiomassYear0EqualsR0TimesPhi0) {
   size_t pop_id = population->GetId();
   auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
   double r0 = fims_math::exp(population->recruitment->log_rzero[0]);
@@ -174,16 +174,16 @@ TEST_F(
                                                             age);
     }
     catch_at_age_model->CalculateMaturityAA(population, age, 0, age);
-    catch_at_age_model->CalculateUnfishedMatureBiomass(population, age, 0,
+    catch_at_age_model->CalculateUnfishedSpawningBiomass(population, age, 0,
                                                          age);
   }
 
-  // Unfished mature biomass in year 0 is the equilibrium, so it must equal
-  // unfished recruitment times unfished mature biomass per recruit. The
+  // Unfished spawning biomass in year 0 is the equilibrium, so it must equal
+  // unfished recruitment times unfished spawning biomass per recruit. The
   // fixture's natural mortality varies by age, so this also checks that both
   // use the natural mortality of the age being left.
   double phi_0 = catch_at_age_model->CalculateSBPR0(population);
-  EXPECT_NEAR(dq["unfished_mature_biomass"][0], r0 * phi_0,
+  EXPECT_NEAR(dq["unfished_spawning_biomass"][0], r0 * phi_0,
               1e-10 * r0 * phi_0);
 }
 

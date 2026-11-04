@@ -29,8 +29,8 @@ void register_population(Rcpp::Module& m) {
       .field("n_lengths", &PopulationInterface::n_lengths)
       .field("log_M", &PopulationInterface::log_M)
       .field("log_f_multiplier", &PopulationInterface::log_f_multiplier)
-      .field("mature_biomass_ratio",
-             &PopulationInterface::mature_biomass_ratio)
+      .field("spawning_biomass_ratio",
+             &PopulationInterface::spawning_biomass_ratio)
       .field("log_init_naa", &PopulationInterface::log_init_naa)
       .field("proportion_female", &PopulationInterface::proportion_female)
       .field("ages", &PopulationInterface::ages)
@@ -43,10 +43,10 @@ void register_population(Rcpp::Module& m) {
       .field("unfished_numbers_at_age",
              &PopulationInterface::unfished_numbers_at_age)
       .field("biomass", &PopulationInterface::biomass)
-      .field("mature_biomass", &PopulationInterface::mature_biomass)
+      .field("spawning_biomass", &PopulationInterface::spawning_biomass)
       .field("unfished_biomass", &PopulationInterface::unfished_biomass)
-      .field("unfished_mature_biomass",
-             &PopulationInterface::unfished_mature_biomass)
+      .field("unfished_spawning_biomass",
+             &PopulationInterface::unfished_spawning_biomass)
       .field("proportion_mature_at_age",
              &PopulationInterface::proportion_mature_at_age)
       .field("expected_recruitment", &PopulationInterface::expected_recruitment)
