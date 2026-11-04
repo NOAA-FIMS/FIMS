@@ -231,8 +231,8 @@ methods::setMethod(
 )
 
 #' @return
-#' [get_lengths()] returns a vector of the lower edges of the length bins used
-#' in the model.
+#' [get_lengths()] returns a vector of the lower edges of the fleet length bins
+#' used in the model. Population length bins are not included.
 #' @export
 #' @rdname get_FIMSFrame
 #' @keywords FIMSFrame
@@ -249,8 +249,8 @@ methods::setMethod(
 )
 
 #' @return
-#' [get_n_lengths()] returns an integer specifying the number of length bins
-#' used in the model.
+#' [get_n_lengths()] returns an integer specifying the number of fleet length
+#' bins used in the model.
 #' @export
 #' @rdname get_FIMSFrame
 #' @keywords FIMSFrame
@@ -1558,6 +1558,127 @@ resolve_fleet_length_bins <- function(
   out
 }
 
+# An empty vector means FIMS builds the population length bins from the fleet
+# bins.
+population_length_bins <- function(data) {
+  if (!all(c("fleet", "type", "length") %in% colnames(data))) {
+    return(numeric())
+  }
+  data |>
+    dplyr::filter(.data[["type"]] == "length_bin", is.na(.data[["fleet"]])) |>
+    dplyr::pull(.data[["length"]]) |>
+    sort()
+}
+
+# Adds the upper edge of the last bin to a vector of lower edges. As in C++
+# (SizeGridBuilder::BuildObservationEdgesFromLowerEdges()), the last bin is as
+# wide as the bin before it.
+length_bin_edges <- function(lower_edges) {
+  n_bins <- length(lower_edges)
+  c(
+    lower_edges,
+    lower_edges[n_bins] + (lower_edges[n_bins] - lower_edges[n_bins - 1])
+  )
+}
+
+# Growth puts no fish outside the population length bins. A fleet bin outside
+# them gets an expected proportion near 0, so observed fish there give a very
+# large likelihood penalty. C++ also rejects a population bin that is wider than a
+# fleet bin it overlaps, and this check gives the user a clearer message.
+validate_population_length_bins <- function(data, fleet_length_bins) {
+  population_rows <- dplyr::filter(
+    data,
+    .data[["type"]] == "length_bin",
+    is.na(.data[["fleet"]])
+  )
+  if (NROW(population_rows) == 0) {
+    return(invisible(TRUE))
+  }
+
+  if (any(!is.na(population_rows[["timing"]]))) {
+    cli::cli_abort(c(
+      "x" = "{.var length_bin} rows with {.code fleet = NA} have non-missing
+      {.var timing} values:
+      {.val {unique(stats::na.omit(population_rows[['timing']]))}}.",
+      "i" = "These rows set the population length bins, which are the same in
+      every year, so they need {.code timing = NA}.",
+      "i" = "Use {.code dplyr::filter(data, type == 'length_bin', is.na(fleet),
+      !is.na(timing))} to find the rows."
+    ))
+  }
+
+  lengths <- population_rows[["length"]]
+  if (anyNA(lengths) || anyDuplicated(lengths) > 0 || length(lengths) < 2) {
+    cli::cli_abort(c(
+      "x" = "{.var length_bin} rows with {.code fleet = NA} have these
+      lengths: {.val {sort(lengths, na.last = TRUE)}}.",
+      "i" = "These rows need at least 2 different lengths and no missing
+      lengths. Each row gives the lower edge of 1 population length bin.",
+      "i" = "Use {.code dplyr::count(dplyr::filter(data, type == 'length_bin',
+      is.na(fleet)), length)} to see the lengths."
+    ))
+  }
+
+  population_edges <- length_bin_edges(sort(lengths))
+  first_edge <- population_edges[1]
+  last_edge <- population_edges[length(population_edges)]
+  # Upper edges are computed, so a population edge can miss a fleet edge by
+  # rounding. Coverage is checked with a tolerance for this reason.
+  tolerance <- 1e-8 * max(1, last_edge - first_edge)
+  fleet_edges <- fleet_length_bins |>
+    purrr::keep(\(bins) length(bins) >= 2) |>
+    purrr::map(length_bin_edges)
+
+  uncovered_fleets <- fleet_edges |>
+    purrr::keep(\(edges) {
+      first_edge > edges[1] + tolerance ||
+        last_edge < edges[length(edges)] - tolerance
+    }) |>
+    names()
+  if (length(uncovered_fleets) > 0) {
+    cli::cli_abort(c(
+      "x" = "The population length bins span {.val {first_edge}} to
+      {.val {last_edge}}. This does not cover the length bins of
+      {cli::qty(length(uncovered_fleets))}fleet{?s}
+      {.val {uncovered_fleets}}.",
+      "i" = "The population length bins must span every fleet's length bins.
+      The last bin of each set is as wide as the bin before it.",
+      "i" = "Use {.code dplyr::distinct(dplyr::filter(data, type %in%
+      c('length_bin', 'length_comp')), fleet, length)} to compare the
+      population and fleet lengths."
+    ))
+  }
+
+  # Same rule and tolerance as EnforcePopulationGridNotCoarserThanFleetBins()
+  # in C++, which runs only with growth that gives length at age. R also checks
+  # with EWAA growth, so invalid bins are caught before they are ignored.
+  population_widths <- diff(population_edges)
+  width_tolerance <- 1e-12 * pmax(population_widths, 1)
+  coarser_fleets <- fleet_edges |>
+    purrr::keep(\(edges) {
+      n_population <- length(population_edges)
+      n_fleet <- length(edges)
+      overlap <- outer(population_edges[-1], edges[-1], pmin) -
+        outer(population_edges[-n_population], edges[-n_fleet], pmax)
+      wider <- outer(population_widths, diff(edges), "-")
+      any(overlap > 0 & wider > width_tolerance)
+    }) |>
+    names()
+  if (length(coarser_fleets) > 0) {
+    cli::cli_abort(c(
+      "x" = "Some population length bins are wider than a length bin they
+      overlap for {cli::qty(length(coarser_fleets))}fleet{?s}
+      {.val {coarser_fleets}}.",
+      "i" = "Each population length bin must be no wider than any fleet length
+      bin it overlaps.",
+      "i" = "Use {.code dplyr::distinct(dplyr::filter(data, type %in%
+      c('length_bin', 'length_comp')), fleet, length)} to compare the
+      population and fleet lengths."
+    ))
+  }
+  invisible(TRUE)
+}
+
 # Constructors ----
 
 # All constructors in this file are documented in 1 roxygen file via @rdname.
@@ -1748,6 +1869,7 @@ FIMSFrame <- function(data) {
     } else {
       resolved_fleet_length_bins <- resolve_fleet_length_bins(data)
       lengths <- sort(unique(unlist(resolved_fleet_length_bins, use.names = FALSE)))
+      validate_population_length_bins(data, resolved_fleet_length_bins)
 
       # Check that the age column exists b/c conversion data depends on it
       if (!"age" %in% colnames(data)) {

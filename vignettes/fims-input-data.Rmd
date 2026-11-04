@@ -181,6 +181,30 @@ The `length_bin` data type defines length bins without providing length-composit
 
 For `length_bin` rows, the `length` column contains the lower edge of each length bin, the same as for length compositions. The `observed`, `age`, and `uncertainty` columns should usually be `NA`. The `fleet` column identifies which fleet or survey the length bins apply to, and `timing` can be `NA` unless fleet-specific timing is needed.
 
+`length_bin` rows with `fleet = NA` and `timing = NA` set the population length bins instead. Growth uses these bins for the distribution of length at age, and the expected length compositions of each fleet are built from them. These rows never set fleet bins, even though `fleet = NA` means "shared by all fleets" for `age_to_length_conversion` rows. The population length bins must span every fleet's length bins, and no population bin can be wider than a fleet bin it overlaps. As for fleet bins, the last population bin is as wide as the bin before it. A population bin that crosses a fleet bin edge is split between the 2 fleet bins as if its fish were spread evenly within it, so fleet bin edges should also be population bin edges.
+
+The first and last population length bins hold all smaller and all larger fish, so the last bin should start above the length of nearly all fish. Without these rows, FIMS uses bins 1 unit wide (1 mm for `data_big`) from the smallest fleet lower edge to the largest fleet upper edge, plus 1 more bin. Adding these rows can change weight at age, and so biomass, even without length compositions, because weight at age is then averaged over the length distribution at age. Population length bins need a growth module that gives length at age, so they are not used with `EWAA` growth.
+
+```{r data_big-population-length-bins}
+# population length bins 10 mm wide with lower edges from 0 to 1190 mm, which
+# span the data_big fleet length bins (0 to 1150 mm)
+population_length_bins <- tibble::tibble(
+  type = "length_bin",
+  fleet = NA_character_,
+  age = NA_integer_,
+  length = seq(0, 1190, by = 10),
+  timing = NA_real_,
+  observed = NA_real_,
+  unit = NA_character_,
+  uncertainty = NA_character_
+)
+data_with_population_bins <- dplyr::bind_rows(
+  FIMS::data_big,
+  population_length_bins
+)
+FIMSFrame(data_with_population_bins)
+```
+
 ## Weight-at-age data (`type == "weight_at_age"`)
 
 The weight-at-age data are not currently included in the likelihood and are just used for converting from numbers to biomass in the population dynamics. The `unit` column should be `mt` and the uncertainty should be `NA`.
