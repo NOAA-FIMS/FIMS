@@ -240,17 +240,16 @@ class GrowthModel : public GrowthModelBase<Type> {
     Type sd_laa = length_at_age_sd_at_reference_age_young_;
     if (n_ages_ > 1) {
       // Hold SD at its endpoint values outside the reference-age interval.
-      const Type age_above_young = fims_math::cond_exp_lt(
-          age, vb_.reference_age_for_length_young,
-          vb_.reference_age_for_length_young, age);
+      const Type age_above_young =
+          fims_math::cond_exp_lt(age, vb_.reference_age_for_length_young,
+                                 vb_.reference_age_for_length_young, age);
       const Type interpolation_age = fims_math::cond_exp_lt(
           vb_.reference_age_for_length_old, age_above_young,
           vb_.reference_age_for_length_old, age_above_young);
 
-      sd_laa +=
-          vb_.growth_fraction(interpolation_age) *
-          (length_at_age_sd_at_reference_age_old_ -
-           length_at_age_sd_at_reference_age_young_);
+      sd_laa += vb_.growth_fraction(interpolation_age) *
+                (length_at_age_sd_at_reference_age_old_ -
+                 length_at_age_sd_at_reference_age_young_);
     }
 
     return fims_math::ad_max(sd_laa, static_cast<Type>(1e-8));
