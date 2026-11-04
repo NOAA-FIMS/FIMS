@@ -8,7 +8,8 @@ fims_input_types <- c(
   "maturity_at_age",
   "weight_at_age",
   "spawning_weight_at_age",
-  "fecundity_at_age"
+  "fecundity_at_age",
+  "fecundity_at_length"
 )
 
 usethis::use_data(fims_input_types, overwrite = TRUE)

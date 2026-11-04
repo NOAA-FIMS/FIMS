@@ -1744,6 +1744,161 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
   invisible(TRUE)
 }
 
+# Builds 1 value per year and population length bin, ordered by year then
+# length bin as the C++ population reads them. Rows with a timing are used for
+# that year and rows with timing = NA for every other year.
+at_length_by_year <- function(rows, lengths, years) {
+  year_rows <- rows |>
+    dplyr::filter(!is.na(.data[["timing"]])) |>
+    dplyr::select(dplyr::all_of(c("timing", "length", "observed")))
+  default_rows <- rows |>
+    dplyr::filter(is.na(.data[["timing"]])) |>
+    dplyr::select(dplyr::all_of("length"), default_observed = "observed")
+  tibble::tibble(
+    timing = rep(years, each = length(lengths)),
+    length = rep(lengths, times = length(years))
+  ) |>
+    dplyr::left_join(year_rows, by = c("timing", "length")) |>
+    dplyr::left_join(default_rows, by = "length") |>
+    dplyr::mutate(
+      observed = dplyr::coalesce(
+        .data[["observed"]],
+        .data[["default_observed"]]
+      )
+    ) |>
+    dplyr::pull(.data[["observed"]])
+}
+
+# Fecundity at length is given on the population length bins and is not fit
+# to data, so it follows the year rules of fecundity at age: rows with
+# timing = NA are the default for every year, rows with a timing replace it for
+# that year, and every timing needs 1 row per population length bin.
+validate_fecundity_at_length <- function(data, years) {
+  fecundity_rows <- dplyr::filter(
+    data,
+    .data[["type"]] == "fecundity_at_length"
+  )
+  if (NROW(fecundity_rows) == 0) {
+    return(invisible(TRUE))
+  }
+
+  population_lengths <- population_length_bins(data)
+  if (length(population_lengths) == 0) {
+    cli::cli_abort(c(
+      "x" = "{.var fecundity_at_length} rows need population length bins.",
+      "i" = "Add {.var length_bin} rows with {.code fleet = NA} and
+      {.code timing = NA} that give the lower edge of each population length
+      bin.",
+      "i" = "See the length bins section of
+      {.code vignette(\"fims-input-data\", package = \"FIMS\")}."
+    ))
+  }
+
+  fecundity_fleets <- unique(stats::na.omit(fecundity_rows[["fleet"]]))
+  if (length(fecundity_fleets) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var fecundity_at_length} has rows for
+      {cli::qty(length(fecundity_fleets))}fleet{?s} {.val {fecundity_fleets}}.",
+      "i" = "{.var fecundity_at_length} is an input for the population, so its
+      rows need {.code fleet = NA}.",
+      "i" = "Use {.code dplyr::filter(data, type == 'fecundity_at_length',
+      !is.na(fleet))} to find the rows."
+    ))
+  }
+
+  outside_timings <- setdiff(
+    stats::na.omit(unique(fecundity_rows[["timing"]])),
+    years
+  )
+  if (length(outside_timings) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var fecundity_at_length} has rows for timings outside the model
+      years and the year after the last: {.val {outside_timings}}.",
+      "i" = "Rows can only be given for {min(years)}-{max(years)}.",
+      "i" = "Use {.code dplyr::filter(data, type == 'fecundity_at_length',
+      !timing %in% {min(years)}:{max(years)})} to find the rows."
+    ))
+  }
+
+  invalid_values <- fecundity_rows[["observed"]][
+    is.na(fecundity_rows[["observed"]]) | fecundity_rows[["observed"]] < 0
+  ]
+  if (length(invalid_values) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var fecundity_at_length} has values that are missing or
+      negative: {.val {unique(invalid_values)}}.",
+      "i" = "Every row needs a value of 0 or more. Missing values, including
+      -999, are not allowed.",
+      "i" = "Use {.code dplyr::filter(data, type == 'fecundity_at_length',
+      is.na(observed) | observed < 0)} to find the rows."
+    ))
+  }
+
+  timing_labels <- fecundity_rows |>
+    dplyr::summarize(
+      complete = length(.data[["length"]]) == length(population_lengths) &&
+        setequal(.data[["length"]], population_lengths),
+      .by = dplyr::all_of("timing")
+    ) |>
+    dplyr::filter(!.data[["complete"]]) |>
+    dplyr::mutate(
+      label = dplyr::if_else(
+        is.na(.data[["timing"]]),
+        "NA",
+        as.character(.data[["timing"]])
+      )
+    ) |>
+    dplyr::pull(.data[["label"]])
+  if (length(timing_labels) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var fecundity_at_length} does not have 1 row for each
+      population length bin for these timings: {.val {timing_labels}}.",
+      "i" = "Each timing needs 1 row for each population length bin, with the
+      lower edges given by the {.var length_bin} rows with
+      {.code fleet = NA}.",
+      "i" = "Use {.code dplyr::count(dplyr::filter(data, type ==
+      'fecundity_at_length'), timing, length)} to see the rows."
+    ))
+  }
+
+  # A value of 0 at every length makes spawning output 0 in that year, and
+  # then recruitment and the objective function are undefined (NaN)
+  all_zero_timings <- fecundity_rows |>
+    dplyr::summarize(
+      all_zero = all(.data[["observed"]] == 0),
+      .by = dplyr::all_of("timing")
+    ) |>
+    dplyr::filter(.data[["all_zero"]]) |>
+    dplyr::pull(.data[["timing"]])
+  if (length(all_zero_timings) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var fecundity_at_length} is 0 at every length for these
+      timings: {.val {all_zero_timings}}.",
+      "i" = "Spawning output would be 0, which makes recruitment and the
+      objective function undefined.",
+      "i" = "Use {.code dplyr::filter(data, type == 'fecundity_at_length',
+      observed == 0)} to find the rows."
+    ))
+  }
+
+  if (!any(is.na(fecundity_rows[["timing"]]))) {
+    missing_years <- setdiff(years, fecundity_rows[["timing"]])
+    if (length(missing_years) > 0) {
+      cli::cli_abort(c(
+        "x" = "{.var fecundity_at_length} is missing these years:
+        {.val {missing_years}}.",
+        "i" = "{.var fecundity_at_length} is needed for every model year and
+        the year after the last one. A {.var timing} applies to that year
+        only. Add rows for the missing years, or set {.code timing = NA} for 1
+        set of values that is used for every year without its own rows.",
+        "i" = "Use {.code dplyr::distinct(dplyr::filter(data, type ==
+        'fecundity_at_length'), timing)} to see the years with rows."
+      ))
+    }
+  }
+  invisible(TRUE)
+}
+
 # Constructors ----
 
 # All constructors in this file are documented in 1 roxygen file via @rdname.
@@ -1869,7 +2024,7 @@ FIMSFrame <- function(data) {
     data,
     !.data$type %in% c(
       "age_to_length_conversion", "weight_at_age", "spawning_weight_at_age",
-      "fecundity_at_age", "maturity_at_age"
+      "fecundity_at_age", "maturity_at_age", "fecundity_at_length"
     )
   ) |>
     dplyr::pull(.data$timing)
@@ -1981,6 +2136,7 @@ FIMSFrame <- function(data) {
     )
   }
   validate_maturity_at_age(data)
+  validate_fecundity_at_length(data, years = start_year:(end_year + 1))
 
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with model_*() are correct.

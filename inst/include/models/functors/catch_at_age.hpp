@@ -531,6 +531,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * defaults to 1, so without either input this is the population weight at
    * age and spawning output is spawning biomass.
    *
+   * With fecundity at length \f$f_{l,y}\f$, spawning weight is replaced by
+   * fecundity at length averaged over the distribution of length at age on
+   * the population length bins \f$l\f$:
+   * \f[
+   * f_{a,y} \sum_{l} P(l \mid a, y) f_{l,y}
+   * \f]
+   *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
@@ -540,16 +547,32 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year,
       size_t age) {
     size_t i_age_year = year * population->n_ages + age;
-    Type spawning_weight;
-    if (population->spawning_weight_at_age.size() > 0) {
-      spawning_weight = population->spawning_weight_at_age[i_age_year];
+    Type spawning_output;
+    if (population->fecundity_at_length.size() > 0) {
+      if (population->size_distribution_provider == nullptr) {
+        throw std::runtime_error(
+            "Population fecundity_at_length needs growth that gives length at "
+            "age and population length bins.");
+      }
+      // The year after the last model year uses the length at age of the last
+      // model year, as PopulationMeanWeightAA() does
+      size_t size_year = (std::min)(year, population->n_years - 1);
+      size_t n_bins = population->size_grid.n_bins;
+      spawning_output = static_cast<Type>(0.0);
+      for (size_t l = 0; l < n_bins; l++) {
+        spawning_output += population->size_distribution_provider->ProbSize(
+                               size_year, age, l) *
+                           population->fecundity_at_length[year * n_bins + l];
+      }
+    } else if (population->spawning_weight_at_age.size() > 0) {
+      spawning_output = population->spawning_weight_at_age[i_age_year];
     } else {
-      spawning_weight = PopulationMeanWeightAA(population, year, age);
+      spawning_output = PopulationMeanWeightAA(population, year, age);
     }
     if (population->fecundity_at_age.size() > 0) {
-      spawning_weight *= population->fecundity_at_age[i_age_year];
+      spawning_output *= population->fecundity_at_age[i_age_year];
     }
-    return spawning_weight;
+    return spawning_output;
   }
 
   /**

@@ -358,6 +358,19 @@ test_that("`FIMSFrame()` accepts population length bins that cover the fleet len
   ))
 })
 
+test_that("`FIMSFrame()` accepts fecundity at length on the population length bins", {
+  population_lengths <- seq(0, 1150, by = 50)
+  #' @description Test that `FIMSFrame()` accepts fecundity at length with a `timing = NA` default and a row set for 1 year.
+  expect_s4_class(
+    FIMSFrame(dplyr::bind_rows(
+      with_population_bins(population_lengths),
+      fecundity_at_length_rows(population_lengths, population_lengths),
+      fecundity_at_length_rows(population_lengths, population_lengths, 5)
+    )),
+    "FIMSFrame"
+  )
+})
+
 ## Edge handling ----
 test_that("`FIMSFrame()` returns correct outputs for edge cases", {
   #' @description Test that `get_data()` retrieves the data slot as a data frame when passed a data frame rather than a FIMSFrame object.
@@ -852,6 +865,53 @@ test_that("`FIMSFrame()` returns errors for invalid population length bins", {
     ),
     "(?s)wider than a length bin.*fleet\\s+\"survey1\"\\.",
     perl = TRUE
+  )
+})
+
+test_that("`FIMSFrame()` returns errors for invalid fecundity at length", {
+  population_lengths <- seq(0, 1150, by = 50)
+  with_fecundity <- function(rows) {
+    dplyr::bind_rows(with_population_bins(population_lengths), rows)
+  }
+  fecundity_rows <- fecundity_at_length_rows(
+    population_lengths,
+    population_lengths
+  )
+
+  #' @description Test that `FIMSFrame()` errors when there are fecundity-at-length rows but no population length bins.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(data_big, fecundity_rows)),
+    "need population length bins"
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity-at-length rows have a fleet.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::mutate(fecundity_rows, fleet = "fleet1"))),
+    "has rows for\\s+fleet\\s+\"fleet1\""
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity-at-length rows have a timing after the year after the last model year.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::mutate(fecundity_rows, timing = 40))),
+    "timings outside the model"
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity at length is negative.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::mutate(fecundity_rows, observed = -1))),
+    "missing or\\s+negative"
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity at length is missing a population length bin.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::filter(fecundity_rows, length > 0))),
+    "does not have 1 row for each\\s+population length bin"
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity at length is 0 at every length, because spawning output would be 0.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::mutate(fecundity_rows, observed = 0))),
+    "is 0 at every length"
+  )
+  #' @description Test that `FIMSFrame()` errors when fecundity at length skips years and has no `timing = NA` default.
+  expect_error(
+    FIMSFrame(with_fecundity(dplyr::mutate(fecundity_rows, timing = 1))),
+    "fecundity_at_length` is missing these years"
   )
 })
 

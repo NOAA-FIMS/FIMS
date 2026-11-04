@@ -50,6 +50,13 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    * output is spawning biomass.
    */
   fims::Vector<Type> fecundity_at_age;
+  /**
+   * @brief Spawning output of a fish in each population length bin, e.g.,
+   * eggs, ordered by year and then length bin for the model years and the
+   * year after. When it is not empty, it replaces spawning weight at age in
+   * spawning output.
+   */
+  fims::Vector<Type> fecundity_at_length;
   fims::Vector<Type> log_f_multiplier;       /*!< estimated parameter: vector of
     annual fishing mortality multipliers to scale total mortality of all fleets*/
   fims::Vector<Type> spawning_biomass_ratio; /*!< estimated parameter: vector of

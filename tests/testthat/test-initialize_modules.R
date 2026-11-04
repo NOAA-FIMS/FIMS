@@ -605,6 +605,110 @@ test_that("`initialize_fims()` builds the length distribution at age on the popu
   )
 })
 
+test_that("`initialize_population()` uses fecundity at length for spawning output", {
+  population_lengths <- seq(0, 1150, by = 50)
+  bins_data <- dplyr::bind_rows(
+    data_big,
+    population_length_bin_rows(population_lengths)
+  )
+  growth <- setup_default_Growth(
+    data = FIMSFrame(bins_data),
+    module_type = "VonBertalanffySchnute"
+  )
+  growth_value <- function(label) growth[["value"]][growth[["label"]] == label]
+  # Weight at each bin center. Without fecundity at length, spawning output at
+  # age is this weight averaged over the length distribution at age.
+  weight_at_length <- growth_value("length_weight_a") *
+    (population_lengths + 25)^growth_value("length_weight_b")
+  get_report_with <- function(...) {
+    frame <- FIMSFrame(dplyr::bind_rows(bins_data, ...))
+    get_population_report(frame, setup_vonb_parameters(frame))
+  }
+  base_report <- get_report_with()
+  weight_report <- get_report_with(
+    fecundity_at_length_rows(population_lengths, weight_at_length)
+  )
+  double_report <- get_report_with(
+    fecundity_at_length_rows(population_lengths, 2 * weight_at_length)
+  )
+  year_5_report <- get_report_with(
+    fecundity_at_length_rows(population_lengths, weight_at_length),
+    fecundity_at_length_rows(population_lengths, 2 * weight_at_length, 5)
+  )
+
+  #' @description Test that fecundity at length equal to weight at length gives the same spawning output as no fecundity at length.
+  expect_equal(
+    object = weight_report[["spawning_biomass"]],
+    expected = base_report[["spawning_biomass"]]
+  )
+  #' @description Test that doubling fecundity at length doubles spawning output.
+  expect_equal(
+    object = double_report[["spawning_biomass"]][[1]],
+    expected = 2 * weight_report[["spawning_biomass"]][[1]]
+  )
+  #' @description Test that doubling fecundity at length does not change the jnll, because recruitment depends on spawning output relative to unfished.
+  expect_equal(
+    object = double_report[["jnll"]],
+    expected = weight_report[["jnll"]]
+  )
+  #' @description Test that fecundity-at-length rows for year 5 leave spawning output in years 1-4 unchanged.
+  expect_equal(
+    object = year_5_report[["spawning_biomass"]][[1]][1:4],
+    expected = weight_report[["spawning_biomass"]][[1]][1:4]
+  )
+  #' @description Test that fecundity-at-length rows for year 5 change spawning output in year 5.
+  expect_false(isTRUE(all.equal(
+    year_5_report[["spawning_biomass"]][[1]][5],
+    weight_report[["spawning_biomass"]][[1]][5]
+  )))
+
+  fecundity_at_age_rows <- tibble::tibble(
+    type = "fecundity_at_age",
+    fleet = NA_character_,
+    age = get_ages(FIMSFrame(data_big)),
+    length = NA_real_,
+    timing = NA_real_,
+    observed = 2,
+    unit = NA_character_,
+    uncertainty = NA_character_
+  )
+  #' @description Test that `initialize_population()` warns that fecundity at age multiplies fecundity at length.
+  expect_warning(
+    fecundity_at_age_report <- get_report_with(
+      fecundity_at_length_rows(population_lengths, weight_at_length),
+      fecundity_at_age_rows
+    ),
+    "multiplies spawning output"
+  )
+  #' @description Test that fecundity at age of 2 doubles spawning output from fecundity at length.
+  expect_equal(
+    object = fecundity_at_age_report[["spawning_biomass"]][[1]],
+    expected = 2 * weight_report[["spawning_biomass"]][[1]]
+  )
+
+  ewaa_frame <- FIMSFrame(dplyr::bind_rows(
+    bins_data,
+    fecundity_at_length_rows(population_lengths, weight_at_length)
+  ))
+  ewaa_report <- get_population_report(data, default_parameters)
+  #' @description Test that `initialize_population()` warns that fecundity at length is not used with EWAA growth.
+  expect_warning(
+    expect_warning(
+      ewaa_fecundity_report <- get_population_report(
+        ewaa_frame,
+        setup_default_parameters(ewaa_frame)
+      ),
+      "fecundity_at_length` rows are not used"
+    ),
+    "population length bins"
+  )
+  #' @description Test that fecundity at length does not change spawning output with EWAA growth.
+  expect_equal(
+    object = ewaa_fecundity_report[["spawning_biomass"]],
+    expected = ewaa_report[["spawning_biomass"]]
+  )
+})
+
 ## Error handling ----
 test_that("`initialize_population()` returns correct error messages", {
   #' @description Test that `initialize_population()` handles missing linked_ids correctly.
@@ -615,6 +719,25 @@ test_that("`initialize_population()` returns correct error messages", {
       linked_ids = c(growth = 1)
     ),
     "`linked_ids` for population must include `growth`, `maturity`, and"
+  )
+  clear()
+
+  population_lengths <- seq(0, 1150, by = 50)
+  spawning_weight_rows <- dplyr::filter(data_big, type == "weight_at_age") |>
+    dplyr::mutate(type = "spawning_weight_at_age", fleet = NA_character_)
+  fecundity_frame <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    population_length_bin_rows(population_lengths),
+    fecundity_at_length_rows(population_lengths, population_lengths),
+    spawning_weight_rows
+  ))
+  #' @description Test that `initialize_population()` errors when there are both fecundity-at-length and spawning-weight-at-age rows.
+  expect_error(
+    initialize_test_population(
+      setup_vonb_parameters(fecundity_frame),
+      fecundity_frame
+    ),
+    "both `fecundity_at_length` and\\s+`spawning_weight_at_age`"
   )
   clear()
 })

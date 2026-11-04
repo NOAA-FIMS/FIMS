@@ -582,3 +582,25 @@ population_length_bin_rows <- function(lengths, timing = NA_real_) {
     uncertainty = NA_character_
   )
 }
+
+#' Make `fecundity_at_length` rows on the population length bins
+#'
+#' @param lengths A numeric vector of the lower edges of the population length
+#'   bins.
+#' @param values A numeric vector of fecundity at each length.
+#' @param timing A numeric timing for the rows. `NA` gives the default for every
+#'   year.
+#'
+#' @return A tibble with the columns of `data_big`.
+fecundity_at_length_rows <- function(lengths, values, timing = NA_real_) {
+  tibble::tibble(
+    type = "fecundity_at_length",
+    fleet = NA_character_,
+    age = NA_real_,
+    length = lengths,
+    timing = timing,
+    observed = values,
+    unit = "eggs",
+    uncertainty = NA_character_
+  )
+}

@@ -37,7 +37,8 @@ units for each data type are as follows. \code{mt} or \code{number} are used for
 \code{index} and \code{catch} data, with 1 unit per fleet for each type. \code{mt} is
 used for \code{weight_at_age} and \code{spawning_weight_at_age} data.
 \code{fecundity_at_age} is spawning output per unit of spawning weight, e.g.,
-\code{eggs/mt}. \code{number} or \code{proportion} are each viable units for the
+\code{eggs/mt}. \code{fecundity_at_length} is spawning output per fish, e.g.,
+\code{eggs}. \code{number} or \code{proportion} are each viable units for the
 composition data, where the former is the preferred unit of
 measurement. \code{proportion} is used for \code{maturity_at_age} data.}
 \item{uncertainty}{A right-handed formula specifying the distributional
