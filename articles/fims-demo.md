@@ -676,16 +676,34 @@ prints the result of every check in one place, similar to
 sanity <- sanity_fims(fit)
 ```
 
-    ## ✖ No convergence checks were run because the model was not optimized.
+    ## ── FIMS sanity check ───────────────────────────────────────────────────────────
 
-    ## ℹ Use `fit_fims(optimize = TRUE)`.
+    ## ✔ optimizer: relative convergence (4)
+
+    ## ✔ max_gradient: Maximum absolute gradient is below 0.001.
+
+    ## ✔ nll: Negative log-likelihood and its components are finite.
+
+    ## ✔ hessian: Hessian is positive definite.
+
+    ## ✔ standard_errors: No standard errors are NA.
+
+    ## ✔ large_standard_errors: No fixed or random effect has a standard error above
+    ##   the threshold.
+
+    ## ✔ condition_number: Condition number of the Hessian is at or below the
+    ##   threshold.
+
+    ## ────────────────────────────────────────────────────────────────────────────────
+
+    ## ✔ All 7 checks are OK.
 
 ``` r
 
 sanity[["all_ok"]]
 ```
 
-    ## [1] FALSE
+    ## [1] TRUE
 
 The same checks are stored on the fit and returned as a tibble by
 [`get_convergence()`](https://NOAA-FIMS.github.io/FIMS/reference/get_FIMSFit.md).
@@ -700,9 +718,16 @@ collected across many fits, e.g., in a simulation.
 get_convergence(fit)
 ```
 
-    ## # A tibble: 0 × 6
-    ## # ℹ 6 variables: check <chr>, severity <chr>, value <dbl>, threshold <dbl>,
-    ## #   parameter <chr>, message <chr>
+    ## # A tibble: 7 × 6
+    ##   check                 severity       value  threshold parameter        message
+    ##   <chr>                 <chr>          <dbl>      <dbl> <chr>            <chr>  
+    ## 1 optimizer             OK          0             0     <NA>             relati…
+    ## 2 max_gradient          OK          0.000246      0.001 Population.1.lo… Maximu…
+    ## 3 nll                   OK       3231.           NA     <NA>             Negati…
+    ## 4 hessian               OK         NA            NA     <NA>             Hessia…
+    ## 5 standard_errors       OK          0             0     <NA>             No sta…
+    ## 6 large_standard_errors OK          0          1000     <NA>             No fix…
+    ## 7 condition_number      OK         89.3      100000     Recruitment.1.l… Condit…
 
 ### Oh no! My model didn’t converge! 😨 HELP‼️
 
@@ -803,7 +828,7 @@ unconverged_fit <- parameters_4_model |>
     ## ✖ Convergence: "FAIL" from "optimizer", "max_gradient", and "sdreport". Use
     ##   `sanity_fims(fit)` to see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 2.95136 seconds
+    ## ℹ Total run time was 2.98139 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 27.41724
     ## ℹ Negative log likelihood (NLL):
@@ -1023,7 +1048,7 @@ high_slope_fit <- parameters_high_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 57.29892 seconds
+    ## ℹ Total run time was 57.88327 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00024
     ## ℹ Negative log likelihood (NLL):
@@ -1059,7 +1084,7 @@ low_slope_fit <- parameters_low_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 55.73468 seconds
+    ## ℹ Total run time was 56.21532 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 5e-04
     ## ℹ Negative log likelihood (NLL):
@@ -1183,7 +1208,7 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 57.62173 seconds
+    ## ℹ Total run time was 57.99117 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00051
     ## ℹ Negative log likelihood (NLL):
@@ -1295,7 +1320,7 @@ age_only_fit <- parameters_4_model |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 10.71518 seconds
+    ## ℹ Total run time was 10.93446 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00022
     ## ℹ Negative log likelihood (NLL):
@@ -1354,7 +1379,7 @@ length_only_fit <- parameters_4_model |>
     ## ! Convergence: "WARN" from "large_standard_errors". Use `sanity_fims(fit)` to
     ##   see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.27843 minutes
+    ## ℹ Total run time was 1.28275 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00027
     ## ℹ Negative log likelihood (NLL):

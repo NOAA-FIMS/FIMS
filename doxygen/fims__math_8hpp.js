@@ -3,6 +3,7 @@ var fims__math_8hpp =
     [ "fims_math::ad_fabs", "fims__math_8hpp.html#abda4b1b8b7ea34fcde2a05e78217d522", null ],
     [ "fims_math::ad_max", "fims__math_8hpp.html#a54cfbb09833fa0de10e18203526e8321", null ],
     [ "fims_math::ad_min", "fims__math_8hpp.html#a4c3897f03cbc7860a4b73b21f58558f6", null ],
+    [ "fims_math::apply_ageing_error", "fims__math_8hpp.html#a15e62e8fcb8c7f077c332030ee04e70f", null ],
     [ "fims_math::double_logistic", "fims__math_8hpp.html#a4f55d4bf901b546a57ed3a626a445e52", null ],
     [ "fims_math::inv_logit", "fims__math_8hpp.html#ab0329c7a64173d4612e7a1d0ddb3f3e6", null ],
     [ "fims_math::logistic", "fims__math_8hpp.html#ae8d003754148800ba87fbf228bc7d062", null ],

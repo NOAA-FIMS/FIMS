@@ -339,6 +339,8 @@ std::set&lt; uint32_t &gt; &amp;&#160;</td><td class="memItemRight" valign="bott
 <tr class="memitem:ada7b94e7b412d51f06de1a00e25a51f7" id="r_ada7b94e7b412d51f06de1a00e25a51f7"><td class="memItemLeft" align="right" valign="top">Type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ada7b94e7b412d51f06de1a00e25a51f7">PopulationMeanWeightAA</a> (const std::shared_ptr&lt; <a class="el" href="structfims__popdy_1_1Population.html">fims_popdy::Population</a>&lt; Type &gt; &gt; &amp;population, size_t year, size_t age)</td></tr>
 <tr class="memdesc:ada7b94e7b412d51f06de1a00e25a51f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates population-level mean weight-at-age.  <br /></td></tr>
 <tr class="memitem:a6270771e42f11407eb87b099087b1b55" id="r_a6270771e42f11407eb87b099087b1b55"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6270771e42f11407eb87b099087b1b55">evaluate_length_comp</a> ()</td></tr>
+<tr class="memitem:a7e16b202e4e84425708bbb3865dac548" id="r_a7e16b202e4e84425708bbb3865dac548"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7e16b202e4e84425708bbb3865dac548">evaluate_ageing_error</a> ()</td></tr>
+<tr class="memdesc:a7e16b202e4e84425708bbb3865dac548"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply each fleet's ageing error to its expected age composition.  <br /></td></tr>
 <tr class="memitem:afd9d2e41729f03ac80fd1d449bb6d8f9" id="r_afd9d2e41729f03ac80fd1d449bb6d8f9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afd9d2e41729f03ac80fd1d449bb6d8f9">evaluate_index</a> ()</td></tr>
 <tr class="memitem:a112f8522f15b982a412de0f31296665e" id="r_a112f8522f15b982a412de0f31296665e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a112f8522f15b982a412de0f31296665e">evaluate_catch</a> ()</td></tr>
 <tr class="memitem:a84c67ee2edf996a8f3cf736801a6eeb6" id="r_a84c67ee2edf996a8f3cf736801a6eeb6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a84c67ee2edf996a8f3cf736801a6eeb6">Evaluate</a> ()</td></tr>
@@ -1787,6 +1789,36 @@ template&lt;typename Type&gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Evaluate the proportion of catch numbers at age. </p>
+
+</div>
+</div>
+<a id="a7e16b202e4e84425708bbb3865dac548" name="a7e16b202e4e84425708bbb3865dac548"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7e16b202e4e84425708bbb3865dac548">&#9670;&#160;</a></span>evaluate_ageing_error()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classfims__popdy_1_1CatchAtAge.html">fims_popdy::CatchAtAge</a>&lt; Type &gt;::evaluate_ageing_error </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Apply each fleet's ageing error to its expected age composition. </p>
+<p>Moves the expected age composition from true age to observed age. Rows sum to 1, so expected numbers keep the observed sample size. Runs after <a class="el" href="#a6270771e42f11407eb87b099087b1b55">evaluate_length_comp()</a>, which needs true ages. </p>
 
 </div>
 </div>

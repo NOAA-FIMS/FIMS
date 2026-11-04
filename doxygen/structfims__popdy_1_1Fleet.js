@@ -5,6 +5,7 @@ var structfims__popdy_1_1Fleet =
     [ "Prepare", "structfims__popdy_1_1Fleet.html#a889b7e1e0b2aa9f4a3114d3d6f8ad577", null ],
     [ "age_to_length_conversion", "structfims__popdy_1_1Fleet.html#ab0ba9edd8d93288939648869c2ab6996", null ],
     [ "age_to_length_conversion_model", "structfims__popdy_1_1Fleet.html#ac0dc3820cc040fbfe846e1fe7660a6da", null ],
+    [ "ageing_error", "structfims__popdy_1_1Fleet.html#a500016a6877021710275277dcc9cb6f7", null ],
     [ "fleet_observed_agecomp_data_id_m", "structfims__popdy_1_1Fleet.html#a650c1f21f4efce9a78472408e4abd2d2", null ],
     [ "fleet_observed_catch_data_id_m", "structfims__popdy_1_1Fleet.html#afd765612ff3e1f5c6c5f0b3e4882f986", null ],
     [ "fleet_observed_index_data_id_m", "structfims__popdy_1_1Fleet.html#ab8fa4db5de7dba45fece778e182d4e27", null ],

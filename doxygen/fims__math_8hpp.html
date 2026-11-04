@@ -246,6 +246,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a4c3897f03cbc7860a4b73b21f58558f6 template"><td class="memItemLeft" align="right" valign="top">const Type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4c3897f03cbc7860a4b73b21f58558f6">fims_math::ad_min</a> (const Type &amp;a, const Type &amp;b, Type C=1e-5)</td></tr>
 <tr class="memitem:a54cfbb09833fa0de10e18203526e8321" id="r_a54cfbb09833fa0de10e18203526e8321"><td class="memTemplParams" colspan="2">template&lt;typename Type&gt; </td></tr>
 <tr class="memitem:a54cfbb09833fa0de10e18203526e8321 template"><td class="memItemLeft" align="right" valign="top">const Type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a54cfbb09833fa0de10e18203526e8321">fims_math::ad_max</a> (const Type &amp;a, const Type &amp;b, Type C=1e-5)</td></tr>
+<tr class="memitem:a15e62e8fcb8c7f077c332030ee04e70f" id="r_a15e62e8fcb8c7f077c332030ee04e70f"><td class="memTemplParams" colspan="2">template&lt;typename Type&gt; </td></tr>
+<tr class="memitem:a15e62e8fcb8c7f077c332030ee04e70f template"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; Type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a15e62e8fcb8c7f077c332030ee04e70f">fims_math::apply_ageing_error</a> (const <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; Type &gt; &amp;proportion_at_true_age, const <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; Type &gt; &amp;ageing_error, size_t year=0)</td></tr>
+<tr class="memdesc:a15e62e8fcb8c7f077c332030ee04e70f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts values at true age, proportions or expected numbers, to values at observed age using an ageing error matrix.  <br /></td></tr>
 <tr class="memitem:a2f6d3a9290062d44590350c1bc739217" id="r_a2f6d3a9290062d44590350c1bc739217"><td class="memTemplParams" colspan="2">template&lt;class T&gt; </td></tr>
 <tr class="memitem:a2f6d3a9290062d44590350c1bc739217 template"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2f6d3a9290062d44590350c1bc739217">fims_math::sum</a> (const std::vector&lt; T &gt; &amp;v)</td></tr>
 <tr class="memitem:a60f8fb42e9a4786ca5e30b9fad43afed" id="r_a60f8fb42e9a4786ca5e30b9fad43afed"><td class="memTemplParams" colspan="2">template&lt;class T&gt; </td></tr>
@@ -381,6 +384,62 @@ template&lt;typename Type&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a15e62e8fcb8c7f077c332030ee04e70f" name="a15e62e8fcb8c7f077c332030ee04e70f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15e62e8fcb8c7f077c332030ee04e70f">&#9670;&#160;</a></span>apply_ageing_error()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; Type &gt; fims_math::apply_ageing_error </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; Type &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>proportion_at_true_age</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; Type &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>ageing_error</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t</td>          <td class="paramname"><span class="paramname"><em>year</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Converts values at true age, proportions or expected numbers, to values at observed age using an ageing error matrix. </p>
+<p>Ageing error spreads fish of one true age across several observed ages, so the expected composition of observed ages is</p>
+<p>\( p^{obs}_{a&#39;} = \sum_{a} p_{a} E_{a,a&#39;} \)</p>
+<p>where \( E_{a,a&#39;} \) is the probability that a fish of true age \( a \) is read as age \( a&#39; \). Each row of \( E \) sums to 1, so the total is unchanged. The caller checks the length of <span class="tt">ageing_error</span>.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Type</td><td>The scalar type, a TMB AD type or double. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">proportion_at_true_age</td><td>Values at true age, 1 per model age. </td></tr>
+    <tr><td class="paramname">ageing_error</td><td>1 matrix for all years or 1 per year, with true age as rows and observed age varying fastest. </td></tr>
+    <tr><td class="paramname">year</td><td>Year index, used only when there is 1 matrix per year. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Values at observed age, 1 per model age. </dd></dl>
 
 </div>
 </div>

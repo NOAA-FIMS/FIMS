@@ -93,7 +93,7 @@ GitHub but will not be in your local installation because it is in the
     <p>A data frame with 2808 observations of 8
 variables:</p><dl><dt>type</dt>
 <dd><p>The type of input the row contains. Allowed types include
-age_comp, age_to_length_conversion, index, catch, length_bin, length_comp, and weight_at_age.</p></dd>
+age_comp, age_to_length_conversion, ageing_error, index, catch, length_bin, length_comp, and weight_at_age.</p></dd>
 
 <dt>fleet</dt>
 <dd><p>A character string providing the name of the information
@@ -131,12 +131,15 @@ units for each data type are as follows. <code>mt</code> or <code>number</code> 
 <code>index</code> and <code>catch</code> data, with 1 unit per fleet for each type. <code>mt</code> is
 used for <code>weight_at_age</code> data. <code>number</code> or <code>proportion</code> are each viable
 units for the composition data, where the former is the preferred unit
-of measurement.</p></dd>
+of measurement. <code>proportion</code> is also used for <code>ageing_error</code> data, the
+probability that a fish of a given true age is read as the age in
+<code>age</code>.</p></dd>
 
 <dt>uncertainty</dt>
-<dd><p>A right-handed formula specifying the distributional
-assumptions for the entry in <code>observed</code>. See <code><a href="FIMSFrame.html">FIMSFrame()</a></code> for more
-information about this column.</p></dd>
+<dd><p>A character string with a right-handed formula
+specifying the distributional assumptions for the entry in <code>observed</code>.
+See <code><a href="FIMSFrame.html">FIMSFrame()</a></code> for more information about this column. For
+<code>ageing_error</code> rows, the string is the true age, e.g., <code>"5"</code>.</p></dd>
 
 
 </dl></div>

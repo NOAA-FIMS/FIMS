@@ -1,5 +1,10 @@
 var NAVTREEINDEX7 =
 {
+"structfims__popdy_1_1LogisticSelectivity.html#a47d008ca4b862abca4f361d68b07d4f0":[2,0,5,25,3],
+"structfims__popdy_1_1LogisticSelectivity.html#a7e5e73a7689cefb1949cb844d12307b8":[1,0,0,25,0],
+"structfims__popdy_1_1LogisticSelectivity.html#a7e5e73a7689cefb1949cb844d12307b8":[2,0,5,25,0],
+"structfims__popdy_1_1LogisticSelectivity.html#a9abf9caf9ba8c003ebb2dfa9c2184207":[1,0,0,25,1],
+"structfims__popdy_1_1LogisticSelectivity.html#a9abf9caf9ba8c003ebb2dfa9c2184207":[2,0,5,25,1],
 "structfims__popdy_1_1LogisticSelectivity.html#ac4f5ab8f67acd93af04f1b3c771498c1":[1,0,0,25,2],
 "structfims__popdy_1_1LogisticSelectivity.html#ac4f5ab8f67acd93af04f1b3c771498c1":[2,0,5,25,2],
 "structfims__popdy_1_1MaturityBase.html":[1,0,0,16],

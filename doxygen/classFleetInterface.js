@@ -22,6 +22,7 @@ var classFleetInterface =
     [ "age_to_length_conversion", "classFleetInterface.html#a846dfa86edec8b8a3db754e41bbcfd7c", null ],
     [ "agecomp_expected", "classFleetInterface.html#ad3c5fc3cc8182a701a44f533f092b7f0", null ],
     [ "agecomp_proportion", "classFleetInterface.html#a51586d11eba056f7a959dfc1fcc71913", null ],
+    [ "ageing_error", "classFleetInterface.html#a807bb76afed72211825f771adc5f53f0", null ],
     [ "catch_expected", "classFleetInterface.html#aedeeb0d9257fa46d32a0c654cf89814e", null ],
     [ "catch_numbers", "classFleetInterface.html#ad27a048b53fda65e203f0547c8f5b607", null ],
     [ "catch_numbers_at_age", "classFleetInterface.html#a3ece1bd9592b727fb55fcc98092ac957", null ],

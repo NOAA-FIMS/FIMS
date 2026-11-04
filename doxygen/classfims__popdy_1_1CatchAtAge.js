@@ -35,6 +35,7 @@ var classfims__popdy_1_1CatchAtAge =
     [ "EnsureAllFleetAgeToLengthConversion", "classfims__popdy_1_1CatchAtAge.html#a292f850338c18cf28d1a7181ede45f55", null ],
     [ "Evaluate", "classfims__popdy_1_1CatchAtAge.html#a84c67ee2edf996a8f3cf736801a6eeb6", null ],
     [ "evaluate_age_comp", "classfims__popdy_1_1CatchAtAge.html#a4b7f463cdd464efc2c056a5b8328cec8", null ],
+    [ "evaluate_ageing_error", "classfims__popdy_1_1CatchAtAge.html#a7e16b202e4e84425708bbb3865dac548", null ],
     [ "evaluate_catch", "classfims__popdy_1_1CatchAtAge.html#a112f8522f15b982a412de0f31296665e", null ],
     [ "evaluate_index", "classfims__popdy_1_1CatchAtAge.html#afd9d2e41729f03ac80fd1d449bb6d8f9", null ],
     [ "evaluate_length_comp", "classfims__popdy_1_1CatchAtAge.html#a6270771e42f11407eb87b099087b1b55", null ],

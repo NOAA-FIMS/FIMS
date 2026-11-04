@@ -1,5 +1,6 @@
 var NAVTREEINDEX1 =
 {
+"classFleetInterfaceBase.html#ac9b1c7f3becc53284f7d6e977979e414":[2,0,21,1],
 "classGrowthDerivedObservationInterfaceBase.html":[2,0,22],
 "classGrowthDerivedObservationInterfaceBase.html#a76acce6192ceac36979896026a699701":[2,0,22,2],
 "classGrowthDerivedObservationInterfaceBase.html#adbb6472d0e087dfbf59e2371329ae1f6":[2,0,22,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX1 =
 "classSharedReal.html#a5489c1d8d3128671bc89b685a9611254":[2,0,38,16],
 "classSharedReal.html#a572d3a05dfc9f7e33223968ba1d14843":[2,0,38,37],
 "classSharedReal.html#a5cff409c7cbcaa04c670f17d5f64eb8b":[2,0,38,24],
-"classSharedReal.html#a651cacebfc417faba7b4da1c94dd515c":[2,0,38,26],
-"classSharedReal.html#a67a9b97cee17f1240b6b2b99d10c68cf":[2,0,38,18]
+"classSharedReal.html#a651cacebfc417faba7b4da1c94dd515c":[2,0,38,26]
 };

@@ -21,8 +21,8 @@ A data frame with 2808 observations of 8 variables:
 - type:
 
   The type of input the row contains. Allowed types include age_comp,
-  age_to_length_conversion, index, catch, length_bin, length_comp, and
-  weight_at_age.
+  age_to_length_conversion, ageing_error, index, catch, length_bin,
+  length_comp, and weight_at_age.
 
 - fleet:
 
@@ -66,14 +66,17 @@ A data frame with 2808 observations of 8 variables:
   `index` and `catch` data, with 1 unit per fleet for each type. `mt` is
   used for `weight_at_age` data. `number` or `proportion` are each
   viable units for the composition data, where the former is the
-  preferred unit of measurement.
+  preferred unit of measurement. `proportion` is also used for
+  `ageing_error` data, the probability that a fish of a given true age
+  is read as the age in `age`.
 
 - uncertainty:
 
-  A right-handed formula specifying the distributional assumptions for
-  the entry in `observed`. See
+  A character string with a right-handed formula specifying the
+  distributional assumptions for the entry in `observed`. See
   [`FIMSFrame()`](https://NOAA-FIMS.github.io/FIMS/reference/FIMSFrame.md)
-  for more information about this column.
+  for more information about this column. For `ageing_error` rows, the
+  string is the true age, e.g., `"5"`.
 
 ## Source
 
