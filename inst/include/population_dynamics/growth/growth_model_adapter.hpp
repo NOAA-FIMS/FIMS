@@ -557,7 +557,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
       case LengthReferenceParameterization::kEstimatedReferenceLengths:
       case LengthReferenceParameterization::
           kConstantLengthYoungEstimatedLengthOld:
-        // Recover older length from younger length plus the positive difference.
+        // Recover older length from younger length plus the positive
+        // difference.
         return CurrentMeanLengthYoung() + CurrentMeanLengthOldStorage();
 
       case LengthReferenceParameterization::
