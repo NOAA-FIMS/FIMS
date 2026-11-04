@@ -92,12 +92,12 @@ is the returned object from \code{\link[=setup_default_parameters]{setup_default
 \code{\link[=get_report]{get_report()}} returns the TMB report, where anything that is flagged as
 reportable in the C++ code is returned.
 
-\code{\link[=get_obj]{get_obj()}} returns the output from \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}. After \code{\link[=clear]{clear()}},
-its \code{report()} method returns a \code{jnll} of 0 and keeps the other values from
-its last call. After the fit is read with \code{\link[=readRDS]{readRDS()}} in a new R session,
-its \code{fn()}, \code{gr()}, \code{he()}, and \code{report()} methods return wrong values. Use
-\code{\link[=get_report]{get_report()}}, \code{\link[=get_gradient]{get_gradient()}}, or \code{\link[=get_estimates]{get_estimates()}} instead. These
-return values stored during fitting.
+\code{\link[=get_obj]{get_obj()}} returns the output from \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}. Its methods can use
+the FIMS model that is in memory instead of the model that made the fit.
+This happens after \code{\link[=clear]{clear()}}, after another model is set up, or after the
+fit is read with \code{\link[=readRDS]{readRDS()}}. The methods then return wrong values without
+an error. Use \code{\link[=get_report]{get_report()}}, \code{\link[=get_gradient]{get_gradient()}}, or \code{\link[=get_estimates]{get_estimates()}}
+instead. These return values stored during fitting.
 
 \code{\link[=get_opt]{get_opt()}} returns the output from \code{\link[=nlminb]{nlminb()}}, which is the minimizer used
 in \code{\link[=fit_fims]{fit_fims()}}.
@@ -106,9 +106,8 @@ in \code{\link[=fit_fims]{fit_fims()}}.
 model.
 
 \code{\link[=get_gradient]{get_gradient()}} returns the per-parameter gradient vector at the MLE as
-stored during fitting. Unlike calling \code{get_obj(x)[["gr"]](get_opt(x)[["par"]])}
-this function is safe to call after \code{\link[=clear]{clear()}} because it reads
-from a stored R vector rather than the compiled C++ objective function.
+stored during fitting. It reads a stored R vector, so it does not depend on
+the FIMS model in memory.
 
 \code{\link[=get_sdreport]{get_sdreport()}} returns the list from \code{\link[TMB:sdreport]{TMB::sdreport()}}.
 
