@@ -459,10 +459,11 @@ initialize_population <- function(parameters, data, linked_ids) {
           per fish also changes with age at a given length."
         ))
       }
-      module$fecundity_at_length[] <- at_length_by_year(
+      module[["fecundity_at_length"]][] <- at_age_by_year(
         fecundity_rows,
-        lengths = population_lengths,
-        years = spawning_years
+        ages = population_lengths,
+        years = spawning_years,
+        column = "length"
       )
     }
   }

@@ -269,23 +269,23 @@ Because the 3 values are multiplied, a combined vector can be put in 1 of them w
 
 Fecundity at length needs population length bins (`length_bin` rows with `fleet = NA`) and growth that gives length at age, such as von Bertalanffy growth. With `EWAA` growth the rows are not used and FIMS warns. They cannot be combined with `spawning_weight_at_age` rows. `fecundity_at_age` rows still multiply spawning output, with a warning, so do not also use the combined-vector recipe above. Doubling fecundity at length doubles spawning output and unfished spawning output, so the spawning biomass ratio and recruitment do not change.
 
-The Stock Synthesis fecundity options can be tabulated at the center of each population length bin. Here `a` and `b` are the Stock Synthesis fecundity parameters, and `weight` uses the same length-weight relationship as the growth module, in the same units as the Stock Synthesis model. Options 4 and 5 can be negative for small fish, so they are set to 0.
+The Stock Synthesis fecundity options can be tabulated at the center of each population length bin, as Stock Synthesis does. Here `a` and `b` are the Stock Synthesis fecundity parameters, and `weight` is weight at the bin center in kg, the unit Stock Synthesis uses for fecundity. Options 4 and 5 can be negative for small fish, so they are set to 0. With length-based maturity in Stock Synthesis (maturity options 1 and 6), maturity is applied at each length before averaging over length at age, so multiply maturity at length into `fecundity_at_length` and set FIMS maturity to 1 at every age.
 
 ```{r fecundity-at-length-ss3, eval = FALSE}
 population_lengths <- seq(0, 1150, by = 50)
-centers <- population_lengths + 25
-weight <- length_weight_a * centers^length_weight_b
+length_midpoints <- population_lengths + 25
+weight <- length_weight_a * length_midpoints^length_weight_b
 fecundity <- switch(ss3_fecundity_option,
   weight * (a + b * weight), # 1: eggs = weight x (a + b x weight)
-  a * centers^b, # 2: eggs = a x length^b
+  a * length_midpoints^b, # 2: eggs = a x length^b
   a * weight^b, # 3: eggs = a x weight^b
-  pmax(a + b * centers, 0), # 4: eggs = a + b x length
+  pmax(a + b * length_midpoints, 0), # 4: eggs = a + b x length
   pmax(a + b * weight, 0) # 5: eggs = a + b x weight
 )
 fecundity_rows <- tibble::tibble(
   type = "fecundity_at_length",
   fleet = NA_character_,
-  age = NA_integer_,
+  age = NA_real_,
   length = population_lengths,
   timing = NA_real_,
   observed = fecundity,

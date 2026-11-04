@@ -531,11 +531,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * defaults to 1, so without either input this is the population weight at
    * age and spawning output is spawning biomass.
    *
-   * With fecundity at length \f$f_{l,y}\f$, spawning weight is replaced by
-   * fecundity at length averaged over the distribution of length at age on
+   * With fecundity at length \f$\phi_{l,y}\f$, spawning weight is replaced
+   * by fecundity at length averaged over the distribution of length at age on
    * the population length bins \f$l\f$:
    * \f[
-   * f_{a,y} \sum_{l} P(l \mid a, y) f_{l,y}
+   * f_{a,y} \sum_{l} P(l \mid a, y) \phi_{l,y}
    * \f]
    *
    * @snippet{doc} this param_population

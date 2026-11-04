@@ -656,11 +656,11 @@ test_that("`initialize_population()` uses fecundity at length for spawning outpu
     object = year_5_report[["spawning_biomass"]][[1]][1:4],
     expected = weight_report[["spawning_biomass"]][[1]][1:4]
   )
-  #' @description Test that fecundity-at-length rows for year 5 change spawning output in year 5.
-  expect_false(isTRUE(all.equal(
-    year_5_report[["spawning_biomass"]][[1]][5],
-    weight_report[["spawning_biomass"]][[1]][5]
-  )))
+  #' @description Test that doubling fecundity at length for year 5 doubles spawning output in year 5, because numbers at age in year 5 depend only on spawning output in earlier years.
+  expect_equal(
+    object = year_5_report[["spawning_biomass"]][[1]][5],
+    expected = 2 * weight_report[["spawning_biomass"]][[1]][5]
+  )
 
   fecundity_at_age_rows <- tibble::tibble(
     type = "fecundity_at_age",
