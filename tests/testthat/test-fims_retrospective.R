@@ -104,8 +104,9 @@ test_that("run_fims_retrospective() works with correct inputs", {
 })
 
 test_that("run_modified_data_fims() keeps length_bin rows", {
-  # The fleet1 length_bin rows are the only length data, so the model has no
-  # length bins if they are dropped. Growth gives length at age, so the
+  # The fleet1 length_bin rows are the only length data. They set the population
+  # length bins that mean weight at age is averaged over, so the jnll changes if
+  # they are dropped. Growth gives length at age, so the
   # age_to_length_conversion rows are not needed. The bins are few and narrow to
   # keep the fits fast.
   bins_data <- dplyr::bind_rows(
