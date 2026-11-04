@@ -1575,7 +1575,10 @@ population_length_bins <- function(data) {
 # wide as the bin before it.
 length_bin_edges <- function(lower_edges) {
   n_bins <- length(lower_edges)
-  c(lower_edges, 2 * lower_edges[n_bins] - lower_edges[n_bins - 1])
+  c(
+    lower_edges,
+    lower_edges[n_bins] + (lower_edges[n_bins] - lower_edges[n_bins - 1])
+  )
 }
 
 # Growth puts no fish outside the population length bins. A fleet bin outside
@@ -1607,9 +1610,8 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
   lengths <- population_rows[["length"]]
   if (anyNA(lengths) || anyDuplicated(lengths) > 0 || length(lengths) < 2) {
     cli::cli_abort(c(
-      "x" = "{.var length_bin} rows with {.code fleet = NA} have
-      {length(lengths)} length{?s}, with missing or repeated values:
-      {.val {sort(lengths, na.last = TRUE)}}.",
+      "x" = "{.var length_bin} rows with {.code fleet = NA} have these
+      lengths: {.val {sort(lengths, na.last = TRUE)}}.",
       "i" = "These rows need at least 2 different lengths and no missing
       lengths. Each row gives the lower edge of 1 population length bin.",
       "i" = "Use {.code dplyr::count(dplyr::filter(data, type == 'length_bin',
@@ -1620,7 +1622,8 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
   population_edges <- length_bin_edges(sort(lengths))
   first_edge <- population_edges[1]
   last_edge <- population_edges[length(population_edges)]
-  # Edges are computed, so compare them with a tolerance, as C++ does
+  # Upper edges are computed, so a population edge can miss a fleet edge by
+  # rounding. Coverage is checked with a tolerance for this reason.
   tolerance <- 1e-8 * max(1, last_edge - first_edge)
   fleet_edges <- fleet_length_bins |>
     purrr::keep(\(bins) length(bins) >= 2) |>
@@ -1647,14 +1650,18 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
     ))
   }
 
+  # Same rule and tolerance as EnforcePopulationGridNotCoarserThanFleetBins()
+  # in C++, so R passes exactly the bins that C++ accepts
+  population_widths <- diff(population_edges)
+  width_tolerance <- 1e-12 * pmax(population_widths, 1)
   coarser_fleets <- fleet_edges |>
     purrr::keep(\(edges) {
       n_population <- length(population_edges)
       n_fleet <- length(edges)
       overlap <- outer(population_edges[-1], edges[-1], pmin) -
         outer(population_edges[-n_population], edges[-n_fleet], pmax)
-      wider <- outer(diff(population_edges), diff(edges), "-")
-      any(overlap > tolerance & wider > tolerance)
+      wider <- outer(population_widths, diff(edges), "-")
+      any(overlap > 0 & wider > width_tolerance)
     }) |>
     names()
   if (length(coarser_fleets) > 0) {

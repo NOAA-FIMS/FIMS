@@ -782,12 +782,12 @@ test_that("`FIMSFrame()` checks population length bins", {
     "at least 2"
   )
 
-  #' @description Test that population length bins that end exactly at the last fleet edge are accepted when the edges are not exact in floating point.
+  #' @description Test that `validate_population_length_bins()` accepts 0.05-wide population length bins that end at the last fleet edge despite rounding.
   expect_no_error(validate_population_length_bins(
     population_length_bin_rows(seq(0.1, 1.15, by = 0.05)),
     list(fleet1 = seq(0.1, 1.1, by = 0.1))
   ))
-  #' @description Test that `FIMSFrame()` errors when a population length bin is wider than a fleet length bin it overlaps.
+  #' @description Test that `validate_population_length_bins()` errors when a population length bin is wider than a fleet length bin it overlaps.
   expect_error(
     validate_population_length_bins(
       population_length_bin_rows(seq(0, 1150, by = 50)),

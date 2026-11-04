@@ -516,7 +516,10 @@ test_that("`initialize_fims()` builds the length distribution at age on the popu
   expect_equal(default_bins_report[["jnll"]], base_report[["jnll"]])
   expect_equal(default_bins_report[["biomass"]], base_report[["biomass"]])
   #' @description Test that population length bins without length compositions give the same biomass as length compositions with the same population length bins.
-  expect_equal(no_length_bins_report[["biomass"]], base_report[["biomass"]])
+  expect_equal(
+    no_length_bins_report[["biomass"]],
+    default_bins_report[["biomass"]]
+  )
 })
 
 ## Error handling ----
@@ -532,7 +535,6 @@ test_that("`initialize_population()` returns correct error messages", {
   )
   clear()
 })
-
 
 # test_initialize_selectivity ----
 ## IO correctness ----
