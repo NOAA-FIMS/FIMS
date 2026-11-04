@@ -29,10 +29,9 @@ TEST(GrowthModel, CanConstructAndPrepare) {
   const double growth_coefficient = 0.18;
   const double reference_age_for_length_young = 1.0;
   const double reference_age_for_length_old = 12.0;
-  const double denom_raw =
+  const double denom =
       1.0 - std::exp(-growth_coefficient * (reference_age_for_length_old -
                                             reference_age_for_length_young));
-  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double expected_length_at_age_1 =
       mean_length_young +
       (mean_length_old - mean_length_young) *
@@ -194,6 +193,33 @@ TEST(GrowthModel, SingleAgeRejectsCoincidentReferenceAges) {
   gm.SetLengthSdParams(28.0, 73.0);
 
   EXPECT_THROW(gm.Prepare(), std::runtime_error);
+}
+
+TEST(GrowthModel, HoldsSdConstantOutsideReferenceAges) {
+  fims_popdy::GrowthModel<double> gm(1, 21, 1);
+
+  gm.SetVonBertalanffySchnuteParameters(
+      275.0, 725.0, 0.18, 4.0, 18.0);
+  gm.SetLengthWeightParameters(2.5e-11, 3.0);
+  gm.SetLengthSdParams(28.0, 73.0);
+  gm.SetAgeOffset(0.0);
+  gm.Prepare();
+
+  const auto& products = gm.GetProducts();
+
+  for (std::size_t age = 0; age <= 4; ++age) {
+    SCOPED_TRACE(age);
+    EXPECT_NEAR(products.SdLAA(0, age, 0), 28.0, 1e-6);
+  }
+
+  for (std::size_t age = 18; age <= 20; ++age) {
+    SCOPED_TRACE(age);
+    EXPECT_NEAR(products.SdLAA(0, age, 0), 73.0, 1e-6);
+  }
+
+  // Holding SD constant must not stop mean growth.
+  EXPECT_LT(products.MeanLAA(0, 2, 0), products.MeanLAA(0, 4, 0));
+  EXPECT_GT(products.MeanLAA(0, 20, 0), products.MeanLAA(0, 18, 0));
 }
 
 }  // namespace
