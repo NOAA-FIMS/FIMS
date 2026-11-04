@@ -100,13 +100,13 @@ jobs:
             any::snowfall
           needs: check
 
-      # The {snowfall} workers in test-slow-parallel-caa-mle-wrappers.R load
-      # FIMS with library(), so this checkout must be installed, not only
-      # loaded by devtools::test().
-      - name: Install FIMS for parallel workers
+      # The {snowfall} workers in test-slow-parallel-caa-mle-wrappers.R call
+      # library(FIMS), so FIMS must be installed from this checkout.
+      # devtools::test() only loads it in the main R process.
+      - name: Install FIMS for Parallel Workers
         if: matrix.test_type == 'slow'
         shell: Rscript {0}
-        run: devtools::install(upgrade = "never", quick = TRUE)
+        run: devtools::install(quick = TRUE)
 
       - name: Run Slow Tests Only
         env:
