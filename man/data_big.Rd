@@ -40,7 +40,8 @@ used for \code{weight_at_age} and \code{spawning_weight_at_age} data.
 \code{eggs/mt}. \code{fecundity_at_length} is spawning output per fish, e.g.,
 \code{eggs}. \code{number} or \code{proportion} are each viable units for the
 composition data, where the former is the preferred unit of
-measurement. \code{proportion} is used for \code{maturity_at_age} data.}
+measurement. \code{proportion} is used for \code{maturity_at_age} and
+\code{maturity_at_length} data.}
 \item{uncertainty}{A right-handed formula specifying the distributional
 assumptions for the entry in \code{observed}. See \code{\link[=FIMSFrame]{FIMSFrame()}} for more
 information about this column.

@@ -59,6 +59,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       "spawning_weight_at_age",
       "fecundity_at_age",
       "fecundity_at_length",
+      "maturity_at_length",
       "expected_recruitment",
       "sum_selectivity"
     ))
@@ -446,6 +447,49 @@ initialize_maturity <- function(parameters, data) {
       dplyr::bind_rows(maturity_rows)
   }
 
+  # Maturity at age multiplies maturity at length, so a maturity at age between
+  # 0 and 1 counts maturity twice. Values of only 0 and 1, such as a first
+  # mature age, do not. Under EWAA growth maturity at length is not used.
+  growth_type <- parameters |>
+    dplyr::filter(.data[["module_name"]] == "Growth") |>
+    dplyr::pull(.data[["module_type"]]) |>
+    unique()
+  if (any(get_data(data)[["type"]] == "maturity_at_length") &&
+    !"EWAA" %in% growth_type) {
+    maturity_parameters <- dplyr::filter(
+      parameters,
+      .data[["module_name"]] == "Maturity"
+    )
+    estimated_labels <- maturity_parameters |>
+      dplyr::filter(.data[["estimation_type"]] != "constant") |>
+      dplyr::pull(.data[["label"]]) |>
+      unique()
+    if (length(estimated_labels) > 0) {
+      cli::cli_abort(c(
+        "x" = "Maturity parameters {.val {estimated_labels}} are estimated,
+        and the data have {.var maturity_at_length} rows.",
+        "i" = "FIMS does not fit maturity to data, so maturity parameters need
+        {.code estimation_type = \"constant\"}.",
+        "i" = "Use {.code dplyr::filter(parameters, module_name == 'Maturity',
+        estimation_type != 'constant')} to find the rows."
+      ))
+    }
+    at_age_values <- maturity_parameters |>
+      dplyr::filter(.data[["label"]] == "maturity_at_age") |>
+      dplyr::pull(.data[["value"]])
+    if (!identical(as.character(maturity_type), "Empirical") ||
+      any(at_age_values > 0 & at_age_values < 1)) {
+      cli::cli_warn(c(
+        "!" = "Maturity at age has values between 0 and 1, and it multiplies
+        the {.var maturity_at_length} values.",
+        "i" = "Use a maturity at age of only 0 and 1 unless maturity at a
+        given length also changes with age.
+        {.code setup_default_Maturity(data, module_type = \"Empirical\")}
+        gives 1 at every age when there are no {.var maturity_at_age} rows."
+      ))
+    }
+  }
+
   module <- initialize_module(
     parameters = parameters,
     data = data,
@@ -523,33 +567,34 @@ initialize_population <- function(parameters, data, linked_ids) {
     ))
   }
 
-  # Fecundity at length is averaged over the length distribution at age, which
-  # EWAA growth does not have, so the rows are only used with growth that gives
-  # length at age
-  fecundity_rows <- dplyr::filter(
-    input_data,
-    .data[["type"]] == "fecundity_at_length"
+  # Fecundity and maturity at length are averaged over the length distribution
+  # at age, which EWAA growth does not have, so the rows are only used with
+  # growth that gives length at age
+  length_input_types <- intersect(
+    c("fecundity_at_length", "maturity_at_length"),
+    input_data[["type"]]
   )
-  if (NROW(fecundity_rows) > 0) {
+  if (length(length_input_types) > 0) {
     if ("EWAA" %in% growth_type) {
       cli::cli_warn(c(
-        "!" = "The {.var fecundity_at_length} rows are not used because growth
-        is {.val EWAA}, so spawning output is in weight units.",
-        "i" = "Fecundity at length needs a growth module that gives length at
+        "!" = "The {.var {length_input_types}} rows are not used because
+        growth is {.val EWAA}.",
+        "i" = "Inputs at length need a growth module that gives length at
         age, such as {.code setup_default_Growth(module_type =
         \"VonBertalanffySchnute\")}."
       ))
     } else {
       if (any(input_data[["type"]] == "spawning_weight_at_age")) {
         cli::cli_abort(c(
-          "x" = "The data have both {.var fecundity_at_length} and
+          "x" = "The data have both {.var {length_input_types}} and
           {.var spawning_weight_at_age} rows.",
-          "i" = "Fecundity at length replaces spawning weight at age in
-          spawning output, so only 1 of them can be given.",
+          "i" = "Spawning output from inputs at length replaces spawning
+          weight at age, so they cannot be combined.",
           "i" = "Use {.code dplyr::count(data, type)} to see the types."
         ))
       }
-      if (any(input_data[["type"]] == "fecundity_at_age")) {
+      if ("fecundity_at_length" %in% length_input_types &&
+        any(input_data[["type"]] == "fecundity_at_age")) {
         cli::cli_warn(c(
           "!" = "{.var fecundity_at_age} multiplies spawning output from
           {.var fecundity_at_length}.",
@@ -557,12 +602,14 @@ initialize_population <- function(parameters, data, linked_ids) {
           per fish also changes with age at a given length."
         ))
       }
-      module[["fecundity_at_length"]][] <- at_age_by_year(
-        fecundity_rows,
-        ages = population_lengths,
-        years = spawning_years,
-        column = "length"
-      )
+      for (field in length_input_types) {
+        module[[field]][] <- at_age_by_year(
+          dplyr::filter(input_data, .data[["type"]] == .env[["field"]]),
+          ages = population_lengths,
+          years = spawning_years,
+          column = "length"
+        )
+      }
     }
   }
 

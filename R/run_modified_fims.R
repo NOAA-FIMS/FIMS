@@ -140,11 +140,12 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
 
   # Remove years from data, but leave catch and the inputs that are not fit
   # to data (weight, spawning weight, fecundity, and maturity at age,
-  # fecundity at length, age_to_length_conversion, and length_bin), because the
-  # model years do not change
+  # fecundity and maturity at length, age_to_length_conversion, and
+  # length_bin), because the model years do not change
   inputs_kept <- c(
     "age_to_length_conversion", "weight_at_age", "spawning_weight_at_age",
-    "fecundity_at_age", "maturity_at_age", "fecundity_at_length", "length_bin"
+    "fecundity_at_age", "maturity_at_age", "fecundity_at_length",
+    "maturity_at_length", "length_bin"
   )
   if (years_to_remove == 0) {
     data_mod <- data_to_use

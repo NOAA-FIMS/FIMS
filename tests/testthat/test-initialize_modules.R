@@ -709,6 +709,87 @@ test_that("`initialize_population()` uses fecundity at length for spawning outpu
   )
 })
 
+test_that("`initialize_population()` uses maturity at length for spawning output", {
+  population_lengths <- seq(0, 1150, by = 50)
+  bins_data <- dplyr::bind_rows(
+    data_big,
+    population_length_bin_rows(population_lengths)
+  )
+  growth <- setup_default_Growth(
+    data = FIMSFrame(bins_data),
+    module_type = "VonBertalanffySchnute"
+  )
+  growth_value <- function(label) growth[["value"]][growth[["label"]] == label]
+  weight_at_length <- growth_value("length_weight_a") *
+    (population_lengths + 25)^growth_value("length_weight_b")
+  maturity_at_age_rows <- tibble::tibble(
+    type = "maturity_at_age",
+    fleet = NA_character_,
+    age = get_ages(FIMSFrame(data_big)),
+    length = NA_real_,
+    timing = NA_real_,
+    observed = 1,
+    unit = "proportion",
+    uncertainty = NA_character_
+  )
+  # Maturity at age is 1 in every run, from maturity_at_age rows or from the
+  # Empirical default with maturity_at_length rows
+  get_report_with <- function(...) {
+    frame <- FIMSFrame(dplyr::bind_rows(bins_data, ...))
+    parameters <- setup_vonb_parameters(frame) |>
+      dplyr::filter(module_name != "Maturity") |>
+      dplyr::bind_rows(setup_default_Maturity(frame, module_type = "Empirical"))
+    get_population_report(frame, parameters)
+  }
+  base_report <- get_report_with(maturity_at_age_rows)
+  one_report <- get_report_with(
+    maturity_at_length_rows(population_lengths, 1)
+  )
+  half_report <- get_report_with(
+    maturity_at_length_rows(population_lengths, 0.5)
+  )
+  half_double_report <- get_report_with(
+    maturity_at_length_rows(population_lengths, 0.5),
+    fecundity_at_length_rows(population_lengths, 2 * weight_at_length)
+  )
+
+  #' @description Test that maturity at length of 1 gives the same spawning output as no inputs at length, because weight at the bin centers averaged over length at age is the population weight at age.
+  expect_equal(
+    object = one_report[["spawning_biomass"]],
+    expected = base_report[["spawning_biomass"]]
+  )
+  #' @description Test that maturity at length of 0.5 halves spawning output.
+  expect_equal(
+    object = half_report[["spawning_biomass"]][[1]],
+    expected = 0.5 * one_report[["spawning_biomass"]][[1]]
+  )
+  #' @description Test that maturity at length of 0.5 and fecundity at length of twice the weight at length give the spawning output of maturity 1 and weight at length.
+  expect_equal(
+    object = half_double_report[["spawning_biomass"]],
+    expected = one_report[["spawning_biomass"]]
+  )
+
+  # Maturity at age of 0 at ages 1 and 2 and 1 above, as for a first mature age
+  first_mature_rows <- dplyr::mutate(
+    maturity_at_age_rows,
+    observed = as.numeric(age > 2)
+  )
+  first_mature_frame <- FIMSFrame(dplyr::bind_rows(
+    bins_data,
+    first_mature_rows,
+    maturity_at_length_rows(population_lengths, 0.5)
+  ))
+  first_mature_parameters <- setup_vonb_parameters(first_mature_frame) |>
+    dplyr::filter(module_name != "Maturity") |>
+    dplyr::bind_rows(
+      setup_default_Maturity(first_mature_frame, module_type = "Empirical")
+    )
+  #' @description Test that a maturity at age of only 0 and 1 with maturity at length does not warn.
+  expect_no_warning(
+    get_population_report(first_mature_frame, first_mature_parameters)
+  )
+})
+
 ## Error handling ----
 test_that("`initialize_population()` returns correct error messages", {
   #' @description Test that `initialize_population()` handles missing linked_ids correctly.
@@ -738,6 +819,31 @@ test_that("`initialize_population()` returns correct error messages", {
       fecundity_frame
     ),
     "both `fecundity_at_length` and\\s+`spawning_weight_at_age`"
+  )
+  clear()
+
+  maturity_frame <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    population_length_bin_rows(population_lengths),
+    maturity_at_length_rows(population_lengths, 0.5)
+  ))
+  logistic_parameters <- setup_vonb_parameters(maturity_frame)
+  #' @description Test that `initialize_maturity()` warns that a logistic maturity at age multiplies maturity at length.
+  expect_warning(
+    initialize_maturity(logistic_parameters, maturity_frame),
+    "multiplies\\s+the `maturity_at_length` values"
+  )
+  clear()
+  estimated_parameters <- logistic_parameters |>
+    dplyr::mutate(estimation_type = dplyr::if_else(
+      module_name == "Maturity" & label == "inflection_point",
+      "fixed_effects",
+      estimation_type
+    ))
+  #' @description Test that `initialize_maturity()` errors when maturity parameters are estimated with maturity at length.
+  expect_error(
+    initialize_maturity(estimated_parameters, maturity_frame),
+    "are estimated"
   )
   clear()
 })

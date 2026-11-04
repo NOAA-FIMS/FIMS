@@ -44,7 +44,8 @@
 #'     `eggs/mt`. `fecundity_at_length` is spawning output per fish, e.g.,
 #'     `eggs`. `number` or `proportion` are each viable units for the
 #'     composition data, where the former is the preferred unit of
-#'     measurement. `proportion` is used for `maturity_at_age` data.}
+#'     measurement. `proportion` is used for `maturity_at_age` and
+#'     `maturity_at_length` data.}
 #'   \item{uncertainty}{A right-handed formula specifying the distributional
 #'     assumptions for the entry in `observed`. See [FIMSFrame()] for more
 #'     information about this column.

@@ -79,6 +79,36 @@ test_that("`setup_default_parameters()` picks Empirical with maturity data", {
   clear()
 })
 
+test_that("`setup_default_Maturity()` gives maturity at age of 1 with maturity at length", {
+  population_lengths <- seq(0, 1150, by = 50)
+  length_rows <- dplyr::bind_rows(
+    population_length_bin_rows(population_lengths),
+    maturity_at_length_rows(population_lengths, 0.5)
+  )
+  length_data <- FIMS::FIMSFrame(dplyr::bind_rows(data_big, length_rows))
+  #' @description Test that Empirical maturity is 1 at every age when the data have maturity-at-length rows and no maturity-at-age rows.
+  result <- setup_default_Maturity(length_data, module_type = "Empirical")
+  expect_equal(object = result[["value"]], expected = rep(1, length(ages)))
+  expect_true(all(is.na(result[["timing"]])))
+
+  #' @description Test that `setup_default_parameters()` picks Empirical maturity with maturity-at-length rows and growth that gives length at age.
+  vonb_data <- FIMS::FIMSFrame(dplyr::bind_rows(
+    dplyr::filter(data_big, type != "weight_at_age"),
+    length_rows
+  ))
+  maturity <- setup_default_parameters(data = vonb_data) |>
+    dplyr::filter(.data[["module_name"]] == "Maturity")
+  expect_true(all(maturity[["module_type"]] == "Empirical"))
+  expect_equal(object = maturity[["value"]], expected = rep(1, length(ages)))
+
+  #' @description Test that `setup_default_parameters()` keeps Logistic maturity with maturity-at-length rows and EWAA growth, because maturity at length is not used.
+  maturity <- setup_default_parameters(data = length_data) |>
+    dplyr::filter(.data[["module_name"]] == "Maturity")
+  expect_true(all(maturity[["module_type"]] == "Logistic"))
+
+  clear()
+})
+
 ## Edge handling ----
 test_that("`setup_default_Maturity()` works with rows for every year and no default", {
   # Without a default, the year after the last model year needs rows too

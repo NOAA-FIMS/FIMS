@@ -1501,21 +1501,22 @@ validate_at_age_input <- function(data, type, ages, years, column = "age") {
   invisible(TRUE)
 }
 
-# Maturity at age is a proportion mature, so it also needs values of 1 or less
-# and unit = "proportion". validate_at_age_input() checks everything else.
-validate_maturity_at_age <- function(data) {
-  maturity_rows <- dplyr::filter(data, .data[["type"]] == "maturity_at_age")
+# Maturity at age and at length are proportions mature, so they also need
+# values of 1 or less and unit = "proportion". validate_at_age_input() checks
+# everything else.
+validate_maturity_at_age <- function(data, type = "maturity_at_age") {
+  maturity_rows <- dplyr::filter(data, .data[["type"]] == .env[["type"]])
   if (NROW(maturity_rows) == 0) {
     return(invisible(TRUE))
   }
   above_one <- maturity_rows[["observed"]][maturity_rows[["observed"]] > 1]
   if (length(above_one) > 0) {
     cli::cli_abort(c(
-      "x" = "{.var maturity_at_age} has values above 1:
+      "x" = "{.var {type}} has values above 1:
       {.val {unique(above_one)}}.",
-      "i" = "{.var maturity_at_age} is the proportion mature at age, so every
+      "i" = "{.var {type}} is a proportion mature, so every
       value must be from 0 to 1.",
-      "i" = "Use {.code dplyr::filter(data, type == 'maturity_at_age',
+      "i" = "Use {.code dplyr::filter(data, type == '{type}',
       observed > 1)} to find the rows."
     ))
   }
@@ -1523,12 +1524,12 @@ validate_maturity_at_age <- function(data) {
   bad_units <- bad_units[is.na(bad_units) | bad_units != "proportion"]
   if (length(bad_units) > 0) {
     cli::cli_abort(c(
-      "x" = "{.var maturity_at_age} has units other than {.val proportion}:
+      "x" = "{.var {type}} has units other than {.val proportion}:
       {.val {bad_units}}.",
-      "i" = "{.var maturity_at_age} is the proportion mature at age, so every
+      "i" = "{.var {type}} is a proportion mature, so every
       row needs {.code unit = \"proportion\"}.",
       "i" = "Use {.code dplyr::count(dplyr::filter(data, type ==
-      'maturity_at_age'), unit)} to see the units."
+      '{type}'), unit)} to see the units."
     ))
   }
   invisible(TRUE)
@@ -1887,7 +1888,8 @@ FIMSFrame <- function(data) {
     data,
     !.data$type %in% c(
       "age_to_length_conversion", "weight_at_age", "spawning_weight_at_age",
-      "fecundity_at_age", "maturity_at_age", "fecundity_at_length"
+      "fecundity_at_age", "maturity_at_age", "fecundity_at_length",
+      "maturity_at_length"
     )
   ) |>
     dplyr::pull(.data$timing)
@@ -1998,14 +2000,18 @@ FIMSFrame <- function(data) {
       years = start_year:(end_year + 1)
     )
   }
-  validate_maturity_at_age(data)
-  validate_at_age_input(
-    data,
-    type = "fecundity_at_length",
-    ages = population_length_bins(data),
-    years = start_year:(end_year + 1),
-    column = "length"
-  )
+  for (at_length_type in c("fecundity_at_length", "maturity_at_length")) {
+    validate_at_age_input(
+      data,
+      type = at_length_type,
+      ages = population_length_bins(data),
+      years = start_year:(end_year + 1),
+      column = "length"
+    )
+  }
+  for (maturity_type in c("maturity_at_age", "maturity_at_length")) {
+    validate_maturity_at_age(data, type = maturity_type)
+  }
 
   # Work on filling in missing data with -999 and arrange in the correct
   # order so that getting information out with model_*() are correct.

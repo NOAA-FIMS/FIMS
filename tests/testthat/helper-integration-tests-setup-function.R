@@ -604,3 +604,17 @@ fecundity_at_length_rows <- function(lengths, values, timing = NA_real_) {
     uncertainty = NA_character_
   )
 }
+
+#' Make `maturity_at_length` rows on the population length bins
+#'
+#' @param lengths A numeric vector of the lower edges of the population length
+#'   bins.
+#' @param values A numeric vector of the proportion mature at each length.
+#' @param timing A numeric timing for the rows. `NA` gives the default for every
+#'   year.
+#'
+#' @return A tibble with the columns of `data_big`.
+maturity_at_length_rows <- function(lengths, values, timing = NA_real_) {
+  fecundity_at_length_rows(lengths, values, timing) |>
+    dplyr::mutate(type = "maturity_at_length", unit = "proportion")
+}

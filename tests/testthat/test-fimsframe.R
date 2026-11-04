@@ -915,6 +915,30 @@ test_that("`FIMSFrame()` returns errors for invalid fecundity at length", {
   )
 })
 
+test_that("`FIMSFrame()` returns errors for invalid maturity at length", {
+  population_lengths <- seq(0, 1150, by = 50)
+  with_maturity <- function(rows) {
+    dplyr::bind_rows(with_population_bins(population_lengths), rows)
+  }
+  maturity_rows <- maturity_at_length_rows(population_lengths, 0.5)
+
+  #' @description Test that `FIMSFrame()` errors when maturity at length is above 1.
+  expect_error(
+    FIMSFrame(with_maturity(dplyr::mutate(maturity_rows, observed = 2))),
+    "maturity_at_length` has values above 1"
+  )
+  #' @description Test that `FIMSFrame()` errors when maturity at length is not a proportion.
+  expect_error(
+    FIMSFrame(with_maturity(dplyr::mutate(maturity_rows, unit = "eggs"))),
+    "maturity_at_length` has units other than"
+  )
+  #' @description Test that `FIMSFrame()` errors when maturity at length is missing a population length bin.
+  expect_error(
+    FIMSFrame(with_maturity(dplyr::filter(maturity_rows, length > 0))),
+    "is missing lengths for these timings"
+  )
+})
+
 # model_* ----
 ## Setup ----
 fims_frame <- FIMS::FIMSFrame(data_big)
