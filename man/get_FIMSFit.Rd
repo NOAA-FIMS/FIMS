@@ -93,10 +93,11 @@ is the returned object from \code{\link[=setup_default_parameters]{setup_default
 reportable in the C++ code is returned.
 
 \code{\link[=get_obj]{get_obj()}} returns the output from \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}. After \code{\link[=clear]{clear()}},
-its \code{report()} method no longer returns the fitted values. After the fit is
-read from disk with \code{\link[=readRDS]{readRDS()}}, its \code{fn()}, \code{gr()}, \code{he()}, and \code{report()}
-methods do not either. Use \code{\link[=get_report]{get_report()}}, \code{\link[=get_gradient]{get_gradient()}}, or
-\code{\link[=get_estimates]{get_estimates()}} instead, which return values stored during fitting.
+its \code{report()} method returns a \code{jnll} of 0 and keeps the other values from
+its last call. After the fit is read with \code{\link[=readRDS]{readRDS()}} in a new R session,
+its \code{fn()}, \code{gr()}, \code{he()}, and \code{report()} methods return wrong values. Use
+\code{\link[=get_report]{get_report()}}, \code{\link[=get_gradient]{get_gradient()}}, or \code{\link[=get_estimates]{get_estimates()}} instead. These
+return values stored during fitting.
 
 \code{\link[=get_opt]{get_opt()}} returns the output from \code{\link[=nlminb]{nlminb()}}, which is the minimizer used
 in \code{\link[=fit_fims]{fit_fims()}}.

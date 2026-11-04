@@ -172,10 +172,11 @@ methods::setMethod("get_report", "FIMSFit", function(x) x@report)
 
 #' @return
 #' [get_obj()] returns the output from [TMB::MakeADFun()]. After [clear()],
-#' its `report()` method no longer returns the fitted values. After the fit is
-#' read from disk with [readRDS()], its `fn()`, `gr()`, `he()`, and `report()`
-#' methods do not either. Use [get_report()], [get_gradient()], or
-#' [get_estimates()] instead, which return values stored during fitting.
+#' its `report()` method returns a `jnll` of 0 and keeps the other values from
+#' its last call. After the fit is read with [readRDS()] in a new R session,
+#' its `fn()`, `gr()`, `he()`, and `report()` methods return wrong values. Use
+#' [get_report()], [get_gradient()], or [get_estimates()] instead. These
+#' return values stored during fitting.
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
