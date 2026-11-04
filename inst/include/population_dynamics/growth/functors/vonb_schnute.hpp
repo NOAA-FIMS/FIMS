@@ -62,35 +62,25 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
         reference_age_for_length_old - reference_age_for_length_young;
 
     // Evaluate (1 - exp(-x)) / x and, optionally, its derivative.
-    auto scaled_decay = [](const Type& x,
-                           Type* decay_derivative) -> Type {
+    auto scaled_decay = [](const Type& x, Type* decay_derivative) -> Type {
       const Type threshold = Type(1e-3);
       // Keep both expressions safe because AD may evaluate the inactive branch.
-      const Type series_x = fims_math::cond_exp_lt(
-          x, threshold, x, Type(0.0));
-      const Type regular_x = fims_math::cond_exp_lt(
-          x, threshold, Type(1.0), x);
+      const Type series_x = fims_math::cond_exp_lt(x, threshold, x, Type(0.0));
+      const Type regular_x = fims_math::cond_exp_lt(x, threshold, Type(1.0), x);
 
       const Type series =
           Type(1.0) +
-          series_x *
-              (Type(-0.5) +
-               series_x *
-                   (Type(1.0 / 6.0) +
-                    series_x *
-                        (Type(-1.0 / 24.0) +
-                         series_x * Type(1.0 / 120.0))));
-      const Type regular =
-          (Type(1.0) - fims_math::exp(-regular_x)) / regular_x;
+          series_x * (Type(-0.5) +
+                      series_x * (Type(1.0 / 6.0) +
+                                  series_x * (Type(-1.0 / 24.0) +
+                                              series_x * Type(1.0 / 120.0))));
+      const Type regular = (Type(1.0) - fims_math::exp(-regular_x)) / regular_x;
 
       if (decay_derivative != nullptr) {
         const Type series_derivative =
-            Type(-0.5) +
-            series_x *
-                (Type(1.0 / 3.0) +
-                 series_x *
-                     (Type(-1.0 / 8.0) +
-                      series_x * Type(1.0 / 30.0)));
+            Type(-0.5) + series_x * (Type(1.0 / 3.0) +
+                                     series_x * (Type(-1.0 / 8.0) +
+                                                 series_x * Type(1.0 / 30.0)));
         const Type regular_derivative =
             (fims_math::exp(-regular_x) - regular) / regular_x;
 
@@ -103,21 +93,20 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
 
     Type elapsed_derivative = Type(0.0);
     Type reference_derivative = Type(0.0);
-    const Type elapsed_decay = scaled_decay(
-        growth_coefficient * elapsed_age,
-        derivative != nullptr ? &elapsed_derivative : nullptr);
-    const Type reference_decay = scaled_decay(
-        growth_coefficient * reference_age_span,
-        derivative != nullptr ? &reference_derivative : nullptr);
+    const Type elapsed_decay =
+        scaled_decay(growth_coefficient * elapsed_age,
+                     derivative != nullptr ? &elapsed_derivative : nullptr);
+    const Type reference_decay =
+        scaled_decay(growth_coefficient * reference_age_span,
+                     derivative != nullptr ? &reference_derivative : nullptr);
     const Type age_ratio = elapsed_age / reference_age_span;
     const Type decay_ratio = elapsed_decay / reference_decay;
 
     if (derivative != nullptr) {
-      *derivative =
-          age_ratio *
-          (elapsed_age * elapsed_derivative -
-           decay_ratio * reference_age_span * reference_derivative) /
-          reference_decay;
+      *derivative = age_ratio *
+                    (elapsed_age * elapsed_derivative -
+                     decay_ratio * reference_age_span * reference_derivative) /
+                    reference_decay;
     }
 
     return age_ratio * decay_ratio;
