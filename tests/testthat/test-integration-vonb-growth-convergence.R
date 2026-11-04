@@ -616,7 +616,7 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
   fit <- FIMS::fit_fims(
     input = input,
     optimize = TRUE,
-    number_of_loops = 2,
+    number_of_loops = 5,
     number_of_newton_steps = 0,
     get_sd = FALSE
   )
