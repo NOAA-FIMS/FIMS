@@ -77,7 +77,51 @@ test_that("`parse_data_distribution()` returns correct outputs for edge cases", 
   expect_equal(parse_data_distribution(NA_character_)$family, NA_character_)
 })
 
+test_that("repeated specifications preserve ordering and missing values", {
+  #' @description Repeated character specifications agree with independent parsing, including mixed families and missing observations.
+  specifications <- c(
+    "~dnorm(mean = x, sd = 0.1)", NA_character_,
+    "~dmultinom(prob = p, size = 10)",
+    "~dlnorm(meanlog = y, sdlog = 0.2)"
+  )
+  specifications <- specifications[c(1, 3, 1, 2, 4, 3, 2, 4)]
+  individual <- lapply(specifications, parse_data_distribution)
+  expected <- lapply(names(individual[[1]]), function(name) {
+    do.call(c, lapply(individual, `[[`, name))
+  })
+  names(expected) <- names(individual[[1]])
+  expect_identical(parse_data_distribution(specifications), expected)
+  expect_identical(
+    parse_data_distribution(rep(NA_character_, 3))$sd, rep(list(1), 3)
+  )
+  expect_true(all(lengths(parse_data_distribution(character())) == 0L))
+})
+
 ## Error handling ----
+test_that("repeated scale expressions are evaluated for each observation", {
+  #' @description Reuse of distribution specifications preserves evaluation and validation of nonliteral scales for every observation.
+  old <- options(fims.parser.test.counter = 0L)
+  on.exit(options(old), add = TRUE)
+  specification <- paste0(
+    "~dnorm(mean = x, sd = {",
+    "n <- getOption('fims.parser.test.counter') + 1L; ",
+    "options(fims.parser.test.counter = n); if (n == 2L) -1 else 1})"
+  )
+  expect_error(parse_data_distribution(rep(specification, 3)),
+    "`sd` must be positive", fixed = TRUE
+  )
+  # The existing error message evaluates the invalid expression once more.
+  expect_identical(getOption("fims.parser.test.counter"), 3L)
+  options(fims.parser.test.counter = 0L)
+  specification <- paste0(
+    "~dlnorm(meanlog = x, sdlog = {",
+    "options(fims.parser.test.counter = ",
+    "getOption('fims.parser.test.counter') + 1L); 1})"
+  )
+  parse_data_distribution(rep(specification, 3))
+  expect_identical(getOption("fims.parser.test.counter"), 3L)
+})
+
 test_that("`parse_data_distribution()` returns correct error messages", {
   #' @description Test that unsupported input types return an informative error.
   expect_error(

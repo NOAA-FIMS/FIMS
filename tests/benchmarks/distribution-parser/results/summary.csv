@@ -1,0 +1,13 @@
+"years","phase","variant","elapsed"
+30,"frame","after",0.1925
+120,"frame","after",0.257
+30,"modules","after",0.138
+120,"modules","after",0.231
+30,"parameters","after",0.0425000000000001
+120,"parameters","after",0.0435
+30,"frame","before",0.1955
+120,"frame","before",0.2715
+30,"modules","before",0.288
+120,"modules","before",0.747
+30,"parameters","before",0.0445
+120,"parameters","before",0.043
