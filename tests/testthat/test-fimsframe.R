@@ -324,6 +324,16 @@ test_that("`model_weight_at_age()` returns a fleet's own weight at age with the 
     model_weight_at_age(mixed_defaults_frame),
     population_weight
   )
+
+  single_fleet_frame <- suppressWarnings(FIMSFrame(dplyr::bind_rows(
+    dplyr::filter(data_big, type != "weight_at_age"),
+    dplyr::mutate(population_default_rows, fleet = "fleet1")
+  )))
+  #' @description Test that a fleet without its own rows gets the population weight at age when the only rows are for 1 other fleet and so are used for the population.
+  expect_equal(
+    model_weight_at_age(single_fleet_frame, fleet = "survey1"),
+    rep(population_default_rows[["observed"]], n_years)
+  )
 })
 
 ## Edge handling ----

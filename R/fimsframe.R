@@ -508,32 +508,10 @@ methods::setMethod(
     if (!is_population) {
       assert_presence_of_fleet(x, fleet)
     }
-    n_ages <- get_n_ages(x)
     weight_data <- dplyr::filter(
       .data = as.data.frame(x@data),
       .data[["type"]] == "weight_at_age"
-    ) |>
-      dplyr::mutate( # Change a unique fleet to NA for population info
-        fleet = if (
-          is_population && dplyr::n_distinct(.data[["fleet"]]) == 1L &
-            !anyNA(.data[["fleet"]])
-        ) {
-          NA_character_
-        } else {
-          .data[["fleet"]]
-        }
-      ) |>
-      dplyr::filter(.data[["fleet"]] %in% c(NA_character_, .env[["fleet"]])) |>
-      dplyr::mutate(
-        source_priority = dplyr::case_when(
-          is.na(.data[["fleet"]]) & is.na(.data[["timing"]]) ~ 4L,
-          is.na(.data[["fleet"]]) & !is.na(.data[["timing"]]) ~ 3L,
-          .data[["fleet"]] == .env[["fleet"]] &
-            is.na(.data[["timing"]]) ~ 2L,
-          .data[["fleet"]] == .env[["fleet"]] &
-            !is.na(.data[["timing"]]) ~ 1L
-        )
-      )
+    )
     if (NROW(weight_data) == 0) {
       cli::cli_abort(c(
         "x" = "The data have no {.code type = \"weight_at_age\"} rows.",
@@ -541,21 +519,6 @@ methods::setMethod(
         years or 1 set per year plus the year after the last model year.",
         "i" = "Types in the data: {.val {unique(x@data[['type']])}}."
       ))
-    }
-    # Check if looking for non-time-varying population and return early
-    if (is_population && NROW(weight_data) == n_ages) {
-      dplyr::pull(weight_data, .data[["observed"]])
-    }
-    # Check if looking for non-time-varying fleet and return early
-    if (!is_population) {
-      weight_data_fleet <- dplyr::filter(
-        weight_data,
-        .data[["fleet"]] == .env[["fleet"]]
-      )
-      if (all(is.na(weight_data_fleet[["timing"]])) &&
-        NROW(weight_data_fleet) == n_ages) {
-        dplyr::pull(weight_data_fleet, .data[["observed"]])
-      }
     }
     # The population needs the year after the last model year for spawning
     # biomass at the start of that year, after the last catches are removed.
@@ -565,26 +528,25 @@ methods::setMethod(
     } else {
       get_start_year(x):get_end_year(x)
     }
-
-    dplyr::bind_rows(
-      dplyr::filter(weight_data, !is.na(.data[["timing"]])),
-      weight_data |>
-        dplyr::filter(is.na(.data[["timing"]])) |>
-        dplyr::select(-"timing") |>
-        dplyr::cross_join(tibble::tibble(timing = years))
-    ) |>
-      dplyr::filter(.data[["timing"]] %in% .env[["years"]]) |>
-      dplyr::arrange(
-        .data[["timing"]],
-        .data[["age"]],
-        .data[["source_priority"]]
-      ) |>
-      dplyr::distinct(
-        .data[["timing"]],
-        .data[["age"]],
-        .keep_all = TRUE
-      ) |>
-      dplyr::pull(.data[["observed"]])
+    ages <- get_ages(x)
+    population_weight <- at_age_by_year(
+      population_weight_at_age_rows(weight_data),
+      ages = ages,
+      years = years
+    )
+    if (is_population) {
+      return(population_weight)
+    }
+    # A fleet uses its own rows for a year when it has them, and the
+    # population weight otherwise
+    fleet_rows <- dplyr::filter(
+      weight_data,
+      .data[["fleet"]] %in% .env[["fleet"]]
+    )
+    dplyr::coalesce(
+      at_age_by_year(fleet_rows, ages = ages, years = years),
+      population_weight
+    )
   }
 )
 #' @rdname model_
