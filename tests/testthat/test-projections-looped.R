@@ -465,7 +465,7 @@ run_FIMS_projection_scenario <- function(om_input,
   opt <- stats::nlminb(obj[["par"]], obj[["fn"]], obj[["gr"]],
     control = list(eval.max = 10000, iter.max = 10000, trace = 0)
   )
-  FIMS::set_fixed(opt$par)
+  restore_tmb_parameters(obj)
   fims_finalized <- caa$get_output()
 
   # Call report using MLE parameter values, or
