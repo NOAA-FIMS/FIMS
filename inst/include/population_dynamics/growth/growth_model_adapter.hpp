@@ -19,6 +19,16 @@
 namespace fims_popdy {
 
 /**
+ * @brief Constant/estimated configuration of the two reference mean lengths.
+ */
+enum class LengthReferenceParameterization {
+  kEstimatedReferenceLengths = 0,
+  kConstantLengthYoungEstimatedLengthOld,
+  kEstimatedLengthYoungBelowConstantLengthOld,
+  kBothConstant
+};
+
+/**
  * @brief Generic capability interface for growth models that can feed the
  * growth-derived age-to-length conversion / bin-based WAA path in catch-at-age.
  */
@@ -81,67 +91,23 @@ class VonBertalanffySchnuteGrowthModelAdapter
   VonBertalanffySchnuteGrowthModelAdapter()
       : GrowthDerivedObservationBase<Type>() {}
 
-  /**
-   * @brief Options for how the two reference lengths are supplied.
-   */
-  enum class LengthReferenceParameterization {
-    kEstimatedReferenceLengths = 0,
-    kConstantLengthYoungEstimatedLengthOld,
-    kEstimatedLengthYoungBelowConstantLengthOld,
-    kBothConstant
-  };
+  using LengthReferenceParameterization =
+      fims_popdy::LengthReferenceParameterization;
 
   /**
-   * @brief Estimate both reference mean lengths.
+   * @brief Configure reference-length interpretation and invalidate products.
+   * @param parameterization Constant/estimated configuration.
+   * @param reference_mean_length_young Natural-scale younger reference length;
+   * used only when the younger length is constant.
+   * @param reference_mean_length_old Natural-scale older reference length;
+   * used only when the older length is constant.
    */
-  void UseEstimatedReferenceMeanLengths() {
-    length_reference_parameterization_ =
-        LengthReferenceParameterization::kEstimatedReferenceLengths;
-    growth_products_prepared_ = false;
-  }
-
-  /**
-   * @brief Fix young reference length and estimate older reference mean length.
-   *
-   * @param constant_mean_length_young Fixed mean length at the younger
-   * reference age.
-   */
-  void UseConstantMeanLengthYoungWithEstimatedMeanLengthOld(
-      Type constant_mean_length_young) {
-    length_reference_parameterization_ =
-        LengthReferenceParameterization::kConstantLengthYoungEstimatedLengthOld;
-    constant_mean_length_young_ = constant_mean_length_young;
-    growth_products_prepared_ = false;
-  }
-
-  /**
-   * @brief Estimate young reference length below a fixed old reference length.
-   *
-   * @param constant_mean_length_old Fixed mean length at the older reference
-   * age.
-   */
-  void UseEstimatedMeanLengthYoungBelowConstantMeanLengthOld(
-      Type constant_mean_length_old) {
-    length_reference_parameterization_ = LengthReferenceParameterization::
-        kEstimatedLengthYoungBelowConstantLengthOld;
-    constant_mean_length_old_ = constant_mean_length_old;
-    growth_products_prepared_ = false;
-  }
-
-  /**
-   * @brief Fix both young and old reference mean lengths.
-   *
-   * @param constant_mean_length_young Fixed mean length at the younger
-   * reference age.
-   * @param constant_mean_length_old Fixed mean length at the older reference
-   * age.
-   */
-  void UseConstantReferenceMeanLengths(Type constant_mean_length_young,
-                                       Type constant_mean_length_old) {
-    length_reference_parameterization_ =
-        LengthReferenceParameterization::kBothConstant;
-    constant_mean_length_young_ = constant_mean_length_young;
-    constant_mean_length_old_ = constant_mean_length_old;
+  void SetLengthReferenceParameterization(
+      LengthReferenceParameterization parameterization,
+      Type reference_mean_length_young, Type reference_mean_length_old) {
+    length_reference_parameterization_ = parameterization;
+    constant_mean_length_young_ = reference_mean_length_young;
+    constant_mean_length_old_ = reference_mean_length_old;
     growth_products_prepared_ = false;
   }
 
@@ -501,34 +467,52 @@ class VonBertalanffySchnuteGrowthModelAdapter
                                       CurrentLengthWeightB());
 
     if (HasInterpolationSdInputs()) {
-      model_->SetLengthSdParams(CurrentLengthAtAgeSdAtReferenceAge1(),
-                                CurrentLengthAtAgeSdAtReferenceAge2());
+      const Type length_at_age_sd_young =
+          fims_math::exp(length_at_age_sd_young_vector_[0]);
+      const Type length_at_age_sd_old =
+          fims_math::exp(length_at_age_sd_old_vector_[0]);
+      model_->SetLengthSdParams(length_at_age_sd_young, length_at_age_sd_old);
     }
 
     if (HasStructuredDeltaMethodInputs()) {
+      const Type sd_mean_length_young =
+          fims_math::exp(log_sd_mean_length_young_vector_[0]);
+      const Type sd_mean_length_old =
+          fims_math::exp(log_sd_mean_length_old_vector_[0]);
+      const Type sd_growth_coefficient =
+          fims_math::exp(log_sd_growth_coefficient_vector_[0]);
+      const Type corr_mean_length_young_mean_length_old =
+          fims_math::inv_logit(
+              Type(-1.0), Type(1.0),
+              mean_length_young_mean_length_old_logit_corr_vector_[0]);
+      const Type corr_mean_length_young_growth_coefficient =
+          fims_math::inv_logit(
+              Type(-1.0), Type(1.0),
+              mean_length_young_growth_coefficient_logit_corr_vector_[0]);
+      const Type corr_mean_length_old_growth_coefficient =
+          fims_math::inv_logit(
+              Type(-1.0), Type(1.0),
+              mean_length_old_growth_coefficient_logit_corr_vector_[0]);
+
       model_->SetGrowthParameterCovariance(
-          CurrentMeanLengthYoungVariance(),
-          CurrentMeanLengthYoungLengthAtRefAgeOldCovariance(),
-          CurrentMeanLengthYoungKCovariance(), CurrentMeanLengthOldVariance(),
-          CurrentMeanLengthOldKCovariance(),
-          CurrentGrowthCoefficientVariance());
+          sd_mean_length_young * sd_mean_length_young,
+          corr_mean_length_young_mean_length_old * sd_mean_length_young *
+              sd_mean_length_old,
+          corr_mean_length_young_growth_coefficient * sd_mean_length_young *
+              sd_growth_coefficient,
+          sd_mean_length_old * sd_mean_length_old,
+          corr_mean_length_old_growth_coefficient * sd_mean_length_old *
+              sd_growth_coefficient,
+          sd_growth_coefficient * sd_growth_coefficient);
     } else {
       model_->ClearGrowthParameterCovariance();
     }
   }
 
-  Type CurrentMeanLengthYoungStorage() const {
-    return fims_math::exp(mean_length_young_vector_[0]);
-  }
-
-  Type CurrentMeanLengthOldStorage() const {
-    return fims_math::exp(mean_length_old_vector_[0]);
-  }
-
   Type CurrentMeanLengthYoung() const {
     switch (length_reference_parameterization_) {
       case LengthReferenceParameterization::kEstimatedReferenceLengths:
-        return CurrentMeanLengthYoungStorage();
+        return fims_math::exp(mean_length_young_vector_[0]);
 
       case LengthReferenceParameterization::
           kConstantLengthYoungEstimatedLengthOld:
@@ -544,7 +528,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
         return constant_mean_length_young_;
     }
 
-    return CurrentMeanLengthYoungStorage();
+    return fims_math::exp(mean_length_young_vector_[0]);
   }
 
   Type CurrentMeanLengthOld() const {
@@ -552,7 +536,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
       case LengthReferenceParameterization::kEstimatedReferenceLengths:
       case LengthReferenceParameterization::
           kConstantLengthYoungEstimatedLengthOld:
-        return CurrentMeanLengthOldStorage();
+        return fims_math::exp(mean_length_old_vector_[0]);
 
       case LengthReferenceParameterization::
           kEstimatedLengthYoungBelowConstantLengthOld:
@@ -562,7 +546,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
         return constant_mean_length_old_;
     }
 
-    return CurrentMeanLengthOldStorage();
+    return fims_math::exp(mean_length_old_vector_[0]);
   }
 
   Type CurrentGrowthCoefficient() const {
@@ -579,71 +563,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
   }
   Type CurrentLengthWeightB() const {
     return fims_math::exp(length_weight_b_vector_[0]);
-  }
-  Type CurrentLengthAtAgeSdAtReferenceAge1() const {
-    return fims_math::exp(length_at_age_sd_young_vector_[0]);
-  }
-  Type CurrentLengthAtAgeSdAtReferenceAge2() const {
-    return fims_math::exp(length_at_age_sd_old_vector_[0]);
-  }
-  Type CurrentSdLengthAtRefAgeYoung() const {
-    return fims_math::exp(log_sd_mean_length_young_vector_[0]);
-  }
-
-  Type CurrentSdLengthAtRefAgeOld() const {
-    return fims_math::exp(log_sd_mean_length_old_vector_[0]);
-  }
-
-  Type CurrentSdGrowthCoefficient() const {
-    return fims_math::exp(log_sd_growth_coefficient_vector_[0]);
-  }
-
-  Type CurrentCorrLengthAtRefAgeYoungLengthAtRefAgeOld() const {
-    return fims_math::inv_logit(
-        static_cast<Type>(-1.0), static_cast<Type>(1.0),
-        mean_length_young_mean_length_old_logit_corr_vector_[0]);
-  }
-
-  Type CurrentCorrLengthAtRefAgeYoungK() const {
-    return fims_math::inv_logit(
-        static_cast<Type>(-1.0), static_cast<Type>(1.0),
-        mean_length_young_growth_coefficient_logit_corr_vector_[0]);
-  }
-
-  Type CurrentCorrLengthAtRefAgeOldK() const {
-    return fims_math::inv_logit(
-        static_cast<Type>(-1.0), static_cast<Type>(1.0),
-        mean_length_old_growth_coefficient_logit_corr_vector_[0]);
-  }
-
-  Type CurrentMeanLengthYoungVariance() const {
-    const Type sd = CurrentSdLengthAtRefAgeYoung();
-    return sd * sd;
-  }
-
-  Type CurrentMeanLengthOldVariance() const {
-    const Type sd = CurrentSdLengthAtRefAgeOld();
-    return sd * sd;
-  }
-
-  Type CurrentGrowthCoefficientVariance() const {
-    const Type sd = CurrentSdGrowthCoefficient();
-    return sd * sd;
-  }
-
-  Type CurrentMeanLengthYoungLengthAtRefAgeOldCovariance() const {
-    return CurrentCorrLengthAtRefAgeYoungLengthAtRefAgeOld() *
-           CurrentSdLengthAtRefAgeYoung() * CurrentSdLengthAtRefAgeOld();
-  }
-
-  Type CurrentMeanLengthYoungKCovariance() const {
-    return CurrentCorrLengthAtRefAgeYoungK() * CurrentSdLengthAtRefAgeYoung() *
-           CurrentSdGrowthCoefficient();
-  }
-
-  Type CurrentMeanLengthOldKCovariance() const {
-    return CurrentCorrLengthAtRefAgeOldK() * CurrentSdLengthAtRefAgeOld() *
-           CurrentSdGrowthCoefficient();
   }
 
   bool HasInterpolationSdInputs() const {

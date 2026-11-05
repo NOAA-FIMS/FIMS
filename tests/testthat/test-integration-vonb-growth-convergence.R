@@ -286,7 +286,7 @@ initialize_test_fleet <- function(parameters, data, fleet) {
 }
 
 ## IO correctness ----
-test_that("reference lengths survive initialization across estimation settings", {
+test_that("reference lengths initialize and report updates across estimation settings", {
   FIMS::clear()
   on.exit(FIMS::clear(), add = TRUE)
 
@@ -309,9 +309,11 @@ test_that("reference lengths survive initialization across estimation settings",
         )
       )
 
-    fit <- parameters |>
-      FIMS::initialize_fims(data = ctx$data) |>
-      FIMS::fit_fims(optimize = FALSE, get_sd = FALSE)
+    input <- FIMS::initialize_fims(
+      parameters = parameters,
+      data = ctx$data
+    )
+    fit <- FIMS::fit_fims(input, optimize = FALSE, get_sd = FALSE)
 
     lengths <- FIMS::get_estimates(fit) |>
       dplyr::filter(
@@ -332,6 +334,64 @@ test_that("reference lengths survive initialization across estimation settings",
     expect_equal(
       as.numeric(FIMS::get_report(fit)[["growth_mean_LAA"]][[1]][1]),
       lengths$input[lengths$label == "mean_length_young"],
+      tolerance = 1e-8,
+      info = case
+    )
+
+    working <- FIMS::get_fixed()
+    parameter_names <- names(FIMS::get_obj(fit)[["par"]])
+
+    expect_length(working, length(parameter_names))
+
+    length_labels <- c("mean_length_young", "mean_length_old")
+    initial_lengths <- lengths[["input"]][
+      match(length_labels, lengths[["label"]])
+    ]
+    expected_lengths <- initial_lengths
+
+    if (settings[["young"]][i] == "fixed_effects") {
+      young_index <- grep(
+        "^Growth\\..*\\.mean_length_young\\.",
+        parameter_names
+      )
+      expect_length(young_index, 1L)
+
+      if (settings[["old"]][i] == "constant") {
+        working[young_index] <- qlogis(0.5)
+        expected_lengths[1] <- initial_lengths[2] / 2
+      } else {
+        expected_lengths[1] <- initial_lengths[1] * 1.1
+        working[young_index] <- log(expected_lengths[1])
+      }
+    }
+
+    if (settings[["old"]][i] == "fixed_effects") {
+      old_index <- grep(
+        "^Growth\\..*\\.mean_length_old\\.",
+        parameter_names
+      )
+      expect_length(old_index, 1L)
+
+      expected_lengths[2] <- initial_lengths[2] * 1.2
+      working[old_index] <- log(expected_lengths[2])
+    }
+
+    FIMS::set_fixed(working)
+
+    updated_lengths <- FIMS:::reshape_json_estimates(
+      input[["model"]]$get_output()
+    ) |>
+      dplyr::filter(
+        module_name == "Growth",
+        label %in% length_labels
+      )
+
+    #' @description Finalization decodes updated working values while preserving constant reference lengths.
+    expect_equal(
+      updated_lengths[["estimated"]][
+        match(length_labels, updated_lengths[["label"]])
+      ],
+      expected_lengths,
       tolerance = 1e-8,
       info = case
     )
@@ -494,7 +554,7 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
   K <- 0.18
   a0 <- -1.36
 
-  # Same von Bertalanffy--Schnute formula used in the model comparison OM data generator.
+  # Convert Traditional von Bertalanffy OM parameters to reference lengths.
   AtoL <- function(a, Linf, K, a0) {
     Linf * (1 - exp(-K * (a - a0)))
   }
@@ -514,7 +574,6 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
 
   input <- ctx$parameters |>
     FIMS::initialize_fims(data = ctx$data)
-  input$model$ReportAgeToLengthConversionDerivedTensor(TRUE)
 
   fit <- FIMS::fit_fims(
     input = input,
@@ -862,7 +921,6 @@ test_that("fleet-specific length bins initialize n_lengths consistently", {
   expect_equal(fleet_short_obj$n_lengths$get(), length(fleet_short_lengths))
 
   #' @description Test that different fleets can carry different length_bin vectors.
-  expect_false(identical(fleet1_lengths, fleet_short_lengths))
   expect_true(length(fleet_short_lengths) < length(fleet1_lengths))
   expect_equal(fleet_short_lengths, seq(0, 550, 50))
 
@@ -928,9 +986,6 @@ test_that("fleet-specific length bins initialize n_lengths consistently", {
       dplyr::pull(out)
   )
 })
-## Edge handling ----
-# No edge cases to test.
-
 ## Error handling ----
 test_that("von bertalanffy initialization rejects decreasing reference lengths", {
   ctx <- make_vonb_convergence_context()
