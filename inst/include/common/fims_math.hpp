@@ -333,15 +333,13 @@ inline const Type double_logistic(const Type &inflection_point_asc,
  */
 template <class Type>
 const Type ad_fabs(const Type &x, Type C = 1e-5) {
-  // C = 0 gives the exact |x|, which has no derivative at x = 0. C < 0 gives
-  // the square root of a negative number when |x| is small, which is NaN.
-  // C is a constant, not a parameter, so this branch does not depend on the
-  // values being estimated.
+  // C = 0 gives the exact |x|, which has a NaN derivative at x = 0. C < 0
+  // gives NaN when |x| is small. C is a fixed setting, not an estimated
+  // value, so checking it once when TMB records the tape is enough.
   if (fims_math::Value(C) <= 0.0) {
-    throw std::invalid_argument(
-        "fims_math::ad_fabs: C must be greater than 0 for a smooth result, "
-        "but C = " +
-        fims::to_string(fims_math::Value(C)) + ".");
+    throw std::invalid_argument("fims_math::ad_fabs: C is " +
+                                fims::to_string(fims_math::Value(C)) +
+                                ", which is not greater than 0.");
   }
   return sqrt((x * x) + C);
 }
