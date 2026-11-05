@@ -561,7 +561,7 @@ dimension_folded_to_tibble <- function(section) {
 #' )
 #' dimensions_to_tibble(dummy_dimensions)
 dimensions_to_tibble <- function(data) {
-  # Positions before the first one, e.g., 3 for "3+n_years"
+  # Number of positions before the first year. "3+n_years" has 3.
   header <- unlist(data[["header"]])
   has_prefix <- grepl("^\\d+\\+", header)
   prefix <- rep(0, length(header))

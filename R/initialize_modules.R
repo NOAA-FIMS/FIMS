@@ -428,9 +428,10 @@ check_initial_numbers <- function(parameters, data) {
   has_free <- "log_init_naa" %in% population_labels
   has_equilibrium <- "log_init_rzero_offset" %in% population_labels
   if (has_free == has_equilibrium) {
+    n_found <- if (has_free) "both" else "neither"
     cli::cli_abort(c(
-      "x" = "The Population module needs exactly 1 of {.var log_init_naa}
-      and {.var log_init_rzero_offset}.",
+      "x" = "The Population module has {n_found} of {.var log_init_naa} and
+      {.var log_init_rzero_offset}, but it needs exactly 1.",
       "i" = "{.code initial_numbers = \"free\"} in
       {.fn setup_default_parameters} gives {.var log_init_naa} and the
       default, {.code \"equilibrium\"}, gives {.var log_init_rzero_offset}.",

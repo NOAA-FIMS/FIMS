@@ -164,7 +164,8 @@ setup_default_parameters <- function(
   )
 
   # Suppress the known informational alert about log_init_naa being NA here,
-  # because this function computes and sets log_init_naa immediately below.
+  # because for free initial numbers at age this function computes and sets
+  # log_init_naa immediately below.
   population_defaults <- withCallingHandlers(
     setup_default_Population(data = data, initial_numbers = initial_numbers),
     message = function(message_condition) {
@@ -584,7 +585,8 @@ setup_default_Population <- function(
     cli::cli_abort(c(
       "x" = "Equilibrium initial numbers at age need at least 2 ages, not
       {.val {n_ages}}.",
-      "i" = "Use {.code initial_numbers = \"free\"} for a model with 1 age.",
+      "i" = "With 1 age, the only age is the plus group. Use
+      {.code initial_numbers = \"free\"}.",
       "i" = "Check the ages with {.code get_ages(data)}."
     ))
   }
@@ -593,7 +595,9 @@ setup_default_Population <- function(
   # start
   if (initial_numbers == "equilibrium" && !all(is.na(log_init_naa))) {
     cli::cli_abort(c(
-      "x" = "{.var log_init_naa} is only used when
+      "x" = "{.var log_init_naa} has values, but
+      {.code initial_numbers = \"equilibrium\"} does not use them.",
+      "i" = "{.var log_init_naa} is only used when
       {.code initial_numbers = \"free\"}.",
       "i" = "Set {.code initial_numbers = \"free\"} to use
       {.var log_init_naa}, or leave it as {.val NA} for the default

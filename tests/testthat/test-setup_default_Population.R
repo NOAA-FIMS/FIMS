@@ -22,7 +22,7 @@ test_that("`setup_default_Population()` works with correct inputs", {
   #' @description Test that equilibrium initial numbers at age, the default, have no log_init_naa.
   expect_false("log_init_naa" %in% result[["label"]])
 
-  #' @description Test that log_init_rzero_offset is fixed at 0 by default so initial recruitment equals unfished recruitment.
+  #' @description Test that log_init_rzero_offset is constant at 0 by default so initial recruitment equals unfished recruitment.
   expect_equal(
     dplyr::filter(result, .data[["label"]] == "log_init_rzero_offset") |>
       dplyr::select("value", "estimation_type"),
@@ -40,7 +40,7 @@ test_that("`setup_default_Population()` works with correct inputs", {
     initial_numbers = "free",
     log_init_naa = rep(log(1000), get_n_ages(data))
   )
-  #' @description Test that free initial numbers at age have one log_init_naa per age and no log_init_rzero_offset.
+  #' @description Test that free initial numbers at age have 1 log_init_naa per age and no log_init_rzero_offset.
   expect_equal(
     dplyr::filter(free_result, .data[["label"]] == "log_init_naa")[["age"]],
     get_ages(data)
