@@ -414,7 +414,9 @@ initialize_population <- function(parameters, data, linked_ids) {
 #' year. That cohort can be up to `n_ages - 2` years before the first year,
 #' because the plus group has no deviation. The C++ model reads `log_devs` by
 #' position, so a vector that does not match the option would put each
-#' deviation on the wrong year without an error.
+#' deviation on the wrong year without an error. An equilibrium population
+#' needs 1 `log_init_rzero_offset` because the model reads only the first
+#' value.
 #' @inheritParams initialize_module
 #' @return
 #' Either `"free"` or `"equilibrium"`.
@@ -443,6 +445,17 @@ check_initial_numbers <- function(parameters, data) {
     dplyr::filter(.data$module_name == "Recruitment") |>
     dplyr::pull(.data$label)
   if (initial_numbers == "equilibrium") {
+    n_offsets <- sum(population_labels == "log_init_rzero_offset")
+    if (n_offsets != 1) {
+      cli::cli_abort(c(
+        "x" = "The Population module needs 1 {.var log_init_rzero_offset}
+        row, not {.val {n_offsets}}.",
+        "i" = "The offset scales the whole first-year age structure. Use
+        {.var log_devs} before the first year to change individual ages.",
+        "i" = "Check the rows with
+        {.code dplyr::filter(parameters, label == \"log_init_rzero_offset\")}."
+      ))
+    }
     if (get_n_ages(data) < 2) {
       cli::cli_abort(c(
         "x" = "Equilibrium initial numbers at age need at least 2 ages.",

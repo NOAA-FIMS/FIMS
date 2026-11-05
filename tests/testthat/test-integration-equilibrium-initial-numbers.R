@@ -247,6 +247,17 @@ test_that("initialize_fims() checks how initial numbers at age are set", {
   )
   clear()
 
+  #' @description Test that a second log_init_rzero_offset row returns an informative error because the model uses only 1.
+  expect_error(
+    object = parameters |>
+      dplyr::bind_rows(
+        dplyr::filter(parameters, label == "log_init_rzero_offset")
+      ) |>
+      initialize_fims(data = data_4_model),
+    regexp = "row, not 2"
+  )
+  clear()
+
   #' @description Test that log_r recruitment with equilibrium initial numbers at age returns an informative error.
   expect_error(
     object = parameters |>

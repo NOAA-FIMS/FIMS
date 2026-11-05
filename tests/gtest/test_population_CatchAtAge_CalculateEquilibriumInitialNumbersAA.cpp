@@ -143,6 +143,7 @@ TEST_F(CAAEvaluateTestFixture,
 TEST_F(CAAEvaluateTestFixture,
        CaptureError_CatchAtAge_InitializeEquilibriumDeviations) {
   population->initial_numbers = "equilibrium";
+  population->log_init_rzero_offset.resize(1);
   // The fixture's n_years - 1 deviations are the free layout, which has no
   // deviation for the first year.
   EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
@@ -157,5 +158,23 @@ TEST_F(CAAEvaluateTestFixture,
   EXPECT_EQ(population->n_initial_devs, static_cast<size_t>(n_ages - 2));
   EXPECT_EQ(population->recruitment->log_expected_recruitment.size(),
             static_cast<size_t>(n_years + n_ages - 2));
+}
+
+TEST_F(CAAEvaluateTestFixture,
+       CaptureError_CatchAtAge_InitializeEquilibriumOffset) {
+  population->initial_numbers = "equilibrium";
+  population->recruitment->log_recruit_devs.resize(n_years);
+
+  // Without an offset, the first-year numbers at age would read past the end
+  // of the vector.
+  population->log_init_rzero_offset.resize(0);
+  EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
+
+  // A second offset is never used.
+  population->log_init_rzero_offset.resize(2);
+  EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
+
+  population->log_init_rzero_offset.resize(1);
+  EXPECT_NO_THROW(catch_at_age_model->Initialize());
 }
 }  // namespace

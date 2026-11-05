@@ -183,6 +183,19 @@ class CatchAtAge : public FisheryModelBase<Type> {
           (this->populations[p]->n_years + 1));
 
       if (this->populations[p]->initial_numbers == "equilibrium") {
+        // CalculateEquilibriumInitialNumbersAA() reads only the first offset.
+        // Without one it would read past the end of the vector, and a second
+        // one would be an unidentified parameter.
+        size_t n_offsets = this->populations[p]->log_init_rzero_offset.size();
+        if (n_offsets != 1) {
+          std::stringstream ss;
+          ss << "Equilibrium initial numbers at age need 1 "
+                "log_init_rzero_offset, but population "
+             << this->populations[p]->GetId() << " has " << n_offsets << ".";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
+
         // log_recruit_devs runs from the oldest cohort with a deviation in the
         // first-year age structure to the last year, so its length sets how
         // many of the cohorts that recruited before the first year have a
