@@ -326,11 +326,23 @@ inline const Type double_logistic(const Type &inflection_point_asc,
  * with the default C.
  *
  * @param x value to keep positive
- * @param C default = 1e-5
+ * @param C A positive constant that sets how smooth the result is. Default
+ * is 1e-5.
  * @return A smooth approximation of the absolute value of x.
+ * @throws std::invalid_argument if C is not greater than 0.
  */
 template <class Type>
 const Type ad_fabs(const Type &x, Type C = 1e-5) {
+  // C = 0 gives the exact |x|, which has no derivative at x = 0. C < 0 gives
+  // the square root of a negative number when |x| is small, which is NaN.
+  // C is a constant, not a parameter, so this branch does not depend on the
+  // values being estimated.
+  if (fims_math::Value(C) <= 0.0) {
+    throw std::invalid_argument(
+        "fims_math::ad_fabs: C must be greater than 0 for a smooth result, "
+        "but C = " +
+        fims::to_string(fims_math::Value(C)) + ".");
+  }
   return sqrt((x * x) + C);
 }
 
@@ -351,6 +363,7 @@ const Type ad_fabs(const Type &x, Type C = 1e-5) {
  * @param C A positive constant that sets how smooth the result is. A smaller
  * C gives a smaller error but a sharper bend at a = b. Default is 1e-5.
  * @return A smooth approximation of the minimum of a and b.
+ * @throws std::invalid_argument if C is not greater than 0.
  */
 
 template <typename Type>
@@ -375,6 +388,7 @@ inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
  * @param C A positive constant that sets how smooth the result is. A smaller
  * C gives a smaller error but a sharper bend at a = b. Default is 1e-5.
  * @return A smooth approximation of the maximum of a and b.
+ * @throws std::invalid_argument if C is not greater than 0.
  */
 template <typename Type>
 inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
