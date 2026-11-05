@@ -16,6 +16,47 @@ namespace {
 // CatchAtAge_Initialize
 // Error handling
 TEST_F(CAAEvaluateTestFixture,
+       CaptureError_CatchAtAge_InitializeInitialNumbersOption) {
+  // A misspelled option would otherwise take the free branch.
+  population->initial_numbers = "Equilibrium";
+  EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
+
+  population->initial_numbers = "free";
+  EXPECT_NO_THROW(catch_at_age_model->Initialize());
+}
+
+// CatchAtAge_Initialize
+// Error handling
+TEST_F(CAAEvaluateTestFixture,
+       CaptureError_CatchAtAge_InitializeFreeInitialNumbers) {
+  // Free initial numbers at age read 1 log_init_naa per age.
+  population->log_init_naa.resize(n_ages - 1);
+  EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
+}
+
+// CatchAtAge_Initialize
+// Error handling
+TEST_F(CAAEvaluateTestFixture,
+       CaptureError_CatchAtAge_InitializeFreeDeviations) {
+  // The fixture's n_years - 1 deviations start in the second year.
+  EXPECT_NO_THROW(catch_at_age_model->Initialize());
+
+  // With 1 deviation per year, the output would label every deviation 1 year
+  // earlier than the year it is applied to.
+  population->recruitment->log_recruit_devs.resize(n_years);
+  EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
+
+  // LogR reads log_r, so the length of log_recruit_devs does not matter.
+  auto log_r = std::make_shared<fims_popdy::LogR<double>>();
+  population->recruitment->process = log_r;
+  log_r->recruitment = population->recruitment;
+  population->recruitment->log_recruit_devs.resize(1);
+  EXPECT_NO_THROW(catch_at_age_model->Initialize());
+}
+
+// CatchAtAge_Initialize
+// Error handling
+TEST_F(CAAEvaluateTestFixture,
        CaptureError_CatchAtAge_InitializeEquilibriumDeviations) {
   population->initial_numbers = "equilibrium";
   population->log_init_rzero_offset.resize(1);

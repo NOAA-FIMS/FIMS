@@ -526,6 +526,30 @@ class PopulationInterface : public PopulationInterfaceBase {
     info->variable_map[this->log_f_multiplier.id_m] =
         &(population)->log_f_multiplier;
 
+    // Only the vector for the selected initial numbers at age is used. Values
+    // set in the other one would be ignored, and an estimated value would not
+    // change the likelihood and would make the Hessian singular. A vector
+    // that was never set keeps its 1 constant placeholder.
+    bool is_equilibrium = this->initial_numbers.get() == "equilibrium";
+    VariableVector &unused_initial_numbers =
+        is_equilibrium ? this->log_init_naa : this->log_init_rzero_offset;
+    std::string unused_name =
+        is_equilibrium ? "log_init_naa" : "log_init_rzero_offset";
+    bool is_unused_set = unused_initial_numbers.size() > 1;
+    for (size_t i = 0; i < unused_initial_numbers.size(); i++) {
+      if (unused_initial_numbers[i].estimation_type_m.get() != "constant") {
+        is_unused_set = true;
+      }
+    }
+    if (is_unused_set) {
+      ss.str("");
+      ss << "Population " << this->id << " sets " << unused_name << ", but "
+         << this->initial_numbers.get()
+         << " initial numbers at age do not use it.";
+      FIMS_ERROR_LOG(ss.str());
+      throw std::invalid_argument(ss.str());
+    }
+
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
       if (this->log_init_naa[i].estimation_type_m.get() == "fixed_effects") {

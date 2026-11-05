@@ -182,6 +182,20 @@ class CatchAtAge : public FisheryModelBase<Type> {
       this->populations[p]->spawning_biomass_ratio.resize(
           (this->populations[p]->n_years + 1));
 
+      // Any other value would take the free branch in Evaluate() and read
+      // log_init_naa, which an equilibrium model does not fill.
+      const std::string &initial_numbers =
+          this->populations[p]->initial_numbers;
+      if (initial_numbers != "free" && initial_numbers != "equilibrium") {
+        std::stringstream ss;
+        ss << "Initial numbers at age must be \"free\" or \"equilibrium\", "
+              "but population "
+           << this->populations[p]->GetId() << " has \"" << initial_numbers
+           << "\".";
+        FIMS_ERROR_LOG(ss.str());
+        throw std::runtime_error(ss.str());
+      }
+
       if (this->populations[p]->initial_numbers == "equilibrium") {
         // CalculateEquilibriumInitialNumbersAA() reads only the first offset.
         // Without one it would read past the end of the vector, and a second
@@ -229,6 +243,37 @@ class CatchAtAge : public FisheryModelBase<Type> {
         }
         this->populations[p]->n_initial_devs = n_devs - n_years;
         recruitment->log_expected_recruitment.resize(n_devs);
+      } else {
+        // Free initial numbers at age read 1 log_init_naa per age
+        size_t n_ages = this->populations[p]->n_ages;
+        size_t n_init_naa = this->populations[p]->log_init_naa.size();
+        if (n_init_naa != n_ages) {
+          std::stringstream ss;
+          ss << "Free initial numbers at age need 1 log_init_naa per age ("
+             << n_ages << "), but population " << this->populations[p]->GetId()
+             << " has " << n_init_naa << ".";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
+
+        // LogDevs reads 1 deviation for each year after the first. The
+        // log_devs output labels years from the vector length, so any other
+        // length would report the deviations on the wrong years.
+        std::shared_ptr<fims_popdy::RecruitmentBase<Type>> &recruitment =
+            this->populations[p]->recruitment;
+        size_t n_devs = recruitment->log_recruit_devs.size();
+        size_t n_years = this->populations[p]->n_years;
+        if (std::dynamic_pointer_cast<fims_popdy::LogDevs<Type>>(
+                recruitment->process) &&
+            n_devs + 1 != n_years) {
+          std::stringstream ss;
+          ss << "Free initial numbers at age need n_years - 1 recruitment "
+                "deviations ("
+             << n_years - 1 << "), but population "
+             << this->populations[p]->GetId() << " has " << n_devs << ".";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
       }
     }
 
