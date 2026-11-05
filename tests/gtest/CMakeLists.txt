@@ -512,3 +512,17 @@ target_link_libraries(population_CatchAtAge_CalculateEquilibriumInitialNumbersAA
 )
 
 gtest_discover_tests(population_CatchAtAge_CalculateEquilibriumInitialNumbersAA)
+
+
+# test_population_CatchAtAge_Initialize.cpp
+add_executable(population_CatchAtAge_Initialize
+  test_population_CatchAtAge_Initialize.cpp
+)
+add_as_invoker_manifest(population_CatchAtAge_Initialize)
+
+target_link_libraries(population_CatchAtAge_Initialize
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_CatchAtAge_Initialize)
