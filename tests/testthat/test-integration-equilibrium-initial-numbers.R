@@ -32,6 +32,22 @@ first_year <- function(report, label) {
   report[[label]][[1]][seq_len(n_ages)]
 }
 
+# Unfished numbers at age from R0 and a natural mortality that is the same for
+# every age and year. The plus group holds every older age, which is a
+# geometric series with ratio exp(-M).
+unfished_numbers_at_age <- function(natural_mortality) {
+  r0 <- exp(dplyr::filter(parameters, label == "log_rzero")[["value"]])
+  numbers_at_age <- r0 * exp(-natural_mortality * (seq_len(n_ages) - 1))
+  numbers_at_age[n_ages] <- numbers_at_age[n_ages] /
+    (1 - exp(-natural_mortality))
+  numbers_at_age
+}
+
+# FIMS represents a fleet that does not fish with log_Fmort = -200, as in the
+# default survey
+no_fishing_parameters <- parameters |>
+  dplyr::mutate(value = dplyr::if_else(label == "log_Fmort", -200, value))
+
 ## IO correctness ----
 test_that("equilibrium initial numbers at age match the unfished equilibrium", {
   output <- run_without_fitting(parameters)
@@ -139,7 +155,103 @@ test_that("log_devs before the first year are reported with year_i of 0 or less"
   )
 })
 
+test_that("with no fishing, an equilibrium start stays at the unfished age structure", {
+  natural_mortality <- exp(unique(
+    dplyr::filter(parameters, label == "log_M")[["value"]]
+  ))
+  #' @description Test that the setup has a single natural mortality, which the closed form below assumes.
+  expect_length(natural_mortality, 1)
+
+  report <- run_without_fitting(no_fishing_parameters)[["report"]]
+
+  #' @description Test that numbers at age equal R0 exp(-M a), with the geometric plus group, in every year including the year after the last.
+  expect_equal(
+    object = report[["numbers_at_age"]][[1]],
+    expected = rep(
+      unfished_numbers_at_age(natural_mortality),
+      get_n_years(data_4_model) + 1
+    ),
+    tolerance = 1e-10
+  )
+  #' @description Test that spawning biomass stays at unfished spawning biomass, so the spawning biomass ratio is 1 in every year.
+  expect_equal(
+    object = report[["spawning_biomass_ratio"]][[1]],
+    expected = rep(1, get_n_years(data_4_model) + 1),
+    tolerance = 1e-10
+  )
+})
+
+test_that("with no fishing, a deviation before the first year follows its cohort to the plus group", {
+  natural_mortality <- exp(unique(
+    dplyr::filter(parameters, label == "log_M")[["value"]]
+  ))
+  deviation <- 0.3
+  # The cohort that recruited 3 years before the first year is the fourth age
+  # in the first year
+  first_age <- 4
+  report <- no_fishing_parameters |>
+    dplyr::rows_update(
+      tibble::tibble(
+        label = "log_devs",
+        timing = start_year - (first_age - 1),
+        value = deviation
+      ),
+      by = c("label", "timing")
+    ) |>
+    run_without_fitting()
+  # The cohort gets 1 year and 1 age older each year until the plus group,
+  # where it mixes with older cohorts. Numbers at age are folded with ages
+  # changing fastest.
+  cohort_ages <- first_age:(n_ages - 1)
+  years_since_start <- cohort_ages - first_age
+  cohort_numbers <- report[["report"]][["numbers_at_age"]][[1]][
+    years_since_start * n_ages + cohort_ages
+  ]
+
+  #' @description Test that the cohort stays exp(deviation) times its unfished numbers in every year, because only M acts on it.
+  expect_equal(
+    object = cohort_numbers /
+      unfished_numbers_at_age(natural_mortality)[cohort_ages],
+    expected = rep(exp(deviation), length(cohort_ages)),
+    tolerance = 1e-10
+  )
+})
+
 ## Edge handling ----
+test_that("removing only the oldest deviations keeps the others on their cohorts", {
+  # Keep deviations from 2 years before the first year, so the third age and
+  # younger have one
+  parameters_some_devs <- parameters |>
+    dplyr::filter(!(label == "log_devs" & timing < start_year - 2)) |>
+    dplyr::rows_update(
+      tibble::tibble(
+        label = "log_devs",
+        timing = c(start_year - 2, start_year - 1),
+        value = c(0.3, -0.2)
+      ),
+      by = c("label", "timing")
+    )
+  output <- run_without_fitting(parameters_some_devs)
+  log_ratio <- log(
+    first_year(output[["report"]], "numbers_at_age") /
+      first_year(output[["report"]], "unfished_numbers_at_age")
+  )
+  expected_log_ratio <- rep(0, n_ages)
+  expected_log_ratio[2:3] <- c(-0.2, 0.3)
+
+  #' @description Test that each remaining deviation scales only its own cohort in the first year and the older cohorts stay at equilibrium.
+  expect_equal(
+    object = log_ratio,
+    expected = expected_log_ratio,
+    tolerance = 1e-12
+  )
+  #' @description Test that the remaining deviations are reported from year_i -1, 2 years before the first year.
+  expect_equal(
+    object = dplyr::filter(output[["estimates"]], label == "log_devs")[["year_i"]],
+    expected = -1:(end_year - start_year + 1)
+  )
+})
+
 test_that("removed deviations before the first year add no recruitment likelihood terms", {
   parameters_no_devs <- parameters |>
     dplyr::filter(!(label == "log_devs" & timing < start_year))
@@ -223,15 +335,20 @@ test_that("initialize_fims() checks how initial numbers at age are set", {
   )
   clear()
 
+  # The extra row goes before the other log_devs rows so the years stay in
+  # order and only the plus group rule is broken
+  plus_group_deviation <- parameters |>
+    dplyr::filter(label == "log_devs", timing == start_year) |>
+    dplyr::mutate(timing = start_year - n_ages + 1)
   #' @description Test that a deviation for the plus group cohort returns an informative error.
   expect_error(
     object = parameters |>
-      dplyr::bind_rows(
-        dplyr::filter(parameters, label == "log_devs", timing == start_year) |>
-          dplyr::mutate(timing = start_year - n_ages + 1)
+      dplyr::add_row(
+        plus_group_deviation,
+        .before = which(parameters[["label"]] == "log_devs")[1]
       ) |>
       initialize_fims(data = data_4_model),
-    regexp = "log_devs"
+    regexp = "must be from"
   )
   clear()
 
