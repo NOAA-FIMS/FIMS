@@ -72,8 +72,9 @@ TEST_F(CAAEvaluateTestFixture,
 
 // CatchAtAge_CalculateEquilibriumInitialNumbersAA
 // Edge handling
-TEST_F(CAAEvaluateTestFixture,
-       HandlesZeroOffsetAndDeviations_CatchAtAge_EquilibriumEqualsUnfished) {
+TEST_F(
+    CAAEvaluateTestFixture,
+    HandlesZeroOffsetAndDeviations_CatchAtAge_CalculateEquilibriumInitialNumbersAA) {
   auto& dq =
       catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
   // With no offset and no deviations, the first-year age structure is the
@@ -176,5 +177,18 @@ TEST_F(CAAEvaluateTestFixture,
 
   population->log_init_rzero_offset.resize(1);
   EXPECT_NO_THROW(catch_at_age_model->Initialize());
+}
+
+TEST_F(CAAEvaluateTestFixture,
+       CaptureError_CatchAtAge_InitializeEquilibriumLogR) {
+  population->initial_numbers = "equilibrium";
+  population->log_init_rzero_offset.resize(1);
+  population->recruitment->log_recruit_devs.resize(n_years);
+
+  // LogR reads log_r, not the log_recruit_devs used for the first year.
+  auto log_r = std::make_shared<fims_popdy::LogR<double>>();
+  population->recruitment->process = log_r;
+  log_r->recruitment = population->recruitment;
+  EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
 }
 }  // namespace

@@ -40,7 +40,7 @@ struct Population : public fims_model_object::FIMSObject<Type> {
    */
   std::string initial_numbers = "free";
   /**
-   * @brief Estimated parameter: offset on the natural log of unfished
+   * @brief Parameter: offset on the natural log of unfished
    * recruitment for the first-year age structure under "equilibrium".
    */
   fims::Vector<Type> log_init_rzero_offset;

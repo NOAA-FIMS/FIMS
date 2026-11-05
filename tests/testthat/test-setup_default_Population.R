@@ -104,6 +104,21 @@ test_that("`setup_default_Population()` returns correct error messages", {
     regexp = "initial_numbers = \"free\""
   )
 
+  # A 1-age model keeps age 1 and drops the length data, which needs more
+  # than 1 age
+  data_1_age <- data_big |>
+    dplyr::filter(
+      is.na(age) | age == 1,
+      !type %in% c("length_comp", "age_to_length_conversion")
+    ) |>
+    dplyr::mutate(observed = dplyr::if_else(type == "age_comp", 1, observed)) |>
+    FIMSFrame()
+  #' @description Test that an equilibrium start with 1 age returns an error because the only age is the plus group.
+  expect_error(
+    object = setup_default_Population(data = data_1_age),
+    regexp = "at least 2 ages"
+  )
+
   #' @description Test that an unknown initial_numbers option returns expected error.
   expect_error(
     object = setup_default_Population(data = data, initial_numbers = "fished"),

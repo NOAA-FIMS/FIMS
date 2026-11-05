@@ -26,14 +26,16 @@ Dnorm, NA.}
 \item{initial_numbers}{A string specifying how numbers at age in the first
 year are set. The available options are
 equilibrium, free.
-The default is
-equilibrium, the
-unfished equilibrium with recruitment deviations for every cohort in the
-first-year age structure except the plus group. To keep the oldest of
-those cohorts at equilibrium, remove their \code{log_devs} rows, starting with
-the earliest \code{timing}. Do not set them to constant instead, because a
-constant deviation still adds a term to the recruitment likelihood.
-\code{"free"} estimates \code{log_init_naa} for every age.}
+The default,
+equilibrium,
+starts from the unfished equilibrium with recruitment deviations for every
+cohort in the first-year age structure except the plus group, so
+\code{log_devs} start \code{n_ages - 2} years before the first year. To keep the
+oldest of those cohorts at equilibrium, remove their \code{log_devs} rows,
+starting with the earliest \code{timing}. Do not set them to constant instead,
+because a constant deviation still adds a term to the recruitment
+likelihood. \code{"free"} estimates \code{log_init_naa} for every age, and
+\code{log_devs} start in the second year.}
 }
 \value{
 A tibble containing default recruitment parameters. See \code{\link{setup_default_parameters}}

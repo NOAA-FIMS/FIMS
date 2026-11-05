@@ -39,14 +39,16 @@
 #' @param initial_numbers A string specifying how numbers at age in the first
 #'   year are set. The available options are
 #'   `r toString(eval(formals(setup_default_parameters)[["initial_numbers"]]))`.
-#'   The default is
-#'   `r eval(formals(setup_default_parameters)[["initial_numbers"]])[1]`, the
-#'   unfished equilibrium with recruitment deviations for every cohort in the
-#'   first-year age structure except the plus group. To keep the oldest of
-#'   those cohorts at equilibrium, remove their `log_devs` rows, starting with
-#'   the earliest `timing`. Do not set them to constant instead, because a
-#'   constant deviation still adds a term to the recruitment likelihood.
-#'   `"free"` estimates `log_init_naa` for every age.
+#'   The default,
+#'   `r eval(formals(setup_default_parameters)[["initial_numbers"]])[1]`,
+#'   starts from the unfished equilibrium with recruitment deviations for every
+#'   cohort in the first-year age structure except the plus group, so
+#'   `log_devs` start `n_ages - 2` years before the first year. To keep the
+#'   oldest of those cohorts at equilibrium, remove their `log_devs` rows,
+#'   starting with the earliest `timing`. Do not set them to constant instead,
+#'   because a constant deviation still adds a term to the recruitment
+#'   likelihood. `"free"` estimates `log_init_naa` for every age, and
+#'   `log_devs` start in the second year.
 #' @return
 #' A `tibble` containing default parameter values and metadata for your model.
 #' Key columns are listed below:
@@ -505,7 +507,7 @@ setup_default_Growth <- function(
 #' for ages below the plus group, and for the plus group \eqn{A}, which
 #' accumulates survivors each year,
 #' \deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}
-#' Only used when `initial_numbers = "free"`.
+#' Must be `NA` unless `initial_numbers = "free"`.
 #' @param proportion_female A numeric value or vector (length equal to the
 #' number of ages) between 0 and 1 specifying the proportion of each age that
 #' is female, which scales spawning biomass. Default is `0.5`.
@@ -573,6 +575,17 @@ setup_default_Population <- function(
       0 to 1: {.val {proportion_female[invalid_proportion]}}.",
       "i" = "{.var proportion_female} is the proportion of each age that is
       female, so every value must be between 0 and 1."
+    ))
+  }
+
+  # With 1 age, the only age is the plus group, which has no recruitment
+  # deviation, so the first year could only be unfished numbers
+  if (initial_numbers == "equilibrium" && n_ages < 2) {
+    cli::cli_abort(c(
+      "x" = "Equilibrium initial numbers at age need at least 2 ages, not
+      {.val {n_ages}}.",
+      "i" = "Use {.code initial_numbers = \"free\"} for a model with 1 age.",
+      "i" = "Check the ages with {.code get_ages(data)}."
     ))
   }
 

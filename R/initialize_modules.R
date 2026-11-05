@@ -429,7 +429,7 @@ check_initial_numbers <- function(parameters, data) {
   has_equilibrium <- "log_init_rzero_offset" %in% population_labels
   if (has_free == has_equilibrium) {
     cli::cli_abort(c(
-      "x" = "The Population module needs exactly one of {.var log_init_naa}
+      "x" = "The Population module needs exactly 1 of {.var log_init_naa}
       and {.var log_init_rzero_offset}.",
       "i" = "{.code initial_numbers = \"free\"} in
       {.fn setup_default_parameters} gives {.var log_init_naa} and the
@@ -458,9 +458,11 @@ check_initial_numbers <- function(parameters, data) {
     }
     if (get_n_ages(data) < 2) {
       cli::cli_abort(c(
-        "x" = "Equilibrium initial numbers at age need at least 2 ages.",
+        "x" = "Equilibrium initial numbers at age need at least 2 ages, not
+        {.val {get_n_ages(data)}}.",
         "i" = "With 1 age, the only age is the plus group. Use
-        {.code setup_default_parameters(initial_numbers = \"free\")}."
+        {.code setup_default_parameters(initial_numbers = \"free\")}.",
+        "i" = "Check the ages with {.code get_ages(data)}."
       ))
     }
     if ("log_r" %in% recruitment_labels) {
@@ -468,7 +470,10 @@ check_initial_numbers <- function(parameters, data) {
         "x" = "{.var log_r} recruitment cannot be used with equilibrium
         initial numbers at age yet.",
         "i" = "Use {.var log_devs} for recruitment or
-        {.code setup_default_parameters(initial_numbers = \"free\")}."
+        {.code setup_default_parameters(initial_numbers = \"free\")}.",
+        "i" = "Check the labels with
+        {.code dplyr::filter(parameters, module_name == \"Recruitment\") |>
+        dplyr::distinct(label)}."
       ))
     }
   }

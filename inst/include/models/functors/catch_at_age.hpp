@@ -215,6 +215,18 @@ class CatchAtAge : public FisheryModelBase<Type> {
           FIMS_ERROR_LOG(ss.str());
           throw std::runtime_error(ss.str());
         }
+        // First-year numbers at age read log_recruit_devs, but LogR reads
+        // log_r, so the first year and later years would use different
+        // vectors.
+        if (std::dynamic_pointer_cast<fims_popdy::LogR<Type>>(
+                recruitment->process)) {
+          std::stringstream ss;
+          ss << "Equilibrium initial numbers at age cannot be used with log_r "
+                "recruitment yet, but population "
+             << this->populations[p]->GetId() << " uses it.";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
         this->populations[p]->n_initial_devs = n_devs - n_years;
         recruitment->log_expected_recruitment.resize(n_devs);
       }

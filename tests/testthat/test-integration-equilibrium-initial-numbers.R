@@ -243,7 +243,7 @@ test_that("initialize_fims() checks how initial numbers at age are set", {
           dplyr::filter(label == "log_init_naa")
       ) |>
       initialize_fims(data = data_4_model),
-    regexp = "exactly one"
+    regexp = "exactly 1"
   )
   clear()
 

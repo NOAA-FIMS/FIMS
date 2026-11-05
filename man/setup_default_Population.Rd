@@ -28,7 +28,7 @@ equilibrium implied by unfished recruitment \eqn{R_0} and natural mortality
 for ages below the plus group, and for the plus group \eqn{A}, which
 accumulates survivors each year,
 \deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}
-Only used when \code{initial_numbers = "free"}.}
+Must be \code{NA} unless \code{initial_numbers = "free"}.}
 
 \item{proportion_female}{A numeric value or vector (length equal to the
 number of ages) between 0 and 1 specifying the proportion of each age that
@@ -37,14 +37,16 @@ is female, which scales spawning biomass. Default is \code{0.5}.}
 \item{initial_numbers}{A string specifying how numbers at age in the first
 year are set. The available options are
 equilibrium, free.
-The default is
-equilibrium, the
-unfished equilibrium with recruitment deviations for every cohort in the
-first-year age structure except the plus group. To keep the oldest of
-those cohorts at equilibrium, remove their \code{log_devs} rows, starting with
-the earliest \code{timing}. Do not set them to constant instead, because a
-constant deviation still adds a term to the recruitment likelihood.
-\code{"free"} estimates \code{log_init_naa} for every age.}
+The default,
+equilibrium,
+starts from the unfished equilibrium with recruitment deviations for every
+cohort in the first-year age structure except the plus group, so
+\code{log_devs} start \code{n_ages - 2} years before the first year. To keep the
+oldest of those cohorts at equilibrium, remove their \code{log_devs} rows,
+starting with the earliest \code{timing}. Do not set them to constant instead,
+because a constant deviation still adds a term to the recruitment
+likelihood. \code{"free"} estimates \code{log_init_naa} for every age, and
+\code{log_devs} start in the second year.}
 }
 \value{
 A tibble of default population configurations, including initial numbers at
