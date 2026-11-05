@@ -49,20 +49,20 @@ TEST(fimsMath_adMax, HandlesCorrectInput) {
 }
 
 // Error handling
-// Test that C = 0, which gives the exact |x| with no derivative at x = 0, and
-// C < 0, which can give NaN, both throw
-TEST(fimsMath_adFabs, ThrowsWhenCNotPositive) {
+// Test that ad_fabs throws for C = 0 and C < 0
+TEST(fimsMath_adFabs, CaptureError) {
   EXPECT_THROW(fims_math::ad_fabs(2.0, 0.0), std::invalid_argument);
   EXPECT_THROW(fims_math::ad_fabs(0.0, -1e-5), std::invalid_argument);
 }
 
-// Test that ad_min and ad_max pass the check on C through from ad_fabs
-TEST(fimsMath_adMin, ThrowsWhenCNotPositive) {
+// Test that ad_min throws for C = 0 and C < 0, through ad_fabs
+TEST(fimsMath_adMin, CaptureError) {
   EXPECT_THROW(fims_math::ad_min(2.0, 1.0, 0.0), std::invalid_argument);
   EXPECT_THROW(fims_math::ad_min(2.0, 1.0, -1e-5), std::invalid_argument);
 }
 
-TEST(fimsMath_adMax, ThrowsWhenCNotPositive) {
+// Test that ad_max throws for C = 0 and C < 0, through ad_fabs
+TEST(fimsMath_adMax, CaptureError) {
   EXPECT_THROW(fims_math::ad_max(2.0, 1.0, 0.0), std::invalid_argument);
   EXPECT_THROW(fims_math::ad_max(2.0, 1.0, -1e-5), std::invalid_argument);
 }
