@@ -127,5 +127,9 @@ TEST_F(CAAEvaluateTestFixture,
   population->recruitment->process = log_r;
   log_r->recruitment = population->recruitment;
   EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
+
+  // Without a process, later years would not read log_recruit_devs either.
+  population->recruitment->process = nullptr;
+  EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
 }
 }  // namespace

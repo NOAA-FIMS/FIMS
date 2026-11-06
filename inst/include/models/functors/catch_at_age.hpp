@@ -244,28 +244,31 @@ class CatchAtAge : public FisheryModelBase<Type> {
         }
         if (n_devs < n_years || n_devs + 2 > n_years + n_ages) {
           std::stringstream ss;
-          ss << "Equilibrium initial numbers at age need between n_years and "
-                "n_years + n_ages - 2 recruitment deviations, but population "
+          ss << "Equilibrium initial numbers at age need " << n_years << " to "
+             << n_years + n_ages - 2
+             << " recruitment deviations (n_years to n_years + n_ages - 2), "
+                "but population "
              << this->populations[p]->GetId() << " has " << n_devs << ".";
           FIMS_ERROR_LOG(ss.str());
           throw std::runtime_error(ss.str());
         }
-        // First-year numbers at age read log_recruit_devs, but LogR reads
-        // log_r, so the first year and later years would use different
-        // vectors.
-        if (std::dynamic_pointer_cast<fims_popdy::LogR<Type>>(
+        // First-year numbers at age read log_recruit_devs directly. Only
+        // LogDevs reads the same vector in later years. LogR reads log_r, so
+        // the first year and later years would use different vectors.
+        if (!std::dynamic_pointer_cast<fims_popdy::LogDevs<Type>>(
                 recruitment->process)) {
           std::stringstream ss;
-          ss << "Equilibrium initial numbers at age cannot be used with log_r "
-                "recruitment yet, but population "
-             << this->populations[p]->GetId() << " uses it.";
+          ss << "Equilibrium initial numbers at age need log_devs "
+                "recruitment, but population "
+             << this->populations[p]->GetId()
+             << " uses another recruitment process.";
           FIMS_ERROR_LOG(ss.str());
           throw std::runtime_error(ss.str());
         }
         this->populations[p]->n_initial_devs = n_devs - n_years;
         recruitment->log_expected_recruitment.resize(n_devs);
       } else {
-        // Free initial numbers at age read 1 log_init_naa per age
+        // Free initial numbers at age read 1 log_init_naa per age.
         size_t n_ages = this->populations[p]->n_ages;
         size_t n_init_naa = this->populations[p]->log_init_naa.size();
         if (n_init_naa != n_ages) {
@@ -434,7 +437,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     Type log_scale = population->log_init_rzero_offset[0];
     // Element n_initial_devs is the first-year recruitment deviation and the
-    // elements before it are for the cohorts that recruited earlier
+    // elements before it are for the cohorts that recruited earlier.
     if (age <= population->n_initial_devs) {
       log_scale += population->recruitment
                        ->log_recruit_devs[population->n_initial_devs - age];
@@ -848,7 +851,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     size_t i_dev_year = year - 1;
     if (population->initial_numbers == "equilibrium") {
       // The first n_initial_devs + 1 deviations belong to the cohorts in the
-      // first-year age structure
+      // first-year age structure.
       i_dev_year += population->n_initial_devs + 1;
     }
 
