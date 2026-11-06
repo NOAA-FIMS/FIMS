@@ -10,15 +10,17 @@
 # integration_properties_invariance ----
 ## Setup ----
 # The approach and the helpers are described in
-# helper-integration-tests-properties.R. Each test changes how the same model
-# is written and checks that the result does not change.
+# helper-integration-tests-properties.R. Each test writes the same model in a
+# different way and checks that the results do not change. The last check
+# changes 1 year of selectivity, which should change that year only.
 data("data_big")
 data_4_model <- FIMSFrame(data_big)
 default_parameters <- setup_default_parameters(data = data_4_model)
 n_years <- get_n_years(data_4_model)
+n_ages <- get_n_ages(data_4_model)
 
-# The objective and the main outputs of a run. Fleet outputs are found by
-# fleet name because the fleet order in the report follows the parameters.
+# The joint negative log-likelihood and the main outputs of a run, with fleet
+# outputs found by fleet name.
 main_outputs <- function(report, parameters) {
   fleet1 <- fleet_position(parameters, "fleet1")
   survey1 <- fleet_position(parameters, "survey1")
@@ -35,38 +37,34 @@ default_report <- run_deterministic(default_parameters, data_4_model)
 default_outputs <- main_outputs(default_report, default_parameters)
 
 ## IO correctness ----
-test_that("the order of the data rows does not change the model", {
-  shuffled_data <- data_big[withr::with_seed(1918, sample(nrow(data_big))), ]
-  shuffled_frame <- FIMSFrame(shuffled_data)
-  parameters <- setup_default_parameters(data = shuffled_frame)
-  report <- run_deterministic(parameters, shuffled_frame)
+test_that("the order of data rows and fleets does not change the model", {
+  # FIMSFrame() sorts the rows by fleet, type, timing, age, and length, but its
+  # list of fleets keeps the order in which fleets first appear. survey1 rows
+  # first put survey1 first in the parameters and the report.
+  reordered_data <- withr::with_seed(
+    1918,
+    dplyr::slice_sample(data_big, prop = 1)
+  ) |>
+    dplyr::arrange(fleet != "survey1")
+  reordered_frame <- FIMSFrame(reordered_data)
+  parameters <- setup_default_parameters(data = reordered_frame)
+  report <- run_deterministic(parameters, reordered_frame)
 
-  #' @description Test that shuffled data rows give the same objective, numbers at age, spawning biomass, and expected values.
-  expect_equal(
-    object = main_outputs(report, parameters),
-    expected = default_outputs
-  )
-})
-
-test_that("the order of the fleets does not change the model", {
-  survey_first_frame <- FIMSFrame(dplyr::arrange(data_big, fleet != "survey1"))
-  parameters <- setup_default_parameters(data = survey_first_frame)
-  report <- run_deterministic(parameters, survey_first_frame)
-
-  #' @description Test that the setup puts survey1 first in the report.
+  #' @description Test that the setup puts survey1 first in the parameters.
   expect_equal(fleet_position(parameters, "survey1"), 1)
-  #' @description Test that a different fleet order gives the same objective, numbers at age, spawning biomass, and expected values.
+  #' @description Test that shuffled data rows with survey1 first give the same joint negative log-likelihood, numbers at age, spawning biomass, and expected values.
   expect_equal(
     object = main_outputs(report, parameters),
     expected = default_outputs
   )
 })
 
-test_that("inputs repeated in every year match the constant inputs", {
+test_that("inputs repeated in every year match the inputs given once", {
   # 1 row per year in year order makes an input time-varying. FIMS reads the
-  # rows in the order given. All 3 inputs are repeated in 1 run to keep the
-  # file fast. The -recruitment and -observations files check maturity and
-  # survey1 log_q by year, and the end of this test checks selectivity.
+  # rows in the order given, not by timing (#1875). All 5 inputs are repeated
+  # in 1 run to keep the file fast. The -recruitment and -observations files
+  # check the maturity inflection point and survey1 log_q by year, and the end
+  # of this test checks the fleet1 selectivity inflection point.
   repeated_inputs <- tibble::tribble(
     ~module_name, ~label, ~fleet,
     "Maturity", "inflection_point", NA,
@@ -75,6 +73,8 @@ test_that("inputs repeated in every year match the constant inputs", {
     "Selectivity", "slope", "fleet1",
     "Fleet", "log_q", "survey1"
   )
+  # The dplyr joins match a missing fleet to a missing fleet, so they find the
+  # maturity rows, which have no fleet.
   input_columns <- c("module_name", "label", "fleet")
   input_rows <- dplyr::semi_join(
     default_parameters, repeated_inputs,
@@ -97,13 +97,15 @@ test_that("inputs repeated in every year match the constant inputs", {
       dplyr::pull(n),
     expected = rep(n_years, nrow(repeated_inputs))
   )
-  #' @description Test that maturity, fleet1 selectivity, and survey1 log_q repeated in every year give the same objective and outputs as the constant inputs.
+  #' @description Test that maturity, fleet1 selectivity, and survey1 log_q repeated in every year give the same joint negative log-likelihood and outputs as the inputs given once.
   expect_equal(
     object = main_outputs(report, parameters),
     expected = default_outputs
   )
 
-  # A selectivity change in 1 year shows that the yearly rows are read by year.
+  # The fraction of numbers at age caught depends only on F, selectivity, and
+  # M in that year, so a selectivity change in 1 year changes it in that year
+  # only.
   changed_year <- 10
   changed_parameters <- parameters |>
     dplyr::mutate(
@@ -114,21 +116,26 @@ test_that("inputs repeated in every year match the constant inputs", {
         value
       )
     )
-  changed_catch <- run_deterministic(changed_parameters, data_4_model) |>
-    pull_output("catch_expected", fleet_position(parameters, "fleet1"))
-  default_catch <- default_outputs[["fleet1_catch"]]
-  earlier_years <- seq_len(changed_year - 1)
+  changed_report <- run_deterministic(changed_parameters, data_4_model)
+  caught_fraction <- function(report, parameters) {
+    pull_output(
+      report, "catch_numbers_at_age", fleet_position(parameters, "fleet1")
+    ) /
+      pull_output(report, "numbers_at_age")[seq_len(n_years * n_ages)]
+  }
+  changed_fraction <- caught_fraction(changed_report, changed_parameters)
+  default_fraction <- caught_fraction(default_report, default_parameters)
+  changed_rows <- (changed_year - 1) * n_ages + seq_len(n_ages)
+  fraction_ratio <- changed_fraction[changed_rows] /
+    default_fraction[changed_rows]
 
-  #' @description Test that fleet1 selectivity changed in 1 year leaves expected catch in earlier years unchanged.
+  #' @description Test that fleet1 selectivity changed in 1 year leaves the fraction caught at age in the other years unchanged.
   expect_equal(
-    object = changed_catch[earlier_years],
-    expected = default_catch[earlier_years]
+    object = changed_fraction[-changed_rows],
+    expected = default_fraction[-changed_rows]
   )
-  #' @description Test that fleet1 selectivity changed in 1 year changes expected catch in that year.
-  expect_gt(
-    abs(changed_catch[changed_year] / default_catch[changed_year] - 1),
-    1e-3
-  )
+  #' @description Test that fleet1 selectivity changed in 1 year changes the fraction caught at age in that year.
+  expect_gt(max(abs(fraction_ratio - 1)), 1e-3)
 })
 
 ## Edge handling ----
