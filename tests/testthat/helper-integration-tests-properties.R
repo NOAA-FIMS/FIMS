@@ -39,6 +39,18 @@ pull_output <- function(report, output_label, fleet_number = 1) {
   report[[output_label]][[fleet_number]]
 }
 
+#' Find the position of a fleet in the report
+#'
+#' @details `initialize_fims()` creates fleets in the order they first appear
+#'   in the parameters, so moving parameter rows can change the position. Use
+#'   the parameters of the run that made the report.
+#' @param parameters The parameter tibble used for the run.
+#' @param fleet_name A string with the fleet name.
+#' @return An integer to pass to `pull_output()` as `fleet_number`.
+fleet_position <- function(parameters, fleet_name) {
+  match(fleet_name, unique(stats::na.omit(parameters[["fleet"]])))
+}
+
 #' Run FIMS once at the input values and return the report
 #'
 #' @details The report is used rather than `get_estimates()` because it keeps
