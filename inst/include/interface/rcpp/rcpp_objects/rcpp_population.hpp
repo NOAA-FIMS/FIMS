@@ -529,7 +529,7 @@ class PopulationInterface : public PopulationInterfaceBase {
     // Only the vector for the selected initial numbers at age is used. Values
     // set in the other one would be ignored, and an estimated value would not
     // change the likelihood and would make the Hessian singular. A vector
-    // that was never set keeps its 1 constant placeholder.
+    // that was never set keeps its 1 constant placeholder of 0.
     bool is_equilibrium = this->initial_numbers.get() == "equilibrium";
     VariableVector &unused_initial_numbers =
         is_equilibrium ? this->log_init_naa : this->log_init_rzero_offset;
@@ -537,7 +537,8 @@ class PopulationInterface : public PopulationInterfaceBase {
         is_equilibrium ? "log_init_naa" : "log_init_rzero_offset";
     bool is_unused_set = unused_initial_numbers.size() > 1;
     for (size_t i = 0; i < unused_initial_numbers.size(); i++) {
-      if (unused_initial_numbers[i].estimation_type_m.get() != "constant") {
+      if (unused_initial_numbers[i].estimation_type_m.get() != "constant" ||
+          unused_initial_numbers[i].initial_value_m != 0.0) {
         is_unused_set = true;
       }
     }

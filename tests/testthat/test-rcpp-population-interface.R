@@ -116,4 +116,10 @@ test_that("rcpp population rejects initial numbers it does not use", {
   #' @description Test that an estimated log_init_rzero_offset with free initial numbers returns an error.
   expect_error(CreateTMBModel(), "sets log_init_rzero_offset")
   clear()
+
+  population <- new_population("free")
+  population$log_init_rzero_offset[] <- 0.5
+  #' @description Test that a nonzero constant log_init_rzero_offset with free initial numbers returns an error instead of being ignored.
+  expect_error(CreateTMBModel(), "sets log_init_rzero_offset")
+  clear()
 })
