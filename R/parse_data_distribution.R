@@ -49,7 +49,8 @@
 #' by `NA`. Missing specifications use `NA_character_` for the family and link,
 #' `NA` for central parameters, and `1` for ancillary parameters. These neutral
 #' ancillary values prevent missing observations from introducing `NA` into
-#' vectorized likelihood calculations.
+#' vectorized likelihood calculations. [initialize_data_distribution()] skips
+#' these rows when it reads the multinomial `offset`.
 #'
 #' @keywords internal
 #' @examples
@@ -136,7 +137,13 @@ parse_one_data_distribution <- function(expr) {
 
   # Extract the distribution family name
   dist_name <- as.character(right_hand[[1]])
-  dist_formals <- names(formals(dist_name))
+  # FIMS arguments, not formals(), because offset is not an argument of
+  # stats::dmultinom(). Base R because this runs once per data row.
+  in_family <- FIMS::fims_distributions[["family"]] == dist_name
+  dist_arguments <- c(
+    FIMS::fims_distributions[["central_parameter"]][in_family],
+    unlist(FIMS::fims_distributions[["other_parameters"]][in_family])
+  )
   args_list <- as.list(right_hand[-1])
   link_name <- dplyr::filter(
     FIMS::fims_distributions,
@@ -160,12 +167,13 @@ parse_one_data_distribution <- function(expr) {
       "The {dist_name} expects {.code {link_name}} as a parameter"
     ))
   }
-  if (length(setdiff(names(args_list), dist_formals)) > 0) {
+  unknown_arguments <- setdiff(names(args_list), dist_arguments)
+  if (length(unknown_arguments) > 0) {
     cli::cli_abort(c(
-      x = "The arguments you passed in your distribution, {expr}, are not
-      formal arguments of the {.function {dist_name} function}",
-      i = "Argument options are {dist_formals}",
-      i = "Run {.code ?{dist_name}} for information on what each argument means"
+      x = "{.code {dist_name}} in FIMS does not take
+      {.val {unknown_arguments}}, in your distribution {expr}.",
+      i = "Argument options are {.val {dist_arguments}}.",
+      i = "See the Uncertainty section of {.code ?FIMSFrame}."
     ))
   }
   if (dist_name == "dnorm" && eval(args_list[["sd"]]) <= 0) {
@@ -179,6 +187,18 @@ parse_one_data_distribution <- function(expr) {
       x = "{.var sdlog} must be positive",
       i = "In your distribution, {expr}, you passed {eval(args_list$sdlog)}"
     ))
+  }
+  if (dist_name == "dmultinom" && !is.null(args_list[["offset"]])) {
+    # Store the value so an expression such as 1/1000 works downstream.
+    args_list[["offset"]] <- eval(args_list[["offset"]])
+    offset <- args_list[["offset"]]
+    if (!is.numeric(offset) || length(offset) != 1 || !is.finite(offset) ||
+      offset < 0) {
+      cli::cli_abort(c(
+        x = "{.var offset} must be a single finite number, 0 or greater",
+        i = "In your distribution, {expr}, you passed {.val {offset}}"
+      ))
+    }
   }
 
 

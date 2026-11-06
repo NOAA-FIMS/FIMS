@@ -35,7 +35,8 @@ test_that("catch-at-age model (deterministic MLE with wrappers) works with corre
     report = get_report(deterministic_age_length_comp),
     om_input = om_input_list[[iter_id]],
     om_output = om_output_list[[iter_id]],
-    em_input = em_input_list[[iter_id]]
+    em_input = em_input_list[[iter_id]],
+    offset = 1e-5
   )
 
   parameters <- FIMS::parameters_big
@@ -93,7 +94,8 @@ if (Sys.getenv("RUN_SLOW_TESTS") == "true") {
       report = get_report(deterministic_age_length_comp),
       om_input = om_input_list[[iter_id]],
       om_output = om_output_list[[iter_id]],
-      em_input = em_input_list[[iter_id]]
+      em_input = em_input_list[[iter_id]],
+      offset = 1e-5
     )
 
     parameters <- readRDS(testthat::test_path("fixtures", "parameters_model_comparison_project_fixed_effects.RDS"))

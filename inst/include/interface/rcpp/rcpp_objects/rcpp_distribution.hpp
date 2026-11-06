@@ -943,6 +943,11 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    */
   RealVector dims;
   /**
+   * @brief Constant added to each expected proportion, see
+   * fims_distributions::MultinomialLPMF. The default is 0.
+   */
+  RealVector offset;
+  /**
    * @brief Vector that records the individual log probability function for each
    * observation.
    */
@@ -974,6 +979,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
         observed_values(other.observed_values),
         expected_values(other.expected_values),
         dims(other.dims),
+        offset(other.offset),
         lpdf_vec(other.lpdf_vec),
         notes(other.notes) {}
 
@@ -1040,6 +1046,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     dmultinom.dims.resize(2);
     dmultinom.dims[0] = this->dims[0];
     dmultinom.dims[1] = this->dims[1];
+    dmultinom.offset = this->offset[0];
     return dmultinom.evaluate();
   }
 
@@ -1191,6 +1198,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       distribution->expected_values[i] =
           this->expected_values[i].initial_value_m;
     }
+    distribution->offset = this->offset[0];
 
     info->density_components[distribution->id] = distribution;
     return true;

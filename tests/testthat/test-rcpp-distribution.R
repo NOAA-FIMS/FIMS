@@ -128,6 +128,15 @@ test_that("rcpp distribution works with correct inputs", {
     stats::dmultinom(x = x_values, prob = p, log = TRUE)
   )
 
+  # stats::dmultinom() rescales prob to sum to 1, the same as dividing by
+  # 1 + K * offset, so it checks FIMS without repeating its calculation.
+  dmultinom_$offset[] <- 0.01
+  #' @description Test that dmultinom with an offset matches R's dmultinom with the offset added to each expected proportion.
+  expect_equal(
+    dmultinom_$evaluate(),
+    stats::dmultinom(x = x_values, prob = p + 0.01, log = TRUE)
+  )
+
   clear()
 })
 
@@ -317,6 +326,14 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   # Generate data using R `stats:rnorm()`.
   expect_equal(
     dmultinom_$evaluate(), NaN
+  )
+
+  dmultinom_$offset[] <- 1e-5
+  #' @description Test that an offset gives a finite value for empty bins with an expected proportion of 0.
+  expect_true(is.finite(dmultinom_$evaluate()))
+  expect_equal(
+    dmultinom_$evaluate(),
+    stats::dmultinom(x = x_values, prob = p + 1e-5, log = TRUE)
   )
   clear()
 })

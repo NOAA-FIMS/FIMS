@@ -126,7 +126,9 @@ check_distribution_validity <- function(args) {
 #'   `r eval(formals(initialize_data_distribution)[["data_type"]])[1]`.
 #' @param uncertainty A vector of strings specifying formulas for each data
 #'   point. See [FIMSFrame()] for more information on what the formula should
-#'   look like.
+#'   look like. For `dmultinom()`, every formula must use the same `offset`,
+#'   and a formula without `offset` uses 1e-5. See
+#'   `vignette("fims-input-data", package = "FIMS")`.
 #' @return
 #' A reference class. is returned. Use [methods::show()] to view the various
 #' Rcpp class fields, methods, and documentation.
@@ -176,6 +178,29 @@ initialize_data_distribution <- function(
       unlist(uncertainty_split[[ancillary_parameter]], use.names = FALSE)
     )
     new_module$log_sd$set_estimation_types("constant")
+  }
+  if ("offset" %in% names(new_module)) {
+    # Rows without a formula hold placeholder values, so only rows with a
+    # formula set the offset.
+    offset <- unlist(
+      uncertainty_split[["offset"]][!is.na(uncertainty_split[["family"]])],
+      use.names = FALSE
+    )
+    offset[is.na(offset)] <- 1e-5
+    offset <- unique(offset)
+    if (length(offset) > 1) {
+      cli::cli_abort(c(
+        "x" = "The {.val {data_type}} formulas for fleet
+        {.val {module$GetName()}} use more than one {.var offset}:
+        {.val {offset}}.",
+        "i" = "Each fleet takes 1 {.var offset} per composition type. A
+        formula without {.var offset} uses 1e-5.",
+        "i" = "Check the formulas with {.code dplyr::filter(data, fleet ==
+        \"{module$GetName()}\", type == \"{data_type}\") |>
+        dplyr::distinct(uncertainty)}."
+      ))
+    }
+    new_module$offset[] <- offset
   }
 
   # setup link to observed data

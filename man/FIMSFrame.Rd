@@ -60,9 +60,12 @@ you use a lognormal distribution the observation is assumed to represent
 specify \code{"~dlnorm(meanlog = log_catch_expected, sdlog = 0.01)"}. Where, the
 input value for sd or sdlog is the standard deviation of the mean or
 standard deviation of the log of the mean, respectively. The distribution
-names and argument names match the names used in R. Use \code{\link[=args]{args()}}, e.g.,
-\code{args(dnorm)}, to get information on the argument names that are required
-for your distribution. And, use \code{?distributions} to get a list of
+names and argument names match the names used in R, e.g., \code{args(dnorm)},
+and \link{fims_distributions} lists the arguments FIMS uses for each
+distribution. Composition data use \code{dmultinom()}, which also takes an
+\code{offset} added to each expected proportion, see
+\code{vignette("fims-input-data", package = "FIMS")}. And, use
+\code{?distributions} to get a list of
 distributions that have density functions in base R. To get information on
 available derived quantities to set the central tendency of the distribution
 to, you can create a fleet object and inspect the available names, e.g.,

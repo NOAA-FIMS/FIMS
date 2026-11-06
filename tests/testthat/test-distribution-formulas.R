@@ -115,6 +115,27 @@ test_that("`initialize_data_distribution()` works with correct inputs", {
       glue::glue("~dlnorm(meanlog = log_index_expected, sdlog = {fleet_sd[1]})")
     )$log_sd[1]$value
   )
+  #' @description Test that `initialize_data_distribution()` sets the multinomial offset to 1e-5 when the formulas omit it, ignoring rows without a formula.
+  expect_equal(
+    initialize_data_distribution(
+      module = fishing_fleet,
+      data_type = "age_comp",
+      uncertainty = c(NA, "~dmultinom(prob = agecomp_proportion, size = 10)")
+    )$offset$get_values(),
+    1e-5
+  )
+  #' @description Test that `initialize_data_distribution()` uses the multinomial offset given in the formulas.
+  expect_equal(
+    initialize_data_distribution(
+      module = fishing_fleet,
+      data_type = "age_comp",
+      uncertainty = rep(
+        "~dmultinom(prob = agecomp_proportion, size = 10, offset = 0)",
+        2
+      )
+    )$offset$get_values(),
+    0
+  )
 })
 
 ## Edge handling ----
@@ -215,6 +236,19 @@ test_that("`initialize_data_distribution()` returns correct error messages", {
       data_type = "age_comp"
     ),
     "argument .*uncertainty.* is missing"
+  )
+
+  #' @description Test that error is thrown when the multinomial formulas of one fleet use more than one offset.
+  expect_error(
+    initialize_data_distribution(
+      module = fishing_fleet,
+      data_type = "age_comp",
+      uncertainty = c(
+        "~dmultinom(prob = agecomp_proportion, size = 10, offset = 0.001)",
+        "~dmultinom(prob = agecomp_proportion, size = 10)"
+      )
+    ),
+    "more than one `offset`"
   )
   clear()
 })
