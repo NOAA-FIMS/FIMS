@@ -35,7 +35,10 @@
 #' Parameter values are returned as language objects rather than evaluated
 #' numeric vectors. This preserves references to symbols in the calling
 #' environment (for example, `catch_expected`) so evaluation can occur later
-#' in a context where those objects exist.
+#' in a context where those objects exist. The multinomial `offset_expected`
+#' and `offset_observed` are the exception: they are evaluated in the base
+#' environment and checked here, so an expression such as `1/1000` returns its
+#' value and a variable name is an error.
 #'
 #' @return A column-oriented list. Every component has the same length as
 #'   `expr`, and every parameter supported by [FIMS::fims_distributions] is
@@ -49,7 +52,8 @@
 #' by `NA`. Missing specifications use `NA_character_` for the family and link,
 #' `NA` for central parameters, and `1` for ancillary parameters. These neutral
 #' ancillary values prevent missing observations from introducing `NA` into
-#' vectorized likelihood calculations.
+#' vectorized likelihood calculations. [initialize_data_distribution()] skips
+#' these rows when it reads the multinomial offsets.
 #'
 #' @keywords internal
 #' @examples
@@ -136,7 +140,13 @@ parse_one_data_distribution <- function(expr) {
 
   # Extract the distribution family name
   dist_name <- as.character(right_hand[[1]])
-  dist_formals <- names(formals(dist_name))
+  # FIMS arguments, not formals(), because the offsets are not arguments of
+  # stats::dmultinom().
+  in_family <- FIMS::fims_distributions[["family"]] == dist_name
+  dist_arguments <- c(
+    FIMS::fims_distributions[["central_parameter"]][in_family],
+    unlist(FIMS::fims_distributions[["other_parameters"]][in_family])
+  )
   args_list <- as.list(right_hand[-1])
   link_name <- dplyr::filter(
     FIMS::fims_distributions,
@@ -160,12 +170,22 @@ parse_one_data_distribution <- function(expr) {
       "The {dist_name} expects {.code {link_name}} as a parameter"
     ))
   }
-  if (length(setdiff(names(args_list), dist_formals)) > 0) {
+  unknown_arguments <- setdiff(names(args_list), dist_arguments)
+  if (length(unknown_arguments) > 0) {
     cli::cli_abort(c(
-      x = "The arguments you passed in your distribution, {expr}, are not
-      formal arguments of the {.function {dist_name} function}",
-      i = "Argument options are {dist_formals}",
-      i = "Run {.code ?{dist_name}} for information on what each argument means"
+      x = "{.code {dist_name}} in FIMS does not take
+      {.val {unknown_arguments}}.",
+      i = "Your distribution is {expr}.",
+      i = "Argument options are {.val {dist_arguments}}.",
+      i = "See the Uncertainty section of {.code ?FIMSFrame}."
+    ))
+  }
+  repeated_arguments <- unique(names(args_list)[duplicated(names(args_list))])
+  if (length(repeated_arguments) > 0) {
+    cli::cli_abort(c(
+      x = "Your distribution, {expr}, gives {.val {repeated_arguments}} more
+      than once.",
+      i = "Give each argument once."
     ))
   }
   if (dist_name == "dnorm" && eval(args_list[["sd"]]) <= 0) {
@@ -179,6 +199,28 @@ parse_one_data_distribution <- function(expr) {
       x = "{.var sdlog} must be positive",
       i = "In your distribution, {expr}, you passed {eval(args_list$sdlog)}"
     ))
+  }
+  offset_names <- intersect(
+    c("offset_expected", "offset_observed"),
+    names(args_list)
+  )
+  for (offset_name in offset_names) {
+    # Evaluate in baseenv() so numbers and arithmetic such as 1/1000 work but
+    # no variables do. A name that is not found gets the error below.
+    offset <- tryCatch(
+      eval(args_list[[offset_name]], baseenv()),
+      error = function(e) NULL
+    )
+    if (!is.numeric(offset) || length(offset) != 1 || !is.finite(offset) ||
+      offset < 0) {
+      cli::cli_abort(c(
+        x = "{.var {offset_name}} must be a single finite number of 0 or
+        more",
+        i = "In your distribution, {expr}, you passed
+        {.code {deparse(args_list[[offset_name]])}}"
+      ))
+    }
+    args_list[[offset_name]] <- offset
   }
 
 

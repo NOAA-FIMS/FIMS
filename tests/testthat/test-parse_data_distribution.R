@@ -26,7 +26,9 @@ test_that("`parse_data_distribution()` works with correct inputs", {
       prob = list(NA),
       sd = list(NA),
       sdlog = list(0.00999975001354021),
-      size = list(NA)
+      size = list(NA),
+      offset_expected = list(NA),
+      offset_observed = list(NA)
     )
   )
 
@@ -41,8 +43,26 @@ test_that("`parse_data_distribution()` works with correct inputs", {
       prob = list(NA),
       sd = list(0.1),
       sdlog = list(NA),
-      size = list(NA)
+      size = list(NA),
+      offset_expected = list(NA),
+      offset_observed = list(NA)
     )
+  )
+
+  #' @description Test that the multinomial offsets are parsed with the other multinomial parameters.
+  parsed <- parse_data_distribution(
+    "~ dmultinom(prob = agecomp_proportion, size = 200, offset_expected = 0.001, offset_observed = 0)"
+  )
+  expect_equal(parsed[["size"]], list(200))
+  expect_equal(parsed[["offset_expected"]], list(0.001))
+  expect_equal(parsed[["offset_observed"]], list(0))
+
+  #' @description Test that a multinomial offset given as an expression is returned as its value.
+  expect_equal(
+    parse_data_distribution(
+      "~ dmultinom(prob = agecomp_proportion, size = 200, offset_expected = 1/1000)"
+    )[["offset_expected"]],
+    list(0.001)
   )
 
   #' @description Test that calls and single-element expressions are accepted without first converting them to strings.
@@ -107,10 +127,53 @@ test_that("`parse_data_distribution()` returns correct error messages", {
     fixed = TRUE
   )
 
-  #' @description Test that distribution arguments must be formal arguments of the selected family.
+  #' @description Test that distribution arguments must be arguments of the selected family in FIMS.
   expect_error(
     parse_data_distribution("~dnorm(mean = x, sd = 1, extra = 2)"),
-    "are not formal arguments of the dnorm function",
+    "`dnorm` in FIMS does not take \"extra\"",
+    fixed = TRUE
+  )
+
+  #' @description Test that an argument of the R function that FIMS does not use is rejected.
+  expect_error(
+    parse_data_distribution("~dmultinom(prob = x, size = 10, log = TRUE)"),
+    "`dmultinom` in FIMS does not take \"log\"",
+    fixed = TRUE
+  )
+
+  #' @description Test that an argument given more than once is an error.
+  expect_error(
+    parse_data_distribution(
+      "~dmultinom(prob = x, size = 10, offset_expected = 0.001, offset_expected = 0.1)"
+    ),
+    "more than once",
+    fixed = TRUE
+  )
+
+  #' @description Test that a multinomial offset given as a variable name is an error, even when the name exists while the formula is parsed.
+  expect_error(
+    parse_data_distribution(
+      "~dmultinom(prob = x, size = 10, offset_expected = 0.001, offset_observed = offset)"
+    ),
+    "`offset_observed` must be a single finite number of 0 or more",
+    fixed = TRUE
+  )
+
+  #' @description Test that a multinomial offset must be 0 or greater.
+  expect_error(
+    parse_data_distribution(
+      "~dmultinom(prob = x, size = 10, offset_observed = -0.1)"
+    ),
+    "`offset_observed` must be a single finite number of 0 or more",
+    fixed = TRUE
+  )
+
+  #' @description Test that a multinomial offset must be finite.
+  expect_error(
+    parse_data_distribution(
+      "~dmultinom(prob = x, size = 10, offset_expected = Inf)"
+    ),
+    "`offset_expected` must be a single finite number of 0 or more",
     fixed = TRUE
   )
 

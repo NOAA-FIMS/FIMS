@@ -33,6 +33,21 @@ namespace fims_distributions {
  *
  * Row observations could be counts of each age for a given time step, where
  * additional time steps would be additional rows. Thus, columns are bins.
+ *
+ * Before the row is evaluated, `offset_expected` (\f$c_e\f$) is added to each
+ * expected proportion and `offset_observed` (\f$c_o\f$) to each observed
+ * proportion, and both are rescaled. With \f$K\f$ bins and a row sample size
+ * of \f$n = \sum_k x_k\f$:
+ * \f[
+ * \tilde{p}_{k} = \frac{p_{k} + c_e}{1 + Kc_e}, \qquad
+ * \tilde{x}_{k} = \frac{x_{k} + c_o n}{1 + Kc_o}.
+ * \f]
+ * Expected proportions in a row sum to 1, so \f$\tilde{p}\f$ also sums to 1,
+ * and \f$\tilde{x}\f$ sums to \f$n\f$. Without an expected offset, a bin with
+ * an expected proportion of 0 makes the row, and the objective, NaN or
+ * infinite. When the 2 offsets are equal, the observed proportions are still
+ * the best fit. Reported observed and expected values do not include the
+ * offsets.
  */
 template <typename Type>
 struct MultinomialLPMF : public DensityComponentBase<Type> {
@@ -41,6 +56,12 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
    * dataset.
    */
   fims::Vector<size_t> dims;
+
+  /** @brief Constant added to each expected proportion, 0 by default. */
+  Type offset_expected = static_cast<Type>(0.0);
+
+  /** @brief Constant added to each observed proportion, 0 by default. */
+  Type offset_observed = static_cast<Type>(0.0);
 
   /** @brief Constructor.
    */
@@ -143,6 +164,24 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       }
 
       if (!containsNA) {
+        // Dividing by 1 + K * offset keeps the expected row summing to 1 and
+        // the observed row summing to its sample size.
+        const Type n_bins = static_cast<Type>(dims[1]);
+        Type sample_size = static_cast<Type>(0.0);
+        for (size_t j = 0; j < dims[1]; j++) {
+          sample_size += observed_values_vector[j];
+        }
+        const Type expected_scale =
+            static_cast<Type>(1.0) + n_bins * this->offset_expected;
+        const Type observed_scale =
+            static_cast<Type>(1.0) + n_bins * this->offset_observed;
+        for (size_t j = 0; j < dims[1]; j++) {
+          prob_vector[j] =
+              (prob_vector[j] + this->offset_expected) / expected_scale;
+          observed_values_vector[j] = (observed_values_vector[j] +
+                                       this->offset_observed * sample_size) /
+                                      observed_scale;
+        }
         Type row_lpmf = dmultinom(observed_values_vector.to_tmb(),
                                   prob_vector.to_tmb(), true);
         // The row log-probability mass has no unique split across bins because
