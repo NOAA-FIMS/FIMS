@@ -943,13 +943,13 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    */
   RealVector dims;
   /**
-   * @brief Constant added to each expected proportion, see
-   * fims_distributions::MultinomialLPMF. The default is 0.
+   * @brief Constant added to each expected proportion, 0 by default, see
+   * fims_distributions::MultinomialLPMF.
    */
   RealVector offset_expected;
   /**
-   * @brief Constant added to each observed proportion, see
-   * fims_distributions::MultinomialLPMF. The default is 0.
+   * @brief Constant added to each observed proportion, 0 by default, see
+   * fims_distributions::MultinomialLPMF.
    */
   RealVector offset_observed;
   /**

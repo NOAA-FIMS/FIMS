@@ -246,7 +246,7 @@ test_that("`initialize_data_distribution()` returns correct error messages", {
     "argument .*uncertainty.* is missing"
   )
 
-  #' @description Test that error is thrown when the multinomial formulas of one fleet use more than one offset.
+  #' @description Test that error is thrown when the multinomial formulas of one fleet give more than 1 value of an offset.
   expect_error(
     initialize_data_distribution(
       module = fishing_fleet,
@@ -256,7 +256,7 @@ test_that("`initialize_data_distribution()` returns correct error messages", {
         "~dmultinom(prob = agecomp_proportion, size = 10)"
       )
     ),
-    "more than one `offset_observed`"
+    "more than 1 value of `offset_observed`"
   )
 
   #' @description Test that a warning is given when both multinomial offsets are above 0 and differ.
@@ -266,7 +266,17 @@ test_that("`initialize_data_distribution()` returns correct error messages", {
       data_type = "age_comp",
       uncertainty = "~dmultinom(prob = agecomp_proportion, size = 10, offset_expected = 0.001)"
     ),
-    "Different offsets bias the fit"
+    "moves the best fit away from the observed proportions"
+  )
+
+  #' @description Test that a warning is given for an observed offset with an expected offset of 0.
+  expect_warning(
+    initialize_data_distribution(
+      module = fishing_fleet,
+      data_type = "age_comp",
+      uncertainty = "~dmultinom(prob = agecomp_proportion, size = 10, offset_expected = 0)"
+    ),
+    "moves the best fit away from the observed proportions"
   )
 
   #' @description Test that no warning is given for an expected offset with an observed offset of 0.

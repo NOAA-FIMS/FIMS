@@ -35,7 +35,9 @@
 #' Parameter values are returned as language objects rather than evaluated
 #' numeric vectors. This preserves references to symbols in the calling
 #' environment (for example, `catch_expected`) so evaluation can occur later
-#' in a context where those objects exist.
+#' in a context where those objects exist. The multinomial `offset_expected`
+#' and `offset_observed` are the exception: they are evaluated and checked
+#' here, so an expression such as `1/1000` returns its value.
 #'
 #' @return A column-oriented list. Every component has the same length as
 #'   `expr`, and every parameter supported by [FIMS::fims_distributions] is
@@ -138,7 +140,7 @@ parse_one_data_distribution <- function(expr) {
   # Extract the distribution family name
   dist_name <- as.character(right_hand[[1]])
   # FIMS arguments, not formals(), because the offsets are not arguments of
-  # stats::dmultinom(). Base R because this runs once per data row.
+  # stats::dmultinom().
   in_family <- FIMS::fims_distributions[["family"]] == dist_name
   dist_arguments <- c(
     FIMS::fims_distributions[["central_parameter"]][in_family],
@@ -171,7 +173,8 @@ parse_one_data_distribution <- function(expr) {
   if (length(unknown_arguments) > 0) {
     cli::cli_abort(c(
       x = "{.code {dist_name}} in FIMS does not take
-      {.val {unknown_arguments}}, in your distribution {expr}.",
+      {.val {unknown_arguments}}.",
+      i = "Your distribution is {expr}.",
       i = "Argument options are {.val {dist_arguments}}.",
       i = "See the Uncertainty section of {.code ?FIMSFrame}."
     ))

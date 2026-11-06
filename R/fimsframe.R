@@ -1968,12 +1968,10 @@ resolve_fleet_length_bins <- function(
 #' specify `"~dlnorm(meanlog = log_catch_expected, sdlog = 0.01)"`. Where, the
 #' input value for sd or sdlog is the standard deviation of the mean or
 #' standard deviation of the log of the mean, respectively. The distribution
-#' names and argument names match the names used in R, e.g., `args(dnorm)`,
-#' and [fims_distributions] lists the arguments FIMS uses for each
-#' distribution. Composition data use `dmultinom()`, which also takes
-#' `offset_expected` and `offset_observed`, constants added to the expected
-#' and observed proportions, see
-#' `vignette("fims-input-data", package = "FIMS")`. And, use
+#' names and argument names match the names used in R (see `args(dnorm)`).
+#' [fims_distributions] lists the arguments FIMS takes for each distribution.
+#' `dmultinom()` also takes `offset_expected` and `offset_observed`, which are
+#' described in `vignette("fims-input-data", package = "FIMS")`. And, use
 #' `?distributions` to get a list of
 #' distributions that have density functions in base R. To get information on
 #' available derived quantities to set the central tendency of the distribution

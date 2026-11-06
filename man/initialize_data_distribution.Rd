@@ -22,9 +22,9 @@ catch.}
 
 \item{uncertainty}{A vector of strings specifying formulas for each data
 point. See \code{\link[=FIMSFrame]{FIMSFrame()}} for more information on what the formula should
-look like. For \code{dmultinom()}, every formula must use the same
-\code{offset_expected} and \code{offset_observed}, and a formula without one uses
-1e-5. See \code{vignette("fims-input-data", package = "FIMS")}.}
+look like. For \code{dmultinom()}, all formulas must give the same
+\code{offset_expected} and the same \code{offset_observed}. See
+\code{vignette("fims-input-data", package = "FIMS")}.}
 }
 \value{
 A reference class. is returned. Use \code{\link[methods:show]{methods::show()}} to view the various

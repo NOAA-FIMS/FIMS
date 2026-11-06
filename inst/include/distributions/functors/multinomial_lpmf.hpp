@@ -37,17 +37,17 @@ namespace fims_distributions {
  * Before the row is evaluated, `offset_expected` (\f$c_e\f$) is added to each
  * expected proportion and `offset_observed` (\f$c_o\f$) to each observed
  * proportion, and both are rescaled. With \f$K\f$ bins and a row sample size
- * of \f$n\f$:
+ * of \f$n = \sum_k x_k\f$:
  * \f[
  * \tilde{p}_{k} = \frac{p_{k} + c_e}{1 + Kc_e}, \qquad
  * \tilde{x}_{k} = \frac{x_{k} + c_o n}{1 + Kc_o}.
  * \f]
  * Expected proportions in a row sum to 1, so \f$\tilde{p}\f$ also sums to 1,
  * and \f$\tilde{x}\f$ sums to \f$n\f$. Without an expected offset, a bin with
- * an expected proportion of 0 and an observed value of 0 gives
- * \f$0 \log(0)\f$, which makes the row, and the objective, NaN. When the 2
- * offsets are equal, the observed proportions are still the best fit.
- * Reported observed and expected values do not include the offsets.
+ * an expected proportion of 0 makes the row, and the objective, NaN or
+ * infinite. When the 2 offsets are equal, the observed proportions are still
+ * the best fit. Reported observed and expected values do not include the
+ * offsets.
  */
 template <typename Type>
 struct MultinomialLPMF : public DensityComponentBase<Type> {
@@ -57,16 +57,10 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
    */
   fims::Vector<size_t> dims;
 
-  /**
-   * @brief Constant added to each expected proportion before the row is
-   * evaluated. The default is 0.
-   */
+  /** @brief Constant added to each expected proportion, 0 by default. */
   Type offset_expected = static_cast<Type>(0.0);
 
-  /**
-   * @brief Constant added to each observed proportion before the row is
-   * evaluated. The default is 0.
-   */
+  /** @brief Constant added to each observed proportion, 0 by default. */
   Type offset_observed = static_cast<Type>(0.0);
 
   /** @brief Constructor.
