@@ -9,6 +9,7 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 
+#include <cmath>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -1043,7 +1044,7 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   void check_offset(const std::string &name, RealVector &offset) {
     if (offset.size() != 1 || !std::isfinite(offset[0]) || offset[0] < 0.0) {
       std::string message = "DmultinomDistribution: " + name +
-                            " must be a single finite value of 0 or more.";
+                            " must be a single finite number of 0 or more.";
       FIMS_ERROR_LOG(message);
       throw std::invalid_argument(message);
     }

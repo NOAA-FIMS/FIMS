@@ -211,7 +211,8 @@ initialize_data_distribution <- function(
     }
     # An expected offset alone is common in assessment models, so only an
     # observed offset that differs from the expected one warns.
-    # scale makes the comparison relative, so offsets near 0 still differ.
+    # scale = max(offsets) makes the comparison relative, so offsets near 0
+    # that differ still warn.
     if (offsets[["offset_observed"]] > 0 &&
       !isTRUE(all.equal(
         offsets[["offset_expected"]],

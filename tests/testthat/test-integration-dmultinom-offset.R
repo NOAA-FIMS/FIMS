@@ -32,7 +32,8 @@ data_zero_youngest <- data_big |>
 
 run_zero_youngest <- function(data) {
   data_4_model <- FIMSFrame(data)
-  # 1 / (1 + exp(1000)) is exactly 0 in double precision
+  # A logit selectivity of -1000 gives 1 / (1 + exp(1000)), which is exactly 0
+  # in double precision
   age_specific <- setup_default_Selectivity(
     data = data_4_model,
     fleet = "survey1",

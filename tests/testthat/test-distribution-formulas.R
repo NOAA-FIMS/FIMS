@@ -269,7 +269,7 @@ test_that("`initialize_data_distribution()` returns correct error messages", {
     "moves the best fit away from the observed proportions"
   )
 
-  #' @description Test that a warning is given for offsets that differ when both are near 0.
+  #' @description Test that a warning is given for offsets that differ by less than the default all.equal() tolerance.
   expect_warning(
     initialize_data_distribution(
       module = fishing_fleet,

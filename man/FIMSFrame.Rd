@@ -60,11 +60,11 @@ you use a lognormal distribution the observation is assumed to represent
 specify \code{"~dlnorm(meanlog = log_catch_expected, sdlog = 0.01)"}. Where, the
 input value for sd or sdlog is the standard deviation of the mean or
 standard deviation of the log of the mean, respectively. The distribution
-names and argument names match the names used in R (see \code{args(dnorm)}).
-\link{fims_distributions} lists the arguments FIMS takes for each distribution.
-\code{dmultinom()} also takes \code{offset_expected} and \code{offset_observed}, which are
-described in \code{vignette("fims-input-data", package = "FIMS")}. And, use
-\code{?distributions} to get a list of
+names and argument names match the names used in R (see \code{args(dnorm)}),
+except the \code{dmultinom()} offsets, which are described in
+\code{vignette("fims-input-data", package = "FIMS")}. \link{fims_distributions} lists
+the arguments FIMS takes for each distribution. And, use \code{?distributions} to
+get a list of
 distributions that have density functions in base R. To get information on
 available derived quantities to set the central tendency of the distribution
 to, you can create a fleet object and inspect the available names, e.g.,

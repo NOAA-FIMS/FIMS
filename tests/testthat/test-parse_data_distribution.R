@@ -150,12 +150,21 @@ test_that("`parse_data_distribution()` returns correct error messages", {
     fixed = TRUE
   )
 
+  #' @description Test that a multinomial offset given as a variable name is an error, even when the name exists while the formula is parsed.
+  expect_error(
+    parse_data_distribution(
+      "~dmultinom(prob = x, size = 10, offset_expected = 0.001, offset_observed = offset)"
+    ),
+    "`offset_observed` must be a single finite number of 0 or more",
+    fixed = TRUE
+  )
+
   #' @description Test that a multinomial offset must be 0 or greater.
   expect_error(
     parse_data_distribution(
       "~dmultinom(prob = x, size = 10, offset_observed = -0.1)"
     ),
-    "`offset_observed` must be a single finite number, 0 or greater",
+    "`offset_observed` must be a single finite number of 0 or more",
     fixed = TRUE
   )
 
@@ -164,7 +173,7 @@ test_that("`parse_data_distribution()` returns correct error messages", {
     parse_data_distribution(
       "~dmultinom(prob = x, size = 10, offset_expected = Inf)"
     ),
-    "`offset_expected` must be a single finite number, 0 or greater",
+    "`offset_expected` must be a single finite number of 0 or more",
     fixed = TRUE
   )
 

@@ -38,7 +38,7 @@
 #' in a context where those objects exist. The multinomial `offset_expected`
 #' and `offset_observed` are the exception: they are evaluated in the base
 #' environment and checked here, so an expression such as `1/1000` returns its
-#' value.
+#' value and a variable name is an error.
 #'
 #' @return A column-oriented list. Every component has the same length as
 #'   `expr`, and every parameter supported by [FIMS::fims_distributions] is
@@ -205,18 +205,22 @@ parse_one_data_distribution <- function(expr) {
     names(args_list)
   )
   for (offset_name in offset_names) {
-    # Evaluate in baseenv() so only numbers and arithmetic such as 1/1000
-    # work, not variables in this function, and store the value.
-    args_list[[offset_name]] <- eval(args_list[[offset_name]], baseenv())
-    offset <- args_list[[offset_name]]
+    # Evaluate in baseenv() so numbers and arithmetic such as 1/1000 work but
+    # no variables do. A name that is not found gets the error below.
+    offset <- tryCatch(
+      eval(args_list[[offset_name]], baseenv()),
+      error = function(e) NULL
+    )
     if (!is.numeric(offset) || length(offset) != 1 || !is.finite(offset) ||
       offset < 0) {
       cli::cli_abort(c(
-        x = "{.var {offset_name}} must be a single finite number, 0 or
-        greater",
-        i = "In your distribution, {expr}, you passed {.val {offset}}"
+        x = "{.var {offset_name}} must be a single finite number of 0 or
+        more",
+        i = "In your distribution, {expr}, you passed
+        {.code {deparse(args_list[[offset_name]])}}"
       ))
     }
+    args_list[[offset_name]] <- offset
   }
 
 

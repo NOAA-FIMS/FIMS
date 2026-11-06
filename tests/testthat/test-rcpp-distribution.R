@@ -138,7 +138,7 @@ test_that("rcpp distribution works with correct inputs", {
   )
 
   # stats::dmultinom() rounds x, so FIMS_dmultinom() is used for observed
-  # counts that are no longer whole numbers.
+  # counts that are not whole numbers after the offset.
   dmultinom_$offset_observed[] <- 0.01
   observed_proportion <- x_values / sum(x_values)
   x_with_offset <- sum(x_values) * (observed_proportion + 0.01) /
@@ -460,14 +460,23 @@ test_that("rcpp distribution returns correct error messages", {
   #' @description dmultinom should error out when an offset is negative.
   expect_error(
     object = dmultinom_$evaluate(),
-    regexp = "offset_expected must be a single finite value of 0 or more"
+    regexp = "offset_expected must be a single finite number of 0 or more"
   )
   dmultinom_$offset_expected[] <- 0
   dmultinom_$offset_observed[] <- c(0.001, 0.01)
   #' @description dmultinom should error out when an offset has more than 1 value.
   expect_error(
     object = dmultinom_$evaluate(),
-    regexp = "offset_observed must be a single finite value of 0 or more"
+    regexp = "offset_observed must be a single finite number of 0 or more"
+  )
+  clear()
+
+  dmultinom_ <- methods::new(DmultinomDistribution)
+  dmultinom_$offset_observed[] <- NA
+  #' @description dmultinom should error out when the TMB model is created with an offset that is not finite.
+  expect_error(
+    object = CreateTMBModel(),
+    regexp = "offset_observed must be a single finite number of 0 or more"
   )
   clear()
 })
