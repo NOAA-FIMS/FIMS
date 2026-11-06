@@ -63,8 +63,9 @@ Parameter values are returned as language objects rather than evaluated
 numeric vectors. This preserves references to symbols in the calling
 environment (for example, \code{catch_expected}) so evaluation can occur later
 in a context where those objects exist. The multinomial \code{offset_expected}
-and \code{offset_observed} are the exception: they are evaluated and checked
-here, so an expression such as \code{1/1000} returns its value.
+and \code{offset_observed} are the exception: they are evaluated in the base
+environment and checked here, so an expression such as \code{1/1000} returns its
+value.
 }
 \examples{
 FIMS:::parse_data_distribution(

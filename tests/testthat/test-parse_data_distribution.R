@@ -141,6 +141,15 @@ test_that("`parse_data_distribution()` returns correct error messages", {
     fixed = TRUE
   )
 
+  #' @description Test that an argument given more than once is an error.
+  expect_error(
+    parse_data_distribution(
+      "~dmultinom(prob = x, size = 10, offset_expected = 0.001, offset_expected = 0.1)"
+    ),
+    "more than once",
+    fixed = TRUE
+  )
+
   #' @description Test that a multinomial offset must be 0 or greater.
   expect_error(
     parse_data_distribution(

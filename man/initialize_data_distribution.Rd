@@ -27,7 +27,7 @@ look like. For \code{dmultinom()}, all formulas must give the same
 \code{vignette("fims-input-data", package = "FIMS")}.}
 }
 \value{
-A reference class. is returned. Use \code{\link[methods:show]{methods::show()}} to view the various
+A reference class is returned. Use \code{\link[methods:show]{methods::show()}} to view the various
 Rcpp class fields, methods, and documentation.
 }
 \description{

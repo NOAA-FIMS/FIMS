@@ -130,7 +130,7 @@ check_distribution_validity <- function(args) {
 #'   `offset_expected` and the same `offset_observed`. See
 #'   `vignette("fims-input-data", package = "FIMS")`.
 #' @return
-#' A reference class. is returned. Use [methods::show()] to view the various
+#' A reference class is returned. Use [methods::show()] to view the various
 #' Rcpp class fields, methods, and documentation.
 #' @keywords distribution
 #' @export
@@ -211,10 +211,12 @@ initialize_data_distribution <- function(
     }
     # An expected offset alone is common in assessment models, so only an
     # observed offset that differs from the expected one warns.
+    # scale makes the comparison relative, so offsets near 0 still differ.
     if (offsets[["offset_observed"]] > 0 &&
       !isTRUE(all.equal(
         offsets[["offset_expected"]],
-        offsets[["offset_observed"]]
+        offsets[["offset_observed"]],
+        scale = max(offsets)
       ))) {
       cli::cli_warn(c(
         "!" = "The {.val {data_type}} formulas for fleet

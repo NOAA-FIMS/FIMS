@@ -449,4 +449,25 @@ test_that("rcpp distribution returns correct error messages", {
     regexp = "MultinomialLPDF: Vector index out of bounds. The dimension of the observed vector of size 9 and the expected vector is of size 10"
   )
   clear()
+
+  dmultinom_ <- methods::new(DmultinomDistribution)
+  dmultinom_$dims$resize(2)
+  dmultinom_$dims$set(0, 1)
+  dmultinom_$dims$set(1, length(p))
+  dmultinom_$expected_values[] <- p
+  dmultinom_$observed_values[] <- x_values
+  dmultinom_$offset_expected[] <- -0.01
+  #' @description dmultinom should error out when an offset is negative.
+  expect_error(
+    object = dmultinom_$evaluate(),
+    regexp = "offset_expected must be a single finite value of 0 or more"
+  )
+  dmultinom_$offset_expected[] <- 0
+  dmultinom_$offset_observed[] <- c(0.001, 0.01)
+  #' @description dmultinom should error out when an offset has more than 1 value.
+  expect_error(
+    object = dmultinom_$evaluate(),
+    regexp = "offset_observed must be a single finite value of 0 or more"
+  )
+  clear()
 })

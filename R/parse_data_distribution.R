@@ -36,8 +36,9 @@
 #' numeric vectors. This preserves references to symbols in the calling
 #' environment (for example, `catch_expected`) so evaluation can occur later
 #' in a context where those objects exist. The multinomial `offset_expected`
-#' and `offset_observed` are the exception: they are evaluated and checked
-#' here, so an expression such as `1/1000` returns its value.
+#' and `offset_observed` are the exception: they are evaluated in the base
+#' environment and checked here, so an expression such as `1/1000` returns its
+#' value.
 #'
 #' @return A column-oriented list. Every component has the same length as
 #'   `expr`, and every parameter supported by [FIMS::fims_distributions] is
@@ -179,6 +180,14 @@ parse_one_data_distribution <- function(expr) {
       i = "See the Uncertainty section of {.code ?FIMSFrame}."
     ))
   }
+  repeated_arguments <- unique(names(args_list)[duplicated(names(args_list))])
+  if (length(repeated_arguments) > 0) {
+    cli::cli_abort(c(
+      x = "Your distribution, {expr}, gives {.val {repeated_arguments}} more
+      than once.",
+      i = "Give each argument once."
+    ))
+  }
   if (dist_name == "dnorm" && eval(args_list[["sd"]]) <= 0) {
     cli::cli_abort(c(
       x = "{.var sd} must be positive",
@@ -196,8 +205,9 @@ parse_one_data_distribution <- function(expr) {
     names(args_list)
   )
   for (offset_name in offset_names) {
-    # Store the value so an expression such as 1/1000 works downstream.
-    args_list[[offset_name]] <- eval(args_list[[offset_name]])
+    # Evaluate in baseenv() so only numbers and arithmetic such as 1/1000
+    # work, not variables in this function, and store the value.
+    args_list[[offset_name]] <- eval(args_list[[offset_name]], baseenv())
     offset <- args_list[[offset_name]]
     if (!is.numeric(offset) || length(offset) != 1 || !is.finite(offset) ||
       offset < 0) {
