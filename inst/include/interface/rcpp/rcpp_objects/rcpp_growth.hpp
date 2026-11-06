@@ -586,12 +586,8 @@ class VonBertalanffySchnuteGrowthInterface
   }
 
  private:
-  enum class LengthReferenceParameterization {
-    kEstimatedReferenceLengths = 0,
-    kConstantLengthYoungEstimatedLengthOld,
-    kEstimatedLengthYoungBelowConstantLengthOld,
-    kBothConstant
-  };
+  using LengthReferenceParameterization =
+      fims_popdy::LengthReferenceParameterization;
 
   bool IsEstimated(VariableVector& pv) {
     return pv.size() > 0 && pv[0].estimation_type_m.get() != "constant";
@@ -672,35 +668,6 @@ class VonBertalanffySchnuteGrowthInterface
       } else {
         pv[i].final_value_m = final_value;
       }
-    }
-  }
-
-  template <typename Type>
-  void ConfigureLengthReferenceParameterization(
-      const std::shared_ptr<
-          fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<Type>>& vb) {
-    switch (GetLengthReferenceParameterization()) {
-      case LengthReferenceParameterization::kEstimatedReferenceLengths:
-        vb->UseEstimatedReferenceMeanLengths();
-        break;
-
-      case LengthReferenceParameterization::
-          kConstantLengthYoungEstimatedLengthOld:
-        vb->UseConstantMeanLengthYoungWithEstimatedMeanLengthOld(
-            static_cast<Type>(InitialLengthAtRefAgeYoung()));
-        break;
-
-      case LengthReferenceParameterization::
-          kEstimatedLengthYoungBelowConstantLengthOld:
-        vb->UseEstimatedMeanLengthYoungBelowConstantMeanLengthOld(
-            static_cast<Type>(InitialLengthAtRefAgeOld()));
-        break;
-
-      case LengthReferenceParameterization::kBothConstant:
-        vb->UseConstantReferenceMeanLengths(
-            static_cast<Type>(InitialLengthAtRefAgeYoung()),
-            static_cast<Type>(InitialLengthAtRefAgeOld()));
-        break;
     }
   }
 
@@ -1053,7 +1020,10 @@ class VonBertalanffySchnuteGrowthInterface
           load_and_register(pv, target, base_name, log_scale);
         };
 
-    ConfigureLengthReferenceParameterization<Type>(vb);
+    vb->SetLengthReferenceParameterization(
+        GetLengthReferenceParameterization(),
+        static_cast<Type>(InitialLengthAtRefAgeYoung()),
+        static_cast<Type>(InitialLengthAtRefAgeOld()));
 
     load_and_register(this->mean_length_young, vb->MeanLengthYoungVector(),
                       "mean_length_young", true);
