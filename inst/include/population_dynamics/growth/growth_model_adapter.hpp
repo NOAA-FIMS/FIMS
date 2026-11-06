@@ -481,18 +481,16 @@ class VonBertalanffySchnuteGrowthModelAdapter
           fims_math::exp(log_sd_mean_length_old_vector_[0]);
       const Type sd_growth_coefficient =
           fims_math::exp(log_sd_growth_coefficient_vector_[0]);
-      const Type corr_mean_length_young_mean_length_old =
-          fims_math::inv_logit(
-              Type(-1.0), Type(1.0),
-              mean_length_young_mean_length_old_logit_corr_vector_[0]);
+      const Type corr_mean_length_young_mean_length_old = fims_math::inv_logit(
+          Type(-1.0), Type(1.0),
+          mean_length_young_mean_length_old_logit_corr_vector_[0]);
       const Type corr_mean_length_young_growth_coefficient =
           fims_math::inv_logit(
               Type(-1.0), Type(1.0),
               mean_length_young_growth_coefficient_logit_corr_vector_[0]);
-      const Type corr_mean_length_old_growth_coefficient =
-          fims_math::inv_logit(
-              Type(-1.0), Type(1.0),
-              mean_length_old_growth_coefficient_logit_corr_vector_[0]);
+      const Type corr_mean_length_old_growth_coefficient = fims_math::inv_logit(
+          Type(-1.0), Type(1.0),
+          mean_length_old_growth_coefficient_logit_corr_vector_[0]);
 
       model_->SetGrowthParameterCovariance(
           sd_mean_length_young * sd_mean_length_young,
