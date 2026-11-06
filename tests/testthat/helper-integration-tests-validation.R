@@ -481,9 +481,10 @@ verify_fims_deterministic <- function(
 #' such as numbers at age, biomass, spawning biomass, fishing mortality, and indices.
 #' @param em_input A list containing the estimation model inputs, including observed
 #' catch, indices, and other relevant data.
-#' @param offset The multinomial offset added to the expected composition
-#' proportions. Models set up with `initialize_fims()` use 1e-5 unless the
-#' `uncertainty` formula gives one. Models built with `methods::new()` use 0.
+#' @param offset The multinomial offset added to both the observed and the
+#' expected composition proportions. Models set up with `initialize_fims()` use
+#' 1e-5 unless the `uncertainty` formula gives one. Models built with
+#' `methods::new()` use 0.
 #'
 #' @return None. The function uses `testthat` functions to perform validations.
 #'
@@ -523,63 +524,67 @@ verify_fims_nll <- function(report,
     sqrt(log(em_input[["cv.survey"]][["survey1"]]^2 + 1)), TRUE
   ))
 
-  # Expected proportions by year (rows) and bin (columns), with the offset
-  # added to each bin and each year rescaled to sum to 1.
-  expected_proportions <- function(expected_numbers) {
-    (expected_numbers / rowSums(expected_numbers) + offset) /
-      (1 + ncol(expected_numbers) * offset)
+  # Proportions by year (rows) and bin (columns), with the offset added to
+  # each bin and each year rescaled to sum to 1.
+  with_offset <- function(numbers) {
+    (numbers / rowSums(numbers) + offset) / (1 + ncol(numbers) * offset)
+  }
+  # Observed counts with the offset, keeping each year's total.
+  observed_counts <- function(proportions, sample_size) {
+    counts <- proportions * sample_size
+    with_offset(counts) * rowSums(counts)
   }
 
   # age comp likelihoods
-  fishing_acomp_observed <- em_input[["L.age.obs"]][["fleet1"]]
-  fishing_acomp_expected <- expected_proportions(
-    om_output[["L.age"]][["fleet1"]]
+  fishing_acomp_observed <- observed_counts(
+    em_input[["L.age.obs"]][["fleet1"]], em_input[["n.L"]][["fleet1"]]
   )
-  survey_acomp_observed <- em_input[["survey.age.obs"]][["survey1"]]
-  survey_acomp_expected <- expected_proportions(
+  fishing_acomp_expected <- with_offset(om_output[["L.age"]][["fleet1"]])
+  survey_acomp_observed <- observed_counts(
+    em_input[["survey.age.obs"]][["survey1"]],
+    em_input[["n.survey"]][["survey1"]]
+  )
+  survey_acomp_expected <- with_offset(
     om_output[["survey_age_comp"]][["survey1"]]
   )
-  age_comp_nll_fleet <- age_comp_nll_survey <- 0
-  for (y in 1:om_input[["nyr"]]) {
-    age_comp_nll_fleet <- age_comp_nll_fleet -
-      dmultinom(
-        fishing_acomp_observed[y, ] * em_input[["n.L"]][["fleet1"]], em_input[["n.L"]][["fleet1"]],
-        fishing_acomp_expected[y, ], TRUE
-      )
-
-    age_comp_nll_survey <- age_comp_nll_survey -
-      dmultinom(
-        survey_acomp_observed[y, ] * em_input[["n.survey"]][["survey1"]], em_input[["n.survey"]][["survey1"]],
-        survey_acomp_expected[y, ], TRUE
-      )
-  }
-  age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
 
   # length comp likelihoods
-  fishing_lengthcomp_observed <- em_input[["L.length.obs"]][["fleet1"]]
-  fishing_lengthcomp_expected <- expected_proportions(
+  fishing_lengthcomp_observed <- observed_counts(
+    em_input[["L.length.obs"]][["fleet1"]],
+    em_input[["n.L.lengthcomp"]][["fleet1"]]
+  )
+  fishing_lengthcomp_expected <- with_offset(
     om_output[["L.length"]][["fleet1"]]
   )
-  survey_lengthcomp_observed <- em_input[["survey.length.obs"]][["survey1"]]
-  survey_lengthcomp_expected <- expected_proportions(
+  survey_lengthcomp_observed <- observed_counts(
+    em_input[["survey.length.obs"]][["survey1"]],
+    em_input[["n.survey.lengthcomp"]][["survey1"]]
+  )
+  survey_lengthcomp_expected <- with_offset(
     om_output[["survey_length_comp"]][["survey1"]]
   )
+
+  # FIMS_dmultinom() matches the TMB dmultinom calculation and differs from R
+  # by NOT rounding obs to the nearest integer.
+  age_comp_nll_fleet <- age_comp_nll_survey <- 0
   lengthcomp_nll_fleet <- lengthcomp_nll_survey <- 0
   for (y in 1:om_input[["nyr"]]) {
-    # test using FIMS_dmultinom which matches the TMB dmultinom calculation and differs from R
-    # by NOT rounding obs to the nearest integer.
+    age_comp_nll_fleet <- age_comp_nll_fleet -
+      FIMS_dmultinom(fishing_acomp_observed[y, ], fishing_acomp_expected[y, ])
+    age_comp_nll_survey <- age_comp_nll_survey -
+      FIMS_dmultinom(survey_acomp_observed[y, ], survey_acomp_expected[y, ])
     lengthcomp_nll_fleet <- lengthcomp_nll_fleet -
       FIMS_dmultinom(
-        fishing_lengthcomp_observed[y, ] * em_input[["n.L.lengthcomp"]][["fleet1"]],
+        fishing_lengthcomp_observed[y, ],
         fishing_lengthcomp_expected[y, ]
       )
-
     lengthcomp_nll_survey <- lengthcomp_nll_survey -
       FIMS_dmultinom(
-        survey_lengthcomp_observed[y, ] * em_input[["n.survey.lengthcomp"]][["survey1"]],
+        survey_lengthcomp_observed[y, ],
         survey_lengthcomp_expected[y, ]
       )
   }
+  age_comp_nll <- age_comp_nll_fleet + age_comp_nll_survey
   lengthcomp_nll <- lengthcomp_nll_fleet + lengthcomp_nll_survey
 
   expected_jnll <- rec_nll + catch_nll + index_nll + age_comp_nll + lengthcomp_nll

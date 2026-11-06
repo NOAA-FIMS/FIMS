@@ -62,8 +62,9 @@ input value for sd or sdlog is the standard deviation of the mean or
 standard deviation of the log of the mean, respectively. The distribution
 names and argument names match the names used in R, e.g., \code{args(dnorm)},
 and \link{fims_distributions} lists the arguments FIMS uses for each
-distribution. Composition data use \code{dmultinom()}, which also takes an
-\code{offset} added to each expected proportion, see
+distribution. Composition data use \code{dmultinom()}, which also takes
+\code{offset_expected} and \code{offset_observed}, constants added to the expected
+and observed proportions, see
 \code{vignette("fims-input-data", package = "FIMS")}. And, use
 \code{?distributions} to get a list of
 distributions that have density functions in base R. To get information on

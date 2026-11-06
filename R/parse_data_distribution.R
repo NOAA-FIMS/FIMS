@@ -50,7 +50,7 @@
 #' `NA` for central parameters, and `1` for ancillary parameters. These neutral
 #' ancillary values prevent missing observations from introducing `NA` into
 #' vectorized likelihood calculations. [initialize_data_distribution()] skips
-#' these rows when it reads the multinomial `offset`.
+#' these rows when it reads the multinomial offsets.
 #'
 #' @keywords internal
 #' @examples
@@ -137,7 +137,7 @@ parse_one_data_distribution <- function(expr) {
 
   # Extract the distribution family name
   dist_name <- as.character(right_hand[[1]])
-  # FIMS arguments, not formals(), because offset is not an argument of
+  # FIMS arguments, not formals(), because the offsets are not arguments of
   # stats::dmultinom(). Base R because this runs once per data row.
   in_family <- FIMS::fims_distributions[["family"]] == dist_name
   dist_arguments <- c(
@@ -188,14 +188,19 @@ parse_one_data_distribution <- function(expr) {
       i = "In your distribution, {expr}, you passed {eval(args_list$sdlog)}"
     ))
   }
-  if (dist_name == "dmultinom" && !is.null(args_list[["offset"]])) {
+  offset_names <- intersect(
+    c("offset_expected", "offset_observed"),
+    names(args_list)
+  )
+  for (offset_name in offset_names) {
     # Store the value so an expression such as 1/1000 works downstream.
-    args_list[["offset"]] <- eval(args_list[["offset"]])
-    offset <- args_list[["offset"]]
+    args_list[[offset_name]] <- eval(args_list[[offset_name]])
+    offset <- args_list[[offset_name]]
     if (!is.numeric(offset) || length(offset) != 1 || !is.finite(offset) ||
       offset < 0) {
       cli::cli_abort(c(
-        x = "{.var offset} must be a single finite number, 0 or greater",
+        x = "{.var {offset_name}} must be a single finite number, 0 or
+        greater",
         i = "In your distribution, {expr}, you passed {.val {offset}}"
       ))
     }

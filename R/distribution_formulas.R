@@ -126,9 +126,9 @@ check_distribution_validity <- function(args) {
 #'   `r eval(formals(initialize_data_distribution)[["data_type"]])[1]`.
 #' @param uncertainty A vector of strings specifying formulas for each data
 #'   point. See [FIMSFrame()] for more information on what the formula should
-#'   look like. For `dmultinom()`, every formula must use the same `offset`,
-#'   and a formula without `offset` uses 1e-5. See
-#'   `vignette("fims-input-data", package = "FIMS")`.
+#'   look like. For `dmultinom()`, every formula must use the same
+#'   `offset_expected` and `offset_observed`, and a formula without one uses
+#'   1e-5. See `vignette("fims-input-data", package = "FIMS")`.
 #' @return
 #' A reference class. is returned. Use [methods::show()] to view the various
 #' Rcpp class fields, methods, and documentation.
@@ -179,28 +179,45 @@ initialize_data_distribution <- function(
     )
     new_module$log_sd$set_estimation_types("constant")
   }
-  if ("offset" %in% names(new_module)) {
+  if ("offset_expected" %in% names(new_module)) {
     # Rows without a formula hold placeholder values, so only rows with a
-    # formula set the offset.
-    offset <- unlist(
-      uncertainty_split[["offset"]][!is.na(uncertainty_split[["family"]])],
-      use.names = FALSE
-    )
-    offset[is.na(offset)] <- 1e-5
-    offset <- unique(offset)
-    if (length(offset) > 1) {
-      cli::cli_abort(c(
-        "x" = "The {.val {data_type}} formulas for fleet
-        {.val {module$GetName()}} use more than one {.var offset}:
-        {.val {offset}}.",
-        "i" = "Each fleet takes 1 {.var offset} per composition type. A
-        formula without {.var offset} uses 1e-5.",
-        "i" = "Check the formulas with {.code dplyr::filter(data, fleet ==
-        \"{module$GetName()}\", type == \"{data_type}\") |>
-        dplyr::distinct(uncertainty)}."
+    # formula set the offsets.
+    has_formula <- !is.na(uncertainty_split[["family"]])
+    offsets <- c(offset_expected = 1e-5, offset_observed = 1e-5)
+    for (offset_name in names(offsets)) {
+      offset <- unlist(
+        uncertainty_split[[offset_name]][has_formula],
+        use.names = FALSE
+      )
+      offset <- unique(dplyr::coalesce(offset, offsets[[offset_name]]))
+      if (length(offset) > 1) {
+        cli::cli_abort(c(
+          "x" = "The {.val {data_type}} formulas for fleet
+          {.val {module$GetName()}} use more than one {.var {offset_name}}:
+          {.val {offset}}.",
+          "i" = "Each fleet takes 1 {.var {offset_name}} per composition
+          type. A formula without {.var {offset_name}} uses 1e-5.",
+          "i" = "Check the formulas with {.code dplyr::filter(data, fleet ==
+          \"{module$GetName()}\", type == \"{data_type}\") |>
+          dplyr::distinct(uncertainty)}."
+        ))
+      }
+      offsets[[offset_name]] <- offset
+    }
+    if (all(offsets > 0) &&
+      offsets[["offset_expected"]] != offsets[["offset_observed"]]) {
+      cli::cli_warn(c(
+        "!" = "The {.val {data_type}} formulas for fleet
+        {.val {module$GetName()}} use {.var offset_expected} =
+        {.val {offsets[['offset_expected']]}} and {.var offset_observed} =
+        {.val {offsets[['offset_observed']]}}.",
+        "i" = "Different offsets bias the fit by about (offset_observed -
+        offset_expected) * (1 - K * p) for a bin with proportion p, where K
+        is the number of bins."
       ))
     }
-    new_module$offset[] <- offset
+    new_module$offset_expected[] <- offsets[["offset_expected"]]
+    new_module$offset_observed[] <- offsets[["offset_observed"]]
   }
 
   # setup link to observed data

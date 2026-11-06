@@ -11,8 +11,8 @@
 ## Setup ----
 # Give survey1 a selectivity of exactly 0 at the youngest age, so its expected
 # age-composition proportion there is 0, and move the observed fish at that age
-# to the next age. Without an offset, the empty bin gives 0 * log(0), which
-# makes the survey1 age-composition likelihood NaN.
+# to the next age. Without an expected offset, the empty bin gives
+# 0 * log(0), which makes the survey1 age-composition likelihood NaN.
 data("data_big")
 youngest_age <- min(get_ages(FIMSFrame(data_big)))
 
@@ -66,14 +66,17 @@ with_zero_offset <- data_zero_youngest |>
   dplyr::mutate(
     uncertainty = dplyr::if_else(
       type %in% c("age_comp", "length_comp"),
-      sub("\\)\\s*$", ", offset = 0)", uncertainty),
+      sub(
+        "\\)\\s*$", ", offset_expected = 0, offset_observed = 0)",
+        uncertainty
+      ),
       uncertainty
     )
   ) |>
   run_zero_youngest()
 
 ## IO correctness ----
-test_that("dmultinom with the default offset is finite when an expected proportion is 0", {
+test_that("dmultinom with the default offsets is finite when an expected proportion is 0", {
   #' @description Test that the setup gives survey1 an expected age-composition proportion of exactly 0 and an observed value of 0 at the youngest age in every year.
   youngest <- with_default_offset[["survey_age_comp"]] |>
     dplyr::filter(age == youngest_age)
@@ -86,16 +89,22 @@ test_that("dmultinom with the default offset is finite when an expected proporti
     expected = 0
   )
 
-  #' @description Test that the default offset gives a finite joint negative log-likelihood and gradient.
+  #' @description Test that the default offsets give a finite joint negative log-likelihood and gradient.
   expect_true(is.finite(with_default_offset[["jnll"]]))
   expect_true(all(is.finite(with_default_offset[["gradient"]])))
 
-  #' @description Test that the survey1 age-composition likelihood matches R's dmultinom with 1e-5 added to each expected proportion.
-  # stats::dmultinom() rescales prob to sum to 1, the same as dividing by
-  # 1 + K * offset.
+  #' @description Test that the survey1 age-composition likelihood matches the multinomial with 1e-5 added to each observed and expected proportion and both rescaled to sum to 1.
   r_lpmf <- with_default_offset[["survey_age_comp"]] |>
+    dplyr::mutate(
+      observed_proportion = observed / sum(observed),
+      .by = year_i
+    ) |>
     dplyr::summarize(
-      lpmf = stats::dmultinom(observed, prob = expected + 1e-5, log = TRUE),
+      lpmf = FIMS_dmultinom(
+        sum(observed) * (observed_proportion + 1e-5) /
+          sum(observed_proportion + 1e-5),
+        (expected + 1e-5) / sum(expected + 1e-5)
+      ),
       .by = year_i
     )
   expect_equal(
@@ -105,7 +114,7 @@ test_that("dmultinom with the default offset is finite when an expected proporti
 })
 
 ## Edge handling ----
-test_that("dmultinom with an offset of 0 is NaN when an expected proportion is 0", {
-  #' @description Test that the same model with offset = 0 in the formulas gives a NaN joint negative log-likelihood.
+test_that("dmultinom with offsets of 0 is NaN when an expected proportion is 0", {
+  #' @description Test that the same model with both offsets set to 0 in the formulas gives a NaN joint negative log-likelihood.
   expect_true(is.nan(with_zero_offset[["jnll"]]))
 })

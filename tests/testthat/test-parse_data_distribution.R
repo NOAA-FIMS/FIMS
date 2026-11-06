@@ -27,7 +27,8 @@ test_that("`parse_data_distribution()` works with correct inputs", {
       sd = list(NA),
       sdlog = list(0.00999975001354021),
       size = list(NA),
-      offset = list(NA)
+      offset_expected = list(NA),
+      offset_observed = list(NA)
     )
   )
 
@@ -43,22 +44,24 @@ test_that("`parse_data_distribution()` works with correct inputs", {
       sd = list(0.1),
       sdlog = list(NA),
       size = list(NA),
-      offset = list(NA)
+      offset_expected = list(NA),
+      offset_observed = list(NA)
     )
   )
 
-  #' @description Test that a multinomial offset is parsed with the other multinomial parameters.
+  #' @description Test that the multinomial offsets are parsed with the other multinomial parameters.
   parsed <- parse_data_distribution(
-    "~ dmultinom(prob = agecomp_proportion, size = 200, offset = 0.001)"
+    "~ dmultinom(prob = agecomp_proportion, size = 200, offset_expected = 0.001, offset_observed = 0)"
   )
   expect_equal(parsed[["size"]], list(200))
-  expect_equal(parsed[["offset"]], list(0.001))
+  expect_equal(parsed[["offset_expected"]], list(0.001))
+  expect_equal(parsed[["offset_observed"]], list(0))
 
   #' @description Test that a multinomial offset given as an expression is returned as its value.
   expect_equal(
     parse_data_distribution(
-      "~ dmultinom(prob = agecomp_proportion, size = 200, offset = 1/1000)"
-    )[["offset"]],
+      "~ dmultinom(prob = agecomp_proportion, size = 200, offset_expected = 1/1000)"
+    )[["offset_expected"]],
     list(0.001)
   )
 
@@ -140,15 +143,19 @@ test_that("`parse_data_distribution()` returns correct error messages", {
 
   #' @description Test that a multinomial offset must be 0 or greater.
   expect_error(
-    parse_data_distribution("~dmultinom(prob = x, size = 10, offset = -0.1)"),
-    "`offset` must be a single finite number, 0 or greater",
+    parse_data_distribution(
+      "~dmultinom(prob = x, size = 10, offset_observed = -0.1)"
+    ),
+    "`offset_observed` must be a single finite number, 0 or greater",
     fixed = TRUE
   )
 
   #' @description Test that a multinomial offset must be finite.
   expect_error(
-    parse_data_distribution("~dmultinom(prob = x, size = 10, offset = Inf)"),
-    "`offset` must be a single finite number, 0 or greater",
+    parse_data_distribution(
+      "~dmultinom(prob = x, size = 10, offset_expected = Inf)"
+    ),
+    "`offset_expected` must be a single finite number, 0 or greater",
     fixed = TRUE
   )
 

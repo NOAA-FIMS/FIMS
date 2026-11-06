@@ -28,7 +28,7 @@ by \code{NA}. Missing specifications use \code{NA_character_} for the family and
 \code{NA} for central parameters, and \code{1} for ancillary parameters. These neutral
 ancillary values prevent missing observations from introducing \code{NA} into
 vectorized likelihood calculations. \code{\link[=initialize_data_distribution]{initialize_data_distribution()}} skips
-these rows when it reads the multinomial \code{offset}.
+these rows when it reads the multinomial offsets.
 }
 \description{
 Parse one-sided formula-like distribution specifications and return their

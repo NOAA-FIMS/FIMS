@@ -70,5 +70,8 @@ void register_distributions(Rcpp::Module& m) {
       .field("expected_values",
              &DmultinomDistributionsInterface::expected_values)
       .field("dims", &DmultinomDistributionsInterface::dims)
-      .field("offset", &DmultinomDistributionsInterface::offset);
+      .field("offset_expected",
+             &DmultinomDistributionsInterface::offset_expected)
+      .field("offset_observed",
+             &DmultinomDistributionsInterface::offset_observed);
 }

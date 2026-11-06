@@ -2,7 +2,7 @@ fims_distributions <- tibble::tribble(
   ~family,     ~sample_function, ~central_parameter,  ~other_parameters,
   "dnorm",     "rnorm",          "mean",              list("sd"),
   "dlnorm",    "rlnorm",         "meanlog",           list("sdlog"),
-  "dmultinom", "rmultinom",      "prob",              list("size", "offset")
+  "dmultinom", "rmultinom",      "prob",              list("size", "offset_expected", "offset_observed")
 )
 
 usethis::use_data(fims_distributions, overwrite = TRUE)
