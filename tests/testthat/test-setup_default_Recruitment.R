@@ -23,6 +23,27 @@ test_that("`setup_default_Recruitment()` works with correct inputs", {
   clear()
 })
 
+test_that("`setup_default_Recruitment()` sets deviation years for each initial numbers option", {
+  start_year <- get_start_year(data)
+  end_year <- get_end_year(data)
+  n_ages <- get_n_ages(data)
+  equilibrium <- setup_default_Recruitment(data = data)
+  free <- setup_default_Recruitment(data = data, initial_numbers = "free")
+
+  #' @description Test that the default equilibrium start has deviations for every cohort in the first-year age structure except the plus group.
+  expect_equal(
+    dplyr::filter(equilibrium, .data[["label"]] == "log_devs")[["timing"]],
+    (start_year - n_ages + 2):end_year
+  )
+  #' @description Test that free initial numbers at age have deviations from the second year on.
+  expect_equal(
+    dplyr::filter(free, .data[["label"]] == "log_devs")[["timing"]],
+    (start_year + 1):end_year
+  )
+
+  clear()
+})
+
 ## Edge handling ----
 test_that("`setup_default_Recruitment()` works with edge cases", {
   result <- setup_default_Recruitment(data = data, distribution = NA_character_)
