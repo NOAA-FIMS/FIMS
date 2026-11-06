@@ -161,7 +161,7 @@ test_that("catch at age follows the Baranov equation with 2 fishing fleets", {
     )
   }
 
-  # Each cohort loses exp(-Z) of its numbers per year. The plus group also
+  # Each cohort keeps exp(-Z) of its numbers per year. The plus group also
   # keeps its own survivors.
   survivors <- numbers_at_age[fished_years, ] * exp(-total_mortality)
   expected_numbers <- cbind(
