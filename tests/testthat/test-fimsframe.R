@@ -792,6 +792,17 @@ test_that("`FIMSFrame()` returns errors for invalid population length bins", {
     FIMSFrame(with_population_bins(c(0, 0, seq(50, 1150, by = 50)))),
     "at least 2"
   )
+  #' @description Test that `FIMSFrame()` errors when population length bins have missing lengths and no other row has a length.
+  expect_error(
+    FIMSFrame(dplyr::bind_rows(
+      dplyr::filter(
+        data_big,
+        !type %in% c("length_comp", "age_to_length_conversion")
+      ),
+      population_length_bin_rows(c(NA_real_, NA_real_))
+    )),
+    "no\\s+missing\\s+lengths"
+  )
   #' @description Test that `validate_population_length_bins()` errors when a population length bin is wider than a fleet length bin it overlaps.
   expect_error(
     validate_population_length_bins(

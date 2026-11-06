@@ -2234,12 +2234,15 @@ FIMSFrame <- function(data) {
   data <- drop_age_to_length_conversion_ages(data, ages)
 
   if ("length" %in% colnames(data)) {
+    resolved_fleet_length_bins <- resolve_fleet_length_bins(data)
+    # Check before the all-missing test. Otherwise population length bins with
+    # only missing lengths are dropped without a message.
+    validate_population_length_bins(data, resolved_fleet_length_bins)
+
     if (all(is.na(data[["length"]]))) {
       lengths <- numeric()
     } else {
-      resolved_fleet_length_bins <- resolve_fleet_length_bins(data)
       lengths <- sort(unique(unlist(resolved_fleet_length_bins, use.names = FALSE)))
-      validate_population_length_bins(data, resolved_fleet_length_bins)
 
       # Check that the age column exists b/c conversion data depends on it
       if (!"age" %in% colnames(data)) {
