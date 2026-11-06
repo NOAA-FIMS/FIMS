@@ -122,4 +122,26 @@ test_that("rcpp population rejects initial numbers it does not use", {
   #' @description Test that a nonzero constant log_init_rzero_offset with free initial numbers returns an error instead of being ignored.
   expect_error(CreateTMBModel(), "sets log_init_rzero_offset")
   clear()
+
+  population <- new_population("Equilibrium")
+  population$log_init_rzero_offset[] <- 0.3
+  #' @description Test that a misspelled initial_numbers option is reported before the unused vector.
+  expect_error(CreateTMBModel(), "must be \"free\" or \"equilibrium\"")
+  clear()
+})
+
+test_that("rcpp population and recruitment need the same number of years", {
+  population <- methods::new(Population)
+  population$n_ages$set(3)
+  population$ages[] <- seq(1, 3)
+  population$n_years$set(2)
+  population$log_init_naa[] <- rep(0, 3)
+  recruitment <- methods::new(BevertonHoltRecruitment)
+  recruitment$n_years$set(3)
+  population$SetRecruitmentID(recruitment$get_id())
+  catch_at_age <- methods::new(CatchAtAge)
+  catch_at_age$AddPopulation(population$get_id())
+  #' @description Test that a recruitment n_years that differs from the population n_years returns an error because log_devs would be labeled on the wrong years.
+  expect_error(CreateTMBModel(), "has 3 years, but population")
+  clear()
 })

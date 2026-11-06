@@ -1062,6 +1062,31 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         continue;
       }
 
+      // The log_devs output labels years from the recruitment n_years, but
+      // the model applies the deviations by the population n_years. If the 2
+      // differ, the deviations would be reported on the wrong years.
+      auto recruitment_interface_it =
+          RecruitmentInterfaceBase::live_objects.find(
+              population_interface->recruitment_id.get());
+      if (recruitment_interface_it !=
+          RecruitmentInterfaceBase::live_objects.end()) {
+        std::shared_ptr<BevertonHoltRecruitmentInterface>
+            recruitment_interface =
+                std::dynamic_pointer_cast<BevertonHoltRecruitmentInterface>(
+                    recruitment_interface_it->second);
+        if (recruitment_interface && recruitment_interface->n_years.get() !=
+                                         population_interface->n_years.get()) {
+          std::string message =
+              "Recruitment " + fims::to_string(recruitment_interface->id) +
+              " has " + fims::to_string(recruitment_interface->n_years.get()) +
+              " years, but population " +
+              fims::to_string(population_interface->id) + " has " +
+              fims::to_string(population_interface->n_years.get()) + ".";
+          FIMS_ERROR_LOG(message);
+          throw std::invalid_argument(message);
+        }
+      }
+
       model->InitializePopulationDerivedQuantities(population_interface->id);
       std::map<std::string, fims::Vector<Type>> &derived_quantities =
           model->GetPopulationDerivedQuantities(population_interface->id);
