@@ -41,9 +41,8 @@ pull_output <- function(report, output_label, fleet_number = 1) {
 
 #' Find the position of a fleet in the report
 #'
-#' @details `initialize_fims()` creates fleets in the order they first appear
-#'   in the parameters, so moving parameter rows can change the position. Use
-#'   the parameters of the run that made the report.
+#' @details Moving parameter rows can change the position, so use the
+#'   parameters of the run that made the report.
 #' @param parameters The parameter tibble used for the run.
 #' @param fleet_name A string with the fleet name.
 #' @return An integer to pass to `pull_output()` as `fleet_number`.
@@ -55,7 +54,10 @@ fleet_position <- function(parameters, fleet_name) {
 #'
 #' @details The report is used rather than `get_estimates()` because it keeps
 #'   full precision. `get_estimates()` rounds derived quantities, which matters
-#'   for exact comparisons of small values such as proportions and ratios.
+#'   for exact comparisons of small values such as proportions and ratios. The
+#'   report does not name the likelihood components (#1782), so they are named
+#'   from the model output, e.g., `"fleet1_catch"`, before the model is
+#'   cleared.
 #' @param parameters A tibble from `setup_default_parameters()`.
 #' @param data A `FIMSFrame` object.
 #' @return A list from `get_report()`.
@@ -64,6 +66,9 @@ run_deterministic <- function(parameters, data) {
     initialize_fims(data = data) |>
     fit_fims(optimize = FALSE)
   report <- get_report(fit)
+  names(report[["nll_components"]]) <- FIMS:::label_nll_components(
+    get_model_output(fit), length(report[["nll_components"]])
+  )
   clear()
   report
 }

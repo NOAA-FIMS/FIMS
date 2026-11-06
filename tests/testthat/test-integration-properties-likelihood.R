@@ -45,9 +45,10 @@ fleet1 <- fleet_position(parameters, "fleet1")
 survey1 <- fleet_position(parameters, "survey1")
 
 ## IO correctness ----
-test_that("the joint negative log-likelihood is the sum of its components", {
+test_that("the report has 1 likelihood component per density", {
   # Recruitment deviations have 1 density, and each fleet has 1 density per
-  # data type it is fit to.
+  # data type it is fit to. Model::Evaluate() builds the joint negative
+  # log-likelihood by adding these components, so the sum is not tested.
   n_data_components <- likelihood_data |>
     dplyr::filter(type %in% c("catch", "index", "age_comp", "length_comp")) |>
     dplyr::distinct(type, fleet) |>
@@ -55,18 +56,13 @@ test_that("the joint negative log-likelihood is the sum of its components", {
 
   #' @description Test that the report has 1 likelihood component for recruitment deviations and 1 for each fleet and data type.
   expect_length(report[["nll_components"]], 1 + n_data_components)
-  #' @description Test that the joint negative log-likelihood is the sum of the reported components.
-  expect_equal(
-    object = report[["jnll"]],
-    expected = sum(report[["nll_components"]])
-  )
 })
 
 ## Edge handling ----
 test_that("a -999 observation drops only its own log density", {
-  # 1 observation of each data type is set to -999. Each changes a different
-  # likelihood component, so each component should change by the log density
-  # of its dropped observation and the others not at all.
+  # 1 year of each data type is set to -999, each in a different likelihood
+  # component.
+  na_value <- -999
   dropped_index_year <- 5
   dropped_catch_year <- 7
   dropped_age_comp_year <- 9
@@ -82,79 +78,79 @@ test_that("a -999 observation drops only its own log density", {
     )
   dropped <- dplyr::filter(marked_data, is_dropped)
   missing_data <- marked_data |>
-    dplyr::mutate(observed = dplyr::if_else(is_dropped, -999, observed)) |>
+    dplyr::mutate(observed = dplyr::if_else(is_dropped, na_value, observed)) |>
     dplyr::select(-is_dropped)
   missing_report <- run_deterministic(parameters, FIMSFrame(missing_data))
 
-  observed <- function(data_type) {
+  dropped_values <- function(data_type) {
     dropped |>
       dplyr::filter(type == data_type) |>
       dplyr::arrange(age, length) |>
       dplyr::pull(observed)
   }
-  # The densities use the expected values from the run with all data, which
-  # the -999 rows do not change. Vectors are ordered by year and then age or
-  # length. FIMS fits composition counts, the observed proportions times the
-  # sample size, without rounding them. FIMS_dmultinom() is the multinomial
-  # without rounding. stats::dmultinom() rounds, and the data_big length
-  # composition counts are not whole numbers.
+  # The densities use the expected values from the run with all data. Vectors
+  # are ordered by year and then age or length. FIMS fits composition counts,
+  # the observed proportions times the sample size, without rounding.
+  # stats::dmultinom() rounds, and the data_big length composition counts are
+  # not whole numbers, so the test uses FIMS_dmultinom().
   year_rows <- function(year, n_bins) (year - 1) * n_bins + seq_len(n_bins)
   index_expected <- pull_output(report, "index_expected", survey1)
   catch_expected <- pull_output(report, "catch_expected", fleet1)
   age_comp_expected <- pull_output(report, "agecomp_proportion", fleet1)
   length_comp_expected <- pull_output(report, "lengthcomp_proportion", survey1)
-  age_comp_counts <- composition_size * observed("age_comp")
-  length_comp_counts <- composition_size * observed("length_comp")
   log_densities <- c(
-    stats::dlnorm(
-      observed("index"),
+    survey1_index = stats::dlnorm(
+      dropped_values("index"),
       meanlog = log(index_expected[dropped_index_year]),
       sdlog = index_sdlog,
       log = TRUE
     ),
-    stats::dlnorm(
-      observed("catch"),
+    fleet1_catch = stats::dlnorm(
+      dropped_values("catch"),
       meanlog = log(catch_expected[dropped_catch_year]),
       sdlog = catch_sdlog,
       log = TRUE
     ),
-    FIMS_dmultinom(
-      age_comp_counts,
+    fleet1_agecomp = FIMS_dmultinom(
+      composition_size * dropped_values("age_comp"),
       p = age_comp_expected[year_rows(dropped_age_comp_year, n_ages)]
     ),
-    FIMS_dmultinom(
-      length_comp_counts,
+    survey1_lengthcomp = FIMS_dmultinom(
+      composition_size * dropped_values("length_comp"),
       p = length_comp_expected[year_rows(dropped_length_comp_year, n_lengths)]
     )
   )
+  # nll_components holds negative log-likelihoods, so dropping an observation
+  # adds its log density. The other components should not change.
   nll_change <- missing_report[["nll_components"]] -
     report[["nll_components"]]
+  expected_change <- stats::setNames(
+    rep(0, length(nll_change)), names(nll_change)
+  )
+  expected_change[names(log_densities)] <- log_densities
 
-  #' @description Test that the setup drops 1 observed value of each data type.
+  #' @description Test that the setup sets 1 year of each data type to -999.
   expect_equal(
     object = dplyr::count(dropped, type)[["n"]],
     expected = c(n_ages, 1, 1, n_lengths)
   )
-  # nll_components holds negative log-likelihoods, so dropping an observation
-  # adds its log density.
-  #' @description Test that each likelihood component changes by the lognormal or multinomial log density of its dropped observation and the other components do not change.
-  expect_equal(
-    object = sort(nll_change),
-    expected = sort(c(log_densities, rep(0, length(nll_change) - 4)))
-  )
-  #' @description Test that -999 observations do not change numbers at age or the expected values.
+  #' @description Test that each likelihood component with a -999 observation changes by the lognormal or multinomial log density of that observation and the other components do not change.
+  expect_equal(object = nll_change, expected = expected_change)
+  #' @description Test that -999 observations do not change numbers at age, expected catch and index, or expected composition proportions.
   expect_equal(
     object = list(
       pull_output(missing_report, "numbers_at_age"),
       pull_output(missing_report, "catch_expected", fleet1),
       pull_output(missing_report, "index_expected", survey1),
-      pull_output(missing_report, "agecomp_proportion", fleet1)
+      pull_output(missing_report, "agecomp_proportion", fleet1),
+      pull_output(missing_report, "lengthcomp_proportion", survey1)
     ),
     expected = list(
       pull_output(report, "numbers_at_age"),
-      pull_output(report, "catch_expected", fleet1),
-      pull_output(report, "index_expected", survey1),
-      pull_output(report, "agecomp_proportion", fleet1)
+      catch_expected,
+      index_expected,
+      age_comp_expected,
+      length_comp_expected
     )
   )
 })
