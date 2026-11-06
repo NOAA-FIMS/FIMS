@@ -12,6 +12,148 @@
 data <- FIMS::FIMSFrame(data_big)
 
 ## IO correctness ----
+test_that("Rcpp numeric defaults match the corresponding R helper values", {
+  on.exit(clear(), add = TRUE)
+
+  cases <- list(
+    list(
+      module = methods::new(LogisticSelectivity),
+      parameters = setup_default_Selectivity(data, fleet = "fleet1")
+    ),
+    list(
+      module = methods::new(DoubleLogisticSelectivity),
+      parameters = setup_default_Selectivity(
+        data, fleet = "fleet1", module_type = "DoubleLogistic"
+      )
+    ),
+    list(
+      module = methods::new(LogisticMaturity),
+      parameters = setup_default_Maturity(data)
+    ),
+    list(
+      module = methods::new(Population),
+      parameters = setup_default_Population(data) |>
+        dplyr::filter(.data[["label"]] != "log_init_naa")
+    ),
+    list(
+      module = methods::new(Fleet),
+      parameters = setup_default_Fleet(data, fleet = "survey1")
+    ),
+    list(
+      module = methods::new(BevertonHoltRecruitment),
+      parameters = setup_default_BevertonHoltRecruitment(data)
+    ),
+    list(
+      module = methods::new(DnormDistribution),
+      parameters = setup_default_DnormDistribution(data = data)
+    ),
+    list(
+      module = methods::new(DnormDistribution),
+      parameters = setup_default_Recruitment(data) |>
+        dplyr::filter(.data[["label"]] == "log_sd")
+    ),
+    list(
+      module = methods::new(DlnormDistribution),
+      parameters = setup_default_DlnormDistribution(data = data)
+    ),
+    list(
+      module = methods::new(VonBertalanffySchnuteGrowth),
+      parameters = setup_default_Growth(
+        data, module_type = "VonBertalanffySchnute"
+      ) |>
+        dplyr::filter(!.data[["label"]] %in% c(
+          "reference_age_for_length_young", "reference_age_for_length_old"
+        ))
+    )
+  )
+
+  for (case in cases) {
+    module <- case[["module"]]
+    parameters <- case[["parameters"]]
+    for (label in unique(parameters[["label"]])) {
+      expected <- parameters |>
+        dplyr::filter(.data[["label"]] == .env$label) |>
+        dplyr::pull(.data[["value"]])
+      parameter <- module[[label]]
+      values <- purrr::map_dbl(
+        seq_len(parameter$size()), \(index) parameter[index][["value"]]
+      )
+      #' @description Test that numeric constructor defaults match R helper values, allowing scalar defaults to repeat over data dimensions.
+      expect_equal(rep(values, length.out = length(expected)), expected)
+      expect_equal(parameter$size(), length(unique(expected)))
+      #' @description Test that changing numeric defaults leaves every constructor parameter constant.
+      for (index in seq_len(parameter$size())) {
+        expect_equal(parameter[index][["estimation_type"]]$get(), "constant")
+      }
+    }
+  }
+})
+
+test_that("value-only alignment preserves intentionally different defaults", {
+  on.exit(clear(), add = TRUE)
+  population <- methods::new(Population)
+  selectivity <- methods::new(AgeSpecificSelectivity)
+  fleet <- methods::new(Fleet)
+  growth <- methods::new(VonBertalanffySchnuteGrowth)
+
+  #' @description Test that initial abundance and age-specific selectivity retain scalar zero defaults.
+  expect_equal(population[["log_init_naa"]][1][["value"]], 0)
+  expect_equal(selectivity[["logit_sel_at_age"]][1][["value"]], 0)
+  expect_equal(selectivity[["logit_sel_at_age"]]$size(), 1)
+
+  #' @description Test that fishing-fleet R defaults still override the survey-safe C++ mortality default.
+  fishing_mortality <- setup_default_Fleet(data, fleet = "fleet1") |>
+    dplyr::filter(.data[["label"]] == "log_Fmort") |>
+    dplyr::pull(.data[["value"]])
+  expect_equal(unique(fishing_mortality), -3)
+  expect_equal(fleet[["log_Fmort"]][1][["value"]], -200)
+
+  #' @description Test that growth reference ages remain caller-supplied and alternate delta-method inputs remain absent.
+  expect_equal(growth[["reference_age_for_length_young"]][1][["value"]], 0)
+  expect_equal(growth[["reference_age_for_length_old"]][1][["value"]], 0)
+  delta_labels <- c(
+    "log_sd_mean_length_young", "log_sd_mean_length_old",
+    "log_sd_growth_coefficient", "mean_length_young_mean_length_old_logit_corr",
+    "mean_length_young_growth_coefficient_logit_corr",
+    "mean_length_old_growth_coefficient_logit_corr"
+  )
+  for (label in delta_labels) {
+    expect_equal(growth[[label]]$size(), 0)
+  }
+})
+
+test_that("R growth initialization clears interpolation defaults for the delta path", {
+  on.exit(clear(), add = TRUE)
+  parameters <- setup_default_Growth(
+    data, module_type = "VonBertalanffySchnute"
+  ) |>
+    dplyr::filter(
+      .data[["label"]] != "length_at_age_sd_at_reference_ages"
+    ) |>
+    dplyr::bind_rows(
+      setup_default_parameters_template(6) |>
+        dplyr::mutate(
+          module_name = "Growth",
+          module_type = "VonBertalanffySchnute",
+          label = c(
+            "log_sd_mean_length_young", "log_sd_mean_length_old",
+            "log_sd_growth_coefficient",
+            "mean_length_young_mean_length_old_logit_corr",
+            "mean_length_young_growth_coefficient_logit_corr",
+            "mean_length_old_growth_coefficient_logit_corr"
+          ),
+          value = c(rep(log(0.1), 3), rep(0, 3)),
+          estimation_type = "constant"
+        )
+    )
+  growth <- initialize_growth(parameters, data)
+
+  #' @description Test that explicit R delta-method parameters replace constructor interpolation defaults without activating both paths.
+  expect_equal(growth[["length_at_age_sd_at_reference_ages"]]$size(), 0)
+  expect_equal(growth[["log_sd_mean_length_young"]][1][["value"]], log(0.1))
+  expect_no_error(growth$evaluate(min(get_ages(data))))
+})
+
 test_that("`setup_default_parameters()` works with correct inputs", {
   result <- setup_default_parameters(data = data)
 

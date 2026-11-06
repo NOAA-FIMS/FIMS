@@ -252,6 +252,7 @@ class FleetInterface : public FleetInterfaceBase {
     this->weight_at_age.resize(0);
     // Likewise, an empty ageing_error means no ageing error
     this->ageing_error.resize(0);
+    this->log_Fmort[0].initial_value_m = -200.0;
     std::shared_ptr<FleetInterface> fleet =
         std::make_shared<FleetInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(fleet);

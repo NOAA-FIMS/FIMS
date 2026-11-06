@@ -102,6 +102,7 @@ new_vonb_with_delta_block <- function(
   mean_length_old_growth_coefficient_logit_corr_in = 0
 ) {
   vb <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
+  vb[["length_at_age_sd_at_reference_ages"]]$resize(0)
 
   vb$mean_length_young$resize(1)
   vb$mean_length_young[1]$value <- mean_length_young_in

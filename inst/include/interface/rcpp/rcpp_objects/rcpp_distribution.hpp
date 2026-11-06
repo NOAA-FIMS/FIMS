@@ -268,6 +268,7 @@ class DnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief The constructor.
    */
   DnormDistributionsInterface() : DistributionsInterfaceBase() {
+    this->log_sd[0].initial_value_m = 0.1;
     DistributionsInterfaceBase::live_objects[this->id_m] =
         std::make_shared<DnormDistributionsInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
@@ -631,6 +632,7 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
    * @brief The constructor.
    */
   DlnormDistributionsInterface() : DistributionsInterfaceBase() {
+    this->log_sd[0].initial_value_m = std::log(0.1);
     DistributionsInterfaceBase::live_objects[this->id_m] =
         std::make_shared<DlnormDistributionsInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(

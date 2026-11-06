@@ -433,12 +433,23 @@ class VonBertalanffySchnuteGrowthInterface
     // leave them absent until a caller explicitly supplies one path.
     this->length_at_age_sd_young.resize(0);
     this->length_at_age_sd_old.resize(0);
+    // The alternate delta-method path must be supplied explicitly.
     this->log_sd_mean_length_young.resize(0);
     this->log_sd_mean_length_old.resize(0);
     this->log_sd_growth_coefficient.resize(0);
     this->mean_length_young_mean_length_old_logit_corr.resize(0);
     this->mean_length_young_growth_coefficient_logit_corr.resize(0);
     this->mean_length_old_growth_coefficient_logit_corr.resize(0);
+    
+    // Set default initial values for the growth parameters.
+    this->mean_length_young[0].initial_value_m = 275.0;
+    this->mean_length_old[0].initial_value_m = 725.0;
+    this->growth_coefficient[0].initial_value_m = 0.18;
+    this->length_weight_a[0].initial_value_m = 2.5e-11;
+    this->length_weight_b[0].initial_value_m = 3.0;
+    this->length_at_age_sd_at_reference_ages.resize(2);
+    this->length_at_age_sd_at_reference_ages[0].initial_value_m = 28.0;
+    this->length_at_age_sd_at_reference_ages[1].initial_value_m = 73.0;
 
     // Register this interface instance in global registries so it can be
     // discovered and linked by ID during model initialization.

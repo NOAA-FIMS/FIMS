@@ -192,6 +192,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
           ) &&
           !(field %in% module_input$label)
       ) {
+        module[[field]]$resize(0)
         next
       }
 

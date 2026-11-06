@@ -164,7 +164,9 @@ test_that("rcpp selectivity returns correct outputs for edge cases", {
   #' @description Test that rcpp selectivity returns default values when no parameters are set for input values of 20.
   expect_equal(
     object = emptyLogistic$evaluate(20),
-    expected = 0.5
+    # The value 2 is the default location parameter for the logistic
+    # selectivity function in the Rcpp implementation
+    expected = stats::plogis(20 - 2)
   )
 
   # emptyDoubleLogistic
@@ -172,7 +174,10 @@ test_that("rcpp selectivity returns correct outputs for edge cases", {
   #' @description Test that rcpp double selectivity returns default values when no parameters are set for input values of 20.
   expect_equal(
     object = emptyDoubleLogistic$evaluate(20),
-    expected = 0.25
+    # The value 2 is the default location parameter for the first logistic
+    # and the value 4 is the default location parameter for the second logistic
+    # in the Rcpp implementation
+    expected = stats::plogis(20 - 2) * (1 - stats::plogis(20 - 4))
   )
 
   # Did not specify a default value test for AgeSpecificSelectivity
