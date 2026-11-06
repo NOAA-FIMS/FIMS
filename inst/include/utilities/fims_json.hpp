@@ -93,12 +93,12 @@ class JsonValue {
   JsonArray& GetArray() { return array; }
 
  private:
-  JsonValueType type; /**< Type of the JSON value. */
-  double number = 0.0; /**< Numeric value. */
-  std::string str;    /**< String value. */
+  JsonValueType type;   /**< Type of the JSON value. */
+  double number = 0.0;  /**< Numeric value. */
+  std::string str;      /**< String value. */
   bool boolean = false; /**< Boolean value. */
-  JsonObject object;  /**< JSON object. */
-  JsonArray array;    /**< JSON array. */
+  JsonObject object;    /**< JSON object. */
+  JsonArray array;      /**< JSON array. */
 };
 
 /**
