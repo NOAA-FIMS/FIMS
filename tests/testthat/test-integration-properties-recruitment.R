@@ -9,9 +9,7 @@
 
 # integration_properties_recruitment ----
 ## Setup ----
-# Each test changes a few inputs, runs the model without optimizing, and
-# compares the output to a value worked out in R from the inputs, or from
-# other model outputs through a closed form. The helpers are in
+# The approach and the helpers are described in
 # helper-integration-tests-properties.R.
 data("data_big")
 data_4_model <- FIMSFrame(data_big)
@@ -85,7 +83,10 @@ test_that("maturity in one year is used in that year only", {
   expected_spawning_biomass <- sum(
     numbers_at_age[changed_year, ] * weight_at_age[changed_year, ] *
       proportion_female *
-      stats::plogis(ages, changed_inflection_point, 1 / slope)
+      stats::plogis(
+        ages,
+        location = changed_inflection_point, scale = 1 / slope
+      )
   )
   #' @description Test that spawning biomass in the changed year uses that year's maturity ogive.
   expect_equal(
@@ -99,16 +100,11 @@ test_that("maturity in one year is used in that year only", {
   )
   # Numbers at age after the changed year differ from the default run because
   # recruitment depends on spawning biomass, so the check uses this run's
-  # numbers at age with the default maturity ogive.
-  default_maturity <- stats::plogis(
-    ages,
-    pull_input(default_parameters, "Maturity", "inflection_point"),
-    1 / slope
-  )
+  # numbers at age with the default maturity ogive from the setup.
   later_years <- seq(changed_year + 1, n_years + 1)
   expected_later_spawning_biomass <- as.vector(
     (numbers_at_age[later_years, ] * weight_at_age[later_years, ]) %*%
-      (proportion_female * default_maturity)
+      (proportion_female * maturity)
   )
   #' @description Test that spawning biomass after the changed maturity year uses the default maturity ogive.
   expect_equal(
@@ -117,7 +113,7 @@ test_that("maturity in one year is used in that year only", {
   )
 })
 
-test_that("SSB in one year first changes recruitment in the next year", {
+test_that("SB in 1 year first changes recruitment in the next year", {
   default_recruitment <- pull_output(default_report, "expected_recruitment")
   recruitment <- pull_output(maturity_change_report, "expected_recruitment")
   years_up_to_change <- seq_len(changed_year)
@@ -127,7 +123,7 @@ test_that("SSB in one year first changes recruitment in the next year", {
     object = recruitment[years_up_to_change],
     expected = default_recruitment[years_up_to_change]
   )
-  #' @description Test that lower spawning biomass in one year lowers recruitment in the next year.
+  #' @description Test that lower spawning biomass in 1 year lowers recruitment in the next year.
   expect_lt(
     recruitment[changed_year + 1],
     default_recruitment[changed_year + 1]
@@ -140,9 +136,9 @@ test_that("Beverton-Holt recruitment is R0 at SB0 and h R0 at 0.2 SB0", {
   # The population starts unfished with no deviations, so spawning biomass is
   # SB0 in each year before low_year. Weight at age in low_year times 0.2
   # makes spawning biomass in that year exactly 0.2 SB0 without changing
-  # numbers at age. SB0 uses first-year weight, so it does not change.
-  # Maturity cannot be scaled by an exact factor because it is a logistic
-  # curve.
+  # numbers at age. SB0 uses first-year weight, so it does not change. Weight
+  # is scaled, not maturity, because the logistic parameters cannot scale
+  # maturity by 0.2 at every age.
   low_spawning_data <- data_big |>
     dplyr::mutate(
       observed = dplyr::if_else(
@@ -165,7 +161,7 @@ test_that("Beverton-Holt recruitment is R0 at SB0 and h R0 at 0.2 SB0", {
   recruitment <- pull_output(report, "expected_recruitment")
   years_after_sb0 <- 2:low_year
 
-  #' @description Test that the setup puts spawning biomass at 20 percent of SB0 in 1 year.
+  #' @description Test that the setup puts spawning biomass at 0.2 SB0 in 1 year.
   expect_equal(
     object = spawning_biomass[low_year],
     expected = 0.2 * unfished_spawning_biomass
@@ -175,14 +171,14 @@ test_that("Beverton-Holt recruitment is R0 at SB0 and h R0 at 0.2 SB0", {
     object = recruitment[years_after_sb0],
     expected = rep(r0, length(years_after_sb0))
   )
-  #' @description Test that recruitment is steepness times R0 in the year after spawning biomass is 20 percent of SB0.
+  #' @description Test that recruitment is steepness times R0 in the year after spawning biomass is 0.2 SB0.
   expect_equal(
     object = recruitment[low_year + 1],
     expected = steepness * r0
   )
 })
 
-test_that("recruitment is Beverton-Holt of last year's SSB times exp(dev)", {
+test_that("recruitment is Beverton-Holt of last year's SB times exp(dev)", {
   # Distinct deviations make a shift of 1 year between deviations and
   # recruitment years visible. log_devs start in year 2 because recruits in
   # year 1 are the initial numbers at age.
@@ -214,7 +210,7 @@ test_that("recruitment is Beverton-Holt of last year's SSB times exp(dev)", {
     expected = beverton_holt(spawning_biomass[deviation_years - 1]) *
       exp(0.3 * sin(deviation_years))
   )
-  #' @description Test that recruitment in the year after the last has no deviation and is Beverton-Holt of the last year's spawning biomass.
+  #' @description Test that recruitment in the year after the last data year has no deviation and is Beverton-Holt of the last year's spawning biomass.
   expect_equal(
     object = recruitment[n_years + 1],
     expected = beverton_holt(spawning_biomass[n_years])

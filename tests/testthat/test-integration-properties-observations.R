@@ -9,9 +9,7 @@
 
 # integration_properties_observations ----
 ## Setup ----
-# Each test changes a few inputs, runs the model without optimizing, and
-# compares the output to a value worked out in R from the inputs, or from
-# other model outputs through a closed form. The helpers are in
+# The approach and the helpers are described in
 # helper-integration-tests-properties.R.
 data("data_big")
 data_4_model <- FIMSFrame(data_big)
@@ -28,8 +26,11 @@ fleet_names <- unique(stats::na.omit(default_parameters[["fleet"]]))
 fleet_number <- stats::setNames(seq_along(fleet_names), fleet_names)
 
 # The survey selects a different part of the population than the fishery, so
-# a mix-up between fleets changes the expected values.
-set_survey_inputs <- function(parameters) {
+# a mix-up between fleets changes the expected values. Distinct recruitment
+# deviations in the data years make a deviation used in the wrong year change
+# the hindcast in the projection test. Later deviations keep their default of
+# 0.
+set_shared_inputs <- function(parameters) {
   parameters |>
     dplyr::mutate(
       value = dplyr::case_when(
@@ -38,11 +39,12 @@ set_survey_inputs <- function(parameters) {
           label == "inflection_point" ~ 5,
         module_name == "Selectivity" & fleet == "survey1" &
           label == "slope" ~ 2,
+        label == "log_devs" & timing <= n_years ~ 0.3 * sin(timing),
         .default = value
       )
     )
 }
-parameters <- set_survey_inputs(default_parameters)
+parameters <- set_shared_inputs(default_parameters)
 report <- run_deterministic(parameters, data_4_model)
 # Numbers at age come from the model output. Rows are years and columns are
 # ages.
@@ -73,7 +75,7 @@ test_that("expected survey index is q times selected biomass in each year", {
     expected = catchability *
       rowSums(selected_numbers * weight_at_age[data_years, ])
   )
-  #' @description Test that the survey index in numbers is q times the sum over ages of numbers and selectivity.
+  #' @description Test that the expected survey index in numbers is q times the sum over ages of numbers and selectivity.
   expect_equal(
     object = pull_output(report, "index_numbers", fleet_number[["survey1"]]),
     expected = catchability * rowSums(selected_numbers)
@@ -82,8 +84,8 @@ test_that("expected survey index is q times selected biomass in each year", {
 
 test_that("expected survey index uses the q of each year", {
   # q differs in every year, so a q taken from the wrong year changes the
-  # expected index. FIMS uses the log_q rows in the order given, so they are
-  # in year order.
+  # expected index. FIMS reads the log_q rows in the order given, not by
+  # timing, so the test adds them in year order.
   catchability <- seq(1.5, 3.5, length.out = n_years)
   log_q_by_year <- parameters |>
     dplyr::filter(label == "log_q", fleet == "survey1") |>
@@ -100,7 +102,7 @@ test_that("expected survey index uses the q of each year", {
       weight_at_age[data_years, ]
   )
 
-  #' @description Test that the setup gives survey1 1 log_q per year.
+  #' @description Test that the setup gives survey1 a log_q for each year.
   expect_length(
     pull_input(q_by_year_parameters, "Fleet", "log_q", "survey1"),
     n_years
@@ -129,8 +131,9 @@ test_that("expected compositions are proportions of expected numbers", {
     fleet1 = catch_at_age / rowSums(catch_at_age),
     survey1 = index_at_age / rowSums(index_at_age)
   )
-  # data_big has 1 age-to-length conversion for every fleet. Each age is
-  # rescaled to sum to 1, so a row is the distribution of length at that age.
+  # data_big has 1 age-to-length conversion shared by all fleets. FIMSFrame()
+  # rescales each age to sum to 1, so a row is the distribution of length at
+  # that age.
   age_to_length_conversion <- data_big |>
     dplyr::filter(type == "age_to_length_conversion") |>
     dplyr::arrange(age, length) |>
@@ -197,11 +200,12 @@ test_that("projection years leave the hindcast unchanged", {
       )
     ) |>
     FIMSFrame()
-  # The projection F is larger than any hindcast F. The default deviations are
-  # 0, so recruitment in the first projection year is the mean recruitment
-  # that the hindcast run uses for the year after its last year.
+  # The projection F is larger than any hindcast F, so projection F used in a
+  # hindcast year changes the hindcast. Deviations after the last data year are
+  # 0, so recruitment in the first projection year equals the hindcast run's
+  # recruitment in the year after its last year, which has no deviation.
   projection_parameters <- setup_default_parameters(data = projection_frame) |>
-    set_survey_inputs() |>
+    set_shared_inputs() |>
     dplyr::mutate(
       value = dplyr::case_when(
         label == "log_Fmort" & fleet == "fleet1" & timing > n_years ~ log(0.8),
@@ -233,17 +237,23 @@ test_that("projection years leave the hindcast unchanged", {
     )[hindcast_years],
     expected = pull_output(report, "spawning_biomass_ratio")
   )
-  for (output_label in c("catch_expected", "index_expected")) {
-    for (fleet_name in fleet_names) {
-      #' @description Test that expected catch and index for each fleet in hindcast years do not change with projection years.
-      expect_equal(
-        object = pull_output(
-          projection_report, output_label, fleet_number[[fleet_name]]
-        )[data_years],
-        expected = pull_output(report, output_label, fleet_number[[fleet_name]])
-      )
-    }
-  }
+  # The survey does not fish, so its expected catch is near 0, and
+  # expect_equal() would pass for any change to it. The fleet1 catch and the
+  # survey index are the fitted series.
+  #' @description Test that expected fleet1 catch in hindcast years does not change with projection years.
+  expect_equal(
+    object = pull_output(
+      projection_report, "catch_expected", fleet_number[["fleet1"]]
+    )[data_years],
+    expected = pull_output(report, "catch_expected", fleet_number[["fleet1"]])
+  )
+  #' @description Test that the expected survey index in hindcast years does not change with projection years.
+  expect_equal(
+    object = pull_output(
+      projection_report, "index_expected", fleet_number[["survey1"]]
+    )[data_years],
+    expected = pull_output(report, "index_expected", fleet_number[["survey1"]])
+  )
 })
 
 ## Edge handling ----
