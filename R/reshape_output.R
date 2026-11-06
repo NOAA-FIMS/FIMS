@@ -533,7 +533,10 @@ dimension_folded_to_tibble <- function(section) {
 #' is returned from this function will need to map to 1900 and that will need
 #' to be done externally.
 #' This function will accommodate dimensions of year-1 and year+1 where the
-#' indexing of the former will start at 2 instead of 1.
+#' indexing of the former will start at 2 instead of 1. A numeric prefix adds
+#' positions before position 1. For example, "3+n_years" starts at -2.
+#' Recruitment deviations use this for the cohorts that recruited before the
+#' first year.
 #' @param data A list containing the header and dimensions information from a
 #'   FIMS json output object.
 #' @return
@@ -551,12 +554,24 @@ dimension_folded_to_tibble <- function(section) {
 #'   dimensions = list(31L, 12L)
 #' )
 #' dimensions_to_tibble(dummy_dimensions)
+#' # Example with 3 positions before the first year
+#' dummy_dimensions <- list(
+#'   header = list("3+n_years"),
+#'   dimensions = list(33L)
+#' )
+#' dimensions_to_tibble(dummy_dimensions)
 dimensions_to_tibble <- function(data) {
+  # Number of positions before the first year. "3+n_years" has 3.
+  header <- unlist(data[["header"]])
+  has_prefix <- grepl("^\\d+\\+", header)
+  prefix <- rep(0, length(header))
+  prefix[has_prefix] <- as.numeric(gsub("^(\\d+)\\+.*", "\\1", header[has_prefix]))
+  header <- gsub("^\\d+\\+", "", header)
   #' Replace headers like "n_years" with "year_i".
   #' Example: "n_ages+1" with "age_i"
   #' This matches names starting with 'n' (with or without an underscore)
   #' and shortens them to a simple indexed form.
-  better_names <- unlist(data[["header"]]) |>
+  better_names <- header |>
     gsub(pattern = "^n_?(.+?)s([-\\+]\\d+)?$", replacement = "\\1_i")
   names(data[["dimensions"]]) <- better_names
   if (length(better_names) == 0) {
@@ -568,12 +583,16 @@ dimensions_to_tibble <- function(data) {
     return(tibble::add_row(tibble::tibble()))
   }
   # Accommodate any -1 by creating a different start value
-  test <- grepl("-\\d", data[["header"]])
-  addition <- gsub(".+-(\\d)", "\\1", data[["header"]])
+  test <- grepl("-\\d", header)
+  addition <- gsub(".+-(\\d)", "\\1", header)
   addition[!test] <- 0
   start <- 1 + as.numeric(addition)
   data[["dimensions"]][test] <- as.numeric(data[["dimensions"]][test]) +
     as.numeric(addition)
+  # Accommodate any prefix by starting before 1
+  start[has_prefix] <- start[has_prefix] - prefix[has_prefix]
+  data[["dimensions"]][has_prefix] <-
+    as.numeric(data[["dimensions"]][has_prefix]) - prefix[has_prefix]
   # Create the returned tibble by first sequencing from 1:n for each dimension
   purrr::map2(start, data[["dimensions"]], seq) |>
     purrr::set_names(names(data[["dimensions"]])) |>

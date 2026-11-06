@@ -524,7 +524,10 @@ om_input <- returned_om[["om_input"]]
 om_output <- returned_om[["om_output"]]
 em_input <- returned_om[["em_input"]]
 
-parameters_big <- FIMS::setup_default_parameters(data = data_frame) |>
+parameters_big <- FIMS::setup_default_parameters(
+  data = data_frame,
+  initial_numbers = "free"
+) |>
   dplyr::rows_update(
     tibble::tibble(
       fleet = "fleet1",

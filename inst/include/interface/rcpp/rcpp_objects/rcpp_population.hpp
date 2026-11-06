@@ -136,6 +136,16 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   VariableVector log_init_naa;
   /**
+   * @brief Offset on the natural log of unfished recruitment for the
+   * first-year age structure when initial numbers at age are "equilibrium".
+   */
+  VariableVector log_init_rzero_offset;
+  /**
+   * @brief How numbers at age in the first year are set, either "free" or
+   * "equilibrium".
+   */
+  SharedString initial_numbers = fims::to_string("free");
+  /**
    * @brief Proportion of females in the population.
    *
    * Used to calculate spawning biomass and other sex-specific derived
@@ -260,6 +270,8 @@ class PopulationInterface : public PopulationInterfaceBase {
         spawning_biomass_ratio(other.spawning_biomass_ratio),
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
+        log_init_rzero_offset(other.log_init_rzero_offset),
+        initial_numbers(other.initial_numbers),
         proportion_female(other.proportion_female),
         ages(other.ages),
         name(other.name),
@@ -383,6 +395,17 @@ class PopulationInterface : public PopulationInterfaceBase {
         }
       }
 
+      for (size_t i = 0; i < this->log_init_rzero_offset.size(); i++) {
+        if (this->log_init_rzero_offset[i].estimation_type_m.get() ==
+            "constant") {
+          this->log_init_rzero_offset[i].final_value_m =
+              this->log_init_rzero_offset[i].initial_value_m;
+        } else {
+          this->log_init_rzero_offset[i].final_value_m =
+              pop->log_init_rzero_offset[i];
+        }
+      }
+
       for (size_t i = 0; i < this->proportion_female.size(); i++) {
         if (this->proportion_female[i].estimation_type_m.get() == "constant") {
           this->proportion_female[i].final_value_m =
@@ -503,6 +526,43 @@ class PopulationInterface : public PopulationInterfaceBase {
     info->variable_map[this->log_f_multiplier.id_m] =
         &(population)->log_f_multiplier;
 
+    // Only the vector for the selected initial numbers at age is used. Values
+    // set in the other one would be ignored, and an estimated value would not
+    // change the likelihood and would make the Hessian singular. A vector
+    // that was never set keeps its 1 constant placeholder of 0.
+
+    // Check the option first, so a misspelled option gets its own error.
+    if (this->initial_numbers.get() != "free" &&
+        this->initial_numbers.get() != "equilibrium") {
+      ss.str("");
+      ss << "Initial numbers at age must be \"free\" or \"equilibrium\", but "
+            "population "
+         << this->id << " has \"" << this->initial_numbers.get() << "\".";
+      FIMS_ERROR_LOG(ss.str());
+      throw std::invalid_argument(ss.str());
+    }
+    bool is_equilibrium = this->initial_numbers.get() == "equilibrium";
+    VariableVector &unused_initial_numbers =
+        is_equilibrium ? this->log_init_naa : this->log_init_rzero_offset;
+    std::string unused_name =
+        is_equilibrium ? "log_init_naa" : "log_init_rzero_offset";
+    bool is_unused_set = unused_initial_numbers.size() > 1;
+    for (size_t i = 0; i < unused_initial_numbers.size(); i++) {
+      if (unused_initial_numbers[i].estimation_type_m.get() != "constant" ||
+          unused_initial_numbers[i].initial_value_m != 0.0) {
+        is_unused_set = true;
+      }
+    }
+    if (is_unused_set) {
+      ss.str("");
+      ss << "Population " << this->id << " sets " << unused_name << ", but "
+         << this->initial_numbers.get()
+         << " initial numbers at age do not use it. Leave " << unused_name
+         << " unset or change initial_numbers.";
+      FIMS_ERROR_LOG(ss.str());
+      throw std::invalid_argument(ss.str());
+    }
+
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
       if (this->log_init_naa[i].estimation_type_m.get() == "fixed_effects") {
@@ -521,6 +581,32 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
+
+    population->initial_numbers = this->initial_numbers.get();
+    population->log_init_rzero_offset.resize(
+        this->log_init_rzero_offset.size());
+    for (size_t i = 0; i < log_init_rzero_offset.size(); i++) {
+      population->log_init_rzero_offset[i] =
+          this->log_init_rzero_offset[i].initial_value_m;
+      if (this->log_init_rzero_offset[i].estimation_type_m.get() ==
+          "fixed_effects") {
+        ss.str("");
+        ss << "Population." << this->id << ".log_init_rzero_offset."
+           << this->log_init_rzero_offset[i].id_m;
+        info->RegisterParameterName(ss.str());
+        info->RegisterParameter(population->log_init_rzero_offset[i]);
+      }
+      if (this->log_init_rzero_offset[i].estimation_type_m.get() ==
+          "random_effects") {
+        ss.str("");
+        ss << "Population." << this->id << ".log_init_rzero_offset."
+           << this->log_init_rzero_offset[i].id_m;
+        info->RegisterRandomEffectName(ss.str());
+        info->RegisterRandomEffect(population->log_init_rzero_offset[i]);
+      }
+    }
+    info->variable_map[this->log_init_rzero_offset.id_m] =
+        &(population)->log_init_rzero_offset;
 
     if (this->proportion_female.size() == 1 ||
         this->proportion_female.size() ==

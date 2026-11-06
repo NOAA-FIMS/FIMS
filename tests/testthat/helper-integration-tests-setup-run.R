@@ -123,8 +123,10 @@ prepare_test_data <- function() {
   em_input <- em_input_list[[iter_id]]
 
   data_age_length_comp <- FIMSFrame(data_big)
+  # The operating model's first-year numbers at age are used as free values
   default_parameters <- setup_default_parameters(
-    data = data_age_length_comp
+    data = data_age_length_comp,
+    initial_numbers = "free"
   )
 
   modified_parameters <- default_parameters |>

@@ -45,6 +45,7 @@ jobs:
           - slow
           - integration-ageing-error
           - integration-caa
+          - integration-equilibrium-initial-numbers
           - integration-fims-bayesian
           - integration-fims-estimation-random-effects
           - integration-proportion
