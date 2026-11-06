@@ -12,6 +12,18 @@
 
 namespace {
 
+// Default population parameters use shared mortality and sex proportion.
+TEST(PopulationDefaults, SharedDefaults) {
+  fims_popdy::Population<double> population;
+  ASSERT_EQ(population.log_M.size(), 1);
+  ASSERT_EQ(population.proportion_female.size(), 1);
+  EXPECT_DOUBLE_EQ(population.log_M[0],
+                   fims_defaults::population::kDefaultLogM);
+  EXPECT_DOUBLE_EQ(population.proportion_female[0],
+                   fims_defaults::population::kDefaultProportionFemale);
+  EXPECT_TRUE(population.log_init_naa.empty());
+}
+
 // Population_InitializePrepare
 // IO correctness
 TEST_F(CAAInitializeTestFixture, HandlesCorrectInput_InputData) {

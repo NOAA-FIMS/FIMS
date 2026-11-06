@@ -19,6 +19,23 @@
 // #include <iostream>
 
 namespace {
+// Default construction uses all four shared starting values.
+TEST(DoubleLogisticSelectivity_Evaluate, SharedDefaults) {
+  fims_popdy::DoubleLogisticSelectivity<double> selectivity;
+  ASSERT_EQ(selectivity.inflection_point_asc.size(), 1);
+  ASSERT_EQ(selectivity.slope_asc.size(), 1);
+  ASSERT_EQ(selectivity.inflection_point_desc.size(), 1);
+  ASSERT_EQ(selectivity.slope_desc.size(), 1);
+  EXPECT_DOUBLE_EQ(selectivity.inflection_point_asc[0],
+                   fims_defaults::double_logistic::kDefaultInflectionPointAsc);
+  EXPECT_DOUBLE_EQ(selectivity.slope_asc[0],
+                   fims_defaults::double_logistic::kDefaultSlopeAsc);
+  EXPECT_DOUBLE_EQ(selectivity.inflection_point_desc[0],
+                   fims_defaults::double_logistic::kDefaultInflectionPointDesc);
+  EXPECT_DOUBLE_EQ(selectivity.slope_desc[0],
+                   fims_defaults::double_logistic::kDefaultSlopeDesc);
+}
+
 // DoubleLogisticSelectivity_Evaluate
 // IO correctness
 TEST(DoubleLogisticSelectivity_Evaluate, HandlesCorrectInput) {

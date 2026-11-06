@@ -14,6 +14,15 @@
 
 namespace {
 
+// A default fleet uses fishing-fleet values; survey status is caller supplied.
+TEST(FleetDefaults, SharedDefaults) {
+  fims_popdy::Fleet<double> fleet;
+  ASSERT_EQ(fleet.log_q.size(), 1);
+  ASSERT_EQ(fleet.log_Fmort.size(), 1);
+  EXPECT_DOUBLE_EQ(fleet.log_q[0], fims_defaults::fleet::kDefaultLogQ);
+  EXPECT_DOUBLE_EQ(fleet.log_Fmort[0], fims_defaults::fleet::kDefaultLogFmort);
+}
+
 // Fleet_InitializePrepare
 // IO correctness
 TEST_F(CAAInitializeTestFixture, HandlesCorrectInput_Fleet_Initialize) {

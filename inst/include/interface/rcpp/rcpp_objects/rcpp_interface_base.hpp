@@ -16,8 +16,8 @@
 #include <map>
 #include <vector>
 
-#include "common/information.hpp"
 #include "../../interface.hpp"
+#include "common/information.hpp"
 #include "rcpp_shared_primitive.hpp"
 #include <limits>
 

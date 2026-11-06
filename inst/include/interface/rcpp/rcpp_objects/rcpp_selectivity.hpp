@@ -89,8 +89,9 @@ class LogisticSelectivityInterface : public SelectivityInterfaceBase {
    * @brief The constructor.
    */
   LogisticSelectivityInterface() : SelectivityInterfaceBase() {
-    this->inflection_point[0].initial_value_m = 2.0;
-    this->slope[0].initial_value_m = 1.0;
+    this->inflection_point[0].initial_value_m =
+        fims_defaults::logistic::kDefaultInflectionPoint;
+    this->slope[0].initial_value_m = fims_defaults::logistic::kDefaultSlope;
     SelectivityInterfaceBase::live_objects[this->id] =
         std::make_shared<LogisticSelectivityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
@@ -317,10 +318,14 @@ class DoubleLogisticSelectivityInterface : public SelectivityInterfaceBase {
   VariableVector slope_desc;
 
   DoubleLogisticSelectivityInterface() : SelectivityInterfaceBase() {
-    this->inflection_point_asc[0].initial_value_m = 2.0;
-    this->slope_asc[0].initial_value_m = 1.0;
-    this->inflection_point_desc[0].initial_value_m = 4.0;
-    this->slope_desc[0].initial_value_m = 1.0;
+    this->inflection_point_asc[0].initial_value_m =
+        fims_defaults::double_logistic::kDefaultInflectionPointAsc;
+    this->slope_asc[0].initial_value_m =
+        fims_defaults::double_logistic::kDefaultSlopeAsc;
+    this->inflection_point_desc[0].initial_value_m =
+        fims_defaults::double_logistic::kDefaultInflectionPointDesc;
+    this->slope_desc[0].initial_value_m =
+        fims_defaults::double_logistic::kDefaultSlopeDesc;
     SelectivityInterfaceBase::live_objects[this->id] =
         std::make_shared<DoubleLogisticSelectivityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(

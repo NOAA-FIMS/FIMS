@@ -14,6 +14,12 @@
 #include "../../common/def.hpp"
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
+
+/** @brief Normal helper defaults take log SD directly. */
+namespace fims_defaults::distribution {
+inline constexpr double kDefaultNormalLogSd = 0.1;
+}  // namespace fims_defaults::distribution
+
 namespace fims_distributions {
 /**
  * @copybrief normal_lpdf.hpp
@@ -36,7 +42,8 @@ struct NormalLPDF : public DensityComponentBase<Type> {
    * each instance through the use of
    * \ref fims::Vector::get_force_scalar(size_t) "get_force_scalar()".
    */
-  fims::Vector<Type> log_sd;
+  fims::Vector<Type> log_sd{
+      Type(fims_defaults::distribution::kDefaultNormalLogSd)};
 
   /** @brief Constructor.
    */

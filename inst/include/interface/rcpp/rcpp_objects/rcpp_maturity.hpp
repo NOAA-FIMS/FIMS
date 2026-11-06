@@ -87,8 +87,9 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
    * @brief The constructor.
    */
   LogisticMaturityInterface() : MaturityInterfaceBase() {
-    this->inflection_point[0].initial_value_m = 2.0;
-    this->slope[0].initial_value_m = 1.0;
+    this->inflection_point[0].initial_value_m =
+        fims_defaults::logistic::kDefaultInflectionPoint;
+    this->slope[0].initial_value_m = fims_defaults::logistic::kDefaultSlope;
     MaturityInterfaceBase::live_objects[this->id] =
         std::make_shared<LogisticMaturityInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(

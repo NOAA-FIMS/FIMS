@@ -10,8 +10,19 @@
 #ifndef FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 #define FIMS_POPULATION_DYNAMICS_RECRUITMENT_SR_BEVERTON_HOLT_HPP
 
+#include <cmath>
+
 #include "recruitment_base.hpp"
 #include "common/fims_vector.hpp"
+
+/** @brief Recommended Beverton--Holt starting values on parameter scales. */
+namespace fims_defaults::recruitment {
+inline const double kDefaultLogRzero = std::log(1e6);
+// Steepness 0.75 transformed to the interval (0.2, 1).
+inline const double kDefaultLogitSteep =
+    -std::log(1.0 - 0.75) + std::log(0.75 - 0.2);
+inline constexpr double kDefaultLogDevs = 0.0;
+}  // namespace fims_defaults::recruitment
 
 namespace fims_popdy {
 
@@ -35,7 +46,12 @@ struct SRBevertonHolt : public RecruitmentBase<Type> {
                                   recruitment at 20 percent of unfished
                                   spawning biomass.*/
 
-  SRBevertonHolt() : RecruitmentBase<Type>() {}
+  SRBevertonHolt() : RecruitmentBase<Type>() {
+    this->logit_steep = {Type(fims_defaults::recruitment::kDefaultLogitSteep)};
+    this->log_rzero = {Type(fims_defaults::recruitment::kDefaultLogRzero)};
+    this->log_recruit_devs = {
+        Type(fims_defaults::recruitment::kDefaultLogDevs)};
+  }
 
   virtual ~SRBevertonHolt() {}
 

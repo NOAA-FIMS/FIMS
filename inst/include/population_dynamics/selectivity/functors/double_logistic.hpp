@@ -11,7 +11,18 @@
 
 #include "common/fims_math.hpp"
 #include "common/fims_vector.hpp"
+#include "logistic.hpp"
 #include "selectivity_base.hpp"
+
+/** @brief Recommended double-logistic starting values. */
+namespace fims_defaults::double_logistic {
+inline constexpr double kDefaultInflectionPointAsc =
+    logistic::kDefaultInflectionPoint;
+inline constexpr double kDefaultSlopeAsc = logistic::kDefaultSlope;
+// TODO: Determine if the default descending inflection point should be 4.
+inline constexpr double kDefaultInflectionPointDesc = 4.0;
+inline constexpr double kDefaultSlopeDesc = logistic::kDefaultSlope;
+}  // namespace fims_defaults::double_logistic
 
 namespace fims_popdy {
 
@@ -27,28 +38,32 @@ struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
    * @details Overall selectivity is below 0.5 at this point because it is the
    * product of both limbs.
    */
-  fims::Vector<Type> inflection_point_asc;
+  fims::Vector<Type> inflection_point_asc{
+      Type(fims_defaults::double_logistic::kDefaultInflectionPointAsc)};
   /**
    * @brief How quickly selectivity rises on the ascending limb; larger values
    * give a steeper, more knife-edge rise.
    * @details Scalar multiplier applied to the difference between x and
    * inflection_point_asc on the ascending limb.
    */
-  fims::Vector<Type> slope_asc;
+  fims::Vector<Type> slope_asc{
+      Type(fims_defaults::double_logistic::kDefaultSlopeAsc)};
   /**
    * @brief The age at which the descending limb is 0.5 for models that start at
    * age zero and each age bin represents one year.
    * @details Overall selectivity is below 0.5 at this point because it is the
    * product of both limbs.
    */
-  fims::Vector<Type> inflection_point_desc;
+  fims::Vector<Type> inflection_point_desc{
+      Type(fims_defaults::double_logistic::kDefaultInflectionPointDesc)};
   /**
    * @brief How quickly selectivity falls on the descending limb; larger values
    * give a steeper decline.
    * @details Scalar multiplier applied to the difference between x and
    * inflection_point_desc on the descending limb.
    */
-  fims::Vector<Type> slope_desc;
+  fims::Vector<Type> slope_desc{
+      Type(fims_defaults::double_logistic::kDefaultSlopeDesc)};
 
   DoubleLogisticSelectivity() : SelectivityBase<Type>() {}
 

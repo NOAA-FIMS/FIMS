@@ -120,9 +120,12 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
    * @brief The constructor.
    */
   BevertonHoltRecruitmentInterface() : RecruitmentInterfaceBase() {
-    this->log_rzero[0].initial_value_m = std::log(1e6);
+    this->log_rzero[0].initial_value_m =
+        fims_defaults::recruitment::kDefaultLogRzero;
     this->logit_steep[0].initial_value_m =
-        -std::log(1.0 - 0.75) + std::log(0.75 - 0.2);
+        fims_defaults::recruitment::kDefaultLogitSteep;
+    this->log_devs[0].initial_value_m =
+        fims_defaults::recruitment::kDefaultLogDevs;
     RecruitmentInterfaceBase::live_objects[this->id] =
         std::make_shared<BevertonHoltRecruitmentInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(

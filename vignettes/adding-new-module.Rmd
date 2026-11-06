@@ -215,6 +215,27 @@ struct LogisticSelectivity : public SelectivityBase<Type> {
 - **`evaluate()` methods**: define the actual model behavior and give you a natural target for unit tests.
 - **Optional reporting hooks**: many implementations also override report-vector helpers so derived quantities can be surfaced downstream.
 
+#### Define starting values beside the implementation
+
+Define recommended, data-independent starting values in the concrete core
+module header, using a module-specific namespace under `fims_defaults`.
+Name these constants `kDefault` followed by a descriptive PascalCase name,
+such as `kDefaultInflectionPoint` or `kDefaultSlope`. This follows Google-style
+constant naming while making their role as starting values explicit.
+Use those definitions in both the core class and its Rcpp constructor rather
+than repeating numeric literals. Keep these definitions independent of Rcpp so
+standalone C++ users receive the same starting values.
+
+For example, logistic starting values live in
+`population_dynamics/selectivity/functors/logistic.hpp`. Double-logistic
+selectivity and logistic maturity deliberately reuse the shared logistic
+definitions. Distribution defaults live beside their corresponding density
+functors.
+
+Dimensions, data-derived growth reference ages, initial numbers at age, and
+estimation settings remain caller-configured. Optional, mutually exclusive
+growth variability paths must not be activated implicitly by a constructor.
+
 **See also**
 
 - [inst/include/population_dynamics/selectivity/functors/logistic.hpp](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/selectivity/functors/logistic.hpp)
@@ -467,6 +488,13 @@ The R wrapper functions use `setup_default_parameters()` before `initialize_fims
 **Relevant files**
 
 - [R/setup_default_parameters.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/setup_default_parameters.R)
+- [src/rcpp_functions.cpp](https://github.com/NOAA-FIMS/FIMS/blob/main/src/rcpp_functions.cpp)
+
+Expose the module's core starting values through `get_parameter_defaults()` in
+`src/rcpp_functions.cpp`, then read them from the R setup helper. The bridge
+collects definitions from module headers; it must not introduce another set of
+numeric defaults. Adding a new supported module still requires wiring this
+bridge, just as exposing a new class requires Rcpp registration.
 
 If you add a new module type that users should be able to request by default, update:
 
@@ -595,14 +623,16 @@ When adding a new module or a new module type, you will usually touch several la
 ## Required or commonly required files
 
 - [ ] `inst/include/population_dynamics/[category]/functors/[category]_base.hpp` if you are introducing a new module for the population dynamics
-- [ ] `inst/include/population_dynamics/[category]/functors/[name].hpp` for the concrete implementation
+- [ ] `inst/include/population_dynamics/[category]/functors/[name].hpp` for the concrete implementation and its recommended starting values
 - [ ] `inst/include/population_dynamics/[category]/[category].hpp` to expose the new implementation through the umbrella header
 - [ ] `inst/include/interface/rcpp/rcpp_objects/rcpp_[category].hpp` for the Rcpp interface and TMB registration
 - [ ] `src/fims_modules.hpp` to expose the class to R
 - [ ] `R/FIMS-package.R` to export the class
+- [ ] `src/rcpp_functions.cpp` to expose core starting values through `get_parameter_defaults()` when adding R setup support
 - [ ] `R/setup_default_parameters.R` so default values and estimation settings are generated correctly
 - [ ] `R/initialize_modules.R` if the module needs special initialization or linking behavior
 - [ ] tests in `tests/gtest/` and/or `tests/testthat/`
+- [ ] tests that core constructors, direct Rcpp constructors, and R helpers use the same starting values
 
 ## Validation checklist
 

@@ -4,6 +4,24 @@
 #include "population_dynamics/growth/functors/vonb_schnute.hpp"
 
 namespace {
+// Shared growth defaults still require caller-supplied reference ages.
+TEST(VonBertalanffySchnuteEvaluate, SharedDefaults) {
+  fims_popdy::VonBertalanffySchnuteGrowth<double> growth;
+  EXPECT_DOUBLE_EQ(growth.mean_length_young,
+                   fims_defaults::growth::kDefaultMeanLengthYoung);
+  EXPECT_DOUBLE_EQ(growth.mean_length_old,
+                   fims_defaults::growth::kDefaultMeanLengthOld);
+  EXPECT_DOUBLE_EQ(growth.growth_coefficient,
+                   fims_defaults::growth::kDefaultGrowthCoefficient);
+  EXPECT_DOUBLE_EQ(growth.length_weight_a,
+                   fims_defaults::growth::kDefaultLengthWeightA);
+  EXPECT_DOUBLE_EQ(growth.length_weight_b,
+                   fims_defaults::growth::kDefaultLengthWeightB);
+  growth.reference_age_for_length_young = 1.0;
+  growth.reference_age_for_length_old = 12.0;
+  EXPECT_TRUE(std::isfinite(growth.evaluate(0, 5.0)));
+}
+
 fims_popdy::VonBertalanffySchnuteGrowth<double> MakeValidVonB() {
   fims_popdy::VonBertalanffySchnuteGrowth<double> vb;
 

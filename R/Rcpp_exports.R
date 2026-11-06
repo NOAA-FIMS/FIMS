@@ -37,6 +37,46 @@
 #' - [VariableVector](https://noaa-fims.github.io/FIMS/doxygen/classVariableVector.html)
 NULL
 
+#' Shared parameter starting values
+#'
+#' Retrieve the data-independent starting values defined beside their core C++
+#' modules, in each module's header. Core C++ classes, Rcpp constructors, and
+#' [setup_default_parameters()] use these same R-independent definitions.
+#'
+#' @details
+#' Developers should define recommended values in the corresponding core module
+#' header, reuse them in that module's Rcpp constructor, and expose them here
+#' when adding R setup support. This function only collects existing definitions;
+#' it does not define a second set of defaults.
+#'
+#' These are suggested starting values, not a complete model configuration or
+#' defaults appropriate for every stock. Direct Rcpp users must still supply
+#' dimensions, data, module links, estimation types, initial numbers at age,
+#' and growth reference ages. Fleet constructors use fishing-fleet mortality;
+#' use `survey_log_Fmort` for surveys.
+#'
+#' Growth variability inputs remain absent in Rcpp constructors because the
+#' interpolation and delta-method paths are mutually exclusive. R setup selects
+#' interpolation and assigns `length_sd_young` and `length_sd_old` at the
+#' data-derived reference ages.
+#'
+#' `Dnorm` supplies `log_sd` directly. `Dlnorm` supplies both `sd`, the input
+#' scale of its R setup helper, and `log_sd`, the parameter scale.
+#' Rcpp estimation types remain `"constant"` unless explicitly configured;
+#' R setup assigns its existing module-specific estimation settings.
+#'
+#' Calling this function does not construct or register model objects. Each
+#' call returns a fresh list; modifying it does not change future defaults.
+#'
+#' @return A named list of named numeric vectors for `Logistic`,
+#'   `DoubleLogistic`, `BevertonHolt`, `VonBertalanffySchnute`, `Population`,
+#'   `Fleet`, `Dnorm`, and `Dlnorm`.
+#' @name get_parameter_defaults
+#' @examples
+#' get_parameter_defaults()[["Logistic"]]
+#' get_parameter_defaults()[["Population"]][["log_M"]]
+NULL
+
 #' C++ Functions Exported via Rcpp
 #'
 #' The following functions are exported from C++ via Rcpp. Their documentation

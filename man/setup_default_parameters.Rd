@@ -59,6 +59,10 @@ population components, then combines those defaults into one tibble.
 You can modify the returned tibble before fitting a model (for example,
 updating maturity and selectivity parameter values).
 
+Data-independent starting values come from \code{\link[=get_parameter_defaults]{get_parameter_defaults()}}, shared
+with the core C++ classes and Rcpp constructors. R adds data-dependent
+dimensions, reference ages, initial numbers at age, and estimation settings.
+
 Growth defaults are chosen from the data. Models with empirical weight-at-age
 data default to \code{"EWAA"}. Models without empirical weight-at-age data but with
 length-composition data default to \code{"VonBertalanffySchnute"}.

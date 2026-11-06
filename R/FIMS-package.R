@@ -19,6 +19,7 @@
 #' @export set_random
 #' @export get_random
 #' @export get_parameter_names
+#' @export get_parameter_defaults
 #' @export get_random_names
 #' @export get_log
 #' @export get_log_errors

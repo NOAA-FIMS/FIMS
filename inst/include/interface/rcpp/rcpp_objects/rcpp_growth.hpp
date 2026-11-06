@@ -429,6 +429,16 @@ class VonBertalanffySchnuteGrowthInterface
    */
   VonBertalanffySchnuteGrowthInterface()
       : GrowthDerivedObservationInterfaceBase() {
+    this->mean_length_young[0].initial_value_m =
+        fims_defaults::growth::kDefaultMeanLengthYoung;
+    this->mean_length_old[0].initial_value_m =
+        fims_defaults::growth::kDefaultMeanLengthOld;
+    this->growth_coefficient[0].initial_value_m =
+        fims_defaults::growth::kDefaultGrowthCoefficient;
+    this->length_weight_a[0].initial_value_m =
+        fims_defaults::growth::kDefaultLengthWeightA;
+    this->length_weight_b[0].initial_value_m =
+        fims_defaults::growth::kDefaultLengthWeightB;
     // Variability inputs are optional and mutually exclusive by path, so
     // leave them absent until a caller explicitly supplies one path.
     this->length_at_age_sd_young.resize(0);

@@ -10,8 +10,16 @@
 #ifndef LOGNORMAL_LPDF
 #define LOGNORMAL_LPDF
 
+#include <cmath>
+
 #include "density_components_base.hpp"
 #include "../../common/fims_vector.hpp"
+
+/** @brief Lognormal helper defaults take SD and transform it to log SD. */
+namespace fims_defaults::distribution {
+inline constexpr double kDefaultLognormalSd = 0.1;
+inline const double kDefaultLognormalLogSd = std::log(kDefaultLognormalSd);
+}  // namespace fims_defaults::distribution
 
 namespace fims_distributions {
 /**
@@ -38,7 +46,8 @@ struct LogNormalLPDF : public DensityComponentBase<Type> {
    * referenced for each instance through the use of
    * \ref fims::Vector::get_force_scalar(size_t) "get_force_scalar()".
    */
-  fims::Vector<Type> log_sd;
+  fims::Vector<Type> log_sd{
+      Type(fims_defaults::distribution::kDefaultLognormalLogSd)};
 
   /** @brief Constructor.
    */

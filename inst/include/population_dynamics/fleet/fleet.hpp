@@ -13,8 +13,15 @@
 #include "common/fims_vector.hpp"
 #include "common/model_object.hpp"
 #include "distributions/distributions.hpp"
-#include "population_dynamics/selectivity/selectivity.hpp"
 #include "population_dynamics/age_to_length_conversion/functors/base.hpp"
+#include "population_dynamics/selectivity/selectivity.hpp"
+
+/** @brief Recommended fleet values; callers select survey mortality. */
+namespace fims_defaults::fleet {
+inline constexpr double kDefaultLogQ = 0.0;
+inline constexpr double kDefaultLogFmort = -3.0;
+inline constexpr double kDefaultSurveyLogFmort = -200.0;
+}  // namespace fims_defaults::fleet
 
 namespace fims_popdy {
 
@@ -71,10 +78,10 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
       observed_lengthcomp_data; /*!< observed lengthcomp data*/
 
   // Mortality and catchability
-  fims::Vector<Type>
-      log_Fmort; /*!< estimated parameter: log Fishing mortality*/
-  fims::Vector<Type>
-      log_q; /*!< estimated parameter: catchability of the fleet */
+  fims::Vector<Type> log_Fmort{Type(fims_defaults::fleet::kDefaultLogFmort)};
+  /*!< estimated parameter: log Fishing mortality*/
+  fims::Vector<Type> log_q{Type(fims_defaults::fleet::kDefaultLogQ)};
+  /*!< estimated parameter: catchability of the fleet */
 
   fims::Vector<Type> Fmort; /*!< transformed parameter: Fishing mortality*/
   fims::Vector<Type>

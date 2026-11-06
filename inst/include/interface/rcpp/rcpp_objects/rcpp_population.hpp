@@ -231,8 +231,9 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @brief The constructor.
    */
   PopulationInterface() : PopulationInterfaceBase() {
-    this->log_M[0].initial_value_m = std::log(0.2);
-    this->proportion_female[0].initial_value_m = static_cast<double>(0.5);
+    this->log_M[0].initial_value_m = fims_defaults::population::kDefaultLogM;
+    this->proportion_female[0].initial_value_m =
+        fims_defaults::population::kDefaultProportionFemale;
     this->proportion_female[0].estimation_type_m.set("constant");
     this->fleet_ids = std::make_shared<std::set<uint32_t>>();
     std::shared_ptr<PopulationInterface> population =

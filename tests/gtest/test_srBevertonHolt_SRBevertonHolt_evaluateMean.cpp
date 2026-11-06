@@ -70,4 +70,18 @@ TEST(SRBevertonHolt_evaluateMean, HandlesCorrectInput) {
   EXPECT_EQ(recruit2.evaluate_process(0), 0);
 }
 
+// Default recruitment preserves the shared parameter scales.
+TEST(SRBevertonHolt_evaluateMean, SharedDefaults) {
+  fims_popdy::SRBevertonHolt<double> recruitment;
+  ASSERT_EQ(recruitment.log_rzero.size(), 1);
+  ASSERT_EQ(recruitment.logit_steep.size(), 1);
+  ASSERT_EQ(recruitment.log_recruit_devs.size(), 1);
+  EXPECT_DOUBLE_EQ(recruitment.log_rzero[0],
+                   fims_defaults::recruitment::kDefaultLogRzero);
+  EXPECT_DOUBLE_EQ(recruitment.logit_steep[0],
+                   fims_defaults::recruitment::kDefaultLogitSteep);
+  EXPECT_DOUBLE_EQ(recruitment.log_recruit_devs[0],
+                   fims_defaults::recruitment::kDefaultLogDevs);
+  EXPECT_NEAR(recruitment.evaluate_mean(1e6, 1.0), 1e6, 1e-8);
+}
 }  // namespace

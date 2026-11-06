@@ -12,6 +12,17 @@
 #include "../../../common/fims_math.hpp"
 #include "growth_base.hpp"
 
+/** @brief Recommended growth values; reference ages and SD path need setup. */
+namespace fims_defaults::growth {
+inline constexpr double kDefaultMeanLengthYoung = 275.0;
+inline constexpr double kDefaultMeanLengthOld = 725.0;
+inline constexpr double kDefaultGrowthCoefficient = 0.18;
+inline constexpr double kDefaultLengthWeightA = 2.5e-11;
+inline constexpr double kDefaultLengthWeightB = 3.0;
+inline constexpr double kDefaultLengthSdYoung = 28.0;
+inline constexpr double kDefaultLengthSdOld = 73.0;
+}  // namespace fims_defaults::growth
+
 namespace fims_popdy {
 
 /**
@@ -31,20 +42,21 @@ namespace fims_popdy {
 template <typename Type>
 struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
   /** @brief Expected length at the first reference age. */
-  Type mean_length_young = Type(0.0);
+  Type mean_length_young = Type(fims_defaults::growth::kDefaultMeanLengthYoung);
   /** @brief Expected length at the second reference age. */
-  Type mean_length_old = Type(0.0);
+  Type mean_length_old = Type(fims_defaults::growth::kDefaultMeanLengthOld);
   /** @brief Growth coefficient. */
-  Type growth_coefficient = Type(0.0);
+  Type growth_coefficient =
+      Type(fims_defaults::growth::kDefaultGrowthCoefficient);
   /** @brief First reference age for the length parameterization. */
   Type reference_age_for_length_young = Type(0.0);
   /** @brief Second reference age for the length parameterization. */
   Type reference_age_for_length_old = Type(0.0);
 
   /** @brief Coefficient in the length-weight relationship, W = a * L^b. */
-  Type length_weight_a = Type(0.0);
+  Type length_weight_a = Type(fims_defaults::growth::kDefaultLengthWeightA);
   /** @brief Exponent in the length-weight relationship, W = a * L^b. */
-  Type length_weight_b = Type(3.0);
+  Type length_weight_b = Type(fims_defaults::growth::kDefaultLengthWeightB);
 
   VonBertalanffySchnuteGrowth() : GrowthBase<Type>() {}
   virtual ~VonBertalanffySchnuteGrowth() {}

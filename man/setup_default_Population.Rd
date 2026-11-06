@@ -6,9 +6,9 @@
 \usage{
 setup_default_Population(
   data,
-  log_M = log(0.2),
+  log_M = get_parameter_defaults()[["Population"]][["log_M"]],
   log_init_naa = NA_real_,
-  proportion_female = 0.5
+  proportion_female = get_parameter_defaults()[["Population"]][["proportion_female"]]
 )
 }
 \arguments{

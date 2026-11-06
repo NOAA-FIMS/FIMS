@@ -12,6 +12,17 @@
 
 namespace {
 
+// Default maturity uses the same shared logistic parameters as selectivity.
+TEST(LogisticMaturity_evaluate, SharedDefaults) {
+  fims_popdy::LogisticMaturity<double> maturity;
+  ASSERT_EQ(maturity.inflection_point.size(), 1);
+  ASSERT_EQ(maturity.slope.size(), 1);
+  EXPECT_DOUBLE_EQ(maturity.inflection_point[0],
+                   fims_defaults::logistic::kDefaultInflectionPoint);
+  EXPECT_DOUBLE_EQ(maturity.slope[0], fims_defaults::logistic::kDefaultSlope);
+  EXPECT_DOUBLE_EQ(maturity.evaluate(maturity.inflection_point[0]), 0.5);
+}
+
 // LogisticMaturity_evaluate
 // IO correctness
 TEST(LogisticMaturity_evaluate, HandlesCorrectInput) {

@@ -23,6 +23,10 @@
 #' You can modify the returned tibble before fitting a model (for example,
 #' updating maturity and selectivity parameter values).
 #'
+#' Data-independent starting values come from [get_parameter_defaults()], shared
+#' with the core C++ classes and Rcpp constructors. R adds data-dependent
+#' dimensions, reference ages, initial numbers at age, and estimation settings.
+#'
 #' Growth defaults are chosen from the data. Models with empirical weight-at-age
 #' data default to `"EWAA"`. Models without empirical weight-at-age data but with
 #' length-composition data default to `"VonBertalanffySchnute"`.
@@ -230,7 +234,7 @@ setup_default_parameters <- function(data) {
 setup_default_log_init_naa <- function(
   n_ages,
   log_rzero,
-  log_M = log(0.2)
+  log_M = get_parameter_defaults()[["Population"]][["log_M"]]
 ) {
   assert_numeric_length(
     x = log_M,
@@ -405,6 +409,7 @@ setup_default_Growth <- function(
   # The delta-method wiring is retained in the backend, but it is not used
   # in the default setup until it is re-derived for the traditional Von
   # Bertalanffy parameterization.
+  growth_defaults <- get_parameter_defaults()[["VonBertalanffySchnute"]]
   default <- setup_default_parameters_template(n_parameters = 9) |>
     dplyr::mutate(
       module_name = "Growth",
@@ -422,15 +427,15 @@ setup_default_Growth <- function(
       ),
       age = NA_real_,
       value = c(
-        275,
-        725,
-        0.18,
+        growth_defaults[["mean_length_young"]],
+        growth_defaults[["mean_length_old"]],
+        growth_defaults[["growth_coefficient"]],
         reference_age_for_length_young,
         reference_age_for_length_old,
-        2.5e-11,
-        3,
-        28,
-        73
+        growth_defaults[["length_weight_a"]],
+        growth_defaults[["length_weight_b"]],
+        growth_defaults[["length_sd_young"]],
+        growth_defaults[["length_sd_old"]]
       ),
       estimation_type = c(
         "fixed_effects",
@@ -486,9 +491,9 @@ setup_default_Growth <- function(
 #' }
 setup_default_Population <- function(
   data,
-  log_M = log(0.2),
+  log_M = get_parameter_defaults()[["Population"]][["log_M"]],
   log_init_naa = NA_real_,
-  proportion_female = 0.5
+  proportion_female = get_parameter_defaults()[["Population"]][["proportion_female"]]
 ) {
   # Input checks
   is.FIMSFrame(data)
@@ -590,13 +595,14 @@ setup_default_Population <- function(
 #' default_logistic_parameters <- FIMS:::setup_default_Logistic()
 #' }
 setup_default_Logistic <- function() {
+  logistic_defaults <- get_parameter_defaults()[["Logistic"]]
   # Create a template for default parameters
   default <- setup_default_parameters_template(n_parameters = 2) |>
     # Add the module type, label, value, and estimation type
     dplyr::mutate(
       module_type = "Logistic",
-      label = c("inflection_point", "slope"),
-      value = c(2, 1),
+      label = names(logistic_defaults),
+      value = unname(logistic_defaults),
       estimation_type = "fixed_effects"
     )
 }
@@ -620,17 +626,12 @@ setup_default_Logistic <- function() {
 #' default_double_logistic_parameters <- FIMS:::setup_default_DoubleLogistic()
 #' }
 setup_default_DoubleLogistic <- function() {
+  double_logistic_defaults <- get_parameter_defaults()[["DoubleLogistic"]]
   default <- setup_default_parameters_template(n_parameters = 4) |>
     dplyr::mutate(
       module_type = "DoubleLogistic",
-      label = c(
-        "inflection_point_asc",
-        "slope_asc",
-        "inflection_point_desc",
-        "slope_desc"
-      ),
-      # TODO: Determine if inflection_point_desc should really be 4?
-      value = c(2, 1, 4, 1),
+      label = names(double_logistic_defaults),
+      value = unname(double_logistic_defaults),
       estimation_type = "fixed_effects"
     )
 }
@@ -658,12 +659,16 @@ setup_default_DoubleLogistic <- function() {
 setup_default_AgeSpecific <- function(
   data
 ) {
+  logistic_defaults <- get_parameter_defaults()[["Logistic"]]
   default <- setup_default_parameters_template(n_parameters = get_n_ages(data)) |>
     dplyr::mutate(
       module_type = "AgeSpecific",
       label = "logit_sel_at_age",
       age = get_ages(data),
-      value = qlogis(1 / (1 + (exp(-1 * (get_ages(data) - 2))))),
+      value = qlogis(1 / (1 + exp(
+        -logistic_defaults[["slope"]] *
+          (get_ages(data) - logistic_defaults[["inflection_point"]])
+      ))),
       estimation_type = c(
         rep("fixed_effects", length(get_ages(data)) - 1),
         "constant"
@@ -765,6 +770,7 @@ setup_default_Fleet <- function(
   # Evaluate conditions upfront
   has_catch <- "catch" %in% fleet_types
   has_index <- "index" %in% fleet_types
+  fleet_defaults <- get_parameter_defaults()[["Fleet"]]
 
   # Set up default parameters for catchability
   q_default <- setup_default_parameters_template(n_parameters = 1) |>
@@ -772,7 +778,7 @@ setup_default_Fleet <- function(
       module_name = "Fleet",
       fleet = .env$fleet,
       label = "log_q",
-      value = 0,
+      value = fleet_defaults[["log_q"]],
       estimation_type = if (has_catch) "constant" else "fixed_effects"
     )
 
@@ -785,7 +791,11 @@ setup_default_Fleet <- function(
       fleet = .env$fleet,
       label = "log_Fmort",
       timing = get_start_year(data):get_end_year(data),
-      value = if (has_index) -200 else -3,
+      value = if (has_index) {
+        fleet_defaults[["survey_log_Fmort"]]
+      } else {
+        fleet_defaults[["log_Fmort"]]
+      },
       estimation_type = if (has_index) "constant" else "fixed_effects"
     )
 
@@ -891,12 +901,13 @@ setup_default_BevertonHoltRecruitment <- function(
   is.FIMSFrame(data)
 
   # Set up default parameters for Beverton--Holt recruitment
+  recruitment_defaults <- get_parameter_defaults()[["BevertonHolt"]]
   log_rzero <- setup_default_parameters_template(
     n_parameters = 1
   ) |>
     dplyr::mutate(
       label = "log_rzero",
-      value = log(1e+06),
+      value = recruitment_defaults[["log_rzero"]],
       estimation_type = "fixed_effects"
     )
   logit_steep <- setup_default_parameters_template(
@@ -904,7 +915,7 @@ setup_default_BevertonHoltRecruitment <- function(
   ) |>
     dplyr::mutate(
       label = "logit_steep",
-      value = -log(1.0 - 0.75) + log(0.75 - 0.2),
+      value = recruitment_defaults[["logit_steep"]],
       estimation_type = "constant"
     )
 
@@ -914,7 +925,7 @@ setup_default_BevertonHoltRecruitment <- function(
     dplyr::mutate(
       # TODO: should this be log_recruit_dev to match output?
       label = "log_devs",
-      value = 0.0,
+      value = recruitment_defaults[["log_devs"]],
       timing = (get_start_year(data) + 1):get_end_year(data),
       estimation_type = "random_effects",
       distribution_type = "process",
@@ -963,7 +974,7 @@ setup_default_BevertonHoltRecruitment <- function(
 #' * [setup_default_parameters()]
 #' @noRd
 setup_default_DnormDistribution <- function(
-  value = 0.1,
+  value = get_parameter_defaults()[["Dnorm"]][["log_sd"]],
   data,
   input_type = c("data", "process", "prior")
 ) {
@@ -1003,7 +1014,7 @@ setup_default_DnormDistribution <- function(
 #' * [setup_default_parameters()]
 #' @noRd
 setup_default_DlnormDistribution <- function(
-  value = 0.1,
+  value = get_parameter_defaults()[["Dlnorm"]][["sd"]],
   data,
   input_type = c("data", "process", "prior")
 ) {

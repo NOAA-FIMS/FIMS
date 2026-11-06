@@ -8,14 +8,23 @@
 #ifndef FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 #define FIMS_POPULATION_DYNAMICS_POPULATION_HPP
 
+#include <cmath>
+#include <set>
+
 #include "../../common/model_object.hpp"
+#include "../../interface/interface.hpp"
 #include "../fleet/fleet.hpp"
 #include "../growth/growth.hpp"
-#include "../recruitment/recruitment.hpp"
-#include "../../interface/interface.hpp"
 #include "../maturity/maturity.hpp"
+#include "../recruitment/recruitment.hpp"
 #include "../size/size_distribution_provider_base.hpp"
 #include "../size/size_grid.hpp"
+
+/** @brief Recommended population values; initial numbers require model data. */
+namespace fims_defaults::population {
+inline const double kDefaultLogM = std::log(0.2);
+inline constexpr double kDefaultProportionFemale = 0.5;
+}  // namespace fims_defaults::population
 
 namespace fims_popdy {
 
@@ -34,10 +43,11 @@ struct Population : public fims_model_object::FIMSObject<Type> {
   // parameter list - in information.hpp (same for initial F in fleet)
   fims::Vector<Type>
       log_init_naa; /*!< estimated parameter: natural log of numbers at age*/
-  fims::Vector<Type>
-      log_M; /*!< estimated parameter: natural log of Natural Mortality*/
+  fims::Vector<Type> log_M{Type(fims_defaults::population::kDefaultLogM)};
+  /*!< estimated parameter: natural log of Natural Mortality*/
   fims::Vector<Type> proportion_female = fims::Vector<Type>(
-      1, static_cast<Type>(0.5));            /*!< proportion female by age */
+      1, Type(fims_defaults::population::kDefaultProportionFemale));
+  /*!< proportion female by age */
   fims::Vector<Type> log_f_multiplier;       /*!< estimated parameter: vector of
     annual fishing mortality multipliers to scale total mortality of all fleets*/
   fims::Vector<Type> spawning_biomass_ratio; /*!< estimated parameter: vector of

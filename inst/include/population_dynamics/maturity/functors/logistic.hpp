@@ -10,6 +10,7 @@
 #ifndef POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP
 #define POPULATION_DYNAMICS_MATURITY_LOGISTIC_HPP
 
+#include "../../selectivity/functors/logistic.hpp"
 #include "common/fims_math.hpp"
 #include "common/fims_vector.hpp"
 #include "maturity_base.hpp"
@@ -26,13 +27,14 @@ struct LogisticMaturity : public MaturityBase<Type> {
    * @brief The age at which 50% of fish are mature for models that start at
    * age zero and each age bin represents one year.
    */
-  fims::Vector<Type> inflection_point;
+  fims::Vector<Type> inflection_point{
+      Type(fims_defaults::logistic::kDefaultInflectionPoint)};
   /**
    * @brief How quickly the proportion mature changes with age around the
    * inflection point, per year of age. Larger absolute values give a steeper,
    * more knife-edge maturity curve.
    */
-  fims::Vector<Type> slope;
+  fims::Vector<Type> slope{Type(fims_defaults::logistic::kDefaultSlope)};
 
   LogisticMaturity() : MaturityBase<Type>() {}
 

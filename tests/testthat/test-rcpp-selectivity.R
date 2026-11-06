@@ -159,26 +159,40 @@ test_that("rcpp age specific selectivity works with correct inputs", {
 
 ## Edge handling ----
 test_that("rcpp selectivity returns correct outputs for edge cases", {
-  # emptyLogistic
-  emptyLogistic <- methods::new(LogisticSelectivity)
-  #' @description Test that rcpp selectivity returns default values when no parameters are set for input values of 20.
+  withr::defer(clear())
+  defaults <- get_parameter_defaults()
+  logistic_defaults <- defaults[["Logistic"]]
+  double_logistic_defaults <- defaults[["DoubleLogistic"]]
+  evaluation_age <- 3
+  logistic_selectivity <- methods::new(LogisticSelectivity)
+  #' @description Test that an unconfigured logistic curve evaluates with the shared recommended parameters.
   expect_equal(
-    object = emptyLogistic$evaluate(20),
-    # The value 2 is the default location parameter for the logistic
-    # selectivity function in the Rcpp implementation
-    expected = stats::plogis(20 - 2)
+    object = logistic_selectivity$evaluate(evaluation_age),
+    expected = stats::plogis(
+      logistic_defaults[["slope"]] *
+        (evaluation_age - logistic_defaults[["inflection_point"]])
+    )
   )
 
-  # emptyDoubleLogistic
-  emptyDoubleLogistic <- methods::new(DoubleLogisticSelectivity)
-  #' @description Test that rcpp double selectivity returns default values when no parameters are set for input values of 20.
+  double_logistic_selectivity <- methods::new(DoubleLogisticSelectivity)
+  #' @description Test that an unconfigured double-logistic curve evaluates with the shared recommended parameters.
   expect_equal(
-    object = emptyDoubleLogistic$evaluate(20),
-    # The value 2 is the default location parameter for the first logistic
-    # and the value 4 is the default location parameter for the second logistic
-    # in the Rcpp implementation
-    expected = stats::plogis(20 - 2) * (1 - stats::plogis(20 - 4))
+    object = double_logistic_selectivity$evaluate(evaluation_age),
+    expected = stats::plogis(
+      double_logistic_defaults[["slope_asc"]] *
+        (evaluation_age - double_logistic_defaults[["inflection_point_asc"]])
+    ) * (1 - stats::plogis(
+      double_logistic_defaults[["slope_desc"]] *
+        (evaluation_age - double_logistic_defaults[["inflection_point_desc"]])
+    ))
   )
+
+  logistic_selectivity[["slope"]][1][["value"]] <- 0
+  double_logistic_selectivity[["slope_asc"]][1][["value"]] <- 0
+  double_logistic_selectivity[["slope_desc"]][1][["value"]] <- 0
+  #' @description Test that explicitly setting zero slopes retains the former flat-curve behavior.
+  expect_equal(logistic_selectivity$evaluate(evaluation_age), 0.5)
+  expect_equal(double_logistic_selectivity$evaluate(evaluation_age), 0.25)
 
   # Did not specify a default value test for AgeSpecificSelectivity
   # This test is not appropriate: inputs are used in indices and not calculation

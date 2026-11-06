@@ -84,4 +84,18 @@ TEST(LogisticSelectivity_Evaluate, HandlesThreeTimeSteps) {
 
 // Error handling
 // No built-in errors/warnings.
+
+// Default construction uses the shared, overridable starting values.
+TEST(LogisticSelectivity_Evaluate, SharedDefaults) {
+  fims_popdy::LogisticSelectivity<double> selectivity;
+  ASSERT_EQ(selectivity.inflection_point.size(), 1);
+  ASSERT_EQ(selectivity.slope.size(), 1);
+  EXPECT_DOUBLE_EQ(selectivity.inflection_point[0],
+                   fims_defaults::logistic::kDefaultInflectionPoint);
+  EXPECT_DOUBLE_EQ(selectivity.slope[0],
+                   fims_defaults::logistic::kDefaultSlope);
+  EXPECT_DOUBLE_EQ(selectivity.evaluate(selectivity.inflection_point[0]), 0.5);
+  selectivity.slope[0] = 2.0;
+  EXPECT_DOUBLE_EQ(selectivity.slope[0], 2.0);
+}
 }  // namespace
