@@ -57,3 +57,6 @@ test_that("dimensions_to_tibble() returns correct outputs for edge cases", {
       dplyr::arrange(age_i, year_i)
   )
 })
+
+## Error handling ----
+# No built-in errors to test.

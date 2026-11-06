@@ -53,7 +53,7 @@ test_that("`setup_default_parameters()` sets up equilibrium and free initial num
   equilibrium <- setup_default_parameters(data = data)
   free <- setup_default_parameters(data = data, initial_numbers = "free")
 
-  #' @description Test that the default equilibrium start has recruitment deviations for every cohort in the first-year age structure except the plus group.
+  #' @description Test that the default equilibrium initial numbers at age have recruitment deviations for every cohort in the first-year age structure except the plus group.
   expect_equal(
     dplyr::filter(equilibrium, .data[["label"]] == "log_devs")[["timing"]],
     (start_year - n_ages + 2):end_year
@@ -65,7 +65,7 @@ test_that("`setup_default_parameters()` sets up equilibrium and free initial num
       nrow(),
     1
   )
-  #' @description Test that the default equilibrium start uses log_init_rzero_offset instead of log_init_naa.
+  #' @description Test that the default equilibrium initial numbers at age use log_init_rzero_offset instead of log_init_naa.
   expect_true("log_init_rzero_offset" %in% equilibrium[["label"]])
   expect_false("log_init_naa" %in% equilibrium[["label"]])
 

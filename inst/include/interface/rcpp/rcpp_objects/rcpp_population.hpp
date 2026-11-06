@@ -530,7 +530,8 @@ class PopulationInterface : public PopulationInterfaceBase {
     // set in the other one would be ignored, and an estimated value would not
     // change the likelihood and would make the Hessian singular. A vector
     // that was never set keeps its 1 constant placeholder of 0.
-    // Check the option first so a misspelling is reported as such
+
+    // Check the option first, so a misspelled option gets its own error.
     if (this->initial_numbers.get() != "free" &&
         this->initial_numbers.get() != "equilibrium") {
       ss.str("");
@@ -556,7 +557,8 @@ class PopulationInterface : public PopulationInterfaceBase {
       ss.str("");
       ss << "Population " << this->id << " sets " << unused_name << ", but "
          << this->initial_numbers.get()
-         << " initial numbers at age do not use it.";
+         << " initial numbers at age do not use it. Leave " << unused_name
+         << " unset or change initial_numbers.";
       FIMS_ERROR_LOG(ss.str());
       throw std::invalid_argument(ss.str());
     }

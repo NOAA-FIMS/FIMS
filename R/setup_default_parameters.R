@@ -591,17 +591,14 @@ setup_default_Population <- function(
     ))
   }
 
-  # Values for log_init_naa would be silently dropped under an equilibrium
-  # start
+  # Values for log_init_naa would be silently dropped with equilibrium
+  # initial numbers at age.
   if (initial_numbers == "equilibrium" && !all(is.na(log_init_naa))) {
     cli::cli_abort(c(
       "x" = "{.var log_init_naa} has values, but
       {.code initial_numbers = \"equilibrium\"} does not use them.",
-      "i" = "{.var log_init_naa} is only used when
-      {.code initial_numbers = \"free\"}.",
       "i" = "Set {.code initial_numbers = \"free\"} to use
-      {.var log_init_naa}, or leave it as {.val NA} for the default
-      equilibrium start."
+      {.var log_init_naa}, or leave it as {.val NA}."
     ))
   }
 
@@ -991,10 +988,9 @@ setup_default_BevertonHoltRecruitment <- function(
     )
 
   # Free initial numbers at age set the first-year recruitment, so deviations
-  # start in the second year. An equilibrium start also has deviations for the
-  # first year and for every cohort in the first-year age structure except the
-  # plus group, which are the cohorts that recruited up to n_ages - 2 years
-  # before the first year.
+  # start in the second year. Equilibrium initial numbers at age have
+  # deviations from n_ages - 2 years before the first year, 1 for each cohort
+  # in the first-year age structure except the plus group.
   first_dev_year <- switch(initial_numbers,
     "free" = get_start_year(data) + 1,
     "equilibrium" = get_start_year(data) - max(get_n_ages(data) - 2, 0)

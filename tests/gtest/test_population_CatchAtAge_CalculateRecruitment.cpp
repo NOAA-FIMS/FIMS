@@ -84,9 +84,9 @@ TEST_F(CAAEvaluateTestFixture,
        HandlesEquilibriumDeviations_CatchAtAge_CalculateRecruitment) {
   auto& dq =
       catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
-  // Under an equilibrium start, recruitment in year y uses deviation
-  // y + n_initial_devs because the first n_initial_devs + 1 deviations belong
-  // to the first-year age structure.
+  // With equilibrium initial numbers at age, recruitment in year y uses
+  // deviation y + n_initial_devs because the first n_initial_devs + 1
+  // deviations belong to the first-year age structure.
   size_t n_initial_devs = 3;
   population->initial_numbers = "equilibrium";
   population->n_initial_devs = n_initial_devs;

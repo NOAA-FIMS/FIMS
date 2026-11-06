@@ -408,10 +408,10 @@ initialize_population <- function(parameters, data, linked_ids) {
 #' Initial numbers at age are "free" when the population has `log_init_naa`
 #' and "equilibrium" when it has `log_init_rzero_offset`. Free initial numbers
 #' set the first-year recruitment, so `log_devs` must run from the second year
-#' to the last year. An equilibrium start reads the deviations of the cohorts
-#' in the first-year age structure from the front of `log_devs`, so `log_devs`
-#' must run without gaps from the oldest cohort with a deviation to the last
-#' year. That cohort can be up to `n_ages - 2` years before the first year,
+#' to the last year. Equilibrium initial numbers read the deviations of the
+#' cohorts in the first-year age structure from the front of `log_devs`, so
+#' `log_devs` must run without gaps from the oldest cohort with a deviation to
+#' the last year. That cohort can be up to `n_ages - 2` years before the first year,
 #' because the plus group has no deviation. The C++ model reads `log_devs` by
 #' position, so a vector that does not match the option would put each
 #' deviation on the wrong year without an error. An equilibrium population
@@ -429,9 +429,11 @@ check_initial_numbers <- function(parameters, data) {
   has_equilibrium <- "log_init_rzero_offset" %in% population_labels
   if (has_free == has_equilibrium) {
     n_found <- if (has_free) "both" else "neither"
+    conjunction <- if (has_free) "and" else "nor"
     cli::cli_abort(c(
-      "x" = "The Population module has {n_found} of {.var log_init_naa} and
-      {.var log_init_rzero_offset}, but it needs exactly 1.",
+      "x" = "The Population module has {n_found} {.var log_init_naa}
+      {conjunction} {.var log_init_rzero_offset}, but it needs exactly 1 of
+      them.",
       "i" = "{.code initial_numbers = \"free\"} in
       {.fn setup_default_parameters} gives {.var log_init_naa} and the
       default, {.code \"equilibrium\"}, gives {.var log_init_rzero_offset}.",

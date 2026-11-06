@@ -142,7 +142,7 @@ test_that("rcpp population and recruitment need the same number of years", {
   catch_at_age <- methods::new(CatchAtAge)
   catch_at_age$AddPopulation(population$get_id())
   #' @description Test that a recruitment n_years that differs from the population n_years returns an error because log_devs would be labeled on the wrong years.
-  expect_error(CreateTMBModel(), "has 3 years, but population")
+  expect_error(CreateTMBModel(), "has n_years = 3, but population")
   clear()
 })
 

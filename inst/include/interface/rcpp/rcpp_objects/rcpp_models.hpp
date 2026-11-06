@@ -1078,10 +1078,12 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
                                          population_interface->n_years.get()) {
           std::string message =
               "Recruitment " + fims::to_string(recruitment_interface->id) +
-              " has " + fims::to_string(recruitment_interface->n_years.get()) +
-              " years, but population " +
-              fims::to_string(population_interface->id) + " has " +
-              fims::to_string(population_interface->n_years.get()) + ".";
+              " has n_years = " +
+              fims::to_string(recruitment_interface->n_years.get()) +
+              ", but population " + fims::to_string(population_interface->id) +
+              " has n_years = " +
+              fims::to_string(population_interface->n_years.get()) +
+              ". Set the same n_years for both.";
           FIMS_ERROR_LOG(message);
           throw std::invalid_argument(message);
         }

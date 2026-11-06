@@ -22,7 +22,7 @@ test_that("`setup_default_Population()` works with correct inputs", {
   #' @description Test that equilibrium initial numbers at age, the default, have no log_init_naa.
   expect_false("log_init_naa" %in% result[["label"]])
 
-  #' @description Test that log_init_rzero_offset is constant at 0 by default so initial recruitment equals unfished recruitment.
+  #' @description Test that log_init_rzero_offset is constant at 0 by default so the first-year age structure is unfished.
   expect_equal(
     dplyr::filter(result, .data[["label"]] == "log_init_rzero_offset") |>
       dplyr::select("value", "estimation_type"),
@@ -95,7 +95,7 @@ test_that("`setup_default_Population()` returns correct error messages", {
     regexp = "log_M"
   )
 
-  #' @description Test that log_init_naa values with an equilibrium start return an error instead of being dropped.
+  #' @description Test that log_init_naa values with equilibrium initial numbers at age return an error instead of being dropped.
   expect_error(
     object = setup_default_Population(
       data = data,
@@ -113,7 +113,7 @@ test_that("`setup_default_Population()` returns correct error messages", {
     ) |>
     dplyr::mutate(observed = dplyr::if_else(type == "age_comp", 1, observed)) |>
     FIMSFrame()
-  #' @description Test that an equilibrium start with 1 age returns an error because the only age is the plus group.
+  #' @description Test that equilibrium initial numbers at age with 1 age return an error because the only age is the plus group.
   expect_error(
     object = setup_default_Population(data = data_1_age),
     regexp = "at least 2 ages"

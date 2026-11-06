@@ -43,8 +43,7 @@ unfished_numbers_at_age <- function(natural_mortality) {
   numbers_at_age
 }
 
-# FIMS represents a fleet that does not fish with log_Fmort = -200, as in the
-# default survey
+# A fleet with log_Fmort = -200 does not fish, as for the default survey.
 no_fishing_parameters <- parameters |>
   dplyr::mutate(value = dplyr::if_else(label == "log_Fmort", -200, value))
 
@@ -155,7 +154,7 @@ test_that("log_devs before the first year are reported with year_i of 0 or less"
   )
 })
 
-test_that("with no fishing, an equilibrium start stays at the unfished age structure", {
+test_that("with no fishing, equilibrium initial numbers at age stay at the unfished age structure", {
   natural_mortality <- exp(unique(
     dplyr::filter(parameters, label == "log_M")[["value"]]
   ))
@@ -384,7 +383,7 @@ test_that("initialize_fims() checks how initial numbers at age are set", {
   )
   clear()
 
-  #' @description Test that a free population with log_devs set up for an equilibrium start returns an informative error instead of putting deviations on the wrong years.
+  #' @description Test that a free population with log_devs set up for equilibrium initial numbers at age returns an informative error instead of putting deviations on the wrong years.
   expect_error(
     object = parameters |>
       dplyr::filter(module_name != "Population") |>

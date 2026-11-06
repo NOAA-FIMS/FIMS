@@ -30,7 +30,7 @@ test_that("`setup_default_Recruitment()` sets deviation years for each initial n
   equilibrium <- setup_default_Recruitment(data = data)
   free <- setup_default_Recruitment(data = data, initial_numbers = "free")
 
-  #' @description Test that the default equilibrium start has deviations for every cohort in the first-year age structure except the plus group.
+  #' @description Test that the default equilibrium initial numbers at age have deviations for every cohort in the first-year age structure except the plus group.
   expect_equal(
     dplyr::filter(equilibrium, .data[["label"]] == "log_devs")[["timing"]],
     (start_year - n_ages + 2):end_year

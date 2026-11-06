@@ -280,10 +280,10 @@ class BevertonHoltRecruitmentInterface : public RecruitmentInterfaceBase {
     ss << "  \"dimensions\": [" << this->log_rzero.size() << "]\n},\n";
     ss << "   \"values\":" << this->log_rzero << "},\n";
 
-    // Free initial numbers at age have no deviation for the first year. An
-    // equilibrium start has one for the first year and up to n_ages - 2 for
-    // earlier cohorts. These are written as a prefix, so "3+n_years" starts 3
-    // years before the first year.
+    // Free initial numbers at age have no deviation for the first year.
+    // Equilibrium initial numbers at age have one for the first year and up
+    // to n_ages - 2 for earlier cohorts. These are written as a prefix, so
+    // "3+n_years" starts 3 years before the first year.
     std::string log_devs_header = "n_years-1";
     int n_years = this->n_years.get();
     int n_devs = static_cast<int>(this->log_devs.size());
