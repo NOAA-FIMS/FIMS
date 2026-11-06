@@ -145,3 +145,17 @@ test_that("rcpp population and recruitment need the same number of years", {
   expect_error(CreateTMBModel(), "has 3 years, but population")
   clear()
 })
+
+test_that("rcpp catch-at-age model needs recruitment for each population", {
+  population <- methods::new(Population)
+  population$n_ages$set(3)
+  population$ages[] <- seq(1, 3)
+  population$n_years$set(2)
+  population$initial_numbers$set("free")
+  population$log_init_naa[] <- rep(0, 3)
+  catch_at_age <- methods::new(CatchAtAge)
+  catch_at_age$AddPopulation(population$get_id())
+  #' @description Test that a population with no recruitment returns an error instead of crashing R.
+  expect_error(CreateTMBModel(), "has no recruitment")
+  clear()
+})

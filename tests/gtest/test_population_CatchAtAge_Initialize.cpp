@@ -28,6 +28,19 @@ TEST_F(CAAEvaluateTestFixture,
 // CatchAtAge_Initialize
 // Error handling
 TEST_F(CAAEvaluateTestFixture,
+       CaptureError_CatchAtAge_InitializeNoRecruitment) {
+  // Both initial numbers options read the recruitment deviations.
+  population->recruitment = nullptr;
+  EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
+
+  population->initial_numbers = "equilibrium";
+  population->log_init_rzero_offset.resize(1);
+  EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
+}
+
+// CatchAtAge_Initialize
+// Error handling
+TEST_F(CAAEvaluateTestFixture,
        CaptureError_CatchAtAge_InitializeFreeInitialNumbers) {
   // Free initial numbers at age read 1 log_init_naa per age.
   population->log_init_naa.resize(n_ages - 1);
@@ -74,6 +87,11 @@ TEST_F(CAAEvaluateTestFixture,
   EXPECT_EQ(population->n_initial_devs, static_cast<size_t>(n_ages - 2));
   EXPECT_EQ(population->recruitment->log_expected_recruitment.size(),
             static_cast<size_t>(n_years + n_ages - 2));
+
+  // With 1 age, the only age is the plus group, which never has a deviation.
+  population->n_ages = 1;
+  population->recruitment->log_recruit_devs.resize(n_years);
+  EXPECT_THROW(catch_at_age_model->Initialize(), std::runtime_error);
 }
 
 // CatchAtAge_Initialize

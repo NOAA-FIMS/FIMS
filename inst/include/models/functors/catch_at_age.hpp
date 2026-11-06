@@ -196,6 +196,17 @@ class CatchAtAge : public FisheryModelBase<Type> {
         throw std::runtime_error(ss.str());
       }
 
+      // Both initial numbers options check the recruitment deviations below.
+      // A population with no recruitment linked only gets a warning when the
+      // model is created, so it would otherwise crash here.
+      if (!this->populations[p]->recruitment) {
+        std::stringstream ss;
+        ss << "Population " << this->populations[p]->GetId()
+           << " has no recruitment, but a catch-at-age model needs one.";
+        FIMS_ERROR_LOG(ss.str());
+        throw std::runtime_error(ss.str());
+      }
+
       if (this->populations[p]->initial_numbers == "equilibrium") {
         // CalculateEquilibriumInitialNumbersAA() reads only the first offset.
         // Without one it would read past the end of the vector, and a second
@@ -221,6 +232,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
         size_t n_devs = recruitment->log_recruit_devs.size();
         size_t n_years = this->populations[p]->n_years;
         size_t n_ages = this->populations[p]->n_ages;
+        // With 1 age, the only age is the plus group, so no range of
+        // deviations below would be valid.
+        if (n_ages < 2) {
+          std::stringstream ss;
+          ss << "Equilibrium initial numbers at age need at least 2 ages, but "
+                "population "
+             << this->populations[p]->GetId() << " has " << n_ages << ".";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
         if (n_devs < n_years || n_devs + 2 > n_years + n_ages) {
           std::stringstream ss;
           ss << "Equilibrium initial numbers at age need between n_years and "
