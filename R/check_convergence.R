@@ -437,12 +437,17 @@ check_sdreport_convergence <- function(
   hessian_check_result <- tryCatch(
     {
       if (has_random_effects) {
-        hessian <- obj[["env"]]$spHess(random = TRUE)
+        # Without par, spHess() uses the starting values, not the fit
+        hessian <- obj[["env"]]$spHess(
+          par = obj[["env"]][["last.par.best"]],
+          random = TRUE
+        )
       } else {
         hessian <- as.matrix(obj$he(opt[["par"]]))
       }
-      # Compare condition number to threshold
-      condition_number <- kappa(hessian)
+      # The default kappa() is a QR-based estimate that changes with parameter
+      # order, so a model could pass or warn depending on that order.
+      condition_number <- kappa(hessian, exact = TRUE)
 
       if (condition_number > condition_number_threshold) {
         n_show <- if (is.null(largest_se)) 0 else nrow(largest_se)
