@@ -84,6 +84,36 @@ test_that("glance() returns correct outputs for edge cases", {
   expect_no_error(object = generics::glance(fit))
 })
 
+test_that("glance() and augment() leave out missing observations", {
+  # fleet1 has no age composition in year 3
+  missing_data <- data_big |>
+    dplyr::filter(
+      !(.data$type == "age_comp" & .data$fleet == "fleet1" & .data$timing == 3)
+    )
+  data_4_model <- FIMSFrame(missing_data)
+  missing_fit <- setup_default_parameters(data = data_4_model) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  clear()
+  n_observations <- missing_data |>
+    dplyr::filter(
+      .data$type %in% c("catch", "index", "age_comp", "length_comp")
+    ) |>
+    nrow()
+
+  #' @description Test that generics::glance(fit) counts only observed rows in nobs.
+  expect_equal(
+    object = generics::glance(missing_fit)[["nobs"]],
+    expected = n_observations
+  )
+  #' @description Test that generics::augment(fit) has 1 row per observation in the data and no -999 in .truth.
+  expect_equal(
+    object = nrow(generics::augment(missing_fit)),
+    expected = n_observations
+  )
+  expect_false(any(generics::augment(missing_fit)[[".truth"]] %in% -999))
+})
+
 ## Error handling ----
 # No built-in errors or warnings for glance().
 

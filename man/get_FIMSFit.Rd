@@ -120,7 +120,12 @@ and \code{message}. It has no rows when the model was not optimized.
 uncertainties from a fitted model. The \code{year_i} column is a position that
 starts at 1, and the \code{age} and \code{length} columns are the ages and length bins
 from the data. \code{age} is \code{NA} if populations have different ages, and both
-are \code{NA} for fits saved before they were added to the output.
+are \code{NA} for fits saved before they were added to the output. \code{observed} is
+\code{NA} for missing observations. The likelihood skips a composition year with
+any missing bin, so \code{observed} and \code{estimated} are \code{NA} for every bin of
+that year, and for every year of a fleet without composition data. The
+proportions are reported as \code{agecomp_proportion} and
+\code{lengthcomp_proportion}.
 
 \code{\link[=get_number_of_parameters]{get_number_of_parameters()}} returns a vector of integers specifying the
 number of fixed-effect parameters and the number of random-effect parameters
