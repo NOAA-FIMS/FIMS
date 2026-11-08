@@ -52,6 +52,29 @@ test_that("`parse_data_distribution()` works with correct inputs", {
   )
 })
 
+test_that("`parse_data_distribution()` returns the values of each row when strings repeat", {
+  parsed <- parse_data_distribution(c(
+    "~ dmultinom(prob = agecomp_expected, size = 200)",
+    "~ dlnorm(meanlog = log_index_expected, sdlog = 0.2)",
+    NA_character_,
+    "~ dmultinom(prob = agecomp_expected, size = 200)",
+    "~ dmultinom(prob = agecomp_expected, size = 50)",
+    "~ dlnorm(meanlog = log_index_expected, sdlog = 0.2)",
+    NA_character_
+  ))
+  #' @description Test that repeated strings mixed with other strings and missing values return the family of each row in input order.
+  expect_equal(
+    parsed[["family"]],
+    c("dmultinom", "dlnorm", NA, "dmultinom", "dmultinom", "dlnorm", NA)
+  )
+  #' @description Test that repeated multinomial strings return the sample size of each row, and 1 for missing rows.
+  expect_equal(parsed[["size"]], list(200, NA, 1, 200, 50, NA, 1))
+  #' @description Test that repeated lognormal strings return the log-scale standard deviation of each row, and 1 for missing rows.
+  expect_equal(parsed[["sdlog"]], list(NA, 0.2, 1, NA, NA, 0.2, 1))
+  #' @description Test that every component has 1 element per input string when strings repeat.
+  expect_equal(unname(lengths(parsed)), rep(7L, length(parsed)))
+})
+
 ## Edge handling ----
 test_that("`parse_data_distribution()` returns correct outputs for edge cases", {
   #' @description Test that mixed distributions and missing specifications return aligned components with a fixed schema.
@@ -75,6 +98,23 @@ test_that("`parse_data_distribution()` returns correct outputs for edge cases", 
 
   #' @description Test that a scalar missing specification has the same rectangular return schema as non-missing input.
   expect_equal(parse_data_distribution(NA_character_)$family, NA_character_)
+
+  #' @description Test that strings whose standard deviations differ only in the 16th significant digit keep their own values.
+  expect_identical(
+    parse_data_distribution(c(
+      "~ dlnorm(meanlog = log_index_expected, sdlog = 0.1000000000000001)",
+      "~ dlnorm(meanlog = log_index_expected, sdlog = 0.1)"
+    ))[["sdlog"]],
+    list(0.1000000000000001, 0.1)
+  )
+  #' @description Test that expressions whose standard deviations differ only in the 16th significant digit keep their own values.
+  expect_identical(
+    parse_data_distribution(expression(
+      ~ dlnorm(meanlog = log_index_expected, sdlog = 0.1000000000000001),
+      ~ dlnorm(meanlog = log_index_expected, sdlog = 0.1)
+    ))[["sdlog"]],
+    list(0.1000000000000001, 0.1)
+  )
 })
 
 ## Error handling ----

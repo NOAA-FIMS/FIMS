@@ -63,9 +63,19 @@
 #'   expression(~ dlnorm(meanlog = mu, sdlog = 0.1))
 #' )
 parse_data_distribution <- function(expr) {
-  if (is.character(expr) || is.expression(expr)) {
+  if (is.character(expr)) {
+    # A data set repeats a few uncertainty strings across thousands of rows,
+    # so each distinct string is parsed once and copied to its rows.
+    unique_expr <- unique(expr)
+    row_index <- match(expr, unique_expr)
+    expr <- as.list(unique_expr)
+  } else if (is.expression(expr)) {
+    # Not matched like strings, because match() compares calls by their
+    # deparsed text, which rounds numbers to 15 significant digits.
+    row_index <- seq_along(expr)
     expr <- as.list(expr)
   } else if (is.call(expr) || inherits(expr, "formula")) {
+    row_index <- 1L
     expr <- list(expr)
   } else {
     cli::cli_abort(
@@ -103,7 +113,7 @@ parse_data_distribution <- function(expr) {
       output[[parameter]][[i]] <- parsed$parameters[[parameter]]
     }
   }
-  output
+  purrr::map(output, \(component) component[row_index])
 }
 
 parse_one_data_distribution <- function(expr) {
