@@ -12,16 +12,21 @@
 make_mock_obj <- function(
   random = numeric(),
   hessian = diag(3),
-  hessian_error = FALSE
+  hessian_error = FALSE,
+  start_hessian = hessian
 ) {
+  start_par <- 0
+  best_par <- 1
   list(
     env = list(
       random = random,
-      spHess = function(random = TRUE) {
+      last.par.best = best_par,
+      # Like TMB's spHess(), the default par is the starting values
+      spHess = function(par = start_par, random = TRUE) {
         if (hessian_error) {
           stop("Failed to compute sparse Hessian")
         }
-        hessian
+        if (identical(par, best_par)) hessian else start_hessian
       }
     ),
     he = function(par) {
@@ -267,6 +272,76 @@ test_that("check_sdreport_convergence() flags large standard errors", {
     out[["severity"]][out[["check"]] == "large_standard_errors"],
     "OK"
   )
+})
+
+test_that("check_sdreport_convergence() uses the exact condition number", {
+  # 1 parameter with a curvature of 8000 and 2 parameters with an
+  # off-diagonal Hessian entry of 0.9. The eigenvalues are 8000, 1.9, and
+  # 0.1, so the exact condition number is 8000 / 0.1 = 80000, below the
+  # threshold of 1e5. The default kappa() estimate for this matrix is about
+  # 107628, above the threshold.
+  hessian <- diag(3)
+  hessian[1, 1] <- 8000
+  hessian[2, 3] <- 0.9
+  hessian[3, 2] <- 0.9
+  opt <- list(par = c(0, 0, 0))
+  sdreport <- make_mock_sdreport(
+    fixed_se = c(0.1, 0.2, 0.3),
+    random_se = numeric(),
+    report_se = 0.4
+  )
+  register_mock_sdreport_summary()
+
+  #' @description Test that `check_sdreport_convergence()` does not warn when the exact condition number is below the threshold.
+  expect_no_warning(
+    out <- FIMS:::check_sdreport_convergence(
+      make_mock_obj(random = numeric(), hessian = hessian),
+      opt,
+      sdreport
+    )
+  )
+  condition_number <- out[out[["check"]] == "condition_number", ]
+  #' @description Test that `check_sdreport_convergence()` reports the exact condition number, the largest eigenvalue of the Hessian over the smallest.
+  expect_equal(condition_number[["value"]], 80000)
+  expect_equal(condition_number[["severity"]], "OK")
+
+  #' @description Test that `check_sdreport_convergence()` warns when the exact condition number is above the threshold.
+  hessian[1, 1] <- 20000
+  expect_warning(
+    out <- FIMS:::check_sdreport_convergence(
+      make_mock_obj(random = numeric(), hessian = hessian),
+      opt,
+      sdreport
+    ),
+    regexp = "Large condition number"
+  )
+  condition_number <- out[out[["check"]] == "condition_number", ]
+  expect_equal(condition_number[["value"]], 2e5)
+  expect_equal(condition_number[["severity"]], "WARN")
+})
+
+test_that("check_sdreport_convergence() uses the random-effect Hessian at the fit", {
+  # The Hessian at the starting values has a condition number of 1e6 and the
+  # Hessian at the best parameters has a condition number of 4
+  obj <- make_mock_obj(
+    random = 1,
+    hessian = diag(c(4, 1)),
+    start_hessian = diag(c(1e6, 1))
+  )
+  sdreport <- make_mock_sdreport(
+    fixed_se = 0.1,
+    random_se = 0.3,
+    report_se = 0.4
+  )
+  register_mock_sdreport_summary()
+
+  #' @description Test that `check_sdreport_convergence()` does not warn about the Hessian at the starting values when there are random effects.
+  expect_no_warning(
+    out <- FIMS:::check_sdreport_convergence(obj, list(par = 0), sdreport)
+  )
+  condition_number <- out[out[["check"]] == "condition_number", ]
+  #' @description Test that `check_sdreport_convergence()` reports the condition number of the random-effect Hessian at the best parameters.
+  expect_equal(condition_number[["value"]], 4)
 })
 
 ## Edge handling ----
