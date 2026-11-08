@@ -224,6 +224,10 @@ test_that("`get_estimates()` works with time-varying age-specific selectivity", 
     rep(seq_len(nrow(age_specific)), times = n_years),
   ] |>
     dplyr::mutate(
+      timing = rep(
+        get_start_year(data_4_model):get_end_year(data_4_model),
+        each = n_ages
+      ),
       value = rep(seq_len(n_years), each = n_ages) / 10 +
         rep(seq_len(n_ages), times = n_years) / 100,
       estimation_type = "constant"

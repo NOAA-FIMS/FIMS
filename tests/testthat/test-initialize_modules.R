@@ -274,6 +274,44 @@ test_that("`initialize_recruitment()` works with correct inputs", {
   clear()
 })
 
+test_that("`initialize_recruitment()` reads the log_sd rows in any order", {
+  # A different log_sd for each recruitment deviation and deviations that
+  # differ in size, so a log_sd read into the wrong year changes the likelihood
+  parameters <- default_parameters |>
+    dplyr::mutate(
+      value = dplyr::if_else(
+        label == "log_devs",
+        seq(0, 0.5, length.out = dplyr::n()),
+        value
+      ),
+      .by = label
+    )
+  log_devs_timing <- parameters |>
+    dplyr::filter(label == "log_devs") |>
+    dplyr::pull(timing)
+  log_sd_rows <- parameters |>
+    dplyr::filter(module_name == "Recruitment", label == "log_sd") |>
+    dplyr::slice(rep(1, length(log_devs_timing))) |>
+    dplyr::mutate(
+      timing = log_devs_timing,
+      value = log(seq(0.3, 0.9, length.out = length(log_devs_timing)))
+    )
+  get_log_sd_report <- function(log_sd_rows) {
+    report <- parameters |>
+      dplyr::filter(!(module_name == "Recruitment" & label == "log_sd")) |>
+      dplyr::bind_rows(log_sd_rows) |>
+      initialize_fims(data = data) |>
+      fit_fims(optimize = FALSE) |>
+      get_report()
+    clear()
+    report
+  }
+  sorted_report <- get_log_sd_report(log_sd_rows)
+  reversed_report <- get_log_sd_report(log_sd_rows[nrow(log_sd_rows):1, ])
+  #' @description Test that `initialize_recruitment()` gives the same report for log_sd rows in reverse timing order as in timing order.
+  expect_equal(reversed_report, sorted_report)
+})
+
 
 # test_initialize_growth ----
 ## IO correctness ----
@@ -1009,10 +1047,97 @@ test_that("`initialize_comp()` returns correct error messages", {
 
 # test_set_param_vector ----
 ## IO correctness ----
+test_that("`set_param_vector()` works with rows in any order", {
+  default_report <- default_parameters |>
+    initialize_fims(data = data) |>
+    fit_fims(optimize = FALSE) |>
+    get_report()
+  clear()
+  # Shuffle the rows within each parameter. The order of the modules and fleets
+  # is kept because it sets the order of the fleets in the report.
+  shuffled_parameters <- withr::with_seed(
+    1875,
+    dplyr::slice_sample(
+      default_parameters,
+      prop = 1,
+      by = c(module_name, fleet, label)
+    )
+  )
+  shuffled_report <- shuffled_parameters |>
+    initialize_fims(data = data) |>
+    fit_fims(optimize = FALSE) |>
+    get_report()
+  clear()
+  #' @description Test that the setup moves the log_init_naa rows, which differ by age, out of age order.
+  expect_true(
+    is.unsorted(
+      dplyr::filter(shuffled_parameters, label == "log_init_naa")[["age"]]
+    )
+  )
+  #' @description Test that `set_param_vector()` gives the same objective and report for shuffled parameter rows.
+  expect_equal(shuffled_report, default_report)
+
+  # A different M in every year and age, so an M read into the wrong year or
+  # age changes the report
+  years <- get_start_year(data):get_end_year(data)
+  ages <- get_ages(data)
+  log_M_value <- function(timing, age) {
+    log(0.2) + (timing - years[1]) / 100 + age / 1000
+  }
+  get_log_M_report <- function(log_M_grid) {
+    log_M_rows <- default_parameters |>
+      dplyr::filter(label == "log_M") |>
+      dplyr::slice(rep(1, nrow(log_M_grid))) |>
+      dplyr::mutate(
+        timing = log_M_grid[["timing"]],
+        age = log_M_grid[["age"]],
+        value = log_M_value(timing, age)
+      )
+    report <- default_parameters |>
+      dplyr::filter(label != "log_M") |>
+      dplyr::bind_rows(log_M_rows) |>
+      initialize_fims(data = data) |>
+      fit_fims(optimize = FALSE) |>
+      get_report()
+    clear()
+    report
+  }
+  year_major_grid <- tidyr::expand_grid(timing = years, age = ages)
+  year_major_report <- get_log_M_report(year_major_grid)
+  age_major_report <- get_log_M_report(
+    tidyr::expand_grid(age = ages, timing = years)
+  )
+  #' @description Test that `set_param_vector()` puts each log_M value in its own year and age, with every age of the first year first.
+  expect_equal(
+    object = year_major_report[["mortality_M"]][[1]],
+    expected = exp(
+      log_M_value(year_major_grid[["timing"]], year_major_grid[["age"]])
+    )
+  )
+  #' @description Test that `set_param_vector()` gives the same report for log_M rows sorted by age and then year as for rows sorted by year and then age.
+  expect_equal(age_major_report, year_major_report)
+})
 
 ## Edge handling ----
 
 ## Error handling ----
+test_that("`set_param_vector()` errors on repeated rows", {
+  # Age-specific selectivity copied into every year without setting timing
+  age_specific <- setup_default_Selectivity(
+    data = data,
+    fleet = "survey1",
+    module_type = "AgeSpecific"
+  )
+  parameters <- default_parameters |>
+    dplyr::filter(!(fleet == "survey1" & module_name == "Selectivity")) |>
+    dplyr::bind_rows(age_specific, age_specific)
+  #' @description Test that `set_param_vector()` errors when 2 rows of a parameter have the same timing, age, and length.
+  expect_error(
+    initialize_fims(parameters = parameters, data = data),
+    regexp = "has more than 1 row with the same"
+  )
+  clear()
+})
 
 test_that("`set_param_vector()` returns correct error messages", {
   #' @description Test that `set_param_vector()` requires the field argument.
