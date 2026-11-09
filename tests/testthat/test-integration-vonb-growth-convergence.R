@@ -780,7 +780,7 @@ test_that("default non-derived growth keeps the historical fixed age-to-length c
   expect_equal(length(report[["age_to_length_conversion_derived"]][[1]]), 0)
 })
 
-test_that("von bertalanffy Newton polishing does not worsen objective or gradient", {
+test_that("von bertalanffy Newton polishing reduces the gradient without worsening the objective", {
   ctx <- make_vonb_convergence_context()
   on.exit(
     {

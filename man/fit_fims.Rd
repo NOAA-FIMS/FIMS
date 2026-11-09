@@ -48,8 +48,8 @@ a list containing the obj and report slot.}
 number of Newton steps to take after \code{\link[stats:nlminb]{stats::nlminb()}} to improve the
 gradient. Each step uses the Hessian from \code{\link[stats:optimHess]{stats::optimHess()}}. A step is
 kept only if it reduces the maximum absolute gradient and does not
-increase the objective by more than 1e-8. Steps stop at the first step
-that is not kept. The default is 0.}
+increase the objective by more than 1e-8. The loop stops at the first
+step that is not kept. The default is 0.}
 
 \item{control}{A list of optimizer settings passed to \code{\link[stats:nlminb]{stats::nlminb()}}. The
 the default is a list of length three with \code{eval.max = 1000},

@@ -682,8 +682,8 @@ FIMSFit <- function(
 #'   number of Newton steps to take after [stats::nlminb()] to improve the
 #'   gradient. Each step uses the Hessian from [stats::optimHess()]. A step is
 #'   kept only if it reduces the maximum absolute gradient and does not
-#'   increase the objective by more than 1e-8. Steps stop at the first step
-#'   that is not kept. The default is 0.
+#'   increase the objective by more than 1e-8. The loop stops at the first
+#'   step that is not kept. The default is 0.
 #' @param control A list of optimizer settings passed to [stats::nlminb()]. The
 #'   the default is a list of length three with `eval.max = 1000`,
 #'   `iter.max = 10000`, and `trace = 0`.
@@ -740,7 +740,8 @@ fit_fims <- function(input,
   ) {
     cli::cli_abort(c(
       "x" = "{.arg number_of_newton_steps} is {.val {number_of_newton_steps}}.",
-      "i" = "{.arg number_of_newton_steps} must be 1 non-negative integer, e.g.,
+      "i" = "{.arg number_of_newton_steps} must be a single non-negative
+      integer, e.g.,
       {.code number_of_newton_steps = 0}."
     ))
   }
@@ -841,9 +842,8 @@ fit_fims <- function(input,
     best_par <- obj[["env"]][["last.par.best"]]
     best_value <- obj[["env"]][["value.best"]]
     for (ii in seq_len(number_of_newton_steps)) {
-      # stats::optimHess() finite-differences the marginal gradient obj[["gr"]],
-      # which works with or without random effects (obj[["he"]]() errors when
-      # random effects are present).
+      # obj[["he"]]() errors when the model has random effects, so the Hessian
+      # comes from finite differences of obj[["gr"]].
       newton_step <- tryCatch(
         solve(
           stats::optimHess(opt[["par"]], fn = obj[["fn"]], gr = obj[["gr"]]),
@@ -860,7 +860,12 @@ fit_fims <- function(input,
         error = function(err) NA_real_
       )
       # 1e-8 allows for round-off in the objective near a flat optimum.
-      if (!isTRUE(new_objective <= opt[["objective"]] + 1e-8)) {
+      if (
+        !isTRUE(
+          is.finite(new_objective) &&
+            new_objective <= opt[["objective"]] + 1e-8
+        )
+      ) {
         break
       }
       new_gradient <- tryCatch(
@@ -882,9 +887,10 @@ fit_fims <- function(input,
       number_of_kept_steps <- number_of_kept_steps + 1
     }
     # TMB moves last.par.best only when fn() lowers value.best, and the
-    # optimHess(), fn() and gr() calls above move last.par. Set both to the
-    # last kept step so report(), get_estimates() and sdreport() use the same
-    # fixed effects and random-effect mode as opt[["par"]].
+    # optimHess(), fn(), and gr() calls above move last.par. Set both to the
+    # last kept step, or to the nlminb() best if no step is kept, so report(),
+    # get_estimates(), and sdreport() use the same fixed effects and
+    # random-effect mode as opt[["par"]].
     obj[["env"]][["last.par"]] <- best_par
     obj[["env"]][["last.par.best"]] <- best_par
     obj[["env"]][["value.best"]] <- best_value
