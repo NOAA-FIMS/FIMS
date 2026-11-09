@@ -19,28 +19,7 @@ n_ages <- get_n_ages(data_4_model)
 n_years <- get_n_years(data_4_model)
 weight_at_age <- weight_at_age_matrix(data_big)
 
-r0 <- exp(pull_input(default_parameters, "Recruitment", "log_rzero"))
-natural_mortality <- exp(unique(
-  pull_input(default_parameters, "Population", "log_M")
-))
-# The FIMS logistic with slope s is the logistic distribution function with
-# scale 1 / s.
-maturity <- stats::plogis(
-  ages,
-  location = pull_input(default_parameters, "Maturity", "inflection_point"),
-  scale = 1 / pull_input(default_parameters, "Maturity", "slope")
-)
-proportion_female <- pull_input(
-  default_parameters, "Population", "proportion_female"
-)
-equilibrium_numbers <- equilibrium_numbers_at_age(
-  r0, rep(natural_mortality, n_ages)
-)
-# Unfished spawning biomass SB0 is R0 times spawning biomass per recruit,
-# using the first-year weight and maturity.
-unfished_spawning_biomass <- sum(
-  equilibrium_numbers * weight_at_age[1, ] * proportion_female * maturity
-)
+unfished <- unfished_quantities(default_parameters, ages, weight_at_age)
 
 # One maturity row per year makes maturity time-varying. A later inflection
 # point in 1 year lowers spawning biomass in that year.
@@ -82,7 +61,7 @@ test_that("maturity in one year is used in that year only", {
   # come from the model output and maturity from the inputs.
   expected_spawning_biomass <- sum(
     numbers_at_age[changed_year, ] * weight_at_age[changed_year, ] *
-      proportion_female *
+      unfished[["proportion_female"]] *
       stats::plogis(
         ages,
         location = changed_inflection_point, scale = 1 / slope
@@ -104,7 +83,7 @@ test_that("maturity in one year is used in that year only", {
   later_years <- seq(changed_year + 1, n_years + 1)
   expected_later_spawning_biomass <- as.vector(
     (numbers_at_age[later_years, ] * weight_at_age[later_years, ]) %*%
-      (proportion_female * maturity)
+      (unfished[["proportion_female"]] * unfished[["maturity"]])
   )
   #' @description Test that spawning biomass after the changed maturity year uses the default maturity ogive.
   expect_equal(
@@ -152,7 +131,8 @@ test_that("Beverton-Holt recruitment is R0 at SB0 and h R0 at 0.2 SB0", {
         label == "logit_steep" ~ stats::qlogis((steepness - 0.2) / 0.8),
         label == "log_Fmort" ~ -200,
         label == "log_devs" ~ 0,
-        label == "log_init_naa" ~ log(equilibrium_numbers)[match(age, ages)],
+        label == "log_init_naa" ~
+          log(unfished[["numbers_at_age"]])[match(age, ages)],
         .default = value
       )
     )
@@ -164,17 +144,17 @@ test_that("Beverton-Holt recruitment is R0 at SB0 and h R0 at 0.2 SB0", {
   #' @description Test that the setup puts spawning biomass at 0.2 SB0 in 1 year.
   expect_equal(
     object = spawning_biomass[low_year],
-    expected = 0.2 * unfished_spawning_biomass
+    expected = 0.2 * unfished[["spawning_biomass"]]
   )
   #' @description Test that recruitment is R0 in each year after spawning biomass is SB0.
   expect_equal(
     object = recruitment[years_after_sb0],
-    expected = rep(r0, length(years_after_sb0))
+    expected = rep(unfished[["r0"]], length(years_after_sb0))
   )
   #' @description Test that recruitment is steepness times R0 in the year after spawning biomass is 0.2 SB0.
   expect_equal(
     object = recruitment[low_year + 1],
-    expected = steepness * r0
+    expected = steepness * unfished[["r0"]]
   )
 })
 
@@ -198,8 +178,8 @@ test_that("recruitment is Beverton-Holt of last year's SB times exp(dev)", {
   # Beverton-Holt in the standard steepness form. Spawning biomass comes from
   # the model output and the other terms from the inputs.
   beverton_holt <- function(spawning_biomass) {
-    4 * steepness * r0 * spawning_biomass /
-      (unfished_spawning_biomass * (1 - steepness) +
+    4 * steepness * unfished[["r0"]] * spawning_biomass /
+      (unfished[["spawning_biomass"]] * (1 - steepness) +
         spawning_biomass * (5 * steepness - 1))
   }
   deviation_years <- 2:n_years

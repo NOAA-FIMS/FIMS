@@ -120,3 +120,44 @@ weight_at_age_matrix <- function(data) {
     byrow = TRUE
   )
 }
+
+#' Unfished quantities from the inputs
+#'
+#' @details The closed forms assume a single M for all ages and years, so
+#'   `natural_mortality` has length 1 when the inputs meet that assumption.
+#'   The FIMS logistic with slope s is the logistic distribution function with
+#'   scale 1 / s. Unfished spawning biomass SB0 is R0 times spawning biomass
+#'   per recruit, using the first-year weight and maturity.
+#' @param parameters A tibble from `setup_default_parameters()`.
+#' @param ages A numeric vector of model ages from `get_ages()`.
+#' @param weight_at_age A matrix from `weight_at_age_matrix()`.
+#' @return A list with `r0`, `natural_mortality`, `maturity` at age,
+#'   `proportion_female`, equilibrium `numbers_at_age`, and SB0 as
+#'   `spawning_biomass`.
+unfished_quantities <- function(parameters, ages, weight_at_age) {
+  r0 <- exp(pull_input(parameters, "Recruitment", "log_rzero"))
+  natural_mortality <- exp(unique(
+    pull_input(parameters, "Population", "log_M")
+  ))
+  maturity <- stats::plogis(
+    ages,
+    location = pull_input(parameters, "Maturity", "inflection_point"),
+    scale = 1 / pull_input(parameters, "Maturity", "slope")
+  )
+  proportion_female <- pull_input(
+    parameters, "Population", "proportion_female"
+  )
+  numbers_at_age <- equilibrium_numbers_at_age(
+    r0, rep(natural_mortality, length(ages))
+  )
+  list(
+    r0 = r0,
+    natural_mortality = natural_mortality,
+    maturity = maturity,
+    proportion_female = proportion_female,
+    numbers_at_age = numbers_at_age,
+    spawning_biomass = sum(
+      numbers_at_age * weight_at_age[1, ] * proportion_female * maturity
+    )
+  )
+}

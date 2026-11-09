@@ -75,6 +75,7 @@ The following :hammer: helper functions are available to assist with writing int
 - `fleet_position()`: Find the position of a fleet in the report from the parameters of the run (in [`tests/testthat/helper-integration-tests-properties.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-properties.R)).
 - `equilibrium_numbers_at_age()`: Calculate unfished equilibrium numbers at age, including the plus group, from recruitment and natural mortality at age (in [`tests/testthat/helper-integration-tests-properties.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-properties.R)).
 - `weight_at_age_matrix()`: Arrange the weight-at-age data as a year by age matrix (in [`tests/testthat/helper-integration-tests-properties.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-properties.R)).
+- `unfished_quantities()`: Calculate R0, natural mortality, maturity at age, proportion female, equilibrium numbers at age, and unfished spawning biomass (SB0) from the inputs (in [`tests/testthat/helper-integration-tests-properties.R`](https://github.com/NOAA-FIMS/FIMS/blob/main/tests/testthat/helper-integration-tests-properties.R)).
 
 #### :shushing_face: Skipping tests
 
