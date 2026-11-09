@@ -20,10 +20,7 @@ n_years <- get_n_years(data_4_model)
 data_years <- seq_len(n_years)
 weight_at_age <- weight_at_age_matrix(data_big)
 
-# initialize_fims() creates fleets in the order they first appear in the
-# parameters, and the report lists fleet outputs in that order.
 fleet_names <- unique(stats::na.omit(default_parameters[["fleet"]]))
-fleet_number <- stats::setNames(seq_along(fleet_names), fleet_names)
 
 # The survey selects a different part of the population than the fishery, so
 # a mix-up between fleets changes the expected values. Distinct recruitment
@@ -46,6 +43,8 @@ set_shared_inputs <- function(parameters) {
 }
 parameters <- set_shared_inputs(default_parameters)
 report <- run_deterministic(parameters, data_4_model)
+fleet1 <- fleet_position(parameters, "fleet1")
+survey1 <- fleet_position(parameters, "survey1")
 # Numbers at age come from the model output. Rows are years and columns are
 # ages.
 numbers_at_age <- pull_output(report, "numbers_at_age") |>
@@ -71,13 +70,13 @@ test_that("expected survey index is q times selected biomass in each year", {
 
   #' @description Test that the expected survey index in weight is q times the sum over ages of numbers, selectivity, and weight.
   expect_equal(
-    object = pull_output(report, "index_expected", fleet_number[["survey1"]]),
+    object = pull_output(report, "index_expected", survey1),
     expected = catchability *
       rowSums(selected_numbers * weight_at_age[data_years, ])
   )
   #' @description Test that the expected survey index in numbers is q times the sum over ages of numbers and selectivity.
   expect_equal(
-    object = pull_output(report, "index_numbers", fleet_number[["survey1"]]),
+    object = pull_output(report, "index_numbers", survey1),
     expected = catchability * rowSums(selected_numbers)
   )
 })
@@ -110,7 +109,8 @@ test_that("expected survey index uses the q of each year", {
   #' @description Test that the expected survey index with q by year is the q of that year times the sum over ages of numbers, selectivity, and weight.
   expect_equal(
     object = pull_output(
-      q_by_year_report, "index_expected", fleet_number[["survey1"]]
+      q_by_year_report, "index_expected",
+      fleet_position(q_by_year_parameters, "survey1")
     ),
     expected = catchability * selected_biomass
   )
@@ -120,9 +120,7 @@ test_that("expected compositions are proportions of expected numbers", {
   # The fishery age composition comes from its catch at age. The survey has no
   # catch data, so its age composition comes from its index at age, where q
   # cancels.
-  catch_at_age <- pull_output(
-    report, "catch_numbers_at_age", fleet_number[["fleet1"]]
-  ) |>
+  catch_at_age <- pull_output(report, "catch_numbers_at_age", fleet1) |>
     matrix(ncol = n_ages, byrow = TRUE)
   index_at_age <- sweep(
     numbers_at_age[data_years, ], 2, survey_selectivity, "*"
@@ -146,14 +144,14 @@ test_that("expected compositions are proportions of expected numbers", {
     #' @description Test that expected age composition proportions for each fleet are its expected numbers at age over their total.
     expect_equal(
       object = pull_output(
-        report, "agecomp_proportion", fleet_number[[fleet_name]]
+        report, "agecomp_proportion", fleet_position(parameters, fleet_name)
       ),
       expected = as.vector(t(expected_age_composition[[fleet_name]]))
     )
     #' @description Test that expected length composition proportions for each fleet are its age composition times the age-to-length conversion.
     expect_equal(
       object = pull_output(
-        report, "lengthcomp_proportion", fleet_number[[fleet_name]]
+        report, "lengthcomp_proportion", fleet_position(parameters, fleet_name)
       ),
       expected = as.vector(t(
         expected_age_composition[[fleet_name]] %*% age_to_length_conversion
@@ -243,16 +241,18 @@ test_that("projection years leave the hindcast unchanged", {
   #' @description Test that expected fleet1 catch in hindcast years does not change with projection years.
   expect_equal(
     object = pull_output(
-      projection_report, "catch_expected", fleet_number[["fleet1"]]
+      projection_report, "catch_expected",
+      fleet_position(projection_parameters, "fleet1")
     )[data_years],
-    expected = pull_output(report, "catch_expected", fleet_number[["fleet1"]])
+    expected = pull_output(report, "catch_expected", fleet1)
   )
   #' @description Test that the expected survey index in hindcast years does not change with projection years.
   expect_equal(
     object = pull_output(
-      projection_report, "index_expected", fleet_number[["survey1"]]
+      projection_report, "index_expected",
+      fleet_position(projection_parameters, "survey1")
     )[data_years],
-    expected = pull_output(report, "index_expected", fleet_number[["survey1"]])
+    expected = pull_output(report, "index_expected", survey1)
   )
 })
 

@@ -39,6 +39,23 @@ pull_output <- function(report, output_label, fleet_number = 1) {
   report[[output_label]][[fleet_number]]
 }
 
+#' Find the position of a fleet in the report
+#'
+#' @details Moving parameter rows can change the position, so use the
+#'   parameters of the run that made the report. The function stops if the
+#'   name is not a fleet, because `pull_output()` would then return `NULL`,
+#'   and 2 runs that both return `NULL` compare equal.
+#' @param parameters The parameter tibble used for the run.
+#' @param fleet_name A string with the fleet name.
+#' @return An integer to pass to `pull_output()` as `fleet_number`.
+fleet_position <- function(parameters, fleet_name) {
+  position <- match(fleet_name, unique(stats::na.omit(parameters[["fleet"]])))
+  if (is.na(position)) {
+    cli::cli_abort("{.val {fleet_name}} is not a fleet in the parameters.")
+  }
+  position
+}
+
 #' Run FIMS once at the input values and return the report
 #'
 #' @details The report is used rather than `get_estimates()` because it keeps

@@ -19,10 +19,7 @@ n_ages <- get_n_ages(data_4_model)
 n_years <- get_n_years(data_4_model)
 weight_at_age <- weight_at_age_matrix(data_big)
 
-# initialize_fims() creates fleets in the order they first appear in the
-# parameters, and the report lists fleet outputs in that order.
 fleet_names <- unique(stats::na.omit(default_parameters[["fleet"]]))
-fleet_number <- stats::setNames(seq_along(fleet_names), fleet_names)
 
 # Unfished quantities from the default inputs. The closed forms assume 1
 # natural mortality and 1 set of weights at age, which the first test checks.
@@ -157,7 +154,7 @@ test_that("catch at age follows the Baranov equation with 2 fishing fleets", {
     #' @description Test that catch numbers at age for each fleet equal F / Z * (1 - exp(-Z)) * N with F and Z from the inputs.
     expect_equal(
       object = pull_output(
-        report, "catch_numbers_at_age", fleet_number[[fleet_name]]
+        report, "catch_numbers_at_age", fleet_position(parameters, fleet_name)
       ),
       expected = as.vector(t(expected_catch))
     )
@@ -301,10 +298,13 @@ test_that("R0 and initial numbers times k scale N, SB, and catch by k", {
   #' @description Test that fleet1 catch in numbers scales by k when R0 and initial numbers scale by k.
   expect_equal(
     object = pull_output(
-      scaled_report, "catch_numbers", fleet_number[["fleet1"]]
+      scaled_report, "catch_numbers",
+      fleet_position(scaled_parameters, "fleet1")
     ),
-    expected = scale_factor *
-      pull_output(fished_report, "catch_numbers", fleet_number[["fleet1"]])
+    expected = scale_factor * pull_output(
+      fished_report, "catch_numbers",
+      fleet_position(fished_parameters, "fleet1")
+    )
   )
   #' @description Test that the spawning biomass ratio does not change when R0 and initial numbers scale by k.
   expect_equal(
