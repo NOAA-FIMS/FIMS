@@ -801,7 +801,12 @@ test_that("`FIMSFrame()` returns errors for invalid population length bins", {
       ),
       population_length_bin_rows(c(NA_real_, NA_real_))
     )),
-    "no\\s+missing\\s+lengths"
+    "no\\s+missing\\s+or\\s+infinite\\s+lengths"
+  )
+  #' @description Test that `FIMSFrame()` errors when a population length bin has an infinite lower edge, which C++ cannot turn into bin edges.
+  expect_error(
+    FIMSFrame(with_population_bins(c(seq(0, 1150, by = 50), Inf))),
+    "no\\s+missing\\s+or\\s+infinite\\s+lengths"
   )
   #' @description Test that `validate_population_length_bins()` errors when a population length bin is wider than a fleet length bin it overlaps.
   expect_error(

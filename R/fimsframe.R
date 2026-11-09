@@ -1977,12 +1977,16 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
   }
 
   lengths <- population_rows[["length"]]
-  if (anyNA(lengths) || anyDuplicated(lengths) > 0 || length(lengths) < 2) {
+  # An infinite lower edge gives an infinite or NaN upper edge, which C++
+  # rejects. The last bin already holds all larger fish, so Inf is not needed.
+  if (!all(is.finite(lengths)) || anyDuplicated(lengths) > 0 ||
+    length(lengths) < 2) {
     cli::cli_abort(c(
       "x" = "{.var length_bin} rows with {.code fleet = NA} have these
       lengths: {.val {sort(lengths, na.last = TRUE)}}.",
-      "i" = "These rows need at least 2 different lengths and no missing
-      lengths. Each row gives the lower edge of 1 population length bin.",
+      "i" = "These rows need at least 2 different lengths and no missing or
+      infinite lengths. Each row gives the lower edge of 1 population length
+      bin.",
       "i" = "Use {.code dplyr::count(dplyr::filter(data, type == 'length_bin',
       is.na(fleet)), length)} to see the lengths."
     ))
