@@ -1949,10 +1949,11 @@ length_bin_edges <- function(lower_edges) {
   )
 }
 
-# Growth puts no fish outside the population length bins. A fleet bin outside
-# them gets an expected proportion near 0, so observed fish there give a very
-# large likelihood penalty. C++ also rejects a population bin that is wider than a
-# fleet bin it overlaps, and this check gives the user a clearer message.
+# Fish reach a fleet bin only through its overlap with the population length
+# bins. A fleet bin outside them gets an expected proportion near 0, so
+# observed fish there give a very large likelihood penalty. C++ also rejects a
+# population bin that is wider than a fleet bin it overlaps, and this check
+# gives the user a clearer message.
 validate_population_length_bins <- function(data, fleet_length_bins) {
   population_rows <- dplyr::filter(
     data,
