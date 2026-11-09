@@ -57,44 +57,50 @@ proportion_at_true_age <- function(report, fleet) {
 }
 
 # Each run is a full model build, so the runs are shared by the tests below.
-base_run <- run_at_initial_values(data_big)
-blurred_run <- run_at_initial_values(
-  dplyr::bind_rows(data_big, ageing_error_rows())
+# Ageing error is data, so it does not change the default parameters.
+default_parameters <- setup_default_parameters(data_4_model)
+base_report <- run_deterministic(default_parameters, data_4_model)
+blurred_report <- run_deterministic(
+  default_parameters,
+  FIMSFrame(dplyr::bind_rows(data_big, ageing_error_rows()))
 )
 # fleet1 has its own identity matrix, which takes precedence over the
 # fleet = NA rows for every year. survey1 uses the default except in 1 year.
 changed_year <- 10
-mixed_run <- run_at_initial_values(dplyr::bind_rows(
-  data_big,
-  ageing_error_rows(),
-  ageing_error_rows(diag(n_ages), timing = years[changed_year]),
-  ageing_error_rows(diag(n_ages), fleet = "fleet1")
-))
+mixed_report <- run_deterministic(
+  default_parameters,
+  FIMSFrame(dplyr::bind_rows(
+    data_big,
+    ageing_error_rows(),
+    ageing_error_rows(diag(n_ages), timing = years[changed_year]),
+    ageing_error_rows(diag(n_ages), fleet = "fleet1")
+  ))
+)
 
 ## IO correctness ----
 test_that("ageing error moves expected age compositions to observed ages", {
   for (fleet in 1:2) {
     #' @description Test that expected proportions equal the proportions at true age times the ageing error matrix, with true age as rows.
     expect_equal(
-      by_year_and_age(blurred_run[["report"]], "agecomp_proportion", fleet),
-      proportion_at_true_age(blurred_run[["report"]], fleet) %*% reads_older,
+      by_year_and_age(blurred_report, "agecomp_proportion", fleet),
+      proportion_at_true_age(blurred_report, fleet) %*% reads_older,
       tolerance = 1e-12
     )
     #' @description Test that the expected numbers keep the observed sample size in each year.
     expect_equal(
       rowSums(
-        by_year_and_age(blurred_run[["report"]], "agecomp_expected", fleet)
+        by_year_and_age(blurred_report, "agecomp_expected", fleet)
       ),
       rowSums(
-        by_year_and_age(base_run[["report"]], "agecomp_expected", fleet)
+        by_year_and_age(base_report, "agecomp_expected", fleet)
       ),
       tolerance = 1e-12
     )
   }
-  #' @description Test that ageing error changes the objective function.
+  #' @description Test that ageing error changes the joint negative log-likelihood.
   expect_false(isTRUE(all.equal(
-    blurred_run[["objective"]],
-    base_run[["objective"]]
+    blurred_report[["jnll"]],
+    base_report[["jnll"]]
   )))
 })
 
@@ -109,8 +115,8 @@ test_that("ageing error does not change length compositions, catch, or index", {
   for (quantity in unchanged) {
     #' @description Test that length compositions, catch, and index are identical to the model without ageing error.
     expect_identical(
-      blurred_run[["report"]][[quantity]],
-      base_run[["report"]][[quantity]],
+      blurred_report[[quantity]],
+      base_report[[quantity]],
       label = quantity
     )
   }
@@ -119,28 +125,28 @@ test_that("ageing error does not change length compositions, catch, or index", {
 test_that("each fleet and year uses its own ageing error matrix", {
   #' @description Test that a fleet's own identity matrix reproduces its expected proportions without ageing error exactly, in every year.
   expect_identical(
-    mixed_run[["report"]][["agecomp_proportion"]][[1]],
-    base_run[["report"]][["agecomp_proportion"]][[1]]
+    mixed_report[["agecomp_proportion"]][[1]],
+    base_report[["agecomp_proportion"]][[1]]
   )
   #' @description Test that a fleet's own identity matrix reproduces its expected numbers at age without ageing error exactly.
   expect_identical(
-    mixed_run[["report"]][["agecomp_expected"]][[1]],
-    base_run[["report"]][["agecomp_expected"]][[1]]
+    mixed_report[["agecomp_expected"]][[1]],
+    base_report[["agecomp_expected"]][[1]]
   )
 
-  survey <- by_year_and_age(mixed_run[["report"]], "agecomp_proportion", 2)
+  survey <- by_year_and_age(mixed_report, "agecomp_proportion", 2)
   #' @description Test that the year with its own matrix uses that matrix and not a neighboring year's.
   expect_identical(
     survey[changed_year, ],
     by_year_and_age(
-      base_run[["report"]], "agecomp_proportion", 2
+      base_report, "agecomp_proportion", 2
     )[changed_year, ]
   )
   #' @description Test that the other years use the default matrix.
   expect_identical(
     survey[-changed_year, ],
     by_year_and_age(
-      blurred_run[["report"]], "agecomp_proportion", 2
+      blurred_report, "agecomp_proportion", 2
     )[-changed_year, ]
   )
 })
