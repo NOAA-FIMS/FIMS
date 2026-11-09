@@ -712,6 +712,17 @@ FIMSFit <- function(
 #' With no active fixed effects, TMB evaluates the random-effects model without
 #' running an outer optimizer. If no parameters remain active, use
 #' `optimize = FALSE`.
+#'
+#' A fit with random effects can need several GB of memory for a long time
+#' series. If FIMS was installed with TMB 1.9.18 or later, running
+#' `TMB::config(tmbad.sparse_hessian_compress = 1, DLL = "FIMS")` after
+#' loading FIMS and before `fit_fims()` uses less memory but takes longer.
+#' With 60 years of data built from `data_big`, peak memory fell from 2.2 GB
+#' to 0.6 GB and the fit took twice as long. At the same parameter values the
+#' objective, gradient and standard errors are the same to about 1e-12, but
+#' the optimizer can stop at a slightly different point, so the convergence
+#' checks can change. The setting lasts for the R session and does not reach
+#' parallel workers.
 #' @keywords fit_fims
 #' @export
 fit_fims <- function(input,
