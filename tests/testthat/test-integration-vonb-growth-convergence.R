@@ -818,8 +818,8 @@ test_that("von bertalanffy Newton polishing does not worsen objective or gradien
     base_objective + 1e-8
   )
 
-  #' @description Test that optional Newton polishing does not worsen the maximum gradient.
-  expect_lte(
+  #' @description Test that optional Newton polishing reduces the maximum gradient.
+  expect_lt(
     newton_max_gradient,
     base_max_gradient
   )

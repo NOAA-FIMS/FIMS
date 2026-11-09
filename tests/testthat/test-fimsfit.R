@@ -76,7 +76,7 @@ test_that("`fit_fims()` passes `getReportCovariance` to `TMB::sdreport()`", {
   clear()
 })
 
-test_that("`fit_fims()` runs Newton steps and updates the parameter estimates", {
+test_that("`fit_fims()` keeps only Newton steps that reduce the gradient", {
   yearly_types <- c("catch", "index", "age_comp", "length_comp")
   data_5_years <- data_big |>
     dplyr::filter(
@@ -86,52 +86,75 @@ test_that("`fit_fims()` runs Newton steps and updates the parameter estimates", 
     ) |>
     FIMSFrame()
   default_parameters <- setup_default_parameters(data_5_years)
-
-  fit_no_newton <- suppressWarnings(
+  fit_5_years <- function(number_of_newton_steps) {
     default_parameters |>
       initialize_fims(data = data_5_years) |>
       fit_fims(
         number_of_loops = 0,
-        number_of_newton_steps = 0,
+        number_of_newton_steps = number_of_newton_steps,
         get_sd = FALSE
       )
-  )
-  no_newton_objective <- get_opt(fit_no_newton)[["objective"]]
+  }
+  # The 2 stored parameter vectors that report() and get_estimates() read.
+  get_best_parameters <- function(fit) {
+    best_parameters <- unname(get_obj(fit)[["env"]][["last.par.best"]])
+    list(
+      fixed = best_parameters[get_obj(fit)[["env"]][["lfixed"]]()],
+      all = best_parameters
+    )
+  }
+
+  fit_no_newton <- fit_5_years(number_of_newton_steps = 0)
+  no_newton_opt <- get_opt(fit_no_newton)
   no_newton_max_gradient <- get_max_gradient(fit_no_newton)
+  no_newton_best_parameters <- get_best_parameters(fit_no_newton)
   clear()
 
-  fit_newton <- suppressWarnings(
-    default_parameters |>
-      initialize_fims(data = data_5_years) |>
-      fit_fims(
-        number_of_loops = 0,
-        number_of_newton_steps = 1,
-        get_sd = FALSE
-      )
-  )
+  fit_newton <- fit_5_years(number_of_newton_steps = 1)
   newton_opt <- get_opt(fit_newton)
   newton_max_gradient <- get_max_gradient(fit_newton)
-  fixed_estimates <- get_estimates(fit_newton) |>
-    dplyr::filter(.data[["estimation_type"]] == "fixed_effects") |>
-    dplyr::arrange(.data[["parameter_id"]]) |>
-    dplyr::pull(.data[["estimated"]])
-
   #' @description Test that 1 Newton step reduces the maximum absolute gradient.
   expect_lt(newton_max_gradient, no_newton_max_gradient)
 
   #' @description Test that 1 Newton step does not worsen the objective value.
-  expect_lte(newton_opt[["objective"]], no_newton_objective + 1e-8)
+  expect_lte(newton_opt[["objective"]], no_newton_opt[["objective"]] + 1e-8)
 
-  #' @description Test that fixed-effect estimates in `get_estimates()` match `get_opt()[["par"]]` after 1 Newton step.
-  expect_equal(
-    object = fixed_estimates,
-    expected = unname(newton_opt[["par"]]),
-    tolerance = 1e-4
+  #' @description Test that the best parameters stored by TMB, which feed `get_report()` and `get_estimates()`, are `get_opt()[["par"]]` after 1 Newton step.
+  expect_identical(
+    object = get_best_parameters(fit_newton)[["fixed"]],
+    expected = unname(newton_opt[["par"]])
   )
-  #' @description Test that `get_gradient()` matches `get_max_gradient()` after 1 Newton step.
+
+  #' @description Test that the maximum gradient in `get_convergence()` matches `get_max_gradient()` after 1 Newton step.
   expect_equal(
-    object = max(abs(get_gradient(fit_newton))),
+    object = get_convergence(fit_newton) |>
+      dplyr::filter(.data[["check"]] == "max_gradient") |>
+      dplyr::pull(.data[["value"]]),
     expected = newton_max_gradient
+  )
+  clear()
+
+  # A negated Hessian sends the step uphill, so the step is not kept.
+  optim_hess <- stats::optimHess
+  local_mocked_bindings(
+    optimHess = function(par, fn, gr = NULL, ...) -optim_hess(par, fn, gr, ...),
+    .package = "stats"
+  )
+  fit_rejected <- fit_5_years(number_of_newton_steps = 1)
+  #' @description Test that a rejected Newton step leaves `get_opt()[["par"]]` at the `nlminb()` estimates.
+  expect_equal(
+    object = get_opt(fit_rejected)[["par"]],
+    expected = no_newton_opt[["par"]]
+  )
+  #' @description Test that a rejected Newton step leaves the maximum gradient at the `nlminb()` value.
+  expect_equal(
+    object = get_max_gradient(fit_rejected),
+    expected = no_newton_max_gradient
+  )
+  #' @description Test that a rejected Newton step leaves the stored fixed effects and random-effect mode at the `nlminb()` values.
+  expect_equal(
+    object = get_best_parameters(fit_rejected),
+    expected = no_newton_best_parameters
   )
   clear()
 })
@@ -207,6 +230,11 @@ test_that("`fit_fims()` errors when `number_of_newton_steps` is invalid", {
   #' @description Test that `fit_fims()` rejects a non-finite `number_of_newton_steps`.
   expect_error(
     fit_fims(input = NULL, number_of_newton_steps = Inf),
+    regexp = "number_of_newton_steps.*1 non-negative integer"
+  )
+  #' @description Test that `fit_fims()` rejects more than 1 value of `number_of_newton_steps`.
+  expect_error(
+    fit_fims(input = NULL, number_of_newton_steps = c(1, 2)),
     regexp = "number_of_newton_steps.*1 non-negative integer"
   )
 })
