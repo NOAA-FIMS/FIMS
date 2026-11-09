@@ -1,6 +1,7 @@
 # Helper file for the population properties tests ----
-# These functions are used by the test-integration-properties-*.R files. Each
-# property changes a few inputs and runs the model at its input values without
+# These functions are used by the test-integration-properties-*.R files, and
+# run_deterministic() also by test-integration-ageing-error.R. Each property
+# changes a few inputs and runs the model at its input values without
 # optimizing. It compares the output to a value worked out in R from the
 # inputs, or from other model outputs through a closed form, or to the output
 # of a second run.
