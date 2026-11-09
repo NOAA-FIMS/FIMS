@@ -117,8 +117,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& MeanLengthYoungVector() {
-    use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return mean_length_young_vector_;
   }
@@ -130,8 +128,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& MeanLengthOldVector() {
-    use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return mean_length_old_vector_;
   }
@@ -142,8 +138,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& GrowthCoefficientVector() {
-    use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return growth_coefficient_vector_;
   }
@@ -153,8 +147,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& ReferenceAgeForLengthYoungVector() {
-    use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return reference_age_for_length_young_vector_;
   }
@@ -164,8 +156,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& ReferenceAgeForLengthOldVector() {
-    use_param_vectors_ = true;
-    vb_params_set_ = true;
     growth_products_prepared_ = false;
     return reference_age_for_length_old_vector_;
   }
@@ -175,8 +165,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LengthWeightAVector() {
-    use_param_vectors_ = true;
-    lw_params_set_ = true;
     growth_products_prepared_ = false;
     return length_weight_a_vector_;
   }
@@ -186,8 +174,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LengthWeightBVector() {
-    use_param_vectors_ = true;
-    lw_params_set_ = true;
     growth_products_prepared_ = false;
     return length_weight_b_vector_;
   }
@@ -197,7 +183,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LengthAtAgeSdYoungVector() {
-    use_param_vectors_ = true;
     growth_products_prepared_ = false;
     return length_at_age_sd_young_vector_;
   }
@@ -207,7 +192,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LengthAtAgeSdOldVector() {
-    use_param_vectors_ = true;
     growth_products_prepared_ = false;
     return length_at_age_sd_old_vector_;
   }
@@ -217,7 +201,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LogSdLengthAtRefAgeYoungVector() {
-    use_param_vectors_ = true;
     growth_products_prepared_ = false;
     return log_sd_mean_length_young_vector_;
   }
@@ -227,7 +210,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LogSdLengthAtRefAgeOldVector() {
-    use_param_vectors_ = true;
     growth_products_prepared_ = false;
     return log_sd_mean_length_old_vector_;
   }
@@ -237,7 +219,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LogSdGrowthCoefficientVector() {
-    use_param_vectors_ = true;
     growth_products_prepared_ = false;
     return log_sd_growth_coefficient_vector_;
   }
@@ -248,7 +229,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LogitCorrLengthAtRefAgeYoungLengthAtRefAgeOldVector() {
-    use_param_vectors_ = true;
     growth_products_prepared_ = false;
     return mean_length_young_mean_length_old_logit_corr_vector_;
   }
@@ -259,7 +239,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LogitCorrLengthAtRefAgeYoungKVector() {
-    use_param_vectors_ = true;
     growth_products_prepared_ = false;
     return mean_length_young_growth_coefficient_logit_corr_vector_;
   }
@@ -270,7 +249,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @return Mutable parameter vector.
    */
   fims::Vector<Type>& LogitCorrLengthAtRefAgeOldKVector() {
-    use_param_vectors_ = true;
     growth_products_prepared_ = false;
     return mean_length_old_growth_coefficient_logit_corr_vector_;
   }
@@ -431,7 +409,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
   fims::Vector<Type> mean_length_young_mean_length_old_logit_corr_vector_;
   fims::Vector<Type> mean_length_young_growth_coefficient_logit_corr_vector_;
   fims::Vector<Type> mean_length_old_growth_coefficient_logit_corr_vector_;
-  bool use_param_vectors_ = false;
   LengthReferenceParameterization length_reference_parameterization_ =
       LengthReferenceParameterization::kEstimatedReferenceLengths;
   Type constant_mean_length_young_ = Type(0.0);
@@ -441,8 +418,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
   std::size_t n_sexes_ = 1;
   double age_offset_ = 0.0;
   bool age_offset_set_ = false;
-  bool vb_params_set_ = false;
-  bool lw_params_set_ = false;
   bool growth_products_prepared_ = false;
 
   mutable std::shared_ptr<GrowthModel<Type>> model_;
@@ -596,7 +571,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
   }
 
   void EnsureParamsSet() const {
-    if (!use_param_vectors_ || mean_length_young_vector_.size() < 1 ||
+    if (mean_length_young_vector_.size() < 1 ||
         mean_length_old_vector_.size() < 1 ||
         growth_coefficient_vector_.size() < 1 ||
         reference_age_for_length_young_vector_.size() < 1 ||
