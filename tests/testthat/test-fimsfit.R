@@ -76,6 +76,66 @@ test_that("`fit_fims()` passes `getReportCovariance` to `TMB::sdreport()`", {
   clear()
 })
 
+test_that("`fit_fims()` runs Newton steps and updates the parameter estimates", {
+  yearly_types <- c("catch", "index", "age_comp", "length_comp")
+  data_5_years <- data_big |>
+    dplyr::filter(
+      !(.data[["type"]] %in% c(yearly_types, "weight_at_age")) |
+        (.data[["type"]] %in% yearly_types & .data[["timing"]] <= 5) |
+        (.data[["type"]] == "weight_at_age" & .data[["timing"]] <= 6)
+    ) |>
+    FIMSFrame()
+  default_parameters <- setup_default_parameters(data_5_years)
+
+  fit_no_newton <- suppressWarnings(
+    default_parameters |>
+      initialize_fims(data = data_5_years) |>
+      fit_fims(
+        number_of_loops = 0,
+        number_of_newton_steps = 0,
+        get_sd = FALSE
+      )
+  )
+  no_newton_objective <- get_opt(fit_no_newton)[["objective"]]
+  no_newton_max_gradient <- get_max_gradient(fit_no_newton)
+  clear()
+
+  fit_newton <- suppressWarnings(
+    default_parameters |>
+      initialize_fims(data = data_5_years) |>
+      fit_fims(
+        number_of_loops = 0,
+        number_of_newton_steps = 1,
+        get_sd = FALSE
+      )
+  )
+  newton_opt <- get_opt(fit_newton)
+  newton_max_gradient <- get_max_gradient(fit_newton)
+  fixed_estimates <- get_estimates(fit_newton) |>
+    dplyr::filter(.data[["estimation_type"]] == "fixed_effects") |>
+    dplyr::arrange(.data[["parameter_id"]]) |>
+    dplyr::pull(.data[["estimated"]])
+
+  #' @description Test that 1 Newton step reduces the maximum absolute gradient.
+  expect_lt(newton_max_gradient, no_newton_max_gradient)
+
+  #' @description Test that 1 Newton step does not worsen the objective value.
+  expect_lte(newton_opt[["objective"]], no_newton_objective + 1e-8)
+
+  #' @description Test that fixed-effect estimates in `get_estimates()` match `get_opt()[["par"]]` after 1 Newton step.
+  expect_equal(
+    object = fixed_estimates,
+    expected = unname(newton_opt[["par"]]),
+    tolerance = 1e-4
+  )
+  #' @description Test that `get_gradient()` matches `get_max_gradient()` after 1 Newton step.
+  expect_equal(
+    object = max(abs(get_gradient(fit_newton))),
+    expected = newton_max_gradient
+  )
+  clear()
+})
+
 test_that("`get_convergence()` works with correct inputs", {
   convergence <- get_convergence(fit_age_length_comp)
   #' @description Test that `get_convergence()` returns 1 row per check run by `fit_fims()` when sdreport is run.
@@ -133,11 +193,21 @@ test_that("`is.FIMSFit()` returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-test_that("fit_fims() errors when Newton steps are requested", {
-  #' @description Test that fit_fims() says to use number_of_loops when Newton steps are requested.
+test_that("`fit_fims()` errors when `number_of_newton_steps` is invalid", {
+  #' @description Test that `fit_fims()` rejects a negative `number_of_newton_steps`.
   expect_error(
-    fit_fims(input = NULL, number_of_newton_steps = 1),
-    regexp = "Newton steps are not implemented yet.*number_of_loops"
+    fit_fims(input = NULL, number_of_newton_steps = -1),
+    regexp = "number_of_newton_steps.*1 non-negative integer"
+  )
+  #' @description Test that `fit_fims()` rejects a non-integer `number_of_newton_steps`.
+  expect_error(
+    fit_fims(input = NULL, number_of_newton_steps = 1.5),
+    regexp = "number_of_newton_steps.*1 non-negative integer"
+  )
+  #' @description Test that `fit_fims()` rejects a non-finite `number_of_newton_steps`.
+  expect_error(
+    fit_fims(input = NULL, number_of_newton_steps = Inf),
+    regexp = "number_of_newton_steps.*1 non-negative integer"
   )
 })
 

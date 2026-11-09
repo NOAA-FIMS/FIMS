@@ -44,8 +44,11 @@ gradient. The default is three, leading to four total optimization steps.}
 \item{optimize}{Optimize (TRUE, default) or (FALSE) build and return
 a list containing the obj and report slot.}
 
-\item{number_of_newton_steps}{The number of Newton steps using the inverse
-Hessian to do after optimization. Not yet implemented.}
+\item{number_of_newton_steps}{A non-negative integer specifying the number of
+Newton steps using the finite-difference Hessian from \code{\link[stats:optimHess]{stats::optimHess()}}
+to do after \code{\link[stats:nlminb]{stats::nlminb()}} optimization. Each step is accepted only if
+it is finite, reduces the maximum absolute gradient, and does not worsen
+the objective value. The default is 0.}
 
 \item{control}{A list of optimizer settings passed to \code{\link[stats:nlminb]{stats::nlminb()}}. The
 the default is a list of length three with \code{eval.max = 1000},

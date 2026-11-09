@@ -678,8 +678,11 @@ FIMSFit <- function(
 #'   gradient. The default is three, leading to four total optimization steps.
 #' @param optimize Optimize (TRUE, default) or (FALSE) build and return
 #'   a list containing the obj and report slot.
-#' @param number_of_newton_steps The number of Newton steps using the inverse
-#'   Hessian to do after optimization. Not yet implemented.
+#' @param number_of_newton_steps A non-negative integer specifying the number of
+#'   Newton steps using the finite-difference Hessian from [stats::optimHess()]
+#'   to do after [stats::nlminb()] optimization. Each step is accepted only if
+#'   it is finite, reduces the maximum absolute gradient, and does not worsen
+#'   the objective value. The default is 0.
 #' @param control A list of optimizer settings passed to [stats::nlminb()]. The
 #'   the default is a list of length three with `eval.max = 1000`,
 #'   `iter.max = 10000`, and `trace = 0`.
@@ -727,18 +730,18 @@ fit_fims <- function(input,
                      ),
                      filename = NULL,
                      getReportCovariance = FALSE) {
-  # See issue 455 of sdmTMB to see what should be used.
-  # https://github.com/pbs-assess/sdmTMB/issues/455
-  # NOTE: When we add implementation for newton step we need to
-  # review the above github issue to make sure we maintain continuity
-  # between outputs as last.par may not equal last.par.best due to
-  # the smallest newton gradient solution not matching the smallest
-  # likelihood value. This can cause sanity issues in output reporting.
-  if (number_of_newton_steps > 0) {
+  if (
+    !is.numeric(number_of_newton_steps) ||
+      length(number_of_newton_steps) != 1 ||
+      !is.finite(number_of_newton_steps) ||
+      number_of_newton_steps < 0 ||
+      number_of_newton_steps %% 1 != 0
+  ) {
     cli::cli_abort(c(
-      "x" = "Newton steps are not implemented yet.",
-      "i" = "Use {.code number_of_newton_steps = 0}. To improve the gradient,
-      increase {.arg number_of_loops} instead."
+      "x" = "{.arg number_of_newton_steps} {?is/are}
+      {.val {number_of_newton_steps}}.",
+      "i" = "{.arg number_of_newton_steps} must be 1 non-negative integer, e.g.,
+      {.code number_of_newton_steps = 0}."
     ))
   }
   if (number_of_loops < 0) {
@@ -824,12 +827,99 @@ fit_fims <- function(input,
     ))
     cli::cli_end(div_digit)
   }
-  time_optimization <- Sys.time() - t0
-  cli::cli_inform(c("v" = "Finished optimization"))
   opt[["par"]] <- obj[["env"]][["last.par.best"]][obj[["env"]][["lfixed"]]()]
   opt[["objective"]] <- obj[["fn"]](opt[["par"]])
   gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
   maxgrad <- if (length(gradient) > 0) max(abs(gradient)) else 0
+  if (number_of_newton_steps > 0 && length(obj[["par"]]) > 0) {
+    cli::cli_inform(c(
+      "i" = "Running {number_of_newton_steps} Newton step{?s} to improve
+            gradient."
+    ))
+    maxgrad_before_newton <- maxgrad
+    for (ii in seq_len(number_of_newton_steps)) {
+      best_par <- obj[["env"]][["last.par.best"]]
+      best_value <- obj[["env"]][["value.best"]]
+      # stats::optimHess() finite-differences the marginal gradient obj[["gr"]],
+      # which works with or without random effects (obj[["he"]]() errors when
+      # random effects are present).
+      hessian <- tryCatch(
+        stats::optimHess(
+          opt[["par"]],
+          fn = obj[["fn"]],
+          gr = obj[["gr"]]
+        ),
+        error = function(err) NULL
+      )
+      if (is.null(hessian) || any(!is.finite(hessian))) {
+        obj[["env"]][["last.par"]] <- best_par
+        obj[["env"]][["last.par.best"]] <- best_par
+        obj[["env"]][["value.best"]] <- best_value
+        break
+      }
+      step <- tryCatch(
+        solve(hessian, gradient),
+        error = function(err) NULL
+      )
+      if (is.null(step) || any(!is.finite(step))) {
+        obj[["env"]][["last.par"]] <- best_par
+        obj[["env"]][["last.par.best"]] <- best_par
+        obj[["env"]][["value.best"]] <- best_value
+        break
+      }
+      new_par <- opt[["par"]] - as.numeric(step)
+      new_objective <- tryCatch(
+        obj[["fn"]](new_par),
+        error = function(err) NA_real_
+      )
+      if (
+        !is.finite(new_objective) ||
+          new_objective > opt[["objective"]] + 1e-8
+      ) {
+        obj[["env"]][["last.par"]] <- best_par
+        obj[["env"]][["last.par.best"]] <- best_par
+        obj[["env"]][["value.best"]] <- best_value
+        break
+      }
+      # TMB updates last.par.best only when fn() lowers value.best. Copying
+      # last.par here warm-starts gr()'s Laplace mode from fn() and keeps
+      # last.par.best at the accepted step for report() and sdreport().
+      obj[["env"]][["last.par.best"]] <- obj[["env"]][["last.par"]]
+      new_gradient <- tryCatch(
+        as.numeric(obj[["gr"]](new_par)),
+        error = function(err) NA_real_
+      )
+      new_maxgrad <- if (
+        length(new_gradient) == length(new_par) &&
+          all(is.finite(new_gradient))
+      ) {
+        max(abs(new_gradient))
+      } else {
+        Inf
+      }
+      if (is.finite(new_maxgrad) && new_maxgrad < maxgrad) {
+        opt[["par"]] <- new_par
+        opt[["objective"]] <- new_objective
+        gradient <- new_gradient
+        maxgrad <- new_maxgrad
+        obj[["env"]][["last.par.best"]] <- obj[["env"]][["last.par"]]
+        obj[["env"]][["value.best"]] <- new_objective
+      } else {
+        obj[["env"]][["last.par"]] <- best_par
+        obj[["env"]][["last.par.best"]] <- best_par
+        obj[["env"]][["value.best"]] <- best_value
+        break
+      }
+    }
+    div_digit <- cli::cli_div(theme = list(.val = list(digits = 5)))
+    cli::cli_inform(c(
+      "i" = "Maximum gradient went from {.val {maxgrad_before_newton}} to
+            {.val {maxgrad}} after {number_of_newton_steps} Newton step{?s}."
+    ))
+    cli::cli_end(div_digit)
+  }
+  time_optimization <- Sys.time() - t0
+  cli::cli_inform(c("v" = "Finished optimization"))
 
   mle_convergence <- check_mle_convergence(
     opt,
