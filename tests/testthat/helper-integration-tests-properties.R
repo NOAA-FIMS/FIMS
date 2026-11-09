@@ -124,3 +124,51 @@ weight_at_age_matrix <- function(data) {
     byrow = TRUE
   )
 }
+
+#' Calculate unfished quantities from the inputs
+#'
+#' @details The closed forms assume a single M for all ages and years. The
+#'   function stops unless the inputs have exactly 1 value of M, because SB0
+#'   would otherwise be wrong with no error. The FIMS logistic with slope s is
+#'   the logistic distribution function with scale 1 / s. Unfished spawning
+#'   biomass SB0 is R0 times spawning biomass per recruit, using first-year
+#'   weight at age and the single maturity ogive in the inputs.
+#' @param parameters A tibble from `setup_default_parameters()`.
+#' @param ages A numeric vector of model ages from `get_ages()`.
+#' @param weight_at_age A matrix from `weight_at_age_matrix()`.
+#' @return A list with `r0`, `maturity` at age, `proportion_female`,
+#'   equilibrium `numbers_at_age`, and SB0 as `spawning_biomass`.
+unfished_quantities <- function(parameters, ages, weight_at_age) {
+  r0 <- exp(pull_input(parameters, "Recruitment", "log_rzero"))
+  natural_mortality <- exp(unique(
+    pull_input(parameters, "Population", "log_M")
+  ))
+  if (length(natural_mortality) != 1) {
+    cli::cli_abort(c(
+      "x" = "The inputs have {.val {length(natural_mortality)}} values of M.",
+      "i" = "{.fn unfished_quantities} assumes a single M for all ages and
+      years.",
+      "i" = "Check {.code dplyr::filter(parameters, label == \"log_M\")}."
+    ))
+  }
+  maturity <- stats::plogis(
+    ages,
+    location = pull_input(parameters, "Maturity", "inflection_point"),
+    scale = 1 / pull_input(parameters, "Maturity", "slope")
+  )
+  proportion_female <- pull_input(
+    parameters, "Population", "proportion_female"
+  )
+  numbers_at_age <- equilibrium_numbers_at_age(
+    r0, rep(natural_mortality, length(ages))
+  )
+  list(
+    r0 = r0,
+    maturity = maturity,
+    proportion_female = proportion_female,
+    numbers_at_age = numbers_at_age,
+    spawning_biomass = sum(
+      numbers_at_age * weight_at_age[1, ] * proportion_female * maturity
+    )
+  )
+}
