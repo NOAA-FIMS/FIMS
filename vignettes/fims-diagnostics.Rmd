@@ -138,7 +138,9 @@ fig_retrospective_ssb <- stockplotr::plot_spawning_biomass(
     dplyr::mutate(
       uncertainty_label = "se"
     ),
-  group = "retrospective_peel"
+  group = "retrospective_peel",
+  # The estimates have no unit column, so give the unit of weight_at_age
+  unit_label = "mt"
 )
 print(fig_retrospective_ssb)
 ```

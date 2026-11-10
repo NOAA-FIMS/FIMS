@@ -274,6 +274,8 @@ stockplotr::plot_biomass(
         year = year_i,
         estimate = estimated
       )
-  )
+  ),
+  # get_estimates() has no unit column, so give the unit of weight_at_age
+  unit_label = "mt"
 )
 ```

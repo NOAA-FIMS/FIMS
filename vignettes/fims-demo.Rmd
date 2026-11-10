@@ -315,7 +315,9 @@ output <- get_estimates(fit) |>
 #| fig.alt: >
 #|   Plot of spawning biomass.
 stockplotr::plot_spawning_biomass(
-  dplyr::filter(output, label == "spawning_biomass")
+  dplyr::filter(output, label == "spawning_biomass"),
+  # get_estimates() has no unit column, so give the unit of weight_at_age
+  unit_label = "mt"
 ) +
   stockplotr::theme_noaa()
 ```
@@ -520,6 +522,8 @@ stockplotr::plot_biomass(
         year = year_i,
         estimate = estimated
       )
-  )
+  ),
+  # get_estimates() has no unit column, so give the unit of weight_at_age
+  unit_label = "mt"
 )
 ```
