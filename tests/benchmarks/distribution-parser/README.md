@@ -1,6 +1,6 @@
 # Distribution parser reuse benchmark
 
-This PR replaces a per-observation dplyr registry lookup with direct indexing and reuses repeated character specifications with literal numeric scales within one parser call. Nonliteral scales still execute and validate per observation; reuse does not persist across calls.
+This PR replaces a per-observation dplyr registry lookup with direct indexing and reuses repeated character specifications with literal numeric scales within one parser call. Scale expressions still execute and validate per observation; reuse does not persist across calls.
 
 Measured 2026-11-10 against main `a739d031bb62d04f9366231182682b9ee389c1e2`. Both installed variants use the identical compiled main backend (SHA256 recorded in results/manifest.json); only this PR's R changes differ. The candidate was installed with `R CMD INSTALL --no-libs --no-test-load`, then the unchanged main library's `libs` directory was copied into the candidate library. Both packages load successfully. No TMB settings changed.
 
@@ -13,7 +13,7 @@ Two fresh processes per variant at each size, in before/after/after/before order
 
 Memory results are mixed: 4.0% higher at 30 years and 6.4% lower at 120 years. These are process peaks, not retained cache sizes or allocation volumes. No general memory reduction or full-fit runtime gain is claimed.
 
-All eight runs' objectives, gradients and ordinary reports agree with their same-size baseline at tolerance 1e-10. Focused tests passed 157 assertions with no failures, errors, warnings or skips: parser, distribution formulas, module initialization, and Rcpp distributions. New tests cover mixed families/order/missing values, empty input, nonliteral scale side effects and errors, and independent results within/across calls. Test results are in results/tests.csv. Full-suite CI remains a separate pre-merge check.
+All eight runs' objectives, gradients and ordinary reports agree with their same-size baseline at tolerance 1e-10. Focused tests passed 157 assertions with no failures, errors, warnings or skips: parser, distribution formulas, module initialization, and Rcpp distributions. New tests cover mixed families/order/missing values, empty input, scale-expression side effects and errors, and independent results within/across calls. Test results are in results/tests.csv. Full-suite CI remains a separate pre-merge check.
 
 ## Reproduce
 
