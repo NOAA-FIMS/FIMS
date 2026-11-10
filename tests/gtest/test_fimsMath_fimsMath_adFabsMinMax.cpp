@@ -7,6 +7,9 @@
 // More assertion macros provided by GoogleTest can be found at
 // https://google.github.io/googletest/reference/assertions.html.
 
+#include <stdexcept>
+#include <string>
+
 #include "gtest/gtest.h"
 #include "fims_math.hpp"
 
@@ -48,4 +51,65 @@ TEST(fimsMath_adMax, HandlesCorrectInput) {
   EXPECT_NEAR(fims_math::ad_max(2.0, 1.0, 1e-4), 2.000025, 0.000001);
 }
 
+// Error handling
+// The smooth guarantee of these functions requires C > 0 (issue #1941):
+// C = 0 turns ad_fabs into |x| (exact but no longer smooth) and C < 0 makes
+// the square root non-real, producing NaN. Both are rejected with an
+// informative error message.
+TEST(fimsMath_adFabs, CaptureError) {
+  // C = 0 and C < 0 are rejected
+  EXPECT_THROW(fims_math::ad_fabs(2.0, 0.0), std::invalid_argument);
+  EXPECT_THROW(fims_math::ad_fabs(2.0, -1e-5), std::invalid_argument);
+
+  // The error message names the function and the constraint
+  try {
+    fims_math::ad_fabs(2.0, -1.0);
+    FAIL() << "Expected std::invalid_argument for C <= 0";
+  } catch (const std::invalid_argument &e) {
+    const std::string msg(e.what());
+    EXPECT_NE(msg.find("ad_fabs"), std::string::npos);
+    EXPECT_NE(msg.find("greater than 0"), std::string::npos);
+  }
+
+  // Any positive C is accepted, however small
+  EXPECT_NO_THROW(fims_math::ad_fabs(2.0, 1e-12));
+}
+
+TEST(fimsMath_adMin, CaptureError) {
+  // C = 0 and C < 0 are rejected
+  EXPECT_THROW(fims_math::ad_min(2.0, 1.0, 0.0), std::invalid_argument);
+  EXPECT_THROW(fims_math::ad_min(2.0, 1.0, -1e-5), std::invalid_argument);
+
+  // The error message names the function and the constraint
+  try {
+    fims_math::ad_min(2.0, 1.0, -1.0);
+    FAIL() << "Expected std::invalid_argument for C <= 0";
+  } catch (const std::invalid_argument &e) {
+    const std::string msg(e.what());
+    EXPECT_NE(msg.find("ad_min"), std::string::npos);
+    EXPECT_NE(msg.find("greater than 0"), std::string::npos);
+  }
+
+  // Any positive C is accepted, however small
+  EXPECT_NO_THROW(fims_math::ad_min(2.0, 1.0, 1e-12));
+}
+
+TEST(fimsMath_adMax, CaptureError) {
+  // C = 0 and C < 0 are rejected
+  EXPECT_THROW(fims_math::ad_max(2.0, 1.0, 0.0), std::invalid_argument);
+  EXPECT_THROW(fims_math::ad_max(2.0, 1.0, -1e-5), std::invalid_argument);
+
+  // The error message names the function and the constraint
+  try {
+    fims_math::ad_max(2.0, 1.0, -1.0);
+    FAIL() << "Expected std::invalid_argument for C <= 0";
+  } catch (const std::invalid_argument &e) {
+    const std::string msg(e.what());
+    EXPECT_NE(msg.find("ad_max"), std::string::npos);
+    EXPECT_NE(msg.find("greater than 0"), std::string::npos);
+  }
+
+  // Any positive C is accepted, however small
+  EXPECT_NO_THROW(fims_math::ad_max(2.0, 1.0, 1e-12));
+}
 }  // namespace
