@@ -8,9 +8,26 @@
 // https://google.github.io/googletest/reference/assertions.html.
 
 #include "gtest/gtest.h"
+#include "model.hpp"
 #include "../../tests/gtest/test_population_test_fixture.hpp"
 
 namespace {
+
+class CountingCatchAtAge : public fims_popdy::CatchAtAge<double> {
+ public:
+  size_t prepare_calls = 0;
+  size_t evaluate_calls = 0;
+
+  void Prepare() override {
+    ++prepare_calls;
+    fims_popdy::CatchAtAge<double>::Prepare();
+  }
+
+  void Evaluate() override {
+    ++evaluate_calls;
+    fims_popdy::CatchAtAge<double>::Evaluate();
+  }
+};
 
 // Population_InitializePrepare
 // IO correctness
@@ -84,5 +101,42 @@ TEST_F(CAAPrepareTestFixture,
     EXPECT_EQ(catch_at_age_model->populations[0]->proportion_female[i],
               p_female[i]);
   }
+}
+
+// Verify Model::Evaluate() prepares each FisheryModelBase once per evaluation
+// through CatchAtAge::Evaluate() and resets accumulated derived quantities.
+TEST_F(CAAEvaluateTestFixture, ModelEvaluatePreparesOncePerEvaluation) {
+  auto counting_model = std::make_shared<CountingCatchAtAge>();
+  static_cast<fims_popdy::CatchAtAge<double>&>(*counting_model) =
+      *catch_at_age_model;
+  for (auto& kv : counting_model->fleets) {
+    kv.second->n_lengths = 0;
+  }
+
+  fims_model::Model<double> model;
+  model.fims_information = std::make_shared<fims_info::Information<double>>();
+  model.fims_information->models_map[counting_model->GetId()] = counting_model;
+
+  model.Evaluate();
+  EXPECT_EQ(counting_model->evaluate_calls, 1u);
+  EXPECT_EQ(counting_model->prepare_calls, 1u);
+
+  const uint32_t pop_id = counting_model->populations[0]->GetId();
+  const fims::Vector<double> first_biomass =
+      counting_model->GetPopulationDerivedQuantities(pop_id)["biomass"];
+  const fims::Vector<double> first_spawning_biomass =
+      counting_model->GetPopulationDerivedQuantities(
+          pop_id)["spawning_biomass"];
+  EXPECT_GT(first_biomass[0], 0.0);
+  EXPECT_GT(first_spawning_biomass[0], 0.0);
+
+  model.Evaluate();
+  EXPECT_EQ(counting_model->evaluate_calls, 2u);
+  EXPECT_EQ(counting_model->prepare_calls, 2u);
+  EXPECT_EQ(counting_model->GetPopulationDerivedQuantities(pop_id)["biomass"],
+            first_biomass);
+  EXPECT_EQ(counting_model->GetPopulationDerivedQuantities(
+                pop_id)["spawning_biomass"],
+            first_spawning_biomass);
 }
 }  // namespace
