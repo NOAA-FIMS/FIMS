@@ -5,6 +5,8 @@ vignette: >
   %\VignetteIndexEntry{FIMS Growth With VonBertalanffySchnute}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+level: "intermediate-user"
+summary: "Walks through the `VonBertalanffySchnute` growth option in FIMS using simulated data"
 ---
 
 ```{r, include = FALSE}
