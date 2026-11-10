@@ -274,3 +274,46 @@ stopifnot(
   identical(all_fleets$spr$fishing_mortality, directed_only$spr$fishing_mortality)
 )
 ```
+
+## Parameter uncertainty
+
+`calculate_reference_points_uncertainty()` propagates the fitted fixed-effect
+covariance through the equilibrium calculations. It draws parameters jointly on
+the estimation scale, preserving their correlations. Supply `get_sdreport(fit)`
+and a function mapping those parameters into a complete biological snapshot.
+For example, if only log R0 is estimated and the remaining biology is fixed:
+
+```{r uncertainty-example, eval=FALSE}
+snapshot <- inputs
+input_fn <- function(par) {
+  draw_inputs <- snapshot
+  draw_inputs$recruitment$rzero <- exp(par[["log_rzero"]])
+  draw_inputs
+}
+set.seed(42)
+uncertainty <- calculate_reference_points_uncertainty(
+  get_sdreport(fit), input_fn, n_draws = 1000, level = 0.95
+)
+uncertainty$summary
+uncertainty$errors
+table(uncertainty$draws$status)
+```
+
+Adapt the parameter name to the fitted report. If mortality, maturity, growth,
+selectivity, allocation, or other recruitment parameters are estimated, the
+mapping must update those quantities too, including the recruitment `phi0`
+baseline where appropriate. Holding them fixed conditions the intervals on
+their supplied values. The mapping should return snapshots without changing a
+live model.
+
+The result includes the estimate at fitted parameters, parameter draws, all
+successful calculation rows (including unconverged solver candidates), and
+errors identified by draw number. Summary intervals use only finite quantities
+from converged solutions. They include converged biological collapse, with zero
+equilibrium biomass and yield. Each summary row reports how many draws were
+used or excluded; inspect these counts and solver statuses before interpreting
+intervals. Draws are never replaced after an error.
+
+These intervals describe parameter uncertainty under a local normal
+approximation. They exclude future process and observation variation and do
+not sample conditional random effects. They are not prediction intervals.

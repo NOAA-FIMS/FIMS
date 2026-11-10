@@ -118,7 +118,8 @@ strictly between 0.2 and 1. Nonpositive recruitment equilibria are extinction.
 
 MSY uses a grid followed by golden-section refinement of candidate peaks,
 including plateaus, and both boundary-adjacent intervals. Check sensitivity
-to bounds and grid resolution for unusual fishing patterns. These post-fit calculations do not provide standard errors.
+to bounds and grid resolution for unusual fishing patterns. For approximate parameter uncertainty intervals, see
+\code{\link[=calculate_reference_points_uncertainty]{calculate_reference_points_uncertainty()}}.
 
 \code{get_reference_points()} refreshes the live model's derived quantities and
 copies the chosen year's biology. It uses the current internal double

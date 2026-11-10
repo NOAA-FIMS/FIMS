@@ -1,5 +1,7 @@
 # FIMS 0.11.0
 
+* *(reference_points)* Compare equilibrium benchmarks against all 100 stored operating-model iterations. Add `calculate_reference_points_uncertainty()` for correlated fixed-effect draws, percentile intervals, and draw diagnostics.
+
 ## Bug Fixes
 
 * *(reference_points)* Use stable mortality losses in per-recruit calculations and the live unfished recruitment baseline. Refine multiple MSY candidate peaks and plateaus while retaining boundary-adjacent searches.

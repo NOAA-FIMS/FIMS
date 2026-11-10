@@ -63,7 +63,8 @@
 #'
 #' MSY uses a grid followed by golden-section refinement of candidate peaks,
 #' including plateaus, and both boundary-adjacent intervals. Check sensitivity
-#' to bounds and grid resolution for unusual fishing patterns. These post-fit calculations do not provide standard errors.
+#' to bounds and grid resolution for unusual fishing patterns. For approximate parameter uncertainty intervals, see
+#' [calculate_reference_points_uncertainty()].
 #' @export
 #' @examples
 #' inputs <- list(
