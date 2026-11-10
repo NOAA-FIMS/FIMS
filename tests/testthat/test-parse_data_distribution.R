@@ -108,7 +108,7 @@ test_that("reused results remain independent within and across calls", {
   expect_identical(
     parse_data_distribution(rep(specification, 2)),
     parse_data_distribution(expression(
-      ~dnorm(mean = x, sd = 0.1), ~dnorm(mean = x, sd = 0.1)
+      ~ dnorm(mean = x, sd = 0.1), ~ dnorm(mean = x, sd = 0.1)
     ))
   )
 })
@@ -124,7 +124,8 @@ test_that("repeated scale expressions are evaluated for each observation", {
     "options(fims.parser.test.counter = n); if (n == 2L) -1 else 1})"
   )
   expect_error(parse_data_distribution(rep(specification, 3)),
-    "`sd` must be positive", fixed = TRUE
+    "`sd` must be positive",
+    fixed = TRUE
   )
   # The existing error message evaluates the invalid expression once more.
   expect_identical(getOption("fims.parser.test.counter"), 3L)
