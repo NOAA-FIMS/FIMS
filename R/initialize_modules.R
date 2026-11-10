@@ -161,10 +161,6 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
 
   if (module_class_name == "VonBertalanffyTraditionalGrowth") {
     optional_growth_fields <- c(
-      "reference_age_for_length_young",
-      "reference_age_for_length_old",
-      "length_at_age_sd_young",
-      "length_at_age_sd_old",
       "log_sd_asymptotic_length",
       "log_sd_growth_coefficient",
       "asymptotic_length_growth_coefficient_logit_corr"
@@ -259,12 +255,7 @@ initialize_growth <- function(parameters, data) {
       "length_at_age_sd_old"
     )
 
-    uses_interpolation_variability <-
-      identical(growth_type, "VonBertalanffySchnute") ||
-        (identical(growth_type, "VonBertalanffyTraditional") &&
-          any(interpolation_sd_labels %in% growth_input$label))
-
-    if (uses_interpolation_variability) {
+    if (identical(growth_type, "VonBertalanffySchnute")) {
       sd_rows <- growth_input |>
         dplyr::filter(.data$label %in% interpolation_sd_labels)
 

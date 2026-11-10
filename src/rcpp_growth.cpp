@@ -71,20 +71,10 @@ void register_growth(Rcpp::Module& m) {
              &VonBertalanffyTraditionalGrowthInterface::growth_coefficient)
       .field("age_at_zero_length",
              &VonBertalanffyTraditionalGrowthInterface::age_at_zero_length)
-      .field("reference_age_for_length_young",
-             &VonBertalanffyTraditionalGrowthInterface::
-                 reference_age_for_length_young)
-      .field("reference_age_for_length_old",
-             &VonBertalanffyTraditionalGrowthInterface::
-                 reference_age_for_length_old)
       .field("length_weight_a",
              &VonBertalanffyTraditionalGrowthInterface::length_weight_a)
       .field("length_weight_b",
              &VonBertalanffyTraditionalGrowthInterface::length_weight_b)
-      .field("length_at_age_sd_young",
-             &VonBertalanffyTraditionalGrowthInterface::length_at_age_sd_young)
-      .field("length_at_age_sd_old",
-             &VonBertalanffyTraditionalGrowthInterface::length_at_age_sd_old)
       .field("log_sd_asymptotic_length",
              &VonBertalanffyTraditionalGrowthInterface::
                  log_sd_asymptotic_length)
@@ -94,8 +84,6 @@ void register_growth(Rcpp::Module& m) {
       .field("asymptotic_length_growth_coefficient_logit_corr",
              &VonBertalanffyTraditionalGrowthInterface::
                  asymptotic_length_growth_coefficient_logit_corr)
-      .field("n_ages", &VonBertalanffyTraditionalGrowthInterface::n_ages)
-      .field("min_age", &VonBertalanffyTraditionalGrowthInterface::min_age)
       .method("get_id", &VonBertalanffyTraditionalGrowthInterface::get_id)
       .method("evaluate", &VonBertalanffyTraditionalGrowthInterface::evaluate)
       .method("to_json", &VonBertalanffyTraditionalGrowthInterface::to_json)

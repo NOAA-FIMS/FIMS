@@ -967,38 +967,22 @@ class VonBertalanffyTraditionalGrowthInterface
   VariableVector growth_coefficient;
   /** @brief Theoretical age at length zero, t0, on the natural age scale. */
   VariableVector age_at_zero_length;
-  /** @brief First reference age for interpolation-based variability. */
-  VariableVector reference_age_for_length_young;
-  /** @brief Second reference age for interpolation-based variability. */
-  VariableVector reference_age_for_length_old;
   /** @brief Coefficient in the length-weight relationship, W = a * L^b. */
   VariableVector length_weight_a;
   /** @brief Exponent in the length-weight relationship, W = a * L^b. */
   VariableVector length_weight_b;
-  /** @brief Natural-scale length-at-age SD at the younger reference age. */
-  VariableVector length_at_age_sd_young;
-  /** @brief Natural-scale length-at-age SD at the older reference age. */
-  VariableVector length_at_age_sd_old;
   /** @brief Working-scale log-SD for log(asymptotic_length). */
   VariableVector log_sd_asymptotic_length;
   /** @brief Working-scale log-SD for log(growth_coefficient). */
   VariableVector log_sd_growth_coefficient;
   /** @brief Logit correlation for log(Linf) and log(K). */
   VariableVector asymptotic_length_growth_coefficient_logit_corr;
-  /** @brief Modeled number of ages used for validation. */
-  SharedInt n_ages = 0;
-  /** @brief Youngest population age; -1 indicates it has not been supplied. */
-  SharedInt min_age = -1;
 
   /**
    * @brief Construct a new traditional Von Bertalanffy growth interface.
    */
   VonBertalanffyTraditionalGrowthInterface()
       : GrowthDerivedObservationInterfaceBase() {
-    this->reference_age_for_length_young.resize(0);
-    this->reference_age_for_length_old.resize(0);
-    this->length_at_age_sd_young.resize(0);
-    this->length_at_age_sd_old.resize(0);
     this->log_sd_asymptotic_length.resize(0);
     this->log_sd_growth_coefficient.resize(0);
     this->asymptotic_length_growth_coefficient_logit_corr.resize(0);
@@ -1019,18 +1003,12 @@ class VonBertalanffyTraditionalGrowthInterface
         asymptotic_length(other.asymptotic_length),
         growth_coefficient(other.growth_coefficient),
         age_at_zero_length(other.age_at_zero_length),
-        reference_age_for_length_young(other.reference_age_for_length_young),
-        reference_age_for_length_old(other.reference_age_for_length_old),
         length_weight_a(other.length_weight_a),
         length_weight_b(other.length_weight_b),
-        length_at_age_sd_young(other.length_at_age_sd_young),
-        length_at_age_sd_old(other.length_at_age_sd_old),
         log_sd_asymptotic_length(other.log_sd_asymptotic_length),
         log_sd_growth_coefficient(other.log_sd_growth_coefficient),
         asymptotic_length_growth_coefficient_logit_corr(
-            other.asymptotic_length_growth_coefficient_logit_corr),
-        n_ages(other.n_ages),
-        min_age(other.min_age) {}
+            other.asymptotic_length_growth_coefficient_logit_corr) {}
 
   virtual ~VonBertalanffyTraditionalGrowthInterface() {}
 
@@ -1066,30 +1044,12 @@ class VonBertalanffyTraditionalGrowthInterface
                             vb->AsymptoticLengthVector(), true);
     SetFinalParameterValues(this->growth_coefficient,
                             vb->GrowthCoefficientVector(), true);
-    if (this->age_at_zero_length[0].estimation_type_m.get() == "constant") {
-      this->age_at_zero_length[0].final_value_m =
-          this->age_at_zero_length[0].initial_value_m;
-    } else {
-      this->age_at_zero_length[0].final_value_m = vb->GetAgeAtZeroLength();
-    }
+    this->age_at_zero_length[0].final_value_m =
+        this->age_at_zero_length[0].initial_value_m;
     SetFinalParameterValues(this->length_weight_a,
                             vb->LengthWeightAVector(), true);
     SetFinalParameterValues(this->length_weight_b,
                             vb->LengthWeightBVector(), true);
-
-    const bool has_interpolation_variability =
-        this->length_at_age_sd_young.size() > 0 ||
-        this->length_at_age_sd_old.size() > 0;
-    if (has_interpolation_variability) {
-      SetFinalParameterValues(this->reference_age_for_length_young,
-                              vb->ReferenceAgeForLengthYoungVector(), false);
-      SetFinalParameterValues(this->reference_age_for_length_old,
-                              vb->ReferenceAgeForLengthOldVector(), false);
-      SetFinalParameterValues(this->length_at_age_sd_young,
-                              vb->LengthAtAgeSdYoungVector(), true);
-      SetFinalParameterValues(this->length_at_age_sd_old,
-                              vb->LengthAtAgeSdOldVector(), true);
-    }
 
     const bool has_delta_method_variability =
         this->log_sd_asymptotic_length.size() > 0 &&
@@ -1160,14 +1120,6 @@ class VonBertalanffyTraditionalGrowthInterface
     append_parameter("length_weight_a", this->length_weight_a);
     append_parameter("length_weight_b", this->length_weight_b);
 
-    append_optional_parameter("reference_age_for_length_young",
-                              this->reference_age_for_length_young);
-    append_optional_parameter("reference_age_for_length_old",
-                              this->reference_age_for_length_old);
-    append_optional_parameter("length_at_age_sd_young",
-                              this->length_at_age_sd_young);
-    append_optional_parameter("length_at_age_sd_old",
-                              this->length_at_age_sd_old);
     append_optional_parameter("log_sd_asymptotic_length",
                               this->log_sd_asymptotic_length);
     append_optional_parameter("log_sd_growth_coefficient",
@@ -1196,80 +1148,13 @@ class VonBertalanffyTraditionalGrowthInterface
 
     ValidateVonBertalanffyTraditionalGrowthInputs(true);
 
-    if (this->age_at_zero_length.size() != 1) {
-      Rcpp::stop(
-          "VonBertalanffyTraditionalGrowth requires exactly one "
-          "age_at_zero_length value");
-    }
-
-    const std::string t0_estimation_type =
-        this->age_at_zero_length[0].estimation_type_m.get();
-    const bool transform_t0 =
-        t0_estimation_type == "fixed_effects" ||
-        t0_estimation_type == "random_effects";
-
-    double initial_t0_log_distance = 0.0;
-    if (transform_t0) {
-      if (this->min_age.get() < 0) {
-        Rcpp::stop(
-            "min_age must be supplied and nonnegative when estimating "
-            "age_at_zero_length");
-      }
-
-      const double reference_age_young =
-          this->reference_age_for_length_young[0].initial_value_m;
-      const double reference_age_old =
-          this->reference_age_for_length_old[0].initial_value_m;
-
-      if (reference_age_old <= reference_age_young) {
-        Rcpp::stop(
-            "Older interpolation reference age %.17g must be greater "
-            "than younger interpolation reference age %.17g.",
-            reference_age_old, reference_age_young);
-      }
-
-      const double population_minimum_age =
-          static_cast<double>(this->min_age.get());
-      const double minimum_required_age =
-          reference_age_young < population_minimum_age
-              ? reference_age_young
-              : population_minimum_age;
-      const double initial_t0 =
-          this->age_at_zero_length[0].initial_value_m;
-
-      if (initial_t0 >= minimum_required_age) {
-        Rcpp::stop(
-            "Initial age_at_zero_length (t0) is %.17g. When estimating t0, "
-            "its initial value must be strictly less than %.17g.\n"
-            "Population minimum age: %.17g.\n"
-            "Younger interpolation reference age: %.17g.",
-            initial_t0, minimum_required_age,
-            population_minimum_age, reference_age_young);
-      }
-
-      const double distance = minimum_required_age - initial_t0;
-      if (!std::isfinite(distance)) {
-        Rcpp::stop(
-            "Cannot configure estimated age_at_zero_length (t0): subtracting "
-            "initial t0 %.17g from the youngest required growth age %.17g "
-            "produced a nonfinite value.",
-            initial_t0, minimum_required_age);
-      }
-
-      initial_t0_log_distance = std::log(distance);
-      vb->UseLogDistanceAgeAtZeroLength(minimum_required_age);
-    }
-
     std::stringstream ss;
     auto load_and_register = [&](VariableVector& pv, fims::Vector<Type>& target,
-                                 const std::string& base_name, bool log_scale,
-                                 bool log_distance_scale = false) {
+                                 const std::string& base_name, bool log_scale) {
       target.resize(pv.size());
       for (size_t i = 0; i < pv.size(); i++) {
         double v = pv[i].initial_value_m;
-        if (log_distance_scale) {
-          v = initial_t0_log_distance;
-        } else if (log_scale) {
+        if (log_scale) {
           if (v <= 0.0) {
             Rcpp::stop((base_name + " must be > 0").c_str());
           }
@@ -1292,47 +1177,23 @@ class VonBertalanffyTraditionalGrowthInterface
       info->variable_map[pv.id_m] = &target;
     };
 
-    auto load_optional_and_register =
-        [&](VariableVector& pv, fims::Vector<Type>& target,
-            const std::string& base_name, bool log_scale) {
-          if (pv.size() == 0) {
-            target.resize(0);
-            return;
-          }
-          load_and_register(pv, target, base_name, log_scale);
-        };
-
     load_and_register(this->asymptotic_length, vb->AsymptoticLengthVector(),
                       "asymptotic_length", true);
     load_and_register(this->growth_coefficient, vb->GrowthCoefficientVector(),
                       "growth_coefficient", true);
     load_and_register(this->age_at_zero_length, vb->AgeAtZeroLengthVector(),
-                      "age_at_zero_length", false, transform_t0);
+                      "age_at_zero_length", false);
     load_and_register(this->length_weight_a, vb->LengthWeightAVector(),
                       "length_weight_a", true);
     load_and_register(this->length_weight_b, vb->LengthWeightBVector(),
                       "length_weight_b", true);
-
-    load_optional_and_register(this->reference_age_for_length_young,
-                               vb->ReferenceAgeForLengthYoungVector(),
-                               "reference_age_for_length_young", false);
-    load_optional_and_register(this->reference_age_for_length_old,
-                               vb->ReferenceAgeForLengthOldVector(),
-                               "reference_age_for_length_old", false);
-    load_optional_and_register(this->length_at_age_sd_young,
-                               vb->LengthAtAgeSdYoungVector(),
-                               "length_at_age_sd_young", true);
-    load_optional_and_register(this->length_at_age_sd_old,
-                               vb->LengthAtAgeSdOldVector(),
-                               "length_at_age_sd_old", true);
-
-    load_optional_and_register(this->log_sd_asymptotic_length,
-                               vb->LogSdAsymptoticLengthVector(),
-                               "log_sd_asymptotic_length", false);
-    load_optional_and_register(this->log_sd_growth_coefficient,
-                               vb->LogSdGrowthCoefficientVector(),
-                               "log_sd_growth_coefficient", false);
-    load_optional_and_register(
+    load_and_register(this->log_sd_asymptotic_length,
+                      vb->LogSdAsymptoticLengthVector(),
+                      "log_sd_asymptotic_length", false);
+    load_and_register(this->log_sd_growth_coefficient,
+                      vb->LogSdGrowthCoefficientVector(),
+                      "log_sd_growth_coefficient", false);
+    load_and_register(
         this->asymptotic_length_growth_coefficient_logit_corr,
         vb->LogitCorrAsymptoticLengthGrowthCoefficientVector(),
         "asymptotic_length_growth_coefficient_logit_corr", false);
@@ -1358,17 +1219,25 @@ class VonBertalanffyTraditionalGrowthInterface
       Rcpp::stop("VonBertalanffyTraditionalGrowth parameters not set");
     }
 
-    for (size_t i = 0; i < this->age_at_zero_length.size(); i++) {
-      if (!std::isfinite(this->age_at_zero_length[i].initial_value_m)) {
-        Rcpp::stop(
-            "Initial age_at_zero_length (t0) is %.17g. "
-            "Supply a finite numeric value.",
-            this->age_at_zero_length[i].initial_value_m);
-      }
+    if (this->age_at_zero_length.size() != 1) {
+      Rcpp::stop(
+          "VonBertalanffyTraditionalGrowth requires exactly one "
+          "age_at_zero_length value");
     }
 
-    const bool has_sd = this->length_at_age_sd_young.size() > 0 ||
-                        this->length_at_age_sd_old.size() > 0;
+    if (!std::isfinite(this->age_at_zero_length[0].initial_value_m)) {
+      Rcpp::stop(
+          "Initial age_at_zero_length (t0) is %.17g. "
+          "Supply a finite numeric value.",
+          this->age_at_zero_length[0].initial_value_m);
+    }
+
+    if (this->age_at_zero_length[0].estimation_type_m.get() != "constant") {
+      Rcpp::stop(
+          "VonBertalanffyTraditionalGrowth delta-method variability requires "
+          "age_at_zero_length to have estimation_type 'constant'");
+    }
+
     const bool has_any_delta =
         this->log_sd_asymptotic_length.size() > 0 ||
         this->log_sd_growth_coefficient.size() > 0 ||
@@ -1378,79 +1247,10 @@ class VonBertalanffyTraditionalGrowthInterface
         this->log_sd_growth_coefficient.size() > 0 &&
         this->asymptotic_length_growth_coefficient_logit_corr.size() > 0;
 
-    if (require_variability && !has_sd && !has_any_delta) {
-      Rcpp::stop(
-          "VonBertalanffyTraditionalGrowth requires either "
-          "both length_at_age_sd_young and length_at_age_sd_old, "
-          "or traditional delta-method growth variability inputs");
-    }
-
-    if (has_any_delta && !has_delta) {
+    if ((require_variability || has_any_delta) && !has_delta) {
       Rcpp::stop(
           "VonBertalanffyTraditionalGrowth requires all three traditional "
-          "delta-method variability inputs when using that path");
-    }
-
-    if (has_sd && has_any_delta) {
-      Rcpp::stop(
-          "VonBertalanffyTraditionalGrowth requires variability inputs for "
-          "exactly one supported path. Supply either "
-          "both length_at_age_sd_young and length_at_age_sd_old, "
-          "or the full traditional delta-method variability inputs, "
-          "but not both");
-    }
-
-    if (has_sd && (this->length_at_age_sd_young.size() != 1 ||
-                   this->length_at_age_sd_old.size() != 1)) {
-      Rcpp::stop(
-          "Interpolation requires exactly one length_at_age_sd_young value "
-          "and one length_at_age_sd_old value");
-    }
-
-    if (has_sd && (this->reference_age_for_length_young.size() < 1 ||
-                   this->reference_age_for_length_old.size() < 1)) {
-      Rcpp::stop(
-          "VonBertalanffyTraditionalGrowth interpolation variability requires "
-          "reference_age_for_length_young and reference_age_for_length_old");
-    }
-
-    if (has_sd && (this->reference_age_for_length_young.size() != 1 ||
-                   this->reference_age_for_length_old.size() != 1)) {
-      Rcpp::stop(
-          "VonBertalanffyTraditionalGrowth currently supports a single "
-          "interpolation variability parameter set; expected size 1 for each "
-          "reference-age input");
-    }
-
-
-    if (has_sd) {
-      const double reference_age_young =
-          this->reference_age_for_length_young[0].initial_value_m;
-      const double reference_age_old =
-          this->reference_age_for_length_old[0].initial_value_m;
-
-      if (!std::isfinite(reference_age_young)) {
-        Rcpp::stop(
-            "reference_age_for_length_young is %.17g. "
-            "Supply a finite numeric value.",
-            reference_age_young);
-      }
-
-      if (!std::isfinite(reference_age_old)) {
-        Rcpp::stop(
-            "reference_age_for_length_old is %.17g. "
-            "Supply a finite numeric value.",
-            reference_age_old);
-      }
-    }
-    if (has_sd &&
-        (this->reference_age_for_length_young[0].estimation_type_m.get() !=
-             "constant" ||
-         this->reference_age_for_length_old[0].estimation_type_m.get() !=
-             "constant")) {
-      Rcpp::stop(
-          "VonBertalanffyTraditionalGrowth interpolation variability requires "
-          "both reference ages to have estimation_type 'constant'");
+          "delta-method variability inputs");
     }
 
     if (has_delta &&
@@ -1461,13 +1261,6 @@ class VonBertalanffyTraditionalGrowthInterface
           "VonBertalanffyTraditionalGrowth currently supports a single "
           "traditional delta-method variability parameter set; expected size 1 "
           "for each variability input");
-    }
-
-    if (has_delta &&
-        this->age_at_zero_length[0].estimation_type_m.get() != "constant") {
-      Rcpp::stop(
-          "VonBertalanffyTraditionalGrowth delta-method variability requires "
-          "age_at_zero_length to have estimation_type 'constant'");
     }
 
     auto check_positive = [](VariableVector& pv, const std::string& base_name) {
@@ -1485,11 +1278,6 @@ class VonBertalanffyTraditionalGrowthInterface
     check_positive(this->growth_coefficient, "growth_coefficient");
     check_positive(this->length_weight_a, "length_weight_a");
     check_positive(this->length_weight_b, "length_weight_b");
-
-    if (has_sd) {
-      check_positive(this->length_at_age_sd_young, "length_at_age_sd_young");
-      check_positive(this->length_at_age_sd_old, "length_at_age_sd_old");
-    }
   }
 };
 

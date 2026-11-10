@@ -79,35 +79,6 @@ test_that("`setup_default_Growth()` supports traditional von Bertalanffy delta-m
   clear()
 })
 
-test_that("`setup_default_Growth()` supports traditional von Bertalanffy interpolation defaults", {
-  fims_frame <- FIMS::FIMSFrame(data_big)
-
-  result <- setup_default_Growth(
-    data = fims_frame,
-    module_type = "VonBertalanffyTraditional",
-    variability_type = "linear_interpolation"
-  )
-
-  #' @description Test that traditional Von Bertalanffy can use interpolation variability defaults.
-  expect_s3_class(result, "tbl_df")
-  expect_equal(nrow(result), 9)
-  expect_equal(unique(result[["module_name"]]), "Growth")
-  expect_equal(unique(result[["module_type"]]), "VonBertalanffyTraditional")
-  expect_true("reference_age_for_length_young" %in% result[["label"]])
-  expect_true("reference_age_for_length_old" %in% result[["label"]])
-
-  sd_labels <- c("length_at_age_sd_young", "length_at_age_sd_old")
-  sd_rows <- result |>
-    dplyr::filter(.data[["label"]] %in% sd_labels)
-
-  expect_equal(nrow(sd_rows), 2)
-  expect_setequal(sd_rows[["label"]], sd_labels)
-  expect_true(all(is.na(sd_rows[["age"]])))
-  expect_false(any(is.na(sd_rows[["value"]])))
-
-  clear()
-})
-
 ## Edge handling ----
 # Please remove/comment out the test template below if no edge cases are being tested.
 # No edge cases to test.
@@ -118,40 +89,6 @@ test_that("`setup_default_Growth()` returns correct error messages", {
   expect_error(
     object = setup_default_Growth(module_type = "invalid"),
     regexp = "not \"invalid\""
-  )
-
-  #' @description Test that unsupported variability_type returns expected error.
-  expect_error(
-    object = setup_default_Growth(
-      module_type = "VonBertalanffyTraditional",
-      variability_type = "invalid"
-    ),
-    regexp = "not \"invalid\""
-  )
-
-  clear()
-})
-
-test_that("`setup_default_Growth()` rejects unsupported growth variability configurations", {
-  fims_frame <- FIMS::FIMSFrame(data_big)
-
-  #' @description Test that Schnute growth rejects delta-method variability defaults.
-  expect_error(
-    setup_default_Growth(
-      data = fims_frame,
-      module_type = "VonBertalanffySchnute",
-      variability_type = "delta_method"
-    ),
-    regexp = "supports linear interpolation variability only"
-  )
-
-  #' @description Test that traditional interpolation defaults require data.
-  expect_error(
-    setup_default_Growth(
-      module_type = "VonBertalanffyTraditional",
-      variability_type = "linear_interpolation"
-    ),
-    regexp = "requires .*data"
   )
 
   clear()

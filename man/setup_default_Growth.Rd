@@ -6,26 +6,15 @@
 \usage{
 setup_default_Growth(
   data = NULL,
-  module_type = c("EWAA", "VonBertalanffySchnute", "VonBertalanffyTraditional"),
-  variability_type = NULL
+  module_type = c("EWAA", "VonBertalanffySchnute", "VonBertalanffyTraditional")
 )
 }
 \arguments{
 \item{data}{A \code{FIMSFrame} object returned from running \code{\link[=FIMSFrame]{FIMSFrame()}} on
-your long input data. Required when \code{module_type = "VonBertalanffySchnute"}
-or when \code{module_type = "VonBertalanffyTraditional"} and
-\code{variability_type = "linear_interpolation"}.}
+your long input data. Required when \code{module_type = "VonBertalanffySchnute"}.}
 
 \item{module_type}{A character string specifying the type of growth module.
 The default is \code{"EWAA"}.}
-
-\item{variability_type}{A character string specifying the variability
-parameterization for growth-derived length-at-age products. Traditional
-Von Bertalanffy growth defaults to \code{"delta_method"} and also supports
-\code{"linear_interpolation"}. Schnute growth supports
-\code{"linear_interpolation"} only. Linear interpolation specifies length SD
-at two reference ages and interpolates SD in mean-length space, not age
-space. This argument is ignored for \code{"EWAA"}.}
 }
 \value{
 A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
@@ -37,26 +26,16 @@ Modeling System (FIMS) model. It generates a tibble with fields for
 module name, module type, label, value, and estimation type.
 }
 \details{
-Traditional growth uses the same age units as the model for
-\code{age_at_zero_length} (\code{t0}) inputs and finalized estimates.
-Delta-method variability requires \code{t0} to have estimation type
-\code{"constant"} and describes between-fish variability in \code{log(Linf)}
-and \code{log(K)}, including their covariance.
+Schnute growth uses linear interpolation of length SD between two reference
+ages. SD is interpolated in mean-length space, not age space.
 
-With linear interpolation variability, \code{t0} may be constant or estimated.
-Both interpolation reference ages must be constant. Estimated \code{t0}
-is stored internally as \code{log(age_limit - t0)}, where \code{age_limit} is
-the smaller of the population minimum age and the younger interpolation
-reference age. The initial \code{t0} must be strictly below this limit.
-
-A normal prior linked to fixed-effect \code{t0}, or a normal distribution
-linked to random-effect \code{t0}, acts on \code{log(age_limit - t0)}. Its mean
-and standard deviation must be specified on this log-distance scale,
-not the natural age scale.
-For example, when \code{age_limit = 1}, an initial \code{t0 = -0.5} is stored
-as \code{log(1.5)}. This conversion does not determine the distribution's
-mean. The linked distribution does not represent between-fish
-variability in \code{t0}.
+Traditional growth uses delta-method variability in \code{log(Linf)} and
+\code{log(K)}, including their covariance. These inputs describe between-fish
+variability, not uncertainty in the estimated mean growth curve.
+The \code{age_at_zero_length} (\code{t0}) parameter must have estimation type
+\code{"constant"} and uses the same age units as the model. Every age at which
+Traditional growth is evaluated must be strictly greater than \code{t0},
+including the population minimum age. This ensures positive mean length.
 }
 \examples{
 \dontrun{

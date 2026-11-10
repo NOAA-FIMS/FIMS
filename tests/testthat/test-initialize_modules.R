@@ -361,7 +361,7 @@ test_that("`initialize_growth()` rejects malformed named SD inputs", {
   }
 })
 
-test_that("`initialize_growth()` supports traditional von Bertalanffy variability paths", {
+test_that("`initialize_growth()` supports traditional von Bertalanffy delta-method defaults", {
   traditional_delta <- setup_default_Growth(
     module_type = "VonBertalanffyTraditional"
   )
@@ -376,53 +376,6 @@ test_that("`initialize_growth()` supports traditional von Bertalanffy variabilit
   expect_true(traditional_delta_growth$add_to_fims_tmb())
 
   clear()
-
-  traditional_interpolation <- setup_default_Growth(
-    data = data,
-    module_type = "VonBertalanffyTraditional",
-    variability_type = "linear_interpolation"
-  )
-
-  traditional_interpolation_growth <- initialize_growth(
-    parameters = traditional_interpolation,
-    data = data
-  )
-
-  #' @description Test that `initialize_growth()` supports traditional Von Bertalanffy interpolation defaults.
-  expect_type(traditional_interpolation_growth, "S4")
-  expect_true(traditional_interpolation_growth$add_to_fims_tmb())
-
-  clear()
-})
-
-test_that("`initialize_growth()` receives the youngest population age", {
-  #' @description Test that traditional Growth receives population minimum ages
-  #' of zero and one for both supported variability methods.
-  for (minimum_age in c(0, 1)) {
-    shifted_data <- data_big |>
-      dplyr::mutate(
-        age = .data$age - min(get_ages(data)) + minimum_age
-      )
-
-    growth_data <- FIMSFrame(shifted_data)
-    expect_equal(min(get_ages(growth_data)), minimum_age)
-
-    for (variability_type in c("delta_method", "linear_interpolation")) {
-      parameters <- setup_default_Growth(
-        data = growth_data,
-        module_type = "VonBertalanffyTraditional",
-        variability_type = variability_type
-      )
-
-      growth <- initialize_growth(
-        parameters = parameters,
-        data = growth_data
-      )
-
-      expect_equal(growth$min_age$get(), minimum_age)
-      clear()
-    }
-  }
 })
 
 # test_initialize_maturity ----

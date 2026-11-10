@@ -49,18 +49,18 @@ struct VonBertalanffyTraditionalGrowth : public GrowthBase<Type> {
    * @brief Evaluate mean length at age.
    * @param age Age on the natural scale.
    * @return Mean length at the requested age
-   * @throws std::runtime_error If age is below age_at_zero_length.
+   * @throws std::runtime_error If age is at or below age_at_zero_length.
    */
   Type length_at_age(const Type& age) const {
-    if (age < age_at_zero_length) {
+    if (age <= age_at_zero_length) {
       std::ostringstream message;
       message << std::setprecision(17)
               << "Cannot calculate Traditional Von Bertalanffy growth at age "
               << fims_math::Value(age)
               << ": age_at_zero_length (t0) is "
               << fims_math::Value(age_at_zero_length)
-              << ". This equation predicts negative length when the "
-                 "evaluation age is below t0.";
+              << ". The evaluation age must be strictly greater than t0 "
+                 "to give positive mean length.";
       throw std::runtime_error(message.str());
     }
 
@@ -71,21 +71,18 @@ struct VonBertalanffyTraditionalGrowth : public GrowthBase<Type> {
   }
 
   /**
-   * @brief Gradient of natural mean length with respect to log(Linf), log(K),
-   * and natural-scale t0.
+   * @brief Gradient of natural mean length with respect to log(Linf) and
+   * log(K), holding t0 constant.
    * @param age Age on the natural scale.
    * @param d_laa_d_log_asymptotic_length Output derivative with respect to
    * log(asymptotic_length).
    * @param d_laa_d_log_growth_coefficient Output derivative with respect to
    * log(growth_coefficient).
-   * @param d_laa_d_age_at_zero_length Output derivative with respect to
-   * age_at_zero_length.
-   * @throws std::runtime_error If age is below age_at_zero_length.
+   * @throws std::runtime_error If age is at or below age_at_zero_length.
    */
   void length_at_age_working_scale_gradient(
       const Type& age, Type& d_laa_d_log_asymptotic_length,
-      Type& d_laa_d_log_growth_coefficient,
-      Type& d_laa_d_age_at_zero_length) const {
+      Type& d_laa_d_log_growth_coefficient) const {
     d_laa_d_log_asymptotic_length = length_at_age(age);
 
     const Type scaled_age =
@@ -94,8 +91,6 @@ struct VonBertalanffyTraditionalGrowth : public GrowthBase<Type> {
 
     d_laa_d_log_growth_coefficient =
         asymptotic_length * scaled_age * survival_like;
-    d_laa_d_age_at_zero_length =
-        -asymptotic_length * growth_coefficient * survival_like;
   }
 
   /**

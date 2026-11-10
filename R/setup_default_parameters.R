@@ -334,39 +334,20 @@ choose_default_Growth_module_type <- function(data) {
 #' Modeling System (FIMS) model. It generates a tibble with fields for
 #' module name, module type, label, value, and estimation type.
 #' @param data A `FIMSFrame` object returned from running [FIMSFrame()] on
-#'   your long input data. Required when `module_type = "VonBertalanffySchnute"`
-#'   or when `module_type = "VonBertalanffyTraditional"` and
-#'   `variability_type = "linear_interpolation"`.
+#'   your long input data. Required when `module_type = "VonBertalanffySchnute"`.
 #' @param module_type A character string specifying the type of growth module.
 #'   The default is `"EWAA"`.
-#' @param variability_type A character string specifying the variability
-#'   parameterization for growth-derived length-at-age products. Traditional
-#'   Von Bertalanffy growth defaults to `"delta_method"` and also supports
-#'   `"linear_interpolation"`. Schnute growth supports
-#'   `"linear_interpolation"` only. Linear interpolation specifies length SD
-#'   at two reference ages and interpolates SD in mean-length space, not age
-#'   space. This argument is ignored for `"EWAA"`.
 #' @details
-#' Traditional growth uses the same age units as the model for
-#' `age_at_zero_length` (`t0`) inputs and finalized estimates.
-#' Delta-method variability requires `t0` to have estimation type
-#' `"constant"` and describes between-fish variability in `log(Linf)`
-#' and `log(K)`, including their covariance.
+#' Schnute growth uses linear interpolation of length SD between two reference
+#' ages. SD is interpolated in mean-length space, not age space.
 #'
-#' With linear interpolation variability, `t0` may be constant or estimated.
-#' Both interpolation reference ages must be constant. Estimated `t0`
-#' is stored internally as `log(age_limit - t0)`, where `age_limit` is
-#' the smaller of the population minimum age and the younger interpolation
-#' reference age. The initial `t0` must be strictly below this limit.
-#'
-#' A normal prior linked to fixed-effect `t0`, or a normal distribution
-#' linked to random-effect `t0`, acts on `log(age_limit - t0)`. Its mean
-#' and standard deviation must be specified on this log-distance scale,
-#' not the natural age scale.
-#' For example, when `age_limit = 1`, an initial `t0 = -0.5` is stored
-#' as `log(1.5)`. This conversion does not determine the distribution's
-#' mean. The linked distribution does not represent between-fish
-#' variability in `t0`.
+#' Traditional growth uses delta-method variability in `log(Linf)` and
+#' `log(K)`, including their covariance. These inputs describe between-fish
+#' variability, not uncertainty in the estimated mean growth curve.
+#' The `age_at_zero_length` (`t0`) parameter must have estimation type
+#' `"constant"` and uses the same age units as the model. Every age at which
+#' Traditional growth is evaluated must be strictly greater than `t0`,
+#' including the population minimum age. This ensures positive mean length.
 #' @return
 #' A tibble containing default growth parameters. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
@@ -381,18 +362,10 @@ choose_default_Growth_module_type <- function(data) {
 #' }
 setup_default_Growth <- function(
   data = NULL,
-  module_type = c("EWAA", "VonBertalanffySchnute", "VonBertalanffyTraditional"),
-  variability_type = NULL
+  module_type = c("EWAA", "VonBertalanffySchnute", "VonBertalanffyTraditional")
 ) {
   # Input check
   module_type <- rlang::arg_match(module_type)
-
-  if (!is.null(variability_type)) {
-    variability_type <- rlang::arg_match(
-      variability_type,
-      c("delta_method", "linear_interpolation")
-    )
-  }
 
   if (identical(module_type, "EWAA")) {
     if (!is.null(data)) {
@@ -426,29 +399,13 @@ setup_default_Growth <- function(
   }
 
   if (identical(module_type, "VonBertalanffySchnute")) {
-    if (!is.null(variability_type) &&
-      !identical(variability_type, "linear_interpolation")) {
-      cli::cli_abort(c(
-        "VonBertalanffySchnute growth supports linear interpolation variability only.",
-        "i" = "Use {.code variability_type = \"linear_interpolation\"} or omit {.var variability_type}."
-      ))
-    }
-
     if (is.null(data)) {
       cli::cli_abort(c(
-        "{.fn setup_default_Growth} requires {.var data} when {.code module_type = \"VonBertalanffySchnute\"}.",
-        "i" = "VonBertalanffySchnute defaults use the model ages to choose reference ages."
+        "{.fn setup_default_Growth} requires {.var data} to create Schnute growth defaults.",
+        "i" = "Model ages determine the default reference ages. You can change these values before initialization."
       ))
     }
-  } else if (identical(variability_type, "linear_interpolation") && is.null(data)) {
-    cli::cli_abort(c(
-      "{.fn setup_default_Growth} requires {.var data} when using traditional Von Bertalanffy linear interpolation variability.",
-      "i" = "Linear interpolation defaults use the model ages to choose reference ages."
-    ))
-  }
 
-  if (identical(module_type, "VonBertalanffySchnute") ||
-    identical(variability_type, "linear_interpolation")) {
     is.FIMSFrame(data)
 
     ages <- get_ages(data)
@@ -507,54 +464,6 @@ setup_default_Growth <- function(
   }
 
   if (identical(module_type, "VonBertalanffyTraditional")) {
-    if (is.null(variability_type)) {
-      variability_type <- "delta_method"
-    }
-
-    if (identical(variability_type, "linear_interpolation")) {
-      default <- setup_default_parameters_template(n_parameters = 9) |>
-        dplyr::mutate(
-          module_name = "Growth",
-          module_type = "VonBertalanffyTraditional",
-          label = c(
-            "asymptotic_length",
-            "growth_coefficient",
-            "age_at_zero_length",
-            "length_weight_a",
-            "length_weight_b",
-            "reference_age_for_length_young",
-            "reference_age_for_length_old",
-            "length_at_age_sd_young",
-            "length_at_age_sd_old"
-          ),
-          age = NA_real_,
-          value = c(
-            725,
-            0.18,
-            -0.5,
-            2.5e-11,
-            3,
-            reference_age_for_length_young,
-            reference_age_for_length_old,
-            28,
-            73
-          ),
-          estimation_type = c(
-            "fixed_effects",
-            "fixed_effects",
-            "fixed_effects",
-            "constant",
-            "constant",
-            "constant",
-            "constant",
-            "constant",
-            "constant"
-          )
-        )
-
-      return(default)
-    }
-
     default <- setup_default_parameters_template(n_parameters = 8) |>
       dplyr::mutate(
         module_name = "Growth",

@@ -80,51 +80,13 @@ TEST(GrowthModel, CanConstructAndPrepare) {
   EXPECT_NEAR(W5, 2.5e-11 * std::pow(expected_length_at_age_5, 3.0), 1e-8);
 }
 
-TEST(GrowthModel,
-     TraditionalVonBertalanffyUsesSharedInterpolationProducts) {
+TEST(GrowthModel, TraditionalRequiresCovarianceInputs) {
   fims_popdy::GrowthModel<double> gm(1, 5, 1);
-
-  const double asymptotic_length = 100.0;
-  const double growth_coefficient = 0.2;
-  const double age_at_zero_length = -0.5;
-
-  gm.SetVonBertalanffyTraditionalParameters(
-      asymptotic_length, growth_coefficient, age_at_zero_length);
+  gm.SetVonBertalanffyTraditionalParameters(100.0, 0.2, -0.5);
   gm.SetLengthWeightParameters(1.0e-5, 3.0);
-  gm.SetLengthSdReferenceAges(1.0, 5.0);
-  gm.SetLengthSdParams(10.0, 20.0);
   gm.SetAgeOffset(1.0);
 
-  gm.Prepare();
-
-  const auto& p = gm.GetProducts();
-
-  const auto expected_length = [&](double age) {
-    return asymptotic_length *
-           (1.0 -
-            std::exp(-growth_coefficient * (age - age_at_zero_length)));
-  };
-
-  const double expected_length_age_1 = expected_length(1.0);
-  const double expected_length_age_3 = expected_length(3.0);
-  const double expected_length_age_5 = expected_length(5.0);
-
-  EXPECT_NEAR(p.MeanLAA(0, 0, 0), expected_length_age_1, 1e-8);
-  EXPECT_NEAR(p.MeanLAA(0, 2, 0), expected_length_age_3, 1e-8);
-  EXPECT_NEAR(p.MeanLAA(0, 4, 0), expected_length_age_5, 1e-8);
-
-  const double expected_sd_age_3 =
-      10.0 + (20.0 - 10.0) *
-                 (expected_length_age_3 - expected_length_age_1) /
-                 (expected_length_age_5 - expected_length_age_1);
-
-  EXPECT_NEAR(p.SdLAA(0, 0, 0), fims_math::ad_max(10.0, 1e-8), 1e-7);
-  EXPECT_NEAR(p.SdLAA(0, 2, 0), fims_math::ad_max(expected_sd_age_3, 1e-8),
-              1e-7);
-  EXPECT_NEAR(p.SdLAA(0, 4, 0), fims_math::ad_max(20.0, 1e-8), 1e-7);
-
-  EXPECT_NEAR(p.MeanWAA(0, 2, 0),
-              1.0e-5 * std::pow(expected_length_age_3, 3.0), 1e-8);
+  EXPECT_THROW(gm.Prepare(), std::runtime_error);
 }
 
 TEST(GrowthModel, RejectsNonFiniteTraditionalCovarianceInputs) {
@@ -133,11 +95,10 @@ TEST(GrowthModel, RejectsNonFiniteTraditionalCovarianceInputs) {
       std::numeric_limits<double>::infinity(),
       -std::numeric_limits<double>::infinity()};
 
-  for (int index = 0; index < 6; ++index) {
+  for (int index = 0; index < 3; ++index) {
     for (const double invalid_value : invalid_values) {
       fims_popdy::GrowthModel<double> gm(1, 5, 1);
-      double covariance_inputs[] = {
-          0.01, 0.0, 0.0, 0.01, 0.0, 0.01};
+      double covariance_inputs[] = {0.01, 0.0, 0.01};
       covariance_inputs[index] = invalid_value;
 
       SCOPED_TRACE(index);
@@ -146,8 +107,7 @@ TEST(GrowthModel, RejectsNonFiniteTraditionalCovarianceInputs) {
       EXPECT_THROW(
           gm.SetTraditionalGrowthParameterCovariance(
               covariance_inputs[0], covariance_inputs[1],
-              covariance_inputs[2], covariance_inputs[3],
-              covariance_inputs[4], covariance_inputs[5]),
+              covariance_inputs[2]),
           std::runtime_error);
     }
   }
@@ -158,8 +118,7 @@ TEST(GrowthModel, RejectsNonFiniteCalculatedLengthVariance) {
 
   gm.SetVonBertalanffyTraditionalParameters(1e200, 0.2, -0.5);
   gm.SetLengthWeightParameters(1.0, 1.0);
-  gm.SetTraditionalGrowthParameterCovariance(
-      0.01, 0.0, 0.0, 0.01, 0.0, 0.0);
+  gm.SetTraditionalGrowthParameterCovariance(0.01, 0.0, 0.01);
   gm.SetAgeOffset(1.0);
 
   // Finite inputs can still overflow when length derivatives are squared.
@@ -181,10 +140,8 @@ TEST(GrowthModel, TraditionalDeltaMethodAllowsLowCv) {
   gm.SetLengthWeightParameters(1.0e-5, 3.0);
   gm.SetTraditionalGrowthParameterCovariance(
       0.03 * 0.03,  // var(log(Linf))
-      0.0, 0.0,
-      0.0,  // var(log(K))
-      0.0,
-      0.0);  // var(t0)
+      0.0,         // cov(log(Linf), log(K))
+      0.0);        // var(log(K))
   gm.SetAgeOffset(1.0);
 
   gm.Prepare();
@@ -224,10 +181,7 @@ TEST(GrowthModel, TraditionalDeltaMethodHandlesNearPerfectCorrelations) {
     gm.SetTraditionalGrowthParameterCovariance(
         sd_log_linf * sd_log_linf,
         correlation * sd_log_linf * sd_log_k,
-        0.0,
-        sd_log_k * sd_log_k,
-        0.0,
-        0.0);
+        sd_log_k * sd_log_k);
     gm.SetAgeOffset(age);
 
     ASSERT_NO_THROW(gm.Prepare());
@@ -242,99 +196,22 @@ TEST(GrowthModel, TraditionalDeltaMethodHandlesNearPerfectCorrelations) {
   }
 }
 
-TEST(GrowthModel, TraditionalDeltaMethodHasZeroSdAtFixedT0) {
+TEST(GrowthModel, TraditionalZeroCovarianceProducesZeroSd) {
   fims_popdy::GrowthModel<double> gm(1, 5, 1);
 
   gm.SetVonBertalanffyTraditionalParameters(100.0, 0.2, 1.0);
   gm.SetLengthWeightParameters(1.0e-5, 3.0);
-  gm.SetTraditionalGrowthParameterCovariance(
-      0.05 * 0.05,
-      -0.5 * 0.05 * 0.10,
-      0.0,
-      0.10 * 0.10,
-      0.0,
-      0.0);
-  gm.SetAgeOffset(1.0);
+  gm.SetTraditionalGrowthParameterCovariance(0.0, 0.0, 0.0);
+  gm.SetAgeOffset(2.0);
 
-  gm.Prepare();
+  ASSERT_NO_THROW(gm.Prepare());
 
   const auto& products = gm.GetProducts();
-
-  // All individual curves have zero length at their shared, fixed t0.
-  EXPECT_DOUBLE_EQ(products.MeanLAA(0, 0, 0), 0.0);
-  EXPECT_DOUBLE_EQ(products.SdLAA(0, 0, 0), 0.0);
-
-  EXPECT_GT(products.MeanLAA(0, 1, 0), 0.0);
-  EXPECT_GT(products.SdLAA(0, 1, 0), 0.0);
-}
-
-TEST(GrowthModel, TraditionalDeltaMethodIncludesT0Covariances) {
-  fims_popdy::GrowthModel<double> gm(1, 5, 1);
-
-  const double asymptotic_length = 100.0;
-  const double growth_coefficient = 0.2;
-  const double age_at_zero_length = -0.5;
-
-  const double sd_log_asymptotic_length = 0.05;
-  const double sd_log_growth_coefficient = 0.10;
-  const double sd_age_at_zero_length = 0.20;
-
-  const double corr_linf_k = -0.5;
-  const double corr_linf_t0 = 0.25;
-  const double corr_k_t0 = -0.3;
-
-  const double var_log_asymptotic_length =
-      sd_log_asymptotic_length * sd_log_asymptotic_length;
-  const double var_log_growth_coefficient =
-      sd_log_growth_coefficient * sd_log_growth_coefficient;
-  const double var_age_at_zero_length =
-      sd_age_at_zero_length * sd_age_at_zero_length;
-
-  const double cov_linf_k =
-      corr_linf_k * sd_log_asymptotic_length * sd_log_growth_coefficient;
-  const double cov_linf_t0 =
-      corr_linf_t0 * sd_log_asymptotic_length * sd_age_at_zero_length;
-  const double cov_k_t0 =
-      corr_k_t0 * sd_log_growth_coefficient * sd_age_at_zero_length;
-
-  gm.SetVonBertalanffyTraditionalParameters(
-      asymptotic_length, growth_coefficient, age_at_zero_length);
-  gm.SetLengthWeightParameters(1.0e-5, 3.0);
-  gm.SetTraditionalGrowthParameterCovariance(
-      var_log_asymptotic_length, cov_linf_k, cov_linf_t0,
-      var_log_growth_coefficient, cov_k_t0, var_age_at_zero_length);
-  gm.SetAgeOffset(1.0);
-
-  gm.Prepare();
-
-  const auto& p = gm.GetProducts();
-
-  const double age = 3.0;
-
-  const double age_delta = age - age_at_zero_length;
-  const double survival_like = std::exp(-growth_coefficient * age_delta);
-  const double expected_length =
-      asymptotic_length * (1.0 - survival_like);
-
-  const double d_length_d_log_linf = expected_length;
-  const double d_length_d_log_k =
-      asymptotic_length * growth_coefficient * age_delta * survival_like;
-  const double d_length_d_t0 =
-      -asymptotic_length * growth_coefficient * survival_like;
-
-  const double expected_variance =
-      d_length_d_log_linf * d_length_d_log_linf *
-          var_log_asymptotic_length +
-      d_length_d_log_k * d_length_d_log_k *
-          var_log_growth_coefficient +
-      d_length_d_t0 * d_length_d_t0 * var_age_at_zero_length +
-      2.0 * d_length_d_log_linf * d_length_d_log_k * cov_linf_k +
-      2.0 * d_length_d_log_linf * d_length_d_t0 * cov_linf_t0 +
-      2.0 * d_length_d_log_k * d_length_d_t0 * cov_k_t0;
-
-  const double expected_sd = std::sqrt(expected_variance);
-
-  EXPECT_NEAR(p.SdLAA(0, 2, 0), expected_sd, 1e-7);
+  for (std::size_t age_index = 0; age_index < 5; ++age_index) {
+    SCOPED_TRACE(age_index);
+    EXPECT_GT(products.MeanLAA(0, age_index, 0), 0.0);
+    EXPECT_DOUBLE_EQ(products.SdLAA(0, age_index, 0), 0.0);
+  }
 }
 
 TEST(GrowthModel, SwitchingToSchnuteRestoresInterpolation) {
@@ -344,8 +221,7 @@ TEST(GrowthModel, SwitchingToSchnuteRestoresInterpolation) {
   gm.SetAgeOffset(1.0);
 
   gm.SetVonBertalanffyTraditionalParameters(100.0, 0.2, -0.5);
-  gm.SetTraditionalGrowthParameterCovariance(
-      0.01, 0.0, 0.0, 0.01, 0.0, 0.0);
+  gm.SetTraditionalGrowthParameterCovariance(0.01, 0.0, 0.01);
   ASSERT_NO_THROW(gm.Prepare());
 
   gm.SetVonBertalanffySchnuteParameters(
@@ -366,8 +242,7 @@ TEST(GrowthModel, SchnuteRejectsTraditionalDeltaCovariance) {
   gm.SetLengthSdParams(10.0, 20.0);
   gm.SetAgeOffset(1.0);
 
-  gm.SetTraditionalGrowthParameterCovariance(
-      0.01, 0.0, 0.0, 0.01, 0.0, 0.0);
+  gm.SetTraditionalGrowthParameterCovariance(0.01, 0.0, 0.01);
   EXPECT_THROW(gm.Prepare(), std::runtime_error);
 
   // Selecting Schnute again explicitly restores interpolation.
