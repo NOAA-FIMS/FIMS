@@ -2,10 +2,11 @@
 # 0. Setup
 # -------------------------------------------------------------------------
 # Purpose:
-# Extract equations from FIMS source/documentation comments and render a small
-# equation catalog that can later be connected to the package-level explorer.
+# Extract documented equations from FIMS repository source files and
+# generate a CSV catalogue and searchable HTML reference for publication
+# on the FIMS website.
 #
-# This is a prototype script. It does not modify FIMS source code.
+# This script does not modify FIMS source code or run model calculations.
 #
 # Run from the FIMS repository root.
 
@@ -308,6 +309,8 @@ parse_comment_blocks <- function(lines) {
 extract_equations_from_file <- function(path) {
   lines <- readLines(path, warn = FALSE)
   comment_blocks <- parse_comment_blocks(lines)
+  source_kind <- infer_source_kind(path)
+  module <- infer_module(path)
   rows <- list()
 
   for (block in comment_blocks) {
@@ -319,9 +322,7 @@ extract_equations_from_file <- function(path) {
       extract_regex_matches(comment_text, "(?s)\\$\\$.*?\\$\\$")
     )
 
-    math_matches <- math_matches[
-      vapply(math_matches, is_equation_like, logical(1))
-    ]
+    math_matches <- math_matches[is_equation_like(math_matches)]
 
     equation_format <- "latex"
     if (length(math_matches) == 0) {
@@ -384,8 +385,8 @@ extract_equations_from_file <- function(path) {
         source_file = path,
         line_start = block$start_line,
         line_end = block$end_line,
-        source_kind = infer_source_kind(path),
-        module = infer_module(path),
+        source_kind = source_kind,
+        module = module,
         entity = entity_info$entity,
         entity_type = entity_info$entity_type,
         enclosing_class = enclosing_class,
@@ -422,7 +423,8 @@ extract_equations_from_file <- function(path) {
 }
 
 render_equation_catalog <- function(equation_catalog, path) {
-  rows_html <- apply(equation_catalog, 1, function(row) {
+  rows_html <- vapply(seq_len(nrow(equation_catalog)), function(i) {
+    row <- equation_catalog[i, , drop = FALSE]
     card_title <- row[["display_name"]]
     entity <- row[["entity"]]
     entity_type <- row[["entity_type"]]
@@ -435,11 +437,11 @@ render_equation_catalog <- function(equation_catalog, path) {
       card_title <- paste0(card_title, ": ", entity)
     }
 
-    entity_label <- ifelse(
-      !is.na(entity_type) && entity_type != "",
-      paste0(entity_type, ": ", entity),
+    entity_label <- if (!is.na(entity_type) && entity_type != "") {
+      paste0(entity_type, ": ", entity)
+    } else {
       entity
-    )
+    }
 
     # Change display labels only; keep the original identifiers in the footer.
     card_title <- gsub("([A-Z]+)([A-Z][a-z])", "\\1 \\2", card_title)
@@ -479,10 +481,13 @@ render_equation_catalog <- function(equation_catalog, path) {
     }
 
     # Search the source text rather than MathJax's generated markup.
-    search_values <- row[c(
-      "display_name", "module", "entity", "enclosing_class", "r_visible_name",
-      "equation", "source_file"
-    )]
+    search_values <- unlist(
+      row[c(
+        "display_name", "module", "entity", "enclosing_class", "r_visible_name",
+        "equation", "source_file"
+      )],
+      use.names = FALSE
+    )
     search_values <- c(
       search_values, card_title, description, symbol_definitions
     )
@@ -514,7 +519,7 @@ render_equation_catalog <- function(equation_catalog, path) {
       "</footer>",
       "</article>"
     )
-  })
+  }, character(1))
 
   html <- paste0(
     "<!doctype html>",
@@ -595,7 +600,7 @@ render_equation_catalog <- function(equation_catalog, path) {
 
     "<aside class='version-notice' aria-labelledby='version-notice-label'>",
     "<strong id='version-notice-label'>Version information</strong>",
-    "<p>This catalog corresponds to the FIMS version shown above. ",
+    "<p>This catalog reflects the FIMS source version used when the website was built. ",
     "GitHub’s <code>main</code> branch may differ. ",
     "Check your installed version with <code>packageVersion(\"FIMS\")</code>. ",
     "<a href='https://noaa-fims.github.io/FIMS/#installation'>",
@@ -625,6 +630,8 @@ render_equation_catalog <- function(equation_catalog, path) {
       "<script>\n",
       "const searchInput = document.getElementById('equation-search');\n",
       "const moduleFilter = document.getElementById('module-filter');\n",
+      "const searchCount = document.getElementById('search-count');\n",
+      "const searchEmpty = document.getElementById('search-empty');\n",
       "const cards = Array.from(document.querySelectorAll('.equation-card'));\n",
       "const modules = [...new Set(cards.map(card => card.dataset.module).filter(Boolean))].sort((a,b) => a.localeCompare(b));\n",
       "modules.forEach(module => {\n",
@@ -640,8 +647,8 @@ render_equation_catalog <- function(equation_catalog, path) {
       "    card.hidden = !visible;\n",
       "    if(visible) matches++;\n",
       "  });\n",
-      "  document.getElementById('search-count').textContent = (terms.length || moduleFilter.value) ? `${matches} of ${cards.length} equations` : `${cards.length} equations`;\n",
-      "  document.getElementById('search-empty').hidden = matches !== 0;\n",
+      "  searchCount.textContent = (terms.length || moduleFilter.value) ? `${matches} of ${cards.length} equations` : `${cards.length} equations`;\n",
+      "  searchEmpty.hidden = matches !== 0;\n",
       "}\n",
       "searchInput.addEventListener('input', filterEquations);\n",
       "moduleFilter.addEventListener('change', filterEquations);\n",
