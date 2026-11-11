@@ -49,6 +49,7 @@ is_equation_like <- function(x) {
           "\\\\sum",
           "\\\\exp",
           "\\\\log",
+          "\\\\mathrm\\{log\\}",
           "\\\\sqrt",
           "\\\\left",
           "\\\\begin",
