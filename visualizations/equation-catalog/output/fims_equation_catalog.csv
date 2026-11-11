@@ -1,0 +1,85 @@
+"source_file","line_start","line_end","source_kind","module","entity","entity_type","enclosing_class","r_visible_name","equation","equation_format","description","symbol_definitions","display_name"
+"inst/include/common/fims_math.hpp",361,378,"C++ source comment","Common math","ad_max","function",NA,"ad_max","\sqrt{C} / 2","latex","","","ad_max"
+"inst/include/common/fims_math.hpp",361,378,"C++ source comment","Common math","ad_max","function",NA,"ad_max","C / (4|a - b|)","latex","","","ad_max"
+"inst/include/common/fims_math.hpp",337,354,"C++ source comment","Common math","ad_min","function",NA,"ad_min","\sqrt{C} / 2","latex","","","ad_min"
+"inst/include/common/fims_math.hpp",337,354,"C++ source comment","Common math","ad_min","function",NA,"ad_min","C / (4|a - b|)","latex","","","ad_min"
+"inst/include/population_dynamics/selectivity/functors/age_specific.hpp",18,47,"C++ source comment","Selectivity","AgeSpecificSelectivity","struct",NA,"AgeSpecificSelectivity","s_a = \frac{1}{1 + \exp(-logit\_sel\_at\_age)}","latex","Age-specific selectivity calculated using one parameter per age bin.","","AgeSpecificSelectivity"
+"inst/include/common/fims_math.hpp",384,404,"C++ source comment","Common math","apply_ageing_error","function",NA,"apply_ageing_error","p^{obs}_{a'} = \sum_{a} p_{a} E_{a,a'}","latex","Converts values at true age, proportions or expected numbers, to values at observed age using an ageing error matrix.","","apply_ageing_error"
+"inst/include/population_dynamics/recruitment/functors/sr_beverton_holt.hpp",42,48,"C++ source comment","Recruitment","evaluate_mean","function","SRBevertonHolt","BevertonHoltRecruitment","\frac{0.8 R_{0} h S_{t-1}}{0.2 R_{0} \phi_{0} (1 - h) + S_{t-1} (h -
+0.2)}","latex","","","BevertonHoltRecruitment"
+"inst/include/models/functors/catch_at_age.hpp",269,280,"C++ source comment","Model","CalculateInitialNumbersAA","function","CatchAtAge",NA,"N_{a,0} = \exp(\log N_{a,0})","latex","Calculates initial numbers at age for index and age.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",291,312,"C++ source comment","Model","CalculateNumbersAA","function","CatchAtAge",NA,"N_{a,y} = N_{a-1,y-1} \exp(-Z_{a-1,y-1})","latex","Calculates numbers at age for a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",291,312,"C++ source comment","Model","CalculateNumbersAA","function","CatchAtAge",NA,"N_{A,y} = N_{A-1,y-1} \exp(-Z_{A-1,y-1}) + N_{A,y-1} \exp(-Z_{A,y-1})","latex","Calculates numbers at age for a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",334,355,"C++ source comment","Model","CalculateUnfishedNumbersAA","function","CatchAtAge",NA,"N^U_{a,y} = N^U_{a-1,y-1} \exp(-M_{a-1,y-1})","latex","Calculates unfished numbers at age at year and age specific indices.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",334,355,"C++ source comment","Model","CalculateUnfishedNumbersAA","function","CatchAtAge",NA,"N^U_{A,y} = N^U_{A-1,y-1} \exp(-M_{A-1,y-1}) + N^U_{A,y-1} \exp(-M_{A,y-1})","latex","Calculates unfished numbers at age at year and age specific indices.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",376,399,"C++ source comment","Model","CalculateUnfishedInitialNumbersAA","function","CatchAtAge",NA,"N^U_{0,0} = R_0","latex","Calculates unfished numbers at age in the first year.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",376,399,"C++ source comment","Model","CalculateUnfishedInitialNumbersAA","function","CatchAtAge",NA,"N^U_{A,0} = \frac{N^U_{A-1,0} \exp(-M_{A-1,0})}{1 - \exp(-M_{A,0})}","latex","Calculates unfished numbers at age in the first year.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",376,399,"C++ source comment","Model","CalculateUnfishedInitialNumbersAA","function","CatchAtAge",NA,"N^U_{a,0} = N^U_{a-1,0} \exp(-M_{a-1,0})","latex","Calculates unfished numbers at age in the first year.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",376,399,"C++ source comment","Model","CalculateUnfishedInitialNumbersAA","function","CatchAtAge",NA,"SB^U_0 = R_0 \phi_0","latex","Calculates unfished numbers at age in the first year.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",419,449,"C++ source comment","Model","CalculateMortality","function","CatchAtAge",NA,"F_{a,y} = \sum_{f=1}^{N_{fleets}} F_{f,a,y}","latex","Calculates total mortality for a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",419,449,"C++ source comment","Model","CalculateMortality","function","CatchAtAge",NA,"F_{f,a,y} = F_{f,y} \times f_y \times S_f(a)","latex","Calculates total mortality for a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",419,449,"C++ source comment","Model","CalculateMortality","function","CatchAtAge",NA,"Z_{a,y} = M_{a,y} + F_{a,y}","latex","Calculates total mortality for a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",473,486,"C++ source comment","Model","CalculateBiomass","function","CatchAtAge",NA,"B_y \mathrel{+}= N_{a,y} \times w_a","latex","Calculates biomass for a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",497,510,"C++ source comment","Model","CalculateUnfishedBiomass","function","CatchAtAge",NA,"B^U_y \mathrel{+}= N^U_{a,y} \times w_a","latex","Calculates the unfished biomass for a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",522,537,"C++ source comment","Model","CalculateSpawningBiomass","function","CatchAtAge",NA,"SB_y \mathrel{+}= N_{a,y} \times w_a \times p_{female,a} \times
+p_{mature,a}","latex","Calculates spawning biomass for a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",551,565,"C++ source comment","Model","CalculateUnfishedSpawningBiomass","function","CatchAtAge",NA,"SB^U_y \mathrel{+}= N^U_{a,y} \times w_a \times p_{female,a} \times
+p_{mature,a}","latex","Calculated unfished spawning biomass for a population","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",579,593,"C++ source comment","Model","CalculateSpawningBiomassRatio","function","CatchAtAge",NA,"\text{ratio}_y = \frac{SB_y}{SB^U_0}","latex","Calculate the spawning biomass ratio for a population and year.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",602,625,"C++ source comment","Model","CalculateSBPR0","function","CatchAtAge",NA,"\phi_0 = \sum_{a=0}^{A} N_a \times p_{female,a} \times p_{mature,a} \times
+w_a","latex","Calculates equilibrium spawning biomass per recruit.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",602,625,"C++ source comment","Model","CalculateSBPR0","function","CatchAtAge",NA,"N_A = \frac{N_{A-1} \times \exp(-M_{A-1})}{1 - \exp(-M_A)}","latex","Calculates equilibrium spawning biomass per recruit.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",602,625,"C++ source comment","Model","CalculateSBPR0","function","CatchAtAge",NA,"N_a = N_{a-1} \times \exp(-M_{a-1}) \quad \text{for } a = 1,
+\ldots, A-1","latex","Calculates equilibrium spawning biomass per recruit.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",659,681,"C++ source comment","Model","CalculateRecruitment","function","CatchAtAge",NA,"R_y =
+\begin{cases}
+f(SB_{y-1}, \phi_0), & \text{if } i_{dev} = n_{years} \\
+\exp(g(y-1)), & \text{otherwise}
+\end{cases}","latex","Calculates expected recruitment for a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",711,724,"C++ source comment","Model","CalculateMaturityAA","function","CatchAtAge",NA,"p_{mature,a,y} = \text{maturity}(a, \min(y, n_{years} - 1))","latex","Calculates maturity at age, in proportion, for a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",738,752,"C++ source comment","Model","CalculateCatch","function","CatchAtAge",NA,"CW_{f,y} \mathrel{+}= CW_{f,a,y}, \quad
+C_{f,y} \mathrel{+}= C_{f,a,y}","latex","Calculates total catch (catch) by fleet and population for a given year by aggregating age-specific catch over ages.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",775,793,"C++ source comment","Model","CalculateCatchWeightAA","function","CatchAtAge",NA,"CW_{f,a,y} = C_{f,a,y} \times w_{f,a,y}","latex","Calculates weight at age of the catch for a given fleet from a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",823,839,"C++ source comment","Model","CalculateCatchNumbersAA","function","CatchAtAge",NA,"C_{f,a,y} = \frac{F_{f,y} \times f_y \times S_f(a)}{Z_{a,y}} \times N_{a,y}
+\times
+\left( 1 - \exp(-Z_{a,y}) \right)","latex","Calculates numbers of fish for the catch for a given fleet from a population, year and age.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",861,877,"C++ source comment","Model","CalculateIndex","function","CatchAtAge",NA,"IW_{f,y} \mathrel{+}= IWAA_{a,y}, \quad
+IN_{f,y} \mathrel{+}= INAA_{a,y}","latex","Calculates the index for a fleet from a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",890,908,"C++ source comment","Model","CalculateIndexNumbersAA","function","CatchAtAge",NA,"IN_{f,a,y} \mathrel{+}= q_{f,y} \times S_f(a) \times N_{a,y}","latex","Calculates the numbers for the index for a fleet from a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",890,908,"C++ source comment","Model","CalculateIndexNumbersAA","function","CatchAtAge",NA,"IN_{f,a,y} \mathrel{+}= S_{f,y}(a) \times N_{a,y} \times
+e^{(-t_{y}Z_{a,y})}","latex","Calculates the numbers for the index for a fleet from a population.","","CatchAtAge"
+"inst/include/models/functors/catch_at_age.hpp",927,944,"C++ source comment","Model","CalculateIndexWeightAA","function","CatchAtAge",NA,"IWAA_{f,a,y} = IN_{f,a,y} \times w_{f,a,y}","latex","Calculates biomass of fish for the index for a given fleet from a population.","","CatchAtAge"
+"inst/include/distributions/functors/lognormal_lpdf.hpp",51,61,"C++ source comment","Distribution","evaluate","function","LogNormalLPDF","DlnormDistribution","f(x) = \frac{1.0}{ x\sigma\sqrt{2\pi}
+}\mathrm{exp}\Bigg(-\frac{(\mathrm{ln}(x) - \mu)^{2}}{2\sigma^{2}}\Bigg),","latex","Evaluates the lognormal log probability density function.","","DlnormDistribution"
+"inst/include/distributions/functors/multinomial_lpmf.hpp",53,63,"C++ source comment","Distribution","evaluate","function","MultinomialLPMF","DmultinomDistribution","f(\underline{y}) = \frac{n!}{y_{1}!...
+y_{k}!}p^{y_{1}}_{1}...p^{y_{k}}_{k},","latex","Evaluates the multinomial log probability mass function.","","DmultinomDistribution"
+"inst/include/distributions/functors/normal_lpdf.hpp",49,58,"C++ source comment","Distribution","evaluate","function","NormalLPDF","DnormDistribution","f(x) =
+\frac{1}{\sigma\sqrt{2\pi}}\mathrm{exp}\Bigg(-\frac{(x-\mu)^2}{2\sigma^2}
+\Bigg),","latex","Evaluates the normal log probability density function.","","DnormDistribution"
+"inst/include/common/fims_math.hpp",280,301,"C++ source comment","Common math","double_logistic","function",NA,"double_logistic","\frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - inflection_point_{asc}))}
+\frac{1.0}{ 1.0 + exp(slope_{desc} (x - inflection_point_{desc}))}","latex","The general double logistic function","","double_logistic"
+"inst/include/common/fims_math.hpp",280,301,"C++ source comment","Common math","double_logistic","function",NA,"double_logistic","1 / (1 + exp(z))","latex","The general double logistic function","","double_logistic"
+"inst/include/common/fims_math.hpp",280,301,"C++ source comment","Common math","double_logistic","function",NA,"double_logistic","z = slope_desc (x - inflection_point_desc)","latex","The general double logistic function","","double_logistic"
+"inst/include/population_dynamics/selectivity/functors/double_logistic.hpp",57,67,"C++ source comment","Selectivity","evaluate","function","DoubleLogisticSelectivity","DoubleLogisticSelectivity","\frac{1.0}{ 1.0 + exp(-1.0 * slope\_asc (x - inflection_point\_asc))}
+\left(1.0-\frac{1.0}{ 1.0 + exp(-1.0 * slope\_desc (x -
+inflection_point\_desc))} \right)","latex","Method of the double logistic selectivity class that implements the double logistic function from FIMS math.","","DoubleLogisticSelectivity"
+"inst/include/population_dynamics/selectivity/functors/double_logistic.hpp",74,87,"C++ source comment","Selectivity","evaluate","function","DoubleLogisticSelectivity","DoubleLogisticSelectivity","\frac{1.0}{ 1.0 + exp(-1.0 * slope\_asc_t (x -
+inflection_point\_asc_t))} \left(1.0-\frac{1.0}{ 1.0 + exp(-1.0 *
+slope\_desc_t (x - inflection_point\_desc_t))} \right)","latex","Method of the double logistic selectivity class that implements the double logistic function from FIMS math.","","DoubleLogisticSelectivity"
+"inst/include/population_dynamics/size/growth_derived_size_provider.hpp",211,228,"C++ source comment","Size","MeanWeightAtAge","function","GrowthDerivedSizeProvider",NA,"\bar{W}_{y,a} = \sum_l P(l \mid y, a) \, W(c_l)","latex","Mean weight-at-age averaged over the population length-at-age distribution.","","GrowthDerivedSizeProvider"
+"inst/include/common/fims_math.hpp",265,274,"C++ source comment","Common math","inv_logit","function",NA,"inv_logit","a+\frac{b-a}{1+\mathrm{exp}(-\mathrm{logit}(x))}","latex","An inverse logit function for bounding of parameters","","inv_logit"
+"inst/include/common/fims_math.hpp",225,241,"C++ source comment","Common math","logistic","function",NA,"logistic","\frac{1.0}{ 1.0 + exp(-1.0 * slope (x - inflection_point))}","latex","The general logistic function","","logistic"
+"inst/include/population_dynamics/maturity/functors/logistic.hpp",39,47,"C++ source comment","Maturity","evaluate","function","LogisticMaturity","LogisticMaturity","\frac{1.0}{ 1.0 + exp(-1.0 * slope (x - inflection_point))}","latex","Method of the logistic maturity class that implements the logistic function from FIMS math.","","LogisticMaturity"
+"inst/include/population_dynamics/maturity/functors/logistic.hpp",53,62,"C++ source comment","Maturity","evaluate","function","LogisticMaturity","LogisticMaturity","\frac{1.0}{ 1.0 + exp(-1.0 * slope_t (x - {inflection\_point}_t))}","latex","Method of the logistic maturity class that implements the logistic function from FIMS math.","","LogisticMaturity"
+"inst/include/population_dynamics/selectivity/functors/logistic.hpp",48,61,"C++ source comment","Selectivity","evaluate","function","LogisticSelectivity","LogisticSelectivity","\frac{1.0}{ 1.0 + exp(-1.0 * slope (x - inflection\_point))}","latex","Method of the logistic selectivity class that implements the logistic function from FIMS math.","","LogisticSelectivity"
+"inst/include/population_dynamics/growth/functors/vonb_schnute.hpp",17,55,"C++ source comment","Growth","VonBertalanffySchnuteGrowth","struct",NA,"VonBertalanffySchnuteGrowth","L(a) = L_y + (L_o - L_y)
+\frac{1 - \exp[-K(a-a_y)]}{1 - \exp[-K(a_o-a_y)]}","latex","Von Bertalanffy growth using the Schnute parameterization.","- \f$a\f$ is the age being evaluated.
+- \f$L_y\f$ is the mean length at the younger reference age
+  (`mean_length_young`).
+- \f$L_o\f$ is the mean length at the older reference age
+  (`mean_length_old`).
+- \f$a_y\f$ is the younger reference age
+  (`reference_age_for_length_young`).
+- \f$a_o\f$ is the older reference age
+  (`reference_age_for_length_old`).
+- \f$K\f$ is the growth coefficient (`growth_coefficient`).","VonBertalanffySchnuteGrowth"
