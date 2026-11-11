@@ -526,33 +526,35 @@ class VonBertalanffySchnuteGrowthInterface
 
     SetFinalLengthParameter(
         this->mean_length_young,
-        FinalMeanLengthYoungFromWorkingScale(vb->MeanLengthYoungVector()));
+        FinalMeanLengthYoungFromWorkingScale(vb->mean_length_young_vector));
     SetFinalLengthParameter(
         this->mean_length_old,
-        FinalMeanLengthOldFromWorkingScale(vb->MeanLengthYoungVector(),
-                                           vb->MeanLengthOldVector()));
-    set_final(this->growth_coefficient, vb->GrowthCoefficientVector(), true);
+        FinalMeanLengthOldFromWorkingScale(vb->mean_length_young_vector,
+                                           vb->mean_length_old_vector));
+    set_final(this->growth_coefficient, vb->growth_coefficient_vector, true);
     set_final(this->reference_age_for_length_young,
-              vb->ReferenceAgeForLengthYoungVector(), false);
+              vb->reference_age_for_length_young_vector, false);
     set_final(this->reference_age_for_length_old,
-              vb->ReferenceAgeForLengthOldVector(), false);
-    set_final(this->length_weight_a, vb->LengthWeightAVector(), true);
-    set_final(this->length_weight_b, vb->LengthWeightBVector(), true);
-    set_final(this->length_at_age_sd_young, vb->LengthAtAgeSdYoungVector(),
+              vb->reference_age_for_length_old_vector, false);
+    set_final(this->length_weight_a, vb->length_weight_a_vector, true);
+    set_final(this->length_weight_b, vb->length_weight_b_vector, true);
+    set_final(this->length_at_age_sd_young,
+              vb->length_at_age_sd_young_vector, true);
+    set_final(this->length_at_age_sd_old, vb->length_at_age_sd_old_vector,
               true);
-    set_final(this->length_at_age_sd_old, vb->LengthAtAgeSdOldVector(), true);
     set_final(this->log_sd_mean_length_young,
-              vb->LogSdLengthAtRefAgeYoungVector(), false);
-    set_final(this->log_sd_mean_length_old, vb->LogSdLengthAtRefAgeOldVector(),
+              vb->log_sd_mean_length_young_vector, false);
+    set_final(this->log_sd_mean_length_old, vb->log_sd_mean_length_old_vector,
               false);
     set_final(this->log_sd_growth_coefficient,
-              vb->LogSdGrowthCoefficientVector(), false);
+              vb->log_sd_growth_coefficient_vector, false);
     set_final(this->mean_length_young_mean_length_old_logit_corr,
-              vb->LogitCorrLengthAtRefAgeYoungLengthAtRefAgeOldVector(), false);
+              vb->mean_length_young_mean_length_old_logit_corr_vector, false);
     set_final(this->mean_length_young_growth_coefficient_logit_corr,
-              vb->LogitCorrLengthAtRefAgeYoungKVector(), false);
+              vb->mean_length_young_growth_coefficient_logit_corr_vector,
+              false);
     set_final(this->mean_length_old_growth_coefficient_logit_corr,
-              vb->LogitCorrLengthAtRefAgeOldKVector(), false);
+              vb->mean_length_old_growth_coefficient_logit_corr_vector, false);
   }
 
   virtual double evaluate(double age) {
@@ -1025,48 +1027,48 @@ class VonBertalanffySchnuteGrowthInterface
         static_cast<Type>(InitialLengthAtRefAgeYoung()),
         static_cast<Type>(InitialLengthAtRefAgeOld()));
 
-    load_and_register(this->mean_length_young, vb->MeanLengthYoungVector(),
+    load_and_register(this->mean_length_young, vb->mean_length_young_vector,
                       "mean_length_young", true);
-    load_and_register(this->mean_length_old, vb->MeanLengthOldVector(),
+    load_and_register(this->mean_length_old, vb->mean_length_old_vector,
                       "mean_length_old", true);
-    load_and_register(this->growth_coefficient, vb->GrowthCoefficientVector(),
+    load_and_register(this->growth_coefficient, vb->growth_coefficient_vector,
                       "growth_coefficient", true);
     load_and_register(this->reference_age_for_length_young,
-                      vb->ReferenceAgeForLengthYoungVector(),
+                      vb->reference_age_for_length_young_vector,
                       "reference_age_for_length_young", false);
     load_and_register(this->reference_age_for_length_old,
-                      vb->ReferenceAgeForLengthOldVector(),
+                      vb->reference_age_for_length_old_vector,
                       "reference_age_for_length_old", false);
-    load_and_register(this->length_weight_a, vb->LengthWeightAVector(),
+    load_and_register(this->length_weight_a, vb->length_weight_a_vector,
                       "length_weight_a", true);
-    load_and_register(this->length_weight_b, vb->LengthWeightBVector(),
+    load_and_register(this->length_weight_b, vb->length_weight_b_vector,
                       "length_weight_b", true);
     load_optional_and_register(this->length_at_age_sd_young,
-                               vb->LengthAtAgeSdYoungVector(),
+                               vb->length_at_age_sd_young_vector,
                                "length_at_age_sd_young", true);
     load_optional_and_register(this->length_at_age_sd_old,
-                               vb->LengthAtAgeSdOldVector(),
+                               vb->length_at_age_sd_old_vector,
                                "length_at_age_sd_old", true);
     load_optional_and_register(this->log_sd_mean_length_young,
-                               vb->LogSdLengthAtRefAgeYoungVector(),
+                               vb->log_sd_mean_length_young_vector,
                                "log_sd_mean_length_young", false);
     load_optional_and_register(this->log_sd_mean_length_old,
-                               vb->LogSdLengthAtRefAgeOldVector(),
+                               vb->log_sd_mean_length_old_vector,
                                "log_sd_mean_length_old", false);
     load_optional_and_register(this->log_sd_growth_coefficient,
-                               vb->LogSdGrowthCoefficientVector(),
+                               vb->log_sd_growth_coefficient_vector,
                                "log_sd_growth_coefficient", false);
     load_optional_and_register(
         this->mean_length_young_mean_length_old_logit_corr,
-        vb->LogitCorrLengthAtRefAgeYoungLengthAtRefAgeOldVector(),
+        vb->mean_length_young_mean_length_old_logit_corr_vector,
         "mean_length_young_mean_length_old_logit_corr", false);
     load_optional_and_register(
         this->mean_length_young_growth_coefficient_logit_corr,
-        vb->LogitCorrLengthAtRefAgeYoungKVector(),
+        vb->mean_length_young_growth_coefficient_logit_corr_vector,
         "mean_length_young_growth_coefficient_logit_corr", false);
     load_optional_and_register(
         this->mean_length_old_growth_coefficient_logit_corr,
-        vb->LogitCorrLengthAtRefAgeOldKVector(),
+        vb->mean_length_old_growth_coefficient_logit_corr_vector,
         "mean_length_old_growth_coefficient_logit_corr", false);
 
     this->RegisterGrowthObservationInInfo<Type>(growth_observation);
