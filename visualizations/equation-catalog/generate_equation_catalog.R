@@ -33,13 +33,8 @@ clean_comment_text <- function(lines) {
 }
 
 extract_regex_matches <- function(text, pattern) {
-  matches <- gregexpr(pattern, text, perl = TRUE)[[1]]
-
-  if (identical(matches, -1L)) {
-    return(character())
-  }
-
-  regmatches(text, list(matches))[[1]]
+  matches <- gregexpr(pattern, text, perl = TRUE)
+  regmatches(text, matches)[[1]]
 }
 
 is_equation_like <- function(x) {
@@ -185,8 +180,7 @@ normalize_signature <- function(lines) {
     return(NA_character_)
   }
 
-  signature <- paste(lines[seq_len(min(6, length(lines)))], collapse = " ")
-  trimws(signature)
+  paste(lines[seq_len(min(6, length(lines)))], collapse = " ")
 }
 
 infer_entity <- function(lines, block_end) {
@@ -331,12 +325,8 @@ extract_equations_from_file <- function(path) {
 
     equation_format <- "latex"
     if (length(math_matches) == 0) {
-      plain_equations <- extract_plain_equations(comment_text)
-
-      if (length(plain_equations) > 0) {
-        math_matches <- plain_equations
-        equation_format <- "plain"
-      }
+      math_matches <- extract_plain_equations(comment_text)
+      equation_format <- "plain"
     }
 
     if (length(math_matches) == 0) {
@@ -488,40 +478,6 @@ render_equation_catalog <- function(equation_catalog, path) {
       ""
     }
 
-    definitions_html <- ""
-    if (!is.na(symbol_definitions) && nzchar(symbol_definitions)) {
-      definition_items <- strsplit(
-        trimws(symbol_definitions),
-        "\\n(?=\\s*- )",
-        perl = TRUE
-      )[[1]]
-
-      # Join wrapped source lines and remove the source bullet markers.
-      definition_items <- trimws(gsub("\\s+", " ", definition_items))
-      definition_items <- sub("^-\\s+", "", definition_items)
-
-      # Escape source text before adding the supported display markup.
-      definition_items <- html_escape(definition_items)
-      definition_items <- gsub(
-        "\\\\f\\$(.*?)\\\\f\\$",
-        "\\\\(\\1\\\\)",
-        definition_items,
-        perl = TRUE
-      )
-      definition_items <- gsub(
-        "`([^`]+)`",
-        "<code>\\1</code>",
-        definition_items,
-        perl = TRUE
-      )
-
-      definitions_html <- paste0(
-        "<ul class='meaning definitions'>",
-        paste0("<li>", definition_items, "</li>", collapse = ""),
-        "</ul>"
-      )
-    }
-
     # Search the source text rather than MathJax's generated markup.
     search_values <- row[c(
       "display_name", "module", "entity", "enclosing_class", "r_visible_name",
@@ -577,7 +533,6 @@ render_equation_catalog <- function(equation_catalog, path) {
     "margin:0;padding:2rem;color:#213f4b;background:#ffffff;}",
     "a{color:#0e6876;}",
     "h1{color:#0e6876;font-size:2.25rem;margin:0 0 .5rem 0;}",
-    ".product-name{color:#0e6876;font-size:.85rem;font-weight:700;letter-spacing:.12em;margin:0 0 .35rem;}",
     ".catalog-header{border-bottom:1px solid #cfd5d8;padding-bottom:1rem;margin-bottom:1rem;}",
     ".subtitle{color:#4a636c;margin:0 0 .75rem;}",
     ".catalog-info{color:#4a636c;margin:.4rem 0;font-size:.95rem;}",
@@ -602,7 +557,6 @@ render_equation_catalog <- function(equation_catalog, path) {
     ".equation-card[data-module='Growth']{--module-badge-color:#9B4678;}",
     ".equation-card[data-module='Maturity']{--module-badge-color:#716800;}",
     ".meaning{color:#213f4b;font-size:.95rem;line-height:1.45;margin:.35rem 0 .65rem;}",
-    ".definitions code{overflow-wrap:anywhere;}",
     ".equation{overflow-x:auto;padding:.35rem .65rem;background:#FFFFFF;border-radius:6px;font-size:1rem;}",
     ".equation mjx-container[display='true']{margin:.5em 0 !important;}",
     ".equation pre{margin:.5em 0;font-size:.9rem;line-height:1.5;white-space:pre;}",
