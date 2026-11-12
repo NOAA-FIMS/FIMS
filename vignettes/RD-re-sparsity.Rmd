@@ -6,7 +6,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 level: "contributor"
-summary: "Investigates the performance and optimization time of simple random effects paramaterized as a dense vs. sparse matrix"
+summary: "Investigates the performance and optimization time of simple random effects parameterized as a dense vs. sparse matrix"
 ---
 
 
