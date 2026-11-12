@@ -28,6 +28,8 @@ by \code{NA}. Missing specifications use \code{NA_character_} for the family and
 \code{NA} for central parameters, and \code{1} for ancillary parameters. These neutral
 ancillary values prevent missing observations from introducing \code{NA} into
 vectorized likelihood calculations.
+Repeated character specifications with literal numeric scales reuse parsed
+results within a call. Nonliteral scales are evaluated for each observation.
 }
 \description{
 Parse one-sided formula-like distribution specifications and return their

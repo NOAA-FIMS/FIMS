@@ -50,6 +50,8 @@
 #' `NA` for central parameters, and `1` for ancillary parameters. These neutral
 #' ancillary values prevent missing observations from introducing `NA` into
 #' vectorized likelihood calculations.
+#' Repeated character specifications with literal numeric scales reuse parsed
+#' results within a call. Nonliteral scales are evaluated for each observation.
 #'
 #' @keywords internal
 #' @examples
@@ -63,6 +65,14 @@
 #'   expression(~ dlnorm(meanlog = mu, sdlog = 0.1))
 #' )
 parse_data_distribution <- function(expr) {
+  # Repeated observation specifications can share their parsed representation.
+  # Keep this cache local so separate calls never retain input or parsed data.
+  cache_index <- NULL
+  if (is.character(expr) && anyDuplicated(expr)) {
+    specifications <- unique(expr)
+    cache_index <- match(expr, specifications)
+    cache <- vector("list", length(specifications))
+  }
   if (is.character(expr) || is.expression(expr)) {
     expr <- as.list(expr)
   } else if (is.call(expr) || inherits(expr, "formula")) {
@@ -96,9 +106,27 @@ parse_data_distribution <- function(expr) {
       }
       next
     }
-    parsed <- parse_one_data_distribution(expr[[i]])
+    parsed <- if (!is.null(cache_index)) cache[[cache_index[[i]]]] else NULL
+    if (is.null(parsed)) {
+      parsed <- parse_one_data_distribution(expr[[i]])
+      parsed$link <- rlang::as_label(parsed$link)
+      if (!is.null(cache_index)) {
+        scale <- switch(parsed$family,
+          dnorm = parsed$parameters$sd,
+          dlnorm = parsed$parameters$sdlog,
+          dmultinom = 1
+        )
+        if (is.numeric(scale) && length(scale) == 1L) {
+          cache[[cache_index[[i]]]] <- parsed
+        } else {
+          # Scale expressions must still be evaluated for every observation.
+          # They may also have side effects, so discard earlier cached results.
+          cache <- vector("list", length(cache))
+        }
+      }
+    }
     output$family[[i]] <- parsed$family
-    output$link[[i]] <- rlang::as_label(parsed$link)
+    output$link[[i]] <- parsed$link
     for (parameter in names(parsed$parameters)) {
       output[[parameter]][[i]] <- parsed$parameters[[parameter]]
     }
@@ -138,11 +166,10 @@ parse_one_data_distribution <- function(expr) {
   dist_name <- as.character(right_hand[[1]])
   dist_formals <- names(formals(dist_name))
   args_list <- as.list(right_hand[-1])
-  link_name <- dplyr::filter(
-    FIMS::fims_distributions,
-    family == dist_name
-  ) |>
-    dplyr::pull(.data$central_parameter)
+  # This lookup runs for each observation. Avoid constructing a dplyr data
+  # mask and temporary tibble for the small distribution registry.
+  registry <- FIMS::fims_distributions
+  link_name <- registry$central_parameter[which(registry$family == dist_name)]
 
   # Checks
   if (!dist_name %in% FIMS::fims_distributions[["family"]]) {
