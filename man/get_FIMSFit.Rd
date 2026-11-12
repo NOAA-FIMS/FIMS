@@ -117,10 +117,10 @@ did not run, \code{"WARN"}, or \code{"FAIL"}), \code{value}, \code{threshold}, \
 and \code{message}. It has no rows when the model was not optimized.
 
 \code{\link[=get_estimates]{get_estimates()}} returns a tibble of parameter values and their
-uncertainties from a fitted model. The \code{year_i} column is a position that
-starts at 1, and the \code{age} and \code{length} columns are the ages and length bins
-from the data. \code{age} is \code{NA} if populations have different ages, and both
-are \code{NA} for fits saved before they were added to the output.
+uncertainties from a fitted model. The \code{year} column contains calendar years;
+the \code{age} and \code{length} columns contain the ages and length bins from the data.
+Year, age, or length values are \code{NA} for fits saved before they were added to
+the output.
 
 \code{\link[=get_number_of_parameters]{get_number_of_parameters()}} returns a vector of integers specifying the
 number of fixed-effect parameters and the number of random-effect parameters

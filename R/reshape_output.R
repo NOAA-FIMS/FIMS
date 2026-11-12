@@ -57,11 +57,15 @@ reshape_json_estimates <- function(model_output) {
   }
 
   json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE)
+  model_years <- tibble::tibble(
+    year_i = seq_along(json_list[["year"]]),
+    year = as.integer(unlist(json_list[["year"]]))
+  )
   read_list <- purrr::map(
     json_list[!names(json_list) %in% c(
       "name", "type", "estimation_framework", "id", "objective_function_value",
       "max_gradient_component", "gradient",
-      "population_ids", "fleet_ids", "log"
+      "population_ids", "fleet_ids", "year", "log"
     )],
     \(x) tidyr::unnest_wider(tibble::tibble(json = x), dplyr::all_of("json"))
   )
@@ -128,7 +132,7 @@ reshape_json_estimates <- function(model_output) {
       !names(read_list) %in%
         c(
           "name", "type", "estimation_framework", "id",
-          "objective_function_value", "populations", "fleets", "data",
+          "objective_function_value", "year", "populations", "fleets", "data",
           "density_components", "population_ids", "fleet_ids"
         )
     ],
@@ -308,14 +312,14 @@ reshape_json_estimates <- function(model_output) {
       "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
     ) |>
-    # age_i and length_i are positions, so replace them with the age and
-    # length they index. Every age dimension starts at the first age today; a
-    # dimension that starts later, e.g., "n_ages-1", would need its own offset
-    # here.
+    # The dimension columns are positions, so replace year_i, age_i, and
+    # length_i with the values they index.
     dplyr::left_join(fleet_lengths, by = c("module_name", "module_id", "length_i")) |>
     dplyr::left_join(population_ages, by = c("age_i")) |>
-    dplyr::relocate(dplyr::all_of(c("age", "length")), .after = dplyr::all_of("length_i")) |>
-    dplyr::select(-dplyr::all_of(c("age_i", "length_i")))
+    dplyr::left_join(model_years, by = "year_i") |>
+    dplyr::relocate(dplyr::all_of("year"), .after = dplyr::all_of("fleet")) |>
+    dplyr::relocate(dplyr::all_of(c("age", "length")), .after = dplyr::all_of("year")) |>
+    dplyr::select(-dplyr::all_of(c("year_i", "age_i", "length_i")))
   if (is.null(selectivity_fleets)) {
     return(out)
   }
@@ -528,12 +532,10 @@ dimension_folded_to_tibble <- function(section) {
 #' folded into a single vector in the json output.
 #'
 #' @details
-#' The dimension index is returned not the actual year of the model. For
-#' example, if the model starts in year 1900, then year_i of 1, which is what
-#' is returned from this function will need to map to 1900 and that will need
-#' to be done externally.
-#' This function will accommodate dimensions of year-1 and year+1 where the
-#' indexing of the former will start at 2 instead of 1.
+#' Year dimensions are returned as positions (`year_i`) and are labeled with
+#' calendar years by [reshape_json_estimates()] using the model-level `year`
+#' vector. Dimensions such as `n_years-1` and `n_years+1` retain their
+#' corresponding positional offsets.
 #' @param data A list containing the header and dimensions information from a
 #'   FIMS json output object.
 #' @return

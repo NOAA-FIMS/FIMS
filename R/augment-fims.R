@@ -17,7 +17,7 @@
 #' | `fleet`       | Fleet name for fleet rows, otherwise `NA`                 |
 #' | `module_id`   | Unique module identifier                                  |
 #' | `distribution`| Likelihood distribution used for this data stream         |
-#' | `year_i`      | Year index (present when available in the estimates)      |
+#' | `year`         | Calendar year (present when available in the estimates)    |
 #' | `age`         | Age from the data, `NA` for rows without an age           |
 #' | `length`      | Length bin from the data, `NA` for rows without a length  |
 #'
@@ -83,15 +83,15 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   }
 
   # Determine which optional index columns are present in the output
-  # (year_i, season_i, etc.). These and the ages and length bins are carried
-  # through so users can group metrics by, e.g., year or age.
+  # (season_i, etc.). Calendar year, ages, and length bins are also carried
+  # through so users can group metrics by those dimensions.
   index_cols <- names(fit_rows)[grepl("_i$", names(fit_rows))]
 
   # Core set of metadata columns to retain for grouping / filtering
   meta_cols <- intersect(
     c(
       "label", "module_id", "module_type", "fleet", "distribution",
-      "estimation_type", index_cols, "age", "length"
+      "estimation_type", index_cols, "year", "age", "length"
     ),
     names(fit_rows)
   )
