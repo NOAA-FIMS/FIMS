@@ -416,7 +416,6 @@ The results can be plotted with either base R, {ggplot2}, or {stockplotr}. Where
 output <- get_estimates(fit) |>
   dplyr::mutate(
     uncertainty_label = "se",
-    year = year_i,
     estimate = estimated
   ) |>
   stockplotr::convert_output()

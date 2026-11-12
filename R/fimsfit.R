@@ -251,8 +251,8 @@ methods::setMethod("get_convergence", "FIMSFit", function(x) {
 
 #' @return
 #' [get_estimates()] returns a tibble of parameter values and their
-#' uncertainties from a fitted model. The `year_i` column is a position that
-#' starts at 1, and the `age` and `length` columns are the ages and length bins
+#' uncertainties from a fitted model. The `year` column contains calendar
+#' years; the `age` and `length` columns are the ages and length bins
 #' from the data. `age` is `NA` if populations have different ages, and both
 #' are `NA` for fits saved before they were added to the output. `observed` is
 #' `NA` for missing observations. The likelihood skips a composition year with
