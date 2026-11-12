@@ -437,7 +437,8 @@ output <- estimates_big_optimized |>
 #| fig.alt: >
 #|   Plot of spawning biomass.
 stockplotr::plot_spawning_biomass(
-  dplyr::filter(output, label == "spawning_biomass")
+  dplyr::filter(output, label == "spawning_biomass"),
+  unit_label = "mt"
 ) +
   stockplotr::theme_noaa()
 ```
@@ -642,6 +643,7 @@ stockplotr::plot_biomass(
         year = year_i,
         estimate = estimated
       )
-  )
+  ),
+  unit_label = "mt"
 )
 ```

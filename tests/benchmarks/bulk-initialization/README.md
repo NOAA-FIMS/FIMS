@@ -23,7 +23,7 @@ The 30-year full workflow includes frame construction, parameter setup, initiali
 - All eight initialization runs agree with their same-size baseline on input parameter vectors, free parameters, objective, gradient and ordinary reports at tolerance 1e-10.
 - All four full fits converged with max absolute gradient below 0.01, positive-definite Hessians and finite report standard errors. All **36 comparisons passed** for parameters, TMB configuration, objective, optimum parameters, reports, estimates, covariance and uncertainty values/SDs. Tolerances are recorded in full-fit-validation.csv.
 - No C++ or TMB settings changed. Candidate installation used `R CMD INSTALL --no-libs --no-test-load`, followed by copying the unchanged main backend's `libs` directory. Matching backend hashes and source/data hashes are in results/manifest.txt.
-- This branch is local. Full-suite CI has not been run for this candidate. Main's stockplotr vignette compatibility fix is in PR #1956; it is not duplicated here.
+- Full-suite CI remains a pre-merge check. This branch also carries the four explicit metric-tonne plotting labels from PR #1956, needed because current stockplotr no longer supplies the old unit default. All three affected vignettes rendered successfully using CI stockplotr revision `42c6255728e26f1e34df75bfd25c3fe81adb94e4`. No parser changes are included.
 
 Results, session details and assertion counts are under results. Raw profiles/model objects remain in scratch directories outside version control.
 

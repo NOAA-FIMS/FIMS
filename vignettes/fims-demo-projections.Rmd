@@ -274,6 +274,7 @@ stockplotr::plot_biomass(
         year = year_i,
         estimate = estimated
       )
-  )
+  ),
+  unit_label = "mt"
 )
 ```
