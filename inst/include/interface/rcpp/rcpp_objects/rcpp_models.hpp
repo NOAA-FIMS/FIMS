@@ -790,6 +790,21 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 #endif
     ss << " \"id\": " << this->get_id() << ",\n";
     ss << " \"objective_function_value\": " << sanitize_val(value) << ",\n";
+    // year_i is a position in the flattened output. Write the calendar years
+    // once at the model level so R can replace that position with its year.
+    if (!this->population_ids->empty()) {
+      std::shared_ptr<PopulationInterface> population_interface =
+          std::dynamic_pointer_cast<PopulationInterface>(
+              PopulationInterfaceBase::live_objects[*this->population_ids->begin()]);
+      if (population_interface) {
+        ss << " \"year\": [";
+        for (int i = 0; i <= population_interface->n_years.get(); i++) {
+          if (i > 0) ss << ", ";
+          ss << population_interface->start_year.get() + i;
+        }
+        ss << "],\n";
+      }
+    }
     ss << "\"growth\":[\n";
     for (module_id_it = growth_ids.begin(); module_id_it != growth_ids.end();
          module_id_it++) {

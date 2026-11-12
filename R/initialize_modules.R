@@ -144,7 +144,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
 
   integer_fields <- c(
     "n_ages", "n_fleets", "n_lengths",
-    "n_years", "min_age"
+    "n_years", "start_year", "min_age"
   )
 
   real_vector_fields <- c(
@@ -164,6 +164,7 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
           # Or we can use get_n_fleets(data),
           "n_lengths" = get_n_lengths(data),
           "n_years" = get_n_years(data),
+          "start_year" = get_start_year(data),
           "min_age" = min(get_ages(data))
         )
       )
