@@ -1,0 +1,41 @@
+"file","context","test","nb","failed","skipped","error","warning","user","system","real","passed"
+"test-initialization-bulk-transfer.R","initialization-bulk-transfer","parameter initialization preserves mixed types, order and identities",15,0,FALSE,FALSE,0,0.119,0.01,0.15,15
+"test-process-bulk-transfer.R","process-bulk-transfer","process distributions transfer scales and initialize zeros in bulk",32,0,FALSE,FALSE,0,0.0849999999999999,0.011,0.1,32
+"test-distribution-formulas.R","distribution-formulas","`initialize_process_distribution()` works with correct inputs",3,0,FALSE,FALSE,0,0.004,0.001,0.00499999999999989,3
+"test-distribution-formulas.R","distribution-formulas","`initialize_data_distribution()` works with correct inputs",3,0,FALSE,FALSE,0,0.00800000000000001,0.001,0.01,3
+"test-distribution-formulas.R","distribution-formulas","`sd` value from `initialize_process_distribution()` must be greater than 0",1,0,FALSE,FALSE,0,0.024,0,0.024,1
+"test-distribution-formulas.R","distribution-formulas","`initialize_process_distribution()` returns correct error messages",5,0,FALSE,FALSE,0,0.113,0.002,0.115,5
+"test-distribution-formulas.R","distribution-formulas","`initialize_data_distribution()` returns correct error messages",2,0,FALSE,FALSE,0,0.0089999999999999,0.001,0.01,2
+"test-initialize_modules.R","initialize_modules","`initialize_fims()` works with correct inputs",5,0,FALSE,FALSE,0,3.871,0.035,3.906,5
+"test-initialize_modules.R","initialize_modules","`initialize_fims()` works with edge cases",7,0,FALSE,FALSE,0,7.386,0.073,7.46,7
+"test-initialize_modules.R","initialize_modules","`initialize_fims()` returns correct error messages / `initialize_recruitment()` returns correct error messages",2,0,FALSE,FALSE,0,3.752,0.01,3.762,2
+"test-initialize_modules.R","initialize_modules","`initialize_fims()` returns correct error messages",0,0,FALSE,FALSE,0,3.753,0.01,3.763,0
+"test-initialize_modules.R","initialize_modules","`initialize_recruitment()` works with correct inputs",2,0,FALSE,FALSE,0,0.00600000000000023,0,0.00700000000000145,2
+"test-initialize_modules.R","initialize_modules","`initialize_growth()` works with correct inputs",2,0,FALSE,FALSE,0,0.00800000000000267,0.000999999999999973,0.00900000000000034,2
+"test-initialize_modules.R","initialize_modules","`initialize_growth()` assigns named SDs independently of row order",5,0,FALSE,FALSE,0,0.0169999999999995,0.002,0.0179999999999971,5
+"test-initialize_modules.R","initialize_modules","`initialize_growth()` rejects malformed named SD inputs",4,0,FALSE,FALSE,0,0.0470000000000006,0.001,0.0479999999999983,4
+"test-initialize_modules.R","initialize_modules","`initialize_maturity()` works with correct inputs",2,0,FALSE,FALSE,0,0.00400000000000134,0,0.00500000000000256,2
+"test-initialize_modules.R","initialize_modules","`initialize_population()` works with correct inputs",2,0,FALSE,FALSE,0,0.0189999999999984,0,0.0190000000000019,2
+"test-initialize_modules.R","initialize_modules","`initialize_population()` returns correct error messages",1,0,FALSE,FALSE,0,0.00700000000000145,0,0.0069999999999979,1
+"test-initialize_modules.R","initialize_modules","`initialize_selectivity()` works with correct inputs",2,0,FALSE,FALSE,0,0.00399999999999778,0.001,0.004999999999999,2
+"test-initialize_modules.R","initialize_modules","`initialize_fleet()` works with correct inputs",5,0,FALSE,FALSE,0,0.594000000000001,0.004,0.599,5
+"test-initialize_modules.R","initialize_modules","`initialize_fims()` fits catch and index to the expected quantity matching their units",6,0,FALSE,FALSE,0,4.075,0.042,4.117,6
+"test-initialize_modules.R","initialize_modules","`initialize_fims()` errors for a catch unit it cannot map",1,0,FALSE,FALSE,0,0.677,0.002,0.679000000000002,1
+"test-initialize_modules.R","initialize_modules","`initialize_fleet()` passes a fleet's own weight at age to the model",4,0,FALSE,FALSE,0,4.067,0.046,4.113,4
+"test-initialize_modules.R","initialize_modules","`initialize_fleet()` uses a fleet's own age-to-length conversion rows",6,0,FALSE,FALSE,0,7.594,0.048,7.642,6
+"test-initialize_modules.R","initialize_modules","`initialize_catch()` works with correct inputs",4,0,FALSE,FALSE,0,0.00500000000000256,0.001,0.00600000000000023,4
+"test-initialize_modules.R","initialize_modules","`initialize_catch()` treats a catch of 0 as a year with no fishing",5,0,FALSE,FALSE,0,7.26499999999999,0.161,7.43,5
+"test-initialize_modules.R","initialize_modules","`initialize_catch()` returns correct error messages",1,0,FALSE,FALSE,0,0.0130000000000052,0,0.0129999999999981,1
+"test-initialize_modules.R","initialize_modules","`initialize_index()` works with correct inputs",4,0,FALSE,FALSE,0,0.00399999999999778,0.001,0.00499999999999545,4
+"test-initialize_modules.R","initialize_modules","`initialize_index()` returns correct error messages",1,0,FALSE,FALSE,0,0.0129999999999981,0,0.0129999999999981,1
+"test-initialize_modules.R","initialize_modules","`initialize_comp()` works with correct inputs",10,0,FALSE,FALSE,0,0.878,0.004,0.881999999999998,10
+"test-initialize_modules.R","initialize_modules","`initialize_fims()` works with edge cases",2,0,FALSE,FALSE,0,3.681,0.031,3.715,2
+"test-initialize_modules.R","initialize_modules","`initialize_comp()` returns correct error messages",4,0,FALSE,FALSE,0,0.425999999999995,0.001,0.428000000000004,4
+"test-initialize_modules.R","initialize_modules","`set_param_vector()` returns correct error messages",3,0,FALSE,FALSE,0,0.0219999999999985,0,0.0229999999999961,3
+"test-rcpp-distribution.R","rcpp-distribution","rcpp distribution works with correct inputs",7,0,FALSE,FALSE,0,0.0140000000000029,0.002,0.0150000000000006,7
+"test-rcpp-distribution.R","rcpp-distribution","rcpp_distribution returns correct outputs for edge cases",15,0,FALSE,FALSE,0,0.0290000000000035,0.005,0.0339999999999989,15
+"test-rcpp-distribution.R","rcpp-distribution","rcpp distribution returns correct error messages",5,0,FALSE,FALSE,0,0.0139999999999958,0,0.0140000000000029,5
+"test-rcpp-variable-vector.R","rcpp-variable-vector","rcpp VariableVector works as expected",272,0,FALSE,FALSE,0,0.406,0.08,0.487,272
+"test-rcpp-variable-vector.R","rcpp-variable-vector","VariableVector returns correct error messages",3,0,FALSE,FALSE,0,0.0130000000000001,0.001,0.014,3
+"test-rcpp-variable-vector.R","rcpp-variable-vector","rcpp VariableVector supports indexed numeric replacement",5,0,FALSE,FALSE,0,0.0110000000000001,0.002,0.012,5
+"test-rcpp-variable-vector.R","rcpp-variable-vector","rcpp VariableVector deep copies have new ids and independent storage",6,0,FALSE,FALSE,0,0.00800000000000001,0.002,0.00900000000000012,6

@@ -268,48 +268,19 @@ initialize_process_distribution <- function(
     "log_r_Rcpp_BevertonHoltRecruitment" = "log_expected_recruitment"
   )
 
-  # Set up distribution based on `family` argument`
+  # Populate existing Variables in bulk instead of creating per-element wrappers.
   if (family[["family"]] == "lognormal") {
-    # create new Rcpp module
     new_module <- methods::new(DlnormDistribution)
-
-    # populate logged standard deviation parameter with log of input
-    new_module$log_sd[] <- log(sd[["value"]])
-
-    # setup whether or not sd parameter is estimated
-    et <- sd[["estimation_type"]]
-    et[is.na(et)] <- "constant"
-    new_module$log_sd$set_estimation_types(et)
   }
-
   if (family[["family"]] == "gaussian") {
-    # create new Rcpp module
     new_module <- methods::new(DnormDistribution)
-
-    # populate logged standard deviation parameter with log of input
-    new_module$log_sd$resize(length(sd[["value"]]))
-    for (i in seq_along(sd[["value"]])) {
-      new_module$log_sd[i]$value <- log(sd[["value"]][i])
-    }
-
-    # setup whether or not sd parameter is estimated
-    et <- sd[["estimation_type"]]
-    et[is.na(et)] <- "constant"
-    new_module$log_sd$set_estimation_types(et)
-
-    #   if (length(sd[["value"]]) > 1 && length(sd[["estimation_type"]]) == 1) {
-    #     if (sd[["estimation_type"]] == "constant") {
-    #       new_module$log_sd$set_estimation_types(c("constant"))
-    #     } else {
-    #       new_module$log_sd$set_estimation_types(c("fixed_effects"))
-    #     }
-    #   } else {
-    #     for (i in seq_along(sd[["estimation_type"]])) {
-    #       new_module$log_sd[i]$estimation_type$set(sd[["estimation_type"]][i])
-    #     }
-    #   }
-    # }
   }
+  log_sd <- new_module$log_sd
+  log_sd$resize(length(sd[["value"]]))
+  log_sd$set_values(log(sd[["value"]]))
+  et <- sd[["estimation_type"]]
+  et[is.na(et)] <- "constant"
+  log_sd$set_estimation_types(et)
 
   n_dim <- length(module$field(par))
 
@@ -319,10 +290,8 @@ initialize_process_distribution <- function(
 
   # initialize values with 0
   # these are overwritten in the code later by user input
-  for (i in 1:n_dim) {
-    new_module$observed_values[i]$value <- 0
-    new_module$expected_values[i]$value <- 0
-  }
+  new_module$observed_values$set_values(numeric(n_dim))
+  new_module$expected_values$set_values(numeric(n_dim))
 
   # setup links to parameter
   if (is.null(expected)) {

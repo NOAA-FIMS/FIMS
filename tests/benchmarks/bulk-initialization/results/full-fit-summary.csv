@@ -1,0 +1,3 @@
+"variant","wall_seconds","peak_rss_mib","initialization_seconds","fit_seconds","pipeline_seconds","optimization_seconds","uncertainty_seconds"
+"after",21.4509124584874,876.7265625,1.992,17.583,20.4955,9.00040650367737,8.45551407337189
+"before",22.2889595830056,889.3125,2.294,18.111,21.335,9.10058152675628,8.87543892860413
