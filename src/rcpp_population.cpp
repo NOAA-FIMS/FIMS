@@ -26,6 +26,7 @@ void register_population(Rcpp::Module& m) {
       .field("n_ages", &PopulationInterface::n_ages)
       .field("n_fleets", &PopulationInterface::n_fleets)
       .field("n_years", &PopulationInterface::n_years)
+       .field("start_year", &PopulationInterface::start_year)
       .field("n_lengths", &PopulationInterface::n_lengths)
       .field("log_M", &PopulationInterface::log_M)
       .field("log_f_multiplier", &PopulationInterface::log_f_multiplier)

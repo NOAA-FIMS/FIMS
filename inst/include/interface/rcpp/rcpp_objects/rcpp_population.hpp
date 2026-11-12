@@ -100,6 +100,10 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   SharedInt n_years;
   /**
+   * @brief The first calendar year in the model.
+   */
+  SharedInt start_year;
+  /**
    * @brief The number of population length bins, 0 when FIMS builds the bins
    * from the fleet bins.
    */
@@ -257,6 +261,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         n_fleets(other.n_fleets),
         fleet_ids(other.fleet_ids),
         n_years(other.n_years),
+        start_year(other.start_year),
         n_lengths(other.n_lengths),
         maturity_id(other.maturity_id),
         growth_id(other.growth_id),
