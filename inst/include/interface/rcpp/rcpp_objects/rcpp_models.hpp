@@ -795,7 +795,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     if (!this->population_ids->empty()) {
       std::shared_ptr<PopulationInterface> population_interface =
           std::dynamic_pointer_cast<PopulationInterface>(
-              PopulationInterfaceBase::live_objects[*this->population_ids->begin()]);
+              PopulationInterfaceBase::live_objects[*this->population_ids
+                                                         ->begin()]);
       if (population_interface) {
         ss << " \"year\": [";
         for (int i = 0; i <= population_interface->n_years.get(); i++) {
