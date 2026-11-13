@@ -79,6 +79,152 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
 };
 
 /**
+ * @brief  The Rcpp interface for Data to instantiate the object from R:
+ * data <- methods::new(Data).
+ */
+class DataInterface : public DataInterfaceBase {
+ public:
+  
+  /**
+   * @brief The type of data input. The options are catch, index, age_comp,
+   * length_comp, or caal_comp.
+   */
+  SharedString data_type;
+
+  /**
+   * @brief The vector of dimensions that is being passed from R. The 
+   * length of this vector specifies the number of dimensions 
+   * (i.e. 2 for age and year) and the values specify the size of each dimension.
+   */
+  std::vector<int> dimension_sizes;
+  
+   /**
+   * @brief The vector of dimension names where the vector length matches the 
+   * number of dimensions specified in dimension_sizes and the values name
+   * the dimensions (i.e. "year", "age", "length", "sex").
+   */
+  std::vector<std::string> dimension_names;
+
+  /**
+   * @brief The constructor.
+   */
+  DataInterface(std::string data_type, std::vector<int> dimension_sizes, std::vector<std::string> dimension_names) : DataInterfaceBase() {
+    this->data_type = data_type;
+    this->dimension_sizes.resize(dimension_sizes.size());
+    std::copy(dimension_sizes.begin(), dimension_sizes.end(), this->dimension_sizes.begin());
+    this->dimension_names.resize(dimension_names.size());
+    std::copy(dimension_names.begin(), dimension_names.end(), this->dimension_names.begin());
+    this->observed_data = Rcpp::NumericVector(Rcpp::algorithm::prod(dimension_sizes.begin(), dimension_sizes.end()));
+    this->uncertainty = Rcpp::NumericVector(Rcpp::algorithm::prod(dimension_sizes.begin(), dimension_sizes.end()));
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<DataInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DataInterfaceBase::live_objects[this->id]);
+  }
+
+  /**
+   * @brief Construct a new Data Interface object
+   *
+   * @param other
+   */
+  DataInterface(const DataInterface &other)
+      : DataInterfaceBase(other),
+        data_type(other.data_type),
+        dimension_sizes(other.dimension_sizes),
+        dimension_names(other.dimension_names) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~DataInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * data interface with age-composition data. It also returns the ID, the rank
+   * of 2, the dimensions by printing ymax and amax, followed by the data values
+   * themselves. This string is formatted for a json file.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+
+    ss << "{\n";
+    ss << " \"name\": \"" << this->data_type << "\",\n";
+    ss << " \"id\":" << this->id << ",\n";
+    ss << " \"type\": \"data\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [";
+    for (size_t i = 0; i < dimension_names.size() - 1; i++) {
+      ss << "\"" << dimension_names[i] << "\", ";
+    }
+    ss << "\"" << dimension_names[dimension_names.size() - 1] << "\"],\n";
+    ss << "  \"dimensions\": [";
+    for (size_t i = 0; i < dimension_sizes.size() - 1; i++) {
+      ss << dimension_sizes[i] << ", ";
+    }
+    ss << dimension_sizes[dimension_sizes.size() - 1] << "]\n},\n";
+    ss << " \"value\": [";
+    for (size_t i = 0; i < observed_data.size() - 1; i++) {
+      ss << observed_data[i] << ", ";
+    }
+    ss << observed_data[observed_data.size() - 1] << "],\n";
+    ss << "\"uncertainty\":[ ";
+    for (size_t i = 0; i < uncertainty.size() - 1; i++) {
+      ss << uncertainty[i] << ", ";
+    }
+    ss << uncertainty[uncertainty.size() - 1] << "]\n";
+    ss << "}";
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_data_object::DataObject<Type>> data =
+        std::make_shared<fims_data_object::DataObject<Type>>(
+          this->dimension_sizes);
+
+
+    data->id = this->id;
+    for (size_t i = 0; i < observed_data.size(); i++) {
+      data->at(i) = this->observed_data[i];
+      data->uncertainty[i] = this->uncertainty[i];
+    }
+
+    for(size_t i = 0; i < this->dimension_sizes.size(); i++) {
+      data->generic_dimensions[i] = this->dimension_sizes[i];
+    }
+    
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    info->data_objects[this->id] = data;
+
+    return true;
+  }
+
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+
+    return true;
+  }
+
+#endif
+};
+
+/**
  * @brief  The Rcpp interface for AgeComp to instantiate the object from R:
  * acomp <- methods::new(AgeComp).
  */
@@ -336,6 +482,150 @@ class LengthCompDataInterface : public DataInterfaceBase {
 
     return true;
   }
+#endif
+};
+
+/**
+ * @brief  The Rcpp interface for CaalComp to instantiate the object from R:
+ * caalcomp <- methods::new(CaalComp).
+ */
+class CaalCompDataInterface : public DataInterfaceBase {
+ public:
+  /**
+   * @brief The first dimension of the data, which relates to the number of 
+   * length bins.
+   */
+  fims_int lmax = 0;
+  /**
+   * @brief The second dimension of the data, which relates to the number of age
+   * bins.
+   */
+  fims_int amax = 0;
+  /**
+   * @brief The third dimension of the data, which relates to the number of
+   * time steps or years.
+   */
+  fims_int ymax = 0;
+  /**
+   * @brief The vector of caal-composition data that is being passed from R.
+   */
+  RealVector caal_comp_data;
+  /**
+   * @brief The vector of caal-composition uncertainty that is being passed from
+   * R.
+   */
+  RealVector uncertainty;
+
+  /**
+   * @brief The constructor.
+   */
+  CaalCompDataInterface(int ymax = 0, int amax = 0, int lmax = 0) : DataInterfaceBase() {
+    this->amax = amax;
+    this->ymax = ymax;
+    this->lmax = lmax;
+    this->caal_comp_data.resize(amax * lmax * ymax);
+    this->uncertainty.resize(amax * lmax * ymax);
+    DataInterfaceBase::live_objects[this->id] =
+        std::make_shared<CaalCompDataInterface>(*this);
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(
+        DataInterfaceBase::live_objects[this->id]);
+  }
+
+  /**
+   * @brief Construct a new Caal Comp Data Interface object
+   *
+   * @param other
+   */
+  CaalCompDataInterface(const CaalCompDataInterface &other)
+      : DataInterfaceBase(other),
+        amax(other.amax),
+        lmax(other.lmax),
+        ymax(other.ymax),
+        caal_comp_data(other.caal_comp_data),
+        uncertainty(other.uncertainty) {}
+
+  /**
+   * @brief The destructor.
+   */
+  virtual ~CaalCompDataInterface() {}
+
+  /**
+   * @brief Gets the ID of the interface base object.
+   * @return The ID.
+   */
+  virtual uint32_t get_id() { return this->id; }
+
+  /**
+   * @brief Converts the data to json representation for the output.
+   * @return A string is returned specifying that the module relates to the
+   * data interface with age-composition data. It also returns the ID, the rank
+   * of 2, the dimensions by printing ymax and amax, followed by the data values
+   * themselves. This string is formatted for a json file.
+   */
+  virtual std::string to_json() {
+    std::stringstream ss;
+
+    ss << "{\n";
+    ss << " \"name\": \"CaalComp\",\n";
+    ss << " \"id\":" << this->id << ",\n";
+    ss << " \"type\": \"data\",\n";
+    ss << " \"dimensionality\": {\n";
+    ss << "  \"header\": [" << "\"n_ages\", \"n_lengths\", \"n_years\"" << "],\n";
+    ss << "  \"dimensions\": [" << amax << ", " << lmax << ", " << ymax << "]\n},\n";
+    ss << " \"value\": [";
+    for (size_t i = 0; i < caal_comp_data.size() - 1; i++) {
+      ss << caal_comp_data[i] << ", ";
+    }
+    ss << caal_comp_data[caal_comp_data.size() - 1] << "],\n";
+    ss << "\"uncertainty\":[ ";
+    for (size_t i = 0; i < uncertainty.size() - 1; i++) {
+      ss << uncertainty[i] << ", ";
+    }
+    ss << uncertainty[uncertainty.size() - 1] << "]\n";
+    ss << "}";
+    return ss.str();
+  }
+
+#ifdef TMB_MODEL
+
+  template <typename Type>
+  bool add_to_fims_tmb_internal() {
+    std::shared_ptr<fims_data_object::DataObject<Type>> caal_comp_data =
+        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
+                                                             this->amax,
+                                                             this->lmax);
+
+    caal_comp_data->id = this->id;
+    for (int y = 0; y < ymax; y++) {
+      for (int a = 0; a < amax; a++) {
+        for (int l = 0; l < lmax; l++) {
+          int i_length_age_year = y * amax * lmax + a * lmax + l;
+          caal_comp_data->at(y, a, l) = this->caal_comp_data[i_length_age_year];
+          caal_comp_data->uncertainty[i_length_age_year] = 
+          this->uncertainty[i_length_age_year];
+        }
+      }
+    }
+
+    std::shared_ptr<fims_info::Information<Type>> info =
+        fims_info::Information<Type>::GetInstance();
+
+    info->data_objects[this->id] = caal_comp_data;
+
+    return true;
+  }
+
+  /**
+   * @brief Adds the parameters to the TMB model.
+   * @return A boolean of true.
+   */
+  virtual bool add_to_fims_tmb() {
+    this->add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    this->add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+
+    return true;
+  }
+
 #endif
 };
 
