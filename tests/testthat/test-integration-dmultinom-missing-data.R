@@ -33,7 +33,7 @@ multinomial_rows <- multinomial_cells |>
   dplyr::summarize(
     missing = any(observed == na_value),
     n_likelihood_values = dplyr::n_distinct(likelihood),
-    .by = c(module_id, label, year_i)
+    .by = c(module_id, label, year)
   )
 
 ## IO correctness ----
@@ -71,7 +71,7 @@ test_that("dmultinom reports zero for composition rows with missing data", {
 
   missing_rows <- dplyr::filter(multinomial_rows, missing)
   missing_cells <- multinomial_cells |>
-    dplyr::semi_join(missing_rows, by = c("module_id", "label", "year_i"))
+    dplyr::semi_join(missing_rows, by = c("module_id", "label", "year"))
 
   #' @description Test that every bin of a composition row with missing data reports a log-likelihood of zero.
   expect_equal(

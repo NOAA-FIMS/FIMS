@@ -115,7 +115,7 @@ test_that("augment() works with correct inputs", {
     dplyr::summarize(
       truth = sum(.data[[".truth"]]),
       pred = sum(.data[[".pred"]]),
-      .by = c("label", "module_id", "year_i")
+      .by = c("label", "module_id", "year")
     )
   #' @description Test that generics::augment(fit) composition .pred sums to the observed total in each year.
   expect_equal(

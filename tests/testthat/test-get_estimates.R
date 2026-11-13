@@ -18,6 +18,8 @@ fit_big_unoptimized <- FIMS:::fit_big_unoptimized
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
+  # Checked-in estimate tables predate calendar-year labels. The fresh-fit
+  # regression below checks the current year output.
   "parameter_id", "fleet", "year_i", "age", "length",
   "input", "estimated", "expected", "observed",
   "estimation_type", "uncertainty",
@@ -242,7 +244,7 @@ test_that("`get_estimates()` works with time-varying age-specific selectivity", 
     dplyr::filter(.data$label == "logit_sel_at_age")
   #' @description Test that each time-varying age-specific selectivity value is labelled with its year and age.
   expect_equal(
-    object = selectivity[["year_i"]],
+    object = selectivity[["year"]],
     expected = rep(seq_len(n_years), each = n_ages)
   )
   expect_equal(
@@ -252,7 +254,7 @@ test_that("`get_estimates()` works with time-varying age-specific selectivity", 
   #' @description Test that each time-varying age-specific selectivity value is reported with the year and age it was given for.
   expect_equal(
     object = selectivity[["input"]],
-    expected = selectivity[["year_i"]] / 10 +
+    expected = selectivity[["year"]] / 10 +
       match(selectivity[["age"]], get_ages(data_4_model)) / 100
   )
   clear()
@@ -287,7 +289,7 @@ test_that("`get_estimates()` works with time-varying log_q", {
   log_q <- get_estimates(fit) |>
     dplyr::filter(.data$label == "log_q", .data$fleet == "survey1")
   #' @description Test that time-varying log_q values are labeled with their year.
-  expect_equal(object = log_q[["year_i"]], expected = seq_along(years))
+  expect_equal(object = log_q[["year"]], expected = years)
   #' @description Test that each time-varying log_q value is reported for the year it was given for.
   expect_equal(object = log_q[["input"]], expected = -10 + years / 100)
   #' @description Test that the expected index in each year uses that year's log_q.
@@ -304,6 +306,40 @@ test_that("`get_estimates()` works with time-varying log_q", {
       fit_fims(optimize = FALSE),
     regexp = "log_q size mismatch"
   )
+  clear()
+})
+
+test_that("`get_estimates()` reports calendar years in JSON and estimates", {
+  shifted_data <- data_big |>
+    dplyr::mutate(
+      timing = dplyr::if_else(
+        is.na(.data$timing),
+        .data$timing,
+        .data$timing + 1980L
+      )
+    )
+  data_4_model <- FIMSFrame(shifted_data)
+  years <- get_start_year(data_4_model):get_end_year(data_4_model)
+  fit <- setup_default_parameters(data = data_4_model) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+
+  model_output <- jsonlite::fromJSON(
+    get_model_output(fit),
+    simplifyVector = FALSE
+  )
+  #' @description Test that the model JSON contains calendar years including the extra population year.
+  expect_equal(
+    object = as.integer(unlist(model_output[["year"]])),
+    expected = c(years, max(years) + 1L)
+  )
+
+  estimates <- get_estimates(fit)
+  log_Fmort <- estimates |>
+    dplyr::filter(.data$label == "log_Fmort", .data$fleet == "fleet1")
+  #' @description Test that estimates expose calendar years and no positional year index.
+  expect_false("year_i" %in% names(estimates))
+  expect_equal(object = log_Fmort[["year"]], expected = years)
   clear()
 })
 
