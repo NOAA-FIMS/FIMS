@@ -906,8 +906,7 @@ class Information {
             }
           }
 
-          growth_observation->Initialize(
-              p->n_years, p->n_ages, 1, min_age);
+          growth_observation->Initialize(p->n_years, p->n_ages, 1, min_age);
 
           const bool population_has_size_grid_input =
               p->size_grid.n_bins > 0 || p->size_grid.edges.size() > 0 ||

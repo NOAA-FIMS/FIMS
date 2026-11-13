@@ -103,8 +103,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @param n_sexes Number of modeled sexes.
    * @param min_age Minimum modeled age on the natural scale.
    */
-  void Initialize(std::size_t n_years, std::size_t n_ages,
-                  std::size_t n_sexes, double min_age = 0.0) override {
+  void Initialize(std::size_t n_years, std::size_t n_ages, std::size_t n_sexes,
+                  double min_age = 0.0) override {
     EnsureParamsSet();
     if (n_sexes != 1) {
       throw std::runtime_error(
@@ -115,8 +115,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
     n_ages_ = n_ages;
     n_sexes_ = n_sexes;
     growth_products_prepared_ = false;
-    model_ = std::make_shared<GrowthModel<Type>>(
-        n_years, n_ages, n_sexes, static_cast<Type>(min_age));
+    model_ = std::make_shared<GrowthModel<Type>>(n_years, n_ages, n_sexes,
+                                                 static_cast<Type>(min_age));
     SyncParamsToModel();
   }
 
@@ -214,8 +214,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
     vb.growth_coefficient = fims_math::exp(growth_coefficient_vector[0]);
     vb.reference_age_for_length_young =
         reference_age_for_length_young_vector[0];
-    vb.reference_age_for_length_old =
-        reference_age_for_length_old_vector[0];
+    vb.reference_age_for_length_old = reference_age_for_length_old_vector[0];
     vb.length_weight_a = fims_math::exp(length_weight_a_vector[0]);
     vb.length_weight_b = fims_math::exp(length_weight_b_vector[0]);
     return vb.evaluate(year, a);
@@ -256,18 +255,16 @@ class VonBertalanffySchnuteGrowthModelAdapter
           fims_math::exp(log_sd_mean_length_old_vector[0]);
       const Type sd_growth_coefficient =
           fims_math::exp(log_sd_growth_coefficient_vector[0]);
-      const Type corr_mean_length_young_mean_length_old =
-          fims_math::inv_logit(
-              Type(-1.0), Type(1.0),
-              mean_length_young_mean_length_old_logit_corr_vector[0]);
+      const Type corr_mean_length_young_mean_length_old = fims_math::inv_logit(
+          Type(-1.0), Type(1.0),
+          mean_length_young_mean_length_old_logit_corr_vector[0]);
       const Type corr_mean_length_young_growth_coefficient =
           fims_math::inv_logit(
               Type(-1.0), Type(1.0),
               mean_length_young_growth_coefficient_logit_corr_vector[0]);
-      const Type corr_mean_length_old_growth_coefficient =
-          fims_math::inv_logit(
-              Type(-1.0), Type(1.0),
-              mean_length_old_growth_coefficient_logit_corr_vector[0]);
+      const Type corr_mean_length_old_growth_coefficient = fims_math::inv_logit(
+          Type(-1.0), Type(1.0),
+          mean_length_old_growth_coefficient_logit_corr_vector[0]);
 
       model_->SetGrowthParameterCovariance(
           sd_mean_length_young * sd_mean_length_young,
