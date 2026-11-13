@@ -524,13 +524,21 @@ class VonBertalanffySchnuteGrowthInterface
       }
     };
 
-    SetFinalLengthParameter(
-        this->mean_length_young,
-        FinalMeanLengthYoungFromWorkingScale(vb->mean_length_young_vector));
-    SetFinalLengthParameter(
-        this->mean_length_old,
-        FinalMeanLengthOldFromWorkingScale(vb->mean_length_young_vector,
-                                           vb->mean_length_old_vector));
+    const double stored_mean_length_old =
+        fims_math::exp(vb->mean_length_old_vector[0]);
+    const double mean_length_young =
+        vb->use_bounded_young_length
+            ? fims_math::inv_logit(
+                  0.0, stored_mean_length_old,
+                  vb->mean_length_young_vector[0])
+            : fims_math::exp(vb->mean_length_young_vector[0]);
+    const double mean_length_old =
+        vb->use_old_length_difference
+            ? mean_length_young + stored_mean_length_old
+            : stored_mean_length_old;
+
+    SetFinalLengthParameter(this->mean_length_young, mean_length_young);
+    SetFinalLengthParameter(this->mean_length_old, mean_length_old);
     set_final(this->growth_coefficient, vb->growth_coefficient_vector, true);
     set_final(this->reference_age_for_length_young,
               vb->reference_age_for_length_young_vector, false);
@@ -588,81 +596,8 @@ class VonBertalanffySchnuteGrowthInterface
   }
 
  private:
-  using LengthReferenceParameterization =
-      fims_popdy::LengthReferenceParameterization;
-
   bool IsEstimated(VariableVector& pv) {
     return pv.size() > 0 && pv[0].estimation_type_m.get() != "constant";
-  }
-
-  double InitialLengthAtRefAgeYoung() {
-    return this->mean_length_young[0].initial_value_m;
-  }
-
-  double InitialLengthAtRefAgeOld() {
-    return this->mean_length_old[0].initial_value_m;
-  }
-
-  LengthReferenceParameterization GetLengthReferenceParameterization() {
-    const bool estimate_length_young = IsEstimated(this->mean_length_young);
-    const bool estimate_length_old = IsEstimated(this->mean_length_old);
-
-    if (estimate_length_young && estimate_length_old) {
-      return LengthReferenceParameterization::kEstimatedReferenceLengths;
-    }
-    if (!estimate_length_young && estimate_length_old) {
-      return LengthReferenceParameterization::
-          kConstantLengthYoungEstimatedLengthOld;
-    }
-    if (estimate_length_young && !estimate_length_old) {
-      return LengthReferenceParameterization::
-          kEstimatedLengthYoungBelowConstantLengthOld;
-    }
-    return LengthReferenceParameterization::kBothConstant;
-  }
-
-  double FinalMeanLengthYoungFromWorkingScale(
-      const fims::Vector<double>& mean_length_young_src) {
-    switch (GetLengthReferenceParameterization()) {
-      case LengthReferenceParameterization::kEstimatedReferenceLengths:
-        return fims_math::exp(mean_length_young_src[0]);
-
-      case LengthReferenceParameterization::
-          kConstantLengthYoungEstimatedLengthOld:
-        return InitialLengthAtRefAgeYoung();
-
-      case LengthReferenceParameterization::
-          kEstimatedLengthYoungBelowConstantLengthOld:
-        return fims_math::inv_logit(0.0, InitialLengthAtRefAgeOld(),
-                                    mean_length_young_src[0]);
-
-      case LengthReferenceParameterization::kBothConstant:
-        return InitialLengthAtRefAgeYoung();
-    }
-
-    return InitialLengthAtRefAgeYoung();
-  }
-
-  double FinalMeanLengthOldFromWorkingScale(
-      const fims::Vector<double>& mean_length_young_src,
-      const fims::Vector<double>& mean_length_old_src) {
-    switch (GetLengthReferenceParameterization()) {
-      case LengthReferenceParameterization::kEstimatedReferenceLengths:
-      case LengthReferenceParameterization::
-          kConstantLengthYoungEstimatedLengthOld:
-        // Match evaluation: younger length plus the positive difference.
-        return FinalMeanLengthYoungFromWorkingScale(mean_length_young_src) +
-               fims_math::exp(mean_length_old_src[0]);
-
-      case LengthReferenceParameterization::
-          kEstimatedLengthYoungBelowConstantLengthOld:
-        return InitialLengthAtRefAgeOld();
-
-      case LengthReferenceParameterization::kBothConstant:
-        return InitialLengthAtRefAgeOld();
-    }
-
-    return InitialLengthAtRefAgeOld();
   }
 
   void SetFinalLengthParameter(VariableVector& pv, double final_value) const {
@@ -976,6 +911,14 @@ class VonBertalanffySchnuteGrowthInterface
     // the transformed delta-method variability inputs.
     ValidateVonBertalanffySchnuteGrowthInputs(true);
 
+    const bool use_bounded_young_length =
+        IsEstimated(this->mean_length_young) &&
+        !IsEstimated(this->mean_length_old);
+    const bool use_old_length_difference =
+        IsEstimated(this->mean_length_old);
+    vb->use_bounded_young_length = use_bounded_young_length;
+    vb->use_old_length_difference = use_old_length_difference;
+
     std::stringstream ss;
     auto load_and_register = [&](VariableVector& pv, fims::Vector<Type>& target,
                                  const std::string& base_name, bool log_scale) {
@@ -988,15 +931,13 @@ class VonBertalanffySchnuteGrowthInterface
           }
 
           if (&pv == &this->mean_length_young &&
-              GetLengthReferenceParameterization() ==
-                  LengthReferenceParameterization::
-                      kEstimatedLengthYoungBelowConstantLengthOld) {
-            // Match the bounded inverse logit used in evaluation and reporting.
-            v = fims_math::logit(0.0, InitialLengthAtRefAgeOld(), v);
+              use_bounded_young_length) {
+            v = fims_math::logit(
+                0.0, this->mean_length_old[0].initial_value_m, v);
           } else if (&pv == &this->mean_length_old &&
-                     IsEstimated(this->mean_length_old)) {
-            // Store the positive difference from the younger reference length.
-            v = fims_math::log(v - InitialLengthAtRefAgeYoung());
+                     use_old_length_difference) {
+            v = fims_math::log(
+                v - this->mean_length_young[0].initial_value_m);
           } else {
             v = fims_math::log(v);
           }
@@ -1027,11 +968,6 @@ class VonBertalanffySchnuteGrowthInterface
           }
           load_and_register(pv, target, base_name, log_scale);
         };
-
-    vb->SetLengthReferenceParameterization(
-        GetLengthReferenceParameterization(),
-        static_cast<Type>(InitialLengthAtRefAgeYoung()),
-        static_cast<Type>(InitialLengthAtRefAgeOld()));
 
     load_and_register(this->mean_length_young, vb->mean_length_young_vector,
                       "mean_length_young", true);

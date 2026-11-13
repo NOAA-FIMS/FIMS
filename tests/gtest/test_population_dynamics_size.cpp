@@ -78,6 +78,7 @@ void ConfigureAdapter(
 
   adapter.mean_length_young_vector[0] = fims_math::log(mean_length_young);
   // Estimated older length is stored as the log difference from younger length.
+  adapter.use_old_length_difference = true;
   adapter.mean_length_old_vector[0] =
       fims_math::log(mean_length_old - mean_length_young);
   adapter.growth_coefficient_vector[0] = fims_math::log(growth_coefficient);
