@@ -1,5 +1,6 @@
 var NAVTREEINDEX6 =
 {
+"structfims__distributions_1_1LogNormalLPDF.html#aee168050b533cc95002f3abbf630b794":[2,0,2,1,2],
 "structfims__distributions_1_1MultinomialLPMF.html":[2,0,2,2],
 "structfims__distributions_1_1MultinomialLPMF.html#a12da6014205d15deb9768985f56da979":[2,0,2,2,2],
 "structfims__distributions_1_1MultinomialLPMF.html#a19cf1504c3524fed2381c092431115b7":[2,0,2,2,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX6 =
 "structfims__popdy_1_1LogisticMaturity.html#ab72445a1475fb37ee56e1ae81790446c":[1,0,0,15,1],
 "structfims__popdy_1_1LogisticMaturity.html#ab72445a1475fb37ee56e1ae81790446c":[2,0,5,15,1],
 "structfims__popdy_1_1LogisticSelectivity.html":[1,0,0,25],
-"structfims__popdy_1_1LogisticSelectivity.html":[2,0,5,25],
-"structfims__popdy_1_1LogisticSelectivity.html#a47d008ca4b862abca4f361d68b07d4f0":[1,0,0,25,3]
+"structfims__popdy_1_1LogisticSelectivity.html":[2,0,5,25]
 };

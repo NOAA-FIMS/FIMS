@@ -50,6 +50,9 @@ A data frame with 2808 observations of 8 variables:
   In this dataset, the bins are 50 mm wide, so `length = 250` is the bin
   from 250 to 300 mm, and the conversion puts all fish under 50 mm in
   the first bin and all fish of 1100 mm or more in the last.
+  `length_bin` rows with `fleet = NA` and `timing = NA` set the
+  population length bins (see
+  [`vignette("fims-input-data", package = "FIMS")`](https://NOAA-FIMS.github.io/FIMS/articles/fims-input-data.md)).
 
 - timing:
 

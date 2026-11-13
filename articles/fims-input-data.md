@@ -404,6 +404,97 @@ each length bin, the same as for length compositions. The `observed`,
 column identifies which fleet or survey the length bins apply to, and
 `timing` can be `NA` unless fleet-specific timing is needed.
 
+`length_bin` rows with `fleet = NA` and `timing = NA` set the population
+length bins. These bins are for the whole population and do not set bins
+for any fleet. This differs from `age_to_length_conversion` rows, where
+`fleet = NA` means the conversion is shared by all fleets.
+
+Growth uses the population bins for the distribution of length at each
+age. FIMS then maps that distribution onto each fleet’s bins to get the
+expected length composition for that fleet. The population bins must
+cover every fleet’s bins, and no population bin can be wider than a
+fleet bin it overlaps.
+
+For example, suppose a fleet has bins of 0 to 50 mm and 50 to 100 mm.
+Population bins of 0 to 25, 25 to 50, 50 to 75, and 75 to 100 mm meet
+these rules, and the fleet edge at 50 mm is also a population edge. A
+different set of population bins with a bin of 40 to 60 mm would cross
+that edge. FIMS splits the fish in that bin between the 2 fleet bins by
+how much of the bin falls in each, as if fish were spread evenly within
+the bin. Here half go to each fleet bin. Making every fleet bin edge a
+population bin edge avoids this split.
+
+The `length` values are the lower edges of the bins. The first bin also
+holds all fish shorter than the first lower edge. The last bin is
+open-ended and holds all fish at or above the last lower edge. FIMS
+gives the last bin the same width as the bin before it, which sets the
+length used for its weight. Set the last lower edge high enough that few
+fish fall in this bin. FIMS writes a warning to the log (see
+[`get_log_warnings()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md))
+when more than 1% of the fish at an age in a year are in it.
+
+Without these rows, FIMS builds population bins only when a fleet has
+length bins. They are 1 unit wide (1 mm for `data_big`) from the
+smallest fleet lower edge to the largest fleet upper edge, plus 1 more
+bin. With no population bins, weight at age is the weight at mean
+length. Adding these rows can change weight at age, and so biomass, even
+without length compositions. This is because weight at age is then
+averaged over the length distribution at each age. Population length
+bins need a growth module that gives length at age, so they are not used
+with `EWAA` growth.
+
+``` r
+
+# population length bins 10 mm wide with lower edges from 0 to 1190 mm, which
+# span the data_big fleet length bins (0 to 1150 mm)
+population_length_bins <- tibble::tibble(
+  type = "length_bin",
+  fleet = NA_character_,
+  age = NA_integer_,
+  length = seq(0, 1190, by = 10),
+  timing = NA_real_,
+  observed = NA_real_,
+  unit = NA_character_,
+  uncertainty = NA_character_
+)
+data_with_population_bins <- dplyr::bind_rows(
+  FIMS::data_big,
+  population_length_bins
+)
+FIMSFrame(data_with_population_bins)
+```
+
+    ## tbl_df of class 'FIMSFrame'
+
+    ## with the following 'types': age_comp, catch, length_comp, index, age_to_length_conversion, length_bin, weight_at_age
+
+    ## # A tibble: 6 × 8
+    ##   type     fleet    age length timing observed unit       uncertainty           
+    ##   <chr>    <chr>  <int>  <dbl>  <dbl>    <dbl> <chr>      <chr>                 
+    ## 1 age_comp fleet1     1     NA      1    0.07  proportion ~ dmultinom(prob = ag…
+    ## 2 age_comp fleet1     2     NA      1    0.1   proportion ~ dmultinom(prob = ag…
+    ## 3 age_comp fleet1     3     NA      1    0.115 proportion ~ dmultinom(prob = ag…
+    ## 4 age_comp fleet1     4     NA      1    0.15  proportion ~ dmultinom(prob = ag…
+    ## 5 age_comp fleet1     5     NA      1    0.1   proportion ~ dmultinom(prob = ag…
+    ## 6 age_comp fleet1     6     NA      1    0.05  proportion ~ dmultinom(prob = ag…
+    ## additional slots include the following:fleets:
+    ## [1] "fleet1"  "survey1"
+    ## n_years:
+    ## [1] 30
+    ## ages:
+    ##  [1]  1  2  3  4  5  6  7  8  9 10 11 12
+    ## n_ages:
+    ## [1] 12
+    ## lengths:
+    ##  [1]    0   50  100  150  200  250  300  350  400  450  500  550  600  650  700
+    ## [16]  750  800  850  900  950 1000 1050 1100
+    ## n_lengths:
+    ## [1] 23
+    ## start_year:
+    ## [1] 1
+    ## end_year:
+    ## [1] 30
+
 ## Weight-at-age data (`type == "weight_at_age"`)
 
 The weight-at-age data are not currently included in the likelihood and

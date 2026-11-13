@@ -295,7 +295,7 @@ Public Attributes</h2></td></tr>
 <tr class="memdesc:a568394717d8996d0d5583b6747879773"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of years. <br /></td></tr>
 <tr class="memitem:a9615845b6d1784f250b4d075589d8b79" id="r_a9615845b6d1784f250b4d075589d8b79"><td class="memItemLeft" align="right" valign="top"><a id="a9615845b6d1784f250b4d075589d8b79" name="a9615845b6d1784f250b4d075589d8b79"></a>
 <a class="el" href="classSharedInt.html">SharedInt</a>&#160;</td><td class="memItemRight" valign="bottom"><b>n_lengths</b></td></tr>
-<tr class="memdesc:a9615845b6d1784f250b4d075589d8b79"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of length bins. <br /></td></tr>
+<tr class="memdesc:a9615845b6d1784f250b4d075589d8b79"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of population length bins, 0 when FIMS builds the bins from the fleet bins. <br /></td></tr>
 <tr class="memitem:a40c59e0eaf40f3c24c2d9865bef8d477" id="r_a40c59e0eaf40f3c24c2d9865bef8d477"><td class="memItemLeft" align="right" valign="top"><a id="a40c59e0eaf40f3c24c2d9865bef8d477" name="a40c59e0eaf40f3c24c2d9865bef8d477"></a>
 <a class="el" href="classSharedInt.html">SharedInt</a>&#160;</td><td class="memItemRight" valign="bottom"><b>maturity_id</b></td></tr>
 <tr class="memdesc:a40c59e0eaf40f3c24c2d9865bef8d477"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ID of the maturity module. <br /></td></tr>
@@ -325,6 +325,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a72bb9d21b9f124ce5d9fba3020597c84" id="r_a72bb9d21b9f124ce5d9fba3020597c84"><td class="memItemLeft" align="right" valign="top"><a id="a72bb9d21b9f124ce5d9fba3020597c84" name="a72bb9d21b9f124ce5d9fba3020597c84"></a>
 <a class="el" href="classRealVector.html">RealVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ages</b></td></tr>
 <tr class="memdesc:a72bb9d21b9f124ce5d9fba3020597c84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ages that are modeled in the population, the length of this vector should equal "n_ages". <br /></td></tr>
+<tr class="memitem:a328bd55c867e2c0c4b6bc420a620c961" id="r_a328bd55c867e2c0c4b6bc420a620c961"><td class="memItemLeft" align="right" valign="top"><a id="a328bd55c867e2c0c4b6bc420a620c961" name="a328bd55c867e2c0c4b6bc420a620c961"></a>
+<a class="el" href="classRealVector.html">RealVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>lengths</b></td></tr>
+<tr class="memdesc:a328bd55c867e2c0c4b6bc420a620c961"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lower edges of the population length bins, from <span class="tt">length_bin</span> rows with <span class="tt">fleet = NA</span>. The length of this vector should equal "n_lengths". <br /></td></tr>
 <tr class="memitem:a35eeac59ec9c91677c936c68d292eadc" id="r_a35eeac59ec9c91677c936c68d292eadc"><td class="memItemLeft" align="right" valign="top"><a id="a35eeac59ec9c91677c936c68d292eadc" name="a35eeac59ec9c91677c936c68d292eadc"></a>
 <a class="el" href="classSharedString.html">SharedString</a>&#160;</td><td class="memItemRight" valign="bottom"><b>name</b> = <a class="el" href="def_8hpp.html#ad28f97734d58355a40d01801bca1e2bf">fims::to_string</a>(&quot;NA&quot;)</td></tr>
 <tr class="memdesc:a35eeac59ec9c91677c936c68d292eadc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The name for the population. <br /></td></tr>

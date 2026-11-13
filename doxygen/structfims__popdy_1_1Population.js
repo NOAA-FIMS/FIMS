@@ -7,6 +7,7 @@ var structfims__popdy_1_1Population =
     [ "fleets", "structfims__popdy_1_1Population.html#a6eaaea0428208feb8fdb2a71a2f86557", null ],
     [ "growth", "structfims__popdy_1_1Population.html#af6896d708c89dcaa07fbff37bb001b39", null ],
     [ "growth_id", "structfims__popdy_1_1Population.html#a2a54f5e84ea887a65239dfcaba9ae489", null ],
+    [ "lengths", "structfims__popdy_1_1Population.html#a3cb1494bdc9104bb9ee7b8ed70a56db5", null ],
     [ "log_f_multiplier", "structfims__popdy_1_1Population.html#a7bc51d900bbe6d3f8a58dbd6034c2340", null ],
     [ "log_init_naa", "structfims__popdy_1_1Population.html#af2e49be95ab9db4d7d071ff3291305a7", null ],
     [ "log_M", "structfims__popdy_1_1Population.html#a3fb02df8e3851a4d956c94e47d01b8f8", null ],

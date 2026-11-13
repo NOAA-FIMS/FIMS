@@ -557,7 +557,7 @@ fit <- FIMS::fit_fims(
 #> ℹ Convergence: "NOTE" from "sdreport". Use `sanity_fims(fit)` to see each
 #>   check.
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 3.87651 seconds
+#> ℹ Total run time was 3.85935 seconds
 #> ℹ Number of parameters: fixed_effects=39, random_effects=1, and total=40
 #> ℹ Maximum gradient= 7e-05
 #> ℹ Negative log likelihood (NLL):
@@ -934,7 +934,10 @@ the length-composition data.
 
 The biological size grid remains separate from fleet observation bins,
 and user-specified size grids are preserved when provided; FIMS only
-builds a default grid when needed.
+builds a default grid when needed. This grid is the population length
+bins. Users set it with `length_bin` rows that have `fleet = NA` and
+`timing = NA`, as described in
+[`vignette("fims-input-data", package = "FIMS")`](https://NOAA-FIMS.github.io/FIMS/articles/fims-input-data.md).
 
 Conceptually, the path is:
 

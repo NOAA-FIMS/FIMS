@@ -17,6 +17,7 @@ var classPopulationInterface =
     [ "expected_recruitment", "classPopulationInterface.html#af3ef2e5e3bf42d9eea3c65bca58de9fa", null ],
     [ "fleet_ids", "classPopulationInterface.html#a0402c6e36b1987376d293e44aae2eeaa", null ],
     [ "growth_id", "classPopulationInterface.html#aba1d29d268236d84ec5642f631a41210", null ],
+    [ "lengths", "classPopulationInterface.html#a328bd55c867e2c0c4b6bc420a620c961", null ],
     [ "log_f_multiplier", "classPopulationInterface.html#a5b3beea59d6427d4f4cecda734e5c1d3", null ],
     [ "log_init_naa", "classPopulationInterface.html#a2c24b84cf46953b5e967ef58ab2bc378", null ],
     [ "log_M", "classPopulationInterface.html#a50cfc0794242474d24da1fb349a7b51e", null ],

@@ -778,6 +778,7 @@ template&lt;typename Type&gt; </div>
 
 <p>Ensure a population has a usable biological size grid. </p>
 <p>Prepare canonical fleet observation-bin geometry from valid fleet length_bin lower edges whenever that geometry is available. If a user provides a valid biological size grid, keep it only if its bins are not coarser than any overlapping active fleet observation bins; otherwise, report an error and invalidate the model. If no biological size grid has been provided, build the built-in default from the prepared fleet observation-bin geometry, enforce the same fleet-bin compatibility rule, and warn when the built-in default creates more than 200 regular bins. If a user provides an invalid or partially specified grid, report the problem and invalidate the model.</p>
+<p>Population length bins given as lower edges (<span class="tt">Population::lengths</span>) are the user-supplied grid. As for fleets, the last bin is as wide as the bin before it.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">valid_model</td><td>Reference to model-validity flag. </td></tr>

@@ -445,6 +445,88 @@ compositions. The <code>observed</code>, <code>age</code>, and
 <code>fleet</code> column identifies which fleet or survey the length
 bins apply to, and <code>timing</code> can be <code>NA</code> unless
 fleet-specific timing is needed.</p>
+<p><code>length_bin</code> rows with <code>fleet = NA</code> and
+<code>timing = NA</code> set the population length bins. These bins are
+for the whole population and do not set bins for any fleet. This differs
+from <code>age_to_length_conversion</code> rows, where
+<code>fleet = NA</code> means the conversion is shared by all
+fleets.</p>
+<p>Growth uses the population bins for the distribution of length at
+each age. FIMS then maps that distribution onto each fleet’s bins to get
+the expected length composition for that fleet. The population bins must
+cover every fleet’s bins, and no population bin can be wider than a
+fleet bin it overlaps.</p>
+<p>For example, suppose a fleet has bins of 0 to 50 mm and 50 to 100 mm.
+Population bins of 0 to 25, 25 to 50, 50 to 75, and 75 to 100 mm meet
+these rules, and the fleet edge at 50 mm is also a population edge. A
+different set of population bins with a bin of 40 to 60 mm would cross
+that edge. FIMS splits the fish in that bin between the 2 fleet bins by
+how much of the bin falls in each, as if fish were spread evenly within
+the bin. Here half go to each fleet bin. Making every fleet bin edge a
+population bin edge avoids this split.</p>
+<p>The <code>length</code> values are the lower edges of the bins. The
+first bin also holds all fish shorter than the first lower edge. The
+last bin is open-ended and holds all fish at or above the last lower
+edge. FIMS gives the last bin the same width as the bin before it, which
+sets the length used for its weight. Set the last lower edge high enough
+that few fish fall in this bin. FIMS writes a warning to the log (see
+<code><a href="../reference/Cpp_functions.html">get_log_warnings()</a></code>) when more than 1% of the fish at an age
+in a year are in it.</p>
+<p>Without these rows, FIMS builds population bins only when a fleet has
+length bins. They are 1 unit wide (1 mm for <code>data_big</code>) from
+the smallest fleet lower edge to the largest fleet upper edge, plus 1
+more bin. With no population bins, weight at age is the weight at mean
+length. Adding these rows can change weight at age, and so biomass, even
+without length compositions. This is because weight at age is then
+averaged over the length distribution at each age. Population length
+bins need a growth module that gives length at age, so they are not used
+with <code>EWAA</code> growth.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># population length bins 10 mm wide with lower edges from 0 to 1190 mm, which</span></span>
+<span><span class="co"># span the data_big fleet length bins (0 to 1150 mm)</span></span>
+<span><span class="va">population_length_bins</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>  type <span class="op">=</span> <span class="st">"length_bin"</span>,</span>
+<span>  fleet <span class="op">=</span> <span class="cn">NA_character_</span>,</span>
+<span>  age <span class="op">=</span> <span class="cn">NA_integer_</span>,</span>
+<span>  length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1190</span>, by <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  timing <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
+<span>  observed <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
+<span>  unit <span class="op">=</span> <span class="cn">NA_character_</span>,</span>
+<span>  uncertainty <span class="op">=</span> <span class="cn">NA_character_</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">data_with_population_bins</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
+<span>  <span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span>,</span>
+<span>  <span class="va">population_length_bins</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/FIMSFrame.html">FIMSFrame</a></span><span class="op">(</span><span class="va">data_with_population_bins</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## tbl_df of class 'FIMSFrame'</span></span></code></pre>
+<pre><code><span><span class="co">## with the following 'types': age_comp, catch, length_comp, index, age_to_length_conversion, length_bin, weight_at_age</span></span></code></pre>
+<pre><code><span><span class="co">## # A tibble: 6 × 8</span></span>
+<span><span class="co">##   type     fleet    age length timing observed unit       uncertainty           </span></span>
+<span><span class="co">##   &lt;chr&gt;    &lt;chr&gt;  &lt;int&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;                 </span></span>
+<span><span class="co">## 1 age_comp fleet1     1     NA      1    0.07  proportion ~ dmultinom(prob = ag…</span></span>
+<span><span class="co">## 2 age_comp fleet1     2     NA      1    0.1   proportion ~ dmultinom(prob = ag…</span></span>
+<span><span class="co">## 3 age_comp fleet1     3     NA      1    0.115 proportion ~ dmultinom(prob = ag…</span></span>
+<span><span class="co">## 4 age_comp fleet1     4     NA      1    0.15  proportion ~ dmultinom(prob = ag…</span></span>
+<span><span class="co">## 5 age_comp fleet1     5     NA      1    0.1   proportion ~ dmultinom(prob = ag…</span></span>
+<span><span class="co">## 6 age_comp fleet1     6     NA      1    0.05  proportion ~ dmultinom(prob = ag…</span></span>
+<span><span class="co">## additional slots include the following:fleets:</span></span>
+<span><span class="co">## [1] "fleet1"  "survey1"</span></span>
+<span><span class="co">## n_years:</span></span>
+<span><span class="co">## [1] 30</span></span>
+<span><span class="co">## ages:</span></span>
+<span><span class="co">##  [1]  1  2  3  4  5  6  7  8  9 10 11 12</span></span>
+<span><span class="co">## n_ages:</span></span>
+<span><span class="co">## [1] 12</span></span>
+<span><span class="co">## lengths:</span></span>
+<span><span class="co">##  [1]    0   50  100  150  200  250  300  350  400  450  500  550  600  650  700</span></span>
+<span><span class="co">## [16]  750  800  850  900  950 1000 1050 1100</span></span>
+<span><span class="co">## n_lengths:</span></span>
+<span><span class="co">## [1] 23</span></span>
+<span><span class="co">## start_year:</span></span>
+<span><span class="co">## [1] 1</span></span>
+<span><span class="co">## end_year:</span></span>
+<span><span class="co">## [1] 30</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="weight-at-age-data-type-weight_at_age">Weight-at-age data (<code>type == "weight_at_age"</code>)<a class="anchor" aria-label="anchor" href="#weight-at-age-data-type-weight_at_age"></a>
@@ -476,7 +558,7 @@ the population.</p>
 identical across time steps and are provided for timing = 1 to 31 with
 <code>fleet = NA</code>. The same weights could be given as 1 set of
 rows with <code>timing = NA</code>.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first and last entries  of the weight-at-age data</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"weight_at_age"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -485,7 +567,7 @@ rows with <code>timing = NA</code>.</p>
 <span><span class="co">## 1 weight_at_age  &lt;NA&gt;   1     NA      1 0.0005306555   mt        &lt;NA&gt;</span></span>
 <span><span class="co">## 2 weight_at_age  &lt;NA&gt;   1     NA      2 0.0005306555   mt        &lt;NA&gt;</span></span>
 <span><span class="co">## 3 weight_at_age  &lt;NA&gt;   1     NA      3 0.0005306555   mt        &lt;NA&gt;</span></span></code></pre>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"weight_at_age"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
@@ -493,7 +575,7 @@ rows with <code>timing = NA</code>.</p>
 <span><span class="co">## 370 weight_at_age  &lt;NA&gt;  12     NA     29 0.009636695   mt        &lt;NA&gt;</span></span>
 <span><span class="co">## 371 weight_at_age  &lt;NA&gt;  12     NA     30 0.009636695   mt        &lt;NA&gt;</span></span>
 <span><span class="co">## 372 weight_at_age  &lt;NA&gt;  12     NA     31 0.009636695   mt        &lt;NA&gt;</span></span></code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># check that the observations are identical across time steps within each age</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"weight_at_age"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -514,7 +596,7 @@ rows with <code>timing = NA</code>.</p>
 <span><span class="co">## 10    10          1</span></span>
 <span><span class="co">## 11    11          1</span></span>
 <span><span class="co">## 12    12          1</span></span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot of weight-at-age by time step</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"weight_at_age"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -588,7 +670,7 @@ stay at true age.</p>
 <p><code>data_big</code> does not include ageing error. The example
 below adds a matrix where each age is read 1 year too young or too old
 with probability 0.1.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ageing_error_ages</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_ages</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span></span>
 <span><span class="va">n_ageing_error_ages</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">ageing_error_ages</span><span class="op">)</span></span>
 <span><span class="va">ageing_error_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="va">n_ageing_error_ages</span><span class="op">)</span></span>
@@ -637,7 +719,7 @@ tails, as FIMS does when it folds observed ages outside the model ages,
 so each row sums to 1. The example below uses this convention, so
 vectors from Stock Synthesis or the AgeingError package can be used
 directly.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Rows are true ages and columns are observed ages. Here readers are unbiased</span></span>
 <span><span class="co"># and the standard deviation grows with age.</span></span>
 <span><span class="va">n_ages</span> <span class="op">&lt;-</span> <span class="va">n_ageing_error_ages</span></span>
@@ -672,7 +754,7 @@ use different readers for different fleets or years, set
 tables start at true age 0 and run to the oldest age read, so FIMS drops
 true ages outside the model ages and adds observed ages outside them to
 the end ages, with warnings.</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># out is the result of AgeingError::run() on double-read data.</span></span>
 <span><span class="va">reader1</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">[[</span><span class="st">"output"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"ageing_error_fims"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"reader1"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">reader2</span> <span class="op">&lt;-</span> <span class="va">out</span><span class="op">[[</span><span class="st">"output"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"ageing_error_fims"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"reader2"</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span></span>
@@ -709,7 +791,7 @@ convert numbers at age to numbers at length when length-composition data
 are included and growth is not estimated internally.</p>
 <p>Note: purely age-based models which have no length-composition data
 can omit the age-to-length conversion data as well.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first and last entries in the age-to-length conversion data type</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"age_to_length_conversion"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -722,7 +804,7 @@ can omit the age-to-length conversion data as well.</p>
 <span><span class="co">## 1        &lt;NA&gt;</span></span>
 <span><span class="co">## 2        &lt;NA&gt;</span></span>
 <span><span class="co">## 3        &lt;NA&gt;</span></span></code></pre>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"age_to_length_conversion"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
@@ -734,17 +816,17 @@ can omit the age-to-length conversion data as well.</p>
 <span><span class="co">## 274        &lt;NA&gt;</span></span>
 <span><span class="co">## 275        &lt;NA&gt;</span></span>
 <span><span class="co">## 276        &lt;NA&gt;</span></span></code></pre>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># show that the number of rows in the age-to-length conversion data type is equal to the product of the number of unique combinations of age and length</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"age_to_length_conversion"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 276</span></span></code></pre>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 12 ages, 23 length bins:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span><span class="op">$</span><span class="va">age</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/na.fail.html" class="external-link">na.omit</a></span><span class="op">(</span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span><span class="op">$</span><span class="va">length</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 276</span></span></code></pre>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># plot of age-to-length conversion observations for the data_big example data set</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">type</span> <span class="op">==</span> <span class="st">"age_to_length_conversion"</span><span class="op">)</span> <span class="op">|&gt;</span></span>

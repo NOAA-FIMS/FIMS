@@ -828,7 +828,7 @@ unconverged_fit <- parameters_4_model |>
     ## ✖ Convergence: "FAIL" from "optimizer", "max_gradient", and "sdreport". Use
     ##   `sanity_fims(fit)` to see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 2.45288 seconds
+    ## ℹ Total run time was 2.42372 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 27.41724
     ## ℹ Negative log likelihood (NLL):
@@ -1050,7 +1050,7 @@ high_slope_fit <- parameters_high_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 45.66593 seconds
+    ## ℹ Total run time was 45.19987 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00043
     ## ℹ Negative log likelihood (NLL):
@@ -1086,7 +1086,7 @@ low_slope_fit <- parameters_low_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 42.8357 seconds
+    ## ℹ Total run time was 42.54586 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00034
     ## ℹ Negative log likelihood (NLL):
@@ -1210,7 +1210,7 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 43.45388 seconds
+    ## ℹ Total run time was 42.94903 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00028
     ## ℹ Negative log likelihood (NLL):
@@ -1299,10 +1299,6 @@ age_only_fit <- parameters_4_model |>
 
     ## Also defined by 'tibble'
 
-    ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
-
-    ## Also defined by 'tibble'
-
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
     ## ℹ Maximum gradient went from 0.00287 to 0.00036 after 3 steps.
@@ -1322,7 +1318,7 @@ age_only_fit <- parameters_4_model |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 8.59728 seconds
+    ## ℹ Total run time was 8.31797 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00036
     ## ℹ Negative log likelihood (NLL):
@@ -1381,7 +1377,7 @@ length_only_fit <- parameters_4_model |>
     ## ! Convergence: "WARN" from "large_standard_errors". Use `sanity_fims(fit)` to
     ##   see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.02788 minutes
+    ## ℹ Total run time was 1.00345 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00025
     ## ℹ Negative log likelihood (NLL):

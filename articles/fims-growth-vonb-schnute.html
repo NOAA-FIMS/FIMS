@@ -674,7 +674,7 @@ growth to fleet length bins.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Convergence: <span style="color: #0000BB;">"NOTE"</span> from <span style="color: #0000BB;">"sdreport"</span>. Use `sanity_fims(fit)` to see each</span></span>
 <span><span class="co">#&gt;   check.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.11.0.9000</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">3.87651</span> seconds</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">3.85935</span> seconds</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=39, random_effects=1, and total=40</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">7e-05</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
@@ -1018,7 +1018,10 @@ age-to-length pathway then maps those population size probabilities onto
 the fleet observation bins used by the length-composition data.</p>
 <p>The biological size grid remains separate from fleet observation
 bins, and user-specified size grids are preserved when provided; FIMS
-only builds a default grid when needed.</p>
+only builds a default grid when needed. This grid is the population
+length bins. Users set it with <code>length_bin</code> rows that have
+<code>fleet = NA</code> and <code>timing = NA</code>, as described in
+<code><a href="../articles/fims-input-data.html">vignette("fims-input-data", package = "FIMS")</a></code>.</p>
 <p>Conceptually, the path is:</p>
 <pre class="text"><code>estimated VonBertalanffySchnute Growth parameters
         |

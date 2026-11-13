@@ -1,5 +1,6 @@
 var NAVTREEINDEX4 =
 {
+"classfims__popdy_1_1SizeDistributionProviderBase.html":[2,0,5,30],
 "classfims__popdy_1_1SizeDistributionProviderBase.html#a08d3c78a8c9fec839c459b173131b27a":[1,0,0,30,7],
 "classfims__popdy_1_1SizeDistributionProviderBase.html#a08d3c78a8c9fec839c459b173131b27a":[2,0,5,30,7],
 "classfims__popdy_1_1SizeDistributionProviderBase.html#a1198d00320d69350b06eafddb06fb473":[1,0,0,30,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX4 =
 "growth__derived__size__provider_8hpp.html":[3,0,0,0,4,7,1],
 "growth__derived__size__provider_8hpp_source.html":[3,0,0,0,4,7,1],
 "growth__model_8hpp.html":[3,0,0,0,4,2,2],
-"growth__model_8hpp_source.html":[3,0,0,0,4,2,2],
-"growth__model__adapter_8hpp.html":[3,0,0,0,4,2,3]
+"growth__model_8hpp_source.html":[3,0,0,0,4,2,2]
 };

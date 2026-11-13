@@ -61,7 +61,7 @@ base_model <- parameters |>
 #> 
 #> ✔ Convergence: "OK"
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 51.35428 seconds
+#> ℹ Total run time was 53.26829 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00048
 #> ℹ Negative log likelihood (NLL):
@@ -222,7 +222,7 @@ retro_fit <- run_fims_retrospective(
 #> 
 #> ✔ Convergence: "OK"
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 54.4307 seconds
+#> ℹ Total run time was 51.05587 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00048
 #> ℹ Negative log likelihood (NLL):
@@ -250,7 +250,7 @@ retro_fit <- run_fims_retrospective(
 #> 
 #> ✔ Convergence: "OK"
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 51.84189 seconds
+#> ℹ Total run time was 48.69644 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00025
 #> ℹ Negative log likelihood (NLL):
@@ -278,7 +278,7 @@ retro_fit <- run_fims_retrospective(
 #> 
 #> ✔ Convergence: "OK"
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 54.21136 seconds
+#> ℹ Total run time was 51.1836 seconds
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
 #> ℹ Maximum gradient= 0.00028
 #> ℹ Negative log likelihood (NLL):
