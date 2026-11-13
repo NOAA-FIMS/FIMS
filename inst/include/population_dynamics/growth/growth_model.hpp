@@ -37,8 +37,8 @@ class GrowthModel : public GrowthModelBase<Type> {
    * @param n_sexes Number of sexes.
    * @param min_age Minimum modeled age on the natural scale.
    */
-  GrowthModel(std::size_t n_years, std::size_t n_ages,
-              std::size_t n_sexes = 1, Type min_age = Type(0.0))
+  GrowthModel(std::size_t n_years, std::size_t n_ages, std::size_t n_sexes = 1,
+              Type min_age = Type(0.0))
       : n_years_(n_years),
         n_ages_(n_ages),
         n_sexes_(n_sexes),
@@ -238,7 +238,6 @@ class GrowthModel : public GrowthModelBase<Type> {
   Type mean_length_old_growth_coefficient_covariance_ = static_cast<Type>(0.0);
   Type growth_coefficient_variance_ = static_cast<Type>(0.0);
   Type age_offset_ = static_cast<Type>(0.0);
-
 };
 
 }  // namespace fims_popdy
