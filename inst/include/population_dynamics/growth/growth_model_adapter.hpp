@@ -39,19 +39,14 @@ class GrowthDerivedObservationBase : public GrowthBase<Type> {
   virtual ~GrowthDerivedObservationBase() = default;
 
   /**
-   * @brief Set the minimum modeled age used to translate cached age indices.
-   * @param min_age Minimum age on the natural scale.
-   */
-  virtual void SetAgeOffset(double min_age) = 0;
-
-  /**
    * @brief Initialize any cached growth products.
    * @param n_years Number of modeled years.
    * @param n_ages Number of modeled ages.
    * @param n_sexes Number of modeled sexes.
+   * @param min_age Minimum modeled age on the natural scale.
    */
   virtual void Initialize(std::size_t n_years, std::size_t n_ages,
-                          std::size_t n_sexes = 1) = 0;
+                          std::size_t n_sexes, double min_age) = 0;
 
   /**
    * @brief Report whether this growth object can support the dynamic
@@ -131,26 +126,14 @@ class VonBertalanffySchnuteGrowthModelAdapter
   }
 
   /**
-   * @brief Set the minimum modeled age used by cached growth products.
-   * @param min_age Minimum age on the natural scale.
-   */
-  void SetAgeOffset(double min_age) override {
-    age_offset_ = min_age;
-    age_offset_set_ = true;
-    growth_products_prepared_ = false;
-    if (model_) {
-      model_->SetAgeOffset(static_cast<Type>(age_offset_));
-    }
-  }
-
-  /**
    * @brief Initialize the backing growth model and cache dimensions.
    * @param n_years Number of modeled years.
    * @param n_ages Number of modeled ages.
    * @param n_sexes Number of modeled sexes.
+   * @param min_age Minimum modeled age on the natural scale.
    */
   void Initialize(std::size_t n_years, std::size_t n_ages,
-                  std::size_t n_sexes = 1) override {
+                  std::size_t n_sexes, double min_age = 0.0) override {
     EnsureParamsSet();
     if (n_sexes != 1) {
       throw std::runtime_error(
@@ -161,11 +144,9 @@ class VonBertalanffySchnuteGrowthModelAdapter
     n_ages_ = n_ages;
     n_sexes_ = n_sexes;
     growth_products_prepared_ = false;
-    model_ = std::make_shared<GrowthModel<Type>>(n_years, n_ages, n_sexes);
+    model_ = std::make_shared<GrowthModel<Type>>(
+        n_years, n_ages, n_sexes, static_cast<Type>(min_age));
     SyncParamsToModel();
-    if (age_offset_set_) {
-      model_->SetAgeOffset(static_cast<Type>(age_offset_));
-    }
   }
 
   /**
@@ -193,29 +174,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
           "reference_age_for_length_young");
     }
 
-    if (!model_) {
-      return EvaluateWithFunctor(year, a);
-    }
-
-    SyncParamsToModel();
-    model_->Prepare();
-    const auto& p = model_->GetProducts();
-    const double offset = age_offset_set_ ? age_offset_ : 0.0;
-    const double age_index_raw = a_round - offset;
-    const double age_index_round = std::round(age_index_raw);
-    if (std::fabs(age_index_raw - age_index_round) <= tol &&
-        age_index_round >= 0.0) {
-      const std::size_t age_index = static_cast<std::size_t>(age_index_round);
-      if (age_index < p.n_ages) {
-        const std::size_t year_index =
-            (year >= 0 && static_cast<std::size_t>(year) < p.n_years)
-                ? static_cast<std::size_t>(year)
-                : static_cast<std::size_t>(0);
-        return p.MeanWAA(year_index, age_index, 0);
-      }
-    }
-
-    // Outside cached model age bins: fall back to direct functor evaluation.
     return EvaluateWithFunctor(year, a);
   }
 
@@ -225,11 +183,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
   void PrepareGrowthProducts() override {
     growth_products_prepared_ = false;
     if (!model_) {
-      if (n_ages_ == 0) {
-        throw std::runtime_error("Growth model not initialized; n_ages is 0");
-      }
-      Initialize(n_years_ == 0 ? 1 : n_years_, n_ages_,
-                 n_sexes_ == 0 ? 1 : n_sexes_);
+      throw std::runtime_error(
+          "Growth model must be initialized before preparing growth products");
     }
     SyncParamsToModel();
     model_->Prepare();
@@ -273,8 +228,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
   std::size_t n_years_ = 0;
   std::size_t n_ages_ = 0;
   std::size_t n_sexes_ = 1;
-  double age_offset_ = 0.0;
-  bool age_offset_set_ = false;
   bool growth_products_prepared_ = false;
 
   mutable std::shared_ptr<GrowthModel<Type>> model_;

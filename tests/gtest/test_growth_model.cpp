@@ -7,12 +7,11 @@ namespace {
 
 TEST(GrowthModel, CanConstructAndPrepare) {
   // years=1, ages=12 (1..12), sexes=1
-  fims_popdy::GrowthModel<double> gm(1, 12, 1);
+  fims_popdy::GrowthModel<double> gm(1, 12, 1, 1.0);
 
   gm.SetVonBertalanffySchnuteParameters(275.0, 725.0, 0.18, 1.0, 12.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
-  gm.SetAgeOffset(1.0);
 
   gm.Prepare();
 
@@ -80,7 +79,7 @@ TEST(GrowthModel, CanConstructAndPrepare) {
 }
 
 TEST(GrowthModel, UsesDeltaMethodVariabilityAtReferenceAges) {
-  fims_popdy::GrowthModel<double> gm(1, 12, 1);
+  fims_popdy::GrowthModel<double> gm(1, 12, 1, 1.0);
 
   const double mean_length_young = 275.0;
   const double mean_length_old = 725.0;
@@ -98,7 +97,6 @@ TEST(GrowthModel, UsesDeltaMethodVariabilityAtReferenceAges) {
       0.01,  // var(log(mean_length_old))) = 0.1^2
       0.0,
       0.01);  // var(log(growth_coefficient))) = 0.1^2
-  gm.SetAgeOffset(1.0);
 
   gm.Prepare();
 
