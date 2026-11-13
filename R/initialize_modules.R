@@ -905,7 +905,10 @@ initialize_comp <- function(data,
 #'   is the primary source of information for what is initialized. That is, if a
 #'   fleet exists in the data but parameter information for how to specify
 #'   selectivity for that fleet is not provided, then selectivity will not be
-#'   initialized for that fleet.
+#'   initialized for that fleet. The rows of a parameter with more than 1
+#'   value are used in order of `timing`, then `age`, then `length`, not in
+#'   the order they appear in the tibble. So each row needs its own
+#'   combination of `timing`, `age`, and `length`.
 #' @param data An S4 object with the `FIMSFrame` class, which is returned from
 #'   [FIMSFrame()]. Passing the data is required because initialization of the
 #'   modules requires passing the data and information regarding the uncertainty
@@ -1294,6 +1297,8 @@ initialize_fims <- function(parameters, data) {
     # Initialize_process_distribution
     sd_input <- recruitment_process_input |>
       dplyr::filter(.data$label == "log_sd") |>
+      # Sorted in the order C++ reads, as in set_param_vector()
+      dplyr::arrange(.data$timing, .data$age, .data$length) |>
       dplyr::mutate(
         label = "sd",
         value = exp(.data$value)
@@ -1397,14 +1402,33 @@ set_param_vector <- function(field, module, module_input, module_class_name) {
     cli::cli_abort("The {.var module_input} argument must be a tibble.")
   }
 
-  # Extract the value of the parameter vector
-  field_value <- module_input |>
+  # C++ reads a parameter vector year by year, then by age within a year, then
+  # by length. Sorting the rows that way puts each value in the position for
+  # its own year, age, and length, whatever the row order of the tibble.
+  field_rows <- module_input |>
     dplyr::filter(.data$label == field) |>
-    dplyr::pull(.data$value)
+    dplyr::arrange(.data$timing, .data$age, .data$length)
 
-  field_estimation_type <- module_input |>
-    dplyr::filter(.data$label == field) |>
-    dplyr::pull(.data$estimation_type)
+  # Sorting cannot order 2 rows with the same timing, age, and length, such as
+  # age-specific selectivity repeated for every year without timing.
+  repeated_rows <- field_rows |>
+    dplyr::count(.data$timing, .data$age, .data$length) |>
+    dplyr::filter(.data$n > 1)
+  if (nrow(repeated_rows) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var {field}} in module {.var {module_class_name}} has more than
+      1 row with the same {.var timing}, {.var age}, and {.var length}.",
+      "i" = "Each value needs its own row. The rows are sorted by
+      {.var timing}, {.var age}, and {.var length} before they are used, so a
+      value that changes by year needs its year in {.var timing}.",
+      "i" = "Use {.code dplyr::count(parameters, module_name, fleet, label, timing, age, length) |> dplyr::filter(n > 1)} to find the repeated rows."
+    ))
+  }
+
+  # Value and estimation type come from the same sorted rows, so each value
+  # keeps its own estimation type.
+  field_value <- field_rows[["value"]]
+  field_estimation_type <- field_rows[["estimation_type"]]
 
   # Check if both value and estimation information are present
   if (length(field_value) == 0 || length(field_estimation_type) == 0) {

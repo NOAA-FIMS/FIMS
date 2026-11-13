@@ -11,7 +11,10 @@ initialize_fims(parameters, data)
 is the primary source of information for what is initialized. That is, if a
 fleet exists in the data but parameter information for how to specify
 selectivity for that fleet is not provided, then selectivity will not be
-initialized for that fleet.}
+initialized for that fleet. The rows of a parameter with more than 1
+value are used in order of \code{timing}, then \code{age}, then \code{length}, not in
+the order they appear in the tibble. So each row needs its own
+combination of \code{timing}, \code{age}, and \code{length}.}
 
 \item{data}{An S4 object with the \code{FIMSFrame} class, which is returned from
 \code{\link[=FIMSFrame]{FIMSFrame()}}. Passing the data is required because initialization of the
