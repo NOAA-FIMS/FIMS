@@ -24,7 +24,9 @@ void ConfigureAdapter(
 
   // Adapter stores positive growth params on log scale.
   adapter.MeanLengthYoungVector()[0] = fims_math::log(mean_length_young);
-  adapter.MeanLengthOldVector()[0] = fims_math::log(mean_length_old);
+  // Estimated older length is stored as the log difference from younger length.
+  adapter.MeanLengthOldVector()[0] =
+      fims_math::log(mean_length_old - mean_length_young);
   adapter.GrowthCoefficientVector()[0] = fims_math::log(growth_coefficient);
   adapter.ReferenceAgeForLengthYoungVector()[0] =
       reference_age_for_length_young;
@@ -50,10 +52,9 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, UsesWaaFromLaa) {
   const double growth_coefficient = 0.18;
   const double reference_age_for_length_young = 1.0;
   const double reference_age_for_length_old = 12.0;
-  const double denom_raw =
+  const double denom =
       1.0 - std::exp(-growth_coefficient * (reference_age_for_length_old -
                                             reference_age_for_length_young));
-  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double L =
       mean_length_young +
       (mean_length_old - mean_length_young) *
@@ -80,10 +81,9 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, HonorsAgeOffset) {
   const double growth_coefficient = 0.18;
   const double reference_age_for_length_young = 1.0;
   const double reference_age_for_length_old = 12.0;
-  const double denom_raw =
+  const double denom =
       1.0 - std::exp(-growth_coefficient * (reference_age_for_length_old -
                                             reference_age_for_length_young));
-  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double L =
       mean_length_young +
       (mean_length_old - mean_length_young) *
@@ -129,10 +129,9 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, ExtrapolatesAboveCachedAgeRange) {
   const double growth_coefficient = 0.18;
   const double reference_age_for_length_young = 1.0;
   const double reference_age_for_length_old = 12.0;
-  const double denom_raw =
+  const double denom =
       1.0 - std::exp(-growth_coefficient * (reference_age_for_length_old -
                                             reference_age_for_length_young));
-  const double denom = fims_math::ad_max(fims_math::ad_fabs(denom_raw), 1e-8);
   const double L =
       mean_length_young +
       (mean_length_old - mean_length_young) *
@@ -172,6 +171,52 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, RejectsBothVariabilityPaths) {
   } catch (const std::runtime_error& e) {
     EXPECT_NE(std::string(e.what()).find("exactly one supported path"),
               std::string::npos);
+  }
+}
+
+
+TEST(VonBertalanffySchnuteGrowthModelAdapter,
+     PreservesLengthOrderingAndHandlesTinyGaps) {
+  for (bool young_is_constant : {false, true}) {
+    SCOPED_TRACE(young_is_constant);
+    fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double> adapter;
+    ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0,
+                     2.5e-11, 3.0, 28.0, 73.0);
+
+    if (young_is_constant) {
+      adapter.UseConstantMeanLengthYoungWithEstimatedMeanLengthOld(275.0);
+    } else {
+      adapter.UseEstimatedReferenceMeanLengths();
+    }
+
+    adapter.SetAgeOffset(1.0);
+    adapter.Initialize(1, 12, 1);
+
+    // Change working values after initialization, as optimization would.
+    adapter.MeanLengthYoungVector()[0] = fims_math::log(800.0);
+    const double expected_young = young_is_constant ? 275.0 : 800.0;
+
+    for (double gap : {1e-20, 0.001, 10.0, 450.0}) {
+      SCOPED_TRACE(gap);
+      adapter.MeanLengthOldVector()[0] = fims_math::log(gap);
+      adapter.PrepareGrowthProducts();
+
+      const auto* products = adapter.TryGetPreparedGrowthProducts();
+      ASSERT_NE(products, nullptr);
+      EXPECT_NEAR(products->MeanLAA(0, 0, 0), expected_young, 1e-8);
+      if (gap == 1e-20) {
+        // This gap is too small to distinguish the two physical lengths.
+        EXPECT_EQ(products->MeanLAA(0, 11, 0),
+                  products->MeanLAA(0, 0, 0));
+      } else {
+        EXPECT_GT(products->MeanLAA(0, 11, 0),
+                  products->MeanLAA(0, 0, 0));
+      }
+      EXPECT_NEAR(products->MeanLAA(0, 11, 0),
+                  expected_young + gap, 1e-8);
+      EXPECT_NEAR(products->SdLAA(0, 0, 0), 28.0, 1e-4);
+      EXPECT_NEAR(products->SdLAA(0, 11, 0), 73.0, 1e-4);
+    }
   }
 }
 
