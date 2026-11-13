@@ -6,6 +6,7 @@ fims_input_types <- c(
   "catch",
   "length_bin",
   "length_comp",
+  "caal_comp",
   "weight_at_age"
 )
 
