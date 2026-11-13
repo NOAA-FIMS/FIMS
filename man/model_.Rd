@@ -11,6 +11,9 @@
 \alias{model_age_comp}
 \alias{model_age_comp,FIMSFrame-method}
 \alias{model_age_comp,data.frame-method}
+\alias{model_caal_comp}
+\alias{model_caal_comp,FIMSFrame-method}
+\alias{model_caal_comp,data.frame-method}
 \alias{model_length_comp}
 \alias{model_length_comp,FIMSFrame-method}
 \alias{model_length_comp,data.frame-method}
@@ -39,6 +42,12 @@ model_age_comp(x, fleet)
 \S4method{model_age_comp}{FIMSFrame}(x, fleet)
 
 \S4method{model_age_comp}{data.frame}(x, fleet)
+
+model_caal_comp(x, fleet)
+
+\S4method{model_caal_comp}{FIMSFrame}(x, fleet)
+
+\S4method{model_caal_comp}{data.frame}(x, fleet)
 
 model_length_comp(x, fleet)
 
@@ -99,6 +108,12 @@ fleet(s).
 \subsection{\code{model_age_comp()}}{
 
 Returns a numeric vector of age-composition data (type \code{"age_comp"}) for the
+specified fleet(s).
+}
+
+\subsection{\code{model_caal_comp()}}{
+
+Returns a numeric vector of conditional age at length data (type \code{"caal_comp"}) for the
 specified fleet(s).
 }
 

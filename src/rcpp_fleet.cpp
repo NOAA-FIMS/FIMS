@@ -44,6 +44,7 @@ void register_fleet(Rcpp::Module& m) {
       .field("log_catch_expected", &FleetInterface::log_catch_expected)
       .field("agecomp_proportion", &FleetInterface::agecomp_proportion)
       .field("lengthcomp_proportion", &FleetInterface::lengthcomp_proportion)
+      .field("caalcomp_proportion", &FleetInterface::caalcomp_proportion)
       .field("index_numbers_at_age", &FleetInterface::index_numbers_at_age)
       .field("index_weight_at_age", &FleetInterface::index_weight_at_age)
       .field("index_numbers_at_length",
@@ -53,6 +54,7 @@ void register_fleet(Rcpp::Module& m) {
       .field("index_expected", &FleetInterface::index_expected)
       .field("agecomp_expected", &FleetInterface::agecomp_expected)
       .field("lengthcomp_expected", &FleetInterface::lengthcomp_expected)
+      .field("caalcomp_expected", &FleetInterface::caalcomp_expected)
       .method("get_id", &FleetInterface::get_id)
       .method("SetName", &FleetInterface::SetName)
       .method("GetName", &FleetInterface::GetName)
@@ -60,6 +62,10 @@ void register_fleet(Rcpp::Module& m) {
               &FleetInterface::SetObservedAgeCompDataID)
       .method("GetObservedAgeCompDataID",
               &FleetInterface::GetObservedAgeCompDataID)
+      .method("SetObservedCaalCompDataID",
+              &FleetInterface::SetObservedCaalCompDataID)
+      .method("GetObservedCaalCompDataID",
+              &FleetInterface::GetObservedCaalCompDataID)
       .method("SetObservedLengthCompDataID",
               &FleetInterface::SetObservedLengthCompDataID)
       .method("GetObservedLengthCompDataID",

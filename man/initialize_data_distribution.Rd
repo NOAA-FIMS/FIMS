@@ -6,7 +6,7 @@
 \usage{
 initialize_data_distribution(
   module,
-  data_type = c("catch", "index", "age_comp", "length_comp"),
+  data_type = c("catch", "index", "age_comp", "length_comp", "caal_comp"),
   uncertainty
 )
 }
@@ -16,7 +16,7 @@ of interest.}
 
 \item{data_type}{A string specifying the type of data that the
 distribution will be fit to. Allowable types include
-"catch", "index", "age_comp", and "length_comp"
+"catch", "index", "age_comp", "length_comp", and "caal_comp"
 and the default is
 catch.}
 
