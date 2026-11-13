@@ -19,16 +19,6 @@
 namespace fims_popdy {
 
 /**
- * @brief Constant/estimated configuration of the two reference mean lengths.
- */
-enum class LengthReferenceParameterization {
-  kEstimatedReferenceLengths = 0,
-  kConstantLengthYoungEstimatedLengthOld,
-  kEstimatedLengthYoungBelowConstantLengthOld,
-  kBothConstant
-};
-
-/**
  * @brief Generic capability interface for growth models that can feed the
  * growth-derived age-to-length conversion / bin-based WAA path in catch-at-age.
  */
@@ -86,9 +76,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
   VonBertalanffySchnuteGrowthModelAdapter()
       : GrowthDerivedObservationBase<Type>() {}
 
-  using LengthReferenceParameterization =
-      fims_popdy::LengthReferenceParameterization;
-
   // Stored parameter vectors on their working scales. Positive parameters
   // use log scale, reference ages stay on the natural scale, and
   // correlation terms use transformed working-scale values.
@@ -107,23 +94,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
   fims::Vector<Type> mean_length_young_mean_length_old_logit_corr_vector;
   fims::Vector<Type> mean_length_young_growth_coefficient_logit_corr_vector;
   fims::Vector<Type> mean_length_old_growth_coefficient_logit_corr_vector;
-
-  /**
-   * @brief Configure reference-length interpretation and invalidate products.
-   * @param parameterization Constant/estimated configuration.
-   * @param reference_mean_length_young Natural-scale younger reference length;
-   * used only when the younger length is constant.
-   * @param reference_mean_length_old Natural-scale older reference length;
-   * used only when the older length is constant.
-   */
-  void SetLengthReferenceParameterization(
-      LengthReferenceParameterization parameterization,
-      Type reference_mean_length_young, Type reference_mean_length_old) {
-    length_reference_parameterization_ = parameterization;
-    constant_mean_length_young_ = reference_mean_length_young;
-    constant_mean_length_old_ = reference_mean_length_old;
-    growth_products_prepared_ = false;
-  }
+  bool use_bounded_young_length = false;
 
   /**
    * @brief Initialize the backing growth model and cache dimensions.
@@ -221,10 +192,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
   }
 
  private:
-  LengthReferenceParameterization length_reference_parameterization_ =
-      LengthReferenceParameterization::kEstimatedReferenceLengths;
-  Type constant_mean_length_young_ = Type(0.0);
-  Type constant_mean_length_old_ = Type(0.0);
   std::size_t n_years_ = 0;
   std::size_t n_ages_ = 0;
   std::size_t n_sexes_ = 1;
@@ -234,9 +201,16 @@ class VonBertalanffySchnuteGrowthModelAdapter
 
   Type EvaluateWithFunctor(int year, const double& a) const {
     EnsureParamsSet();
+    const Type mean_length_old = fims_math::exp(mean_length_old_vector[0]);
+    const Type mean_length_young =
+        use_bounded_young_length
+            ? fims_math::inv_logit(Type(0.0), mean_length_old,
+                                   mean_length_young_vector[0])
+            : fims_math::exp(mean_length_young_vector[0]);
+
     fims_popdy::VonBertalanffySchnuteGrowth<Type> vb;
-    vb.mean_length_young = CurrentMeanLengthYoung();
-    vb.mean_length_old = CurrentMeanLengthOld();
+    vb.mean_length_young = mean_length_young;
+    vb.mean_length_old = mean_length_old;
     vb.growth_coefficient = fims_math::exp(growth_coefficient_vector[0]);
     vb.reference_age_for_length_young =
         reference_age_for_length_young_vector[0];
@@ -251,8 +225,15 @@ class VonBertalanffySchnuteGrowthModelAdapter
     if (!model_) return;
     EnsureParamsSet();
 
+    const Type mean_length_old = fims_math::exp(mean_length_old_vector[0]);
+    const Type mean_length_young =
+        use_bounded_young_length
+            ? fims_math::inv_logit(Type(0.0), mean_length_old,
+                                   mean_length_young_vector[0])
+            : fims_math::exp(mean_length_young_vector[0]);
+
     model_->SetVonBertalanffySchnuteParameters(
-        CurrentMeanLengthYoung(), CurrentMeanLengthOld(),
+        mean_length_young, mean_length_old,
         fims_math::exp(growth_coefficient_vector[0]),
         reference_age_for_length_young_vector[0],
         reference_age_for_length_old_vector[0]);
@@ -301,46 +282,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
     } else {
       model_->ClearGrowthParameterCovariance();
     }
-  }
-
-  Type CurrentMeanLengthYoung() const {
-    switch (length_reference_parameterization_) {
-      case LengthReferenceParameterization::kEstimatedReferenceLengths:
-        return fims_math::exp(mean_length_young_vector[0]);
-
-      case LengthReferenceParameterization::
-          kConstantLengthYoungEstimatedLengthOld:
-        return constant_mean_length_young_;
-
-      case LengthReferenceParameterization::
-          kEstimatedLengthYoungBelowConstantLengthOld:
-        return fims_math::inv_logit(static_cast<Type>(0.0),
-                                    constant_mean_length_old_,
-                                    mean_length_young_vector[0]);
-
-      case LengthReferenceParameterization::kBothConstant:
-        return constant_mean_length_young_;
-    }
-
-    return fims_math::exp(mean_length_young_vector[0]);
-  }
-
-  Type CurrentMeanLengthOld() const {
-    switch (length_reference_parameterization_) {
-      case LengthReferenceParameterization::kEstimatedReferenceLengths:
-      case LengthReferenceParameterization::
-          kConstantLengthYoungEstimatedLengthOld:
-        return fims_math::exp(mean_length_old_vector[0]);
-
-      case LengthReferenceParameterization::
-          kEstimatedLengthYoungBelowConstantLengthOld:
-        return constant_mean_length_old_;
-
-      case LengthReferenceParameterization::kBothConstant:
-        return constant_mean_length_old_;
-    }
-
-    return fims_math::exp(mean_length_old_vector[0]);
   }
 
   bool HasInterpolationSdInputs() const {
