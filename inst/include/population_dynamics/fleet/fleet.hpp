@@ -70,6 +70,11 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_lengthcomp_data; /*!< observed lengthcomp data*/
 
+  // caal data
+  int fleet_observed_caal_data_id_m = -999; /*!< id of caal data */
+  std::shared_ptr<fims_data_object::DataObject<Type>>
+      observed_caal_data; /*!< observed caal data*/
+
   // Mortality and catchability
   fims::Vector<Type>
       log_Fmort; /*!< estimated parameter: log Fishing mortality*/

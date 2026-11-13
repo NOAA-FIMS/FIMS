@@ -451,6 +451,49 @@ methods::setMethod(
 #' @rdname model_
 #' @keywords FIMSFrame
 methods::setGeneric(
+  "model_caal",
+  function(x, fleet) standardGeneric("model_caal")
+)
+#' @rdname model_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "model_caal", "FIMSFrame",
+  function(x, fleet) {
+    dplyr::filter(
+      .data = x@data,
+      .data[["type"]] == "caal",
+      .data[["fleet"]] %in% .env$fleet
+    ) |>
+      dplyr::mutate(
+        sample_size = ifelse(
+          .data$observed == -999,
+          1,
+          unlist(
+            parse_data_distribution(.data$uncertainty)$size,
+            use.names = FALSE
+          )
+        ),
+        probabilities = ifelse(
+          .data$unit == "number",
+          .data$observed,
+          .data$observed * .data$sample_size
+        )
+      ) |>
+      dplyr::pull(.data[["probabilities"]])
+  }
+)
+#' @rdname model_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "model_caal",
+  "data.frame",
+  function(x, fleet) model_caal(FIMSFrame(x), fleet)
+)
+
+#' @export
+#' @rdname model_
+#' @keywords FIMSFrame
+methods::setGeneric(
   "model_length_comp",
   function(x, fleet) standardGeneric("model_length_comp")
 )
@@ -790,6 +833,9 @@ methods::setValidity(
     # Composition data are counts ("number") or proportions that are scaled by
     # the sample size ("proportion"), so any other unit would be read as a
     # proportion without a message.
+    #TODO: it would be better to have a check on the unit types where we do the
+    # conversions so that it is all contained in one place if we added a
+    # additional unit types in the future.
     comp_units <- object@data |>
       dplyr::filter(.data$type %in% grep("_comp", present_types, value = TRUE)) |>
       dplyr::pull(.data$unit) |>

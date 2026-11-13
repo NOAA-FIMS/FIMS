@@ -663,6 +663,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
          << "},\n";
       ss << "{\"lengthcomp\": "
          << fleet_interface->GetObservedLengthCompDataID() << "},\n";
+      ss << "{\"caal\": "
+         << fleet_interface->GetObservedDataID(fims::to_string("caal")) << "},\n";
       ss << "{\"index\": " << fleet_interface->GetObservedIndexDataID()
          << "},\n";
       ss << "{\"catch\": " << fleet_interface->GetObservedCatchDataID()
@@ -1320,6 +1322,17 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<std::string>{"n_years", "n_lengths"});
       info->variable_map[fleet_interface->lengthcomp_proportion.id_m] =
           &derived_quantities["lengthcomp_proportion"];
+
+      derived_quantities["caal_proportion"] = fims::Vector<Type>(
+          fleet_interface->n_years.get() * fleet_interface->n_ages.get());
+      derived_quantities_dim_info["caal_proportion"] =
+          fims_popdy::DimensionInfo(
+              "caal_proportion",
+              fims::Vector<int>{(fleet_interface->n_years.get()),
+                                fleet_interface->n_ages.get()},
+              fims::Vector<std::string>{"n_years", "n_ages"});
+      info->variable_map[fleet_interface->caal_proportion.id_m] =
+          &derived_quantities["caal_proportion"];
 
       // index
       derived_quantities["index_numbers_at_age"] = fims::Vector<Type>(

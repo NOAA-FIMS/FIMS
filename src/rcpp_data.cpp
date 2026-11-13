@@ -14,6 +14,15 @@ std::map<uint32_t, std::shared_ptr<DataInterfaceBase>>
  * Function to register data classes with the Rcpp module system.
  */
 void register_data(Rcpp::Module& m) {
+  Rcpp::class_<DataInterface>("Data",
+                                     "See "
+                                     "https://noaa-fims.github.io/FIMS/doxygen/"
+                                     "classDataInterface.html.")
+      .constructor<string, std::vector<int>, std::vector<string>>()
+      .field("observed_data", &DataInterface::observed_data)
+      .field("uncertainty", &DataInterface::uncertainty)
+      .method("get_id", &DataInterface::get_id);
+
   Rcpp::class_<AgeCompDataInterface>("AgeComp",
                                      "See "
                                      "https://noaa-fims.github.io/FIMS/doxygen/"

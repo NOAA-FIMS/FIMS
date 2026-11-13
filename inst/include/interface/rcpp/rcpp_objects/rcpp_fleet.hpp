@@ -75,6 +75,10 @@ class FleetInterface : public FleetInterfaceBase {
    */
   SharedInt interface_observed_lengthcomp_data_id_m = -999;
   /**
+   * @brief The ID of the observed caal data object.
+   */
+  SharedInt interface_observed_caal_data_id_m = -999;
+  /**
    * @brief Whether this fleet requires age-to-length mapping.
    *
    * When true, the fleet has an active modeled path that converts quantities
@@ -205,6 +209,11 @@ class FleetInterface : public FleetInterfaceBase {
    */
   VariableVector lengthcomp_proportion;
   /**
+   * @brief Proportion of total catch by caal used to specify the caal
+   * composition.
+   */
+  VariableVector caal_proportion;
+  /**
    * @brief Numbers at age for a fleet index such as survey or CPUE.
    */
   VariableVector index_numbers_at_age;
@@ -242,6 +251,10 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief Expected length-composition proportions for the fleet.
    */
   VariableVector lengthcomp_expected;
+  /**
+   * @brief Expected caal proportions for the fleet.
+   */
+  VariableVector caal_expected;
 
   /**
    * @brief The constructor.
@@ -271,6 +284,8 @@ class FleetInterface : public FleetInterfaceBase {
             other.interface_observed_agecomp_data_id_m),
         interface_observed_lengthcomp_data_id_m(
             other.interface_observed_lengthcomp_data_id_m),
+        interface_observed_caal_data_id_m(
+            other.interface_observed_caal_data_id_m),
         interface_requires_age_length_mapping(
             other.interface_requires_age_length_mapping),
         interface_observed_index_data_id_m(
@@ -299,6 +314,7 @@ class FleetInterface : public FleetInterfaceBase {
         log_catch_expected(other.log_catch_expected),
         agecomp_proportion(other.agecomp_proportion),
         lengthcomp_proportion(other.lengthcomp_proportion),
+        caal_proportion(other.caal_proportion),
         index_numbers_at_age(other.index_numbers_at_age),
         index_weight_at_age(other.index_weight_at_age),
         index_numbers_at_length(other.index_numbers_at_length),
@@ -307,7 +323,8 @@ class FleetInterface : public FleetInterfaceBase {
         index_expected(other.index_expected),
         log_index_expected(other.log_index_expected),
         agecomp_expected(other.agecomp_expected),
-        lengthcomp_expected(other.lengthcomp_expected) {}
+        lengthcomp_expected(other.lengthcomp_expected),
+        caal_expected(other.caal_expected) {}
 
   /**
    * @brief The destructor.
@@ -331,6 +348,52 @@ class FleetInterface : public FleetInterfaceBase {
    * @return The name.
    */
   std::string GetName() const { return this->name.get(); }
+
+  /**
+   * @brief Set the unique ID for a data object.
+   * @param data_type Type of data ("age_comp", "length_comp", "caal", "catch",
+   *                  "index").
+   * @param observed_comp_data_id Unique ID for the observed data object.
+   */
+  void SetObservedDataID(std::string data_type, int observed_comp_data_id) {
+    if (data_type == "age_comp") {
+      interface_observed_agecomp_data_id_m.set(observed_comp_data_id);
+    } else if (data_type == "length_comp") {
+      interface_observed_lengthcomp_data_id_m.set(observed_comp_data_id);
+    } else if (data_type == "caal") {
+      interface_observed_caal_data_id_m.set(observed_comp_data_id);
+    } else if (data_type == "catch") {
+      interface_observed_catch_data_id_m.set(observed_comp_data_id);
+    } else if (data_type == "index") {
+      interface_observed_index_data_id_m.set(observed_comp_data_id);
+    } else {
+      throw std::invalid_argument(
+          "Fleet observed data ID mismatch. Unknown data type: " + data_type);
+    }
+  }
+
+  /**
+   * @brief Get the unique ID for a data object.
+   * @param data_type Type of data ("age_comp", "length_comp", "caal", "catch",
+   *                  "index").
+   * @param observed_comp_data_id Unique ID for the observed data object.
+   */
+  int GetObservedDataID(std::string data_type) {
+    if (data_type == "age_comp") {
+      return interface_observed_agecomp_data_id_m.get();
+    } else if (data_type == "length_comp") {
+      return interface_observed_lengthcomp_data_id_m.get();
+    } else if (data_type == "caal") {
+      return interface_observed_caal_data_id_m.get();
+    } else if (data_type == "catch") {
+      return interface_observed_catch_data_id_m.get();
+    } else if (data_type == "index") {
+      return interface_observed_index_data_id_m.get();
+    }else{
+      throw std::invalid_argument(
+          "Fleet observed data ID mismatch. Unknown data type: " + data_type);
+    }
+  }
 
   /**
    * @brief Set the unique ID for the observed age-composition data object.
@@ -518,11 +581,16 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->fleet_observed_lengthcomp_data_id_m =
         interface_observed_lengthcomp_data_id_m.get();
+
+    fleet->fleet_observed_caal_data_id_m =
+        interface_observed_caal_data_id_m.get();
+
     fleet->requires_age_length_mapping =
         interface_requires_age_length_mapping.get();
 
     fleet->fleet_observed_index_data_id_m =
         interface_observed_index_data_id_m.get();
+        
     fleet->fleet_observed_catch_data_id_m =
         interface_observed_catch_data_id_m.get();
 

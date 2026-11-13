@@ -97,6 +97,8 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       "catch_expected",
       "agecomp_expected",
       "agecomp_proportion",
+      "caal_expected",
+      "caal_proportion",
       "observed_index_units",
       "observed_catch_units",
       "catch_numbers_at_age",
@@ -704,7 +706,7 @@ initialize_index <- function(data, fleet) {
 initialize_comp <- function(data,
                             fleet,
                             parameters = NULL,
-                            type = c("AgeComp", "LengthComp")) {
+                            type = c("AgeComp", "LengthComp", "Caal")) {
   comp_types <- list(
     "AgeComp" = list(
       "name" = "age_comp",
@@ -717,6 +719,12 @@ initialize_comp <- function(data,
       "comp_data_field" = "length_comp_data",
       "comp_object" = LengthComp,
       "m_comp" = model_length_comp
+    ),
+    "Caal" = list(
+      "name" = "caal",
+      "comp_data_field" = "caal_data",
+      "comp_object" = Caal,
+      "m_comp" = model_caal
     )
   )
 
@@ -726,15 +734,16 @@ initialize_comp <- function(data,
   assert_presence_of_fleet(data, fleet)
 
   fleet_length_bins <- NULL
-  uses_growth_derived_path <- identical(type, "LengthComp") &&
-    !is.null(parameters) &&
+  uses_growth_derived_path <- (identical(type, "LengthComp") || 
+                                identical(type, "Caal")) &&
+                                !is.null(parameters) &&
     any(
       parameters |>
         dplyr::filter(.data$module_name == "Growth") |>
         dplyr::pull(.data$module_type) %in% "VonBertalanffySchnute"
     )
 
-  if (identical(type, "LengthComp")) {
+  if (identical(type, "LengthComp") || identical(type, "Caal")) {
     fleet_length_bins <- resolve_fleet_length_bins(
       get_data(data),
       allow_global_conversion_fallback = !uses_growth_derived_path
@@ -743,20 +752,20 @@ initialize_comp <- function(data,
     if (is.null(fleet_length_bins) || length(fleet_length_bins) == 0) {
       if (uses_growth_derived_path) {
         cli::cli_abort(c(
-          "Fleet `{fleet}` requires a resolved fleet-specific length-bin layout for `length_comp` on the growth-derived VonBertalanffySchnute path.",
+          "Fleet `{fleet}` requires a resolved fleet-specific length-bin layout for `length_comp` and `caal` on the growth-derived VonBertalanffySchnute path.",
           "i" = "Provide explicit `length_bin` rows or fleet-specific `length_comp` bins.",
           "i" = "Fixed `age_to_length_conversion` rows are not used to define fleet observation bins for the active Growth-derived age-to-length conversion path."
         ))
       }
 
       cli::cli_abort(c(
-        "Fleet `{fleet}` requires a resolved fleet-specific length-bin layout for `length_comp`.",
+        "Fleet `{fleet}` requires a resolved fleet-specific length-bin layout for `length_comp` and `caal`.",
         "i" = "Provide explicit `length_bin` rows, fleet-specific `length_comp` bins, or compatible fixed age-to-length support."
       ))
     }
   }
 
-  expected_n <- if (identical(type, "LengthComp")) {
+  expected_n <- if (identical(type, "LengthComp") || identical(type, "Caal")) {
     length(fleet_length_bins)
   } else {
     get_n_ages(data)
@@ -1022,6 +1031,7 @@ initialize_fims <- function(parameters, data) {
     fleet_index <- fleet_index_distribution <-
     fleet_age_comp <- fleet_agecomp_distribution <-
     fleet_length_comp <- fleet_lengthcomp_distribution <-
+    fleet_caal <- fleet_caal_distribution <-
     vector("list", length(fleets))
 
   for (i in seq_along(fleets)) {
@@ -1090,6 +1100,24 @@ initialize_fims <- function(parameters, data) {
       )
     }
 
+    # Initialize caal composition module if the data type includes "caal" and
+    # if "Caal" exists in the data distribution specification
+    if ("caal" %in% fleet_types) {
+      # Initialize caal composition module for the current fleet
+      fleet_caal[[i]] <- initialize_comp(
+        data = data,
+        fleet = fleets[i],
+        parameters = parameters,
+        type = "Caal"
+      )
+
+      # Add the module ID for the initialized caal composition to the list of fleet module IDs
+      fleet_module_ids <- c(
+        fleet_module_ids,
+        c(caal = fleet_caal[[i]]$get_id())
+      )
+    }
+
     # Initialize length composition module if the data type includes "length_comp" and
     # if "LengthComp" exists in the data distribution specification
     if ("length_comp" %in% fleet_types) {
@@ -1153,6 +1181,19 @@ initialize_fims <- function(parameters, data) {
           dplyr::filter(
             .data$fleet == .env$fleets[i] &
               .data$type == "age_comp"
+          ) |>
+          dplyr::pull(dplyr::all_of("uncertainty"))
+      )
+    }
+
+    if ("caal" %in% fleet_types) {
+      fleet_caal_distribution[[i]] <- initialize_data_distribution(
+        module = fleet[[i]],
+        data_type = "caal",
+        uncertainty = get_data(data) |>
+          dplyr::filter(
+            .data$fleet == .env$fleets[i] &
+              .data$type == "caal"
           ) |>
           dplyr::pull(dplyr::all_of("uncertainty"))
       )

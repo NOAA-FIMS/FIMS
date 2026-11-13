@@ -447,6 +447,69 @@ class Information {
    * @param &valid_model reference to true/false boolean indicating whether
    * model is valid.
    * @param f shared pointer to fleet module
+   * @param composition_type type of composition data (e.g., "age", "length", 
+   * "caal")
+   */
+  void SetCompositionData(bool& valid_model,
+                             std::shared_ptr<fims_popdy::Fleet<Type>> f,
+                            std::string composition_type) {
+    if (composition_type == "age" && 
+      f->fleet_observed_agecomp_data_id_m != static_cast<Type>(-999)) {
+      uint32_t observed_agecomp_id =
+          static_cast<uint32_t>(f->fleet_observed_agecomp_data_id_m);
+      data_iterator it = this->data_objects.find(observed_agecomp_id);
+      if (it != this->data_objects.end()) {
+        f->observed_agecomp_data = (*it).second;
+        FIMS_INFO_LOG("Observed input age-composition data for fleet " +
+                      fims::to_string(f->id) + " successfully set to " +
+                      fims::to_string(f->observed_agecomp_data->at(1)));
+      } else {
+        valid_model = false;
+        FIMS_ERROR_LOG(
+            "Expected age-composition observations not defined for fleet " +
+            fims::to_string(f->id));
+      }
+    }else if (composition_type == "length" && 
+      f->fleet_observed_lengthcomp_data_id_m != static_cast<Type>(-999)) {
+      uint32_t observed_lengthcomp_id =
+          static_cast<uint32_t>(f->fleet_observed_lengthcomp_data_id_m);
+      data_iterator it = this->data_objects.find(observed_lengthcomp_id);
+      if (it != this->data_objects.end()) {
+        f->observed_lengthcomp_data = (*it).second;
+        FIMS_INFO_LOG("Observed input length-composition data for fleet " +
+                      fims::to_string(f->id) + " successfully set to " +
+                      fims::to_string(f->observed_lengthcomp_data->at(1)));
+      } else {
+        valid_model = false;
+        FIMS_ERROR_LOG(
+            "Expected length-composition observations not defined for fleet " +
+            fims::to_string(f->id));
+      }
+    }else if (composition_type == "caal" && 
+      f->fleet_observed_caal_data_id_m != static_cast<Type>(-999)) {
+      uint32_t observed_caal_id =
+          static_cast<uint32_t>(f->fleet_observed_caal_data_id_m);
+      data_iterator it = this->data_objects.find(observed_caal_id);
+      if (it != this->data_objects.end()) {
+        f->observed_caal_data = (*it).second;
+        FIMS_INFO_LOG("Observed input caal data for fleet " +
+                      fims::to_string(f->id) + " successfully set to " +
+                      fims::to_string(f->observed_caal_data->at(1)));
+      } else {
+        valid_model = false;
+        FIMS_ERROR_LOG(
+            "Expected caal observations not defined for fleet " +
+            fims::to_string(f->id));
+      }
+    }
+  }
+
+  /**
+   * @brief Set pointers to age composition data in the fleet module.
+   *
+   * @param &valid_model reference to true/false boolean indicating whether
+   * model is valid.
+   * @param f shared pointer to fleet module
    */
   void SetAgeCompositionData(bool& valid_model,
                              std::shared_ptr<fims_popdy::Fleet<Type>> f) {
