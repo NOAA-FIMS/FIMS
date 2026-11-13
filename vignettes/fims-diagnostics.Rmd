@@ -5,6 +5,8 @@ vignette: >
   %\VignetteIndexEntry{Running diagnostics on a FIMS model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+level: "new-user"
+summary: "How to run a simple FIMS model."
 ---
 
 ```{r, include = FALSE}

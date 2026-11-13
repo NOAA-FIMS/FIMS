@@ -1,10 +1,12 @@
 ---
-title: "RE Sparsity"
+title: "Random Effects Sparsity"
 output: github_document
 vignette: >
   %\VignetteIndexEntry{RE Sparsity}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+level: "contributor"
+summary: "Investigates the performance and optimization time of simple random effects parameterized as a dense vs. sparse matrix"
 ---
 
 
