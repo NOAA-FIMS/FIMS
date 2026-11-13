@@ -18,9 +18,7 @@ fit_big_unoptimized <- FIMS:::fit_big_unoptimized
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
-  # Checked-in estimate tables predate calendar-year labels. The fresh-fit
-  # regression below checks the current year output.
-  "parameter_id", "fleet", "year_i", "age", "length",
+  "parameter_id", "fleet", "year", "age", "length",
   "input", "estimated", "expected", "observed",
   "estimation_type", "uncertainty",
   "distribution", "input_type",

@@ -16,7 +16,7 @@ fit_big_unoptimized <- FIMS:::fit_big_unoptimized
 test_that("`get_model_output()` works with correct inputs", {
   expected_names <- c(
     "name", "type", "estimation_framework", "id", "objective_function_value",
-    "growth", "recruitment", "maturity",
+    "year", "growth", "recruitment", "maturity",
     "selectivity", "population_ids", "fleet_ids", "populations", "fleets",
     "density_components", "data"
   )
