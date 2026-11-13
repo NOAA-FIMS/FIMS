@@ -546,8 +546,8 @@ class VonBertalanffySchnuteGrowthInterface
               vb->reference_age_for_length_old_vector, false);
     set_final(this->length_weight_a, vb->length_weight_a_vector, true);
     set_final(this->length_weight_b, vb->length_weight_b_vector, true);
-    set_final(this->length_at_age_sd_young,
-              vb->length_at_age_sd_young_vector, true);
+    set_final(this->length_at_age_sd_young, vb->length_at_age_sd_young_vector,
+              true);
     set_final(this->length_at_age_sd_old, vb->length_at_age_sd_old_vector,
               true);
     set_final(this->log_sd_mean_length_young,
