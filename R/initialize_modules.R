@@ -40,6 +40,8 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
 
   if (module_class_name == "Population") {
     module_fields <- setdiff(module_fields, c(
+      "n_lengths",
+      "lengths",
       "log_f_multiplier",
       "spawning_biomass_ratio",
       "total_catch_weight",
@@ -386,6 +388,23 @@ initialize_population <- function(parameters, data, linked_ids) {
   # Link fleets to module
   for (i in which(grepl("fleet", names(linked_ids)))) {
     module$AddFleet(linked_ids[[i]])
+  }
+
+  population_lengths <- population_length_bins(get_data(data))
+  module$n_lengths$set(length(population_lengths))
+  module$lengths[] <- population_lengths
+  growth_type <- parameters |>
+    dplyr::filter(.data[["module_name"]] == "Growth") |>
+    dplyr::pull(.data[["module_type"]]) |>
+    unique()
+  if (length(population_lengths) > 0 && "EWAA" %in% growth_type) {
+    cli::cli_warn(c(
+      "!" = "The population length bins ({.var length_bin} rows with
+      {.code fleet = NA}) are not used because growth is {.val EWAA}.",
+      "i" = "Population length bins need a growth module that gives length at
+      age, such as {.code setup_default_Growth(module_type =
+      \"VonBertalanffySchnute\")}."
+    ))
   }
 
   return(module)

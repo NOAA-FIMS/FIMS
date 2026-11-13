@@ -788,7 +788,7 @@ This branch changed more than "turning on growth estimation". The Growth module 
 
 The size subsystem separates population biology from fleet observation biology. Growth defines the biological size structure of the population. Those growth products are then used to build `ProbSize`, the probability that a fish of a given year and age falls into a particular population size bin. The growth-derived age-to-length pathway then maps those population size probabilities onto the fleet observation bins used by the length-composition data.
 
-The biological size grid remains separate from fleet observation bins, and user-specified size grids are preserved when provided; FIMS only builds a default grid when needed.
+The biological size grid remains separate from fleet observation bins, and user-specified size grids are preserved when provided; FIMS only builds a default grid when needed. This grid is the population length bins. Users set it with `length_bin` rows that have `fleet = NA` and `timing = NA`, as described in `vignette("fims-input-data", package = "FIMS")`.
 
 Conceptually, the path is:
 

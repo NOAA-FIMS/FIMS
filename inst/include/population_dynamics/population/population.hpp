@@ -63,6 +63,11 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
 
   // size
   SizeGrid size_grid; /*!< population-level biological size grid */
+  /**
+   * @brief Lower edges of the population length bins. Empty when FIMS builds
+   * the bins from the fleet bins.
+   */
+  fims::Vector<double> lengths;
   std::shared_ptr<fims_popdy::SizeDistributionProviderBase<Type>>
       size_distribution_provider; /*!< population-level size distribution
                                      provider */
