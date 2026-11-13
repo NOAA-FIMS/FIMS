@@ -896,17 +896,18 @@ class Information {
                 growth_observation = std::dynamic_pointer_cast<
                     fims_popdy::GrowthDerivedObservationBase<Type>>(
                     p->growth)) {
-          growth_observation->Initialize(p->n_years, p->n_ages, 1);
-
+          double min_age = 0.0;
           if (p->ages.size() > 0) {
-            double min_age = p->ages[0];
+            min_age = p->ages[0];
             for (size_t i = 1; i < p->ages.size(); ++i) {
               if (p->ages[i] < min_age) {
                 min_age = p->ages[i];
               }
             }
-            growth_observation->SetAgeOffset(static_cast<double>(min_age));
           }
+
+          growth_observation->Initialize(
+              p->n_years, p->n_ages, 1, min_age);
 
           const bool population_has_size_grid_input =
               p->size_grid.n_bins > 0 || p->size_grid.edges.size() > 0 ||

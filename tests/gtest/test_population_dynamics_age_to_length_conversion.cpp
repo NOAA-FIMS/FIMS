@@ -31,10 +31,8 @@ struct FakeGrowthDerivedObservation
   std::size_t prepare_calls = 0;
   bool products_prepared = false;
 
-  void SetAgeOffset(double) override {}
-
   void Initialize(std::size_t n_years, std::size_t n_ages,
-                  std::size_t n_sexes = 1) override {
+                  std::size_t n_sexes = 1, double = 0.0) override {
     products.Resize(n_years, n_ages, n_sexes);
     products_prepared = false;
   }
@@ -402,8 +400,7 @@ TEST(
       fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
-  growth->SetAgeOffset(1.0);
-  growth->Initialize(1, fleet->n_ages, 1);
+  growth->Initialize(1, fleet->n_ages, 1, 1.0);
 
   const fims_popdy::SizeGrid population_size_grid =
       MakePopulationSizeGridForFleet(fleet);
@@ -473,8 +470,7 @@ TEST(AgeToLengthConversionRuntime,
       fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
-  growth->SetAgeOffset(1.0);
-  growth->Initialize(1, 3, 1);
+  growth->Initialize(1, 3, 1, 1.0);
 
   const fims_popdy::SizeGrid population_size_grid =
       fims_popdy::SizeGridBuilder::BuildRegularGrid(0.0, 1500.0, 1.0);
@@ -516,8 +512,7 @@ TEST(AgeToLengthConversionDerived,
       fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
-  growth->SetAgeOffset(1.0);
-  growth->Initialize(1, 3, 1);
+  growth->Initialize(1, 3, 1, 1.0);
 
   std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
       size_provider;
@@ -640,8 +635,7 @@ TEST(AgeToLengthConversionDerived,
       fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
-  growth->SetAgeOffset(1.0);
-  growth->Initialize(1, fleet->n_ages, 1);
+  growth->Initialize(1, fleet->n_ages, 1, 1.0);
   const fims_popdy::SizeGrid population_size_grid =
       MakePopulationSizeGridForFleet(fleet);
   std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
@@ -676,8 +670,7 @@ TEST(AgeToLengthConversionDerived,
       fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
-  growth->SetAgeOffset(1.0);
-  growth->Initialize(1, fleet->n_ages, 1);
+  growth->Initialize(1, fleet->n_ages, 1, 1.0);
   const fims_popdy::SizeGrid population_size_grid =
       MakePopulationSizeGridForFleet(fleet);
   std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
@@ -702,8 +695,7 @@ TEST(AgeToLengthConversionDerived,
       fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
-  growth->SetAgeOffset(1.0);
-  growth->Initialize(1, fleet->n_ages, 1);
+  growth->Initialize(1, fleet->n_ages, 1, 1.0);
 
   const fims_popdy::SizeGrid population_size_grid =
       MakePopulationSizeGridForFleet(fleet);

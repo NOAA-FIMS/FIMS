@@ -21,10 +21,8 @@ struct FakeGrowthDerivedObservation
   fims_popdy::GrowthProducts<double> products;
   bool products_prepared = false;
 
-  void SetAgeOffset(double) override {}
-
   void Initialize(std::size_t n_years, std::size_t n_ages,
-                  std::size_t n_sexes = 1) override {
+                  std::size_t n_sexes = 1, double = 0.0) override {
     products.Resize(n_years, n_ages, n_sexes);
     products_prepared = false;
   }
@@ -215,8 +213,7 @@ TEST(GrowthDerivedSizeProvider,
       fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 10.0,
                    120.0);
-  growth->SetAgeOffset(1.0);
-  growth->Initialize(1, 3, 1);
+  growth->Initialize(1, 3, 1, 1.0);
   ASSERT_NO_THROW(growth->PrepareGrowthProducts());
 
   fims::Vector<fims::Vector<double>> fleet_edges;
@@ -292,16 +289,14 @@ TEST(GrowthDerivedSizeProvider,
       fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(*lower_growth, 225.0, 575.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0,
                    28.0, 73.0);
-  lower_growth->SetAgeOffset(1.0);
-  lower_growth->Initialize(1, 1, 1);
+  lower_growth->Initialize(1, 1, 1, 1.0);
   ASSERT_NO_THROW(lower_growth->PrepareGrowthProducts());
 
   auto higher_growth = std::make_shared<
       fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(*higher_growth, 325.0, 825.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0,
                    28.0, 73.0);
-  higher_growth->SetAgeOffset(1.0);
-  higher_growth->Initialize(1, 1, 1);
+  higher_growth->Initialize(1, 1, 1, 1.0);
   ASSERT_NO_THROW(higher_growth->PrepareGrowthProducts());
 
   const fims_popdy::SizeGrid grid = fims_popdy::SizeGridBuilder::BuildFromEdges(
@@ -379,8 +374,7 @@ TEST(GrowthDerivedSizeProvider,
       fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<double>>();
   ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
-  growth->SetAgeOffset(1.0);
-  growth->Initialize(1, 12, 1);
+  growth->Initialize(1, 12, 1, 1.0);
   ASSERT_NO_THROW(growth->PrepareGrowthProducts());
 
   // 1-unit bins covering well beyond every age's length distribution.

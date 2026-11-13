@@ -35,12 +35,15 @@ class GrowthModel : public GrowthModelBase<Type> {
    * @param n_years Number of years.
    * @param n_ages Number of ages.
    * @param n_sexes Number of sexes.
+   * @param min_age Minimum modeled age on the natural scale.
    */
-  GrowthModel(std::size_t n_years, std::size_t n_ages, std::size_t n_sexes = 1)
+  GrowthModel(std::size_t n_years, std::size_t n_ages,
+              std::size_t n_sexes = 1, Type min_age = Type(0.0))
       : n_years_(n_years),
         n_ages_(n_ages),
         n_sexes_(n_sexes),
-        products_(n_years, n_ages, n_sexes) {}
+        products_(n_years, n_ages, n_sexes),
+        age_offset_(min_age) {}
 
   /// Set fixed VonBertalanffySchnute parameters (explicit reference ages).
   void SetVonBertalanffySchnuteParameters(Type mean_length_young,
@@ -236,12 +239,6 @@ class GrowthModel : public GrowthModelBase<Type> {
   Type growth_coefficient_variance_ = static_cast<Type>(0.0);
   Type age_offset_ = static_cast<Type>(0.0);
 
- public:
-  /// Set an age offset if population ages do not start at zero.
-  void SetAgeOffset(Type offset) {
-    age_offset_ = offset;
-    needs_update_ = true;
-  }
 };
 
 }  // namespace fims_popdy
