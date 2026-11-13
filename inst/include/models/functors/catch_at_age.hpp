@@ -35,7 +35,8 @@
   @param i_agem1_yearm1 Dimension folded index for age-1 and year-1.
   [param_i_agem1_yearm1]
   [param_i_dev]
-  @param i_dev Index to log_recruit_dev of vector length n_years-1.
+  @param i_dev Year index. In year n_years, after the last year, recruitment
+  is the mean with no deviation.
   [param_i_dev]
   [param_other]
   @param other The other CatchAtAge object to copy from.
@@ -180,6 +181,124 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       this->populations[p]->spawning_biomass_ratio.resize(
           (this->populations[p]->n_years + 1));
+
+      // Any other value would take the free branch in Evaluate() and read
+      // log_init_naa, which an equilibrium model does not fill.
+      const std::string &initial_numbers =
+          this->populations[p]->initial_numbers;
+      if (initial_numbers != "free" && initial_numbers != "equilibrium") {
+        std::stringstream ss;
+        ss << "Initial numbers at age must be \"free\" or \"equilibrium\", "
+              "but population "
+           << this->populations[p]->GetId() << " has \"" << initial_numbers
+           << "\".";
+        FIMS_ERROR_LOG(ss.str());
+        throw std::runtime_error(ss.str());
+      }
+
+      // Both initial numbers options check the recruitment deviations below.
+      // A population with no recruitment linked only gets a warning when the
+      // model is created, so it would otherwise crash here.
+      if (!this->populations[p]->recruitment) {
+        std::stringstream ss;
+        ss << "Population " << this->populations[p]->GetId()
+           << " has no recruitment, but a catch-at-age model needs one.";
+        FIMS_ERROR_LOG(ss.str());
+        throw std::runtime_error(ss.str());
+      }
+
+      if (this->populations[p]->initial_numbers == "equilibrium") {
+        // CalculateEquilibriumInitialNumbersAA() reads only the first offset.
+        // Without one it would read past the end of the vector, and a second
+        // one would be an unidentified parameter.
+        size_t n_offsets = this->populations[p]->log_init_rzero_offset.size();
+        if (n_offsets != 1) {
+          std::stringstream ss;
+          ss << "Equilibrium initial numbers at age need 1 "
+                "log_init_rzero_offset, but population "
+             << this->populations[p]->GetId() << " has " << n_offsets << ".";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
+
+        // log_recruit_devs runs from the oldest cohort with a deviation in the
+        // first-year age structure to the last year, so its length sets how
+        // many of the cohorts that recruited before the first year have a
+        // deviation. The plus group never has one. initialize_fims() checks
+        // this in R, but a model built in C++ would otherwise read past the
+        // end of the vector.
+        std::shared_ptr<fims_popdy::RecruitmentBase<Type>> &recruitment =
+            this->populations[p]->recruitment;
+        size_t n_devs = recruitment->log_recruit_devs.size();
+        size_t n_years = this->populations[p]->n_years;
+        size_t n_ages = this->populations[p]->n_ages;
+        // With 1 age, the only age is the plus group, so no range of
+        // deviations below would be valid.
+        if (n_ages < 2) {
+          std::stringstream ss;
+          ss << "Equilibrium initial numbers at age need at least 2 ages, but "
+                "population "
+             << this->populations[p]->GetId() << " has " << n_ages << ".";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
+        if (n_devs < n_years || n_devs + 2 > n_years + n_ages) {
+          std::stringstream ss;
+          ss << "Equilibrium initial numbers at age need " << n_years << " to "
+             << n_years + n_ages - 2
+             << " recruitment deviations (n_years to n_years + n_ages - 2), "
+                "but population "
+             << this->populations[p]->GetId() << " has " << n_devs << ".";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
+        // First-year numbers at age read log_recruit_devs directly. Only
+        // LogDevs reads the same vector in later years. LogR reads log_r, so
+        // the first year and later years would use different vectors.
+        if (!std::dynamic_pointer_cast<fims_popdy::LogDevs<Type>>(
+                recruitment->process)) {
+          std::stringstream ss;
+          ss << "Equilibrium initial numbers at age need log_devs "
+                "recruitment, but population "
+             << this->populations[p]->GetId()
+             << " uses another recruitment process.";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
+        this->populations[p]->n_initial_devs = n_devs - n_years;
+        recruitment->log_expected_recruitment.resize(n_devs);
+      } else {
+        // Free initial numbers at age read 1 log_init_naa per age.
+        size_t n_ages = this->populations[p]->n_ages;
+        size_t n_init_naa = this->populations[p]->log_init_naa.size();
+        if (n_init_naa != n_ages) {
+          std::stringstream ss;
+          ss << "Free initial numbers at age need 1 log_init_naa per age ("
+             << n_ages << "), but population " << this->populations[p]->GetId()
+             << " has " << n_init_naa << ".";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
+
+        // LogDevs reads 1 deviation for each year after the first. The
+        // log_devs output labels years from the vector length, so any other
+        // length would report the deviations on the wrong years.
+        std::shared_ptr<fims_popdy::RecruitmentBase<Type>> &recruitment =
+            this->populations[p]->recruitment;
+        size_t n_devs = recruitment->log_recruit_devs.size();
+        size_t n_years = this->populations[p]->n_years;
+        if (std::dynamic_pointer_cast<fims_popdy::LogDevs<Type>>(
+                recruitment->process) &&
+            n_devs + 1 != n_years) {
+          std::stringstream ss;
+          ss << "Free initial numbers at age need n_years - 1 recruitment "
+                "deviations ("
+             << n_years - 1 << "), but population "
+             << this->populations[p]->GetId() << " has " << n_devs << ".";
+          FIMS_ERROR_LOG(ss.str());
+          throw std::runtime_error(ss.str());
+        }
+      }
     }
 
     for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end();
@@ -286,6 +405,45 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     dq_["numbers_at_age"][i_age_year] =
         fims_math::exp(population->log_init_naa[age]);
+  }
+
+  /**
+   * @brief Calculates initial numbers at age from the unfished equilibrium.
+   *
+   * Numbers at age in the first year are the unfished equilibrium age
+   * structure from CalculateUnfishedInitialNumbersAA(), scaled by an offset on
+   * log unfished recruitment and by the recruitment deviation of each cohort:
+   * \f[
+   * N_{a,0} = N^U_{a,0} \exp(\delta_R + \epsilon_{-a})
+   * \f]
+   * where \f$\delta_R\f$ is log_init_rzero_offset and \f$\epsilon_{-a}\f$ is
+   * the deviation of the cohort that recruited \f$a\f$ years before the first
+   * year. These deviations are the first elements of log_recruit_devs, so they
+   * share the recruitment process and its standard deviation. Ages above
+   * n_initial_devs, including the plus group, have no deviation
+   * (\f$\epsilon = 0\f$).
+   *
+   * Unfished numbers at age for this age and year must be calculated first.
+   *
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_age
+   */
+  void CalculateEquilibriumInitialNumbersAA(
+      std::shared_ptr<fims_popdy::Population<Type>> &population,
+      size_t i_age_year, size_t age) {
+    std::map<std::string, fims::Vector<Type>> &dq_ =
+        this->GetPopulationDerivedQuantities(population->GetId());
+
+    Type log_scale = population->log_init_rzero_offset[0];
+    // Element n_initial_devs is the first-year recruitment deviation and the
+    // elements before it are for the cohorts that recruited earlier.
+    if (age <= population->n_initial_devs) {
+      log_scale += population->recruitment
+                       ->log_recruit_devs[population->n_initial_devs - age];
+    }
+    dq_["numbers_at_age"][i_age_year] =
+        dq_["unfished_numbers_at_age"][i_age_year] * fims_math::exp(log_scale);
   }
 
   /**
@@ -672,7 +830,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * \f]
    *
    * Where \f$f()\f$ evaluates mean recruitment based on spawning biomass and
-   * \f$\phi_0\f$, and \f$g(y-1)\f$ evaluates recruitment deviations.
+   * \f$\phi_0\f$, and \f$g(y-1)\f$ evaluates recruitment deviations. When
+   * initial numbers at age are "equilibrium", the deviations also cover the
+   * cohorts in the first-year age structure, so \f$g()\f$ is evaluated at
+   * \f$y + n_{initial\ devs}\f$ instead of \f$y-1\f$.
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
@@ -687,6 +848,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     Type phi_0 = CalculateSBPR0(population);
 
+    size_t i_dev_year = year - 1;
+    if (population->initial_numbers == "equilibrium") {
+      // The first n_initial_devs + 1 deviations belong to the cohorts in the
+      // first-year age structure.
+      i_dev_year += population->n_initial_devs + 1;
+    }
+
     if (i_dev == population->n_years) {
       dq_["numbers_at_age"][i_age_year] =
           population->recruitment->evaluate_mean(
@@ -697,12 +865,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
       // Why are we using evaluate_mean, how come a virtual function was
       // changed? AMH: there are now two virtual functions: evaluate_mean and
       // evaluate_process (see below)
-      population->recruitment->log_expected_recruitment[year - 1] =
+      population->recruitment->log_expected_recruitment[i_dev_year] =
           fims_math::log(population->recruitment->evaluate_mean(
               dq_["spawning_biomass"][year - 1], phi_0));
 
       dq_["numbers_at_age"][i_age_year] = fims_math::exp(
-          population->recruitment->process->evaluate_process(year - 1));
+          population->recruitment->process->evaluate_process(i_dev_year));
     }
 
     dq_["expected_recruitment"][year] = dq_["numbers_at_age"][i_age_year];
@@ -1585,9 +1753,22 @@ class CatchAtAge : public FisheryModelBase<Type> {
           for the first year and/or age, so these steps are included here.
            */
           if (y == 0) {
-            // Initial numbers at age is a user input or estimated parameter
-            // vector.
-            CalculateInitialNumbersAA(population, i_age_year, a);
+            // Unfished numbers come first because the equilibrium initial
+            // numbers at age are scaled from them
+            if (a == 0) {
+              pdq_["unfished_numbers_at_age"][i_age_year] =
+                  fims_math::exp(population->recruitment->log_rzero[0]);
+            } else {
+              CalculateUnfishedInitialNumbersAA(population, i_age_year, a);
+            }
+
+            if (population->initial_numbers == "equilibrium") {
+              CalculateEquilibriumInitialNumbersAA(population, i_age_year, a);
+            } else {
+              // Initial numbers at age is a user input or estimated parameter
+              // vector.
+              CalculateInitialNumbersAA(population, i_age_year, a);
+            }
 
             if (a == 0) {
               /*
@@ -1595,10 +1776,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
              */
               pdq_["expected_recruitment"][y] =
                   pdq_["numbers_at_age"][i_age_year];
-              pdq_["unfished_numbers_at_age"][i_age_year] =
-                  fims_math::exp(population->recruitment->log_rzero[0]);
-            } else {
-              CalculateUnfishedInitialNumbersAA(population, i_age_year, a);
             }
 
           } else {

@@ -57,8 +57,16 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       "unfished_spawning_biomass",
       "proportion_mature_at_age",
       "expected_recruitment",
-      "sum_selectivity"
+      "sum_selectivity",
+      # Set by initialize_population() from the parameters that are present
+      "initial_numbers"
     ))
+    # A population has either log_init_naa or log_init_rzero_offset, so do not
+    # require the other
+    module_fields <- setdiff(
+      module_fields,
+      setdiff(c("log_init_naa", "log_init_rzero_offset"), module_input[["label"]])
+    )
   }
 
   if (module_class_name == "BevertonHoltRecruitment") {
@@ -374,11 +382,14 @@ initialize_population <- function(parameters, data, linked_ids) {
     ))
   }
 
+  initial_numbers <- check_initial_numbers(parameters, data)
+
   module <- initialize_module(
     parameters = parameters,
     data = data,
     module_name = "Population"
   )
+  module$initial_numbers$set(initial_numbers)
 
   # Link up the recruitment, growth, and maturity modules with
   # this population module
@@ -408,6 +419,135 @@ initialize_population <- function(parameters, data, linked_ids) {
   }
 
   return(module)
+}
+
+#' Check how initial numbers at age are set
+#'
+#' @description
+#' Initial numbers at age are "free" when the population has `log_init_naa`
+#' and "equilibrium" when it has `log_init_rzero_offset`. Free initial numbers
+#' set the first-year recruitment, so `log_devs` must run from the second year
+#' to the last year. Equilibrium initial numbers read the deviations of the
+#' cohorts in the first-year age structure from the front of `log_devs`, so
+#' `log_devs` must run without gaps from the oldest cohort with a deviation to
+#' the last year. That cohort can be up to `n_ages - 2` years before the first year,
+#' because the plus group has no deviation. The C++ model reads `log_devs` by
+#' position, so a vector that does not match the option would put each
+#' deviation on the wrong year without an error. An equilibrium population
+#' needs 1 `log_init_rzero_offset` because the model reads only the first
+#' value.
+#' @inheritParams initialize_module
+#' @return
+#' Either `"free"` or `"equilibrium"`.
+#' @noRd
+check_initial_numbers <- function(parameters, data) {
+  population_labels <- parameters |>
+    dplyr::filter(.data$module_name == "Population") |>
+    dplyr::pull(.data$label)
+  has_free <- "log_init_naa" %in% population_labels
+  has_equilibrium <- "log_init_rzero_offset" %in% population_labels
+  if (has_free == has_equilibrium) {
+    n_found <- if (has_free) "both" else "neither"
+    conjunction <- if (has_free) "and" else "nor"
+    cli::cli_abort(c(
+      "x" = "The Population module has {n_found} {.var log_init_naa}
+      {conjunction} {.var log_init_rzero_offset}, but it needs exactly 1 of
+      them.",
+      "i" = "{.code initial_numbers = \"free\"} in
+      {.fn setup_default_parameters} gives {.var log_init_naa} and the
+      default, {.code \"equilibrium\"}, gives {.var log_init_rzero_offset}.",
+      "i" = "Check the labels with
+      {.code dplyr::filter(parameters, module_name == \"Population\") |>
+      dplyr::distinct(label)}."
+    ))
+  }
+  initial_numbers <- if (has_free) "free" else "equilibrium"
+
+  recruitment_labels <- parameters |>
+    dplyr::filter(.data$module_name == "Recruitment") |>
+    dplyr::pull(.data$label)
+  if (initial_numbers == "equilibrium") {
+    n_offsets <- sum(population_labels == "log_init_rzero_offset")
+    if (n_offsets != 1) {
+      cli::cli_abort(c(
+        "x" = "The Population module needs 1 {.var log_init_rzero_offset}
+        row, not {.val {n_offsets}}.",
+        "i" = "The offset scales the whole first-year age structure. Use
+        {.var log_devs} before the first year to change individual ages.",
+        "i" = "Check the rows with
+        {.code dplyr::filter(parameters, label == \"log_init_rzero_offset\")}."
+      ))
+    }
+    if (get_n_ages(data) < 2) {
+      cli::cli_abort(c(
+        "x" = "Equilibrium initial numbers at age need at least 2 ages, not
+        {.val {get_n_ages(data)}}.",
+        "i" = "With 1 age, the only age is the plus group. Use
+        {.code setup_default_parameters(initial_numbers = \"free\")}.",
+        "i" = "Check the ages with {.code get_ages(data)}."
+      ))
+    }
+    if ("log_r" %in% recruitment_labels) {
+      cli::cli_abort(c(
+        "x" = "{.var log_r} recruitment cannot be used with equilibrium
+        initial numbers at age yet.",
+        "i" = "Use {.var log_devs} for recruitment or
+        {.code setup_default_parameters(initial_numbers = \"free\")}.",
+        "i" = "Check the labels with
+        {.code dplyr::filter(parameters, module_name == \"Recruitment\") |>
+        dplyr::distinct(label)}."
+      ))
+    }
+  }
+  # log_r recruitment has no log_devs to check
+  if (!("log_devs" %in% recruitment_labels)) {
+    return(initial_numbers)
+  }
+
+  dev_years <- parameters |>
+    dplyr::filter(
+      .data$module_name == "Recruitment",
+      .data$label == "log_devs"
+    ) |>
+    dplyr::pull(.data$timing)
+  start_year <- get_start_year(data)
+  end_year <- get_end_year(data)
+  if (initial_numbers == "free") {
+    first_years <- start_year + 1
+  } else {
+    first_years <- (start_year - (get_n_ages(data) - 2)):start_year
+  }
+  valid_years <- !anyNA(dev_years) &&
+    min(dev_years) %in% first_years &&
+    identical(as.numeric(dev_years), as.numeric(min(dev_years):end_year))
+  if (!valid_years) {
+    if (initial_numbers == "free") {
+      first_year_rule <- c(
+        "i" = "The first {.var timing} must be {.val {start_year + 1}}, the
+        second year, because free initial numbers at age set the first-year
+        recruitment. Pass {.code initial_numbers = \"free\"} to both
+        {.fn setup_default_Population} and {.fn setup_default_Recruitment}."
+      )
+    } else {
+      first_year_rule <- c(
+        "i" = "The first {.var timing} must be from {.val {min(first_years)}}
+        to {.val {start_year}}, the first year. To keep cohorts at
+        equilibrium, remove {.var log_devs} rows starting with the earliest
+        year."
+      )
+    }
+    cli::cli_abort(c(
+      "x" = "With {.val {initial_numbers}} initial numbers at age,
+      {.var log_devs} must have 1 row per year, in order and with no gaps,
+      through {.val {end_year}}. The first {.var timing} is
+      {.val {dev_years[1]}}.",
+      first_year_rule,
+      "i" = "Check the years with
+      {.code dplyr::filter(parameters, label == \"log_devs\") |>
+      dplyr::pull(timing)}."
+    ))
+  }
+  initial_numbers
 }
 
 #' Initialize a selectivity module.

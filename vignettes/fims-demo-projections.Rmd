@@ -132,7 +132,10 @@ The major difference below compared to a model without projections is that the r
 ```{r projection-model}
 # Take the default configuration with the new data to create some default
 # parameters that we alter to make the model behave a little better
-parameters_projection <- setup_default_parameters(data = data_4_projections) |>
+parameters_projection <- setup_default_parameters(
+  data = data_4_projections,
+  initial_numbers = "free"
+) |>
   # Update log_Fmort initial values for Fleet1
   # Project the population forward with the terminal year mortality values.
   # More advanced approaches are included in
