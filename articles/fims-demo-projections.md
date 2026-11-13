@@ -312,7 +312,7 @@ projection_fit <- parameters_projection |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.0021 to 0.00036 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00241 to 0.00025 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -337,13 +337,13 @@ projection_fit <- parameters_projection |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 9.23426 seconds
+    ## ℹ Total run time was 12.79946 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00036
+    ## ℹ Maximum gradient= 0.00025
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 1624.68892
     ## • Total NLL= 1560.83065
-    ## ℹ Terminal SB= 988.67003
+    ## ℹ Terminal SB= 988.67084
 
 ``` r
 

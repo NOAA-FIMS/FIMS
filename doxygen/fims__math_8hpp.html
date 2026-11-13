@@ -285,11 +285,17 @@ template&lt;class Type&gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">x</td><td>value to keep positive </td></tr>
-    <tr><td class="paramname">C</td><td>default = 1e-5 </td></tr>
+    <tr><td class="paramname">C</td><td>A positive constant that sets how smooth the result is. Default is 1e-5. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A smooth approximation of the absolute value of x. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>if C is not greater than 0. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -338,6 +344,12 @@ template&lt;typename Type&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A smooth approximation of the maximum of a and b. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>if C is not greater than 0. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -386,6 +398,12 @@ template&lt;typename Type&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A smooth approximation of the minimum of a and b. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::invalid_argument</td><td>if C is not greater than 0. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
