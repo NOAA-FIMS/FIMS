@@ -317,3 +317,57 @@ intervals. Draws are never replaced after an error.
 These intervals describe parameter uncertainty under a local normal
 approximation. They exclude future process and observation variation and do
 not sample conditional random effects. They are not prediction intervals.
+
+## Annual MSY-relative stock status and uncertainty
+
+`calculate_stock_status()` computes annual `sb_over_sb_msy[t] = SB[t] / SB_MSY`
+and `f_over_f_msy[t] = F_eff[t] / F_MSY` against a single reference-year MSY
+benchmark. Historical effective fishing mortality is
+`F_eff[t] = f_multiplier[t] * sum_v(Fmort[v, t])` across the population's
+fleets. When a terminal beginning-of-year biomass row (`n_years + 1`) is
+present without a corresponding fishing mortality, its `f_over_f_msy` is `NA`.
+Changes in fleet allocation or selectivity over time can limit interpretation
+of `f_over_f_msy` as a like-for-like comparison of fishing pressure.
+
+`calculate_stock_status_uncertainty()` pairs each draw's annual numerators with
+that same draw's solved `SB_MSY` and `F_MSY` denominators, preserving covariance
+between numerators and denominators and across years:
+
+```{r stock-status-uncertainty}
+set.seed(12)
+status_report <- list(
+  pdHess = TRUE,
+  par.fixed = c(log_rzero = log(1000), log_f = log(0.25)),
+  cov.fixed = matrix(
+    c(0.02, -0.004, -0.004, 0.01), 2, 2,
+    dimnames = rep(list(c("log_rzero", "log_f")), 2)
+  )
+)
+status_fn <- function(par) {
+  draw_inputs <- inputs
+  rzero <- exp(par[["log_rzero"]])
+  f_eff <- c(0.8, 1.1) * exp(par[["log_f"]])
+  draw_inputs$recruitment$rzero <- rzero
+  draw_inputs$population_id <- 1L
+  draw_inputs$year_index <- 2L
+  draw_inputs$historical <- data.frame(
+    population_id = rep(1L, 3L),
+    year_index = 1:3,
+    calendar_year = 2021:2023,
+    spawning_biomass = rzero * c(3.2, 2.5, 2.2) * exp(-0.4 * c(f_eff, f_eff[2])),
+    f_multiplier = c(1, 1, NA_real_),
+    fleet_fishing_mortality = c(f_eff, NA_real_),
+    effective_fishing_mortality = c(f_eff, NA_real_)
+  )
+  draw_inputs
+}
+status_uncertainty <- calculate_stock_status_uncertainty(
+  status_report, status_fn, n_draws = 200, level = 0.95
+)
+knitr::kable(status_uncertainty$summary[, c(
+  "year_index", "calendar_year", "sb_over_sb_msy",
+  "sb_over_sb_msy_lower", "sb_over_sb_msy_upper", "sb_over_sb_msy_sd",
+  "f_over_f_msy", "f_over_f_msy_lower", "f_over_f_msy_upper", "f_over_f_msy_sd"
+)], digits = 4)
+```
+

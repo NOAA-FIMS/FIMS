@@ -284,6 +284,50 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     snapshot["fleet_ids"] = fleet_ids;
     snapshot["ages"] =
         Rcpp::wrap(population->ages.begin(), population->ages.end());
+    const auto& dq = model->GetPopulationDerivedQuantities(population->GetId());
+    const auto& sb_series = dq.at("spawning_biomass");
+    const size_t n_years = population->n_years;
+    const size_t n_rows = sb_series.size();
+    Rcpp::IntegerVector hist_pop(n_rows, population_id);
+    Rcpp::IntegerVector hist_year(n_rows);
+    Rcpp::NumericVector hist_cal_year(n_rows, NA_REAL);
+    Rcpp::NumericVector hist_sb(n_rows, NA_REAL);
+    Rcpp::NumericVector hist_sbr(n_rows, NA_REAL);
+    Rcpp::NumericVector hist_f_mult(n_rows, NA_REAL);
+    Rcpp::NumericVector hist_fleet_f(n_rows, NA_REAL);
+    Rcpp::NumericVector hist_f_eff(n_rows, NA_REAL);
+    for (size_t t = 0; t < n_rows; ++t) {
+      hist_year[t] = static_cast<int>(t + 1);
+      hist_sb[t] = sb_series[t];
+      if (t < population->spawning_biomass_ratio.size()) {
+        hist_sbr[t] = population->spawning_biomass_ratio[t];
+      }
+      if (t < population->years.size() && std::isfinite(population->years[t])) {
+        hist_cal_year[t] = population->years[t];
+      } else if (t == n_years && population->years.size() == n_years &&
+                 n_years > 0 && std::isfinite(population->years[n_years - 1])) {
+        hist_cal_year[t] = population->years[n_years - 1] + 1.0;
+      }
+      if (t < n_years) {
+        const double f_mult = population->f_multiplier[t];
+        double sum_f = 0.0;
+        for (const auto& fleet : population->fleets) {
+          sum_f += fleet->Fmort[t];
+        }
+        hist_f_mult[t] = f_mult;
+        hist_fleet_f[t] = sum_f;
+        hist_f_eff[t] = f_mult * sum_f;
+      }
+    }
+    snapshot["historical"] = Rcpp::DataFrame::create(
+        Rcpp::Named("population_id") = hist_pop,
+        Rcpp::Named("year_index") = hist_year,
+        Rcpp::Named("calendar_year") = hist_cal_year,
+        Rcpp::Named("spawning_biomass") = hist_sb,
+        Rcpp::Named("spawning_biomass_ratio") = hist_sbr,
+        Rcpp::Named("f_multiplier") = hist_f_mult,
+        Rcpp::Named("fleet_fishing_mortality") = hist_fleet_f,
+        Rcpp::Named("effective_fishing_mortality") = hist_f_eff);
     snapshot["recruitment"] = R_NilValue;
     auto bh = std::dynamic_pointer_cast<fims_popdy::SRBevertonHolt<double>>(
         population->recruitment);

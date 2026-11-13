@@ -486,3 +486,230 @@ test_that("MSY refines multiple peaks and the upper boundary interval", {
     expect_equal(result$msy$objective_yield, 503.371401258, tolerance = 1e-9)
   }
 })
+
+make_two_fleet_status_model <- function(multipliers = c(1.5, 2.5),
+                                        fleet1_f = c(0.12, 0.18),
+                                        fleet2_f = c(0.28, 0.42),
+                                        include_survey = TRUE) {
+  growth <- methods::new(EWAAGrowth)
+  growth$n_years$set(2L)
+  growth$ages[] <- 1:3
+  growth$weights[] <- c(1, 2, 3, 2, 3, 4, 2, 3, 4)
+  maturity <- methods::new(LogisticMaturity)
+  maturity$inflection_point[] <- 2
+  maturity$slope[] <- 1
+  recruitment <- methods::new(BevertonHoltRecruitment)
+  process <- methods::new(LogDevsRecruitmentProcess)
+  recruitment$SetRecruitmentProcessID(process$get_id())
+  recruitment$n_years$set(2L)
+  recruitment$log_rzero[] <- log(1000)
+  recruitment$log_rzero$set_estimation_types("fixed_effects")
+  recruitment$logit_steep[] <- log((0.75 - 0.2) / (1 - 0.75))
+  recruitment$log_devs[] <- 0
+
+  sel1 <- methods::new(LogisticSelectivity)
+  sel1$inflection_point[] <- 1.8
+  sel1$slope[] <- 1.2
+  sel2 <- methods::new(LogisticSelectivity)
+  sel2$inflection_point[] <- 2.4
+  sel2$slope[] <- 0.9
+
+  population <- methods::new(Population)
+  population$n_years$set(2L)
+  population$n_ages$set(3L)
+  population$n_fleets$set(if (include_survey) 3L else 2L)
+  population$ages[] <- 1:3
+  population$log_M[] <- log(c(0.2, 0.4, 0.6, 0.3, 0.4, 0.5))
+  population$log_f_multiplier[] <- log(multipliers)
+  population$log_init_naa[] <- log(c(1000, 500, 500))
+  population$log_init_naa$set_estimation_types("fixed_effects")
+  population$proportion_female[] <- 0.5
+  population$SetGrowthID(growth$get_id())
+  population$SetMaturityID(maturity$get_id())
+  population$SetRecruitmentID(recruitment$get_id())
+
+  fleet1 <- methods::new(Fleet)
+  fleet1$n_years$set(2L)
+  fleet1$n_ages$set(3L)
+  fleet1$n_lengths$set(0L)
+  fleet1$log_Fmort[] <- log(fleet1_f)
+  fleet1$log_q[] <- log(0.5)
+  fleet1$SetSelectivityID(sel1$get_id())
+  population$AddFleet(fleet1$get_id())
+
+  fleet2 <- methods::new(Fleet)
+  fleet2$n_years$set(2L)
+  fleet2$n_ages$set(3L)
+  fleet2$n_lengths$set(0L)
+  fleet2$log_Fmort[] <- log(fleet2_f)
+  fleet2$log_q[] <- log(3.5)
+  fleet2$SetSelectivityID(sel2$get_id())
+  population$AddFleet(fleet2$get_id())
+
+  survey <- NULL
+  if (include_survey) {
+    survey <- methods::new(Fleet)
+    survey$n_years$set(2L)
+    survey$n_ages$set(3L)
+    survey$n_lengths$set(0L)
+    survey$log_Fmort[] <- c(-Inf, -Inf)
+    survey$log_q[] <- log(10)
+    survey$SetSelectivityID(sel1$get_id())
+    population$AddFleet(survey$get_id())
+  }
+
+  model <- methods::new(CatchAtAge)
+  model$AddPopulation(population$get_id())
+  CreateTMBModel()
+  list(
+    model = model, population = population,
+    fleets = list(fleet1 = fleet1, fleet2 = fleet2, survey = survey)
+  )
+}
+
+test_that("deterministic multifleet MSY stock status verifies coefficients, benchmark, and ratios", {
+  #' @description Nonunit f_multiplier, distinct fleet Fs, survey zero-F exclusion, and yield-excluded fishing fleet match manual equations.
+  clear()
+  on.exit(clear(), add = TRUE)
+  live <- make_two_fleet_status_model(
+    multipliers = c(1.5, 2.5),
+    fleet1_f = c(0.12, 0.18),
+    fleet2_f = c(0.28, 0.42),
+    include_survey = TRUE
+  )
+  pop_id <- live$population$get_id()
+  fleet_ids <- c(
+    live$fleets$fleet1$get_id(),
+    live$fleets$fleet2$get_id(),
+    live$fleets$survey$get_id()
+  )
+  # Exclude the second fishing fleet and the zero-F survey from the MSY yield objective.
+  include_flags <- setNames(c(TRUE, FALSE, FALSE), fleet_ids)
+  status_res <- get_stock_status(
+    live$model, pop_id, reference_year = 2L,
+    include_in_msy = include_flags, calendar_years = c(2020, 2021)
+  )
+  table <- status_res$stock_status
+  expect_equal(nrow(table), 3L)
+  expect_equal(table$population_id, rep(pop_id, 3L))
+  expect_equal(table$year_index, 1:3)
+  expect_equal(table$calendar_year, c(2020, 2021, 2022))
+  expect_equal(table$reference_year, rep(2L, 3L))
+
+  # Coefficient sum includes both fishing fleets and excludes the zero-F survey; q is ignored.
+  expected_fleet_f <- c(0.12 + 0.28 + 0, 0.18 + 0.42 + 0, NA_real_)
+  expected_f_mult <- c(1.5, 2.5, NA_real_)
+  expected_f_eff <- c(1.5 * 0.40, 2.5 * 0.60, NA_real_)
+  expect_equal(table$f_multiplier, expected_f_mult, tolerance = 1e-12)
+  expect_equal(table$fleet_fishing_mortality, expected_fleet_f, tolerance = 1e-12)
+  expect_equal(table$effective_fishing_mortality, expected_f_eff, tolerance = 1e-12)
+
+  # Verify reference-year shares, inclusion flags, and single benchmark against independent optimization.
+  expect_equal(unname(status_res$reference$fleet_shares), c(0.3, 0.7, 0), tolerance = 1e-12)
+  expect_equal(unname(status_res$reference$include_in_msy), c(TRUE, FALSE, FALSE))
+  expect_equal(status_res$reference$reference_year, 2L)
+  expect_equal(status_res$reference$calendar_year, 2021)
+
+  independent_inputs <- status_res$reference_points$inputs
+  objective <- function(f) independent_multifleet_equilibrium(independent_inputs, f)$objective_yield
+  opt <- optimize(objective, c(0, 5), maximum = TRUE, tol = 1e-10)
+  expected_eq <- independent_multifleet_equilibrium(independent_inputs, opt$maximum)
+  expect_equal(status_res$reference$f_msy, opt$maximum, tolerance = 1e-6)
+  expect_equal(status_res$reference$sb_msy, expected_eq$spawning_biomass, tolerance = 1e-6)
+  expect_equal(table$sb_msy, rep(status_res$reference_points$msy$spawning_biomass, 3L))
+  expect_equal(table$f_msy, rep(status_res$reference_points$msy$fishing_mortality, 3L))
+
+  # Verify both annual ratio formulas and extra terminal biomass handling.
+  expect_equal(table$sb_over_sb_msy, table$spawning_biomass / table$sb_msy, tolerance = 1e-12)
+  expect_equal(table$f_over_f_msy[1:2], expected_f_eff[1:2] / table$f_msy[1:2], tolerance = 1e-12)
+  expect_true(is.na(table$f_over_f_msy[3]))
+  expect_equal(table$sb_diagnostic, rep("ok", 3L))
+  expect_equal(table$f_diagnostic, c("ok", "ok", "terminal_biomass_only"))
+  expect_equal(table$status, rep("converged", 3L))
+
+  # Verify that CatchAtAge's existing spawning_biomass_ratio (SB / SB_0) is preserved.
+  sbr <- status_res$reference_points$inputs$historical$spawning_biomass_ratio
+  unfished_n0 <- c(1000, 1000 * exp(-0.2), 1000 * exp(-0.6) * (1 + exp(-0.6)))
+  sb0 <- sum(unfished_n0 * c(1, 2, 3) * plogis((1:3) - 2) * 0.5)
+  expect_equal(sbr, table$spawning_biomass / sb0, tolerance = 1e-10)
+  expect_false(isTRUE(all.equal(sbr, table$sb_over_sb_msy)))
+})
+
+test_that("stock status handles alignment, terminal biomass filtering, zero numerators, and unavailable benchmarks", {
+  #' @description Explicit ID alignment, zero numerators, and invalid or unconverged benchmarks behave as specified.
+  inputs <- reference_point_test_inputs()
+  inputs$population_id <- 2L
+  inputs$year_index <- 2L
+  # Multi-population historical table with intentionally reversed year_index order for population 2.
+  inputs$historical <- data.frame(
+    population_id = c(1L, 1L, 2L, 2L, 2L, 2L),
+    year_index = c(1L, 2L, 4L, 2L, 3L, 1L),
+    spawning_biomass = c(999, 999, 1500, 2000, 0, 2500),
+    f_multiplier = c(1, 1, NA_real_, 2, 1.5, 0),
+    fleet_fishing_mortality = c(0.5, 0.5, NA_real_, 0.25, 0, 0.4),
+    effective_fishing_mortality = c(0.5, 0.5, NA_real_, 0.5, 0, 0)
+  )
+  cal_df <- data.frame(
+    population_id = c(2L, 2L, 2L, 2L),
+    year_index = c(3L, 1L, 4L, 2L),
+    calendar_year = c(2012, 2010, 2013, 2011)
+  )
+  res <- calculate_stock_status(inputs, population = 2L, calendar_years = cal_df)
+  tbl <- res$stock_status
+  expect_equal(tbl$population_id, rep(2L, 4L))
+  expect_equal(tbl$year_index, 1:4)
+  expect_equal(tbl$calendar_year, 2010:2013)
+  expect_equal(tbl$spawning_biomass, c(2500, 2000, 0, 1500))
+  expect_equal(tbl$effective_fishing_mortality, c(0, 0.5, 0, NA_real_))
+  # True zero historical numerators produce exact zero ratios.
+  expect_equal(tbl$sb_over_sb_msy[3], 0)
+  expect_equal(tbl$f_over_f_msy[c(1, 3)], c(0, 0))
+  expect_true(is.na(tbl$f_over_f_msy[4]))
+  expect_equal(tbl$f_diagnostic[4], "terminal_biomass_only")
+
+  # Dropping the extra terminal biomass row or requesting specific years aligns by year_index.
+  no_term <- calculate_stock_status(
+    inputs, population = 2L, calendar_years = cal_df,
+    include_terminal_biomass = FALSE
+  )$stock_status
+  expect_equal(no_term$year_index, 1:3)
+  sub_years <- calculate_stock_status(
+    inputs, population = 2L, years = c(3L, 1L), calendar_years = cal_df
+  )$stock_status
+  expect_equal(sub_years$year_index, c(3L, 1L))
+  expect_equal(sub_years$calendar_year, c(2012, 2010))
+
+  # Unavailable and unconverged benchmarks return NA ratios and record why.
+  no_msy <- calculate_stock_status(inputs, population = 2L, msy = FALSE)$stock_status
+  expect_equal(no_msy$status, rep("unavailable", 4L))
+  expect_true(all(is.na(no_msy$sb_over_sb_msy)))
+  expect_true(all(is.na(no_msy$f_over_f_msy)))
+  expect_equal(no_msy$sb_diagnostic, rep("msy_unavailable", 4L))
+  expect_equal(no_msy$f_diagnostic, rep("msy_unavailable", 4L))
+
+  upper <- calculate_stock_status(inputs, population = 2L, max_f = 0.001)$stock_status
+  expect_equal(upper$status, rep("upper_bound", 4L))
+  expect_true(all(is.na(upper$sb_over_sb_msy)))
+  expect_true(all(is.na(upper$f_over_f_msy)))
+  expect_equal(upper$sb_diagnostic, rep("upper_bound", 4L))
+  expect_equal(upper$f_diagnostic, rep("upper_bound", 4L))
+
+  # Nonpositive or nonfinite denominators invalidate only the affected ratio.
+  bad_f <- res$reference_points
+  bad_f$msy$fishing_mortality <- 0
+  bad_f_tbl <- calculate_stock_status(inputs, reference_points = bad_f, population = 2L)$stock_status
+  expect_true(all(is.finite(bad_f_tbl$sb_over_sb_msy)))
+  expect_true(all(is.na(bad_f_tbl$f_over_f_msy)))
+  expect_equal(bad_f_tbl$f_diagnostic, rep("nonpositive_f_msy", 4L))
+
+  bad_sb <- res$reference_points
+  bad_sb$msy$spawning_biomass <- NA_real_
+  bad_sb_tbl <- calculate_stock_status(inputs, reference_points = bad_sb, population = 2L)$stock_status
+  expect_true(all(is.na(bad_sb_tbl$sb_over_sb_msy)))
+  expect_equal(bad_sb_tbl$sb_diagnostic, rep("nonfinite_sb_msy", 4L))
+  expect_true(all(is.finite(bad_sb_tbl$f_over_f_msy[1:3])))
+
+  expect_error(calculate_stock_status(inputs, population = 99L), "population")
+  expect_error(calculate_stock_status(inputs, population = 2L, years = 99L), "Requested years")
+})
+

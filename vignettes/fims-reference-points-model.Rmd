@@ -257,3 +257,18 @@ conventions match. The multiplier cancels in relative fleet shares; it does
 not cancel from the historical total intensity. Overrides to fleet shares
 change the reference fishing pattern and must be reported alongside a ratio.
 Fleet catches in `reference_points` are labeled by the saved fleet IDs.
+
+`get_stock_status()` (or `calculate_stock_status()` on the saved snapshot)
+computes the full annual series of `sb_over_sb_msy` and `f_over_f_msy` against
+the selected reference-year MSY benchmark, retaining the extra terminal
+beginning-of-year biomass row with `NA` fishing mortality:
+
+```{r annual-stock-status}
+status <- calculate_stock_status(snapshot, calendar_years = c(2021, 2022))
+knitr::kable(status$stock_status[, c(
+  "population_id", "year_index", "calendar_year", "spawning_biomass",
+  "effective_fishing_mortality", "sb_msy", "f_msy",
+  "sb_over_sb_msy", "f_over_f_msy", "status"
+)], digits = 4)
+```
+
