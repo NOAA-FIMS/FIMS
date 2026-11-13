@@ -11,7 +11,7 @@
 ## Setup ----
 # Remove the year-3 age and length compositions of fleet1 so that FIMSFrame()
 # fills both rows with the missing-value code and the multinomial skips them.
-na_value <- -999
+# get_estimates() reports these missing observations as NA.
 data("data_big")
 data_missing_row <- data_big |>
   dplyr::filter(
@@ -31,7 +31,7 @@ clear()
 # One element per composition row, i.e., per distribution and year
 multinomial_rows <- multinomial_cells |>
   dplyr::summarize(
-    missing = any(observed == na_value),
+    missing = any(is.na(observed)),
     n_likelihood_values = dplyr::n_distinct(likelihood),
     .by = c(module_id, label, year_i)
   )

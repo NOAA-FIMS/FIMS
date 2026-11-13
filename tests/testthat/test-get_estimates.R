@@ -166,9 +166,92 @@ test_that("`get_estimates()` handles non-finite derived quantities", {
       .data$label == "log_catch_expected",
       .data$fleet == "fleet1"
     )
-  #' @description Test that `get_estimates()` reports an infinite derived quantity as -999, like other missing values.
+  #' @description Test that `get_estimates()` reports an infinite derived quantity as -999, unlike a missing observation, which is NA.
   expect_equal(object = log_catch_expected[["estimated"]][1], expected = -999)
   clear()
+})
+
+test_that("`get_estimates()` reports missing observations and undefined composition counts as NA", {
+  # fleet1 has no age composition in year 3, -999 for age 3 in year 4 (the
+  # other ages rescaled to sum to 1) and no length composition, and survey1
+  # has no index in year 5
+  missing_data <- data_big |>
+    dplyr::mutate(
+      year_4 = .data$type == "age_comp" & .data$fleet == "fleet1" &
+        .data$timing == 4,
+      observed = dplyr::case_when(
+        year_4 & .data$age %in% 3 ~ -999,
+        year_4 ~ .data$observed / sum(.data$observed[year_4 & .data$age != 3]),
+        .default = .data$observed
+      )
+    ) |>
+    dplyr::select(-"year_4") |>
+    dplyr::filter(
+      !(.data$type == "age_comp" & .data$fleet == "fleet1" & .data$timing == 3),
+      !(.data$type == "length_comp" & .data$fleet == "fleet1"),
+      !(.data$type == "index" & .data$fleet == "survey1" & .data$timing == 5)
+    )
+  data_4_model <- FIMSFrame(missing_data)
+  fit <- setup_default_parameters(data = data_4_model) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  estimates <- get_estimates(fit)
+  clear()
+  fleet1_age_comp <- dplyr::filter(
+    estimates,
+    .data$label == "agecomp_expected",
+    .data$fleet == "fleet1"
+  )
+  age_comp_year_3 <- dplyr::filter(fleet1_age_comp, .data$year_i == 3)
+  age_comp_year_4 <- dplyr::filter(fleet1_age_comp, .data$year_i == 4)
+  index_year_5 <- dplyr::filter(
+    estimates,
+    .data$label == "index_expected",
+    .data$fleet == "survey1",
+    .data$year_i == 5
+  )
+  length_comp <- dplyr::filter(estimates, .data$label == "lengthcomp_expected")
+
+  #' @description Test that `get_estimates()` has no -999 in `observed`.
+  expect_false(any(estimates[["observed"]] %in% -999))
+  #' @description Test that `get_estimates()` reports a missing age composition year as NA in `observed` and `estimated`.
+  expect_true(all(is.na(c(
+    age_comp_year_3[["observed"]], age_comp_year_3[["estimated"]]
+  ))))
+  #' @description Test that `get_estimates()` keeps the expected age composition proportions, which sum to 1, in a year without data.
+  expect_equal(
+    object = sum(age_comp_year_3[["expected"]]),
+    expected = 1,
+    # get_estimates() values are rounded
+    tolerance = 1e-5
+  )
+  #' @description Test that `get_estimates()` reports every bin of an age composition year with 1 missing bin as NA, because the likelihood skips that year.
+  expect_true(all(is.na(c(
+    age_comp_year_4[["observed"]], age_comp_year_4[["estimated"]]
+  ))))
+  #' @description Test that the likelihood skips an age composition year with 1 missing bin.
+  expect_equal(
+    object = age_comp_year_4[["likelihood"]],
+    expected = rep(0, get_n_ages(data_4_model))
+  )
+  #' @description Test that `get_estimates()` keeps the expected age composition counts in the other years.
+  expect_equal(
+    object = sum(is.na(fleet1_age_comp[["estimated"]])),
+    expected = 2 * get_n_ages(data_4_model)
+  )
+  #' @description Test that `get_estimates()` reports a missing index year as NA in `observed` and keeps its prediction.
+  expect_true(is.na(index_year_5[["observed"]]))
+  expect_gt(object = index_year_5[["estimated"]], expected = 0)
+  #' @description Test that `get_estimates()` keeps the length composition rows of a fleet without length data.
+  expect_gt(object = sum(length_comp[["fleet"]] == "fleet1"), expected = 0)
+  #' @description Test that `get_estimates()` reports the expected length composition counts of a fleet without length data as NA.
+  expect_true(all(is.na(
+    length_comp[["estimated"]][length_comp[["fleet"]] == "fleet1"]
+  )))
+  #' @description Test that `get_estimates()` keeps the expected length composition counts of a fleet with length data.
+  expect_false(anyNA(
+    length_comp[["estimated"]][length_comp[["fleet"]] == "survey1"]
+  ))
 })
 
 test_that("`get_estimates()` works for a model without random effects", {
