@@ -185,8 +185,8 @@ class VonBertalanffySchnuteGrowthModelAdapter
       throw std::runtime_error("Non-integer age not supported yet");
     }
     EnsureParamsSet();
-    const Type ref_age_young = CurrentReferenceAgeForLengthYoung();
-    const Type ref_age_old = CurrentReferenceAgeForLengthOld();
+    const Type ref_age_young = reference_age_for_length_young_vector[0];
+    const Type ref_age_old = reference_age_for_length_old_vector[0];
     if (ref_age_old <= ref_age_young) {
       throw std::runtime_error(
           "VonBertalanffySchnuteGrowth reference_age_for_length_old must be > "
@@ -260,8 +260,9 @@ class VonBertalanffySchnuteGrowthModelAdapter
   Type EvaluateWeightAtLength(const Type& length) const override {
     EnsureParamsSet();
     const Type length_safe = fims_math::ad_max(length, static_cast<Type>(1e-8));
-    return CurrentLengthWeightA() *
-           fims_math::pow(length_safe, CurrentLengthWeightB());
+    return fims_math::exp(length_weight_a_vector[0]) *
+           fims_math::pow(length_safe,
+                          fims_math::exp(length_weight_b_vector[0]));
   }
 
  private:
@@ -283,11 +284,13 @@ class VonBertalanffySchnuteGrowthModelAdapter
     fims_popdy::VonBertalanffySchnuteGrowth<Type> vb;
     vb.mean_length_young = CurrentMeanLengthYoung();
     vb.mean_length_old = CurrentMeanLengthOld();
-    vb.growth_coefficient = CurrentGrowthCoefficient();
-    vb.reference_age_for_length_young = CurrentReferenceAgeForLengthYoung();
-    vb.reference_age_for_length_old = CurrentReferenceAgeForLengthOld();
-    vb.length_weight_a = CurrentLengthWeightA();
-    vb.length_weight_b = CurrentLengthWeightB();
+    vb.growth_coefficient = fims_math::exp(growth_coefficient_vector[0]);
+    vb.reference_age_for_length_young =
+        reference_age_for_length_young_vector[0];
+    vb.reference_age_for_length_old =
+        reference_age_for_length_old_vector[0];
+    vb.length_weight_a = fims_math::exp(length_weight_a_vector[0]);
+    vb.length_weight_b = fims_math::exp(length_weight_b_vector[0]);
     return vb.evaluate(year, a);
   }
 
@@ -297,10 +300,12 @@ class VonBertalanffySchnuteGrowthModelAdapter
 
     model_->SetVonBertalanffySchnuteParameters(
         CurrentMeanLengthYoung(), CurrentMeanLengthOld(),
-        CurrentGrowthCoefficient(), CurrentReferenceAgeForLengthYoung(),
-        CurrentReferenceAgeForLengthOld());
-    model_->SetLengthWeightParameters(CurrentLengthWeightA(),
-                                      CurrentLengthWeightB());
+        fims_math::exp(growth_coefficient_vector[0]),
+        reference_age_for_length_young_vector[0],
+        reference_age_for_length_old_vector[0]);
+    model_->SetLengthWeightParameters(
+        fims_math::exp(length_weight_a_vector[0]),
+        fims_math::exp(length_weight_b_vector[0]));
 
     if (HasInterpolationSdInputs()) {
       const Type length_at_age_sd_young =
@@ -383,22 +388,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
     }
 
     return fims_math::exp(mean_length_old_vector[0]);
-  }
-
-  Type CurrentGrowthCoefficient() const {
-    return fims_math::exp(growth_coefficient_vector[0]);
-  }
-  Type CurrentReferenceAgeForLengthYoung() const {
-    return reference_age_for_length_young_vector[0];
-  }
-  Type CurrentReferenceAgeForLengthOld() const {
-    return reference_age_for_length_old_vector[0];
-  }
-  Type CurrentLengthWeightA() const {
-    return fims_math::exp(length_weight_a_vector[0]);
-  }
-  Type CurrentLengthWeightB() const {
-    return fims_math::exp(length_weight_b_vector[0]);
   }
 
   bool HasInterpolationSdInputs() const {
