@@ -128,6 +128,27 @@ test_that("rcpp distribution works with correct inputs", {
     stats::dmultinom(x = x_values, prob = p, log = TRUE)
   )
 
+  # stats::dmultinom() rescales prob to sum to 1, the same as dividing by
+  # 1 + K * offset, so it checks FIMS without repeating its calculation.
+  dmultinom_$offset_expected[] <- 0.01
+  #' @description Test that dmultinom with an expected offset matches R's dmultinom with the offset added to each expected proportion.
+  expect_equal(
+    dmultinom_$evaluate(),
+    stats::dmultinom(x = x_values, prob = p + 0.01, log = TRUE)
+  )
+
+  # stats::dmultinom() rounds x, so FIMS_dmultinom() is used for observed
+  # counts that are not whole numbers after the offset.
+  dmultinom_$offset_observed[] <- 0.01
+  observed_proportion <- x_values / sum(x_values)
+  x_with_offset <- sum(x_values) * (observed_proportion + 0.01) /
+    sum(observed_proportion + 0.01)
+  #' @description Test that dmultinom with both offsets matches the multinomial of the observed and expected proportions with the offset added and rescaled to sum to 1.
+  expect_equal(
+    dmultinom_$evaluate(),
+    FIMS_dmultinom(x_with_offset, (p + 0.01) / sum(p + 0.01))
+  )
+
   clear()
 })
 
@@ -318,6 +339,14 @@ test_that("rcpp_distribution returns correct outputs for edge cases", {
   expect_equal(
     dmultinom_$evaluate(), NaN
   )
+
+  dmultinom_$offset_expected[] <- 1e-5
+  #' @description Test that an expected offset gives a finite value for empty bins with an expected proportion of 0.
+  expect_true(is.finite(dmultinom_$evaluate()))
+  expect_equal(
+    dmultinom_$evaluate(),
+    stats::dmultinom(x = x_values, prob = p + 1e-5, log = TRUE)
+  )
   clear()
 })
 
@@ -418,6 +447,36 @@ test_that("rcpp distribution returns correct error messages", {
   expect_error(
     object = dmultinom_$evaluate(),
     regexp = "MultinomialLPDF: Vector index out of bounds. The dimension of the observed vector of size 9 and the expected vector is of size 10"
+  )
+  clear()
+
+  dmultinom_ <- methods::new(DmultinomDistribution)
+  dmultinom_$dims$resize(2)
+  dmultinom_$dims$set(0, 1)
+  dmultinom_$dims$set(1, length(p))
+  dmultinom_$expected_values[] <- p
+  dmultinom_$observed_values[] <- x_values
+  dmultinom_$offset_expected[] <- -0.01
+  #' @description dmultinom should error out when an offset is negative.
+  expect_error(
+    object = dmultinom_$evaluate(),
+    regexp = "offset_expected must be a single finite number of 0 or more"
+  )
+  dmultinom_$offset_expected[] <- 0
+  dmultinom_$offset_observed[] <- c(0.001, 0.01)
+  #' @description dmultinom should error out when an offset has more than 1 value.
+  expect_error(
+    object = dmultinom_$evaluate(),
+    regexp = "offset_observed must be a single finite number of 0 or more"
+  )
+  clear()
+
+  dmultinom_ <- methods::new(DmultinomDistribution)
+  dmultinom_$offset_observed[] <- NA
+  #' @description dmultinom should error out when the TMB model is created with an offset that is not finite.
+  expect_error(
+    object = CreateTMBModel(),
+    regexp = "offset_observed must be a single finite number of 0 or more"
   )
   clear()
 })
