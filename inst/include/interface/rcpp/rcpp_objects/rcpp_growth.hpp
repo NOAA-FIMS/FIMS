@@ -524,35 +524,43 @@ class VonBertalanffySchnuteGrowthInterface
       }
     };
 
-    SetFinalLengthParameter(
-        this->mean_length_young,
-        FinalMeanLengthYoungFromWorkingScale(vb->MeanLengthYoungVector()));
-    SetFinalLengthParameter(
-        this->mean_length_old,
-        FinalMeanLengthOldFromWorkingScale(vb->MeanLengthYoungVector(),
-                                           vb->MeanLengthOldVector()));
-    set_final(this->growth_coefficient, vb->GrowthCoefficientVector(), true);
+    const bool use_bounded_young_length =
+        IsEstimated(this->mean_length_young) &&
+        !IsEstimated(this->mean_length_old);
+    const double mean_length_old =
+        fims_math::exp(vb->mean_length_old_vector[0]);
+    const double mean_length_young =
+        use_bounded_young_length
+            ? fims_math::inv_logit(
+                  0.0, mean_length_old, vb->mean_length_young_vector[0])
+            : fims_math::exp(vb->mean_length_young_vector[0]);
+
+    SetFinalLengthParameter(this->mean_length_young, mean_length_young);
+    SetFinalLengthParameter(this->mean_length_old, mean_length_old);
+    set_final(this->growth_coefficient, vb->growth_coefficient_vector, true);
     set_final(this->reference_age_for_length_young,
-              vb->ReferenceAgeForLengthYoungVector(), false);
+              vb->reference_age_for_length_young_vector, false);
     set_final(this->reference_age_for_length_old,
-              vb->ReferenceAgeForLengthOldVector(), false);
-    set_final(this->length_weight_a, vb->LengthWeightAVector(), true);
-    set_final(this->length_weight_b, vb->LengthWeightBVector(), true);
-    set_final(this->length_at_age_sd_young, vb->LengthAtAgeSdYoungVector(),
+              vb->reference_age_for_length_old_vector, false);
+    set_final(this->length_weight_a, vb->length_weight_a_vector, true);
+    set_final(this->length_weight_b, vb->length_weight_b_vector, true);
+    set_final(this->length_at_age_sd_young,
+              vb->length_at_age_sd_young_vector, true);
+    set_final(this->length_at_age_sd_old, vb->length_at_age_sd_old_vector,
               true);
-    set_final(this->length_at_age_sd_old, vb->LengthAtAgeSdOldVector(), true);
     set_final(this->log_sd_mean_length_young,
-              vb->LogSdLengthAtRefAgeYoungVector(), false);
-    set_final(this->log_sd_mean_length_old, vb->LogSdLengthAtRefAgeOldVector(),
+              vb->log_sd_mean_length_young_vector, false);
+    set_final(this->log_sd_mean_length_old, vb->log_sd_mean_length_old_vector,
               false);
     set_final(this->log_sd_growth_coefficient,
-              vb->LogSdGrowthCoefficientVector(), false);
+              vb->log_sd_growth_coefficient_vector, false);
     set_final(this->mean_length_young_mean_length_old_logit_corr,
-              vb->LogitCorrLengthAtRefAgeYoungLengthAtRefAgeOldVector(), false);
+              vb->mean_length_young_mean_length_old_logit_corr_vector, false);
     set_final(this->mean_length_young_growth_coefficient_logit_corr,
-              vb->LogitCorrLengthAtRefAgeYoungKVector(), false);
+              vb->mean_length_young_growth_coefficient_logit_corr_vector,
+              false);
     set_final(this->mean_length_old_growth_coefficient_logit_corr,
-              vb->LogitCorrLengthAtRefAgeOldKVector(), false);
+              vb->mean_length_old_growth_coefficient_logit_corr_vector, false);
   }
 
   virtual double evaluate(double age) {
@@ -586,83 +594,8 @@ class VonBertalanffySchnuteGrowthInterface
   }
 
  private:
-  enum class LengthReferenceParameterization {
-    kEstimatedReferenceLengths = 0,
-    kConstantLengthYoungEstimatedLengthOld,
-    kEstimatedLengthYoungBelowConstantLengthOld,
-    kBothConstant
-  };
-
   bool IsEstimated(VariableVector& pv) {
     return pv.size() > 0 && pv[0].estimation_type_m.get() != "constant";
-  }
-
-  double InitialLengthAtRefAgeYoung() {
-    return this->mean_length_young[0].initial_value_m;
-  }
-
-  double InitialLengthAtRefAgeOld() {
-    return this->mean_length_old[0].initial_value_m;
-  }
-
-  LengthReferenceParameterization GetLengthReferenceParameterization() {
-    const bool estimate_length_young = IsEstimated(this->mean_length_young);
-    const bool estimate_length_old = IsEstimated(this->mean_length_old);
-
-    if (estimate_length_young && estimate_length_old) {
-      return LengthReferenceParameterization::kEstimatedReferenceLengths;
-    }
-    if (!estimate_length_young && estimate_length_old) {
-      return LengthReferenceParameterization::
-          kConstantLengthYoungEstimatedLengthOld;
-    }
-    if (estimate_length_young && !estimate_length_old) {
-      return LengthReferenceParameterization::
-          kEstimatedLengthYoungBelowConstantLengthOld;
-    }
-    return LengthReferenceParameterization::kBothConstant;
-  }
-
-  double FinalMeanLengthYoungFromWorkingScale(
-      const fims::Vector<double>& mean_length_young_src) {
-    switch (GetLengthReferenceParameterization()) {
-      case LengthReferenceParameterization::kEstimatedReferenceLengths:
-        return fims_math::exp(mean_length_young_src[0]);
-
-      case LengthReferenceParameterization::
-          kConstantLengthYoungEstimatedLengthOld:
-        return InitialLengthAtRefAgeYoung();
-
-      case LengthReferenceParameterization::
-          kEstimatedLengthYoungBelowConstantLengthOld:
-        return fims_math::inv_logit(0.0, InitialLengthAtRefAgeOld(),
-                                    mean_length_young_src[0]);
-
-      case LengthReferenceParameterization::kBothConstant:
-        return InitialLengthAtRefAgeYoung();
-    }
-
-    return InitialLengthAtRefAgeYoung();
-  }
-
-  double FinalMeanLengthOldFromWorkingScale(
-      const fims::Vector<double>& mean_length_young_src,
-      const fims::Vector<double>& mean_length_old_src) {
-    switch (GetLengthReferenceParameterization()) {
-      case LengthReferenceParameterization::kEstimatedReferenceLengths:
-      case LengthReferenceParameterization::
-          kConstantLengthYoungEstimatedLengthOld:
-        return fims_math::exp(mean_length_old_src[0]);
-
-      case LengthReferenceParameterization::
-          kEstimatedLengthYoungBelowConstantLengthOld:
-        return InitialLengthAtRefAgeOld();
-
-      case LengthReferenceParameterization::kBothConstant:
-        return InitialLengthAtRefAgeOld();
-    }
-
-    return InitialLengthAtRefAgeOld();
   }
 
   void SetFinalLengthParameter(VariableVector& pv, double final_value) const {
@@ -672,35 +605,6 @@ class VonBertalanffySchnuteGrowthInterface
       } else {
         pv[i].final_value_m = final_value;
       }
-    }
-  }
-
-  template <typename Type>
-  void ConfigureLengthReferenceParameterization(
-      const std::shared_ptr<
-          fims_popdy::VonBertalanffySchnuteGrowthModelAdapter<Type>>& vb) {
-    switch (GetLengthReferenceParameterization()) {
-      case LengthReferenceParameterization::kEstimatedReferenceLengths:
-        vb->UseEstimatedReferenceMeanLengths();
-        break;
-
-      case LengthReferenceParameterization::
-          kConstantLengthYoungEstimatedLengthOld:
-        vb->UseConstantMeanLengthYoungWithEstimatedMeanLengthOld(
-            static_cast<Type>(InitialLengthAtRefAgeYoung()));
-        break;
-
-      case LengthReferenceParameterization::
-          kEstimatedLengthYoungBelowConstantLengthOld:
-        vb->UseEstimatedMeanLengthYoungBelowConstantMeanLengthOld(
-            static_cast<Type>(InitialLengthAtRefAgeOld()));
-        break;
-
-      case LengthReferenceParameterization::kBothConstant:
-        vb->UseConstantReferenceMeanLengths(
-            static_cast<Type>(InitialLengthAtRefAgeYoung()),
-            static_cast<Type>(InitialLengthAtRefAgeOld()));
-        break;
     }
   }
 
@@ -1005,6 +909,11 @@ class VonBertalanffySchnuteGrowthInterface
     // the transformed delta-method variability inputs.
     ValidateVonBertalanffySchnuteGrowthInputs(true);
 
+    const bool use_bounded_young_length =
+        IsEstimated(this->mean_length_young) &&
+        !IsEstimated(this->mean_length_old);
+    vb->use_bounded_young_length = use_bounded_young_length;
+
     std::stringstream ss;
     auto load_and_register = [&](VariableVector& pv, fims::Vector<Type>& target,
                                  const std::string& base_name, bool log_scale) {
@@ -1017,11 +926,9 @@ class VonBertalanffySchnuteGrowthInterface
           }
 
           if (&pv == &this->mean_length_young &&
-              GetLengthReferenceParameterization() ==
-                  LengthReferenceParameterization::
-                      kEstimatedLengthYoungBelowConstantLengthOld) {
-            // Match the bounded inverse logit used in evaluation and reporting.
-            v = fims_math::logit(0.0, InitialLengthAtRefAgeOld(), v);
+              use_bounded_young_length) {
+            v = fims_math::logit(
+                0.0, this->mean_length_old[0].initial_value_m, v);
           } else {
             v = fims_math::log(v);
           }
@@ -1053,50 +960,48 @@ class VonBertalanffySchnuteGrowthInterface
           load_and_register(pv, target, base_name, log_scale);
         };
 
-    ConfigureLengthReferenceParameterization<Type>(vb);
-
-    load_and_register(this->mean_length_young, vb->MeanLengthYoungVector(),
+    load_and_register(this->mean_length_young, vb->mean_length_young_vector,
                       "mean_length_young", true);
-    load_and_register(this->mean_length_old, vb->MeanLengthOldVector(),
+    load_and_register(this->mean_length_old, vb->mean_length_old_vector,
                       "mean_length_old", true);
-    load_and_register(this->growth_coefficient, vb->GrowthCoefficientVector(),
+    load_and_register(this->growth_coefficient, vb->growth_coefficient_vector,
                       "growth_coefficient", true);
     load_and_register(this->reference_age_for_length_young,
-                      vb->ReferenceAgeForLengthYoungVector(),
+                      vb->reference_age_for_length_young_vector,
                       "reference_age_for_length_young", false);
     load_and_register(this->reference_age_for_length_old,
-                      vb->ReferenceAgeForLengthOldVector(),
+                      vb->reference_age_for_length_old_vector,
                       "reference_age_for_length_old", false);
-    load_and_register(this->length_weight_a, vb->LengthWeightAVector(),
+    load_and_register(this->length_weight_a, vb->length_weight_a_vector,
                       "length_weight_a", true);
-    load_and_register(this->length_weight_b, vb->LengthWeightBVector(),
+    load_and_register(this->length_weight_b, vb->length_weight_b_vector,
                       "length_weight_b", true);
     load_optional_and_register(this->length_at_age_sd_young,
-                               vb->LengthAtAgeSdYoungVector(),
+                               vb->length_at_age_sd_young_vector,
                                "length_at_age_sd_young", true);
     load_optional_and_register(this->length_at_age_sd_old,
-                               vb->LengthAtAgeSdOldVector(),
+                               vb->length_at_age_sd_old_vector,
                                "length_at_age_sd_old", true);
     load_optional_and_register(this->log_sd_mean_length_young,
-                               vb->LogSdLengthAtRefAgeYoungVector(),
+                               vb->log_sd_mean_length_young_vector,
                                "log_sd_mean_length_young", false);
     load_optional_and_register(this->log_sd_mean_length_old,
-                               vb->LogSdLengthAtRefAgeOldVector(),
+                               vb->log_sd_mean_length_old_vector,
                                "log_sd_mean_length_old", false);
     load_optional_and_register(this->log_sd_growth_coefficient,
-                               vb->LogSdGrowthCoefficientVector(),
+                               vb->log_sd_growth_coefficient_vector,
                                "log_sd_growth_coefficient", false);
     load_optional_and_register(
         this->mean_length_young_mean_length_old_logit_corr,
-        vb->LogitCorrLengthAtRefAgeYoungLengthAtRefAgeOldVector(),
+        vb->mean_length_young_mean_length_old_logit_corr_vector,
         "mean_length_young_mean_length_old_logit_corr", false);
     load_optional_and_register(
         this->mean_length_young_growth_coefficient_logit_corr,
-        vb->LogitCorrLengthAtRefAgeYoungKVector(),
+        vb->mean_length_young_growth_coefficient_logit_corr_vector,
         "mean_length_young_growth_coefficient_logit_corr", false);
     load_optional_and_register(
         this->mean_length_old_growth_coefficient_logit_corr,
-        vb->LogitCorrLengthAtRefAgeOldKVector(),
+        vb->mean_length_old_growth_coefficient_logit_corr_vector,
         "mean_length_old_growth_coefficient_logit_corr", false);
 
     this->RegisterGrowthObservationInInfo<Type>(growth_observation);
