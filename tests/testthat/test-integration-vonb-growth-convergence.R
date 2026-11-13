@@ -780,15 +780,7 @@ test_that("default non-derived growth keeps the historical fixed age-to-length c
   expect_equal(length(report[["age_to_length_conversion_derived"]][[1]]), 0)
 })
 
-test_that("von bertalanffy Newton polishing does not worsen objective or gradient", {
-  skip(
-    paste(
-      "Newton steps are currently not implemented in `fit_fims()`.",
-      "See the note in `R/fimsfit.R` above the",
-      "`number_of_newton_steps > 0` guard."
-    )
-  )
-
+test_that("von bertalanffy Newton polishing reduces the gradient without worsening the objective", {
   ctx <- make_vonb_convergence_context()
   on.exit(
     {
@@ -826,8 +818,8 @@ test_that("von bertalanffy Newton polishing does not worsen objective or gradien
     base_objective + 1e-8
   )
 
-  #' @description Test that optional Newton polishing does not worsen the maximum gradient.
-  expect_lte(
+  #' @description Test that optional Newton polishing reduces the maximum gradient.
+  expect_lt(
     newton_max_gradient,
     base_max_gradient
   )

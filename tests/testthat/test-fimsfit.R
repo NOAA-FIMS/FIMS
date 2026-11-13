@@ -21,6 +21,16 @@ if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
 fit_age_length_comp <- readRDS(
   testthat::test_path("fixtures", "fit_age_length_comp.RDS")
 )
+# The first 5 years of data_big keep the covariance matrix small; weight at
+# age needs 1 more year than the other data
+yearly_types <- c("catch", "index", "age_comp", "length_comp")
+data_5_years <- data_big |>
+  dplyr::filter(
+    !(.data[["type"]] %in% c(yearly_types, "weight_at_age")) |
+      (.data[["type"]] %in% yearly_types & .data[["timing"]] <= 5) |
+      (.data[["type"]] == "weight_at_age" & .data[["timing"]] <= 6)
+  ) |>
+  FIMSFrame()
 
 ## IO correctness ----
 test_that("`is.FIMSFit()` works with correct inputs", {
@@ -53,16 +63,6 @@ test_that("`is.FIMSFit()` works with a fit without optimization", {
 })
 
 test_that("`fit_fims()` passes `getReportCovariance` to `TMB::sdreport()`", {
-  # The first 5 years of data_big keep the covariance matrix small; weight at
-  # age needs 1 more year than the other data
-  yearly_types <- c("catch", "index", "age_comp", "length_comp")
-  data_5_years <- data_big |>
-    dplyr::filter(
-      !(.data[["type"]] %in% c(yearly_types, "weight_at_age")) |
-        (.data[["type"]] %in% yearly_types & .data[["timing"]] <= 5) |
-        (.data[["type"]] == "weight_at_age" & .data[["timing"]] <= 6)
-    ) |>
-    FIMSFrame()
   fit_with_covariance <- setup_default_parameters(data_5_years) |>
     initialize_fims(data = data_5_years) |>
     fit_fims(number_of_loops = 1, getReportCovariance = TRUE)
@@ -73,6 +73,84 @@ test_that("`fit_fims()` passes `getReportCovariance` to `TMB::sdreport()`", {
     expected = rep(length(sdreport[["value"]]), 2)
   )
   expect_true(all(is.finite(diag(sdreport[["cov"]]))))
+  clear()
+})
+
+test_that("`fit_fims()` keeps only Newton steps that reduce the gradient", {
+  default_parameters <- setup_default_parameters(data_5_years)
+  fit_5_years <- function(number_of_newton_steps) {
+    default_parameters |>
+      initialize_fims(data = data_5_years) |>
+      fit_fims(
+        number_of_loops = 0,
+        number_of_newton_steps = number_of_newton_steps,
+        get_sd = FALSE
+      )
+  }
+  # TMB's last.par.best, which report() and get_estimates() read, holds the
+  # fixed effects and the random-effect mode.
+  get_best_parameters <- function(fit) {
+    obj <- get_obj(fit)
+    best_parameters <- unname(obj[["env"]][["last.par.best"]])
+    list(
+      fixed = best_parameters[obj[["env"]][["lfixed"]]()],
+      all = best_parameters
+    )
+  }
+
+  fit_no_newton <- fit_5_years(number_of_newton_steps = 0)
+  no_newton_opt <- get_opt(fit_no_newton)
+  no_newton_max_gradient <- get_max_gradient(fit_no_newton)
+  no_newton_best_parameters <- get_best_parameters(fit_no_newton)
+  clear()
+
+  fit_newton <- fit_5_years(number_of_newton_steps = 1)
+  newton_opt <- get_opt(fit_newton)
+  newton_max_gradient <- get_max_gradient(fit_newton)
+  #' @description Test that 1 Newton step reduces the maximum absolute gradient.
+  expect_lt(newton_max_gradient, no_newton_max_gradient)
+
+  #' @description Test that 1 Newton step does not worsen the objective value.
+  expect_lte(newton_opt[["objective"]], no_newton_opt[["objective"]] + 1e-8)
+
+  #' @description Test that the fixed effects in TMB's last.par.best match `get_opt()[["par"]]` after 1 Newton step.
+  expect_identical(
+    object = get_best_parameters(fit_newton)[["fixed"]],
+    expected = unname(newton_opt[["par"]])
+  )
+
+  convergence <- get_convergence(fit_newton)
+  #' @description Test that the maximum gradient in `get_convergence()` matches `get_max_gradient()` after 1 Newton step.
+  expect_equal(
+    object = convergence[["value"]][convergence[["check"]] == "max_gradient"],
+    expected = newton_max_gradient
+  )
+  clear()
+
+  # A negated Hessian points the step away from the minimum. The maximum
+  # gradient doubles, so the step is not kept. Mocking is the only way to force
+  # a rejected step on every platform.
+  optim_hess <- stats::optimHess
+  local_mocked_bindings(
+    optimHess = function(par, fn, gr = NULL, ...) -optim_hess(par, fn, gr, ...),
+    .package = "stats"
+  )
+  fit_rejected <- fit_5_years(number_of_newton_steps = 1)
+  #' @description Test that a rejected Newton step leaves `get_opt()[["par"]]` at the `nlminb()` estimates.
+  expect_equal(
+    object = get_opt(fit_rejected)[["par"]],
+    expected = no_newton_opt[["par"]]
+  )
+  #' @description Test that a rejected Newton step leaves the maximum gradient at the `nlminb()` value.
+  expect_equal(
+    object = get_max_gradient(fit_rejected),
+    expected = no_newton_max_gradient
+  )
+  #' @description Test that a rejected Newton step leaves the stored fixed effects and random-effect mode at the `nlminb()` values.
+  expect_equal(
+    object = get_best_parameters(fit_rejected),
+    expected = no_newton_best_parameters
+  )
   clear()
 })
 
@@ -133,11 +211,31 @@ test_that("`is.FIMSFit()` returns correct outputs for edge cases", {
 })
 
 ## Error handling ----
-test_that("fit_fims() errors when Newton steps are requested", {
-  #' @description Test that fit_fims() says to use number_of_loops when Newton steps are requested.
+test_that("`fit_fims()` errors when `number_of_newton_steps` is invalid", {
+  #' @description Test that `fit_fims()` rejects a negative `number_of_newton_steps`.
   expect_error(
-    fit_fims(input = NULL, number_of_newton_steps = 1),
-    regexp = "Newton steps are not implemented yet.*number_of_loops"
+    fit_fims(input = NULL, number_of_newton_steps = -1),
+    regexp = "number_of_newton_steps.*single non-negative integer"
+  )
+  #' @description Test that `fit_fims()` rejects a non-integer `number_of_newton_steps`.
+  expect_error(
+    fit_fims(input = NULL, number_of_newton_steps = 1.5),
+    regexp = "number_of_newton_steps.*single non-negative integer"
+  )
+  #' @description Test that `fit_fims()` rejects a non-finite `number_of_newton_steps`.
+  expect_error(
+    fit_fims(input = NULL, number_of_newton_steps = Inf),
+    regexp = "number_of_newton_steps.*single non-negative integer"
+  )
+  #' @description Test that `fit_fims()` rejects more than 1 value of `number_of_newton_steps`.
+  expect_error(
+    fit_fims(input = NULL, number_of_newton_steps = c(1, 2)),
+    regexp = "number_of_newton_steps.*single non-negative integer"
+  )
+  #' @description Test that `fit_fims()` rejects a character `number_of_newton_steps`.
+  expect_error(
+    fit_fims(input = NULL, number_of_newton_steps = "1"),
+    regexp = "number_of_newton_steps.*single non-negative integer"
   )
 })
 
