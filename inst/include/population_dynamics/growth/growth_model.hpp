@@ -89,13 +89,6 @@ class GrowthModel : public GrowthModelBase<Type> {
       Type mean_length_old_variance,
       Type mean_length_old_growth_coefficient_covariance,
       Type growth_coefficient_variance) {
-    ValidateGrowthParameterCovariance(
-        mean_length_young_variance,
-        mean_length_young_mean_length_old_covariance,
-        mean_length_young_growth_coefficient_covariance,
-        mean_length_old_variance, mean_length_old_growth_coefficient_covariance,
-        growth_coefficient_variance);
-
     mean_length_young_variance_ = mean_length_young_variance;
     mean_length_young_mean_length_old_covariance_ =
         mean_length_young_mean_length_old_covariance;
@@ -175,69 +168,6 @@ class GrowthModel : public GrowthModelBase<Type> {
   const GrowthProducts<Type>& GetProducts() const override { return products_; }
 
  private:
-  /// Validate that the supplied 3-parameter covariance matrix on the
-  /// log-scale FIMS estimation parameterization is usable for the
-  /// delta-method growth variability path.
-  void ValidateGrowthParameterCovariance(
-      Type mean_length_young_variance,
-      Type mean_length_young_mean_length_old_covariance,
-      Type mean_length_young_growth_coefficient_covariance,
-      Type mean_length_old_variance,
-      Type mean_length_old_growth_coefficient_covariance,
-      Type growth_coefficient_variance) const {
-    if (mean_length_young_variance < Type(0.0) ||
-        mean_length_old_variance < Type(0.0) ||
-        growth_coefficient_variance < Type(0.0)) {
-      throw std::runtime_error("Growth parameter variances must be >= 0");
-    }
-
-    if (mean_length_young_mean_length_old_covariance *
-            mean_length_young_mean_length_old_covariance >
-        mean_length_young_variance * mean_length_old_variance) {
-      throw std::runtime_error(
-          "Growth covariance between mean_length_young and "
-          "mean_length_old is inconsistent with the supplied variances");
-    }
-
-    if (mean_length_young_growth_coefficient_covariance *
-            mean_length_young_growth_coefficient_covariance >
-        mean_length_young_variance * growth_coefficient_variance) {
-      throw std::runtime_error(
-          "Growth covariance between mean_length_young and "
-          "growth_coefficient is inconsistent with the supplied variances");
-    }
-
-    if (mean_length_old_growth_coefficient_covariance *
-            mean_length_old_growth_coefficient_covariance >
-        mean_length_old_variance * growth_coefficient_variance) {
-      throw std::runtime_error(
-          "Growth covariance between mean_length_old and "
-          "growth_coefficient is inconsistent with the supplied variances");
-    }
-
-    const Type determinant =
-        mean_length_young_variance *
-            (mean_length_old_variance * growth_coefficient_variance -
-             mean_length_old_growth_coefficient_covariance *
-                 mean_length_old_growth_coefficient_covariance) -
-        mean_length_young_mean_length_old_covariance *
-            (mean_length_young_mean_length_old_covariance *
-                 growth_coefficient_variance -
-             mean_length_young_growth_coefficient_covariance *
-                 mean_length_old_growth_coefficient_covariance) +
-        mean_length_young_growth_coefficient_covariance *
-            (mean_length_young_mean_length_old_covariance *
-                 mean_length_old_growth_coefficient_covariance -
-             mean_length_young_growth_coefficient_covariance *
-                 mean_length_old_variance);
-
-    if (determinant < Type(0.0)) {
-      throw std::runtime_error(
-          "Growth parameter covariance matrix must be positive "
-          "semi-definite");
-    }
-  }
-
   /// Compute length-at-age SD using either the interpolation path or the
   /// covariance-based delta-method path.
   Type ComputeLengthSdAtAge(const Type& age, const Type& laa,
