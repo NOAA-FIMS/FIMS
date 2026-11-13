@@ -828,7 +828,7 @@ unconverged_fit <- parameters_4_model |>
     ## ✖ Convergence: "FAIL" from "optimizer", "max_gradient", and "sdreport". Use
     ##   `sanity_fims(fit)` to see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 2.45755 seconds
+    ## ℹ Total run time was 2.45288 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 27.41724
     ## ℹ Negative log likelihood (NLL):
@@ -910,7 +910,9 @@ output <- get_estimates(fit) |>
 ``` r
 
 stockplotr::plot_spawning_biomass(
-  dplyr::filter(output, label == "spawning_biomass")
+  dplyr::filter(output, label == "spawning_biomass"),
+  # get_estimates() has no unit column, so give the unit of weight_at_age
+  unit_label = "mt"
 ) +
   stockplotr::theme_noaa()
 ```
@@ -1031,7 +1033,7 @@ high_slope_fit <- parameters_high_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00272 to 0.00027 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00309 to 0.00043 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -1048,13 +1050,13 @@ high_slope_fit <- parameters_high_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 44.01809 seconds
+    ## ℹ Total run time was 45.66593 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00027
+    ## ℹ Maximum gradient= 0.00043
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.598
+    ## ℹ Terminal SB= 1791.58429
 
 ``` r
 
@@ -1067,7 +1069,7 @@ low_slope_fit <- parameters_low_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.0028 to 4e-04 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00766 to 0.00034 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -1084,13 +1086,13 @@ low_slope_fit <- parameters_low_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 43.48145 seconds
+    ## ℹ Total run time was 42.8357 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 4e-04
+    ## ℹ Maximum gradient= 0.00034
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.58274
+    ## ℹ Terminal SB= 1791.58697
 
 ``` r
 
@@ -1208,7 +1210,7 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 43.45528 seconds
+    ## ℹ Total run time was 43.45388 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00028
     ## ℹ Negative log likelihood (NLL):
@@ -1303,7 +1305,7 @@ age_only_fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00296 to 0.00024 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00287 to 0.00036 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -1320,13 +1322,13 @@ age_only_fit <- parameters_4_model |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 8.37931 seconds
+    ## ℹ Total run time was 8.59728 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00024
+    ## ℹ Maximum gradient= 0.00036
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 1627.76704
     ## • Total NLL= 1564.08529
-    ## ℹ Terminal SB= 1740.95407
+    ## ℹ Terminal SB= 1740.95158
 
 ``` r
 
@@ -1360,30 +1362,32 @@ length_only_fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.01688 to 0.00027 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00473 to 0.00025 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
+
+    ## Warning: ! 1 fixed or random effect has a standard error above 1000:
+    ##   "Population.1.log_init_naa.1205".
+    ## ℹ The data may not inform these parameters. Consider fixing them, adding a
+    ##   prior, or simplifying the model.
+    ## ℹ Run `sanity_fims(fit)` to see every convergence check.
+
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
-    ## 
     ## Also defined by 'tibble'
-    ## 
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
-    ## 
     ## Also defined by 'tibble'
-    ## 
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
-    ## 
     ## Also defined by 'tibble'
-    ## 
-    ## ✔ Convergence: "OK"
+    ## ! Convergence: "WARN" from "large_standard_errors". Use `sanity_fims(fit)` to
+    ##   see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 58.52008 seconds
+    ## ℹ Total run time was 1.02788 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00027
+    ## ℹ Maximum gradient= 0.00025
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 1568.32686
+    ## • Marginal NLL= 1568.32685
     ## • Total NLL= 1518.62645
-    ## ℹ Terminal SB= 1722.35862
+    ## ℹ Terminal SB= 1722.36309
 
 ``` r
 
@@ -1406,7 +1410,9 @@ stockplotr::plot_biomass(
         year = year_i,
         estimate = estimated
       )
-  )
+  ),
+  # get_estimates() has no unit column, so give the unit of weight_at_age
+  unit_label = "mt"
 )
 ```
 

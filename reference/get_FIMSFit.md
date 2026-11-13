@@ -91,7 +91,15 @@ which is the returned object from
 reportable in the C++ code is returned.
 
 `get_obj()` returns the output from
-[`TMB::MakeADFun()`](https://rdrr.io/pkg/TMB/man/MakeADFun.html).
+[`TMB::MakeADFun()`](https://rdrr.io/pkg/TMB/man/MakeADFun.html). Its
+methods can use the FIMS model that is in memory instead of the model
+that made the fit. This happens after
+[`clear()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md),
+after another model is set up, or after the fit is read with
+[`readRDS()`](https://rdrr.io/r/base/readRDS.html). The methods then
+return wrong values without an error. Use `get_report()`,
+`get_gradient()`, or `get_estimates()` instead. These return values
+stored during fitting.
 
 `get_opt()` returns the output from
 [`nlminb()`](https://rdrr.io/r/stats/nlminb.html), which is the
@@ -102,12 +110,8 @@ minimizer used in
 the model.
 
 `get_gradient()` returns the per-parameter gradient vector at the MLE as
-stored during fitting. Unlike calling
-`get_obj(x)[["gr"]](get_opt(x)[["par"]])` this function is safe to call
-after
-[`clear()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
-because it reads from a stored R vector rather than the compiled C++
-objective function.
+stored during fitting. It reads a stored R vector, so it does not depend
+on the FIMS model in memory.
 
 `get_sdreport()` returns the list from
 [`TMB::sdreport()`](https://rdrr.io/pkg/TMB/man/sdreport.html).

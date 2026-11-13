@@ -159,15 +159,19 @@ to access objects stored in the available slots.</p>
 is the returned object from <code><a href="setup_default_parameters.html">setup_default_parameters()</a></code>.</p>
 <p><code>get_report()</code> returns the TMB report, where anything that is flagged as
 reportable in the C++ code is returned.</p>
-<p><code>get_obj()</code> returns the output from <code><a href="https://rdrr.io/pkg/TMB/man/MakeADFun.html" class="external-link">TMB::MakeADFun()</a></code>.</p>
+<p><code>get_obj()</code> returns the output from <code><a href="https://rdrr.io/pkg/TMB/man/MakeADFun.html" class="external-link">TMB::MakeADFun()</a></code>. Its methods can use
+the FIMS model that is in memory instead of the model that made the fit.
+This happens after <code><a href="Cpp_functions.html">clear()</a></code>, after another model is set up, or after the
+fit is read with <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code>. The methods then return wrong values without
+an error. Use <code>get_report()</code>, <code>get_gradient()</code>, or <code>get_estimates()</code>
+instead. These return values stored during fitting.</p>
 <p><code>get_opt()</code> returns the output from <code><a href="https://rdrr.io/r/stats/nlminb.html" class="external-link">nlminb()</a></code>, which is the minimizer used
 in <code><a href="fit_fims.html">fit_fims()</a></code>.</p>
 <p><code>get_max_gradient()</code> returns the maximum gradient found when optimizing the
 model.</p>
 <p><code>get_gradient()</code> returns the per-parameter gradient vector at the MLE as
-stored during fitting. Unlike calling <code>get_obj(x)[["gr"]](get_opt(x)[["par"]])</code>
-this function is safe to call after <code><a href="Cpp_functions.html">clear()</a></code> because it reads
-from a stored R vector rather than the compiled C++ objective function.</p>
+stored during fitting. It reads a stored R vector, so it does not depend on
+the FIMS model in memory.</p>
 <p><code>get_sdreport()</code> returns the list from <code><a href="https://rdrr.io/pkg/TMB/man/sdreport.html" class="external-link">TMB::sdreport()</a></code>.</p>
 <p><code>get_convergence()</code> returns a tibble with one row per convergence check
 run by <code><a href="fit_fims.html">fit_fims()</a></code>: <code>check</code>, <code>severity</code> (<code>"OK"</code>, <code>"NOTE"</code> for a check that

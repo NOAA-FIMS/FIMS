@@ -391,7 +391,7 @@ output will be in the same format that users are used to.</p>
 <span><span class="co">##   the stock-recruit parameters.</span></span></code></pre>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00378 to 0.00026 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.0021 to 0.00036 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span>
@@ -416,13 +416,13 @@ output will be in the same format that users are used to.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## ✔ Convergence: "OK"</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 9.47318 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 9.43641 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">## ℹ Maximum gradient= 0.00026</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00036</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
 <span><span class="co">## • Marginal NLL= 1624.68892</span></span>
 <span><span class="co">## • Total NLL= 1560.83065</span></span>
-<span><span class="co">## ℹ Terminal SB= 988.67011</span></span></code></pre>
+<span><span class="co">## ℹ Terminal SB= 988.67003</span></span></code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -444,7 +444,9 @@ comparison.</p>
 <span>        year <span class="op">=</span> <span class="va">year_i</span>,</span>
 <span>        estimate <span class="op">=</span> <span class="va">estimated</span></span>
 <span>      <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  <span class="co"># get_estimates() has no unit column, so give the unit of weight_at_age</span></span>
+<span>  unit_label <span class="op">=</span> <span class="st">"mt"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ! biomass_msy not found for age</span></span></code></pre>
 <p><img src="fims-demo-projections_files/figure-html/fit-plot-projections-1.png" class="r-plt" alt="Plot of spawning biomass for projection model." width="700"></p>

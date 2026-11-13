@@ -207,7 +207,7 @@ checks to follow so that the code is ready for a pull request:
 - Build the package down site using
   [`pkgdown::build_site()`](https://pkgdown.r-lib.org/reference/build_site.html).
 - Run the code coverage report using
-  [`covr::report()`](http://covr.r-lib.org/reference/report.md) to
+  [`covr::report()`](https://covr.r-lib.org/reference/report.html) to
   ensure that all of the code is covered, with the goal of maintaining
   80 percent code coverage.
 
