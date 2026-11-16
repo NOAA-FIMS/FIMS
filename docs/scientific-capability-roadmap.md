@@ -138,3 +138,13 @@ conditional history, explicit process modes and atomic restoration. The next
 scientific design decision is common annual mortality shocks versus correlated
 age-specific innovations; assessment recovery and identifiability benchmarks
 should guide that choice before more covariance structure is added.
+
+The first recovery/identifiability benchmark is implemented in
+`tests/integration/process-recovery/`. Five six-year datasets and 14 paired fit
+configurations produced 70 fits, with 12 SD-boundary cases despite optimizer
+convergence and positive-definite reported Hessians. Joint mortality SD estimates
+were unstable; known-SD state recovery was substantially more reassuring than
+free covariance estimation. The retained pilot includes all fits and separates
+boundary results. Before adding mortality covariance, extend this experiment to
+longer horizons, multiple starts and mortality-SD profiles, and vary observation
+information. Five replicates do not validate interval coverage or scaling.

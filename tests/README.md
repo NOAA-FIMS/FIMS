@@ -188,3 +188,10 @@ If any of the instructions above do not work as expected, please [report an issu
 - Platform compatibility tests are executed before releases to ensure that previously tested pieces are still performing after the code has been changed on all platforms of interest.
 - Beta-testing is used to gather feedback from users during the pre-release stage.
 - One-off testing is used for replicating and fixing user-reported bugs. Some of these one-off tests may eventually be integrated into the permanent testing framework.
+### Scientific process recovery benchmark
+
+The opt-in [recruitment/F/M recovery benchmark](integration/process-recovery/README.md)
+simulates paired datasets and compares state and innovation-SD recovery,
+initialization assumptions, uncertainty, convergence, posterior correlations and
+runtime. Its [small pilot](integration/process-recovery/pilot/README.md) records
+variance-boundary behavior without filtering it from the results.

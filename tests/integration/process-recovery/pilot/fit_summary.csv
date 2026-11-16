@@ -1,0 +1,15 @@
+"processes","initialization","sd_mode","planned_fits","errors","qualified_fits","boundary_fits","median_seconds"
+"F","fixed","estimated",5,0,4,1,0.853
+"F","fixed","known",5,0,5,0,0.733999999999995
+"F","normal","estimated",5,0,4,1,1
+"F","normal","known",5,0,5,0,0.818999999999996
+"M","fixed","estimated",5,0,4,1,1.18599999999999
+"M","fixed","known",5,0,5,0,0.983000000000004
+"M","normal","estimated",5,0,2,3,1.376
+"M","normal","known",5,0,5,0,1.091
+"R","fixed","estimated",5,0,5,0,0.932
+"R","fixed","known",5,0,5,0,0.715000000000003
+"R_F_M","fixed","estimated",5,0,3,2,1.293
+"R_F_M","fixed","known",5,0,5,0,1.029
+"R_F_M","normal","estimated",5,0,1,4,1.56
+"R_F_M","normal","known",5,0,5,0,1.17700000000001

@@ -729,3 +729,24 @@ and both plus-group parents, native restoration, rejected malformed/overflowing
 paths with no partial F update, joint M/F simulation with fixed direct log-R,
 and RNG/parameter preservation after rejected simulation. No operational
 assessment recovery, interval coverage or large-model scaling claim is made.
+
+## Recovery and identifiability screening
+
+The standalone benchmark in `tests/integration/process-recovery/` evaluates
+recruitment, F and M alone against oracle trajectories, then all three jointly,
+with known/estimated SDs and known/proper first-year states. It records native
+full-precision state modes and Laplace/Gaussian marginal uncertainty, log-SD
+intervals, optimizer/inner gradients, Hessian status, variance boundaries,
+posterior state correlations, failures, fit dimensions and runtime. State metrics
+exclude constant anchors, and coverage Monte Carlo SEs use replicate fractions
+rather than pretending age-year cells are independent. Tests check metric
+denominators, failure/boundary accounting, initialization and actual estimation.
+
+The retained five-replicate, six-year pilot has 70 fits and 12 lower-bound SD
+estimates. Joint known-anchor M coverage averaged 0.937 with known SDs versus
+0.613 with estimated SDs, including boundary fits. Proper-initial fits have a
+different scored state set and more initial uncertainty. These are descriptive
+pilot outcomes, not coverage validation or proof of structural confounding.
+The next investigation should use longer series, multiple starts and SD profiles
+before adding common mortality shocks or correlated age innovations. No production
+interfaces, implementations or dependencies changed for this benchmark upgrade.

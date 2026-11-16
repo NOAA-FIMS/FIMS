@@ -288,3 +288,5 @@
 * Added opt-in age-specific annual log-M random walks for assessment inference, with a common innovation SD and explicit fixed or proper-normal initialization. Gaussian process densities now support interleaved independent series.
 
 * Simulation and forecasting now accept age-specific mortality random walks, apply sampled log-M grids before dynamics, preserve conditional history, and report mortality paths and initialization metadata.
+
+* Added a reproducible scientific recovery benchmark for recruitment, fishing and natural mortality processes, with paired initialization/innovation-SD comparisons, failure accounting, interval diagnostics, posterior correlations and a retained five-replicate pilot.
