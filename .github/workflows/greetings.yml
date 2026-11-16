@@ -1,6 +1,7 @@
 name: Greetings
 
-on: [pull_request_target, issues]
+# Will not add a comment to Pull Requests from forks just internal PRs
+on: [pull_request, issues]
 
 permissions:
   issues: write

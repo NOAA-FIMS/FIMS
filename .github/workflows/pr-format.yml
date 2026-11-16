@@ -34,9 +34,7 @@
 name: pr-format
 
 on:
-  # Use pull_request_target because we want it to work on forks
-  # see https://runs-on.com/github-actions/pull-request-vs-pull-request-target/
-  pull_request_target:
+  pull_request:
     types: [opened, reopened, synchronize]
     branches:
       - main
@@ -75,45 +73,6 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
           body-includes: '🎨 Chore: code formatting workflow'
-
-      # If this is a fork, add a comment with instructions (if not already present) and exit
-      - name: Comment on fork PR with formatting instructions
-        if: steps.check_fork.outputs.is_fork == 'true'
-        uses: peter-evans/create-or-update-comment@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          comment-id: ${{ steps.pull.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ## 🎨 Chore: code formatting workflow
-            
-            Our automated workflows cannot run on forks because of permission issues, and thus, we ask that you run the following code locally and push any changes that are created to your feature branch. You will only be reminded of this once per PR. Thank you!
-            
-            ### Format C++ code
-            
-            1. Install clang-format version 18.0.0
-            2. Run the following command from the repository root:
-               ```bash
-               clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")
-               ```
-            
-            ### Format R code
-            
-            1. Install {styler} and {roxygen2}
-            2. Run the following commands in R from the repository root:
-            ```r
-            styler::style_pkg() # Style R code
-            roxygen2::roxygenise() # Update documentation
-            styler::style_pkg() # Style R code again
-            roxygen2::roxygenise() # Update documentation again
-            usethis::use_tidy_description() # Style DESCRIPTION file
-            ```
-            
-            ### Push changes
-            
-            1. Commit the formatting with a commit message of "Chore: format feature branch"
-            2. Push to your fork
-          edit-mode: replace
 
       # Checkout the source branch (head ref) of the Pull Request where
       # formatting will be applied (only for non-forks)

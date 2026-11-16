@@ -8,13 +8,13 @@ Please use [GitHub Discussions](https://github.com/orgs/NOAA-FIMS/discussions) i
 
 ## Found a :bug:
 
-Please use [GitHub Issues](https://github.com/NOAA-FIMS/FIMS/issues/new?template=bug_report.yml) to submit a :bug: report. If you have an idea for a well-defined enhancement to FIMS, please use GitHub to submit a [Feature request](https://github.com/NOAA-FIMS/FIMS/issues/new?template=feature_request.yml). Before submitting either of these tickets, please search the [existing issues](https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue) to see if something identical or similar has already been submitted. Once created, Issues are automatically tagged with the `status: triage_needed` tag.
+Please use [GitHub Issues](https://github.com/NOAA-FIMS/FIMS/issues/new?template=bug_report.yml) to submit a :bug: report. If you have an idea for a well-defined enhancement to FIMS, please use GitHub to submit a [Feature request](https://github.com/NOAA-FIMS/FIMS/issues/new?template=feature_request.yml). Before submitting either of these tickets, please search the [existing issues](https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue) to see if something identical or similar has already been submitted.
 
 ## Contributing code
 
 ### Non-code contributions
 
-Not all contributions are code! Writing documentation, teaching, and other activities are also key parts of contributing to software that are much appreciated. For more information about open source contributions, see [the Open Source Guide's How to Contribute page](https://opensource.guide/how-to-contribute/). A good place to start is by looking for open issues with the [good first issue label](https://github.com/NOAA-FIMS/FIMS/contribute). These issues are generally small and well-defined, making them a good starting point for new contributors. We encourage collaborators to feel welcome to contribute in any way they can, and we will do our best to incorporate these contributions into the FIMS projects. Please see the [feature branches](#feature-branches), [pull requests](#pull-requests), and [style guide](#style-guide) sections below for how to make your contributions to FIMS. We thank you in advance for being part of the team. 
+Not all contributions are code! Writing documentation, teaching, and other activities are also key parts of contributing to software that are much appreciated. For more information about open source contributions, see [the Open Source Guide's How to Contribute page](https://opensource.guide/how-to-contribute/). A good place to start is by looking for open issues with the [good first issue label](https://github.com/NOAA-FIMS/FIMS/contribute). These issues are generally small and well-defined, making them a good starting point for new contributors. We encourage collaborators to feel welcome to contribute in any way they can, and we will do our best to incorporate these contributions into the FIMS projects. Please see the [feature branches](#feature-branches), [Pull Requests](#pull-requests), and [style guide](#style-guide) sections below for how to make your contributions to FIMS. We thank you in advance for being part of the team. 
 
 Additionally, if you would like to make contributions to the [NOAA-FIMS website](https://noaa-fims.github.io/) (write a blog, etc.), please follow this [contributing guide](https://github.com/NOAA-FIMS/noaa-fims.github.io/blob/main/CONTRIBUTING.md).
 
@@ -66,13 +66,13 @@ Note that the examples below are for adding a new module to the population dynam
 
 Once an issue is approved and prioritized for work, a feature branch off of the main branch, e.g., `parametric-discards`, can be created to address the issue. Feature branches can be made within the repository or on a fork of the repository. There are no hard and fast rules for branch names but we tend to use dashes to separate words. Often while working on this new feature branch, there will be updates to the main branch. These updates must be brought in using `git rebase`. Branches that have merge commits will not be accepted into the code base. Please see the [GitHub documentation for rebasing](https://docs.github.com/en/get-started/using-git/about-git-rebase) for more information.
 
-Along the development process it is important to add tests and ensure that the code is well documented. Below are the standard contributor checks to follow so that the code is ready for a pull request:
+Along the development process it is important to add tests and ensure that the code is well documented. Below are the standard contributor checks to follow so that the code is ready for a Pull Request:
 
 #### Standard contributor checks
 
 * Build the doxygen-generated C++ documentation using `cmake --build build`, where the resulting html files will be in build/html. This can also be done using `setup_and_run_gtest()` in R.
 * Implement the suite of Google tests using `cmake --build build` and `ctest --test-dir build`. This can also be done using `setup_and_run_gtest()` in R. If there are failing tests, run `ctest --test-dir --rerun-failed --output-on-failure` to re-run the failed tests verbosely.
-* Format C++ code using clang-format version 18.0.0 with Google style: `clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")`. If you are contributing from a fork, the automated formatting workflow will add a comment to your pull request with detailed instructions on how to format your code locally.
+* Format C++ code using clang-format version 18.0.0 with Google style: `clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")`. If you are contributing from a fork, you will need to perform this step manually because our actions do not run on forks.
 * Run clang tidy to check C++ for common mistakes using TODO: document how to run clang-tidy.
 * Spell check the package using [cspell](https://cspell.org/). Install with `npm install -g cspell` and run `cspell "**/*.{cpp,hpp,h,R,Rmd,md}"` from the package root. Add any terms needed to [`NOAA-FIMS/.github/cspell.json`](https://github.com/NOAA-FIMS/.github/blob/main/cspell.json).
 * Build the roxygen documentation using `devtools::document()`. See the [r-lib](https://roxygen2.r-lib.org/) for all available tags and best practices.
@@ -83,13 +83,28 @@ Along the development process it is important to add tests and ensure that the c
 * Build the package down site using `pkgdown::build_site()`.
 * Run the code coverage report using `covr::report()` to ensure that all of the code is covered, with the goal of maintaining 80 percent code coverage.
 
-### Pull requests
+### Pull Requests
 
-Once the work is complete, a pull request should be created to bring the changes into the appropriate branch. Pull requests from forks will be reviewed under the same guidelines as pull requests from internal branches. Review of the pull request will be both automated and manual, where all pull requests must pass automated tests and syntax checks before being merged in addition to being reviewed by at least one developer. [Code review](https://github.com/features/code-review) ensures health and continuous improvement of the FIMS codebase, while simultaneously helping FIMS developers become familiar with the codebase. [Google's code review guide](https://google.github.io/eng-practices/review/) provides a useful set of guidelines for both reviewers and code authors. Each PR is accompanied by a [checklist of major considerations for code reviews](https://github.com/NOAA-FIMS/FIMS/blob/main/.github/workflows/pr-checklist.yml) to guide reviewers through the PR. Additional guidance can be found at [Conventional Comments](https://conventionalcomments.org/) for formatting/structuring your reviewer comments. Navigate to the [Perforce Blog](https://www.perforce.com/blog/qac/9-best-practices-for-code-review) for nine best practices for code review and use the [FIMS Style Guide](#style-guide) to settle any style arguments.
+Once the work is complete, a Pull Request should be created to bring the changes into the appropriate branch. Pull Requests from forks will be reviewed under the same guidelines as Pull Requests from internal branches, i.e., it checks off the following requirements:
 
-An automated workflow ([pr-format.yml](https://github.com/NOAA-FIMS/FIMS/blob/main/.github/workflows/pr-format.yml)) runs when you open or update a pull request. This workflow checks both C++ and R code formatting. If you are contributing from the main repository, the workflow will automatically create a pull request with formatting changes that need to be merged into your feature branch. If you are contributing from a fork, the workflow will add a comment to your pull request with detailed instructions on how to format your code locally, since the automated workflow cannot push changes to forks.
+- [ ] The code is well-designed
+- [ ] The code is designed well for both users and developers
+- [ ] Code coverage remains high' +
+- [ ] Comments are clear, useful, and explain why instead of what
+- [ ] Code is appropriately documented (doxygen and roxygen)
 
-Versioning follows [semantic versioning](https://semver.org/) to establish the major, minor, and patch number for a release. Often, multiple pull requests are included in a single release, which will be initiated by a member of the FIMS Implementation Team. Release notes for each version can be found in the [release notes](https://github.com/NOAA-FIMS/FIMS/releases).
+Review of the Pull Request will be both automated and manual, where all Pull Requests must pass automated tests and syntax checks before being merged in addition to being reviewed by at least one developer. [Code review](https://github.com/features/code-review) ensures health and continuous improvement of the FIMS codebase, while simultaneously helping FIMS developers become familiar with the codebase. [Google's code review guide](https://google.github.io/eng-practices/review/) provides a useful set of guidelines for both reviewers and code authors. 
+
+An automated workflow ([pr-format.yml](https://github.com/NOAA-FIMS/FIMS/blob/main/.github/workflows/pr-format.yml)) runs when you open or update a Pull Request. This workflow checks both C++ and R code formatting. If you are contributing from the main repository, the workflow will automatically create a Pull Request with formatting changes that need to be merged into your feature branch. If you are contributing from a fork, you will need to run the workflow yourself (see [Standard contributor checks](#standard-contributor-checks)) because the automated workflow cannot push changes to forks.
+
+### Reviewing Pull Requests
+
+- See the [GitHub documentation for how to comment on a PR](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/commenting-on-a-pull-request) to indicate where you have questions or changes are needed before approving the PR.
+- Please use standard [conventional messages](https://www.conventionalcommits.org/) for both commit messages and comments
+- Reviews of Pull Requests are a great way to learn so feel free to share your tips and tricks. However, when suggesting changes to the PR that are optional please include `nit:` (for nitpicking) as the comment type. For example, `nit:` I prefer using a `data.frame()` instead of a `matrix` because ...
+- Engage with the developer. Make it clear when the PR is approved by selecting the approved status, and potentially commenting on the PR with something like `This PR is now ready to be merged.`\n
+
+Additional guidance can be found at [Conventional Comments](https://conventionalcomments.org/) for formatting/structuring your reviewer comments. Navigate to the [Perforce Blog](https://www.perforce.com/blog/qac/9-best-practices-for-code-review) for nine best practices for code review and use the [FIMS Style Guide](#style-guide) to settle any style arguments.
 
 ## Style guide
 
@@ -98,3 +113,7 @@ Style guides are used to ensure the code is consistent, easy to use (e.g., read,
 A self-imposed style within FIMS is the use of `typename` instead of `class` when defining templates for consistency with the `TMB` package. While types may be defined in many ways, we use `Type` instead of `T` to define Types.
 
 Commit messages communicate details about changes that have occurred to collaborators and improve team efficiency. The best guidance for how to create an excellent commit message can be found on [Conventional Commits](https://www.conventionalcommits.org), which is our style guide for commit messages. See [Conventional Comments](https://conventionalcomments.org/) for how to format reviewer comments.
+
+## Versioning
+
+Versioning follows [semantic versioning](https://semver.org/) to establish the major, minor, and patch number for a release. Often, multiple Pull Requests are included in a single release, which will be initiated by a member of the FIMS Implementation Team. Release notes for each version can be found in the [release notes](https://github.com/NOAA-FIMS/FIMS/releases).
