@@ -148,3 +148,14 @@ free covariance estimation. The retained pilot includes all fits and separates
 boundary results. Before adding mortality covariance, extend this experiment to
 longer horizons, multiple starts and mortality-SD profiles, and vary observation
 information. Five replicates do not validate interval coverage or scaling.
+
+The longer-series/multiple-start/profile extension is now complete (see
+`tests/integration/process-recovery/sensitivity-pilot/README.md`). It retained
+132 attempts at 6/18 years, with 129 passing optimizer checks and at least two
+valid starts per selected case. Valid objective spreads were below 0.00004,
+yet two of three 18-year datasets still estimated M innovation SD at the lower
+bound under each initialization setting. The first longer dataset had an
+interior optimum but broad relative likelihood support near the lower bound.
+This small experiment supports observation-information and process-SD sensitivity
+experiments next; it does not support adding unrestricted covariance merely to
+address variance instability. No coverage or general scaling claim follows.

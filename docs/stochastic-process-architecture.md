@@ -750,3 +750,46 @@ pilot outcomes, not coverage validation or proof of structural confounding.
 The next investigation should use longer series, multiple starts and SD profiles
 before adding common mortality shocks or correlated age innovations. No production
 interfaces, implementations or dependencies changed for this benchmark upgrade.
+
+### Longer-series, multiple-start and profile investigation
+
+The `sensitivity.R` benchmark extension keeps the first pilot's source and
+checksum unchanged. It fits joint recruitment/F/M models from common SD starts
+0.025, 0.1 and 0.35 at 6 and 18 years, with both initial-information settings.
+For the first replicated dataset per horizon it computes a mortality-SD profile:
+
+\[
+\ell_p(\sigma_M)=\min_{\log\sigma_R,\log\sigma_F}
+\left[-\log\int p(y\mid u)\,p(u\mid\sigma_R,\sigma_F,\sigma_M)\,du\right],
+\]
+
+using TMB's Laplace approximation over all latent process states. Mapping the
+mortality covariance parameter fixes only that SD; nuisance covariance parameters
+and all states are reoptimized at every grid point and start. An objective-equivalence
+test verifies that mapped/free objectives agree at matching covariance values.
+Relative NLL references the best valid free or grid solution for the same data
+and initial-information setting. No asymptotic confidence cutoff is imposed.
+
+All attempts remain visible. Candidate selection requires code-zero optimization,
+small latent-state gradients and small box-projected covariance gradients, while
+retaining raw gradients and variance-boundary flags. This permits legitimate
+boundary optima in the likelihood investigation without calling their intervals
+regular. Unlike the first recovery pilot, these fits do not calculate `sdreport`
+or interval coverage. Same seed labels at different horizons do not generate
+nested trajectory prefixes, and three shared SD starts do not exhaust nuisance
+parameter combinations or establish global optimization. Checkpoints preserve
+completed datasets; no production interfaces or dependencies change.
+
+The retained sensitivity pilot evaluated 132 starts/profile attempts (129 passed
+optimizer checks). Every selected free/profile case had at least two valid
+starts; maximum valid objective spread was below 0.00004. Mortality SD still
+reached the lower bound in two of three 18-year datasets under each initial
+setting. For the first longer dataset, the anchored profile's lower-bound point
+was 0.905 NLL units above the optimum and the proper-initial profile's was 0.181.
+These broad profiles and start agreement suggest weak variance information in
+these datasets, not a demonstrated improvement from additional covariance.
+Three replicates and one profiled dataset per horizon do not establish boundary
+frequencies or coverage. Details, all attempt outcomes and a visually inspected
+profile PNG are retained in `tests/integration/process-recovery/sensitivity-pilot/`.
+Validation passed 9 tests / 51 assertions, including the two opt-in integration
+checks. Production code and the original pilot source remain unchanged.

@@ -290,3 +290,5 @@
 * Simulation and forecasting now accept age-specific mortality random walks, apply sampled log-M grids before dynamics, preserve conditional history, and report mortality paths and initialization metadata.
 
 * Added a reproducible scientific recovery benchmark for recruitment, fishing and natural mortality processes, with paired initialization/innovation-SD comparisons, failure accounting, interval diagnostics, posterior correlations and a retained five-replicate pilot.
+
+* Extended the scientific process benchmark with longer horizons, multiple covariance starting values and reoptimized mortality-SD likelihood profiles, retaining all attempts and replicate checkpoints.

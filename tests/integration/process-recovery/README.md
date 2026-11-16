@@ -96,3 +96,63 @@ model misspecification. Larger runs should vary horizon, observation information
 starting points and process SDs before adding age covariance or common mortality
 shocks. `pilot/` records the small local pilot, including failures and boundary
 fits; the full RDS stays in the chosen output directory.
+
+## Longer-series, multiple-start and mortality-SD profile experiment
+
+```sh
+Rscript tests/integration/process-recovery/run-sensitivity.R /tmp/fims-sensitivity 3
+Rscript tests/integration/process-recovery/plot-sensitivity.R /tmp/fims-sensitivity
+```
+
+This extension preserves the original benchmark and its source checksum. It
+compares joint recruitment/F/M estimation at 6 and 18 years, with three common
+innovation-SD starts (0.025, 0.1, 0.35) and both initial-information settings.
+Each start sets all three covariance parameters to that value, while the latent
+states retain the original benchmark's deliberately displaced starts. It does
+not try all combinations of covariance starts, perturb latent starts, or prove
+global optimization. Three replicated datasets are generated per horizon.
+
+For replicate 1 at each horizon, the experiment also fixes mortality SD on
+`0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.2, 0.4`. At **every** point and start,
+recruitment and F SDs and all latent states are reoptimized. This is a Laplace
+marginal-likelihood profile, not evaluation of a fixed trajectory or posterior
+Wald interval. TMB maps fix only the mortality covariance parameter. Density
+normalizers and integrated-state dimensions are retained. A test compares the
+free and mapped objectives at the same covariance values.
+
+The `attempts.csv` table retains every start, including errors and nonconverged
+solutions. `best.csv` selects the lowest objective among valid optimizer results
+for each free fit or profile point; when none pass, the failed candidate remains
+with `valid = FALSE` and no delta NLL. Validity requires optimizer code zero,
+inner maximum gradient below 0.001 and maximum box-projected outer gradient
+below 0.001. At a lower bound a positive raw gradient satisfies the KKT condition;
+at an upper bound a negative one does. Both raw and projected gradients remain
+visible. This validity label permits SD boundaries for likelihood exploration,
+unlike the original benchmark's stricter interval-qualification label. No
+Hessian/coverage qualification is performed in this likelihood experiment.
+
+`objective_spread` compares the valid starting-point solutions, and
+`valid_starts` gives its denominator. Relative NLL uses the best valid free or
+profile objective for that same dataset and initial-information setting. A
+profile point below the free fit therefore remains visible as a sign that the
+free optimization may need attention. No chi-square confidence threshold is
+applied: boundaries, short series and the coarse grid require more care.
+
+`checkpoint.rds` saves completed datasets and attempts after each replicate;
+`result.rds` also retains operating-model truth/data and final tables. The runner
+captures source checksums before the experiment. It refuses to overwrite
+nonempty output directories and does not currently implement automatic checkpoint
+resume. Same seed labels across horizons do **not** produce nested trajectories,
+because the numbers and ordering of process draws change with horizon. Fits are
+paired within each generated dataset, not between lengths.
+
+Timings include initialization, outer optimization and latent-mode diagnostics,
+but exclude `sdreport`, covariance inversion, simulation, garbage collection
+and writing. They are not directly comparable to the original pilot's timings,
+which included uncertainty calculations. `M_rmse` scores only estimated mortality
+states, so proper and anchored settings have different first-year scoring sets.
+The PNG shows replicate 1 only. Findings must be checked across more replicates
+before choosing additional mortality covariance or claiming coverage/scalability.
+
+The retained [longer-series/profile pilot](sensitivity-pilot/README.md) records
+all attempts, profile results, source provenance and the inspected profile plot.

@@ -195,3 +195,5 @@ simulates paired datasets and compares state and innovation-SD recovery,
 initialization assumptions, uncertainty, convergence, posterior correlations and
 runtime. Its [small pilot](integration/process-recovery/pilot/README.md) records
 variance-boundary behavior without filtering it from the results.
+The same benchmark directory also provides `run-sensitivity.R` for longer-series,
+multiple-start and mortality-SD profile experiments, plus a profile plotting script.
