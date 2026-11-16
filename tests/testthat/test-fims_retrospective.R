@@ -103,6 +103,61 @@ test_that("run_fims_retrospective() works with correct inputs", {
   )
 })
 
+test_that("run_modified_data_fims() keeps length_bin rows", {
+  # The fleet1 length_bin rows are the only length data. They set the population
+  # length bins that mean weight at age is averaged over, so the jnll changes if
+  # they are dropped. Von Bertalanffy growth gives length at age, so the
+  # age_to_length_conversion rows are not needed. The 3 bins cover a narrow
+  # range to keep the fits fast.
+  bins_data <- dplyr::bind_rows(
+    dplyr::filter(
+      data_big,
+      !type %in% c("age_to_length_conversion", "length_comp")
+    ),
+    tibble::tibble(
+      type = "length_bin",
+      fleet = "fleet1",
+      age = NA_real_,
+      length = c(500, 550, 600),
+      timing = NA_real_,
+      observed = NA_real_,
+      unit = NA_character_,
+      uncertainty = NA_character_
+    )
+  )
+  bins_frame <- FIMSFrame(bins_data)
+  growth_parameters <- setup_default_parameters(bins_frame) |>
+    dplyr::filter(module_name != "Growth") |>
+    dplyr::bind_rows(setup_default_Growth(
+      data = bins_frame,
+      module_type = "VonBertalanffySchnute"
+    ))
+  # Peeling 1 year removes the year-30 index and age_comp rows but keeps the
+  # catch, weight_at_age and length_bin rows
+  peeled_data <- dplyr::filter(
+    bins_data,
+    !(timing %in% 30 & type %in% c("index", "age_comp"))
+  )
+
+  retrospective_fit <- run_modified_data_fims(
+    years_to_remove = 1,
+    data = bins_data,
+    parameters = growth_parameters
+  )
+  clear()
+  peeled_fit <- growth_parameters |>
+    initialize_fims(data = FIMSFrame(peeled_data)) |>
+    fit_fims(optimize = TRUE)
+  clear()
+
+  #' @description Test that run_modified_data_fims() keeps length_bin rows, so
+  #' a 1-year peel gives the same jnll as a fit to the peeled data.
+  expect_equal(
+    object = get_report(retrospective_fit)[["jnll"]],
+    expected = get_report(peeled_fit)[["jnll"]]
+  )
+})
+
 ## Edge handling ----
 test_that("run_fims_retrospective() handles edge cases correctly", {
   #' @description Test that run_fims_retrospective works with years_to_remove = 0.

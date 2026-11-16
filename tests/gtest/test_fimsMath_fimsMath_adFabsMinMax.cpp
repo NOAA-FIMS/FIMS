@@ -48,4 +48,23 @@ TEST(fimsMath_adMax, HandlesCorrectInput) {
   EXPECT_NEAR(fims_math::ad_max(2.0, 1.0, 1e-4), 2.000025, 0.000001);
 }
 
+// Error handling
+// Test that ad_fabs throws for C = 0 and C < 0
+TEST(fimsMath_adFabs, CaptureError) {
+  EXPECT_THROW(fims_math::ad_fabs(2.0, 0.0), std::invalid_argument);
+  EXPECT_THROW(fims_math::ad_fabs(0.0, -1e-5), std::invalid_argument);
+}
+
+// Test that ad_min throws for C = 0 and C < 0, through ad_fabs
+TEST(fimsMath_adMin, CaptureError) {
+  EXPECT_THROW(fims_math::ad_min(2.0, 1.0, 0.0), std::invalid_argument);
+  EXPECT_THROW(fims_math::ad_min(2.0, 1.0, -1e-5), std::invalid_argument);
+}
+
+// Test that ad_max throws for C = 0 and C < 0, through ad_fabs
+TEST(fimsMath_adMax, CaptureError) {
+  EXPECT_THROW(fims_math::ad_max(2.0, 1.0, 0.0), std::invalid_argument);
+  EXPECT_THROW(fims_math::ad_max(2.0, 1.0, -1e-5), std::invalid_argument);
+}
+
 }  // namespace

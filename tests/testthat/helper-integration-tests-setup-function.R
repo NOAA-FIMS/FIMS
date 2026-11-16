@@ -586,3 +586,25 @@ run_at_initial_values <- function(data) {
   clear()
   output
 }
+
+# Population length bins ----
+#' Make `length_bin` rows that set the population length bins
+#'
+#' @param lengths A numeric vector of the lower edges of the population length
+#'   bins.
+#' @param timing A numeric timing for the rows. Population length bins need
+#'   `NA`, so other values are only for testing errors.
+#'
+#' @return A tibble with the columns of `data_big`.
+population_length_bin_rows <- function(lengths, timing = NA_real_) {
+  tibble::tibble(
+    type = "length_bin",
+    fleet = NA_character_,
+    age = NA_real_,
+    length = lengths,
+    timing = timing,
+    observed = NA_real_,
+    unit = NA_character_,
+    uncertainty = NA_character_
+  )
+}

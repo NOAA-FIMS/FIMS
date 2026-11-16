@@ -100,7 +100,8 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   SharedInt n_years;
   /**
-   * @brief The number of length bins.
+   * @brief The number of population length bins, 0 when FIMS builds the bins
+   * from the fleet bins.
    */
   SharedInt n_lengths;
   /**
@@ -149,6 +150,11 @@ class PopulationInterface : public PopulationInterfaceBase {
    * should equal \"n_ages\".
    */
   RealVector ages;
+  /**
+   * @brief Lower edges of the population length bins, from `length_bin` rows
+   * with `fleet = NA`. The length of this vector should equal \"n_lengths\".
+   */
+  RealVector lengths;
   /**
    * @brief The name for the population.
    */
@@ -262,6 +268,7 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_init_naa(other.log_init_naa),
         proportion_female(other.proportion_female),
         ages(other.ages),
+        lengths(other.lengths),
         name(other.name),
         total_catch_weight(other.total_catch_weight),
         total_catch_numbers(other.total_catch_numbers),
@@ -568,6 +575,21 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     for (size_t i = 0; i < ages.size(); i++) {
       population->ages[i] = this->ages[i];
+    }
+
+    if (this->n_lengths.get() > 0) {
+      if (this->lengths.size() != static_cast<size_t>(this->n_lengths.get())) {
+        FIMS_ERROR_LOG("The size of `lengths` does not match `n_lengths`: " +
+                       fims::to_string(this->lengths.size()) +
+                       " != " + fims::to_string(this->n_lengths.get()));
+        throw std::invalid_argument(
+            "The size of the lengths vector for population " +
+            fims::to_string(this->id) + " is not equal to n_lengths.");
+      }
+      population->lengths.resize(this->lengths.size());
+      for (size_t i = 0; i < this->lengths.size(); i++) {
+        population->lengths[i] = this->lengths[i];
+      }
     }
 
     // add to Information

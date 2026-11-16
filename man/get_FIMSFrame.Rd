@@ -123,11 +123,11 @@ model.
 \code{\link[=get_n_ages]{get_n_ages()}} returns an integer specifying the number of age bins used in
 the model.
 
-\code{\link[=get_lengths]{get_lengths()}} returns a vector of the lower edges of the length bins used
-in the model.
+\code{\link[=get_lengths]{get_lengths()}} returns a vector of the lower edges of the fleet length bins
+used in the model. Population length bins are not included.
 
-\code{\link[=get_n_lengths]{get_n_lengths()}} returns an integer specifying the number of length bins
-used in the model.
+\code{\link[=get_n_lengths]{get_n_lengths()}} returns an integer specifying the number of fleet length
+bins used in the model.
 }
 \description{
 There is an accessor function for each slot in the S4 class \code{FIMSFrame},

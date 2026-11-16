@@ -171,7 +171,12 @@ methods::setGeneric("get_report", function(x) standardGeneric("get_report"))
 methods::setMethod("get_report", "FIMSFit", function(x) x@report)
 
 #' @return
-#' [get_obj()] returns the output from [TMB::MakeADFun()].
+#' [get_obj()] returns the output from [TMB::MakeADFun()]. Its methods can use
+#' the FIMS model that is in memory instead of the model that made the fit.
+#' This happens after [clear()], after another model is set up, or after the
+#' fit is read with [readRDS()]. The methods then return wrong values without
+#' an error. Use [get_report()], [get_gradient()], or [get_estimates()]
+#' instead. These return values stored during fitting.
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
@@ -204,9 +209,8 @@ methods::setMethod("get_max_gradient", "FIMSFit", function(x) x@max_gradient)
 
 #' @return
 #' [get_gradient()] returns the per-parameter gradient vector at the MLE as
-#' stored during fitting. Unlike calling `get_obj(x)[["gr"]](get_opt(x)[["par"]])`
-#' this function is safe to call after [clear()] because it reads
-#' from a stored R vector rather than the compiled C++ objective function.
+#' stored during fitting. It reads a stored R vector, so it does not depend on
+#' the FIMS model in memory.
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
@@ -712,6 +716,17 @@ FIMSFit <- function(
 #' With no active fixed effects, TMB evaluates the random-effects model without
 #' running an outer optimizer. If no parameters remain active, use
 #' `optimize = FALSE`.
+#'
+#' A fit with random effects can need several GB of memory for a long time
+#' series. If FIMS was installed with TMB 1.9.18 or later, running
+#' `TMB::config(tmbad.sparse_hessian_compress = 1, DLL = "FIMS")` after
+#' loading FIMS and before `fit_fims()` uses less memory but takes longer.
+#' With 60 years of data built from `data_big`, peak memory fell from 2.2 GB
+#' to 0.6 GB and the fit took twice as long. At the same parameter values the
+#' objective, gradient and standard errors are the same to about 1e-12, but
+#' the optimizer can stop at a slightly different point, so the convergence
+#' checks can change. The setting lasts for the R session and does not reach
+#' parallel workers.
 #' @keywords fit_fims
 #' @export
 fit_fims <- function(input,
