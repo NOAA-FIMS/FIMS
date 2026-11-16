@@ -10,6 +10,7 @@
 #' @export DlnormDistribution
 #' @export DmultinomDistribution
 #' @export DnormDistribution
+#' @export GaussianProcessDistribution
 #' @export DoubleLogisticSelectivity
 #' @export EWAAGrowth
 #' @export VonBertalanffySchnuteGrowth

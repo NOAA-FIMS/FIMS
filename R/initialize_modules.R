@@ -910,8 +910,31 @@ initialize_comp <- function(data,
 #'   [FIMSFrame()]. Passing the data is required because initialization of the
 #'   modules requires passing the data and information regarding the uncertainty
 #'   of that data, i.e., input sample sizes for the multinomial distribution.
+#' @param recruitment_process Optional Gaussian recruitment process specification
+#'   passed as `process` to [initialize_process_distribution()], for example
+#'   `list(type = "ar1", rho = 0.3, estimation_type = "fixed_effects")`.
+#'   Uses the scalar recruitment `log_sd` as an innovation SD, a stationary
+#'   initial distribution, and contiguous annual estimated recruitment values.
+#'   The default `NULL` preserves existing behavior. This does not enable
+#'   unconditional process simulation through the TMB simulation method.
+#' @param fishing_process Optional named list of catch-fleet random walks, for
+#'   example `list(fleet1 = list(type = "rw1", sd = 0.2,
+#'   estimation_type = "fixed_effects", initial = list(type = "normal",
+#'   mean = log(0.2), sd = 0.5)))`. Innovation SDs are on the log-F scale.
+#'   Initial rules are either `list(type = "normal", mean = ..., sd = ...)`,
+#'   with every annual log_Fmort state estimated, or `list(type = "fixed")`,
+#'   with the first log_Fmort constant and all later states estimated. Initial
+#'   distribution parameters are held fixed. States must cover contiguous years;
+#'   other fixed states, survey-only fleets and duplicate row distributions are
+#'   rejected. Selected fleets have independent increments. Optional `sd_group`
+#'   strings share innovation SDs across fleets; members must have identical SDs
+#'   and estimation types. Estimated groups add a TMB `map` to the returned list;
+#'   retain this map when constructing the objective.
+#'   The specification does not change state estimation types: use
+#'   `"random_effects"` for TMB integration or `"fixed_effects"` for a penalized
+#'   fixed-effect fit.
 #' @return
-#' A named list with exactly two top-level elements:
+#' A named list with `parameters` and `model`, plus `map` for shared estimated SDs:
 #'
 #' * `parameters`: A named list of numeric starting-value vectors for TMB:
 #'   * `p`: Fixed-effect values returned by `get_fixed()`.
@@ -968,7 +991,8 @@ initialize_comp <- function(data,
 #'   initialize_fims(data = data_4_model)
 #' clear()
 #' }
-initialize_fims <- function(parameters, data) {
+initialize_fims <- function(parameters, data, recruitment_process = NULL,
+                            fishing_process = NULL) {
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
@@ -991,6 +1015,8 @@ initialize_fims <- function(parameters, data) {
     ))
   }
 
+  fishing_process <- normalize_fishing_processes(fishing_process, parameters, data)
+
   # A catch of 0 is left out of the likelihood (see initialize_catch()), so an
   # estimated F in that year has nothing in the data to inform it.
   zero_catch <- get_data(data) |>
@@ -999,7 +1025,8 @@ initialize_fims <- function(parameters, data) {
   estimated_zero_catch_Fmort <- parameters |>
     dplyr::filter(
       .data$label == "log_Fmort",
-      .data$estimation_type != "constant"
+      .data$estimation_type != "constant",
+      !.data$fleet %in% names(fishing_process)
     ) |>
     dplyr::semi_join(zero_catch, by = c("fleet", "timing"))
   if (NROW(estimated_zero_catch_Fmort) > 0) {
@@ -1018,6 +1045,15 @@ initialize_fims <- function(parameters, data) {
     ))
   }
 
+  # Reject unsupported process configurations before creating C++ objects.
+  if (!is.null(recruitment_process)) {
+    recruitment_process <- validate_recruitment_process(
+      parameters, data, recruitment_process
+    )
+  }
+
+  has_gaussian_process <- !is.null(recruitment_process)
+
   # Clear any previous FIMS settings
   clear()
 
@@ -1034,6 +1070,8 @@ initialize_fims <- function(parameters, data) {
       which fills in {.var fleet} for each fleet."
     ))
   }
+
+  fishing_distributions <- list()
 
   # Initialize lists to store fleet-related objects
   fleet <- fleet_selectivity <-
@@ -1135,6 +1173,12 @@ initialize_fims <- function(parameters, data) {
       # parameters tibble
       linked_ids = fleet_module_ids
     )
+
+    if (fleets[i] %in% names(fishing_process)) {
+      fishing_distributions[[fleets[i]]] <- initialize_fishing_process(
+        fleet[[i]], fishing_process[[fleets[i]]]
+      )
+    }
 
     if ("index" %in% fleet_types) {
       fleet_index_distribution[[i]] <- initialize_data_distribution(
@@ -1304,7 +1348,8 @@ initialize_fims <- function(parameters, data) {
       # TODO: need to update family and match options from the distribution
       # column from the parameters tibble
       family = gaussian(),
-      sd = sd_input
+      sd = sd_input,
+      process = recruitment_process
     )
 
     recruitment_process <- initialize_process_structure(
@@ -1357,6 +1402,14 @@ initialize_fims <- function(parameters, data) {
     model = fims_model
   )
 
+  if (has_gaussian_process) {
+    attr(parameter_list, "gaussian_recruitment") <- recruitment_distribution
+  }
+  if (length(fishing_distributions)) {
+    attr(parameter_list, "fishing_processes") <- fishing_distributions
+    shared_map <- fishing_process_map(parameter_list$parameters, fishing_distributions, fishing_process)
+    if (!is.null(shared_map)) parameter_list$map <- shared_map
+  }
   return(parameter_list)
 }
 

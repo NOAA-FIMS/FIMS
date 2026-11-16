@@ -225,6 +225,14 @@ initialize_data_distribution <- function(
 #' @param par A string specifying the parameter name the distribution applies
 #'   to. Parameters must be members of the specified module. Use
 #'   `methods::show(module)` to obtain names of parameters within the module.
+#' @param process Optional list with `type = "iid"` or `"ar1"`, `rho`
+#'   (default zero), and `estimation_type` for rho (`"constant"` or
+#'   `"fixed_effects"`; default fixed effects for AR1). Requires a Gaussian
+#'   family and one innovation SD. AR1 uses a stationary initial distribution
+#'   and applies to residuals from zero (`log_devs`) or the stock-recruit log
+#'   mean (`log_r`). All target values must be estimated; fixed elements and
+#'   irregular years are not supported by this opt-in pathway. `NULL` retains
+#'   the existing distribution behavior.
 #' @return
 #' A reference class. is returned. Use [methods::show()] to view the various
 #' Rcpp class fields, methods, and documentation.
@@ -254,8 +262,12 @@ initialize_process_distribution <- function(
   sd = tibble::tibble(
     value = 1,
     estimation_type = "fixed_effects"
-  )
+  ),
+  process = NULL
 ) {
+  if (!is.null(process)) {
+    return(initialize_gaussian_process(module, par, family, sd, process))
+  }
   # validity check on user input
   args <- list(family = family, sd = sd)
   check_distribution_validity(args)

@@ -112,6 +112,12 @@ inst/doc
 
 debug.txt
 docs
+# Scientific capability investigation documents
+!/docs/
+/docs/*
+!/docs/scientific-capability-gaps.md
+!/docs/stochastic-process-architecture.md
+!/docs/scientific-capability-roadmap.md
 pkgdown/assets/
 
 # CodeQL generated files

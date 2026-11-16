@@ -3,6 +3,7 @@
  * \brief Implementation of Rcpp distribution interfaces for the FIMS framework.
  */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_distribution.hpp"
+#include "../inst/include/interface/rcpp/rcpp_objects/rcpp_gaussian_process.hpp"
 
 // static id of the DistributionsInterfaceBase object
 uint32_t DistributionsInterfaceBase::id_g = 1;
@@ -17,6 +18,22 @@ std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
  *
  */
 void register_distributions(Rcpp::Module& m) {
+  Rcpp::class_<GaussianProcessDistributionsInterface>(
+      "GaussianProcessDistribution", "IID, AR(1), or initialized Gaussian random walk.")
+      .constructor()
+      .method("get_id", &GaussianProcessDistributionsInterface::get_id)
+      .method("set_process", &GaussianProcessDistributionsInterface::set_process)
+      .method("set_random_walk", &GaussianProcessDistributionsInterface::set_random_walk)
+      .method("set_distribution_links",
+              &GaussianProcessDistributionsInterface::set_distribution_links)
+      .method("evaluate", &GaussianProcessDistributionsInterface::evaluate)
+      .method("simulate", &GaussianProcessDistributionsInterface::simulate)
+      .method("simulate_from", &GaussianProcessDistributionsInterface::simulate_from)
+      .field("observed_values", &GaussianProcessDistributionsInterface::observed_values)
+      .field("expected_values", &GaussianProcessDistributionsInterface::expected_values)
+      .field("log_sd", &GaussianProcessDistributionsInterface::log_sd)
+      .field("unconstrained_rho", &GaussianProcessDistributionsInterface::unconstrained_rho);
+
   Rcpp::class_<DnormDistributionsInterface>(
       "DnormDistribution",
       "See "

@@ -8,6 +8,7 @@
 \alias{DlnormDistribution}
 \alias{DmultinomDistribution}
 \alias{DnormDistribution}
+\alias{GaussianProcessDistribution}
 \alias{DoubleLogisticSelectivity}
 \alias{EWAAGrowth}
 \alias{VonBertalanffySchnuteGrowth}

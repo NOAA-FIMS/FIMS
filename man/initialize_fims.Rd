@@ -4,7 +4,12 @@
 \alias{initialize_fims}
 \title{Initialize C++ modules via Rcpp for a FIMS model}
 \usage{
-initialize_fims(parameters, data)
+initialize_fims(
+  parameters,
+  data,
+  recruitment_process = NULL,
+  fishing_process = NULL
+)
 }
 \arguments{
 \item{parameters}{A tibble returned from \code{\link[=setup_default_parameters]{setup_default_parameters()}}. It
@@ -17,9 +22,32 @@ initialized for that fleet.}
 \code{\link[=FIMSFrame]{FIMSFrame()}}. Passing the data is required because initialization of the
 modules requires passing the data and information regarding the uncertainty
 of that data, i.e., input sample sizes for the multinomial distribution.}
+
+\item{recruitment_process}{Optional Gaussian recruitment process specification
+passed as \code{process} to \code{\link[=initialize_process_distribution]{initialize_process_distribution()}}, for example
+\code{list(type = "ar1", rho = 0.3, estimation_type = "fixed_effects")}.
+Uses the scalar recruitment \code{log_sd} as an innovation SD, a stationary
+initial distribution, and contiguous annual estimated recruitment values.
+The default \code{NULL} preserves existing behavior. This does not enable
+unconditional process simulation through the TMB simulation method.}
+
+\item{fishing_process}{Optional named list of catch-fleet random walks, for
+example \code{list(fleet1 = list(type = "rw1", sd = 0.2, estimation_type = "fixed_effects", initial = list(type = "normal", mean = log(0.2), sd = 0.5)))}. Innovation SDs are on the log-F scale.
+Initial rules are either \code{list(type = "normal", mean = ..., sd = ...)},
+with every annual log_Fmort state estimated, or \code{list(type = "fixed")},
+with the first log_Fmort constant and all later states estimated. Initial
+distribution parameters are held fixed. States must cover contiguous years;
+other fixed states, survey-only fleets and duplicate row distributions are
+rejected. Selected fleets have independent increments. Optional \code{sd_group}
+strings share innovation SDs across fleets; members must have identical SDs
+and estimation types. Estimated groups add a TMB \code{map} to the returned list;
+retain this map when constructing the objective.
+The specification does not change state estimation types: use
+\code{"random_effects"} for TMB integration or \code{"fixed_effects"} for a penalized
+fixed-effect fit.}
 }
 \value{
-A named list with exactly two top-level elements:
+A named list with \code{parameters} and \code{model}, plus \code{map} for shared estimated SDs:
 \itemize{
 \item \code{parameters}: A named list of numeric starting-value vectors for TMB:
 \itemize{

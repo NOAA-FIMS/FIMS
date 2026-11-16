@@ -62,6 +62,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   std::string name_m;
 
+  // Borrowed only during the double-valued simulation evaluator. Null during
+  // inference; target vectors keep their dimensions and registered addresses.
+  const fims::Vector<Type>* simulation_recruitment_residuals = nullptr;
+  bool simulation_uses_log_r = false;
+
   /**
    * @brief Iterate the derived quantities.
    *
@@ -700,6 +705,17 @@ class CatchAtAge : public FisheryModelBase<Type> {
       population->recruitment->log_expected_recruitment[year - 1] =
           fims_math::log(population->recruitment->evaluate_mean(
               dq_["spawning_biomass"][year - 1], phi_0));
+
+      if (simulation_recruitment_residuals != nullptr) {
+        const size_t index = year - 1;
+        const Type residual = (*simulation_recruitment_residuals)[index];
+        if (simulation_uses_log_r) {
+          population->recruitment->log_r[index] =
+              population->recruitment->log_expected_recruitment[index] + residual;
+        } else {
+          population->recruitment->log_recruit_devs[index] = residual;
+        }
+      }
 
       dq_["numbers_at_age"][i_age_year] = fims_math::exp(
           population->recruitment->process->evaluate_process(year - 1));

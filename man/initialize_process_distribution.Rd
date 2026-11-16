@@ -9,7 +9,8 @@ initialize_process_distribution(
   module,
   par,
   family = NULL,
-  sd = tibble::tibble(value = 1, estimation_type = "fixed_effects")
+  sd = tibble::tibble(value = 1, estimation_type = "fixed_effects"),
+  process = NULL
 )
 
 initialize_process_structure(module, par)
@@ -35,6 +36,15 @@ estimated as a fixed effect or held constant. If \code{"value"} is a vector and
 \code{"estimation_type"} is a scalar, the single value specified
 \code{"estimation_type"} value will be repeated to match the length of \code{value}.
 Otherwise, the dimensions of the two must match.}
+
+\item{process}{Optional list with \code{type = "iid"} or \code{"ar1"}, \code{rho}
+(default zero), and \code{estimation_type} for rho (\code{"constant"} or
+\code{"fixed_effects"}; default fixed effects for AR1). Requires a Gaussian
+family and one innovation SD. AR1 uses a stationary initial distribution
+and applies to residuals from zero (\code{log_devs}) or the stock-recruit log
+mean (\code{log_r}). All target values must be estimated; fixed elements and
+irregular years are not supported by this opt-in pathway. \code{NULL} retains
+the existing distribution behavior.}
 }
 \value{
 A reference class. is returned. Use \code{\link[methods:show]{methods::show()}} to view the various

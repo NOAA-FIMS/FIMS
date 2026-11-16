@@ -274,7 +274,7 @@ reshape_json_estimates <- function(model_output) {
       population_information
     ) |>
       dplyr::select(dplyr::all_of(c(
-        "type_id", "module_name", "module_id", "module_type"
+        "type_id", "module_name", "module_id", "module_type", "fleet"
       ))) |>
       dplyr::filter(!is.na(.data$type_id)) |>
       dplyr::distinct()

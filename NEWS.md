@@ -25,6 +25,12 @@
 
 ## Features
 
+* *(fishing mortality)* Add opt-in fleet log-F random walks with explicit initial rules, estimated innovation SDs, conditional simulation, and fleet-owned parameter reporting.
+
+* *(simulation)* Add recruitment-path simulation and conditional forecasts with separate observation noise, coherent state/prediction outputs, and explicit uncertainty scope.
+
+* *(recruitment)* Add an opt-in IID/stationary AR(1) Gaussian process with innovation SD, estimated correlation, and existing random-effect registration.
+
 * *(growth)* Size and growth infrastructure (#1697)
 * *(selectivity)* Selectivity at age
 
@@ -276,3 +282,5 @@
 # FIMS 0.1.0.0
 
 * Added a `NEWS.md` file to track changes to the package.
+
+* Fleet log-F random walks can share innovation SDs through explicit `sd_group` labels and TMB parameter maps. Grouped fleets retain separate trajectories and initial distributions.

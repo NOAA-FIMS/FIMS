@@ -250,6 +250,182 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     }
   }
 
+  /** @brief Copy derived quantities without finalizing or serializing a fit. */
+  static Rcpp::List SimulationQuantities(
+      std::map<std::string, fims::Vector<double>>& quantities) {
+    Rcpp::List result;
+    for (auto& entry : quantities) {
+      result[entry.first] =
+          Rcpp::NumericVector(entry.second.begin(), entry.second.end());
+    }
+    return result;
+  }
+
+  /**
+   * @brief Evaluate an annual recruitment residual path and restore model
+   * state.
+   * @details Empty residuals evaluate the current parameters. A nonempty path
+   * updates log_r or log_devs at each transition after computing its biological
+   * mean, so direct log recruitment responds to the simulated spawning stock.
+   * Initial abundance and the extra terminal report year retain existing rules.
+   */
+  Rcpp::List evaluate_recruitment_path(Rcpp::NumericVector residuals,
+                                       std::string target_name) {
+    return evaluate_process_paths(residuals, target_name, Rcpp::List::create());
+  }
+
+  /** @brief Apply fleet log-F paths before mortality and restore all targets.
+   */
+  Rcpp::List evaluate_process_paths(Rcpp::NumericVector residuals,
+                                    std::string target_name,
+                                    Rcpp::List fishing_paths) {
+    auto info = fims_info::Information<double>::GetInstance();
+    auto found = info->models_map.find(this->id);
+    if (found == info->models_map.end()) {
+      Rcpp::stop("The catch-at-age model is not initialized");
+    }
+    auto model = std::dynamic_pointer_cast<fims_popdy::CatchAtAge<double>>(
+        found->second);
+    if (!model || model->populations.size() != 1 ||
+        (target_name != "log_r" && target_name != "log_devs")) {
+      Rcpp::stop(
+          "Recruitment path evaluation requires one population and log_r or "
+          "log_devs");
+    }
+    auto population = model->populations[0];
+    auto recruitment = population->recruitment;
+    const bool direct = target_name == "log_r";
+    const bool is_direct = std::dynamic_pointer_cast<fims_popdy::LogR<double>>(
+                               recruitment->process) != nullptr;
+    const bool is_deviation =
+        std::dynamic_pointer_cast<fims_popdy::LogDevs<double>>(
+            recruitment->process) != nullptr;
+    if ((direct && !is_direct) || (!direct && !is_deviation)) {
+      Rcpp::stop(
+          "Recruitment simulation target does not match the active process");
+    }
+    auto& target = direct ? recruitment->log_r : recruitment->log_recruit_devs;
+    if (target.size() != population->n_years - 1 ||
+        (residuals.size() != 0 &&
+         static_cast<size_t>(residuals.size()) != target.size())) {
+      Rcpp::stop(
+          "Recruitment residual path must cover all modeled recruitment years");
+    }
+    fims::Vector<double> path(residuals.size());
+    for (R_xlen_t i = 0; i < residuals.size(); ++i) {
+      if (!std::isfinite(residuals[i])) {
+        Rcpp::stop("Recruitment residuals must be finite");
+      }
+      path[i] = residuals[i];
+    }
+    std::vector<std::shared_ptr<fims_popdy::Fleet<double>>> fishing_fleets;
+    std::vector<fims::Vector<double>> saved_fishing, new_fishing;
+    Rcpp::CharacterVector fishing_names;
+    if (fishing_paths.size()) {
+      if (!fishing_paths.hasAttribute("names")) {
+        Rcpp::stop("Fishing paths must be named by fleet");
+      }
+      fishing_names = fishing_paths.names();
+      if (fishing_names.size() != fishing_paths.size()) {
+        Rcpp::stop("Fishing paths must have a name for every fleet");
+      }
+    }
+    std::set<std::string> seen_fleets;
+    for (R_xlen_t j = 0; j < fishing_paths.size(); ++j) {
+      if (Rcpp::CharacterVector::is_na(fishing_names[j])) {
+        Rcpp::stop("Fishing path fleet names cannot be missing");
+      }
+      const std::string name = Rcpp::as<std::string>(fishing_names[j]);
+      if (name.empty() || !seen_fleets.insert(name).second) {
+        Rcpp::stop("Fishing paths require unique nonempty fleet names");
+      }
+      std::shared_ptr<fims_popdy::Fleet<double>> selected;
+      for (const auto& fleet : population->fleets) {
+        auto it = FleetInterface::live_objects.find(fleet->GetId());
+        if (it != FleetInterface::live_objects.end()) {
+          auto interface =
+              std::dynamic_pointer_cast<FleetInterface>(it->second);
+          if (interface && interface->GetName() == name) selected = fleet;
+        }
+      }
+      if (!selected)
+        Rcpp::stop("Fishing path fleet is not in the active model");
+      Rcpp::NumericVector values = fishing_paths[j];
+      if (static_cast<size_t>(values.size()) != selected->log_Fmort.size()) {
+        Rcpp::stop("Fishing paths must cover all fleet model years");
+      }
+      fims::Vector<double> values_copy(values.size());
+      for (R_xlen_t i = 0; i < values.size(); ++i) {
+        if (!std::isfinite(values[i]) || !std::isfinite(std::exp(values[i]))) {
+          Rcpp::stop(
+              "Fishing paths require finite log-F values and mortality rates");
+        }
+        values_copy[i] = values[i];
+      }
+      fishing_fleets.push_back(selected);
+      saved_fishing.push_back(selected->log_Fmort);
+      new_fishing.push_back(values_copy);
+    }
+    const fims::Vector<double> saved = target;
+    auto restore = [&]() {
+      model->simulation_recruitment_residuals = nullptr;
+      model->simulation_uses_log_r = false;
+      for (size_t i = 0; i < saved.size(); ++i) target[i] = saved[i];
+      for (size_t j = 0; j < fishing_fleets.size(); ++j) {
+        for (size_t i = 0; i < saved_fishing[j].size(); ++i) {
+          fishing_fleets[j]->log_Fmort[i] = saved_fishing[j][i];
+        }
+      }
+    };
+    Rcpp::List result;
+    model->simulation_recruitment_residuals = path.size() ? &path : nullptr;
+    model->simulation_uses_log_r = direct;
+    try {
+      for (size_t j = 0; j < fishing_fleets.size(); ++j) {
+        for (size_t i = 0; i < new_fishing[j].size(); ++i) {
+          fishing_fleets[j]->log_Fmort[i] = new_fishing[j][i];
+        }
+      }
+      model->Evaluate();
+      Rcpp::List fleets, log_fishing;
+      for (const auto& fleet : population->fleets) {
+        auto interface = FleetInterface::live_objects.find(fleet->GetId());
+        if (interface == FleetInterface::live_objects.end()) {
+          Rcpp::stop("Simulation fleet interface is unavailable");
+        }
+        auto fleet_interface =
+            std::dynamic_pointer_cast<FleetInterface>(interface->second);
+        if (!fleet_interface)
+          Rcpp::stop("Simulation fleet type is unsupported");
+        log_fishing[fleet_interface->GetName()] = Rcpp::NumericVector(
+            fleet->log_Fmort.begin(), fleet->log_Fmort.end());
+        fleets[fleet_interface->GetName()] = SimulationQuantities(
+            model->GetFleetDerivedQuantities(fleet->GetId()));
+      }
+      result = Rcpp::List::create(
+          Rcpp::Named("population") = SimulationQuantities(
+              model->GetPopulationDerivedQuantities(population->GetId())),
+          Rcpp::Named("fleets") = fleets,
+          Rcpp::Named("log_fishing_mortality") = log_fishing,
+          Rcpp::Named("target") =
+              Rcpp::NumericVector(target.begin(), target.end()),
+          Rcpp::Named("log_mean") =
+              Rcpp::NumericVector(recruitment->log_expected_recruitment.begin(),
+                                  recruitment->log_expected_recruitment.end()));
+    } catch (...) {
+      restore();
+      // Restore owned parameters even if recomputing derived values also fails.
+      try {
+        model->Evaluate();
+      } catch (...) {
+      }
+      throw;
+    }
+    restore();
+    model->Evaluate();
+    return result;
+  }
+
   /**
    * @brief Enable or disable reporting for the CatchAtAge model.
    *
