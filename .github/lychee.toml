@@ -10,6 +10,7 @@ exclude = [
 	'^https://deepwiki\.com/NOAA-FIMS/FIMS/?$',
 	'^https://www\.commerce\.gov/?$',
 	'^https://www\.noaa\.gov/?$',
+	'^https://noaa-fisheries-integrated-toolbox\.r-universe\.dev(?:[/?#]|$)',
 ]
 
 [hosts."deepwiki.com"]
