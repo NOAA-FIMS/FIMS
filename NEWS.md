@@ -296,3 +296,5 @@
 * Added a paired observation-information benchmark varying survey precision and multinomial composition sample sizes, with shared trajectories, common survey errors, nested composition samples and separately normalized mortality-SD profiles.
 
 * Added a replicated state-interval calibration benchmark under informative observations, comparing known/estimated innovation SDs across true mortality SDs and retaining boundary, missing-interval and optimizer diagnostics.
+
+* Added a composition-overdispersion robustness benchmark, independently checked Dirichlet–multinomial sampling, scenario-specific failure accounting and a cold/warm inner-state diagnostic. Fitted production likelihoods are unchanged.

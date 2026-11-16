@@ -1,0 +1,7 @@
+"scenario","true_M_sd","sd_mode","planned_fits","errors","valid_optimizers","sdreport_failures","boundary_fits","M_boundary_fits","regular_fits"
+"multinomial",0.05,"estimated",5,0,5,0,0,0,5
+"multinomial",0.05,"known",5,0,5,0,0,0,5
+"moderate",0.05,"estimated",5,0,5,0,0,0,5
+"moderate",0.05,"known",5,0,5,0,0,0,5
+"strong",0.05,"estimated",5,4,0,0,1,1,0
+"strong",0.05,"known",5,0,5,0,0,0,5

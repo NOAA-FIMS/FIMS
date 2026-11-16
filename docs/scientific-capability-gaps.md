@@ -266,3 +266,13 @@ calibration pilot. This is partial simulation-based validation under known
 biology and matching observation models, not demonstrated operational coverage,
 forecast/derived-quantity calibration or general model adequacy. The small-M-SD
 boundary cases and Monte Carlo uncertainty remain explicit in the roadmap.
+
+Observation-model validation update: the controlled composition-overdispersion
+stress test in `tests/integration/process-recovery/robustness-pilot/` demonstrates
+substantial loss of state-interval coverage when multinomial fits overstate
+sample information, plus process-variance inflation and difficult conditional
+solutions. This supports the existing high-priority overdispersed-composition gap;
+the benchmark's DM sampler does not implement a production DM likelihood. SS3's
+[composition-error options](https://nmfs-ost.github.io/ss3-doc/SS330_User_Manual_release.html)
+remain an authoritative example of reference-model support, with different
+parameter interfaces from the generic concentration used in this stress test.

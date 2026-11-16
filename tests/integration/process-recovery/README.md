@@ -297,3 +297,77 @@ experiments before operational conclusions.
 The retained [interval-calibration pilot](calibration-pilot/README.md) records
 all 60 uncertainty reports, covariance starts, state/hyperparameter summaries,
 paired differences and the inspected coverage/width plot.
+
+## Composition-overdispersion misspecification
+
+```sh
+Rscript tests/integration/process-recovery/run-robustness.R /tmp/fims-robustness 5 18
+Rscript tests/integration/process-recovery/plot-robustness.R /tmp/fims-robustness
+```
+
+The three generating scenarios share latent process truth, catch/survey data and
+composition random-number pools. Every fitted likelihood remains multinomial
+with nominal sample size 2000; no production Dirichlet–multinomial likelihood
+is introduced. Recruitment/F/M innovation SDs remain 0.20/0.15/0.05, proper initial
+uncertainty and known biology are retained, survey log-SD is 0.05 and catch log-SD
+is 0.1. The five-replicate default is a bounded robustness pilot, not a calibration
+study with adequate power for operational claims.
+
+For each independent fleet/type/year composition observation, generate
+
+\[
+q \sim \operatorname{Dirichlet}(\kappa p),\qquad
+C\mid q \sim \operatorname{Multinomial}(n,q).
+\]
+
+The control uses `kappa = Inf`, so `q = p`. Finite concentrations are 2000 and
+200. With `n = 2000`, the marginal covariance of observed proportions is
+
+\[
+\operatorname{Cov}(C/n)=\frac{n+\kappa}{n(1+\kappa)}
+\{\operatorname{diag}(p)-pp^\top\}.
+\]
+
+Variance inflation relative to multinomial sampling is 1, about 2.00 and about
+10.95; moment-matched effective sample sizes are 2000, 1000.5 and 182.7. These
+are analytical design descriptors, not estimated weights and not sample sizes
+passed to the fitted model. Equal covariance does not make a downweighted
+multinomial likelihood identical to a Dirichlet–multinomial likelihood.
+
+The generic concentration parameter is used solely for this stress-test
+hierarchy. [Stock Synthesis documents Dirichlet–multinomial composition options](https://nmfs-ost.github.io/ss3-doc/SS330_User_Manual_release.html#composition-error-distribution),
+which motivates the comparison, but this is not an implementation of its
+parameter interface. The FIMS audit's missing production overdispersed-composition
+capability remains missing.
+
+Independent uniforms generate gamma quantiles at each concentration, then a
+common set of categorical uniforms generates the counts. This gives the declared
+Dirichlet–multinomial marginal law while coupling scenarios. Structural zeros
+are preserved. Samples are not nested across concentrations. Catch/survey
+observations are identical, but control compositions use the new common uniform
+pool and differ from prior pilots; comparisons should remain within this
+experiment. The generator's empirical mean/covariance are tested against the
+analytical formulas, including negative covariance and zero bins.
+
+Known- and estimated-process-SD fits reuse the calibration machinery, with two
+starts for estimated covariance and checked rebuilding before `sdreport`. All
+attempts and report failures remain visible. Summaries are separated by generating
+scenario, SD mode and regularity stratum. A well-behaved Hessian or an interior
+covariance estimate cannot validate a misspecified observation model. The output
+contains pointwise fitted-state coverage/width, recovery, hyperparameters,
+optimizer diagnostics, and paired differences from the control. It does not test
+forecast/derived-quantity coverage, aging error, temporal observation correlation,
+unknown growth/selectivity or a correctly fitted overdispersed likelihood.
+
+The default run generates 15 paired datasets, 30 uncertainty reports and 30
+covariance starting-point fits. RDS/checkpoint outputs retain true/pseudo
+composition probabilities, uniforms, generated data and seeds. Compact tables
+and the plot are reproducible without new dependencies; previous numerical
+sources and pilots remain unchanged.
+
+The retained [composition-robustness pilot](robustness-pilot/README.md) includes
+all attempts and failed rebuilds. Its plot and paired comparisons omit invalid
+optimizer reports while retaining their numerical outcomes in raw tables. Run
+`diagnose-robustness.R OUTPUT_DIRECTORY` to reproduce the documented cold/warm
+inner-state check; that check does not certify global modes or supply replacement
+uncertainty intervals.

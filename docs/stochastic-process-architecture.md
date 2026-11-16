@@ -870,3 +870,25 @@ high apparent coverage and are kept separate from regular outcomes. Tables and
 a visually inspected plot are in `tests/integration/process-recovery/calibration-pilot/`.
 Validation passed 17 tests / 114 assertions, including four integration checks.
 Production code and earlier numerical-source checksums remain unchanged.
+
+### Observation misspecification and conditional-solution sensitivity
+
+The robustness benchmark adds independent Dirichlet–multinomial composition
+generation but retains the fitted multinomial n=2000 likelihood. Concentrations
+infinity/2000/200 imply variance inflation 1/about 2/about 10.95. Shared latent
+truth and random variates control comparisons; the sampler's mean and full
+covariance are tested independently. Five paired 18-year datasets gave known-SD
+M coverage of 94.8%/89.8%/57.4%. Moderate extra variation also inflated estimated
+process variance, despite regular optimizer/Hessian diagnostics.
+
+The strong estimated-SD case had no valid uncertainty reports: four cold rebuilds
+failed objective agreement, and one numerical report had invalid optimization.
+All selected outcomes reached the covariance bound. A saved-inner-state diagnostic
+reproduced one reference objective while a cold state start differed by 0.567 NLL
+units, with small inner gradients and agreement of the joint objective at a common
+reference point. This is evidence of conditional-solution sensitivity, not proof
+of a global optimum or permission to relax validation thresholds. A reusable
+uncertainty pathway should preserve modes and expose alternate solutions, while
+a robust observation likelihood should be validated on the same stress data.
+Details and all failed/numerical outcomes are retained in the robustness pilot.
+Validation passed 22 tests / 194 assertions; production interfaces are unchanged.

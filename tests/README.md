@@ -201,3 +201,5 @@ multiple-start and mortality-SD profile experiments, plus a profile plotting scr
 `plot-information.R` renders paired SD estimates and relative mortality-SD profiles.
 `run-calibration.R` checks pointwise state-interval calibration and true mortality-SD
 sensitivity; `plot-calibration.R` shows replicate-level coverage MCSEs and interval widths.
+`run-robustness.R` stress-tests multinomial fits with overdispersed composition
+data; `diagnose-robustness.R` reproduces a difficult inner-state rebuild case.

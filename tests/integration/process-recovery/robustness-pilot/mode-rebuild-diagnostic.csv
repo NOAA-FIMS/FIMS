@@ -1,0 +1,4 @@
+"initialization","objective","delta_from_reference","max_inner_gradient","joint_nll_at_reference","joint_reference_difference","selected_original_objective"
+"reproduced covariance fit",7323.71995085973,0,NA,7193.09263067112,0,7323.71995085973
+"cold default",7324.28741183864,0.567460978908457,1.52149376431154e-10,7193.09263067112,0,7323.71995085973
+"saved inner mode",7323.71995085973,0,8.20921108868333e-12,7193.09263067112,0,7323.71995085973

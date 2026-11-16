@@ -185,3 +185,17 @@ These results support continued sensitivity testing rather than a claim of
 operational calibration. Next validation targets include more replication,
 misspecification and derived-quantity/forecast uncertainty, before unrestricted
 mortality covariance or assessment recommendations.
+
+The composition-misspecification pilot is complete in
+`tests/integration/process-recovery/robustness-pilot/`. With the fitted multinomial
+size held at 2000, controlled extra composition variation reduced known-SD mean
+M coverage from 94.8% to 89.8%/57.4% across five paired 18-year datasets. Estimated
+process SDs absorbed observation variation; the strongest case reached the
+benchmark M-SD upper bound and yielded no optimizer-valid uncertainty reports.
+Four cold covariance-point rebuilds failed, while one surviving numerical report
+had invalid optimization. A diagnostic reproduced a cold/warm inner-solution
+difference at matching covariance values. These outcomes strengthen the priority
+of a correctly specified overdispersed composition likelihood, with dispersion/
+multinomial-limit/zero-bin/AD validation, and a separate mode-consistent uncertainty
+handoff investigation. Production DM support remains missing; no new production
+code or dependencies were introduced in the stress benchmark.
