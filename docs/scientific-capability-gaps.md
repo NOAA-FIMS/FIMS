@@ -255,6 +255,6 @@ values in the audited baseline. The subsequent `mortality_process` interface in
 age-specific annual log-M random-walk densities using interleaved series in
 `GaussianProcessLPDF`. This is parameter-process inference with a common SD,
 not stochastic abundance or correlated age effects. Mortality process simulation
-and forecasting are not yet implemented. See the architecture document for the
+and conditional forecasting are now implemented for this same formulation. See the architecture document for the
 formulation, dimensionality and validation limits; baseline evidence above is
 retained as the historical audit.

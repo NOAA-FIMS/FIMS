@@ -157,3 +157,137 @@ test_that("age-year M enters cohort survival and both plus-group parents", {
     random = "re", DLL = "FIMS", silent = TRUE)
   expect_true(is.finite(obj$fn(obj$par)))
 })
+
+test_that("mortality simulation is reproducible and drives coherent survival", {
+  on.exit(clear())
+  x <- mortality_rw_fixture()
+  run <- function(noise) simulate_fims(x$parameters, x$data, list(type = "iid"),
+    nsim = 2, seed = 648, process_mode = "fixed", observation_error = noise,
+    mortality_process = x$spec, mortality_mode = "simulate")
+  result <- run(FALSE)
+  expect_identical(result, run(FALSE))
+  noisy <- run(TRUE)
+  expect_false(identical(result$replicates[[1]]$natural_mortality$log_M,
+    result$replicates[[2]]$natural_mortality$log_M))
+  for (i in 1:2) {
+    draw <- result$replicates[[i]]
+    expect_identical(draw$natural_mortality, noisy$replicates[[i]]$natural_mortality)
+    expect_identical(draw$population, noisy$replicates[[i]]$population)
+    expect_equal(draw$population$mortality_M, draw$natural_mortality$M)
+    expect_identical(draw$natural_mortality$log_M[seq_len(x$ages)],
+      x$parameters$value[x$rows[seq_len(x$ages)]])
+    n <- matrix(draw$population$numbers_at_age, ncol = x$ages, byrow = TRUE)
+    z <- matrix(draw$population$mortality_Z, ncol = x$ages, byrow = TRUE)
+    for (year in seq_len(nrow(n) - 1L)) {
+      expect_equal(n[year + 1, 2:(x$ages - 1)],
+        n[year, 1:(x$ages - 2)] * exp(-z[year, 1:(x$ages - 2)]))
+      expect_equal(n[year + 1, x$ages],
+        sum(n[year, (x$ages - 1):x$ages] * exp(-z[year, (x$ages - 1):x$ages])))
+    }
+  }
+  expect_false(result$configuration$mortality_initial_uncertainty)
+})
+
+test_that("mortality forecasts retain history and continue each age separately", {
+  on.exit(clear())
+  x <- mortality_rw_fixture()
+  result <- forecast_fims(x$parameters, x$data, list(type = "iid"), from_year = 3,
+    seed = 93, process_mode = "fixed", observation_error = FALSE,
+    mortality_process = x$spec, mortality_mode = "mean")
+  draw <- result$replicates[[1]]
+  values <- matrix(x$parameters$value[x$rows], nrow = x$ages)
+  expected <- c(values[, 1:2], values[, 2], values[, 2])
+  expect_equal(draw$natural_mortality$log_M, expected)
+  expect_identical(draw$natural_mortality$conditioned,
+    rep(c(TRUE, TRUE, FALSE, FALSE), each = x$ages))
+  obs <- draw$observations
+  expect_equal(obs$simulated[obs$timing < 3], obs$observed[obs$timing < 3])
+  fixed <- simulate_fims(x$parameters, x$data, list(type = "iid"),
+    process_mode = "fixed", observation_error = FALSE,
+    mortality_process = x$spec, mortality_mode = "fixed")
+  expect_equal(fixed$replicates[[1]]$natural_mortality$log_M, c(values))
+})
+
+test_that("proper mortality initialization and initial-year forecasts are explicit", {
+  on.exit(clear())
+  x <- mortality_rw_fixture("normal")
+  run <- function(mode) forecast_fims(x$parameters, x$data, list(type = "iid"),
+    from_year = 1, seed = 45, process_mode = "fixed", observation_error = FALSE,
+    mortality_process = x$spec, mortality_mode = mode)
+  drawn <- run("simulate")
+  expect_true(drawn$configuration$mortality_initial_uncertainty)
+  expect_false(any(drawn$replicates[[1]]$natural_mortality$conditioned))
+  expect_false(identical(drawn$replicates[[1]]$natural_mortality$log_M[seq_len(x$ages)],
+    x$parameters$value[x$rows[seq_len(x$ages)]]))
+  mean <- run("mean")
+  expect_equal(mean$replicates[[1]]$natural_mortality$log_M,
+    rep(x$spec$initial$mean, length(x$rows)))
+})
+
+test_that("native mortality paths restore targets and reject invalid batches atomically", {
+  on.exit(clear())
+  x <- mortality_rw_fixture()
+  initialized <- initialize_fims(x$parameters, x$data, mortality_process = x$spec)
+  before <- get_random()
+  baseline <- initialized$model$evaluate_recruitment_path(numeric(), "log_devs")
+  path <- x$parameters$value[x$rows] + log(2)
+  changed <- initialized$model$evaluate_all_process_paths(numeric(), "log_devs", list(), path)
+  expect_equal(changed$population$mortality_M, exp(path))
+  expect_lt(changed$population$numbers_at_age[x$ages + 2],
+    baseline$population$numbers_at_age[x$ages + 2])
+  expect_identical(get_random(), before)
+  expect_identical(initialized$model$evaluate_recruitment_path(numeric(), "log_devs"), baseline)
+  evaluate <- function(m) initialized$model$evaluate_all_process_paths(numeric(), "log_devs",
+    list(fleet1 = rep(log(0.3), 4)), m)
+  expect_error(evaluate(path[-1]), "full age-year grid")
+  path[2] <- NA_real_
+  expect_error(evaluate(path), "finite")
+  path[2] <- 1000
+  expect_error(evaluate(path), "finite")
+  expect_identical(get_random(), before)
+  expect_identical(initialized$model$evaluate_recruitment_path(numeric(), "log_devs"), baseline)
+})
+
+test_that("joint mortality and fishing draws preserve fixed direct recruitment and RNG", {
+  on.exit(clear())
+  x <- mortality_rw_fixture()
+  rec <- x$parameters$label %in% "log_devs"
+  x$parameters$label[rec] <- "log_r"
+  x$parameters$value[rec] <- x$parameters$value[x$parameters$label %in% "log_rzero"][1]
+  f <- x$parameters$module_name %in% "Fleet" & x$parameters$fleet %in% "fleet1" &
+    x$parameters$label %in% "log_Fmort"
+  x$parameters$estimation_type[f] <- "random_effects"
+  fishing <- list(fleet1 = list(type = "rw1", sd = 0.15, estimation_type = "constant",
+    initial = list(type = "normal", mean = log(0.2), sd = 0.3)))
+  set.seed(512)
+  before <- .Random.seed
+  result <- simulate_fims(x$parameters, x$data, list(type = "iid"), seed = 902,
+    nsim = 2, process_mode = "fixed", observation_error = FALSE,
+    fishing_process = fishing, fishing_mode = "simulate",
+    mortality_process = x$spec, mortality_mode = "simulate")
+  expect_identical(.Random.seed, before)
+  for (draw in result$replicates) {
+    expect_identical(draw$recruitment$value, x$parameters$value[rec])
+    expect_equal(draw$recruitment$residual, draw$recruitment$value - draw$recruitment$log_mean)
+    expect_equal(draw$population$mortality_M, draw$natural_mortality$M)
+  }
+  expect_false(identical(result$replicates[[1]]$fishing_mortality,
+    result$replicates[[2]]$fishing_mortality))
+  expect_false(identical(result$replicates[[1]]$recruitment$log_mean,
+    result$replicates[[2]]$recruitment$log_mean))
+})
+
+test_that("failed mortality simulation restores RNG and leaves native targets unchanged", {
+  on.exit(clear())
+  x <- mortality_rw_fixture("normal")
+  initialize_fims(x$parameters, x$data, mortality_process = x$spec)
+  before <- get_random()
+  set.seed(246)
+  rng <- .Random.seed
+  x$spec$initial$mean <- 1000
+  expect_error(simulate_fims(x$parameters, x$data, list(type = "iid"), seed = 84,
+    process_mode = "fixed", observation_error = FALSE,
+    mortality_process = x$spec, mortality_mode = "mean"), "finite log-M")
+  expect_identical(.Random.seed, rng)
+  expect_identical(get_random(), before)
+})

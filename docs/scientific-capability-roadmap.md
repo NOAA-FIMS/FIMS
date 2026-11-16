@@ -128,7 +128,13 @@ Shared fleet innovation SD groups now use validated `sd_group` labels and the ex
 Natural mortality inference now supports independent age-specific annual log-M
 random walks with one common innovation SD and explicit fixed/proper-normal
 initialization. The existing age-year Population vector and TMB registration
-are reused. The next increment is mortality-aware simulation and conditional
-forecasting; common annual shocks, age covariance and selectivity processes
+are reused. Mortality-aware simulation and conditional
+forecasting are also implemented; common annual shocks, age covariance and selectivity processes
 remain open. Assessment-scale recovery, identifiability and scaling benchmarks
 are still required.
+
+Mortality simulation now applies complete sampled grids before dynamics, with
+conditional history, explicit process modes and atomic restoration. The next
+scientific design decision is common annual mortality shocks versus correlated
+age-specific innovations; assessment recovery and identifiability benchmarks
+should guide that choice before more covariance structure is added.

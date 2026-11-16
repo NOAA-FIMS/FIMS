@@ -279,6 +279,15 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
   Rcpp::List evaluate_process_paths(Rcpp::NumericVector residuals,
                                     std::string target_name,
                                     Rcpp::List fishing_paths) {
+    return evaluate_all_process_paths(residuals, target_name, fishing_paths,
+                                      Rcpp::NumericVector());
+  }
+
+  /** @brief Evaluate validated recruitment, fishing and age-year mortality paths. */
+  Rcpp::List evaluate_all_process_paths(Rcpp::NumericVector residuals,
+                                       std::string target_name,
+                                       Rcpp::List fishing_paths,
+                                       Rcpp::NumericVector mortality_path) {
     auto info = fims_info::Information<double>::GetInstance();
     auto found = info->models_map.find(this->id);
     if (found == info->models_map.end()) {
@@ -366,11 +375,25 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       saved_fishing.push_back(selected->log_Fmort);
       new_fishing.push_back(values_copy);
     }
+    if (mortality_path.size() != 0 &&
+        static_cast<size_t>(mortality_path.size()) != population->log_M.size()) {
+      Rcpp::stop("Mortality paths must cover the full age-year grid");
+    }
+    for (R_xlen_t i = 0; i < mortality_path.size(); ++i) {
+      if (!std::isfinite(mortality_path[i]) ||
+          !std::isfinite(std::exp(mortality_path[i]))) {
+        Rcpp::stop("Mortality paths require finite log-M values and rates");
+      }
+    }
+    const fims::Vector<double> saved_mortality = population->log_M;
     const fims::Vector<double> saved = target;
     auto restore = [&]() {
       model->simulation_recruitment_residuals = nullptr;
       model->simulation_uses_log_r = false;
       for (size_t i = 0; i < saved.size(); ++i) target[i] = saved[i];
+      for (size_t i = 0; i < saved_mortality.size(); ++i) {
+        population->log_M[i] = saved_mortality[i];
+      }
       for (size_t j = 0; j < fishing_fleets.size(); ++j) {
         for (size_t i = 0; i < saved_fishing[j].size(); ++i) {
           fishing_fleets[j]->log_Fmort[i] = saved_fishing[j][i];
@@ -381,6 +404,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     model->simulation_recruitment_residuals = path.size() ? &path : nullptr;
     model->simulation_uses_log_r = direct;
     try {
+      for (R_xlen_t i = 0; i < mortality_path.size(); ++i) {
+        population->log_M[i] = mortality_path[i];
+      }
       for (size_t j = 0; j < fishing_fleets.size(); ++j) {
         for (size_t i = 0; i < new_fishing[j].size(); ++i) {
           fishing_fleets[j]->log_Fmort[i] = new_fishing[j][i];
@@ -407,6 +433,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               model->GetPopulationDerivedQuantities(population->GetId())),
           Rcpp::Named("fleets") = fleets,
           Rcpp::Named("log_fishing_mortality") = log_fishing,
+          Rcpp::Named("log_natural_mortality") = Rcpp::NumericVector(
+              population->log_M.begin(), population->log_M.end()),
           Rcpp::Named("target") =
               Rcpp::NumericVector(target.begin(), target.end()),
           Rcpp::Named("log_mean") =

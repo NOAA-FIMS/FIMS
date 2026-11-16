@@ -648,13 +648,9 @@ those chains in the Hessian. Mortality/F/recruitment confounding means that
 assessment-scale recovery and sensitivity to the initial rule remain necessary
 before operational use.
 
-This upgrade provides inference only. `simulate_fims()` and `forecast_fims()`
-do not accept mortality process specifications or draw mortality paths; they
-continue evaluating supplied mortality states. The next upgrade should apply
-sampled mortality grids before model preparation and recompute all quantities,
-restore all targets on success/error, and validate conditional forecasts,
-cohort survival and both plus-group contributions. No Quadra dependency or
-other dependency has been introduced.
+The initial inference increment has now been extended to mortality-aware
+simulation and forecasting, described below. No Quadra dependency or other
+dependency has been introduced.
 
 Validation for the mortality inference increment: an isolated clean package
 installation passed. The final combined mortality/fishing/recruitment/simulation
@@ -668,3 +664,68 @@ Laplace-integrated assessment. A standalone C++ interleaved-process smoke test
 passed. A corresponding GTest case was added, but the GTest suite was not run
 because the existing local GoogleTest dependency cache is unavailable. These
 checks do not establish operational assessment recovery, coverage or scaling.
+
+
+## Mortality-aware simulation and conditional forecasting
+
+`simulate_fims()` and `forecast_fims()` accept `mortality_process` using the
+same specification as inference, and `mortality_mode` (`simulate`, `fixed`, or
+`mean`, defaulting to `process_mode`). The returned `natural_mortality` table
+records age, year, log-M, M and conditioning flags for every modeled cell.
+Configuration records the specification, mode, first simulated mortality year
+and whether proper initial mortality uncertainty was drawn.
+
+```r
+projection <- forecast_fims(
+  parameters, data, recruitment_process = list(type = "iid"),
+  from_year = get_start_year(data) + 2L, nsim = 20, seed = 42,
+  process_mode = "fixed", observation_error = FALSE,
+  mortality_process = mortality, mortality_mode = "simulate"
+)
+projection$replicates[[1]]$natural_mortality
+```
+
+ Initial abundance
+remains fixed; supplied hyperparameters are used, without posterior parameter
+uncertainty or automatic extraction of fitted covariance values.
+
+All recruitment, fishing and mortality paths are drawn before observation noise.
+Toggling observation error therefore preserves trajectories with a common seed.
+An explicit seed restores the caller's RNG state. Without a mortality process,
+existing simulation behavior is retained. Additional processes change the RNG
+stream for subsequent observation draws, as expected.
+
+A continuation retains complete historical year blocks at every age and starts
+at the requested modeled `from_year`; the initial model year is valid when a
+mortality process is configured. Zero innovations continue each age's last
+historical log-M independently. A whole-series fixed initialization retains the
+first-year supplied values; a proper-normal initialization draws each age's
+first state independently from its specified initial distribution. `mean` uses
+that initial log-scale mean, and `fixed` keeps all supplied states. These log-scale
+means correspond to M medians, not arithmetic means of M or biomass.
+
+The new native `evaluate_all_process_paths()` validates the entire batch before
+changing any targets. It writes M and F before preparation, exponentiation,
+mortality, recruitment means, catches and survival are recomputed. Full owned
+vectors are restored without resizing on success or an exception, followed by a
+baseline evaluation. Older native path-evaluation methods delegate with an empty
+mortality path, preserving their call signatures. Fixed direct log-R remains
+fixed even when sampled mortality changes the biological recruitment mean;
+reported residuals are recomputed against the new mean. Recruitment deviations
+retain their usual interpretation under changing biological means.
+
+The configured horizon, biological inputs and fleet scenarios must already be
+provided. Mortality is calendar-age specific with independent innovations and a
+common innovation SD; this does not add age correlation, common annual shocks,
+management feedback, or posterior state/parameter sampling.
+
+Mortality simulation validation: clean native package installation and R/Rd
+checks passed. The final combined process suite passed 44 tests / 366 assertions
+with no failures, errors or skips. Added tests cover seeded reproducibility,
+observation-noise isolation, distinct replicate mortality paths, fixed and proper
+initial rules, per-age conditional log-scale continuation, retained historical
+observations, supplied fixed mortality paths, rate transformation, cohort survival
+and both plus-group parents, native restoration, rejected malformed/overflowing
+paths with no partial F update, joint M/F simulation with fixed direct log-R,
+and RNG/parameter preservation after rejected simulation. No operational
+assessment recovery, interval coverage or large-model scaling claim is made.

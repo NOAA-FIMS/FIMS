@@ -53,7 +53,7 @@ Supply a complete year-major, age-fast Population \code{log_M} grid. A fixed
 initial rule requires constant first-year values at every age and estimated
 later values. A normal rule (\code{type}, \code{mean}, \code{sd}) estimates every state;
 initial means and SDs are common across ages and held constant. This option
-supports inference only; mortality paths are not simulated by \code{\link[=simulate_fims]{simulate_fims()}}.}
+is also supported by \code{\link[=simulate_fims]{simulate_fims()}} and \code{\link[=forecast_fims]{forecast_fims()}}.}
 }
 \value{
 A named list with \code{parameters} and \code{model}, plus \code{map} for shared estimated SDs:

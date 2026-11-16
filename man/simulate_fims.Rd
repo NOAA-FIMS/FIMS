@@ -15,7 +15,9 @@ simulate_fims(
   process_mode = c("simulate", "fixed", "mean"),
   observation_error = TRUE,
   fishing_process = NULL,
-  fishing_mode = process_mode
+  fishing_mode = process_mode,
+  mortality_process = NULL,
+  mortality_mode = process_mode
 )
 
 forecast_fims(
@@ -28,7 +30,9 @@ forecast_fims(
   process_mode = c("simulate", "fixed", "mean"),
   observation_error = TRUE,
   fishing_process = NULL,
-  fishing_mode = process_mode
+  fishing_mode = process_mode,
+  mortality_process = NULL,
+  mortality_mode = process_mode
 )
 }
 \arguments{
@@ -49,7 +53,7 @@ RNG state is restored. Otherwise the current R random stream is consumed.}
 modeled recruitment transition (the initial population is held fixed).
 Earlier recruitment states condition the continuation. With the default
 \code{NULL}, observations are simulated from the initial model year too; an
-explicit year retains all earlier observations. With a fishing process,
+explicit year retains all earlier observations. With a fishing or mortality process,
 the initial model year is also a valid continuation year. Years beyond the
 configured model horizon must be added to data and parameters beforehand.}
 
@@ -70,10 +74,20 @@ a stored fit. The same applies to recruitment correlation in its specification.}
 defaulting to \code{process_mode}. Zero innovations hold the last log-F level;
 normal initialization uses its declared mean and fixed initialization
 retains the first supplied state. Whole-series draws include initial-year F.}
+
+\item{mortality_process}{Optional age-specific log-M random-walk list, as in
+\code{\link[=initialize_fims]{initialize_fims()}}. Supply innovation SD and initial-rule values explicitly.}
+
+\item{mortality_mode}{Mortality mode (\code{"simulate"}, \code{"fixed"}, \code{"mean"}),
+defaulting to \code{process_mode}. Continuations retain each age's earlier states.
+Zero innovations continue its last log-M level; whole-series normal draws
+use the declared initial distribution independently at each age. Zero
+innovations give natural-scale medians, not arithmetic mean M or biomass.}
 }
 \value{
 A list with configuration, RNG metadata and \code{replicates}. Each replicate
 contains recruitment states/means/residuals, population and fleet quantities,
+optional age-year \code{natural_mortality} tables (\code{log_M}, \code{M}, \code{conditioned}),
 and an observation table with model predictions, distribution locations,
 arithmetic observation means and simulated values. Observations before an
 explicit \code{from_year} are retained. Missing uncertainty designs are labeled and
@@ -81,14 +95,14 @@ are not filled with invented sampling errors. Counts use their input total
 sample size, or a declared design size for missing composition observations.
 }
 \description{
-Generate recruitment and optional fleet log-F paths, recompute population
+Generate recruitment and optional fleet log-F and age-specific log-M paths, recompute population
 dynamics in annual order, and optionally generate observations from each path.
 Other parameters and initial abundance are held at the supplied values. This is
 simulation from a configuration, not a draw from a fitted posterior.
 }
 \details{
 The supported scope is one population with IID/AR1 Gaussian recruitment,
-optional independent random walks on annual fleet log-F,
+optional independent random walks on annual fleet log-F and age-specific log-M,
 normal/lognormal catch and index data, and multinomial compositions. Other
 parameters and latent processes are fixed. Initial abundance is conditional;
 the existing extra terminal report year uses mean recruitment. All process
@@ -99,8 +113,8 @@ TMB methods should not be reused after another model is initialized.
 
 \code{\link[=forecast_fims]{forecast_fims()}} uses the same evaluator with an explicit continuation year.
 Future model years, growth and other inputs must already be configured.
-Fishing mortality stays at supplied values unless a walk is requested;
-simulated or mean walk paths replace future log-F starting values.
+Fishing and natural mortality stay at supplied values unless walks are requested;
+simulated or mean walk paths replace the requested future log-F/log-M values.
 A supplied future catch observation is a sampling design, not a catch target
 solved by this function. Parameter and initial-abundance uncertainty are
 excluded; initial F draws follow the declared random-walk rule.

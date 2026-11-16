@@ -27,6 +27,7 @@ void register_fishery_models(Rcpp::Module& m) {
       .method("get_output", &CatchAtAgeInterface::to_json)
       .method("evaluate_recruitment_path",
               &CatchAtAgeInterface::evaluate_recruitment_path)
+      .method("evaluate_all_process_paths", &CatchAtAgeInterface::evaluate_all_process_paths)
       .method("evaluate_process_paths", &CatchAtAgeInterface::evaluate_process_paths)
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)

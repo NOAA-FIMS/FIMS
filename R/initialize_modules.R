@@ -940,7 +940,7 @@ initialize_comp <- function(data,
 #'   initial rule requires constant first-year values at every age and estimated
 #'   later values. A normal rule (`type`, `mean`, `sd`) estimates every state;
 #'   initial means and SDs are common across ages and held constant. This option
-#'   supports inference only; mortality paths are not simulated by [simulate_fims()].
+#'   is also supported by [simulate_fims()] and [forecast_fims()].
 #' @return
 #' A named list with `parameters` and `model`, plus `map` for shared estimated SDs:
 #'

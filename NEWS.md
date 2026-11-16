@@ -286,3 +286,5 @@
 * Fleet log-F random walks can share innovation SDs through explicit `sd_group` labels and TMB parameter maps. Grouped fleets retain separate trajectories and initial distributions.
 
 * Added opt-in age-specific annual log-M random walks for assessment inference, with a common innovation SD and explicit fixed or proper-normal initialization. Gaussian process densities now support interleaved independent series.
+
+* Simulation and forecasting now accept age-specific mortality random walks, apply sampled log-M grids before dynamics, preserve conditional history, and report mortality paths and initialization metadata.

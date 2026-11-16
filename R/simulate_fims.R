@@ -1,7 +1,7 @@
 #' Simulate population trajectories and observations from a FIMS configuration
 #'
 #' @description
-#' Generate recruitment and optional fleet log-F paths, recompute population
+#' Generate recruitment and optional fleet log-F and age-specific log-M paths, recompute population
 #' dynamics in annual order, and optionally generate observations from each path.
 #' Other parameters and initial abundance are held at the supplied values. This is
 #' simulation from a configuration, not a draw from a fitted posterior.
@@ -18,7 +18,7 @@
 #'   modeled recruitment transition (the initial population is held fixed).
 #'   Earlier recruitment states condition the continuation. With the default
 #'   `NULL`, observations are simulated from the initial model year too; an
-#'   explicit year retains all earlier observations. With a fishing process,
+#'   explicit year retains all earlier observations. With a fishing or mortality process,
 #'   the initial model year is also a valid continuation year. Years beyond the
 #'   configured model horizon must be added to data and parameters beforehand.
 #' @param process_mode One of `"simulate"` (stationary initial draw or conditional
@@ -33,10 +33,18 @@
 #'   defaulting to `process_mode`. Zero innovations hold the last log-F level;
 #'   normal initialization uses its declared mean and fixed initialization
 #'   retains the first supplied state. Whole-series draws include initial-year F.
+#' @param mortality_process Optional age-specific log-M random-walk list, as in
+#'   [initialize_fims()]. Supply innovation SD and initial-rule values explicitly.
+#' @param mortality_mode Mortality mode (`"simulate"`, `"fixed"`, `"mean"`),
+#'   defaulting to `process_mode`. Continuations retain each age's earlier states.
+#'   Zero innovations continue its last log-M level; whole-series normal draws
+#'   use the declared initial distribution independently at each age. Zero
+#'   innovations give natural-scale medians, not arithmetic mean M or biomass.
 #' @param observation_error Draw observation noise when `TRUE`. Otherwise return
 #'   model predictions (lognormal medians) in the simulated column.
 #' @return A list with configuration, RNG metadata and `replicates`. Each replicate
 #'   contains recruitment states/means/residuals, population and fleet quantities,
+#'   optional age-year `natural_mortality` tables (`log_M`, `M`, `conditioned`),
 #'   and an observation table with model predictions, distribution locations,
 #'   arithmetic observation means and simulated values. Observations before an
 #'   explicit `from_year` are retained. Missing uncertainty designs are labeled and
@@ -44,7 +52,7 @@
 #'   sample size, or a declared design size for missing composition observations.
 #' @details
 #' The supported scope is one population with IID/AR1 Gaussian recruitment,
-#' optional independent random walks on annual fleet log-F,
+#' optional independent random walks on annual fleet log-F and age-specific log-M,
 #' normal/lognormal catch and index data, and multinomial compositions. Other
 #' parameters and latent processes are fixed. Initial abundance is conditional;
 #' the existing extra terminal report year uses mean recruitment. All process
@@ -55,8 +63,8 @@
 #'
 #' [forecast_fims()] uses the same evaluator with an explicit continuation year.
 #' Future model years, growth and other inputs must already be configured.
-#' Fishing mortality stays at supplied values unless a walk is requested;
-#' simulated or mean walk paths replace future log-F starting values.
+#' Fishing and natural mortality stay at supplied values unless walks are requested;
+#' simulated or mean walk paths replace the requested future log-F/log-M values.
 #' A supplied future catch observation is a sampling design, not a catch target
 #' solved by this function. Parameter and initial-abundance uncertainty are
 #' excluded; initial F draws follow the declared random-walk rule.
@@ -72,9 +80,11 @@ simulate_fims <- function(parameters, data, recruitment_process,
                           nsim = 1L, seed = NULL, from_year = NULL,
                           process_mode = c("simulate", "fixed", "mean"),
                           observation_error = TRUE, fishing_process = NULL,
-                          fishing_mode = process_mode) {
+                          fishing_mode = process_mode,
+                          mortality_process = NULL, mortality_mode = process_mode) {
   process_mode <- match.arg(process_mode)
   fishing_mode <- match.arg(fishing_mode, c("simulate", "fixed", "mean"))
+  mortality_mode <- match.arg(mortality_mode, c("simulate", "fixed", "mean"))
   if (!is.numeric(nsim) || length(nsim) != 1L || !is.finite(nsim) ||
       nsim < 1 || nsim > .Machine$integer.max || nsim != floor(nsim)) {
     cli::cli_abort("{.arg nsim} must be a positive integer.")
@@ -100,6 +110,7 @@ simulate_fims <- function(parameters, data, recruitment_process,
   is.FIMSFrame(data)
   process <- validate_recruitment_process(parameters, data, recruitment_process)
   fishing <- normalize_fishing_processes(fishing_process, parameters, data)
+  mortality <- normalize_mortality_process(mortality_process, parameters, data)
   recruitment_rows <- parameters[parameters$module_name %in% "Recruitment" &
                                    parameters$label %in% c("log_devs", "log_r"), ]
   years <- recruitment_rows$timing
@@ -107,8 +118,8 @@ simulate_fims <- function(parameters, data, recruitment_process,
   if (whole_series) from_year <- years[1]
   if (!is.numeric(from_year) || length(from_year) != 1L ||
       !is.finite(from_year) ||
-      !from_year %in% c(if (length(fishing)) get_start_year(data), years)) {
-    cli::cli_abort(if (length(fishing)) {
+      !from_year %in% c(if (length(fishing) || !is.null(mortality)) get_start_year(data), years)) {
+    cli::cli_abort(if (length(fishing) || !is.null(mortality)) {
       "{.arg from_year} must be a modeled process year."
     } else "{.arg from_year} must be a modeled recruitment year.")
   }
@@ -119,7 +130,8 @@ simulate_fims <- function(parameters, data, recruitment_process,
   design <- simulation_observation_design(data)
   initialized <- initialize_fims(
     parameters, data, recruitment_process = process,
-    fishing_process = if (length(fishing)) fishing else NULL
+    fishing_process = if (length(fishing)) fishing else NULL,
+    mortality_process = mortality
   )
   baseline <- initialized$model$evaluate_recruitment_path(numeric(), target)
   residuals <- if (target == "log_r") baseline$target - baseline$log_mean else baseline$target
@@ -130,7 +142,8 @@ simulate_fims <- function(parameters, data, recruitment_process,
   if (!is.null(seed)) set.seed(seed)
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE) &&
       (process_mode == "simulate" || observation_error ||
-       (length(fishing) && fishing_mode == "simulate"))) set.seed(NULL)
+       (length(fishing) && fishing_mode == "simulate") ||
+       (!is.null(mortality) && mortality_mode == "simulate"))) set.seed(NULL)
   rng_state <- if (exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE))
     get(".Random.seed", envir = .GlobalEnv) else NULL
   paths <- lapply(seq_len(nsim), function(i) {
@@ -148,13 +161,23 @@ simulate_fims <- function(parameters, data, recruitment_process,
       } else fishing_density$simulate_from(fishing_first, fishing_mode == "simulate")
     }
   }
+  mortality_paths <- rep(list(numeric()), nsim)
+  if (!is.null(mortality)) {
+    mortality_density <- attr(initialized, "gaussian_mortality")
+    mortality_density$observed_values[] <- baseline$log_natural_mortality
+    mortality_paths <- lapply(seq_len(nsim), function(i) {
+      if (mortality_mode == "fixed") baseline$log_natural_mortality else
+        mortality_density$simulate_from(fishing_first * get_n_ages(data),
+                                         mortality_mode == "simulate")
+    })
+  }
   replicates <- lapply(seq_len(nsim), function(i) {
-    # Fixed direct log-R states must stay fixed when a new F path changes the
+    # Fixed direct log-R states must stay fixed when new F or M paths change the
     # biological mean; holding their old residuals would change recruitment.
     recruitment_path <- if (process_mode == "fixed" && target == "log_r")
       numeric() else paths[[i]]
-    snapshot <- initialized$model$evaluate_process_paths(
-      recruitment_path, target, fishing_paths[[i]]
+    snapshot <- initialized$model$evaluate_all_process_paths(
+      recruitment_path, target, fishing_paths[[i]], mortality_paths[[i]]
     )
     realized_residuals <- if (process_mode == "fixed" && target == "log_r")
       snapshot$target - snapshot$log_mean else paths[[i]]
@@ -192,6 +215,16 @@ simulate_fims <- function(parameters, data, recruitment_process,
         )
       }))
     }
+    if (!is.null(mortality)) {
+      n_ages <- get_n_ages(data)
+      timing <- rep(seq.int(get_start_year(data), get_end_year(data)), each = n_ages)
+      result$natural_mortality <- tibble::tibble(
+        timing = timing, age = rep(get_ages(data), get_n_years(data)),
+        log_M = snapshot$log_natural_mortality, M = exp(log_M),
+        conditioned = timing < get_start_year(data) + fishing_first |
+          (timing == get_start_year(data) & mortality$initial$type == "fixed")
+      )
+    }
     result
   })
   result <- list(
@@ -216,6 +249,13 @@ simulate_fims <- function(parameters, data, recruitment_process,
       fishing_mode == "simulate" && any(vapply(fishing,
         function(x) x$initial$type == "normal", logical(1)))
   }
+  if (!is.null(mortality)) {
+    result$configuration$mortality_process <- mortality
+    result$configuration$mortality_mode <- mortality_mode
+    result$configuration$mortality_from_year <- get_start_year(data) + fishing_first
+    result$configuration$mortality_initial_uncertainty <- fishing_first == 0L &&
+      mortality_mode == "simulate" && mortality$initial$type == "normal"
+  }
   result
 }
 
@@ -225,10 +265,12 @@ forecast_fims <- function(parameters, data, recruitment_process, from_year,
                           nsim = 1L, seed = NULL,
                           process_mode = c("simulate", "fixed", "mean"),
                           observation_error = TRUE, fishing_process = NULL,
-                          fishing_mode = process_mode) {
+                          fishing_mode = process_mode,
+                          mortality_process = NULL, mortality_mode = process_mode) {
   simulate_fims(parameters, data, recruitment_process, nsim, seed, from_year,
                  match.arg(process_mode), observation_error,
-                 fishing_process = fishing_process, fishing_mode = fishing_mode)
+                 fishing_process = fishing_process, fishing_mode = fishing_mode,
+                 mortality_process = mortality_process, mortality_mode = mortality_mode)
 }
 
 # Resolve observation layout once; use the same fleet-specific bins as setup.
