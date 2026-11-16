@@ -10,9 +10,9 @@
 # fims_retrospective ----
 ## Setup ----
 #' @description Skip the test unless explicitly enabled for heavy integration testing.
-testthat::skip_if_not(
-  testthat:::env_var_is_true("RUN_SLOW_TESTS"),
-  message = "Skipping: RUN_SLOW_TESTS is not set to true."
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
 )
 
 # Load or prepare any necessary data for testing
@@ -44,29 +44,29 @@ test_that("run_fims_retrospective() works with correct inputs", {
 
   #' @description Test that calculate_mohns_rho() returns a numeric value.
 
-  rho_ssb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
+  rho_sb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
 
   expect_equal(
-    object = class(rho_ssb),
+    object = class(rho_sb),
     expected = "numeric"
   )
 
   expect_equal(
-    object = length(rho_ssb),
+    object = length(rho_sb),
     expected = 1
   )
 
   expect_true(
-    object = is.finite(rho_ssb) && !is.na(rho_ssb)
+    object = is.finite(rho_sb) && !is.na(rho_sb)
   )
 
   #' @description Test that calculate_mohns_rho() returns consistent results across runs.
-  rho_ssb_1 <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
-  rho_ssb_2 <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
+  rho_sb_1 <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
+  rho_sb_2 <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
 
   expect_equal(
-    object = rho_ssb_1,
-    expected = rho_ssb_2
+    object = rho_sb_1,
+    expected = rho_sb_2
   )
 
   #' @description Test that calculate_mohns_rho() works with recruitment quantity.
@@ -87,7 +87,7 @@ test_that("run_fims_retrospective() works with correct inputs", {
     expected = 2
   )
 
-  retro_ssb <- retro_fit[["estimates"]] |>
+  retro_sb <- retro_fit[["estimates"]] |>
     dplyr::filter(label == "spawning_biomass") |>
     dplyr::select(label, year_i, estimated, retrospective_peel) |>
     tidyr::pivot_wider(names_from = retrospective_peel, values_from = estimated) |>
@@ -97,7 +97,7 @@ test_that("run_fims_retrospective() works with correct inputs", {
 
   #' @description Test that fims_retrospective(x) returns y.
   expect_equal(
-    object = retro_ssb,
+    object = retro_sb,
     expected = c(1728.686, 1654.160),
     tolerance = .1
   )
@@ -226,7 +226,7 @@ test_that("calculate_mohns_rho() returns correct error messages", {
       retro_fit = retro_fit_invalid,
       quantity = "spawning_biomass"
     ),
-    regexp = "must contain reference year run"
+    regexp = "must contain the reference run"
   )
 
   #' @description Test that calculate_mohns_rho() errors with non-existent quantity.

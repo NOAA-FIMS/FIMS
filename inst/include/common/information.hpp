@@ -199,25 +199,18 @@ class Information {
     this->recruitment_models.clear();
     this->recruitment_process_models.clear();
 
+    // Density components borrow these vectors from the population, fleet, and
+    // recruitment modules released above, so only drop the links. Reading
+    // through them here would touch freed memory.
     for (density_components_iterator it = density_components.begin();
          it != density_components.end(); ++it) {
       std::shared_ptr<fims_distributions::DensityComponentBase<Type>> d =
           (*it).second;
-      if ((d->priors)[0]) {
-        d->priors.clear();
-      }
-      if (d->data_observed_values) {
-        d->data_observed_values.reset();
-      }
-      if (d->data_expected_values) {
-        d->data_expected_values->clear();
-      }
-      if (d->re) {
-        d->re->clear();
-      }
-      if (d->re_expected_values) {
-        d->re_expected_values->clear();
-      }
+      d->priors.clear();
+      d->data_observed_values.reset();
+      d->data_expected_values = nullptr;
+      d->re = nullptr;
+      d->re_expected_values = nullptr;
     }
     this->density_components.clear();
   }
@@ -580,13 +573,14 @@ class Information {
     }
 
     valid_model = false;
-    FIMS_ERROR_LOG(
-        "Fleet " + fims::to_string(f->id) +
-        " has fleet length observation bins but no usable "
-        "age-to-length conversion path. Provide fixed "
-        "age-to-length conversion of size " +
-        fims::to_string(f->n_ages * f->n_lengths) +
-        " or use a supported growth-derived age-to-length conversion path.");
+    FIMS_ERROR_LOG("Fleet " + fims::to_string(f->id) +
+                   " has fleet length observation bins but no usable "
+                   "age-to-length conversion path. Provide fixed "
+                   "age-to-length conversion of size " +
+                   fims::to_string(f->n_ages * f->n_lengths) + " (or " +
+                   fims::to_string(f->n_years * f->n_ages * f->n_lengths) +
+                   " for 1 table per year) or use a supported growth-derived "
+                   "age-to-length conversion path.");
   }
 
   /**
@@ -671,7 +665,7 @@ class Information {
 
   /**
    * @brief Build canonical fleet observation-bin edge vectors from fleet
-   * length_bin centers.
+   * length_bin lower edges.
    *
    * @param p Shared pointer to population module.
    * @return Prepared fleet observation-bin edge vectors for active fleets.
@@ -696,11 +690,11 @@ class Information {
 
       if (fleet->lengths.size() != fleet->n_lengths) {
         throw std::runtime_error(
-            "Fleet length_bin centers are not consistent with n_lengths");
+            "Fleet length_bin lower edges are not consistent with n_lengths");
       }
 
       fleet->length_bin_edges =
-          fims_popdy::SizeGridBuilder::BuildObservationEdgesFromCenters(
+          fims_popdy::SizeGridBuilder::BuildObservationEdgesFromLowerEdges(
               fleet->lengths);
 
       fleet_edges.emplace_back(fleet->length_bin_edges);
@@ -770,11 +764,11 @@ class Information {
    * @brief Ensure a population has a usable biological size grid.
    *
    * @details Prepare canonical fleet observation-bin geometry from valid fleet
-   * length_bin centers whenever that geometry is available. If a user provides
-   * a valid biological size grid, keep it only if its bins are not coarser
-   * than any overlapping active fleet observation bins; otherwise, report an
-   * error and invalidate the model. If no biological size grid has been
-   * provided, build the built-in default from the prepared fleet
+   * length_bin lower edges whenever that geometry is available. If a user
+   * provides a valid biological size grid, keep it only if its bins are not
+   * coarser than any overlapping active fleet observation bins; otherwise,
+   * report an error and invalidate the model. If no biological size grid has
+   * been provided, build the built-in default from the prepared fleet
    * observation-bin geometry, enforce the same fleet-bin compatibility rule,
    * and warn when the built-in default creates more than 200 regular bins. If
    * a user provides an invalid or partially specified grid, report the problem

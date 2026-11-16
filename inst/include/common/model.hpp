@@ -43,7 +43,8 @@ class Model {  // may need singleton
    * @brief Evaluate. Calculates the joint negative log-likelihood function.
    */
 #ifdef TMB_MODEL
-  ::objective_function<Type> *of;
+  // nullptr outside of a TMB call because TMB owns the objective function.
+  ::objective_function<Type> *of = nullptr;
 #endif
 
   /**

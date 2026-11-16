@@ -21,18 +21,34 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct DoubleLogisticSelectivity : public SelectivityBase<Type> {
-  fims::Vector<Type> inflection_point_asc; /**< 50% quantile of the value of the
-             quantity of interest (x)  on the ascending limb of the double
-             logistic curve; e.g. age at  which 50% of the fish are selected */
-  fims::Vector<Type> slope_asc; /**<scalar multiplier of difference between
-            quantity of interest   value (x) and inflection_point on the
-            ascending limb of the double   logistic   curve*/
-  fims::Vector<Type> inflection_point_desc; /**< 50% quantile of the value of
-             the quantity of interest (x) on the descending limb of the double
-             logistic curve; e.g. age at which 50% of the fish are selected */
-  fims::Vector<Type> slope_desc; /**<scalar multiplier of difference between
-            quantity of interest  value (x) and inflection_point on the
-            descending limb of the double  logistic  curve */
+  /**
+   * @brief The age at which the ascending limb is 0.5 for models that start at
+   * age zero and each age bin represents one year.
+   * @details Overall selectivity is below 0.5 at this point because it is the
+   * product of both limbs.
+   */
+  fims::Vector<Type> inflection_point_asc;
+  /**
+   * @brief How quickly selectivity rises on the ascending limb; larger values
+   * give a steeper, more knife-edge rise.
+   * @details Scalar multiplier applied to the difference between x and
+   * inflection_point_asc on the ascending limb.
+   */
+  fims::Vector<Type> slope_asc;
+  /**
+   * @brief The age at which the descending limb is 0.5 for models that start at
+   * age zero and each age bin represents one year.
+   * @details Overall selectivity is below 0.5 at this point because it is the
+   * product of both limbs.
+   */
+  fims::Vector<Type> inflection_point_desc;
+  /**
+   * @brief How quickly selectivity falls on the descending limb; larger values
+   * give a steeper decline.
+   * @details Scalar multiplier applied to the difference between x and
+   * inflection_point_desc on the descending limb.
+   */
+  fims::Vector<Type> slope_desc;
 
   DoubleLogisticSelectivity() : SelectivityBase<Type>() {}
 

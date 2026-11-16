@@ -10,23 +10,50 @@
 #' @param model_output A JSON object containing the finalized FIMS output as
 #'   returned from `get_output()`, which is an internal function to each model
 #'   family.
-#' @return A tibble containing the reshaped parameter estimates.
+#' @return A tibble containing the reshaped parameter estimates. Parameters of
+#' distributions for random effects, e.g., `log_sd` of the recruitment
+#' deviations, are included with one row per parameter id under the module
+#' that owns the vector they apply to.
 reshape_json_estimates <- function(model_output) {
   # Helper functions
+  # Match each random-effect density value to its parameter by the vector the
+  # distribution applies to, i.e., its first linked id, and the position within
+  # that vector, because parameter values can be tied.
   join_density_information <- function(x, density_tibble) {
-    dplyr::left_join(x,
-      y = dplyr::filter(
-        density_tibble,
-        .data$input_type == "random_effects"
+    vector_lengths <- dplyr::count(x, .data$type_id, name = "n_values")
+    random_effects <- density_tibble |>
+      dplyr::filter(.data$input_type == "random_effects") |>
+      dplyr::group_by(.data$module_id) |>
+      dplyr::group_modify(\(rows, key) {
+        id <- purrr::pluck(rows, "linked_ids", 1, 1, .default = NA_integer_)
+        n_values <- vector_lengths[["n_values"]][
+          match(id, vector_lengths[["type_id"]])
+        ]
+        # Leave the density unmatched rather than guess at its parameters.
+        if (is.na(id) || is.na(n_values) || n_values != NROW(rows)) {
+          return(dplyr::mutate(rows, type_id = NA, density_position = NA))
+        }
+        dplyr::mutate(rows, type_id = id, density_position = seq_len(n_values))
+      }) |>
+      dplyr::ungroup() |>
+      dplyr::select(-dplyr::any_of(c(
+        "module_name", "module_id", "module_type", "observed_data_id",
+        "linked_ids", "observed_values"
+      )))
+
+    x |>
+      dplyr::mutate(
+        density_position = dplyr::row_number(),
+        .by = dplyr::all_of("type_id")
       ) |>
-        dplyr::select(
-          -dplyr::all_of(c("module_name", "module_id", "module_type", "observed_data_id"))
+      dplyr::left_join(
+        y = random_effects,
+        by = c(
+          "estimation_type" = "input_type", "type_id", "density_position"
         ),
-      by = c(
-        "estimation_type" = "input_type",
-        "estimated_value" = "observed_values"
-      )
-    )
+        na_matches = "never"
+      ) |>
+      dplyr::select(-dplyr::all_of("density_position"))
   }
 
   json_list <- jsonlite::fromJSON(model_output, simplifyVector = FALSE)
@@ -40,10 +67,56 @@ reshape_json_estimates <- function(model_output) {
   )
 
 
+  # Distribution parameters, e.g., log_sd, are written with their parameter
+  # ids so they can be reported like module parameters. Any parameter a
+  # random-effect distribution writes is handled the same way, so new ones
+  # need no change here. They are split off before the density components are
+  # joined to other rows, because the joins keep every density column and
+  # would add them to every row.
+  density_components <- read_list[["density_components"]]
+  distribution_information <- NULL
+  if ("parameters" %in% names(density_components)) {
+    # Only random-effect distributions for now. The log_sd of a data
+    # distribution is set from the data uncertainty, held constant, and
+    # already reported next to each observation, and a prior's parameters are
+    # fixed inputs.
+    random_effect_distributions <- density_components |>
+      dplyr::filter(
+        .data$input_type == "random_effects",
+        purrr::map_lgl(.data$parameters, \(x) length(x) > 0)
+      )
+    # A model without random effects has no distribution parameters, and
+    # unnesting zero rows would leave no id column to work with
+    if (nrow(random_effect_distributions) > 0) {
+      distribution_information <- random_effect_distributions |>
+        dplyr::mutate(
+          distribution = .data$module_type,
+          # The first linked id is the vector the distribution applies to
+          linked_id = purrr::map_int(
+            .data$linked_ids,
+            \(x) purrr::pluck(x, 1, .default = NA_integer_)
+          ),
+          parameters = purrr::map(
+            .data$parameters,
+            \(x) purrr::map_df(x, dimension_folded_to_tibble)
+          )
+        ) |>
+        dplyr::select(
+          dplyr::all_of(c(
+            "module_name", "module_id", "module_type", "distribution",
+            "linked_id", "parameters"
+          ))
+        ) |>
+        tidyr::unnest(dplyr::all_of("parameters")) |>
+        # A single log_sd is copied to every element with the same id
+        dplyr::distinct(.data$id, .keep_all = TRUE)
+    }
+    density_components <- density_components |>
+      dplyr::select(-dplyr::all_of("parameters"))
+  }
+
   # Process the density components
-  # TODO: Still need links to the parameter id because we are just joining by
-  #       parameter values, which is fragile
-  density_information <- read_list[["density_components"]] |>
+  density_information <- density_components |>
     dplyr::mutate(
       density_component = purrr::map(.data$density_component, density_to_tibble)
     ) |>
@@ -85,12 +158,15 @@ reshape_json_estimates <- function(model_output) {
       name = paste(.data$data_type, "expected", sep = "_")
     ) |>
     dplyr::left_join(
-      y = read_list[["density_components"]] |>
+      y = density_components |>
         dplyr::filter(
           .data$observed_data_id != -999
         ) |>
         dplyr::rename(distribution = "module_type") |>
-        dplyr::select(-dplyr::starts_with("module")),
+        dplyr::select(
+          -dplyr::starts_with("module"),
+          -dplyr::any_of("linked_ids")
+        ),
       by = c("data_id" = "observed_data_id")
     ) |>
     dplyr::mutate(
@@ -102,7 +178,36 @@ reshape_json_estimates <- function(model_output) {
     dplyr::mutate(join_by = dplyr::row_number()) |>
     dplyr::ungroup()
 
+  # Selectivity is written separately from its fleet, so the fleet section
+  # records which selectivity module each fleet uses. A selectivity module
+  # shared by more than one fleet is left without a fleet name.
+  # Output saved before the link was written has no selectivity_id.
+  selectivity_fleets <- NULL
+  if ("selectivity_id" %in% names(read_list[["fleets"]])) {
+    selectivity_fleets <- read_list[["fleets"]] |>
+      dplyr::select(dplyr::all_of(c("selectivity_id", "fleet"))) |>
+      dplyr::add_count(.data$selectivity_id) |>
+      dplyr::filter(.data$n == 1) |>
+      dplyr::select(-dplyr::all_of("n"))
+  }
+
+  # Dimensions are written as positions, e.g., length_i is 1 for the first
+  # length bin, so each fleet also writes its length bins. Output saved before
+  # the length bins were written leaves length as NA.
+  fleet_lengths <- tibble::tibble(
+    module_name = character(),
+    module_id = integer(),
+    length_i = integer(),
+    length = numeric()
+  )
+  if ("length" %in% names(read_list[["fleets"]])) {
+    fleet_lengths <- read_list[["fleets"]] |>
+      dplyr::select(dplyr::all_of(c("module_name", "module_id", "length"))) |>
+      tidyr::unnest_longer(length, indices_to = "length_i")
+  }
+
   fleet_information <- read_list[["fleets"]] |>
+    dplyr::select(-dplyr::any_of(c("selectivity_id", "length"))) |>
     tidyr::pivot_longer(
       cols = dplyr::all_of(c("parameters", "derived_quantities")),
       names_to = "delete_me",
@@ -137,6 +242,10 @@ reshape_json_estimates <- function(model_output) {
     tidyr::unnest(dplyr::all_of(c("dimensionality", "value", "uncertainty"))) |>
     dplyr::mutate(value = unlist(.data$value), uncertainty = unlist(.data$uncertainty))
 
+  population_ages <- read_list[["populations"]] |>
+    tidyr::unnest_longer(age, indices_to = "age_i") |>
+    # TODO: think about how to join based on population when more than one
+    dplyr::select(age, age_i)
   # Process the population data
   population_information <- read_list[["populations"]] |>
     tidyr::pivot_longer(
@@ -145,7 +254,7 @@ reshape_json_estimates <- function(model_output) {
       values_to = "parameters"
     ) |>
     # TODO: Think about these ids when we have more than one population
-    dplyr::select(-dplyr::all_of("delete_me"), -dplyr::ends_with("_id"), -dplyr::all_of("population")) |>
+    dplyr::select(-dplyr::all_of("delete_me"), -dplyr::ends_with("_id"), -dplyr::any_of(c("population", "age"))) |>
     dplyr::mutate(
       parameters = purrr::map(
         .data$parameters,
@@ -155,12 +264,35 @@ reshape_json_estimates <- function(model_output) {
     tidyr::unnest(dplyr::all_of("parameters")) |>
     join_density_information(density_information)
 
+  # Report each distribution parameter under the module that owns the vector
+  # it applies to, e.g., the recruitment log_sd next to the recruitment
+  # deviations, so users do not have to look up what a density is linked to
+  if (!is.null(distribution_information)) {
+    linked_modules <- dplyr::bind_rows(
+      fleet_information,
+      module_information,
+      population_information
+    ) |>
+      dplyr::select(dplyr::all_of(c(
+        "type_id", "module_name", "module_id", "module_type"
+      ))) |>
+      dplyr::filter(!is.na(.data$type_id)) |>
+      dplyr::distinct()
+    distribution_information <- distribution_information |>
+      dplyr::select(
+        -dplyr::all_of(c("module_name", "module_id", "module_type"))
+      ) |>
+      dplyr::left_join(linked_modules, by = c("linked_id" = "type_id")) |>
+      dplyr::select(-dplyr::all_of("linked_id"))
+  }
+
   # TODO: Change some column names
   # Bring everything together
   out <- dplyr::bind_rows(
     fleet_information,
     module_information,
-    population_information
+    population_information,
+    distribution_information
   ) |>
     dplyr::select(
       dplyr::all_of(c("module_name", "module_id", "module_type")),
@@ -175,6 +307,28 @@ reshape_json_estimates <- function(model_output) {
       lpdf = "lpdf_value", dplyr::all_of("likelihood"),
       "log_sd" = dplyr::all_of("log_sd_values"),
       dplyr::everything()
+    ) |>
+    # age_i and length_i are positions, so replace them with the age and
+    # length they index. Every age dimension starts at the first age today; a
+    # dimension that starts later, e.g., "n_ages-1", would need its own offset
+    # here.
+    dplyr::left_join(fleet_lengths, by = c("module_name", "module_id", "length_i")) |>
+    dplyr::left_join(population_ages, by = c("age_i")) |>
+    dplyr::relocate(dplyr::all_of(c("age", "length")), .after = dplyr::all_of("length_i")) |>
+    dplyr::select(-dplyr::all_of(c("age_i", "length_i")))
+  if (is.null(selectivity_fleets)) {
+    return(out)
+  }
+  selectivity_fleet <- selectivity_fleets[["fleet"]][
+    match(out[["module_id"]], selectivity_fleets[["selectivity_id"]])
+  ]
+  out |>
+    dplyr::mutate(
+      fleet = dplyr::if_else(
+        .data$module_name == "Selectivity",
+        selectivity_fleet,
+        .data$fleet
+      )
     )
 }
 
@@ -197,13 +351,16 @@ reshape_json_estimates <- function(model_output) {
 #'   a second call to `obj[["gr"]]()`, which would crash after [clear()] has
 #'   freed the C++ memory. If `NULL` (default), the gradient is computed
 #'   directly from `obj[["gr"]](opt[["par"]])`.
+#' @param mapping Full-to-reduced parameter metadata saved during fitting, or
+#'   `NULL` for fits created before mapping metadata was available.
 #' @return A tibble containing the reshaped estimates (i.e., parameters and
 #' derived quantities).
 reshape_tmb_estimates <- function(obj,
                                   sdreport = NULL,
                                   opt = NULL,
                                   parameter_names,
-                                  precomputed_gradient = NULL) {
+                                  precomputed_gradient = NULL,
+                                  mapping = NULL) {
   # Outline for the estimates table
   estimates_outline <- tibble::tibble(
     # The FIMS Rcpp module
@@ -238,11 +395,10 @@ reshape_tmb_estimates <- function(obj,
         label = dimnames(std)[[1]],
         estimate = std[, "Estimate"],
         uncertainty = std[, "Std. Error"],
-        # Use obj[["env"]][["parameters"]][["p"]] as this will return both initial
-        # fixed and random effects while obj[["par"]] only returns initial fixed
-        # effects
+        # obj$par has the same reduced indexing as parameter_names when a TMB
+        # factor map fixes or shares parameters.
         initial = c(
-          obj[["env"]][["parameters"]][["p"]],
+          unname(obj[["par"]]),
           rep(NA_real_, derived_quantity_nrow)
         ),
         gradient = c(
@@ -257,12 +413,39 @@ reshape_tmb_estimates <- function(obj,
         )
       )
   } else {
+    estimate_values <- if (length(opt) > 0) opt[["par"]] else obj[["par"]]
     estimates <- estimates_outline |>
       tibble::add_row(
         label = names(obj[["par"]]),
-        initial = obj[["env"]][["parameters"]][["p"]],
-        estimate = obj[["env"]][["parameters"]][["p"]]
+        initial = unname(obj[["par"]]),
+        estimate = unname(estimate_values)
       )
+  }
+
+  if (!is.null(mapping)) {
+    expanded <- list()
+    reduced_names <- character()
+    for (effect in c("p", "re")) {
+      metadata <- mapping[[effect]]
+      index <- metadata[["index"]]
+      rows <- match(metadata[["reduced_names"]][index], estimates[["label"]])
+      gradient <- estimates[["gradient"]][rows]
+      gradient[is.na(index) | duplicated(index)] <- NA_real_
+      expanded[[effect]] <- estimates_outline |>
+        tibble::add_row(
+          label = metadata[["full_names"]],
+          initial = metadata[["initial"]],
+          estimate = metadata[["estimate"]],
+          uncertainty = estimates[["uncertainty"]][rows],
+          log_like_cv = estimates[["log_like_cv"]][rows],
+          gradient = gradient
+        )
+      reduced_names <- c(reduced_names, metadata[["reduced_names"]])
+    }
+    estimates <- dplyr::bind_rows(c(
+      expanded,
+      list(estimates[!estimates[["label"]] %in% reduced_names, ])
+    ))
   }
 
   estimates <- estimates |>
@@ -450,6 +633,7 @@ dimensions_to_tibble <- function(data) {
 #' density_to_tibble(dummy_density)
 #' @noRd
 density_to_tibble <- function(data) {
+  data <- json_infinity_to_numeric(data)
   # Check that each list element is of length-one or the same length otherwise
   # the resulting tibble will not be the correct dimensions
   element_lengths <- purrr::map_int(data, length)
@@ -471,4 +655,30 @@ density_to_tibble <- function(data) {
     tibble::as_tibble() |>
     tidyr::unnest(dplyr::contains("value")) |>
     dplyr::rename(likelihood = dplyr::all_of("value"))
+}
+
+#' Convert infinite values written as JSON strings back to numbers
+#'
+#' @description
+#' JSON has no representation for infinity, so the C++ `value_to_string()`
+#' writes infinite density values, e.g., the log-likelihood of an observation
+#' with an expected value of zero, as the strings `"Infinity"` and
+#' `"-Infinity"`. This turns them back into `Inf` and `-Inf` so numeric columns
+#' stay numeric.
+#'
+#' @param x A value or a list of values read with `jsonlite::fromJSON()` and
+#'   `simplifyVector = FALSE`.
+#' @return `x` with the same structure, where the strings `"Infinity"` and
+#'   `"-Infinity"` are replaced with `Inf` and `-Inf`.
+#' @noRd
+json_infinity_to_numeric <- function(x) {
+  if (is.list(x)) {
+    return(purrr::map(x, json_infinity_to_numeric))
+  }
+  is_infinity <- is.character(x) && length(x) > 0 &&
+    all(x %in% c("Infinity", "-Infinity"))
+  if (is_infinity) {
+    return(dplyr::if_else(x == "Infinity", Inf, -Inf))
+  }
+  x
 }

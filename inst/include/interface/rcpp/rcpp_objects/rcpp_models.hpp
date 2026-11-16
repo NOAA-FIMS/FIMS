@@ -367,12 +367,25 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << "{\n";
 
       ss << " \"module_name\": \"Population\",\n";
-      ss << " \"population\": \"" << population_interface->name << "\",\n";
+      ss << " \"population\": \""
+         << fims::JsonParser::EscapeString(population_interface->name.get())
+         << "\",\n";
       ss << " \"module_id\": " << population_interface->id << ",\n";
       ss << " \"recruitment_id\": " << population_interface->recruitment_id
          << ",\n";
       ss << " \"growth_id\": " << population_interface->growth_id << ",\n";
       ss << " \"maturity_id\": " << population_interface->maturity_id << ",\n";
+      // Dimensions are written as positions (age_i), so the ages are written
+      // too for output to be labeled with the ages they represent. A separate
+      // stream keeps the precision of derived quantities without changing how
+      // the parameters below are written.
+      std::stringstream age;
+      age << std::fixed << std::setprecision(10);
+      for (int i = 0; i < population_interface->n_ages.get(); i++) {
+        if (i > 0) age << ", ";
+        age << sanitize_val(population_interface->ages[i]);
+      }
+      ss << " \"age\": [" << age.str() << "],\n";
 
       ss << " \"parameters\": [\n";
       for (size_t i = 0; i < pop->log_M.size(); i++) {
@@ -545,20 +558,12 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     ss << "\"value\":[";
     ss << std::fixed << std::setprecision(10);
     if (dq.size() > 0) {
+      // JSON has no NaN or Inf, e.g., log(0) for an expected catch of zero, so
+      // non-finite values are written as -999 like missing values elsewhere
       for (size_t i = 0; i < dq.size() - 1; i++) {
-        if (dq[i] != dq[i])  // check for NaN
-        {
-          ss << "-999" << ", ";
-        } else {
-          ss << dq[i] << ", ";
-        }
+        ss << sanitize_val(dq[i]) << ", ";
       }
-      if (dq[dq.size() - 1] != dq[dq.size() - 1])  // check for NaN
-      {
-        ss << "-999]" << "\n";
-      } else {
-        ss << dq[dq.size() - 1] << "]\n";
-      }
+      ss << sanitize_val(dq[dq.size() - 1]) << "]\n";
     } else {
       ss << "]\n";
     }
@@ -575,16 +580,16 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       std::map<std::string, fims::Vector<double>> &dqs,
       std::map<std::string, fims_popdy::DimensionInfo> &dim_info) {
     std::stringstream ss;
+    // Stepping back from end() of an empty map is undefined, and there is no
+    // last element to write without a trailing comma
+    if (dqs.empty()) {
+      return ss.str();
+    }
     std::map<std::string, fims_popdy::DimensionInfo>::iterator dim_info_it;
     std::map<std::string, fims::Vector<double>>::iterator it;
-    std::map<std::string, fims::Vector<double>>::iterator end_it;
-    end_it = dqs.end();
     typename std::map<std::string, fims::Vector<double>>::iterator
-        second_to_last;
-    second_to_last = dqs.end();
-    if (it != end_it) {
-      second_to_last--;
-    }
+        second_to_last = dqs.end();
+    second_to_last--;
 
     it = dqs.begin();
     for (; it != second_to_last; ++it) {
@@ -633,11 +638,27 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
       ss << "{\n";
       ss << " \"module_name\": \"Fleet\",\n";
-      ss << " \"fleet\": \"" << fleet_interface->name << "\",\n";
+      ss << " \"fleet\": \""
+         << fims::JsonParser::EscapeString(fleet_interface->name.get())
+         << "\",\n";
       ss << " \"module_id\": " << fleet_interface->id << ",\n";
+      // Selectivity is written in its own section, so this is what links a
+      // selectivity module to its fleet; an unset id is written as -999
+      ss << " \"selectivity_id\": "
+         << static_cast<int>(fleet_interface->GetSelectivityID()) << ",\n";
       ss << " \"n_ages\": " << fleet_interface->n_ages.get() << ",\n";
       ss << " \"n_years\": " << fleet_interface->n_years.get() << ",\n";
       ss << " \"n_lengths\": " << fleet_interface->n_lengths.get() << ",\n";
+      // The length bins that length_i indexes, written like the age in
+      // population_to_json(); length holds a placeholder value when
+      // n_lengths is 0, so only n_lengths values are written
+      std::stringstream length;
+      length << std::fixed << std::setprecision(10);
+      for (int i = 0; i < fleet_interface->n_lengths.get(); i++) {
+        if (i > 0) length << ", ";
+        length << sanitize_val(fleet_interface->lengths[i]);
+      }
+      ss << " \"length\": [" << length.str() << "],\n";
       ss << "\"data_ids\" : [\n";
       ss << "{\"agecomp\": " << fleet_interface->GetObservedAgeCompDataID()
          << "},\n";
@@ -671,7 +692,13 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       ss << " \"id\":" << fleet_interface->log_q.id_m << ",\n";
       ss << " \"type\": \"vector\",\n";
       ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [\"" << "na" << "\"],\n";
+      // With 1 value per year, log_q is labeled by year like log_Fmort, so
+      // get_estimates() can report the year of each value
+      if (fleet->log_q.size() > 1) {
+        ss << "  \"header\": [\"n_years\"],\n";
+      } else {
+        ss << "  \"header\": [\"na\"],\n";
+      }
       ss << "  \"dimensions\": [" << fleet->log_q.size() << "]\n},\n";
 
       ss << " \"values\": " << fleet_interface->log_q << "}\n";

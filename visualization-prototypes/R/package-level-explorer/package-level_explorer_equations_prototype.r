@@ -692,12 +692,12 @@ equation_catalog_path <- file.path(
 )
 
 if (!file.exists(equation_catalog_path)) {
-  source(file.path(
-    "visualization-prototypes",
-    "R",
-    "package-level-explorer",
-    "equation_extraction_prototype.r"
-  ))
+  stop(
+    "Equation catalog not found at ", equation_catalog_path, ". ",
+    "Run visualizations/equation-catalog/generate_equation_catalog.R ",
+    "as a separate preparation step, setting FIMS_EQ_CSV_OUT to this path.",
+    call. = FALSE
+  )
 }
 
 equation_catalog <- utils::read.csv(

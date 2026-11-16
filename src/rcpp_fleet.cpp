@@ -4,7 +4,7 @@
  */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_fleet.hpp"
 
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 // static id of the FleetInterfaceBase object
 uint32_t FleetInterfaceBase::id_g = 1;
 // local id of the FleetInterfaceBase object map relating the ID of the
@@ -32,6 +32,8 @@ void register_fleet(Rcpp::Module& m) {
       .field("log_index_expected", &FleetInterface::log_index_expected)
       .field("age_to_length_conversion",
              &FleetInterface::age_to_length_conversion)
+      .field("weight_at_age", &FleetInterface::weight_at_age)
+      .field("ageing_error", &FleetInterface::ageing_error)
       .field("catch_numbers_at_age", &FleetInterface::catch_numbers_at_age)
       .field("catch_weight_at_age", &FleetInterface::catch_weight_at_age)
       .field("catch_numbers_at_length",

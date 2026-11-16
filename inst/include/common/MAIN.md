@@ -3,7 +3,7 @@
 This site contains C++ source code documentation for the Fisheries
 Integrated Modeling System (FIMS). Other forms of documentation are linked
 from the main documentation site at
-[https://noaa-fims.github.io/FIMS/articles/fims-documentation.html](https://noaa-fims.github.io/FIMS/articles/fims-documentation.html).
+[https://noaa-fims.github.io/FIMS](https://noaa-fims.github.io/FIMS).
  
 
 **Copyright**

@@ -31,7 +31,8 @@ make_vonb_test_context <- function() {
     growth_coefficient = 0.18,
     length_weight_a = 2.5e-11,
     length_weight_b = 3,
-    length_at_age_sd_at_reference_ages = c(28, 73)
+    length_at_age_sd_young = 28,
+    length_at_age_sd_old = 73
   )
 }
 
@@ -47,7 +48,8 @@ new_vonb <- function(
   reference_age_for_length_old_in = ctx$reference_age_for_length_old,
   length_weight_a_in = ctx$length_weight_a,
   length_weight_b_in = ctx$length_weight_b,
-  length_at_age_sd_at_reference_ages_in = ctx$length_at_age_sd_at_reference_ages
+  length_at_age_sd_young_in = ctx$length_at_age_sd_young,
+  length_at_age_sd_old_in = ctx$length_at_age_sd_old
 ) {
   vb <- methods::new(FIMS::VonBertalanffySchnuteGrowth)
 
@@ -72,9 +74,11 @@ new_vonb <- function(
   vb$length_weight_b$resize(1)
   vb$length_weight_b[1]$value <- length_weight_b_in
 
-  vb$length_at_age_sd_at_reference_ages$resize(2)
-  vb$length_at_age_sd_at_reference_ages[1]$value <- length_at_age_sd_at_reference_ages_in[1]
-  vb$length_at_age_sd_at_reference_ages[2]$value <- length_at_age_sd_at_reference_ages_in[2]
+  vb$length_at_age_sd_young$resize(1)
+  vb$length_at_age_sd_young[1]$value <- length_at_age_sd_young_in
+
+  vb$length_at_age_sd_old$resize(1)
+  vb$length_at_age_sd_old[1]$value <- length_at_age_sd_old_in
 
   vb$n_ages$set(FIMS::get_n_ages(ctx$fims_frame))
 
@@ -258,9 +262,11 @@ test_that("rcpp von bertalanffy growth rejects both variability paths at once", 
   ctx <- make_vonb_test_context()
   vb <- new_vonb_with_delta_block(ctx)
 
-  vb$length_at_age_sd_at_reference_ages$resize(2)
-  vb$length_at_age_sd_at_reference_ages[1]$value <- ctx$length_at_age_sd_at_reference_ages[1]
-  vb$length_at_age_sd_at_reference_ages[2]$value <- ctx$length_at_age_sd_at_reference_ages[2]
+  vb$length_at_age_sd_young$resize(1)
+  vb$length_at_age_sd_young[1]$value <- ctx$length_at_age_sd_young
+
+  vb$length_at_age_sd_old$resize(1)
+  vb$length_at_age_sd_old[1]$value <- ctx$length_at_age_sd_old
 
   on.exit(
     {
@@ -344,7 +350,122 @@ test_that("rcpp von bertalanffy growth allows above-reference ages", {
   expect_true(is.finite(vb$evaluate(age_above_ref)))
 })
 
+test_that("estimated younger length loads below constant older length", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_test_context()
+
+  for (estimation_type in c("fixed_effects", "random_effects")) {
+    FIMS::clear()
+
+    vb <- new_vonb(ctx)
+    vb$mean_length_young[1]$estimation_type$set(estimation_type)
+    vb$mean_length_old[1]$estimation_type$set("constant")
+
+    FIMS::CreateTMBModel()
+
+    if (estimation_type == "fixed_effects") {
+      working <- FIMS::get_fixed()
+      other <- FIMS::get_random()
+    } else {
+      working <- FIMS::get_random()
+      other <- FIMS::get_fixed()
+    }
+
+    #' @description The younger length is registered in the requested parameter category.
+    expect_length(working, 1L)
+    expect_length(other, 0L)
+
+    #' @description The loader encodes estimated younger length on the bounded-logit scale.
+    expect_equal(
+      as.numeric(working),
+      qlogis(ctx$mean_length_young / ctx$mean_length_old),
+      tolerance = 1e-10
+    )
+  }
+})
+
 ## Error handling ----
+test_that("rcpp von bertalanffy growth rejects nonfinite inputs", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_test_context()
+  fields <- c(
+    "mean_length_young",
+    "mean_length_old",
+    "growth_coefficient",
+    "reference_age_for_length_young",
+    "reference_age_for_length_old",
+    "length_weight_a",
+    "length_weight_b",
+    "length_at_age_sd_young",
+    "length_at_age_sd_old"
+  )
+
+  for (field in fields) {
+    for (value in c(NA_real_, NaN, Inf, -Inf)) {
+      FIMS::clear()
+      vb <- new_vonb(ctx)
+      vb[[field]][1]$value <- value
+      case <- paste(field, "=", value)
+
+      #' @description Nonfinite Growth inputs are rejected by direct evaluation with a parameter-specific error.
+      expect_error(
+        vb$evaluate(ctx$reference_age_for_length_young),
+        regexp = paste(field, "must be finite"),
+        info = case
+      )
+
+      #' @description Nonfinite Growth inputs are rejected before loading the backend model.
+      expect_error(
+        FIMS::CreateTMBModel(),
+        regexp = paste(field, "must be finite"),
+        info = case
+      )
+    }
+  }
+})
+
+test_that("rcpp von bertalanffy growth rejects nonfinite delta-method inputs", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_test_context()
+  fields <- c(
+    "log_sd_mean_length_young",
+    "log_sd_mean_length_old",
+    "log_sd_growth_coefficient",
+    "mean_length_young_mean_length_old_logit_corr",
+    "mean_length_young_growth_coefficient_logit_corr",
+    "mean_length_old_growth_coefficient_logit_corr"
+  )
+
+  for (field in fields) {
+    for (value in c(NA_real_, NaN, Inf, -Inf)) {
+      FIMS::clear()
+      vb <- new_vonb_with_delta_block(ctx)
+      vb[[field]][1]$value <- value
+      case <- paste(field, "=", value)
+
+      #' @description Nonfinite delta-method inputs are rejected by direct evaluation with a parameter-specific error.
+      expect_error(
+        vb$evaluate(ctx$reference_age_for_length_young),
+        regexp = paste(field, "must be finite"),
+        info = case
+      )
+
+      #' @description Nonfinite delta-method inputs are rejected before loading the backend model.
+      expect_error(
+        FIMS::CreateTMBModel(),
+        regexp = paste(field, "must be finite"),
+        info = case
+      )
+    }
+  }
+})
+
 test_that("rcpp von bertalanffy growth rejects reversed reference ages", {
   ctx <- make_vonb_test_context()
   vb_bad <- new_vonb(

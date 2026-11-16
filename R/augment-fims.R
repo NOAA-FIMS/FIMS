@@ -11,14 +11,15 @@
 #' | Column        | Role                                                      |
 #' |---------------|-----------------------------------------------------------|
 #' | `.truth`      | Observed data value (maps from `observed`)                |
-#' | `.pred`       | Model-expected value (maps from `expected`)               |
+#' | `.pred`       | Model prediction on the data scale (from `estimated`)     |
 #' | `.weight`     | Inverse-variance weight from `uncertainty` (optional)     |
 #' | `label`       | Parameter / quantity label, e.g. `"catch_expected"`    |
-#' | `fleet`       | Fleet identifier (integer)                                |
+#' | `fleet`       | Fleet name for fleet rows, otherwise `NA`                 |
 #' | `module_id`   | Unique module identifier                                  |
 #' | `distribution`| Likelihood distribution used for this data stream         |
 #' | `year_i`      | Year index (present when available in the estimates)      |
-#' | `age_i`       | Age index  (present when available in the estimates)      |
+#' | `age`         | Age from the data, `NA` for rows without an age           |
+#' | `length`      | Length bin from the data, `NA` for rows without a length  |
 #'
 #' @param x A `FIMSFit` object returned from [fit_fims()].
 #' @param include_weights Logical (default `TRUE`).  When `TRUE` and
@@ -82,23 +83,26 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   }
 
   # Determine which optional index columns are present in the output
-  # (year_i, age_i, length_i, season_i, etc.). These are carried through so
-  # users can group metrics by, e.g., year.
+  # (year_i, season_i, etc.). These and the ages and length bins are carried
+  # through so users can group metrics by, e.g., year or age.
   index_cols <- names(fit_rows)[grepl("_i$", names(fit_rows))]
 
   # Core set of metadata columns to retain for grouping / filtering
   meta_cols <- intersect(
     c(
       "label", "module_id", "module_type", "fleet", "distribution",
-      "estimation_type", index_cols
+      "estimation_type", index_cols, "age", "length"
     ),
     names(fit_rows)
   )
 
+  # `expected` holds the distribution parameter, such as the log-scale mean of
+  # a lognormal or the proportions of a multinomial. `estimated` holds the
+  # model prediction on the same scale as `observed`.
   out <- fit_rows |>
     dplyr::mutate(
       .truth = as.numeric(.data$observed),
-      .pred  = as.numeric(.data$expected)
+      .pred  = as.numeric(.data$estimated)
     ) |>
     dplyr::select(
       dplyr::all_of(c(meta_cols, ".truth", ".pred")),
@@ -264,12 +268,11 @@ NULL
 #' plot it.
 #'
 #' @details
-#' In the FIMS output the `fleet` column is `NA` for derived-quantity rows
-#' (which is where all observed/expected pairs live). Use `module_id` instead
-#' to distinguish fleets and surveys - this matches the convention used in the
-#' FIMS vignettes, where `module_id == 1` is the first fishing fleet and
-#' `module_id == 2` is the first survey.  To discover which `module_id` values
-#' are present in your fit, inspect `augment(fit)` directly.
+#' Fleets and surveys can be told apart by the `fleet` column, which holds the
+#' fleet name from the data, or by `module_id`, where, e.g., `module_id == 1`
+#' is the first fishing fleet and `module_id == 2` is the first survey in the
+#' FIMS vignettes. To discover which values are present in your fit, inspect
+#' `augment(fit)` directly.
 #'
 #' @param x A `FIMSFit` object **or** an already-augmented tibble from
 #'   `augment.FIMSFit()`.

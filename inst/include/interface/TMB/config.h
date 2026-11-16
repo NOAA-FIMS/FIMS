@@ -3,7 +3,7 @@
 // Prevent Rcpp from masking valid uses of Rf_error
 #undef  RCPP_NO_MASK_RF_ERROR
 #define RCPP_NO_MASK_RF_ERROR
-#include <Rcpp.h>
+#include "../rcpp/rcpp_include.hpp"
 // Any failed internal assertion sends Rcpp::exception
 #define TMB_ABORT Rcpp::stop("TMB unexpected")
 // Catch *all* std exceptions (not just bad_alloc)

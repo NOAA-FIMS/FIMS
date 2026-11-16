@@ -29,9 +29,9 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   size_t n_ages;        /*!< the number of ages in the model*/
   size_t n_lengths; /*!< the number of fleet observation bins for this fleet */
   fims::Vector<double>
-      lengths; /*!< Fleet observation-bin centers for this fleet. */
+      lengths; /*!< Fleet observation-bin lower edges for this fleet. */
   fims::Vector<double>
-      length_bin_edges; /*!< Resolved observation-bin edges for this fleet. */
+      length_bin_edges; /*!< Bin lower edges plus the last bin's upper edge. */
 
   // selectivity
   int fleet_selectivity_id_m = -999; /*!< id of selectivity component*/
@@ -51,14 +51,14 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
   std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_catch_data; /*!< observed catch data*/
 
-  std::string observed_catch_units; /*!< is this fleet catch in weight*/
+  std::string observed_catch_units; /*!< "weight" or "number" */
 
   // index data
   int fleet_observed_index_data_id_m = -999; /*!< id of index data */
   std::shared_ptr<fims_data_object::DataObject<Type>>
       observed_index_data; /*!< observed index data*/
 
-  std::string observed_index_units; /*!< is this fleet index in weight*/
+  std::string observed_index_units; /*!< "weight" or "number" */
 
   // age comp data
   int fleet_observed_agecomp_data_id_m = -999; /*!< id of age comp data */
@@ -82,6 +82,18 @@ struct Fleet : public fims_model_object::FIMSObject<Type> {
 
   fims::Vector<Type> age_to_length_conversion; /*!< derived quantity age to
                                                 length conversion matrix*/
+  /**
+   * @brief Ageing error matrices, 1 for all years or 1 per year, with true age
+   * as rows and observed age varying fastest. When it is empty, the fleet has
+   * no ageing error.
+   */
+  fims::Vector<Type> ageing_error;
+  /**
+   * @brief Weight at age for this fleet's catch and index weight, ordered by
+   * year and then age. When it is empty, the population weight at age is
+   * used, e.g., when the fleet has no weight-at-age data of its own.
+   */
+  fims::Vector<Type> weight_at_age;
   /**
    * @brief Constructor.
    */

@@ -10,7 +10,7 @@ uint32_t SelectivityInterfaceBase::id_g = 1;
 // SelectivityInterfaceBase to the SelectivityInterfaceBase objects
 std::map<uint32_t, std::shared_ptr<SelectivityInterfaceBase>>
     SelectivityInterfaceBase::live_objects;
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 
 /**
  * Function to register selectivity classes with the Rcpp module system.

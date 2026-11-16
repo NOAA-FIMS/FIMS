@@ -271,12 +271,14 @@ class CAAEvaluateTestFixture : public testing::Test {
       for (int year = 0; year < n_years; year++) {
         fleet->log_Fmort[year] = log_Fmort_distribution(generator);
       }
+      // Each fleet gets its own selectivity so that a test fails if one
+      // fleet's selectivity is used for another.
       auto selectivity =
           std::make_shared<fims_popdy::LogisticSelectivity<double>>();
       selectivity->inflection_point.resize(1);
-      selectivity->inflection_point[0] = 7;
+      selectivity->inflection_point[0] = 7.0 - 3.0 * i;
       selectivity->slope.resize(1);
-      selectivity->slope[0] = 0.5;
+      selectivity->slope[0] = 0.5 + 0.5 * i;
       fleet->selectivity = selectivity;
 
       // Push fleet to population and catch_at_age_model
@@ -323,10 +325,12 @@ class CAAEvaluateTestFixture : public testing::Test {
           log_M_distribution(generator);
     }
 
+    // The F multiplier differs from 1 and changes by year, so expected
+    // fishing mortality and catch must include it.
     catch_at_age_model->populations[0]->log_f_multiplier.resize(n_years);
     for (int i = 0; i < n_years; i++) {
       catch_at_age_model->populations[0]->log_f_multiplier[i] =
-          static_cast<double>(0.0);
+          fims_math::log(0.8 + 0.02 * i);
     }
 
     // Set initialized values for derived quantities
@@ -347,10 +351,12 @@ class CAAEvaluateTestFixture : public testing::Test {
     double prop_female_max = 0.9;
     std::uniform_real_distribution<double> prop_female_distribution(
         prop_female_min, prop_female_max);
-    double prop_female = prop_female_distribution(generator);
+    // Proportion female varies by age so that spawning biomass must use the
+    // value for each age.
     catch_at_age_model->populations[0]->proportion_female.resize(n_ages);
     for (int i = 0; i < n_ages; i++) {
-      catch_at_age_model->populations[0]->proportion_female[i] = prop_female;
+      catch_at_age_model->populations[0]->proportion_female[i] =
+          prop_female_distribution(generator);
     }
 
     // numbers_at_age
@@ -382,9 +388,11 @@ class CAAEvaluateTestFixture : public testing::Test {
     /*the log_recruit_dev vector does not include a value for year == 0
     and is of length n_years - 1 where the first position of the vector
     corresponds to the second year of the time series.*/
+    // Deviations differ by year so that using the wrong year's deviation
+    // changes recruitment.
     recruitment->log_recruit_devs.resize(n_years - 1);
     for (int i = 0; i < recruitment->log_recruit_devs.size(); i++) {
-      recruitment->log_recruit_devs[i] = 0.0;
+      recruitment->log_recruit_devs[i] = 0.05 * (i + 1);
     }
     recruitment->log_expected_recruitment.resize(n_years + 1);
     for (int i = 0; i < recruitment->log_expected_recruitment.size(); i++) {
@@ -392,12 +400,20 @@ class CAAEvaluateTestFixture : public testing::Test {
     }
     catch_at_age_model->populations[0]->recruitment = recruitment;
 
+    // Total mortality is filled for every year and age, as in the model, so
+    // numbers at age read a non-zero Z from the previous year.
+    for (int year = 0; year < n_years; year++) {
+      for (int age = 0; age < n_ages; age++) {
+        catch_at_age_model->CalculateMortality(
+            population, year * population->n_ages + age, year, age);
+      }
+    }
+
     int year = 4;
     int age = 6;
     int i_age_year = year * population->n_ages + age;
     int i_agem1_yearm1 = (year - 1) * population->n_ages + age - 1;
 
-    catch_at_age_model->CalculateMortality(population, i_age_year, year, age);
     catch_at_age_model->CalculateNumbersAA(population, i_age_year,
                                            i_agem1_yearm1, age);
   }
@@ -645,12 +661,14 @@ class CAAPrepareTestFixture : public testing::Test {
       fleet->age_to_length_conversion_model =
           std::make_shared<fims_popdy::AgeToLengthConversionFixed<double>>(
               fleet);
+      // Each fleet gets its own selectivity so that a test fails if one
+      // fleet's selectivity is used for another.
       auto selectivity =
           std::make_shared<fims_popdy::LogisticSelectivity<double>>();
       selectivity->inflection_point.resize(1);
-      selectivity->inflection_point[0] = 7;
+      selectivity->inflection_point[0] = 7.0 - 3.0 * i;
       selectivity->slope.resize(1);
-      selectivity->slope[0] = 0.5;
+      selectivity->slope[0] = 0.5 + 0.5 * i;
       fleet->selectivity = selectivity;
 
       population->fleets.push_back(fleet);
@@ -678,10 +696,12 @@ class CAAPrepareTestFixture : public testing::Test {
           log_M_distribution(generator);
     }
 
+    // The F multiplier differs from 1 and changes by year, so expected
+    // fishing mortality must include it.
     catch_at_age_model->populations[0]->log_f_multiplier.resize(n_years);
     for (int i = 0; i < n_years; i++) {
       catch_at_age_model->populations[0]->log_f_multiplier[i] =
-          static_cast<double>(0.0);
+          fims_math::log(0.8 + 0.02 * i);
     }
 
     // weight_at_age

@@ -147,20 +147,23 @@ validate_fims <- function(
   }
 
   # Recruitment log deviations
-  # The input value of om_input[["logR.resid"]] is dropped from the model
-  # TODO: the estimates table contains fixed "true" values for LogRecDev, causing
-  # the test below to pass even when recruitment log_devs are fixed. Need to add
-  # additional checks to verify that real estimates are being extracted?
-  if (use_fimsfit &&
-    length(report[["log_recruit_dev"]]) == (om_input[["nyr"]] - 1)
-  ) {
-    validate_error(
-      expected = om_input[["logR.resid"]][-1],
-      param_name = "log_devs",
-      use_fimsfit = use_fimsfit,
-      estimates = estimates,
-      use_strict_outlier_check = TRUE
-    )
+  # The OM year-1 deviation has no FIMS parameter. Deviations are centered on 0,
+  # so check correlation, spread and z-scores instead of relative error.
+  if (use_fimsfit) {
+    log_devs <- estimates |>
+      dplyr::filter(label == "log_devs")
+    if (any(log_devs[["estimation_type"]] != "constant")) {
+      om_log_devs <- om_input[["logR.resid"]][-1]
+      #' @description Test that estimated recruitment log_devs are correlated with the OM deviations.
+      expect_gte(cor(log_devs[["estimated"]], om_log_devs), 0.95)
+      #' @description Test that the spread of estimated recruitment log_devs is within 20% of the spread of the OM deviations.
+      expect_equal(sd(log_devs[["estimated"]]) / sd(om_log_devs), 1, tolerance = 0.2)
+      #' @description Test that no estimated recruitment log_dev is more than 4 standard errors from the OM deviation.
+      expect_lte(
+        max(abs((log_devs[["estimated"]] - om_log_devs) / log_devs[["uncertainty"]])),
+        4
+      )
+    }
   }
 
   # Expected fishery catch and survey index from om_output
@@ -328,6 +331,27 @@ verify_fims_deterministic <- function(
   expect_equal(
     report[["spawning_biomass"]][[1]][1:n_years],
     c(t(om_output[["SSB"]]))
+  )
+
+  # The OM gives unfished numbers per recruit (N.pr0) and unfished spawning
+  # biomass per recruit (Phi.0), so R0 times these is the unfished stock.
+  om_unfished_spawning_biomass <- om_input[["R0"]] * om_input[["Phi.0"]]
+  #' @description Test that the first-year unfished numbers at age from report are equal to R0 times the OM numbers per recruit.
+  expect_equal(
+    report[["unfished_numbers_at_age"]][[1]][1:n_ages],
+    om_input[["R0"]] * om_input[["N.pr0"]]
+  )
+
+  #' @description Test that the first-year unfished spawning biomass from report is equal to R0 times the OM spawning biomass per recruit.
+  expect_equal(
+    report[["unfished_spawning_biomass"]][[1]][1],
+    om_unfished_spawning_biomass
+  )
+
+  #' @description Test that the spawning biomass ratio from report is equal to the OM spawning biomass divided by the OM unfished spawning biomass.
+  expect_equal(
+    report[["spawning_biomass_ratio"]][[1]][1:n_years],
+    om_output[["SSB"]] / om_unfished_spawning_biomass
   )
 
   fims_naa <- matrix(

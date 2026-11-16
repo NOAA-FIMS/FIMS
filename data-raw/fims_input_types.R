@@ -1,6 +1,7 @@
 fims_input_types <- c(
   "age_comp",
   "age_to_length_conversion",
+  "ageing_error",
   "index",
   "catch",
   "length_bin",
@@ -9,4 +10,5 @@ fims_input_types <- c(
 )
 
 usethis::use_data(fims_input_types, overwrite = TRUE)
+save(fims_input_types, file = file.path("data-raw", "fims_input_types.rda"))
 on.exit(rm(fims_input_types), add = TRUE)

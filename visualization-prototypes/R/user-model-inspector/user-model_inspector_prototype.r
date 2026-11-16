@@ -454,24 +454,13 @@ equation_catalog_path <- file.path(
   "data",
   "fims_equation_catalog.csv"
 )
-equation_extraction_script <- file.path(
-  "visualization-prototypes",
-  "R",
-  "package-level-explorer",
-  "equation_extraction_prototype.r"
-)
-
 if (!file.exists(equation_catalog_path)) {
-  if (!file.exists(equation_extraction_script)) {
-    stop(
-      "Equation catalog not found and the equation extraction script ",
-      "is not available at ",
-      equation_extraction_script,
-      "."
-    )
-  }
-
-  source(equation_extraction_script)
+  stop(
+    "Equation catalog not found at ", equation_catalog_path, ". ",
+    "Run visualizations/equation-catalog/generate_equation_catalog.R ",
+    "as a separate preparation step, setting FIMS_EQ_CSV_OUT to this path.",
+    call. = FALSE
+  )
 }
 
 equation_catalog <- utils::read.csv(

@@ -9,16 +9,16 @@
 
 # get_estimates ----
 ## Setup ----
-# Load or prepare any necessary data for testing
-if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
-  prepare_test_data()
-}
+estimates_big_optimized <- FIMS::estimates_big_optimized
+estimates_big_unoptimized <- FIMS:::estimates_big_unoptimized
+fit_big_optimized <- FIMS::fit_big_optimized
+fit_big_unoptimized <- FIMS:::fit_big_unoptimized
 
 ## IO correctness ----
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
-  "parameter_id", "fleet", "year_i", "age_i", "length_i",
+  "parameter_id", "fleet", "year_i", "age", "length",
   "input", "estimated", "expected", "observed",
   "estimation_type", "uncertainty",
   "distribution", "input_type",
@@ -26,9 +26,7 @@ expected_colnames <- c(
 )
 
 test_that("`get_estimates()` works with deterministic run", {
-  # Read the RDS file containing the deterministic run results
-  deterministic_results <- readRDS(testthat::test_path("fixtures", "deterministic_age_length_comp.RDS"))
-  deterministic_colnames <- get_estimates(deterministic_results) |> colnames()
+  deterministic_colnames <- colnames(FIMS:::estimates_big_unoptimized)
   #' @description Test that `get_estimates()` returns correct colnames from a deterministic run.
   expect_equal(
     object = deterministic_colnames,
@@ -37,7 +35,7 @@ test_that("`get_estimates()` works with deterministic run", {
 
   #' @description Test that the result values from the model fit have not changed from the accepted version.
   expect_snapshot({
-    estimates_snapshot <- get_estimates(deterministic_results) |>
+    estimates_snapshot <- FIMS:::estimates_big_unoptimized |>
       # Remove the estimate, uncertainty, and gradient columns, as they
       # may change between runs
       dplyr::select(
@@ -53,42 +51,15 @@ test_that("`get_estimates()` works with deterministic run", {
 })
 
 test_that("`get_estimates()` works with estimation run", {
-  # Load the test data from an RDS file containing model fits.
-  # List all RDS files in the fixtures directory that match the pattern "fit*_.RDS"
-  fit_files <- list.files(
-    path = testthat::test_path("fixtures"),
-    pattern = "^fit.*\\.RDS$",
-    full.names = TRUE
-  )
-
-  # Function to read the RDS file, get estimates, and check column names
-  check_estimates_colnames <- function(fit_file) {
-    fit_data <- readRDS(fit_file)
-    estimates <- get_estimates(fit_data)
-    estimates_colnames <- colnames(estimates)
-
-    #' @description Test that `get_estimates()` returns correct colnames from a estimation run.
-    expect_equal(
-      object = estimates_colnames,
-      expected = expected_colnames
-    )
-  }
-
-  # Use purrr::map to apply the function to each file
-  result <- purrr::map(fit_files, check_estimates_colnames)
-
-  #' @description Test that the result values from the model fit have not changed from the accepted version.
+  estimates_colnames <- colnames(estimates_big_optimized)
+  #' @description Test that `get_estimates()` returns current estimate columns after optimization.
+  expect_equal(estimates_colnames, expected_colnames)
   expect_snapshot({
-    # Read the first RDS file, get estimates, and print a snapshot
-    estimates_snapshot <- readRDS(fit_files[[1]]) |>
-      get_estimates() |>
-      # Remove the estimated, uncertainty, and gradient columns, as they
-      # may change between runs
+    estimates_snapshot <- estimates_big_optimized |>
       dplyr::select(
         -estimated, -expected, -uncertainty, -gradient,
         -likelihood, -log_like_cv
       )
-
     estimates_snapshot_lines <- capture.output(
       print(estimates_snapshot, n = 320, width = Inf)
     )
@@ -96,7 +67,246 @@ test_that("`get_estimates()` works with estimation run", {
   })
 })
 
+test_that("`get_estimates()` reports distribution parameters by id", {
+  data_4_model <- FIMSFrame(data_big)
+  parameters <- setup_default_parameters(data = data_4_model) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$module_name == "Recruitment" & .data$label == "log_sd",
+        "fixed_effects",
+        .data$estimation_type
+      )
+    )
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  estimates <- get_estimates(fit)
+  log_sd_id <- names(get_parameter_names(get_obj(fit)[["par"]])) |>
+    grep(pattern = "^dnorm\\..*\\.log_sd\\.", value = TRUE) |>
+    sub(pattern = ".*\\.", replacement = "") |>
+    as.integer()
+  log_sd_rows <- dplyr::filter(estimates, .data$parameter_id %in% log_sd_id)
+  #' @description Test that `get_estimates()` returns one row for the estimated recruitment `log_sd`.
+  expect_equal(object = nrow(log_sd_rows), expected = 1)
+  #' @description Test that `get_estimates()` reports the recruitment `log_sd` under the module that owns the recruitment deviations.
+  log_devs_module_id <- estimates |>
+    dplyr::filter(
+      .data$module_name == "Recruitment",
+      .data$label == "log_devs"
+    ) |>
+    dplyr::pull(.data$module_id) |>
+    unique()
+  expect_equal(
+    object = unlist(log_sd_rows[c(
+      "module_name", "module_id", "label", "distribution", "estimation_type"
+    )]),
+    expected = c(
+      module_name = "Recruitment",
+      module_id = as.character(log_devs_module_id),
+      label = "log_sd",
+      distribution = "normal",
+      estimation_type = "fixed_effects"
+    )
+  )
+  #' @description Test that `get_estimates()` does not report the fixed `log_sd` of the landings and index distributions as parameters.
+  expect_equal(
+    object = sum(
+      estimates[["label"]] == "log_sd" &
+        estimates[["module_name"]] != "Recruitment",
+      na.rm = TRUE
+    ),
+    expected = 0
+  )
+  clear()
+})
+
 ## Edge handling ----
+test_that("`get_estimates()` keeps fleet names with spaces and quotes", {
+  fleet_names <- c(fleet1 = "fleet one", survey1 = 'survey "A"')
+  data_4_model <- data_big |>
+    dplyr::mutate(fleet = unname(fleet_names[.data$fleet])) |>
+    FIMSFrame()
+  fit <- setup_default_parameters(data = data_4_model) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  estimates <- get_estimates(fit)
+  #' @description Test that `get_estimates()` returns fleet names with spaces and quotes exactly as given in the data.
+  expect_setequal(
+    object = unique(estimates[["fleet"]][estimates[["module_name"]] == "Fleet"]),
+    expected = unname(fleet_names)
+  )
+  selectivity_rows <- estimates[["module_name"]] == "Selectivity"
+  # Each fleet gets its own selectivity module, created in fleet order
+  #' @description Test that `get_estimates()` gives each selectivity row the name of its own fleet.
+  expect_equal(
+    object = estimates[["fleet"]][selectivity_rows],
+    expected = unname(fleet_names)[estimates[["module_id"]][selectivity_rows]]
+  )
+  clear()
+})
+
+
+test_that("`get_estimates()` handles non-finite derived quantities", {
+  data_4_model <- FIMSFrame(data_big)
+  parameters <- setup_default_parameters(data = data_4_model)
+  # exp(-1000) is exactly zero in double precision, so the expected catch in
+  # the first year is zero and its log is -Inf
+  first_log_fmort <- which(
+    parameters[["fleet"]] == "fleet1" & parameters[["label"]] == "log_Fmort"
+  )[1]
+  parameters[["value"]][first_log_fmort] <- -1000
+  parameters[["estimation_type"]][first_log_fmort] <- "constant"
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  #' @description Test that `get_estimates()` works when a derived quantity is infinite.
+  expect_no_error(estimates <- get_estimates(fit))
+  log_catch_expected <- estimates |>
+    dplyr::filter(
+      .data$label == "log_catch_expected",
+      .data$fleet == "fleet1"
+    )
+  #' @description Test that `get_estimates()` reports an infinite derived quantity as -999, like other missing values.
+  expect_equal(object = log_catch_expected[["estimated"]][1], expected = -999)
+  clear()
+})
+
+test_that("`get_estimates()` works for a model without random effects", {
+  data_4_model <- FIMSFrame(data_big)
+  # Without a distribution on the recruitment deviations, the model has no
+  # random-effect distribution and so no distribution parameters to report.
+  # initialize_fims() requires the deviations to be constant in that case.
+  recruitment_deviations <- c("log_devs", "log_sd")
+  parameters <- setup_default_parameters(data = data_4_model) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$module_name == "Recruitment" & .data$label == "log_devs",
+        "constant",
+        .data$estimation_type
+      ),
+      distribution_type = dplyr::if_else(
+        .data$module_name == "Recruitment" &
+          .data$label %in% recruitment_deviations,
+        NA_character_,
+        .data$distribution_type
+      ),
+      distribution = dplyr::if_else(
+        .data$module_name == "Recruitment" &
+          .data$label %in% recruitment_deviations,
+        NA_character_,
+        .data$distribution
+      )
+    )
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  #' @description Test that `get_estimates()` works when the model has no random-effect distribution.
+  expect_no_error(estimates <- get_estimates(fit))
+  #' @description Test that `get_estimates()` reports no `log_sd` row when no random-effect distribution has one.
+  expect_equal(
+    object = sum(estimates[["label"]] == "log_sd", na.rm = TRUE),
+    expected = 0
+  )
+})
+
+test_that("`get_estimates()` works with time-varying age-specific selectivity", {
+  data_4_model <- FIMSFrame(data_big)
+  n_years <- get_n_years(data_4_model)
+  n_ages <- get_n_ages(data_4_model)
+  age_specific <- setup_default_Selectivity(
+    data = data_4_model,
+    fleet = "survey1",
+    module_type = "AgeSpecific"
+  )
+  # 1 set of values per year, in year-major order, with a different value for
+  # each year and age so the labels can be checked against the values
+  age_specific_by_year <- age_specific[
+    rep(seq_len(nrow(age_specific)), times = n_years),
+  ] |>
+    dplyr::mutate(
+      value = rep(seq_len(n_years), each = n_ages) / 10 +
+        rep(seq_len(n_ages), times = n_years) / 100,
+      estimation_type = "constant"
+    )
+  parameters <- setup_default_parameters(data = data_4_model) |>
+    dplyr::filter(
+      !(.data$fleet == "survey1" & .data$module_name == "Selectivity")
+    ) |>
+    dplyr::bind_rows(age_specific_by_year)
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  #' @description Test that `get_estimates()` works when age-specific selectivity has 1 set of values per year.
+  expect_no_error(estimates <- get_estimates(fit))
+  selectivity <- estimates |>
+    dplyr::filter(.data$label == "logit_sel_at_age")
+  #' @description Test that each time-varying age-specific selectivity value is labelled with its year and age.
+  expect_equal(
+    object = selectivity[["year_i"]],
+    expected = rep(seq_len(n_years), each = n_ages)
+  )
+  expect_equal(
+    object = selectivity[["age"]],
+    expected = rep(get_ages(data_4_model), times = n_years)
+  )
+  #' @description Test that each time-varying age-specific selectivity value is reported with the year and age it was given for.
+  expect_equal(
+    object = selectivity[["input"]],
+    expected = selectivity[["year_i"]] / 10 +
+      match(selectivity[["age"]], get_ages(data_4_model)) / 100
+  )
+  clear()
+})
+
+test_that("`get_estimates()` works with time-varying log_q", {
+  data_4_model <- FIMSFrame(data_big)
+  years <- get_start_year(data_4_model):get_end_year(data_4_model)
+  default_parameters <- setup_default_parameters(data = data_4_model)
+  # 1 log_q per year for survey1, in year order, with a different value in each
+  # year so the labels can be checked against the values
+  set_survey_log_q <- function(values) {
+    log_q_rows <- default_parameters |>
+      dplyr::filter(.data$fleet == "survey1", .data$label == "log_q") |>
+      dplyr::slice(rep(1, length(values))) |>
+      dplyr::mutate(timing = years[seq_along(values)], value = values)
+    default_parameters |>
+      dplyr::filter(!(.data$fleet == "survey1" & .data$label == "log_q")) |>
+      dplyr::bind_rows(log_q_rows)
+  }
+  get_survey_index <- function(fit) {
+    get_report(fit)[["index_expected"]][[2]]
+  }
+  constant_fit <- set_survey_log_q(-10) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  constant_index <- get_survey_index(constant_fit)
+  clear()
+  fit <- set_survey_log_q(-10 + years / 100) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  log_q <- get_estimates(fit) |>
+    dplyr::filter(.data$label == "log_q", .data$fleet == "survey1")
+  #' @description Test that time-varying log_q values are labeled with their year.
+  expect_equal(object = log_q[["year_i"]], expected = seq_along(years))
+  #' @description Test that each time-varying log_q value is reported for the year it was given for.
+  expect_equal(object = log_q[["input"]], expected = -10 + years / 100)
+  #' @description Test that the expected index in each year uses that year's log_q.
+  expect_equal(
+    object = get_survey_index(fit) / constant_index,
+    expected = exp(years / 100)
+  )
+  clear()
+
+  #' @description Test that a log_q with neither 1 value nor 1 value per year returns an error.
+  expect_error(
+    set_survey_log_q(c(-10, -10)) |>
+      initialize_fims(data = data_4_model) |>
+      fit_fims(optimize = FALSE),
+    regexp = "log_q size mismatch"
+  )
+  clear()
+})
+
 test_that("`get_estimates()` returns correct outputs for edge cases", {
   #' @description Test that an error occurs if the input is not a valid model fit object.
   expect_error(

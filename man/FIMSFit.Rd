@@ -10,11 +10,22 @@ FIMSFit(
   opt = list(),
   sdreport = list(),
   run_time = c(time_total = as.difftime(0, units = "secs")),
-  version = utils::packageVersion("FIMS")
+  version = utils::packageVersion("FIMS"),
+  convergence = convergence_tibble(character(0), character(0))
 )
 }
 \arguments{
-\item{input}{Input list as returned by \code{\link[=initialize_fims]{initialize_fims()}}.}
+\item{input}{Input list as returned by \code{\link[=initialize_fims]{initialize_fims()}}. An optional
+\code{map} entry is a named list of factors for \code{p} (fixed effects) and/or \code{re}
+(random effects), in the order of the corresponding \code{parameters} vector.
+Each factor must have one entry per parameter. \code{NA} holds a parameter at
+its starting value; repeated levels share one estimated value. Shared
+entries must have identical starting values; otherwise, the error lists
+each parameter's name, 1-based index in \code{p} or \code{re}, and initial value.
+Factor levels determine the
+reduced parameter order; unused levels are dropped. Levels in \code{p} and \code{re}
+are independent; sharing
+across these vectors is not supported.}
 
 \item{obj}{An object returned from \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}.}
 
@@ -33,6 +44,10 @@ by subtracting two \code{\link[=Sys.time]{Sys.time()}} objects.}
 \item{version}{The version of FIMS that was used to optimize the model. If
 \code{\link[=fit_fims]{fit_fims()}} was not used to optimize the model, then the default is to
 use the current version of the package that is loaded.}
+
+\item{convergence}{A data frame with one row per convergence check, as
+returned by \code{\link[=get_convergence]{get_convergence()}}. \code{\link[=fit_fims]{fit_fims()}} fills it in. The default has
+no rows, which means no checks were run.}
 }
 \value{
 An object with an S4 class of \code{FIMSFit} is returned. The object will have the
@@ -68,6 +83,10 @@ if you are running this function yourself.
 }
 \item{\code{model_output}:}{
 The FIMS model output as a JSON string.
+}
+\item{\code{convergence}:}{
+A tibble with the result of each convergence check. See
+\code{\link[=get_convergence]{get_convergence()}}.
 }
 }
 }

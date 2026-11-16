@@ -1,7 +1,7 @@
 #ifndef FIMS_MODULES_HPP
 #define FIMS_MODULES_HPP
 
-#include <Rcpp.h>
+#include "rcpp_include.hpp"
 
 /**
  * \brief Register the population module.

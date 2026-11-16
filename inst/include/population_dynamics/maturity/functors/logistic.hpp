@@ -22,11 +22,17 @@ namespace fims_popdy {
  */
 template <typename Type>
 struct LogisticMaturity : public MaturityBase<Type> {
-  fims::Vector<Type>
-      inflection_point; /**< 50 percent quantile of the value of the quantity of
-interest (x); e.g. age at which 50 percent of the fish are mature */
-  fims::Vector<Type> slope; /**<scalar multiplier of difference between quantity
-            of interest value (x) and inflection_point */
+  /**
+   * @brief The age at which 50% of fish are mature for models that start at
+   * age zero and each age bin represents one year.
+   */
+  fims::Vector<Type> inflection_point;
+  /**
+   * @brief How quickly the proportion mature changes with age around the
+   * inflection point, per year of age. Larger absolute values give a steeper,
+   * more knife-edge maturity curve.
+   */
+  fims::Vector<Type> slope;
 
   LogisticMaturity() : MaturityBase<Type>() {}
 

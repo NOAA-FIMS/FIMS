@@ -10,7 +10,7 @@ uint32_t GrowthInterfaceBase::id_g = 1;
 std::map<uint32_t, std::shared_ptr<GrowthInterfaceBase>>
     GrowthInterfaceBase::live_objects;
 
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 
 /**
  * Function to register growth classes with the Rcpp module system.
@@ -48,9 +48,10 @@ void register_growth(Rcpp::Module& m) {
              &VonBertalanffySchnuteGrowthInterface::length_weight_a)
       .field("length_weight_b",
              &VonBertalanffySchnuteGrowthInterface::length_weight_b)
-      .field("length_at_age_sd_at_reference_ages",
-             &VonBertalanffySchnuteGrowthInterface::
-                 length_at_age_sd_at_reference_ages)
+      .field("length_at_age_sd_young",
+             &VonBertalanffySchnuteGrowthInterface::length_at_age_sd_young)
+      .field("length_at_age_sd_old",
+             &VonBertalanffySchnuteGrowthInterface::length_at_age_sd_old)
       .field("log_sd_mean_length_young",
              &VonBertalanffySchnuteGrowthInterface::log_sd_mean_length_young)
       .field("log_sd_mean_length_old",

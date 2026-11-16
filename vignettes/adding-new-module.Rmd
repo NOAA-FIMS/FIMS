@@ -466,7 +466,7 @@ The R wrapper functions use `setup_default_parameters()` before `initialize_fims
 
 **Relevant files**
 
-- [R/setup_default_parameters.R](../R/setup_default_parameters.R)
+- [R/setup_default_parameters.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/setup_default_parameters.R)
 
 If you add a new module type that users should be able to request by default, update:
 
@@ -485,7 +485,7 @@ For a new selectivity or data-module option, you will often update an existing h
 
 ### 4.2 Update `initialize_modules.R`
 
-**Relevant file**: [R/initialize_modules.R](../R/initialize_modules.R)
+**Relevant file**: [R/initialize_modules.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/initialize_modules.R)
 
 `initialize_module()` currently builds the Rcpp class name by combining `module_type` and `module_name`:
 
@@ -709,8 +709,8 @@ Study these existing modules as templates:
 - **Maturity**: [inst/include/population_dynamics/maturity/](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/maturity/)
 - **Recruitment**: [inst/include/population_dynamics/recruitment/](https://github.com/NOAA-FIMS/FIMS/blob/main/inst/include/population_dynamics/recruitment/)
 - **R parameter workflow**:
-  - [R/setup_default_parameters.R](../R/setup_default_parameters.R)
-  - [R/initialize_modules.R](../R/initialize_modules.R)
+  - [R/setup_default_parameters.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/setup_default_parameters.R)
+  - [R/initialize_modules.R](https://github.com/NOAA-FIMS/FIMS/blob/main/R/initialize_modules.R)
 
 ## Documentation resources
 

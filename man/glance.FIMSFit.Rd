@@ -30,7 +30,7 @@ report (\code{report$jnll}).}
 below 0.001 are generally considered well-converged.}
 \item{\code{converged}}{Logical; \code{TRUE} when \code{opt$convergence == 0} \strong{and}
 \code{max_gradient < 0.001}.}
-\item{\code{terminal_ssb}}{Spawning stock biomass at the terminal year,
+\item{\code{terminal_sb}}{Spawning biomass at the terminal year,
 extracted from the TMB report. Returns a list-column when multiple
 populations are present.}
 \item{\code{fims_version}}{The version of FIMS used to fit the model.}
@@ -42,7 +42,7 @@ Returns a single-row tibble of model-level diagnostics following the
 \code{\link[generics:glance]{generics::glance()}} convention.  Standard information-criterion columns
 (\code{logLik}, \code{AIC}, \code{BIC}, \code{nobs}) are included alongside FIMS-specific
 diagnostics (\code{max_gradient}, \code{marginal_nll}, \code{total_nll}, \code{converged},
-\code{terminal_ssb}).
+\code{terminal_sb}).
 }
 \section{Information criteria}{
 

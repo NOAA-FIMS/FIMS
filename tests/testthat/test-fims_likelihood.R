@@ -10,9 +10,9 @@
 # fims_likelihood ----
 ## Setup ----
 #' @description Skip the test unless explicitly enabled for heavy integration testing.
-testthat::skip_if_not(
-  testthat:::env_var_is_true("RUN_SLOW_TESTS"),
-  message = "Skipping: RUN_SLOW_TESTS is not set to true."
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
 )
 
 # Load or prepare any necessary data for testing
@@ -72,6 +72,29 @@ test_that("fims_likelihood() works with correct inputs", {
     object = total$total_like,
     expected = c(-3164.864, -3191.186),
     tolerance = .1
+  )
+})
+
+test_that("run_fims_likelihood() profiles a label shared across modules", {
+  #' @description Test that run_fims_likelihood() uses module_name to profile inflection_point in the Maturity module only.
+  like_fit <- run_fims_likelihood(
+    model = base_model,
+    parameters = parameters,
+    data = data_big,
+    module_name = "Maturity",
+    parameter_name = "inflection_point",
+    n_cores = 1,
+    min = 0,
+    max = 1,
+    length = 1
+  )
+  expect_equal(
+    object = like_fit[["vec"]],
+    expected = dplyr::filter(
+      parameters,
+      module_name == "Maturity",
+      label == "inflection_point"
+    )[["value"]]
   )
 })
 
@@ -217,7 +240,21 @@ test_that("run_fims_likelihood() returns correct error messages", {
       n_cores = 1,
       length = 3
     ),
-    regexp = "module_name not found"
+    regexp = "\"nonexistent_module\" not found"
+  )
+
+  #' @description Test that run_fims_likelihood errors when parameter_name is not in module_name.
+  expect_error(
+    object = run_fims_likelihood(
+      model = base_model,
+      parameters = parameters,
+      data = data_big,
+      module_name = "Recruitment",
+      parameter_name = "inflection_point",
+      n_cores = 1,
+      length = 3
+    ),
+    regexp = "did not match any rows"
   )
 
   #' @description Test that run_fims_likelihood errors with invalid parameter_name.

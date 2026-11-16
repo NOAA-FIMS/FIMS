@@ -375,6 +375,49 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
+   * @brief Calculates unfished numbers at age in the first year.
+   *
+   * The first year has no previous year to project from, so unfished numbers
+   * at age are set to the equilibrium age structure implied by unfished
+   * recruitment and year-0 natural mortality. This is the same age structure
+   * used for \f$\phi_0\f$ in CalculateSBPR0(), so that
+   * \f$SB^U_0 = R_0 \phi_0\f$.
+   *
+   * Standard update, with \f$N^U_{0,0} = R_0\f$ set by the caller:
+   * \f[
+   * N^U_{a,0} = N^U_{a-1,0} \exp(-M_{a-1,0})
+   * \f]
+   *
+   * Plus group update (if \f$a = A\f$), where the plus group holds survivors
+   * of all older ages and so is the sum of a geometric series:
+   * \f[
+   * N^U_{A,0} = \frac{N^U_{A-1,0} \exp(-M_{A-1,0})}{1 - \exp(-M_{A,0})}
+   * \f]
+   *
+   * @snippet{doc} this param_population
+   * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_age
+   */
+  void CalculateUnfishedInitialNumbersAA(
+      std::shared_ptr<fims_popdy::Population<Type>> &population,
+      size_t i_age_year, size_t age) {
+    std::map<std::string, fims::Vector<Type>> &dq_ =
+        this->GetPopulationDerivedQuantities(population->GetId());
+
+    // In year 0, the previous age is the previous element of the same year
+    size_t i_agem1 = i_age_year - 1;
+    dq_["unfished_numbers_at_age"][i_age_year] =
+        dq_["unfished_numbers_at_age"][i_agem1] *
+        fims_math::exp(-population->M[i_agem1]);
+
+    if (age == (population->n_ages - 1)) {
+      dq_["unfished_numbers_at_age"][i_age_year] =
+          dq_["unfished_numbers_at_age"][i_age_year] /
+          (1.0 - fims_math::exp(-population->M[i_age_year]));
+    }
+  }
+
+  /**
    * @brief Calculates total mortality for a population.
    *
    * This function calculates total mortality \f$Z\f$ for a specific age and
@@ -568,8 +611,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * w_a
    * \f]
    *
-   * The numbers at age \f$N_a\f$ are calculated recursively with natural
-   * mortality: \f[ N_a = N_{a-1} \times \exp(-M_a) \quad \text{for } a = 1,
+   * The numbers at age \f$N_a\f$ are calculated recursively with the natural
+   * mortality of the age being left, as in the population dynamics:
+   * \f[ N_a = N_{a-1} \times \exp(-M_{a-1}) \quad \text{for } a = 1,
    * \ldots, A-1 \f]
    *
    * Plus group update:
@@ -592,7 +636,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
              dq_["proportion_mature_at_age"][0] *
              PopulationMeanWeightAA(population, 0, 0);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
-      numbers_spr[a] = numbers_spr[a - 1] * fims_math::exp(-population->M[a]);
+      numbers_spr[a] =
+          numbers_spr[a - 1] * fims_math::exp(-population->M[a - 1]);
       phi_0 += numbers_spr[a] *
                population->proportion_female.get_force_scalar(a) *
                dq_["proportion_mature_at_age"][a] *
@@ -667,24 +712,28 @@ class CatchAtAge : public FisheryModelBase<Type> {
   /**
    * @brief Calculates maturity at age, in proportion, for a population.
    *
-   * This function evaluates the maturity ogive at the specified age to estimate
-   * the proportion of individuals that are mature:
+   * This function evaluates the maturity ogive at the specified age and year
+   * to estimate the proportion of individuals that are mature:
    * \f[
-   * p_{mature,a} = \text{maturity}(a)
+   * p_{mature,a,y} = \text{maturity}(a, \min(y, n_{years} - 1))
    * \f]
    *
    * @snippet{doc} this param_population
    * @snippet{doc} this param_i_age_year
+   * @snippet{doc} this param_year
    * @snippet{doc} this param_age
    */
   void CalculateMaturityAA(
       std::shared_ptr<fims_popdy::Population<Type>> &population,
-      size_t i_age_year, size_t age) {
+      size_t i_age_year, size_t year, size_t age) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
+    // Year n_years is the start-of-year state after the last data year, so it
+    // reuses that year's maturity.
     dq_["proportion_mature_at_age"][i_age_year] =
-        population->maturity->evaluate(population->ages[age]);
+        population->maturity->evaluate(
+            population->ages[age], (std::min)(year, population->n_years - 1));
   }
 
   /**
@@ -732,12 +781,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * multiplying the expected catch numbers at age by the corresponding
    * weight at age:
    * \f[
-   * CW_{f,a,y} = C_{f,a,y} \times w_a
+   * CW_{f,a,y} = C_{f,a,y} \times w_{f,a,y}
    * \f]
-   * Weight at age comes from the historical direct growth evaluation path
-   * unless the population growth object exposes the growth-derived
-   * observation interface, in which case the biological population mean
-   * weight-at-age path is used.
+   * Weight at age is the fleet's own weight at age when the fleet has one.
+   * Otherwise it is the population weight at age, which comes from the
+   * historical direct growth evaluation path unless the population growth
+   * object exposes the growth-derived observation interface, in which case
+   * the biological population mean weight-at-age path is used.
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
@@ -759,7 +809,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(fleet->GetId());
 
-      Type mean_weight_at_age = PopulationMeanWeightAA(population, year, age);
+      Type mean_weight_at_age;
+      if (fleet->weight_at_age.size() > 0) {
+        mean_weight_at_age = fleet->weight_at_age[i_age_year];
+      } else {
+        mean_weight_at_age = PopulationMeanWeightAA(population, year, age);
+      }
 
       fdq_["catch_weight_at_age"][i_age_year] =
           fdq_["catch_numbers_at_age"][i_age_year] * mean_weight_at_age;
@@ -877,12 +932,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This function computes the expected index weight at age by multiplying the
    * expected index numbers at age by the corresponding weight at age:
    * \f[
-   * IWAA_{f,a,y} = IN_{f,a,y} \times w_a
+   * IWAA_{f,a,y} = IN_{f,a,y} \times w_{f,a,y}
    * \f]
-   * Weight at age comes from the historical direct growth evaluation path
-   * unless the population growth object exposes the growth-derived
-   * observation interface, in which case the biological population mean
-   * weight-at-age path is used.
+   * Weight at age is the fleet's own weight at age when the fleet has one.
+   * Otherwise it is the population weight at age, which comes from the
+   * historical direct growth evaluation path unless the population growth
+   * object exposes the growth-derived observation interface, in which case
+   * the biological population mean weight-at-age path is used.
    * @snippet{doc} this param_population
    * @snippet{doc} this param_year
    * @snippet{doc} this param_age
@@ -904,7 +960,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::map<std::string, fims::Vector<Type>> &fdq_ =
           this->GetFleetDerivedQuantities(fleet->GetId());
 
-      Type mean_weight_at_age = PopulationMeanWeightAA(population, year, age);
+      Type mean_weight_at_age;
+      if (fleet->weight_at_age.size() > 0) {
+        mean_weight_at_age = fleet->weight_at_age[i_age_year];
+      } else {
+        mean_weight_at_age = PopulationMeanWeightAA(population, year, age);
+      }
 
       fdq_["index_weight_at_age"][i_age_year] =
           fdq_["index_numbers_at_age"][i_age_year] * mean_weight_at_age;
@@ -987,13 +1048,16 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
   /**
    * @brief Compute expected fleet-specific weight-at-age from a normalized
-   * age-to-length conversion row and fleet observation-bin centers.
+   * age-to-length conversion row and fleet observation-bin midpoints.
    *
    * This is the bin-based downstream WAA step used with the growth-derived
    * age-to-length conversion path. Instead of using only growth->evaluate(age),
    * it computes expected weight as the weighted average of weight-at-length
    * over the same fleet observation bins used in the mapped age-to-length
-   * conversion row.
+   * conversion row. Fleet lengths are bin lower edges, so weight is evaluated
+   * at the midpoint of each bin's edges. Evaluating it at the lower edge would
+   * take weight at a length half a bin too short. The first and last bins are
+   * open-ended, so their midpoints are nominal.
    *
    * @param growth_observation Shared pointer to the linked growth-derived
    * observation capability.
@@ -1009,9 +1073,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
       const fims::Vector<Type> &age_to_length_conversion_row) {
     Type mean_weight = static_cast<Type>(0.0);
     for (size_t l = 0; l < fleet->n_lengths; ++l) {
-      mean_weight +=
-          age_to_length_conversion_row[l] *
-          growth_observation->EvaluateWeightAtLength(fleet->lengths[l]);
+      const double bin_midpoint =
+          0.5 * (fleet->length_bin_edges[l] + fleet->length_bin_edges[l + 1]);
+      mean_weight += age_to_length_conversion_row[l] *
+                     growth_observation->EvaluateWeightAtLength(bin_midpoint);
     }
     return mean_weight;
   }
@@ -1116,7 +1181,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This helper builds the fleet-specific age-to-length conversion row for the
    * requested year and age, then converts that mapped age-to-length row into
    * expected weight using weight-at-length evaluated at the fleet
-   * observation-bin centers.
+   * observation-bin midpoints.
    *
    * @param age_to_length_conversion_derived Shared pointer to the
    * growth-derived age-to-length conversion.
@@ -1180,6 +1245,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       if (growth_observation != nullptr) {
         growth_observation->PrepareGrowthProducts();
+
+        // Prepared on every evaluation because nothing marks the size
+        // products stale when growth parameters change.
+        if (population->size_distribution_provider != nullptr) {
+          population->size_distribution_provider->PrepareSizeProducts();
+        }
       }
     }
   }
@@ -1288,9 +1359,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * This function returns the biological mean weight at age for a population.
    * If the growth object does not support the growth-derived observation
    * interface, it uses the historical direct growth evaluation path.
-   * If the growth object does support that interface, it reads biological
-   * mean weight-at-age directly from the prepared growth products and does
-   * not require any fleet observation-bin mapping.
+   * If the growth object does support that interface and the population has
+   * a size grid, it returns weight averaged over the population length-at-age
+   * distribution. Without a size grid, it reads weight at the mean length
+   * from the prepared growth products. Neither requires fleet
+   * observation-bin mapping.
    *
    * @param population Shared pointer to the population object.
    * @param year Year index.
@@ -1318,6 +1391,11 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
     if (growth_observation == nullptr) {
       return population->growth->evaluate(year, population->ages[age]);
+    }
+
+    if (population->size_distribution_provider != nullptr) {
+      return population->size_distribution_provider->MeanWeightAtAge(
+          (std::min)(year, population->n_years - 1), age);
     }
 
     return BiologicalMeanWeightFromPreparedGrowthProducts(
@@ -1374,8 +1452,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
           for (size_t l = 0; l < fleet->n_lengths; l++) {
             size_t i_length_year = y * fleet->n_lengths + l;
             const Type age_to_length_prob = age_to_length_conversion_row[l];
+            // Use agecomp_proportion rather than agecomp_expected, which is
+            // rescaled to the observed age-composition sample size and is
+            // therefore 0 in years without age-composition data. The scale
+            // cancels when the length composition is normalized below.
             fdq_["lengthcomp_expected"][i_length_year] +=
-                fdq_["agecomp_expected"][i_age_year] * age_to_length_prob;
+                fdq_["agecomp_proportion"][i_age_year] * age_to_length_prob;
 
             fdq_["catch_numbers_at_length"][i_length_year] +=
                 fdq_["catch_numbers_at_age"][i_age_year] * age_to_length_prob;
@@ -1407,6 +1489,48 @@ class CatchAtAge : public FisheryModelBase<Type> {
             fdq_["lengthcomp_expected"][i_length_year] =
                 fdq_["lengthcomp_proportion"][i_length_year] * sum_obs;
           }
+        }
+      }
+    }
+  }
+
+  /**
+   * @brief Apply each fleet's ageing error to its expected age composition.
+   *
+   * @details
+   * Moves the expected age composition from true age to observed age. Rows
+   * sum to 1, so expected numbers keep the observed sample size.
+   * Runs after evaluate_length_comp(), which needs true ages.
+   */
+  void evaluate_ageing_error() {
+    for (fleet_iterator fit = this->fleets.begin(); fit != this->fleets.end();
+         ++fit) {
+      std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
+      if (fleet->ageing_error.size() == 0) {
+        continue;
+      }
+      std::map<std::string, fims::Vector<Type>> &fdq_ =
+          this->GetFleetDerivedQuantities(fleet->GetId());
+
+      fims::Vector<Type> proportion_at_true_age(fleet->n_ages);
+      fims::Vector<Type> expected_at_true_age(fleet->n_ages);
+      for (size_t y = 0; y < fleet->n_years; y++) {
+        for (size_t a = 0; a < fleet->n_ages; a++) {
+          size_t i_age_year = y * fleet->n_ages + a;
+          proportion_at_true_age[a] = fdq_["agecomp_proportion"][i_age_year];
+          expected_at_true_age[a] = fdq_["agecomp_expected"][i_age_year];
+        }
+        fims::Vector<Type> proportion_at_observed_age =
+            fims_math::apply_ageing_error(proportion_at_true_age,
+                                          fleet->ageing_error, y);
+        fims::Vector<Type> expected_at_observed_age =
+            fims_math::apply_ageing_error(expected_at_true_age,
+                                          fleet->ageing_error, y);
+        for (size_t a = 0; a < fleet->n_ages; a++) {
+          size_t i_age_year = y * fleet->n_ages + a;
+          fdq_["agecomp_proportion"][i_age_year] =
+              proportion_at_observed_age[a];
+          fdq_["agecomp_expected"][i_age_year] = expected_at_observed_age[a];
         }
       }
     }
@@ -1471,7 +1595,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
      code for initial structure and recruitment 0 loops. Could also have started
      loops at 1 with initial structure and recruitment setup outside the loops.
 
-     year loop is extended to <= n_years because SSB is calculated as the start
+     year loop is extended to <= n_years because SB is calculated as the start
      of the year value and by extending one extra year we get estimates of the
      population structure at the end of the final year. An alternative approach
      would be to keep initial numbers at age in it's own vector and each year to
@@ -1511,12 +1635,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
              to inform the subsequent catch and change in numbers at age
              calculations. This is only calculated for years < n_years as these
              are the model estimated years with data. The year loop extends to
-             y=n_years so that population numbers at age and SSB can be
+             y=n_years so that population numbers at age and SB can be
              calculated at the end of the last year of the model
              */
             CalculateMortality(population, i_age_year, y, a);
           }
-          CalculateMaturityAA(population, i_age_year, a);
+          CalculateMaturityAA(population, i_age_year, y, a);
           /* if statements needed because some quantities are only needed
           for the first year and/or age, so these steps are included here.
            */
@@ -1534,13 +1658,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
               pdq_["unfished_numbers_at_age"][i_age_year] =
                   fims_math::exp(population->recruitment->log_rzero[0]);
             } else {
-              CalculateUnfishedNumbersAA(population, i_age_year, a - 1, a);
+              CalculateUnfishedInitialNumbersAA(population, i_age_year, a);
             }
 
           } else {
             if (a == 0) {
               // Set the nrecruits for age a=0 year y (use pointers instead of
-              // functional returns) assuming fecundity = 1 and 50:50 sex ratio
+              // functional returns)
               CalculateRecruitment(population, i_age_year, y, y);
               pdq_["unfished_numbers_at_age"][i_age_year] =
                   fims_math::exp(population->recruitment->log_rzero[0]);
@@ -1593,6 +1717,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
     }
     evaluate_age_comp();
     evaluate_length_comp();
+    evaluate_ageing_error();
     evaluate_index();
     evaluate_catch();
   }

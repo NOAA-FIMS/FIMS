@@ -10,6 +10,11 @@
 # reshape_json_estimates ----
 ## Setup ----
 # Load or prepare any necessary data for testing
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 if (!file.exists(testthat::test_path("fixtures", "fit_age_length_comp.RDS"))) {
   prepare_test_data()
 }
@@ -34,11 +39,14 @@ compare_tmb_and_json_outputs <- function(model_fit_path) {
 
   # Reshape the TMB output into a standardized data frame.
   # This serves as the "expected" result to compare against.
+  # Use the saved gradient because obj[["gr"]]() on a fit read from disk
+  # retapes against C++ objects that no longer exist.
   tmb_output <- FIMS:::reshape_tmb_estimates(
     obj = obj,
     sdreport = sdreport,
     opt = opt,
-    parameter_names = parameter_names
+    parameter_names = parameter_names,
+    precomputed_gradient = get_gradient(fit)
   ) |>
     # Select only the columns needed for the comparison to ensure a clean test.
     dplyr::select(
@@ -181,8 +189,151 @@ test_that("`reshape_json_estimates()` output matches TMB for an estimation run",
   #' @description Test that `reshape_json_estimates()` produces output matching TMB.
   result <- purrr::map(fit_files, compare_tmb_and_json_outputs)
 })
+
+test_that("`reshape_json_estimates()` reports the ages and lengths from the data", {
+  # Shift the ages and scale the length bins so the values differ from their
+  # positions, i.e., the first age is 3 and the second length bin is 500
+  shifted_data <- data_big |>
+    dplyr::mutate(age = .data$age + 2, length = .data$length * 10)
+  data_4_model <- FIMSFrame(shifted_data)
+  fit <- setup_default_parameters(data = data_4_model) |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        .data$estimation_type == "random_effects",
+        "fixed_effects",
+        .data$estimation_type
+      )
+    ) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  estimates <- FIMS:::reshape_json_estimates(get_model_output(fit))
+  clear()
+  ages <- 3:14
+  lengths <- seq(0, 11000, by = 500)
+  length_rows <- dplyr::filter(estimates, !is.na(.data$length))
+  log_rzero <- dplyr::filter(estimates, .data$label == "log_rzero")
+
+  #' @description Test that `reshape_json_estimates()` gives the initial numbers at age the ages from the data, in order.
+  expect_equal(
+    object = dplyr::filter(estimates, .data$label == "log_init_naa")[["age"]],
+    expected = ages
+  )
+  #' @description Test that `reshape_json_estimates()` only reports ages from the data.
+  expect_true(all(stats::na.omit(estimates[["age"]]) %in% ages))
+  #' @description Test that `reshape_json_estimates()` gives each fleet the length bins from the data.
+  expect_equal(
+    object = purrr::map(
+      split(length_rows[["length"]], length_rows[["fleet"]]),
+      \(x) sort(unique(x))
+    ),
+    expected = list(fleet1 = lengths, survey1 = lengths)
+  )
+  #' @description Test that `reshape_json_estimates()` leaves age and length missing for a parameter without either dimension.
+  expect_true(all(is.na(c(log_rzero[["age"]], log_rzero[["length"]]))))
+  #' @description Test that `reshape_json_estimates()` replaces the age_i and length_i positions with age and length.
+  expect_false(any(c("age_i", "length_i") %in% names(estimates)))
+})
+
 ## Edge handling ----
-# No edge cases are being tested.
+test_that("`reshape_json_estimates()` links random effects to densities by id", {
+  data_4_model <- FIMSFrame(data_big)
+  parameters <- setup_default_parameters(data = data_4_model)
+  is_log_devs <- parameters[["label"]] %in% "log_devs"
+  # Distinct deviations show whether each density value lands on its own
+  # deviation; tied deviations, e.g., all zero, cannot.
+  parameters[["value"]][is_log_devs] <- seq(-1, 1, length.out = sum(is_log_devs))
+  fit <- parameters |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  model_output <- get_model_output(fit)
+  log_devs <- get_estimates(fit) |>
+    dplyr::filter(.data$label == "log_devs")
+  clear()
+
+  #' @description Test that random effects give one row per recruitment deviation.
+  expect_equal(object = NROW(log_devs), expected = sum(is_log_devs))
+  #' @description Test that each recruitment deviation has the normal log density of its own value.
+  expect_equal(
+    object = log_devs[["likelihood"]],
+    expected = stats::dnorm(
+      log_devs[["estimated"]],
+      mean = log_devs[["expected"]],
+      sd = exp(log_devs[["log_sd"]]),
+      log = TRUE
+    ),
+    # Parameter values are written to the output with 6 significant digits
+    tolerance = 1e-6
+  )
+
+  # A density linked to an id that is not in the output, e.g., a vector that
+  # was not written, has no parameters to match
+  unknown_id_output <- sub(
+    pattern = paste0(
+      '"linked_ids"\\s*:\\s*\\[\\s*', unique(log_devs[["type_id"]])
+    ),
+    replacement = '"linked_ids": [999999',
+    x = model_output
+  )
+  #' @description Test that the linked id was replaced.
+  expect_false(identical(unknown_id_output, model_output))
+  unmatched_log_devs <- FIMS:::reshape_json_estimates(unknown_id_output) |>
+    dplyr::filter(.data$label == "log_devs")
+  #' @description Test that a density with an unknown linked id keeps one row per deviation.
+  expect_equal(object = NROW(unmatched_log_devs), expected = sum(is_log_devs))
+  #' @description Test that a density with an unknown linked id is left unmatched rather than guessed.
+  expect_true(all(is.na(unmatched_log_devs[["likelihood"]])))
+})
+
+test_that("`reshape_json_estimates()` links selectivity to fleets by id", {
+  data_4_model <- FIMSFrame(data_big)
+  fit <- setup_default_parameters(data = data_4_model) |>
+    initialize_fims(data = data_4_model) |>
+    fit_fims(optimize = FALSE)
+  model_output <- get_model_output(fit)
+  clear()
+  selectivity_fleets <- function(json) {
+    FIMS:::reshape_json_estimates(json) |>
+      dplyr::filter(.data$module_name == "Selectivity") |>
+      dplyr::distinct(.data$module_id, .data$fleet) |>
+      dplyr::arrange(.data$module_id) |>
+      dplyr::pull(.data$fleet)
+  }
+  # fleet1 uses selectivity 1 and survey1 uses selectivity 2, in the same order
+  # as the fleets, so swap the ids to check the link follows selectivity_id
+  swapped_output <- model_output |>
+    gsub(
+      pattern = '"selectivity_id": 1,',
+      replacement = '"selectivity_id": 0,',
+      fixed = TRUE
+    ) |>
+    gsub(
+      pattern = '"selectivity_id": 2,',
+      replacement = '"selectivity_id": 1,',
+      fixed = TRUE
+    ) |>
+    gsub(
+      pattern = '"selectivity_id": 0,',
+      replacement = '"selectivity_id": 2,',
+      fixed = TRUE
+    )
+  #' @description Test that `reshape_json_estimates()` names the fleet of each selectivity module from the fleet's selectivity id, not the fleet order.
+  expect_equal(
+    object = selectivity_fleets(swapped_output),
+    expected = c("survey1", "fleet1")
+  )
+  shared_output <- gsub(
+    pattern = '"selectivity_id": 2,',
+    replacement = '"selectivity_id": 1,',
+    x = model_output,
+    fixed = TRUE
+  )
+  #' @description Test that `reshape_json_estimates()` leaves the fleet missing for a selectivity module used by more than one fleet.
+  expect_equal(
+    object = selectivity_fleets(shared_output),
+    expected = c(NA_character_, NA_character_)
+  )
+})
+
 
 ## Error handling ----
 # Please remove/comment out the test template below if there are no built-in errors/warnings.

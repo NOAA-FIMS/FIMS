@@ -281,8 +281,11 @@ inline const Type inv_logit(const Type &a, const Type &b, const Type &logit_x) {
  * @brief The general double logistic function
  *
  * \f$ \frac{1.0}{ 1.0 + exp(-1.0 * slope_{asc} (x - inflection_point_{asc}))}
- * \left(1-\frac{1.0}{ 1.0 + exp(-1.0 * slope_{desc} (x -
- * inflection_point_{desc}))} \right)\f$
+ * \frac{1.0}{ 1.0 + exp(slope_{desc} (x - inflection_point_{desc}))}\f$
+ *
+ * The descending limb is written as \f$1 / (1 + exp(z))\f$, with
+ * \f$ z = slope_desc (x - inflection_point_desc) \f$, so it stays above 0 in
+ * double precision until \f$ exp(z) \f$ overflows.
  *
  * @param inflection_point_asc the inflection point of the ascending limb of the
  * double logistic function
@@ -305,10 +308,9 @@ inline const Type double_logistic(const Type &inflection_point_asc,
   return (static_cast<Type>(1.0)) /
          (static_cast<Type>(1.0) +
           exp(Type(-1.0) * slope_asc * (x - inflection_point_asc))) *
-         (static_cast<Type>(1.0) -
-          (static_cast<Type>(1.0)) /
-              (static_cast<Type>(1.0) +
-               exp(Type(-1.0) * slope_desc * (x - inflection_point_desc))));
+         (static_cast<Type>(1.0) /
+          (static_cast<Type>(1.0) +
+           exp(slope_desc * (x - inflection_point_desc))));
 }
 
 /**
@@ -320,9 +322,12 @@ inline const Type double_logistic(const Type &inflection_point_asc,
  *
  * \f$ (x^2+C)^.5 \f$
  *
+ * The result is never below \f$ \sqrt{C} \f$, so ad_fabs(0) is about 0.0032
+ * with the default C.
+ *
  * @param x value to keep positive
  * @param C default = 1e-5
- * @return
+ * @return A smooth approximation of the absolute value of x.
  */
 template <class Type>
 const Type ad_fabs(const Type &x, Type C = 1e-5) {
@@ -333,15 +338,19 @@ const Type ad_fabs(const Type &x, Type C = 1e-5) {
  *
  * Returns the minimum between a and b in a continuous manner using:
  *
- * (a + b - fims_math::ad_fabs(a - b))*.5;
+ * (a + b - fims_math::ad_fabs(a - b, C))*.5;
  * Reference: \ref fims_math::ad_fabs()
  *
- * This is an approximation with minimal error.
+ * The result is never above the true minimum. The error is largest,
+ * \f$ \sqrt{C} / 2 \f$, when a = b. It is about \f$ C / (4|a - b|) \f$ when
+ * \f$ |a - b| \f$ is much larger than \f$ \sqrt{C} \f$. Use a smaller C when
+ * a and b can be close.
  *
- * @param a
- * @param b
- * @param C default = 1e-5
- * @return
+ * @param a The first value.
+ * @param b The second value.
+ * @param C A positive constant that sets how smooth the result is. A smaller
+ * C gives a smaller error but a sharper bend at a = b. Default is 1e-5.
+ * @return A smooth approximation of the minimum of a and b.
  */
 
 template <typename Type>
@@ -352,18 +361,65 @@ inline const Type ad_min(const Type &a, const Type &b, Type C = 1e-5) {
 /**
  * Returns the maximum between a and b in a continuous manner using:
  *
- * (a + b + fims_math::ad_fabs(a - b)) *.5;
+ * (a + b + fims_math::ad_fabs(a - b, C)) *.5;
  * Reference: \ref fims_math::ad_fabs()
- * This is an approximation with minimal error.
  *
- * @param a
- * @param b
- * @param C default = 1e-5
- * @return
+ * The result is never below the true maximum. The error is largest,
+ * \f$ \sqrt{C} / 2 \f$, when a = b. It is about \f$ C / (4|a - b|) \f$ when
+ * \f$ |a - b| \f$ is much larger than \f$ \sqrt{C} \f$. With the default C,
+ * ad_max(x, 1e-8) is about 0.0016 at x = 0, not 1e-8, and is 2.4% above x
+ * at x = 0.01. Use a smaller C when values near the floor matter.
+ *
+ * @param a The first value.
+ * @param b The second value.
+ * @param C A positive constant that sets how smooth the result is. A smaller
+ * C gives a smaller error but a sharper bend at a = b. Default is 1e-5.
+ * @return A smooth approximation of the maximum of a and b.
  */
 template <typename Type>
 inline const Type ad_max(const Type &a, const Type &b, Type C = 1e-5) {
   return (a + b + fims_math::ad_fabs(a - b, C)) * static_cast<Type>(.5);
+}
+
+/**
+ * @brief Converts values at true age, proportions or expected numbers, to
+ * values at observed age using an ageing error matrix.
+ *
+ * @details
+ * Ageing error spreads fish of one true age across several observed ages, so
+ * the expected composition of observed ages is
+ *
+ * \f$ p^{obs}_{a'} = \sum_{a} p_{a} E_{a,a'} \f$
+ *
+ * where \f$ E_{a,a'} \f$ is the probability that a fish of true age \f$ a \f$
+ * is read as age \f$ a' \f$. Each row of \f$ E \f$ sums to 1, so the total
+ * is unchanged. The caller checks the length of `ageing_error`.
+ *
+ * @tparam Type The scalar type, a TMB AD type or double.
+ * @param proportion_at_true_age Values at true age, 1 per model age.
+ * @param ageing_error 1 matrix for all years or 1 per year, with true age as
+ * rows and observed age varying fastest.
+ * @param year Year index, used only when there is 1 matrix per year.
+ * @return Values at observed age, 1 per model age.
+ */
+template <typename Type>
+inline fims::Vector<Type> apply_ageing_error(
+    const fims::Vector<Type> &proportion_at_true_age,
+    const fims::Vector<Type> &ageing_error, size_t year = 0) {
+  const size_t n_ages = proportion_at_true_age.size();
+  const size_t matrix_size = n_ages * n_ages;
+  const size_t matrix_offset =
+      (ageing_error.size() == matrix_size) ? 0 : year * matrix_size;
+
+  fims::Vector<Type> proportion_at_observed_age(n_ages, static_cast<Type>(0.0));
+  for (size_t true_age = 0; true_age < n_ages; true_age++) {
+    for (size_t observed_age = 0; observed_age < n_ages; observed_age++) {
+      proportion_at_observed_age[observed_age] +=
+          proportion_at_true_age[true_age] *
+          ageing_error[matrix_offset + true_age * n_ages + observed_age];
+    }
+  }
+  return proportion_at_observed_age;
 }
 
 /**

@@ -4,6 +4,7 @@
 .history
 
 # Session Data files
+data-raw/*.rda
 .RData
 
 # User-specific files

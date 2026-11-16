@@ -10,15 +10,7 @@
 # tidy ----
 
 ## Setup ----
-fit <- local({
-  clear()
-  withr::defer(clear(), envir = parent.env(environment()))
-  data("data_big", package = "FIMS")
-  data_4_model <- FIMSFrame(data_big)
-  setup_default_parameters(data = data_4_model) |>
-    initialize_fims(data = data_4_model) |>
-    fit_fims(optimize = TRUE)
-})
+fit <- FIMS::fit_big_optimized
 
 ## IO correctness ----
 test_that("tidy() works with correct inputs", {
@@ -114,6 +106,28 @@ test_that("augment() works with correct inputs", {
 
   #' @description Test that generics::augment(fit, include_weights = FALSE) still returns .truth and .pred.
   expect_true(all(c(".truth", ".pred") %in% names(generics::augment(fit, include_weights = FALSE))))
+
+  # Expected composition counts are the expected proportions times the
+  # observed sample size, so .pred and .truth sum to the same total each year.
+  # get_estimates() values are rounded, so the totals match to about 1e-6.
+  composition_totals <- generics::augment(fit) |>
+    dplyr::filter(.data[["distribution"]] == "multinomial") |>
+    dplyr::summarize(
+      truth = sum(.data[[".truth"]]),
+      pred = sum(.data[[".pred"]]),
+      .by = c("label", "module_id", "year_i")
+    )
+  #' @description Test that generics::augment(fit) composition .pred sums to the observed total in each year.
+  expect_equal(
+    composition_totals[["pred"]],
+    composition_totals[["truth"]],
+    tolerance = 1e-5
+  )
+
+  catch_rows <- generics::augment(fit) |>
+    dplyr::filter(.data[["label"]] == "catch_expected")
+  #' @description Test that generics::augment(fit) catch .pred is within a log ratio of 0.1 of the observed catch.
+  expect_lt(max(abs(log(catch_rows[[".pred"]] / catch_rows[[".truth"]]))), 0.1)
 })
 
 ## Edge handling ----

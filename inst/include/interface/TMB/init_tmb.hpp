@@ -9,7 +9,7 @@
 #define SRC_INIT_HPP
 
 #include <stdlib.h>
-#include <Rcpp.h>
+#include "../rcpp/rcpp_include.hpp"
 #include <R_ext/Rdynload.h>
 
 #ifdef FIMS_ONLOAD_INIT_TMB

@@ -11,7 +11,7 @@ uint32_t DistributionsInterfaceBase::id_g = 1;
 std::map<uint32_t, std::shared_ptr<DistributionsInterfaceBase>>
     DistributionsInterfaceBase::live_objects;
 
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 /**
  * Function to register distribution classes with the Rcpp module system.
  *

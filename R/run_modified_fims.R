@@ -54,31 +54,32 @@ run_modified_pars_fims <- function(
     parameters_to_use <- parameters
   }
 
-  # find the parameter
-  if (!is.null(module_name)) {
-    parameter_row <- parameters_to_use |>
-      dplyr::filter(
-        .data[["module_name"]] == module_name &
-          .data[["label"]] == parameter_name
-      )
-    if (nrow(parameter_row) == 0) {
-      cli::cli_abort(
-        "Parameter with module name {module_name} and label {parameter_name} not found in parameters object"
-      )
-    }
-  } else {
-    parameter_row <- parameters_to_use |>
-      dplyr::filter(.data[["label"]] == parameter_name)
-    if (nrow(parameter_row) == 0) {
-      cli::cli_abort(
-        "Parameter with label {parameter_name} not found in parameters object"
-      )
-    }
-    if (nrow(parameter_row) > 1) {
-      cli::cli_abort(
-        "Multiple parameters with label {parameter_name} found in parameters object, please specify module_name"
-      )
-    }
+  # find the parameter; `%in%` rather than `==` because `x == NULL` has length
+  # 0, which `filter()` rejects, so a NULL module_name matches every module
+  parameter_row <- parameters_to_use |>
+    dplyr::filter(
+      .data[["label"]] == .env$parameter_name,
+      is.null(.env$module_name) |
+        .data[["module_name"]] %in% .env$module_name
+    )
+  if (nrow(parameter_row) == 0) {
+    cli::cli_abort(c(
+      "Parameter with label {.val {parameter_name}}
+      not found in parameters object.",
+      "i" = if (!is.null(module_name)) "Searched module {.val {module_name}}."
+    ))
+  }
+  if (nrow(parameter_row) > 1) {
+    cli::cli_abort(c(
+      "{nrow(parameter_row)} parameters have label {.val {parameter_name}};
+      select a single parameter.",
+      "i" = if (is.null(module_name)) {
+        "Specify {.arg module_name} if the label is in more than 1 module."
+      } else {
+        "Module {.val {module_name}} has more than 1 row with this label (for
+        example, 1 per fleet or year)."
+      }
+    ))
   }
 
   # Update value
@@ -137,20 +138,24 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
     data_to_use <- data
   }
 
-  # Remove years from data, but leave catch, weight_at_age,
+  # Remove years from data, but leave catch, weight_at_age, ageing_error,
   # and age_to_length_conversion (if present)
   if (years_to_remove == 0) {
     data_mod <- data_to_use
   } else {
-    # exclude weight-at-age from the calculation of the max year of data
+    # exclude weight-at-age and ageing error from the calculation of the max
+    # year of data
     max_timing <- data_to_use |>
-      dplyr::filter(.data[["type"]] != "weight_at_age") |>
+      dplyr::filter(!.data[["type"]] %in% c("weight_at_age", "ageing_error")) |>
       dplyr::pull(.data[["timing"]]) |>
       max(na.rm = TRUE)
     data_mod <- data_to_use |>
       dplyr::filter(
         (.data[["type"]] %in%
-          c("catch", "age_to_length_conversion", "weight_at_age")) |
+          c(
+            "catch", "age_to_length_conversion", "weight_at_age",
+            "ageing_error"
+          )) |
           .data[["timing"]] <= max_timing - years_to_remove
       )
   }

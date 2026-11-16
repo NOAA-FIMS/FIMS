@@ -241,7 +241,8 @@ setup_default_log_init_naa <- function(
 
   m <- rep(exp(log_M), length.out = n_ages)
   log_init_naa <- log_rzero - c(0, cumsum(m))[seq_len(n_ages)]
-  log_init_naa[n_ages] <- log_init_naa[n_ages] - log(m[n_ages])
+  # -expm1(-m) is 1 - exp(-m) without losing precision when m is small
+  log_init_naa[n_ages] <- log_init_naa[n_ages] - log(-expm1(-m[n_ages]))
   log_init_naa
 }
 
@@ -374,7 +375,8 @@ setup_default_Growth <- function(
     ) |>
       dplyr::mutate(
         module_name = "Growth",
-        module_type = .env$module_type
+        module_type = .env$module_type,
+        label = "weight_at_age"
       )
 
     return(default)
@@ -415,20 +417,10 @@ setup_default_Growth <- function(
         "reference_age_for_length_old",
         "length_weight_a",
         "length_weight_b",
-        "length_at_age_sd_at_reference_ages",
-        "length_at_age_sd_at_reference_ages"
+        "length_at_age_sd_young",
+        "length_at_age_sd_old"
       ),
-      age = c(
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        NA_real_,
-        reference_age_for_length_young,
-        reference_age_for_length_old
-      ),
+      age = NA_real_,
       value = c(
         275,
         725,
@@ -468,9 +460,17 @@ setup_default_Growth <- function(
 #' @param log_M A numeric value or vector (length equal to the number of ages *
 #' number of years) specifying the log natural mortality rate. Default is `log(0.2)`.
 #' @param log_init_naa A numeric value or vector (length equal to the number of
-#' ages) specifying the log initial numbers at age. Default is `NA_real_`.
-#' @param proportion_female A numeric value between 0 and 1 specifying the
-#' proportion of females. Default is `0.5`.
+#' ages) specifying the log initial numbers at age. Default is `NA_real_`, in
+#' which case [setup_default_parameters()] fills it with the unfished
+#' equilibrium implied by unfished recruitment \eqn{R_0} and natural mortality
+#' \eqn{M}:
+#' \deqn{N_a = R_0 \exp\left(-\sum_{j < a} M_j\right)}
+#' for ages below the plus group, and for the plus group \eqn{A}, which
+#' accumulates survivors each year,
+#' \deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}
+#' @param proportion_female A numeric value or vector (length equal to the
+#' number of ages) between 0 and 1 specifying the proportion of each age that
+#' is female, which scales spawning biomass. Default is `0.5`.
 #' @inheritParams setup_default_parameters
 #' @return
 #' A tibble of default population configurations, including initial numbers at
@@ -517,16 +517,23 @@ setup_default_Population <- function(
     requirement = "a single numeric value or a vector of length equal to the number of ages"
   )
 
-  # Check proportion_female is a single numeric value between 0 and 1
-  if (!is.numeric(proportion_female) || length(proportion_female) != 1 || proportion_female < 0 || proportion_female > 1) {
-    local_bullets <- c(
-      "i" = "{.var proportion_female} argument must be a single numeric value between 0 and 1.",
-      "x" = "{.var proportion_female} has a length of {length(proportion_female)}.",
-      "x" = "{.var proportion_female} is of the class {class(proportion_female)}."
-    )
-    names(local_bullets)[2] <- ifelse(length(proportion_female) > 1, "x", "i")
-    names(local_bullets)[3] <- ifelse(inherits(proportion_female, "numeric"), "i", "x")
-    cli::cli_abort(local_bullets)
+  # Check proportion_female is a scalar or a full age vector between 0 and 1.
+  assert_numeric_length(
+    x = proportion_female,
+    x_name = "proportion_female",
+    valid_lengths = c(1, n_ages),
+    requirement = "a single numeric value or a vector of length equal to the number of ages"
+  )
+  invalid_proportion <- is.na(proportion_female) |
+    proportion_female < 0 |
+    proportion_female > 1
+  if (any(invalid_proportion)) {
+    cli::cli_abort(c(
+      "x" = "{.var proportion_female} has values that are missing or outside
+      0 to 1: {.val {proportion_female[invalid_proportion]}}.",
+      "i" = "{.var proportion_female} is the proportion of each age that is
+      female, so every value must be between 0 and 1."
+    ))
   }
 
   # If log_init_naa is NA, print a message to the user and advise them to set it
@@ -557,6 +564,7 @@ setup_default_Population <- function(
     ) |>
     dplyr::add_row(
       label = "proportion_female",
+      age = if (length(proportion_female) == 1) NA else ages,
       value = .env$proportion_female,
       estimation_type = "constant"
     ) |>
@@ -721,7 +729,9 @@ setup_default_Selectivity <- function(
 #' For fishing fleets, log_q is set to an estimation type of "constant" with a
 #' default value of 0, while log_Fmort is set to "fixed_effects". For survey
 #' fleets, log_q is set to "fixed_effects" and log_Fmort is set to "constant"
-#' with a default value of -200.
+#' with a default value of -200. For a year with a catch of 0, log_Fmort is
+#' also set to "constant" at -200, so fishing mortality is effectively 0 that
+#' year.
 #'
 #' @param fleet A character. Name of the fleet.
 #' @inherit setup_default_parameters
@@ -777,6 +787,26 @@ setup_default_Fleet <- function(
       timing = get_start_year(data):get_end_year(data),
       value = if (has_index) -200 else -3,
       estimation_type = if (has_index) "constant" else "fixed_effects"
+    )
+
+  # A catch of 0 means the fleet did not fish that year. Nothing in the data
+  # informs F then, so F is fixed at effectively 0 with the same -200 used for
+  # fleets without catch, rather than estimated.
+  zero_catch_years <- get_data(data) |>
+    dplyr::filter(
+      .data$fleet == .env$fleet,
+      .data$type == "catch",
+      .data$observed == 0
+    ) |>
+    dplyr::pull(.data$timing)
+  log_Fmort_default <- log_Fmort_default |>
+    dplyr::mutate(
+      value = dplyr::if_else(
+        .data$timing %in% zero_catch_years, -200, .data$value
+      ),
+      estimation_type = dplyr::if_else(
+        .data$timing %in% zero_catch_years, "constant", .data$estimation_type
+      )
     )
   # Compile all default parameters into a single list
   default <- dplyr::bind_rows(

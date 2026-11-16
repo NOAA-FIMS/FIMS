@@ -418,3 +418,83 @@ add_executable(information_RecruitmentLifetime
 add_as_invoker_manifest(information_RecruitmentLifetime)
 target_link_libraries(information_RecruitmentLifetime fims_test)
 add_test(NAME information_RecruitmentLifetime COMMAND information_RecruitmentLifetime)
+
+
+# test_FIMSJson_JsonParser_PrettyFormatJSON.cpp
+add_executable(FIMSJson_JsonParser_PrettyFormatJSON
+  test_FIMSJson_JsonParser_PrettyFormatJSON.cpp
+)
+add_as_invoker_manifest(FIMSJson_JsonParser_PrettyFormatJSON)
+
+target_link_libraries(FIMSJson_JsonParser_PrettyFormatJSON
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(FIMSJson_JsonParser_PrettyFormatJSON)
+
+
+# test_FIMSJson_JsonParser_EscapeString.cpp
+add_executable(FIMSJson_JsonParser_EscapeString
+  test_FIMSJson_JsonParser_EscapeString.cpp
+)
+add_as_invoker_manifest(FIMSJson_JsonParser_EscapeString)
+
+target_link_libraries(FIMSJson_JsonParser_EscapeString
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(FIMSJson_JsonParser_EscapeString)
+
+# test_information_Information_Clear.cpp
+add_executable(information_Information_Clear
+  test_information_Information_Clear.cpp
+)
+add_as_invoker_manifest(information_Information_Clear)
+
+target_link_libraries(information_Information_Clear
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(information_Information_Clear)
+
+# test_population_CatchAtAge_CalculateCatchWeightAA.cpp
+add_executable(population_CatchAtAge_CalculateCatchWeightAA
+  test_population_CatchAtAge_CalculateCatchWeightAA.cpp
+)
+add_as_invoker_manifest(population_CatchAtAge_CalculateCatchWeightAA)
+target_link_libraries(population_CatchAtAge_CalculateCatchWeightAA
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_CatchAtAge_CalculateCatchWeightAA)
+
+# test_fimsMath_fimsMath_ageingError.cpp
+add_executable(fimsMath_fimsMath_ageingError
+  test_fimsMath_fimsMath_ageingError.cpp
+)
+add_as_invoker_manifest(fimsMath_fimsMath_ageingError)
+
+target_link_libraries(fimsMath_fimsMath_ageingError
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(fimsMath_fimsMath_ageingError)
+
+
+# test_population_CatchAtAge_EvaluateAgeingError.cpp
+add_executable(population_CatchAtAge_EvaluateAgeingError
+  test_population_CatchAtAge_EvaluateAgeingError.cpp
+)
+add_as_invoker_manifest(population_CatchAtAge_EvaluateAgeingError)
+
+target_link_libraries(population_CatchAtAge_EvaluateAgeingError
+  gtest_main
+  fims_test
+)
+
+gtest_discover_tests(population_CatchAtAge_EvaluateAgeingError)

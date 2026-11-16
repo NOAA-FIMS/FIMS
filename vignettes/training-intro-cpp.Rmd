@@ -516,7 +516,7 @@ RCPP_MODULE(shape) {
 
 </details>
 
-We can load this code, which is stored in [`cpp/my_polymorphism.cpp`]((https://github.com/NOAA-FIMS/FIMS/blob/main/vignettes/cpp/my_polymorphism.cpp)) using `Rcpp::sourceCpp()` and `Rcpp::loadModule()` where the second argument is `TRUE` so that all objects are loaded into the R environment. `methods::new()` is used to create new instances of the desired class.
+We can load this code, which is stored in [`cpp/my_polymorphism.cpp`](https://github.com/NOAA-FIMS/FIMS/blob/main/vignettes/cpp/my_polymorphism.cpp) using `Rcpp::sourceCpp()` and `Rcpp::loadModule()` where the second argument is `TRUE` so that all objects are loaded into the R environment. `methods::new()` is used to create new instances of the desired class.
 
 <details>
 <summary><strong>Example: Load module</strong></summary>

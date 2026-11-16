@@ -33,7 +33,8 @@ methods::setClass(
     number_of_parameters = "integer",
     run_time = "difftime",
     version = "package_version",
-    model_output = "character"
+    model_output = "character",
+    convergence = "data.frame"
   )
 )
 
@@ -84,11 +85,37 @@ methods::setMethod(
       sep = "="
     ))
     div_digit <- cli::cli_div(theme = list(.val = list(digits = 5)))
-    terminal_ssb <- sapply(
+    terminal_sb <- sapply(
       x@report[["spawning_biomass"]],
       function(y) utils::tail(y, 1)
     )
+    # The overall status is the most severe check, so a failed check cannot be
+    # missed at the top of the summary.
+    convergence <- get_convergence(x)
+    severity_levels <- c("OK", "NOTE", "WARN", "FAIL")
+    convergence_status <- if (NROW(convergence) == 0) {
+      "not checked"
+    } else {
+      severity_levels[max(match(convergence[["severity"]], severity_levels))]
+    }
+    flagged_checks <- convergence[["check"]][convergence[["severity"]] != "OK"]
+    convergence_bullet <- stats::setNames(
+      if (length(flagged_checks) > 0) {
+        "Convergence: {.val {convergence_status}} from
+        {.val {flagged_checks}}. Use {.code sanity_fims(fit)} to see each
+        check."
+      } else {
+        "Convergence: {.val {convergence_status}}"
+      },
+      switch(convergence_status,
+        "FAIL" = "x",
+        "WARN" = "!",
+        "OK" = "v",
+        "i"
+      )
+    )
     cli::cli_inform(c(
+      convergence_bullet,
       "i" = "FIMS model version: {.val {x@version}}",
       "i" = "Total run time was {.val {rt}} {ru}",
       "i" = "Number of parameters: {all_parameters_info}",
@@ -96,7 +123,7 @@ methods::setMethod(
       "i" = "Negative log likelihood (NLL):",
       "*" = "Marginal NLL= {.val {x@opt$objective}}",
       "*" = "Total NLL= {.val {x@report$jnll}}",
-      "i" = "Terminal SB= {.val {terminal_ssb}}"
+      "i" = "Terminal SB= {.val {terminal_sb}}"
     ))
     cli::cli_end(div_digit)
   }
@@ -199,8 +226,31 @@ methods::setGeneric("get_sdreport", function(x) standardGeneric("get_sdreport"))
 methods::setMethod("get_sdreport", "FIMSFit", function(x) x@sdreport)
 
 #' @return
+#' [get_convergence()] returns a tibble with one row per convergence check
+#' run by [fit_fims()]: `check`, `severity` (`"OK"`, `"NOTE"` for a check that
+#' did not run, `"WARN"`, or `"FAIL"`), `value`, `threshold`, `parameter`,
+#' and `message`. It has no rows when the model was not optimized.
+#' @export
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setGeneric("get_convergence", function(x) standardGeneric("get_convergence"))
+#' @rdname get_FIMSFit
+#' @keywords fit_fims
+methods::setMethod("get_convergence", "FIMSFit", function(x) {
+  # A FIMSFit without a convergence slot, e.g., read from an older saved file,
+  # has no checks to return
+  if (!methods::.hasSlot(x, "convergence")) {
+    return(convergence_tibble(character(0), character(0)))
+  }
+  x@convergence
+})
+
+#' @return
 #' [get_estimates()] returns a tibble of parameter values and their
-#' uncertainties from a fitted model.
+#' uncertainties from a fitted model. The `year_i` column is a position that
+#' starts at 1, and the `age` and `length` columns are the ages and length bins
+#' from the data. `age` is `NA` if populations have different ages, and both
+#' are `NA` for fits saved before they were added to the output.
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
@@ -242,7 +292,8 @@ methods::setMethod(
       sdreport = sdreport,
       opt = opt,
       parameter_names = parameter_names,
-      precomputed_gradient = get_gradient(x)
+      precomputed_gradient = get_gradient(x),
+      mapping = get_input(x)[["tmb_mapping"]]
     ) |>
       add_unique_id()
 
@@ -358,6 +409,89 @@ is.FIMSFit <- function(x) {
 
 # Constructors ----
 
+# Restore full vectors, including fixed and shared map entries, from the best
+# joint parameter vector. The named par argument includes random effects;
+# parList's first argument accepts only the reduced fixed effects.
+restore_tmb_parameters <- function(obj) {
+  parameters <- obj[["env"]][["parList"]](par = obj[["env"]][["last.par.best"]])
+  FIMS::set_fixed(parameters[["p"]])
+  FIMS::set_random(parameters[["re"]])
+  invisible(parameters)
+}
+
+# Apply TMB's factor map to names from FIMS's full parameter registry.
+# TMB omits NA entries and returns one optimized parameter per factor level.
+tmb_mapped_parameter_names <- function(parameter_names, map = NULL) {
+  if (is.null(map)) {
+    return(parameter_names)
+  }
+  if (!is.factor(map)) {
+    cli::cli_abort("A TMB parameter map must be a factor.")
+  }
+  if (length(parameter_names) != length(map)) {
+    cli::cli_abort(c(
+      "x" = "A TMB parameter map must have one entry per FIMS parameter.",
+      "i" = "Found {length(map)} map entries for {length(parameter_names)}
+      parameters."
+    ))
+  }
+
+  active_map <- droplevels(map)
+  parameter_names[match(seq_len(nlevels(active_map)), as.integer(active_map))]
+}
+
+tmb_parameter_mapping <- function(input) {
+  maps <- input[["map"]]
+  if (!is.null(maps) &&
+    (!is.list(maps) || (length(maps) > 0 &&
+      (is.null(names(maps)) || anyDuplicated(names(maps)) ||
+        any(!names(maps) %in% c("p", "re")))))) {
+    cli::cli_abort("TMB maps must be a named list with entries p and/or re.")
+  }
+
+  mapping <- list()
+  for (effect in c("p", "re")) {
+    initial <- input[["parameters"]][[effect]]
+    full_names <- if (effect == "p") {
+      names(get_parameter_names(as.list(initial)))
+    } else {
+      names(get_random_names(as.list(initial)))
+    }
+    map <- maps[[effect]]
+    if (effect %in% names(maps) && !is.factor(map)) {
+      cli::cli_abort("A TMB parameter map must be a factor.")
+    }
+    reduced_names <- tmb_mapped_parameter_names(full_names, map)
+    index <- if (is.null(map)) seq_along(initial) else as.integer(droplevels(map))
+    for (level in seq_along(reduced_names)) {
+      positions <- which(index == level)
+      values <- initial[positions]
+      if (!isTRUE(all(values == values[[1L]]))) {
+        details <- vapply(positions, function(position) {
+          sprintf(
+            "Parameter %s: %s[%d], initial value = %s.",
+            full_names[[position]], effect, position,
+            format(initial[[position]], digits = 17)
+          )
+        }, character(1))
+        cli::cli_abort(c(
+          "Shared TMB map entries in {effect} must have identical starting values.",
+          stats::setNames(details, rep("i", length(details))),
+          "i" = "Use identical starting values to share a parameter, or NA map
+          entries to hold parameters at their individual starting values."
+        ))
+      }
+    }
+    mapping[[effect]] <- list(
+      full_names = full_names,
+      reduced_names = reduced_names,
+      index = index,
+      initial = unname(initial)
+    )
+  }
+  mapping
+}
+
 #' Class constructors for class `FIMSFit` and associated child classes
 #'
 #' Create an object with the class of `FIMSFit` after running a FIMS model. This
@@ -378,6 +512,9 @@ is.FIMSFit <- function(x) {
 #' @param version The version of FIMS that was used to optimize the model. If
 #'   [fit_fims()] was not used to optimize the model, then the default is to
 #'   use the current version of the package that is loaded.
+#' @param convergence A data frame with one row per convergence check, as
+#'   returned by [get_convergence()]. [fit_fims()] fills it in. The default has
+#'   no rows, which means no checks were run.
 #'
 #' @return
 #' An object with an S4 class of `FIMSFit` is returned. The object will have the
@@ -414,6 +551,10 @@ is.FIMSFit <- function(x) {
 #'     \item{\code{model_output}:}{
 #'       The FIMS model output as a JSON string.
 #'     }
+#'     \item{\code{convergence}:}{
+#'       A tibble with the result of each convergence check. See
+#'       [get_convergence()].
+#'     }
 #'   }
 #' @keywords fit_fims
 #' @export
@@ -423,12 +564,18 @@ FIMSFit <- function(
   opt = list(),
   sdreport = list(),
   run_time = c("time_total" = as.difftime(0, units = "secs")),
-  version = utils::packageVersion("FIMS")
+  version = utils::packageVersion("FIMS"),
+  convergence = convergence_tibble(character(0), character(0))
 ) {
+  mapping <- input[["tmb_mapping"]]
+  if (is.null(mapping)) {
+    mapping <- tmb_parameter_mapping(input)
+    input[["tmb_mapping"]] <- mapping
+  }
   # Determine the number of parameters
   n_total <- length(obj[["env"]][["last.par.best"]])
   n_fixed_effects <- length(obj[["par"]])
-  n_random_effects <- length(obj[["env"]]$parList()[["re"]])
+  n_random_effects <- n_total - n_fixed_effects
   number_of_parameters <- c(
     fixed_effects = n_fixed_effects,
     random_effects = n_random_effects
@@ -447,24 +594,43 @@ FIMSFit <- function(
   } else {
     rep(NA_real_, length(obj[["par"]]))
   }
-  max_gradient <- if (length(opt) > 0) max(abs(gradient_vector)) else NA_real_
+  max_gradient <- if (length(opt) == 0) {
+    NA_real_
+  } else if (length(gradient_vector) == 0) {
+    0
+  } else {
+    max(abs(gradient_vector))
+  }
 
-  # Rename parameters instead of "p"
-  parameter_names <- names(get_parameter_names(obj[["par"]]))
+  parameter_names <- mapping[["p"]][["reduced_names"]]
+  random_effects_names <- mapping[["re"]][["reduced_names"]]
+  if (length(parameter_names) != length(obj[["par"]])) {
+    cli::cli_abort(c(
+      "x" = "TMB and FIMS produced different numbers of fixed parameters.",
+      "i" = "TMB produced {length(obj[[\"par\"]])} parameters",
+      "i" = "FIMS produced {length(parameter_names)} parameters"
+    ))
+  }
   names(obj[["par"]]) <- parameter_names
-  random_effects_names <- names(get_random_names(obj[["env"]]$parList()[["re"]]))
+  if (length(opt) > 0) {
+    names(opt[["par"]]) <- parameter_names
+  }
 
   # Get the report
-  report <- if (length(opt) == 0) {
-    obj[["report"]](obj[["env"]][["last.par.best"]])
-  } else {
-    obj[["report"]]()
+  report <- obj[["report"]](obj[["env"]][["last.par.best"]])
+  parameters <- restore_tmb_parameters(obj)
+  for (effect in c("p", "re")) {
+    mapping[[effect]][["estimate"]] <- unname(parameters[[effect]])
   }
+  input[["tmb_mapping"]] <- mapping
 
   if (length(sdreport) > 0) {
     # rename the sdreport
     names(sdreport[["par.fixed"]]) <- parameter_names
     dimnames(sdreport[["cov.fixed"]]) <- list(parameter_names, parameter_names)
+    if (length(sdreport[["par.random"]]) > 0) {
+      names(sdreport[["par.random"]]) <- random_effects_names
+    }
   }
 
   model_output <- input[["model"]]$get_output()
@@ -482,16 +648,28 @@ FIMSFit <- function(
     number_of_parameters = number_of_parameters,
     run_time = run_time,
     version = version,
-    model_output = model_output
+    model_output = model_output,
+    convergence = convergence
   )
   fit
 }
 
 #' Fit a FIMS model (BETA)
 #'
-#' @param input Input list as returned by [initialize_fims()].
+#' @param input Input list as returned by [initialize_fims()]. An optional
+#'   `map` entry is a named list of factors for `p` (fixed effects) and/or `re`
+#'   (random effects), in the order of the corresponding `parameters` vector.
+#'   Each factor must have one entry per parameter. `NA` holds a parameter at
+#'   its starting value; repeated levels share one estimated value. Shared
+#'   entries must have identical starting values; otherwise, the error lists
+#'   each parameter's name, 1-based index in `p` or `re`, and initial value.
+#'   Factor levels determine the
+#'   reduced parameter order; unused levels are dropped. Levels in `p` and `re`
+#'   are independent; sharing
+#'   across these vectors is not supported.
 #' @param get_sd A boolean specifying if the [TMB::sdreport()] should be
-#'   calculated?
+#'   calculated? It is skipped when the maximum gradient is above 0.01 or not
+#'   finite, because standard errors far from the optimum are not meaningful.
 #' @param save_sd A logical, with the default `TRUE`, indicating whether the
 #'   sdreport is returned in the output. If `FALSE`, the slot for the report
 #'   will be empty.
@@ -509,14 +687,31 @@ FIMSFit <- function(
 #'   object as an RDS object. Defaults to 'fit.RDS', and a value of NULL
 #'   indicates not to save it. If specified, it must end in .RDS. The file is
 #'   written to folder given by `input[["path"]]`. Not yet implemented.
+#' @param getReportCovariance A logical passed to [TMB::sdreport()], with the
+#'   default `FALSE`. Standard errors of all parameters and derived quantities
+#'   are calculated either way. If `TRUE`, the full covariance matrix of the
+#'   derived quantities is also calculated and stored as `cov` in the
+#'   `sdreport`; it grows with the square of the number of derived quantities
+#'   and can use several GB of memory. If `FALSE`, `cov` is `NA`.
 #' @return
 #' An object of class `FIMSFit` is returned, where the structure is the same
 #' regardless if `optimize = TRUE` or not. Uncertainty information is only
-#' included in the `estimates` slot if `get_sd = TRUE`.
+#' included in the `estimates` slot if `get_sd = TRUE`. The result of each
+#' convergence check is stored on the object and returned by
+#' [get_convergence()].
 #' @seealso
 #' * [FIMSFit()]
 #' @details This function is a beta version still and subject to change
 #'   without warning.
+#' Mapped parameters are expanded to their full FIMS vectors for reporting.
+#' Shared parameters receive the same estimate and standard error in
+#' [get_estimates()]. Mapped-off parameters retain their starting values and
+#' have `NA` standard errors. Gradients describe reduced fixed-effect
+#' optimization variables and are reported only on the first full parameter
+#' in each shared level. Parameter counts describe the reduced vectors.
+#' With no active fixed effects, TMB evaluates the random-effects model without
+#' running an outer optimizer. If no parameters remain active, use
+#' `optimize = FALSE`.
 #' @keywords fit_fims
 #' @export
 fit_fims <- function(input,
@@ -530,7 +725,8 @@ fit_fims <- function(input,
                        iter.max = 10000,
                        trace = 0
                      ),
-                     filename = NULL) {
+                     filename = NULL,
+                     getReportCovariance = FALSE) {
   # See issue 455 of sdmTMB to see what should be used.
   # https://github.com/pbs-assess/sdmTMB/issues/455
   # NOTE: When we add implementation for newton step we need to
@@ -539,14 +735,24 @@ fit_fims <- function(input,
   # the smallest newton gradient solution not matching the smallest
   # likelihood value. This can cause sanity issues in output reporting.
   if (number_of_newton_steps > 0) {
-    cli::cli_abort("Newton steps not implemented yet.")
+    cli::cli_abort(c(
+      "x" = "Newton steps are not implemented yet.",
+      "i" = "Use {.code number_of_newton_steps = 0}. To improve the gradient,
+      increase {.arg number_of_loops} instead."
+    ))
   }
   if (number_of_loops < 0) {
     cli::cli_abort("number_of_loops ({.par {number_of_loops}}) must be >= 0.")
   }
   # If the estimation_type of all parameters is constant, FIMS will abort if
   # optimize is set to TRUE
-  if (optimize == TRUE & all(purrr::map_vec(input[["parameters"]], length) == 0)) {
+  input[["tmb_mapping"]] <- tmb_parameter_mapping(input)
+  for (effect in names(input[["map"]])) {
+    input[["map"]][[effect]] <- droplevels(input[["map"]][[effect]])
+  }
+  parameter_names <- input[["tmb_mapping"]][["p"]][["reduced_names"]]
+  random_effects_names <- input[["tmb_mapping"]][["re"]][["reduced_names"]]
+  if (optimize && length(parameter_names) + length(random_effects_names) == 0) {
     cli::cli_abort("FIMS must have at least one parameter to optimize.")
   }
 
@@ -579,19 +785,12 @@ fit_fims <- function(input,
   )
 
   if (is.null(opt)) {
-    failed_nlminb_object <- return_failed_nlminb(obj)
-    failed_fit <- fit <- FIMSFit(
-      input = input,
-      obj = obj,
-      opt = failed_nlminb_object[["opt"]],
-      sdreport = list(),
-      run_time = failed_nlminb_object[["run_time"]]
-    )
-    return(failed_fit)
+    return(failed_fims_fit(input, obj))
   }
 
-  maxgrad0 <- maxgrad <- max(abs(obj$gr(opt[["par"]])))
-  if (number_of_loops > 0) {
+  gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
+  maxgrad0 <- maxgrad <- if (length(gradient) > 0) max(abs(gradient)) else 0
+  if (number_of_loops > 0 && length(obj[["par"]]) > 0) {
     cli::cli_inform(c(
       "i" = "Restarting optimizer {number_of_loops} time{?s} to improve
             gradient."
@@ -613,17 +812,10 @@ fit_fims <- function(input,
           "i" = "The model successfully converged before this loop.",
           "i" = "The failed results are being returned."
         ))
-        failed_nlminb_object <- return_failed_nlminb(obj)
-        failed_fit <- fit <- FIMSFit(
-          input = input,
-          obj = obj,
-          opt = failed_nlminb_object[["opt"]],
-          sdreport = list(),
-          run_time = failed_nlminb_object[["run_time"]]
-        )
-        return(failed_fit)
+        return(failed_fims_fit(input, obj))
       }
-      maxgrad <- max(abs(obj[["gr"]](opt[["par"]])))
+      gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
+      maxgrad <- if (length(gradient) > 0) max(abs(gradient)) else 0
     }
     div_digit <- cli::cli_div(theme = list(.val = list(digits = 5)))
     cli::cli_inform(c(
@@ -634,21 +826,58 @@ fit_fims <- function(input,
   }
   time_optimization <- Sys.time() - t0
   cli::cli_inform(c("v" = "Finished optimization"))
+  opt[["par"]] <- obj[["env"]][["last.par.best"]][obj[["env"]][["lfixed"]]()]
+  opt[["objective"]] <- obj[["fn"]](opt[["par"]])
+  gradient <- as.numeric(obj[["gr"]](opt[["par"]]))
+  maxgrad <- if (length(gradient) > 0) max(abs(gradient)) else 0
 
-  check_mle_convergence(input, obj, opt, maxgrad)
+  mle_convergence <- check_mle_convergence(
+    opt,
+    maxgrad,
+    gradient = gradient,
+    parameter_names = parameter_names
+  )
+  # Standard errors at a point far from the optimum are not meaningful, so
+  # sdreport is skipped when the gradient fails. A failed convergence code with
+  # a small gradient, e.g., a false convergence, still gets standard errors.
+  gradient_failed <- any(
+    mle_convergence[["check"]] == "max_gradient" &
+      mle_convergence[["severity"]] == "FAIL"
+  )
 
-  FIMS::set_fixed(opt[["par"]])
+  restore_tmb_parameters(obj)
 
   time_sdreport <- NA
-  if (get_sd) {
+  if (get_sd && !gradient_failed) {
     t2 <- Sys.time()
-    sdreport <- TMB::sdreport(obj)
+    sdreport <- TMB::sdreport(
+      obj,
+      par.fixed = opt[["par"]],
+      getReportCovariance = getReportCovariance
+    )
     cli::cli_inform(c("v" = "Finished sdreport"))
     time_sdreport <- Sys.time() - t2
-    check_sdreport_convergence(input, obj, opt, sdreport)
+    sdreport_convergence <- check_sdreport_convergence(
+      obj,
+      opt,
+      sdreport,
+      parameter_names = parameter_names,
+      random_effects_names = random_effects_names
+    )
   } else {
     sdreport <- list()
     time_sdreport <- as.difftime(0, units = "secs")
+    # Without this row a fit with no sdreport would look like it passed the
+    # Hessian checks rather than skipped them.
+    sdreport_convergence <- convergence_tibble(
+      check = "sdreport",
+      severity = "NOTE",
+      message = if (gradient_failed) {
+        "Hessian not checked because the maximum gradient failed."
+      } else {
+        "Hessian not checked because get_sd = FALSE."
+      }
+    )
   }
 
   run_time <- c(
@@ -662,6 +891,12 @@ fit_fims <- function(input,
     opt = opt,
     sdreport = sdreport,
     run_time = run_time
+  )
+  # The NLL check reads the report and model output that FIMSFit() builds
+  fit@convergence <- dplyr::bind_rows(
+    mle_convergence,
+    check_nll_convergence(opt, get_report(fit), get_model_output(fit)),
+    sdreport_convergence
   )
   print(fit)
   if (!is.null(filename)) {
@@ -695,15 +930,24 @@ methods::setMethod("as.list", signature(x = "FIMSFit"), function(x) {
 try_nlminb <- function(object, control_list, starting_values) {
   optimized <- tryCatch(
     {
-      with(
-        object,
-        nlminb(
-          start = starting_values,
-          objective = fn,
-          gradient = gr,
-          control = control_list
+      if (length(starting_values) == 0) {
+        list(
+          par = starting_values,
+          objective = object[["fn"]](starting_values),
+          convergence = 0L,
+          message = "No fixed effects to optimize"
         )
-      )
+      } else {
+        with(
+          object,
+          nlminb(
+            start = starting_values,
+            objective = fn,
+            gradient = gr,
+            control = control_list
+          )
+        )
+      }
     },
     error = function(e) {
       cli::cli_rule(left = "{.fun stats::nlminb} failure details")
@@ -731,9 +975,14 @@ return_failed_nlminb <- function(object) {
     "x" = "{.fun fit_fims} did not lead to a converged model.",
     "i" = "The resulting coefficients, probability values, or predictions are
     not accurate or stable and should not be used for management.",
-    "i" = "Partial results are returned as a {.var FIMSFit} object to
-    facilitate checking that the model is appropriately configured for your
-    data."
+    "i" = "A {.cls FIMSFit} object containing partial results is returned.",
+    "i" = "Type the name of the variable you assigned it (e.g.,
+           {.code fit <- ...}) to inspect the model inputs and configuration.",
+    "i" = "Run {.code sanity_fims(fit)} to see each convergence check, or
+           {.code get_convergence(fit)} for the same checks as a tibble.",
+    "i" = "To check the starting values, run
+           {.code fit_fims(optimize = FALSE)} and look at
+           {.code get_report(fit)}."
   )
   cli::cli_warn(message = failed_nlminb_message)
   # Construct a fallback optimizer result with consistent structure, i.e.,
@@ -745,10 +994,46 @@ return_failed_nlminb <- function(object) {
       time_total = as.difftime(0, units = "secs")
     ),
     opt = list(
-      par = object[["par"]],
+      par = object[["env"]][["last.par.best"]][object[["env"]][["lfixed"]]()],
       objective = NA_real_,
       convergence = 1L,
       message = "Optimization failed"
     )
   ))
+}
+
+#' Build the FIMSFit returned when nlminb fails
+#'
+#' @param input Input list as returned by [initialize_fims()].
+#' @param obj The TMB object used for fitting.
+#' @return
+#' A FIMSFit object with the partial results and the convergence checks. The
+#' report is from the last parameters nlminb tried, so the `"nll"` check names
+#' the negative log-likelihood components that were not finite there.
+#' @noRd
+failed_fims_fit <- function(input, obj) {
+  failed_nlminb_object <- return_failed_nlminb(obj)
+  fit <- FIMSFit(
+    input = input,
+    obj = obj,
+    opt = failed_nlminb_object[["opt"]],
+    sdreport = list(),
+    run_time = failed_nlminb_object[["run_time"]]
+  )
+  fit@convergence <- dplyr::bind_rows(
+    convergence_tibble(
+      check = "optimizer",
+      severity = "FAIL",
+      value = 1,
+      threshold = 0,
+      message = "nlminb failed or returned an objective that is not finite."
+    ),
+    check_nll_convergence(get_opt(fit), get_report(fit), get_model_output(fit)),
+    convergence_tibble(
+      check = "sdreport",
+      severity = "NOTE",
+      message = "Hessian not checked because the optimization failed."
+    )
+  )
+  fit
 }

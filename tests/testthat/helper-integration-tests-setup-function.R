@@ -560,3 +560,29 @@ setup_and_run_FIMS_with_wrappers <- function(iter_id,
   # Return the results as a list
   return(fit)
 }
+
+# FIMS helper function to run a model at its initial values ----
+#' Run a FIMS model at its initial values
+#'
+#' Sets up a model with the default parameters, builds it without optimizing,
+#' and returns the objective function and the TMB report. The report keeps
+#' full precision, unlike `get_estimates()`. It is evaluated at the initial
+#' random effects, because evaluating the objective re-optimizes them.
+#'
+#' @param data A data frame of FIMS input data.
+#'
+#' @return A list with `objective`, the objective function value, and
+#'   `report`, the TMB report.
+run_at_initial_values <- function(data) {
+  data_frame <- FIMSFrame(data)
+  fit <- suppressMessages(setup_default_parameters(data_frame)) |>
+    initialize_fims(data = data_frame) |>
+    fit_fims(optimize = FALSE)
+  obj <- get_obj(fit)
+  output <- list(
+    objective = obj[["fn"]](obj[["par"]]),
+    report = obj[["report"]](obj[["env"]][["par"]])
+  )
+  clear()
+  output
+}

@@ -25,21 +25,24 @@
 #include "TMB/TMB.h"
 
 // define REPORT, ADREPORT, and SIMULATE
+// F is nullptr when the model is evaluated outside of a TMB call, e.g., by
+// get_output(), and then there is no TMB object to report or simulate into.
 #define FIMS_REPORT_F(name, F)                                         \
-  if (isDouble<Type>::value &&                                         \
+  if (isDouble<Type>::value && F != nullptr &&                         \
       F->current_parallel_region < static_cast<Type>(0)) {             \
     Rf_defineVar(Rf_install(#name), PROTECT(asSEXP(name)), F->report); \
     UNPROTECT(1);                                                      \
   }
 
 #define FIMS_REPORT_F_(name, obj, F)                                 \
-  if (isDouble<Type>::value &&                                       \
+  if (isDouble<Type>::value && F != nullptr &&                       \
       F->current_parallel_region < static_cast<Type>(0)) {           \
     Rf_defineVar(Rf_install(name), PROTECT(asSEXP(obj)), F->report); \
     UNPROTECT(1);                                                    \
   }
 
-#define ADREPORT_F(name, F) F->reportvector.push(name, #name);
+#define ADREPORT_F(name, F) \
+  if (F != nullptr) F->reportvector.push(name, #name);
 
 template <typename Type>
 vector<Type> ADREPORTvector(vector<vector<Type> > x) {
@@ -60,7 +63,8 @@ vector<Type> ADREPORTvector(vector<vector<Type> > x) {
   return res;
 }
 
-#define FIMS_SIMULATE_F(F) if (isDouble<Type>::value && F->do_simulate)
+#define FIMS_SIMULATE_F(F) \
+  if (isDouble<Type>::value && F != nullptr && F->do_simulate)
 
 #endif /* TMB_MODEL */
 

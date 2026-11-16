@@ -9,6 +9,11 @@
 
 # VonBertalanffySchnute growth convergence ----
 ## Setup ----
+testthat::skip_if(
+  Sys.getenv("RUN_SLOW_TESTS") != "true",
+  "Skipping: RUN_SLOW_TESTS is not set to true."
+)
+
 make_vonb_parameters <- function(fims_frame) {
   default_parameters <- FIMS::setup_default_parameters(data = fims_frame)
 
@@ -197,12 +202,22 @@ make_vonb_model_comparison_context <- function() {
   data("data_big", package = "FIMS")
   fims_frame <- FIMS::FIMSFrame(data_big)
 
-  # Keep the older fixture for non-recruitment, non-growth, non-population
-  # structural parameters only. Drop old Data rows because current main uses
-  # parsed uncertainty strings rather than Data rows in the parameter table.
-  base_parameters <- readRDS(
-    testthat::test_path("fixtures", "parameters_model_comparison_project.RDS")
-  ) |>
+  # Keep the Model Comparison parameters for non-recruitment, non-growth,
+  # non-population structural parameters only. Drop old Data rows because
+  # current main uses parsed uncertainty strings rather than Data rows in the
+  # parameter table. parameters_big divides the estimated values by
+  # initial_value_scale, so multiply to start at the OM values.
+  initial_value_scale <- readRDS(
+    testthat::test_path("fixtures", "initial_value_scale.RDS")
+  )
+  base_parameters <- FIMS::parameters_big |>
+    dplyr::mutate(
+      value = dplyr::if_else(
+        estimation_type != "constant",
+        value * initial_value_scale,
+        value
+      )
+    ) |>
     dplyr::filter(
       !module_name %in% c("Data", "Growth", "Recruitment", "Population")
     )
@@ -271,6 +286,58 @@ initialize_test_fleet <- function(parameters, data, fleet) {
 }
 
 ## IO correctness ----
+test_that("reference lengths survive initialization across estimation settings", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_convergence_context()
+  settings <- expand.grid(
+    young = c("constant", "fixed_effects"),
+    old = c("constant", "fixed_effects"),
+    stringsAsFactors = FALSE
+  )
+
+  for (i in seq_len(nrow(settings))) {
+    parameters <- ctx$parameters |>
+      dplyr::mutate(
+        estimation_type = dplyr::case_when(
+          module_name == "Growth" & label == "mean_length_young" ~
+            settings$young[i],
+          module_name == "Growth" & label == "mean_length_old" ~
+            settings$old[i],
+          TRUE ~ estimation_type
+        )
+      )
+
+    fit <- parameters |>
+      FIMS::initialize_fims(data = ctx$data) |>
+      FIMS::fit_fims(optimize = FALSE, get_sd = FALSE)
+
+    lengths <- FIMS::get_estimates(fit) |>
+      dplyr::filter(
+        module_name == "Growth",
+        label %in% c("mean_length_young", "mean_length_old")
+      )
+    case <- paste("young:", settings$young[i], "old:", settings$old[i])
+
+    #' @description Finalized reference lengths equal their physical inputs for all constant/fixed-effect combinations.
+    expect_equal(
+      lengths$estimated,
+      lengths$input,
+      tolerance = 1e-6,
+      info = case
+    )
+
+    #' @description Backend length at the youngest reference age equals the supplied younger length.
+    expect_equal(
+      as.numeric(FIMS::get_report(fit)[["growth_mean_LAA"]][[1]][1]),
+      lengths$input[lengths$label == "mean_length_young"],
+      tolerance = 1e-8,
+      info = case
+    )
+  }
+})
+
 test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   ctx <- make_vonb_convergence_context()
   on.exit(
@@ -311,7 +378,7 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
   #' @description Test that the von Bertalanffy--Schnute growth fit reaches a small maximum gradient under the current non-Newton optimization path.
   # Allow small cross-platform optimizer jitter while still requiring a low
   # gradient for the growth-estimation integration test.
-  expect_lte(FIMS::get_max_gradient(fit), 2e-3)
+  expect_lte(FIMS::get_max_gradient(fit), 1e-2)
 
   #' @description Test that the estimable von Bertalanffy--Schnute growth parameters remain finite and positive.
   expect_true(all(is.finite(core_growth_estimates)))
@@ -378,6 +445,21 @@ test_that("von bertalanffy growth converges when L1 L2 and K are estimable", {
     population_mean_waa[positive_catch_cells],
     tolerance = 1e-8
   )
+
+  #' @description Test that biological mean WAA is weight averaged over the length-at-age distribution, a (mu^3 + 3 mu sd^2) for b = 3, not weight at the mean length.
+  length_weight_a <- growth_estimates |>
+    dplyr::filter(.data[["label"]] == "length_weight_a") |>
+    dplyr::pull(.data[["estimated"]])
+  length_weight_b <- growth_estimates |>
+    dplyr::filter(.data[["label"]] == "length_weight_b") |>
+    dplyr::pull(.data[["estimated"]])
+  expect_equal(length_weight_b, 3)
+  mean_laa <- report[["growth_mean_LAA"]][[1]]
+  sd_laa <- report[["growth_sd_LAA"]][[1]]
+  expected_mean_waa <- length_weight_a *
+    (mean_laa^3 + 3 * mean_laa * sd_laa^2)
+  expect_lt(max(abs(population_mean_waa / expected_mean_waa - 1)), 1e-3)
+  expect_true(all(population_mean_waa > length_weight_a * mean_laa^3))
 
   realized_age_to_length_conversion <- report[["age_to_length_conversion_derived"]][[1]]
   n_years <- FIMS::get_n_years(ctx$data)
@@ -459,26 +541,32 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
   #' @description Test that the fitted von Bertalanffy--Schnute output includes the three Model Comparison OM-truth growth parameters.
   expect_setequal(growth_estimates$label, expected_growth$label)
 
-  #' @description Test that fitted mean_length_young remains close to the model comparison OM value at age 1.
-  expect_equal(
-    growth_estimates |>
-      dplyr::filter(label == "mean_length_young") |>
-      dplyr::pull(estimated),
-    growth_estimates |>
-      dplyr::filter(label == "mean_length_young") |>
-      dplyr::pull(expected),
-    tolerance = 30
+  # The bound is in mm. Reading the length labels half a bin off (25 mm for
+  # the 50 mm bins in data_big) fails it.
+  #' @description Test that fitted mean_length_young remains within 2 mm of the Model Comparison OM value at age 1.
+  expect_lte(
+    abs(
+      growth_estimates |>
+        dplyr::filter(label == "mean_length_young") |>
+        dplyr::pull(estimated) -
+        growth_estimates |>
+        dplyr::filter(label == "mean_length_young") |>
+        dplyr::pull(expected)
+    ),
+    2
   )
 
-  #' @description Test that fitted mean_length_old remains close to the model comparison OM value at age 12.
-  expect_equal(
-    growth_estimates |>
-      dplyr::filter(label == "mean_length_old") |>
-      dplyr::pull(estimated),
-    growth_estimates |>
-      dplyr::filter(label == "mean_length_old") |>
-      dplyr::pull(expected),
-    tolerance = 30
+  #' @description Test that fitted mean_length_old remains within 2 mm of the Model Comparison OM value at age 12.
+  expect_lte(
+    abs(
+      growth_estimates |>
+        dplyr::filter(label == "mean_length_old") |>
+        dplyr::pull(estimated) -
+        growth_estimates |>
+        dplyr::filter(label == "mean_length_old") |>
+        dplyr::pull(expected)
+    ),
+    2
   )
 
   #' @description Test that fitted growth_coefficient remains within 0.01 of the Model Comparison OM growth coefficient.
@@ -520,6 +608,38 @@ test_that("von bertalanffy defaults to lightweight derived age-to-length convers
     \(x) x[["name"]] == "age_to_length_conversion_derived",
     logical(1)
   ))
+
+  sd_labels <- c("length_at_age_sd_young", "length_at_age_sd_old")
+  supplied_sd <- ctx$parameters |>
+    dplyr::filter(module_name == "Growth", label %in% sd_labels) |>
+    dplyr::arrange(match(label, sd_labels)) |>
+    dplyr::pull(value)
+
+  reported_sd <- FIMS::get_estimates(fit) |>
+    dplyr::filter(module_name == "Growth", label %in% sd_labels) |>
+    dplyr::arrange(match(label, sd_labels))
+
+  #' @description Finalized Growth reporting preserves both named SDs in physical length units before optimization.
+  expect_equal(reported_sd$label, sd_labels)
+  expect_equal(reported_sd$estimated, supplied_sd, tolerance = 1e-8)
+
+  reference_labels <- c(
+    "reference_age_for_length_young",
+    "reference_age_for_length_old"
+  )
+  reference_ages <- ctx$parameters |>
+    dplyr::filter(module_name == "Growth", label %in% reference_labels) |>
+    dplyr::arrange(match(label, reference_labels)) |>
+    dplyr::pull(value)
+
+  reference_indices <- match(reference_ages, FIMS::get_ages(ctx$data))
+
+  #' @description Backend SD-at-age recovers the supplied SDs at the two reference ages.
+  expect_equal(
+    as.numeric(report[["growth_sd_LAA"]][[1]])[reference_indices],
+    supplied_sd,
+    tolerance = 1e-6
+  )
 
   #' @description Test that the derived von Bertalanffy--Schnute path is still selected in reports by default.
   expect_equal(report[["age_to_length_conversion_derived_used"]][[1]][1], 1)

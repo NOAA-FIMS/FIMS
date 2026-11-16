@@ -3,8 +3,7 @@
  * \brief Implementation of Rcpp variable interfaces for the FIMS framework.
  */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_interface_base.hpp"
-#include <RcppCommon.h>
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 
 /**
  * Function to register variable classes with the Rcpp module system.

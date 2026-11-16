@@ -15,33 +15,43 @@
 namespace fims_popdy {
 
 /**
- * @brief VonBertalanffySchnute growth functor for length-at-age and
- * weight-at-age.
+ * @brief Von Bertalanffy growth using the Schnute parameterization.
  *
- * The main growth curve is parameterized using lengths at two reference ages:
+ * Mean length at age is defined using lengths at two reference ages:
+ *
  * \f[
  * L(a) = L_y + (L_o - L_y)
  * \frac{1 - \exp[-K(a-a_y)]}{1 - \exp[-K(a_o-a_y)]}
  * \f]
  *
  * where:
- * - \f$a\f$ is age.
- * - \f$L_y\f$ is length at the young reference age (`mean_length_young`).
- * - \f$L_o\f$ is length at the old reference age (`mean_length_old`).
- * - \f$a_y\f$ is the young reference age
+ * - \f$a\f$ is the age being evaluated.
+ * - \f$L_y\f$ is the mean length at the younger reference age
+ *   (`mean_length_young`).
+ * - \f$L_o\f$ is the mean length at the older reference age
+ *   (`mean_length_old`).
+ * - \f$a_y\f$ is the younger reference age
  *   (`reference_age_for_length_young`).
- * - \f$a_o\f$ is the old reference age
+ * - \f$a_o\f$ is the older reference age
  *   (`reference_age_for_length_old`).
  * - \f$K\f$ is the growth coefficient (`growth_coefficient`).
  *
- * @details When the young reference age is positive, ages below that
- * reference age use a linear ramp, with age bounded below by zero.
- * The curved branch also applies a numerical floor to its denominator.
- * The equation above describes the nominal curved relationship.
+ * @details The equation above describes the main growth curve.
+ * When the younger reference age is greater than zero, mean length
+ * at earlier ages is calculated using a linear ramp from age zero
+ * to the younger reference age. Ages used in the ramp are bounded
+ * below by zero.
  *
- * @note Setting reference_age_for_length_young = 0 makes
- * mean_length_young the length at age zero, L(0). This is not necessarily
- * the conventional von Bertalanffy zero-length age parameter, t0.
+ * For numerical stability, the implementation applies smooth
+ * approximations to the absolute value and maximum operations,
+ * using 1e-8 as the lower-bound argument. These approximations
+ * can affect the curve when the denominator is small.
+ *
+ * @note When `reference_age_for_length_young` is zero,
+ * `mean_length_young` represents mean length at age zero, L(0).
+ * Setting the reference age to zero does not imply that the
+ * traditional von Bertalanffy zero-length age parameter, t0,
+ * is zero.
  */
 template <typename Type>
 struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {

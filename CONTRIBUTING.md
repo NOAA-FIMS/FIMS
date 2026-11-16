@@ -8,7 +8,7 @@ Please use [GitHub Discussions](https://github.com/orgs/NOAA-FIMS/discussions) i
 
 ## Found a :bug:
 
-Please use [GitHub Issues](https://github.com/NOAA-FIMS/FIMS/issues/new?template=bug_report.yml) to submit a :bug: report. If you have an idea for a well-defined enhancement to FIMS, please use GitHub to submit a [Feature request](https://github.com/NOAA-FIMS/FIMS/issues/new?template=feature_request.yml). Before submitting either of these tickets, please search the [existing issues](https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue) to see if something identical or similar has already been submitted. Once created, Issues are automatically tagged with the `status: triage_needed` tag and placed on the [Issue Triage Board](https://github.com/orgs/NOAA-FIMS/projects/21) where they will be labeled, given an assignee, and given a milestone by those in charge of the triage process.
+Please use [GitHub Issues](https://github.com/NOAA-FIMS/FIMS/issues/new?template=bug_report.yml) to submit a :bug: report. If you have an idea for a well-defined enhancement to FIMS, please use GitHub to submit a [Feature request](https://github.com/NOAA-FIMS/FIMS/issues/new?template=feature_request.yml). Before submitting either of these tickets, please search the [existing issues](https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue) to see if something identical or similar has already been submitted. Once created, Issues are automatically tagged with the `status: triage_needed` tag.
 
 ## Contributing code
 
@@ -20,7 +20,7 @@ Additionally, if you would like to make contributions to the [NOAA-FIMS website]
 
 ### Adding a new module
 
-If you are adding a new C++ module to FIMS (e.g., a new selectivity function, recruitment model, or other population dynamics component), start with the guide titled [Adding a New C++ Module](vignettes/adding-new-module.Rmd).
+If you are adding a new C++ module to FIMS (e.g., a new selectivity function, recruitment model, or other population dynamics component), start with the guide titled [Adding a New C++ Module](https://noaa-fims.github.io/FIMS/articles/adding-new-module.html).
 
 That guide explains the current architecture in detail. The quick checklist below is intended to help you keep track of the files and workflows you will usually need to touch.
 
@@ -47,7 +47,6 @@ Note that the examples below are for adding a new module to the population dynam
 
 - [ ] Register the class in `src/fims_modules.hpp`.
 - [ ] Export the class in `R/FIMS-package.R` and run `devtools::document()`.
-- [ ] Update `R/create_default_configurations.R` if the new module type should appear in the default configuration workflow.
 - [ ] Update `R/setup_default_parameters.R` so default values and estimation types are generated correctly.
 - [ ] Update `R/initialize_modules.R` and `initialize_fims()` if the module needs explicit initialization or linking behavior.
 
@@ -60,7 +59,7 @@ Note that the examples below are for adding a new module to the population dynam
 **Validation and follow-up**
 
 - [ ] Complete the tasks found in the [Standard contributor checks](#standard-contributor-checks) section
-- [ ] Update the [Adding a New C++ Module vignette](vignettes/adding-new-module.Rmd) itself if your changes alter the recommended workflow.
+- [ ] Update the [Adding a New C++ Module vignette](https://noaa-fims.github.io/FIMS/articles/adding-new-module.html) itself if your changes alter the recommended workflow.
 - [ ] Provide feedback to the developers on how helpful the vignette was to your development process.
 
 ### Feature branches
@@ -75,7 +74,7 @@ Along the development process it is important to add tests and ensure that the c
 * Implement the suite of Google tests using `cmake --build build` and `ctest --test-dir build`. This can also be done using `setup_and_run_gtest()` in R. If there are failing tests, run `ctest --test-dir --rerun-failed --output-on-failure` to re-run the failed tests verbosely.
 * Format C++ code using clang-format version 18.0.0 with Google style: `clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")`. If you are contributing from a fork, the automated formatting workflow will add a comment to your pull request with detailed instructions on how to format your code locally.
 * Run clang tidy to check C++ for common mistakes using TODO: document how to run clang-tidy.
-* Spell check the package using [cspell](https://cspell.org/). Install with `npm install -g cspell` and run `cspell "**/*.{cpp,hpp,h,R,Rmd,md}"` from the package root. Add any project-specific terms to `inst/WORDLIST` (used as the cspell dictionary).
+* Spell check the package using [cspell](https://cspell.org/). Install with `npm install -g cspell` and run `cspell "**/*.{cpp,hpp,h,R,Rmd,md}"` from the package root. Add any terms needed to [`NOAA-FIMS/.github/cspell.json`](https://github.com/NOAA-FIMS/.github/blob/main/cspell.json).
 * Build the roxygen documentation using `devtools::document()`. See the [r-lib](https://roxygen2.r-lib.org/) for all available tags and best practices.
 * Implement the suite of testthat tests using `devtools::test()`.
 * Run `styler::style_pkg()` to style R code.

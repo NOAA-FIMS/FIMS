@@ -3,7 +3,7 @@
  * \brief Implementation of Rcpp recruitment interfaces for the FIMS framework.
  */
 #include "../inst/include/interface/rcpp/rcpp_objects/rcpp_recruitment.hpp"
-#include <Rcpp.h>
+#include "../inst/include/interface/rcpp/rcpp_include.hpp"
 // static id of the RecruitmentInterfaceBase object
 uint32_t RecruitmentInterfaceBase::id_g = 1;
 // local id of the RecruitmentInterfaceBase object map relating the ID of the
@@ -41,9 +41,7 @@ void register_recruitment(Rcpp::Module& m) {
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classLogDevsRecruitmentInterface.html.")
       .constructor()
-      .method("get_id", &LogDevsRecruitmentInterface::get_id)
-      .method("evaluate_process",
-              &LogDevsRecruitmentInterface::evaluate_process);
+      .method("get_id", &LogDevsRecruitmentInterface::get_id);
 
   Rcpp::class_<LogRRecruitmentInterface>(
       "LogRRecruitmentProcess",
@@ -51,6 +49,5 @@ void register_recruitment(Rcpp::Module& m) {
       "https://noaa-fims.github.io/FIMS/doxygen/"
       "classLogRRecruitmentInterface.html.")
       .constructor()
-      .method("get_id", &LogRRecruitmentInterface::get_id)
-      .method("evaluate_process", &LogRRecruitmentInterface::evaluate_process);
+      .method("get_id", &LogRRecruitmentInterface::get_id);
 }

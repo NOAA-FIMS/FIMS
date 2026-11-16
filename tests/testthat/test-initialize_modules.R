@@ -15,7 +15,10 @@ default_parameters <- setup_default_parameters(data = data)
 
 ## IO correctness ----
 test_that("`initialize_fims()` works with correct inputs", {
-  result <- initialize_fims(parameters = default_parameters, data = data)
+  #' @description Test that `initialize_fims()` does not warn when all recruitment process values are estimated.
+  expect_no_warning(
+    result <- initialize_fims(parameters = default_parameters, data = data)
+  )
   #' @description Test that `initialize_fims()` returns a list.
   expect_type(result, "list")
   #' @description Test that `initialize_fims()` returns an output with correct names.
@@ -65,9 +68,13 @@ test_that("`initialize_fims()` works with edge cases", {
     parameters = default_parameters,
     data = data
   )
-  init_parm_multiple_types <- initialize_fims(
-    parameters = parameters_multiple_types,
-    data = data
+  #' @description Test that `initialize_fims()` warns when some process values are constant but still included in the process distribution.
+  expect_warning(
+    init_parm_multiple_types <- initialize_fims(
+      parameters = parameters_multiple_types,
+      data = data
+    ),
+    regexp = "10 of the 29"
   )
   #' @description Test that `initialize_fims()` works with multiple estimation types.
   expect_equal(
@@ -75,6 +82,21 @@ test_that("`initialize_fims()` works with edge cases", {
       length(init_parm_multiple_types$parameters$re),
     length(init_parm_default$parameters$p) +
       length(init_parm_default$parameters$re) - 10
+  )
+  clear()
+
+  parameters_na_types <- parameters_multiple_types |>
+    dplyr::mutate(
+      estimation_type = dplyr::if_else(
+        label == "log_devs" & estimation_type == "constant",
+        NA_character_,
+        estimation_type
+      )
+    )
+  #' @description Test that `initialize_fims()` treats an NA estimation_type in `log_devs` as constant and warns instead of erroring.
+  expect_warning(
+    initialize_fims(parameters = parameters_na_types, data = data),
+    regexp = "10 of the 29"
   )
   clear()
 
@@ -149,7 +171,7 @@ test_that("`initialize_fims()` returns correct error messages", {
   #' @description Test that `initialize_fims()` fails when no fleets are provided.
   expect_error(
     initialize_fims(parameters = parameters_no_fleets, data = data),
-    "No fleets found in the provided `parameters`."
+    "No fleets found in the provided `parameters`"
   )
   clear()
 
@@ -272,6 +294,71 @@ test_that("`initialize_growth()` works with correct inputs", {
     ) %in% names(result$.refClassDef@refMethods)
   ))
   clear()
+})
+
+test_that("`initialize_growth()` assigns named SDs independently of row order", {
+  clear()
+  on.exit(clear(), add = TRUE)
+
+  parameters <- setup_default_Growth(
+    data = data,
+    module_type = "VonBertalanffySchnute"
+  ) |>
+    dplyr::mutate(
+      value = dplyr::case_when(
+        label == "reference_age_for_length_young" ~ 4,
+        label == "reference_age_for_length_old" ~ 18,
+        label == "length_at_age_sd_young" ~ 31,
+        label == "length_at_age_sd_old" ~ 79,
+        TRUE ~ value
+      )
+    ) |>
+    dplyr::slice(dplyr::n():1)
+
+  #' @description Named SD inputs initialize without warnings after changing reference ages and reversing row order.
+  expect_no_warning(
+    result <- initialize_growth(parameters = parameters, data = data)
+  )
+
+  #' @description Each SD and reference age is assigned to its named field.
+  expect_equal(result$length_at_age_sd_young[1]$value, 31)
+  expect_equal(result$length_at_age_sd_old[1]$value, 79)
+  expect_equal(result$reference_age_for_length_young[1]$value, 4)
+  expect_equal(result$reference_age_for_length_old[1]$value, 18)
+})
+
+test_that("`initialize_growth()` rejects malformed named SD inputs", {
+  clear()
+  on.exit(clear(), add = TRUE)
+
+  parameters <- setup_default_Growth(
+    data = data,
+    module_type = "VonBertalanffySchnute"
+  )
+  young <- which(parameters$label == "length_at_age_sd_young")
+  old <- which(parameters$label == "length_at_age_sd_old")
+
+  duplicate <- parameters
+  duplicate$label[old] <- "length_at_age_sd_young"
+
+  age_labeled <- parameters
+  age_labeled$age[young] <- 4
+
+  cases <- list(
+    missing_young = parameters[-young, ],
+    missing_old = parameters[-old, ],
+    duplicate_young = duplicate,
+    unexpected_age = age_labeled
+  )
+
+  #' @description Interpolation requires one SD of each name and no separate age labels.
+  for (case in names(cases)) {
+    expect_error(
+      initialize_growth(parameters = cases[[case]], data = data),
+      regexp = "interpolation-based variability inputs are malformed",
+      info = case
+    )
+  }
 })
 
 # test_initialize_maturity ----
@@ -433,7 +520,181 @@ test_that("`initialize_fleet()` works with correct inputs", {
       "GetObservedCatchDataID"
     ) %in% names(result$.refClassDef@refMethods)
   ))
+  #' @description Test that `initialize_fleet()` leaves weight at age empty for a fleet without its own rows, so the population weight is used.
+  expect_equal(result$weight_at_age$size(), 0)
+  #' @description Test that `initialize_fleet()` leaves ageing error empty for a fleet without ageing error rows.
+  expect_equal(result$ageing_error$size(), 0)
+  #' @description Test that `initialize_fleet()` sets catch in mt to be fit as weight.
+  expect_equal(result$observed_catch_units$get(), "weight")
   clear()
+})
+
+test_that("`initialize_fims()` fits catch and index to the expected quantity matching their units", {
+  get_fleet_report <- function(data) {
+    frame <- FIMSFrame(data)
+    report <- setup_default_parameters(frame) |>
+      initialize_fims(data = frame) |>
+      fit_fims(optimize = FALSE) |>
+      get_report()
+    clear()
+    report
+  }
+  weight_report <- get_fleet_report(data_big)
+  number_report <- get_fleet_report(dplyr::mutate(
+    data_big,
+    unit = dplyr::if_else(type %in% c("catch", "index"), "number", unit)
+  ))
+
+  #' @description Test that catch and index in mt are fit to expected weight.
+  expect_equal(weight_report[["catch_expected"]][[1]], weight_report[["catch_weight"]][[1]])
+  expect_equal(weight_report[["index_expected"]][[2]], weight_report[["index_weight"]][[2]])
+  #' @description Test that catch and index in numbers are fit to expected numbers.
+  expect_equal(number_report[["catch_expected"]][[1]], number_report[["catch_numbers"]][[1]])
+  expect_equal(number_report[["index_expected"]][[2]], number_report[["index_numbers"]][[2]])
+  #' @description Test that expected numbers differ from expected weight, so the checks above can tell the 2 units apart.
+  expect_false(isTRUE(all.equal(
+    number_report[["catch_numbers"]][[1]],
+    number_report[["catch_weight"]][[1]]
+  )))
+  expect_false(isTRUE(all.equal(
+    number_report[["index_numbers"]][[2]],
+    number_report[["index_weight"]][[2]]
+  )))
+})
+
+test_that("`initialize_fims()` errors for a catch unit it cannot map", {
+  #' @description Test that `initialize_fims()` errors rather than fitting a catch unit with no mapping, e.g., one added to FIMSFrame() but not to initialize_fleet().
+  frame <- FIMSFrame(data_big)
+  # FIMSFrame() rejects this unit, so it is set on the stored data directly
+  frame@data[["unit"]][frame@data[["type"]] == "catch"] <- "t"
+  expect_error(
+    object = setup_default_parameters(frame) |>
+      initialize_fims(data = frame),
+    regexp = "has no rule for the catch or index unit"
+  )
+  clear()
+})
+
+test_that("`initialize_fleet()` passes a fleet's own weight at age to the model", {
+  get_fleet_report <- function(data) {
+    frame <- FIMSFrame(data)
+    report <- setup_default_parameters(frame) |>
+      initialize_fims(data = frame) |>
+      fit_fims(optimize = FALSE) |>
+      get_report()
+    clear()
+    report
+  }
+  fleet_default_rows <- dplyr::filter(
+    data_big,
+    type == "weight_at_age",
+    timing == 1
+  ) |>
+    dplyr::mutate(fleet = "fleet1", timing = NA_integer_, observed = observed * 2)
+  fleet_year_5_rows <- dplyr::mutate(
+    fleet_default_rows,
+    timing = 5L,
+    observed = observed / 2 * 3
+  )
+  base_report <- get_fleet_report(data_big)
+  fleet_report <- get_fleet_report(
+    dplyr::bind_rows(data_big, fleet_default_rows, fleet_year_5_rows)
+  )
+  n_ages <- get_n_ages(data)
+  year_5_index <- (5 - get_start_year(data)) * n_ages + seq_len(n_ages)
+  base_catch_weight <- base_report[["catch_weight_at_age"]][[1]]
+  fleet_catch_weight <- fleet_report[["catch_weight_at_age"]][[1]]
+
+  #' @description Test that a fleet's weight at age sets its catch weight at age, with year 5 using that year's rows and other years the fleet default.
+  expect_equal(fleet_catch_weight[year_5_index], 3 * base_catch_weight[year_5_index])
+  expect_equal(fleet_catch_weight[-year_5_index], 2 * base_catch_weight[-year_5_index])
+  #' @description Test that another fleet without its own weight at age keeps the population weight for its index weight.
+  expect_equal(
+    fleet_report[["index_weight_at_age"]][[2]],
+    base_report[["index_weight_at_age"]][[2]]
+  )
+  #' @description Test that a fleet's weight at age does not change population biomass.
+  expect_equal(fleet_report[["biomass"]], base_report[["biomass"]])
+})
+
+test_that("`initialize_fleet()` uses a fleet's own age-to-length conversion rows", {
+  # fleet1 gets a uniform table and survey1 keeps the shared table.
+  conversion <- dplyr::filter(data_big, type == "age_to_length_conversion")
+  uniform_probability <- 1 / dplyr::n_distinct(conversion[["length"]])
+  fleet_data <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(conversion, fleet = "fleet1", observed = uniform_probability)
+  ))
+  fleet_values <- function(fleet, fleet_data) {
+    selectivity <- FIMS:::initialize_selectivity(
+      parameters = default_parameters,
+      data = fleet_data,
+      fleet = fleet
+    )
+    module <- FIMS:::initialize_fleet(
+      parameters = default_parameters,
+      data = fleet_data,
+      fleet = fleet,
+      # Only the conversion is checked, so the data ids are placeholders.
+      linked_ids = c(
+        selectivity = selectivity$get_id(),
+        catch = 1,
+        index = 1,
+        age_comp = 1,
+        length_comp = 1
+      )
+    )
+    purrr::map_dbl(
+      seq_along(module$age_to_length_conversion),
+      \(i) module$age_to_length_conversion[i]$value
+    )
+  }
+  shared_values <- model_age_to_length_conversion(data)
+  #' @description Test that `initialize_fleet()` uses a fleet's own age-to-length conversion rows when it has them.
+  expect_equal(
+    fleet_values("fleet1", fleet_data),
+    rep(uniform_probability, length(shared_values))
+  )
+  #' @description Test that `initialize_fleet()` uses the shared age-to-length conversion rows for a fleet without its own.
+  expect_equal(fleet_values("survey1", fleet_data), shared_values)
+
+  # Year 5 gets a uniform table and every other year keeps the default.
+  year_data <- FIMSFrame(dplyr::bind_rows(
+    data_big,
+    dplyr::mutate(conversion, timing = 5, observed = uniform_probability)
+  ))
+  by_year <- matrix(
+    fleet_values("fleet1", year_data),
+    ncol = get_n_years(year_data)
+  )
+  #' @description Test that `initialize_fleet()` passes 1 age-to-length conversion table per year when a year has its own rows.
+  expect_equal(by_year[, 5], rep(uniform_probability, length(shared_values)))
+  #' @description Test that `initialize_fleet()` passes the default age-to-length conversion table for years without their own rows.
+  expect_equal(by_year[, 4], shared_values)
+  clear()
+
+  # Expected length compositions for fleet1, 1 column per year.
+  fleet1_length_comp <- function(fims_frame) {
+    fit <- suppressWarnings(fit_fims(
+      initialize_fims(setup_default_parameters(data = fims_frame), fims_frame),
+      optimize = FALSE
+    ))
+    on.exit(clear())
+    matrix(
+      get_report(fit)[["lengthcomp_proportion"]][[1]],
+      ncol = get_n_years(fims_frame)
+    )
+  }
+  base_comp <- fleet1_length_comp(data)
+  year_comp <- fleet1_length_comp(year_data)
+  #' @description Test that a uniform year-5 age-to-length conversion table gives a uniform expected length composition in year 5 only.
+  expect_equal(
+    year_comp[, 5],
+    rep(uniform_probability, nrow(year_comp)),
+    tolerance = 1e-8
+  )
+  #' @description Test that a year-5 age-to-length conversion table leaves the expected length composition in other years unchanged.
+  expect_equal(year_comp[, 4], base_comp[, 4])
 })
 
 # test_initialize_catch ----
@@ -465,6 +726,72 @@ test_that("`initialize_catch()` works with correct inputs", {
   clear()
 })
 
+test_that("`initialize_catch()` treats a catch of 0 as a year with no fishing", {
+  zero_catch <- dplyr::mutate(
+    data_big,
+    observed = dplyr::if_else(type == "catch" & timing == 3, 0, observed)
+  )
+  #' @description Test that `initialize_catch()` leaves a catch of 0 out of the likelihood.
+  catch_module <- initialize_catch(data = FIMSFrame(zero_catch), fleet = "fleet1")
+  expect_equal(catch_module$catch_data$get_values()[3], -999)
+  clear()
+
+  get_objective <- function(data, parameters) {
+    fit <- parameters |>
+      initialize_fims(data = data) |>
+      fit_fims(optimize = FALSE)
+    objective <- list(
+      jnll = get_report(fit)[["jnll"]],
+      gradient = get_obj(fit)$gr()
+    )
+    clear()
+    objective
+  }
+  zero_catch_frame <- FIMSFrame(zero_catch)
+  default_objective <- get_objective(
+    zero_catch_frame,
+    setup_default_parameters(zero_catch_frame)
+  )
+  # The manual workaround: catch as missing and F fixed at -200 by hand.
+  missing_catch_frame <- dplyr::mutate(
+    zero_catch,
+    observed = dplyr::if_else(type == "catch" & observed == 0, -999, observed)
+  ) |>
+    FIMSFrame()
+  manual_objective <- get_objective(
+    missing_catch_frame,
+    setup_default_parameters(missing_catch_frame) |>
+      dplyr::mutate(
+        fix_year = .data[["label"]] == "log_Fmort" &
+          .data[["fleet"]] == "fleet1" &
+          .data[["timing"]] == 3,
+        value = dplyr::if_else(.data[["fix_year"]], -200, .data[["value"]]),
+        estimation_type = dplyr::if_else(
+          .data[["fix_year"]],
+          "constant",
+          .data[["estimation_type"]]
+        )
+      ) |>
+      dplyr::select(-"fix_year")
+  )
+
+  #' @description Test that a catch of 0 gives a finite objective and gradient.
+  expect_true(is.finite(default_objective[["jnll"]]))
+  expect_true(all(is.finite(default_objective[["gradient"]])))
+  #' @description Test that a catch of 0 gives the same objective as dropping the catch and fixing F by hand.
+  expect_equal(default_objective[["jnll"]], manual_objective[["jnll"]])
+
+  #' @description Test that `initialize_fims()` warns when F is estimated in a year with a catch of 0.
+  expect_warning(
+    initialize_fims(
+      parameters = setup_default_parameters(data),
+      data = zero_catch_frame
+    ),
+    regexp = "catch of 0:\\s+\"fleet1 3\""
+  )
+  clear()
+})
+
 ## Error handling ----
 test_that("`initialize_catch()` returns correct error messages", {
   #' @description Test that `initialize_catch()` handles unknown fleet correctly.
@@ -473,7 +800,7 @@ test_that("`initialize_catch()` returns correct error messages", {
       data = data,
       fleet = "unknown_fleet"
     ),
-    "Fleet `unknown_fleet` not found in the data object."
+    "`fleet` \"unknown_fleet\" is not present in `data`"
   )
   clear()
 })
@@ -515,7 +842,7 @@ test_that("`initialize_index()` returns correct error messages", {
       data = data,
       fleet = "unknown_fleet"
     ),
-    "Fleet `unknown_fleet` not found in the data object."
+    "`fleet` \"unknown_fleet\" is not present in `data`"
   )
   clear()
 })
@@ -616,7 +943,11 @@ test_that("`initialize_fims()` works with edge cases", {
     dplyr::filter(label != "log_devs" | is.na(label)) |>
     dplyr::bind_rows(modified_log_devs)
   init_parm_default <- initialize_fims(parameters = default_parameters, data = data)
-  init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data)
+  #' @description Test that `initialize_fims()` warns when some `log_devs` are constant but still included in the process distribution.
+  expect_warning(
+    init_parm_multiple_types <- initialize_fims(parameters = parameters_multiple_types, data = data),
+    regexp = "10 of the 29"
+  )
   #' @description Test that `initialize_fims()` works with multiple estimation types.
   expect_equal(length(unlist(init_parm_multiple_types$parameters)), length(unlist(init_parm_default$parameters)) - 10)
 })
@@ -632,7 +963,7 @@ test_that("`initialize_comp()` returns correct error messages", {
       fleet = "unknown_fleet",
       type = "AgeComp"
     ),
-    "Fleet `unknown_fleet` not found in the data object."
+    "`fleet` \"unknown_fleet\" is not present in `data`"
   )
   clear()
 
@@ -656,7 +987,7 @@ test_that("`initialize_comp()` returns correct error messages", {
       fleet = "fleet1",
       type = "AgeComp"
     ),
-    "is unavailable or empty"
+    "Fleet \"fleet1\" has no age-composition data"
   )
   clear()
 

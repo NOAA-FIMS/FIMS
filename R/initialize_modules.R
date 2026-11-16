@@ -120,6 +120,8 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
 
     module_fields <- setdiff(module_fields, c(
       "age_to_length_conversion",
+      "weight_at_age",
+      "ageing_error",
       "lengthcomp_expected",
       "lengthcomp_proportion",
       "n_lengths",
@@ -143,10 +145,6 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
   integer_fields <- c(
     "n_ages", "n_fleets", "n_lengths",
     "n_years", "min_age"
-  )
-
-  boolean_fields <- c(
-    "estimate_prop_female"
   )
 
   real_vector_fields <- c(
@@ -183,7 +181,8 @@ initialize_module <- function(parameters, data, module_name, fleet = NA_characte
       if (
         module_class_name == "VonBertalanffySchnuteGrowth" &&
           field %in% c(
-            "length_at_age_sd_at_reference_ages",
+            "length_at_age_sd_young",
+            "length_at_age_sd_old",
             "log_sd_mean_length_young",
             "log_sd_mean_length_old",
             "log_sd_growth_coefficient",
@@ -256,26 +255,13 @@ initialize_growth <- function(parameters, data) {
       "mean_length_old_growth_coefficient_logit_corr"
     )
 
+    interpolation_sd_labels <- c(
+      "length_at_age_sd_young",
+      "length_at_age_sd_old"
+    )
+
     sd_rows <- growth_input |>
-      dplyr::filter(.data$label == "length_at_age_sd_at_reference_ages")
-
-    if (nrow(sd_rows) > 1 && all(!is.na(sd_rows$age))) {
-      sd_rows <- sd_rows |>
-        dplyr::arrange(.data$age)
-
-      parameters <- parameters |>
-        dplyr::filter(!(
-          .data$module_name == "Growth" &
-            .data$label == "length_at_age_sd_at_reference_ages"
-        )) |>
-        dplyr::bind_rows(sd_rows)
-
-      growth_input <- parameters |>
-        dplyr::filter(.data$module_name == "Growth")
-
-      sd_rows <- growth_input |>
-        dplyr::filter(.data$label == "length_at_age_sd_at_reference_ages")
-    }
+      dplyr::filter(.data$label %in% interpolation_sd_labels)
 
     missing_reference_labels <- setdiff(
       c("reference_age_for_length_young", "reference_age_for_length_old"),
@@ -290,8 +276,7 @@ initialize_growth <- function(parameters, data) {
       ))
     }
 
-    has_interpolation_sd_inputs <-
-      "length_at_age_sd_at_reference_ages" %in% growth_input$label
+    has_interpolation_sd_inputs <- nrow(sd_rows) > 0
 
     present_vonb_delta_labels <- intersect(
       vonb_delta_method_labels,
@@ -315,7 +300,7 @@ initialize_growth <- function(parameters, data) {
       length(present_vonb_delta_labels) == length(vonb_delta_method_labels)) {
       cli::cli_abort(c(
         "VonBertalanffy growth requires exactly one variability path.",
-        "i" = "The default setup uses interpolation via {.var length_at_age_sd_at_reference_ages}.",
+        "i" = "The default setup uses interpolation via {.var length_at_age_sd_young} and {.var length_at_age_sd_old}.",
         "i" = "If you use the delta-method path, supply the full delta block and omit interpolation rows."
       ))
     }
@@ -324,16 +309,18 @@ initialize_growth <- function(parameters, data) {
       length(present_vonb_delta_labels) == 0) {
       cli::cli_abort(c(
         "VonBertalanffy growth requires exactly one variability path.",
-        "i" = "Supply either 2 {.var length_at_age_sd_at_reference_ages} rows or the full delta-method block."
+        "i" = "Supply both {.var length_at_age_sd_young} and {.var length_at_age_sd_old}, or the full delta-method block."
       ))
     }
 
     if (has_interpolation_sd_inputs &&
-      (nrow(sd_rows) != 2 || any(is.na(sd_rows$age)))) {
+      (nrow(sd_rows) != 2 ||
+        !setequal(sd_rows$label, interpolation_sd_labels) ||
+        any(!is.na(sd_rows$age)))) {
       cli::cli_abort(c(
         "VonBertalanffySchnute interpolation-based variability inputs are malformed.",
-        "i" = "Supply exactly 2 {.var length_at_age_sd_at_reference_ages} rows with non-missing ages.",
-        "i" = "These rows should correspond to the two reference ages."
+        "i" = "Supply exactly one {.var length_at_age_sd_young} row and one {.var length_at_age_sd_old} row.",
+        "i" = "Set their {.var age} entries to NA; their ages come from the Growth reference-age parameters."
       ))
     }
   }
@@ -517,31 +504,46 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
 
   module$n_lengths$set(length(fleet_length_bins))
   module$lengths[] <- fleet_length_bins
+
+  # A fleet with its own weight-at-age rows uses them for its catch and index
+  # weight. Other fleets keep an empty vector and use the population weight.
+  input_data <- get_data(data)
+  has_fleet_weight_at_age <- any(
+    input_data[["type"]] == "weight_at_age" &
+      input_data[["fleet"]] %in% fleet
+  )
+  if (has_fleet_weight_at_age) {
+    module$weight_at_age[] <- model_weight_at_age(data, fleet = fleet)
+  }
   module$SetRequiresAgeLengthMapping(requires_age_length_mapping)
 
   module$SetSelectivityID(linked_ids[["selectivity"]])
 
   if (use_age_to_length_conversion_fixed_path) {
     age_to_length_conversion_fixed_data <- get_data(data) |>
-      dplyr::filter(.data$type == "age_to_length_conversion") |>
-      dplyr::group_by(.data$age, .data$length) |>
-      dplyr::summarize(
-        value = mean(as.numeric(.data$observed), na.rm = TRUE),
-        .groups = "drop"
+      resolve_age_to_length_conversion(
+        years = get_start_year(data):get_end_year(data),
+        fleet = fleet,
+        lengths = fleet_length_bins
       ) |>
-      dplyr::filter(.data$length %in% fleet_length_bins) |>
       dplyr::mutate(
         age_order = match(.data$age, get_ages(data)),
         length_order = match(.data$length, fleet_length_bins)
       ) |>
-      dplyr::arrange(.data$age_order, .data$length_order)
+      dplyr::arrange(.data$timing, .data$age_order, .data$length_order)
 
-    expected_age_to_length_conversion_rows <- get_n_ages(data) * length(fleet_length_bins)
+    # The C++ reads 1 table for every year, or 1 table per year.
+    n_tables <- if (all(is.na(age_to_length_conversion_fixed_data[["timing"]]))) {
+      1
+    } else {
+      get_n_years(data)
+    }
+    expected_age_to_length_conversion_rows <- n_tables * get_n_ages(data) * length(fleet_length_bins)
 
     if (nrow(age_to_length_conversion_fixed_data) != expected_age_to_length_conversion_rows) {
       cli::cli_abort(c(
         "Fleet `{fleet}` fixed age-to-length data do not match its resolved fleet bins.",
-        "i" = "Expected {expected_age_to_length_conversion_rows} age-length cells from {get_n_ages(data)} ages x {length(fleet_length_bins)} fleet bins.",
+        "i" = "Expected {expected_age_to_length_conversion_rows} age-length cells from {n_tables} table{?s} x {get_n_ages(data)} ages x {length(fleet_length_bins)} fleet bins.",
         "i" = "Found {nrow(age_to_length_conversion_fixed_data)} matching fixed age-to-length cells after filtering to the fleet bins."
       ))
     }
@@ -553,14 +555,56 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
     module$age_to_length_conversion$resize(0)
   }
 
+  # FIMSFrame() allows only "mt" or "number" as the unit of catch and index,
+  # with 1 unit per fleet for each type. The fleet fits "number" to expected
+  # numbers and "weight" to expected weight.
+  fleet_units <- get_data(data) |>
+    dplyr::filter(
+      .data$fleet == .env$fleet,
+      .data$type %in% c("catch", "index")
+    ) |>
+    dplyr::select(dplyr::all_of(c("type", "unit"))) |>
+    dplyr::distinct()
+  model_units <- dplyr::case_when(
+    fleet_units[["unit"]] == "number" ~ "number",
+    fleet_units[["unit"]] == "mt" ~ "weight"
+  )
+  # A unit allowed by FIMSFrame() but not mapped here would otherwise be fit as
+  # the wrong quantity.
+  if (anyNA(model_units)) {
+    cli::cli_abort(c(
+      "x" = "{.fn initialize_fleet} has no rule for the catch or index unit
+        {.val {fleet_units[['unit']][is.na(model_units)]}} of fleet
+        {.val {fleet}}.",
+      "i" = "Map the unit to {.val number} or {.val weight} in
+        {.fn initialize_fleet}."
+    ))
+  }
+  fleet_units <- stats::setNames(model_units, fleet_units[["type"]])
+
+  # Ageing error only changes expected age compositions.
+  ageing_error <- if ("age_comp" %in% fleet_types) {
+    resolve_ageing_error(
+      get_data(data),
+      fleets = fleet,
+      ages = get_ages(data),
+      years = get_start_year(data):get_end_year(data)
+    )
+  }
+  if (NROW(ageing_error) > 0) {
+    module$ageing_error[] <- ageing_error[["observed"]]
+  }
+
   # Link the observed catch data to the fleet module using its associated ID.
   if ("catch" %in% fleet_types) {
     module$SetObservedCatchDataID(linked_ids[["catch"]])
+    module$observed_catch_units$set(fleet_units[["catch"]])
   }
 
   # Link the observed index data to the fleet module using its associated ID
   if ("index" %in% fleet_types) {
     module$SetObservedIndexDataID(linked_ids[["index"]])
+    module$observed_index_units$set(fleet_units[["index"]])
   }
 
   # Link the observed age-composition data to the fleet module using its
@@ -588,11 +632,7 @@ initialize_fleet <- function(parameters, data, fleet, linked_ids) {
 #' The initialized catch module as an object.
 #' @noRd
 initialize_catch <- function(data, fleet) {
-  # Check if the specified fleet exists in the data
-  fleet_exists <- fleet %in% get_fleets(data)
-  if (!fleet_exists) {
-    cli::cli_abort("Fleet {.var {fleet}} not found in the data object.")
-  }
+  assert_presence_of_fleet(data, fleet)
 
   fleet_type <- dplyr::filter(
     .data = as.data.frame(get_data(data)),
@@ -603,7 +643,11 @@ initialize_catch <- function(data, fleet) {
 
   if ("catch" %in% fleet_type) {
     module <- methods::new(Catch, get_n_years(data))
-    module$catch_data[] <- model_catch(data, fleet)
+    # A catch of 0 is left out of the likelihood (-999): dlnorm is NaN at 0,
+    # and setup_default_Fleet() fixes F at effectively 0 for that year.
+    catch_data <- model_catch(data, fleet)
+    catch_data[catch_data == 0] <- -999
+    module$catch_data[] <- catch_data
 
     return(module)
   } else {
@@ -622,11 +666,7 @@ initialize_catch <- function(data, fleet) {
 #' The initialized index module as an object.
 #' @noRd
 initialize_index <- function(data, fleet) {
-  # Check if the specified fleet exists in the data
-  fleet_exists <- fleet %in% get_fleets(data)
-  if (!fleet_exists) {
-    cli::cli_abort("Fleet {.var {fleet}} not found in the data object.")
-  }
+  assert_presence_of_fleet(data, fleet)
 
   fleet_type <- dplyr::filter(
     .data = as.data.frame(get_data(data)),
@@ -683,10 +723,7 @@ initialize_comp <- function(data,
   type <- match.arg(type)
   comp <- comp_types[[type]]
 
-  fleet_exists <- fleet %in% get_fleets(data)
-  if (!fleet_exists) {
-    cli::cli_abort("Fleet {.var {fleet}} not found in the data object.")
-  }
+  assert_presence_of_fleet(data, fleet)
 
   fleet_length_bins <- NULL
   uses_growth_derived_path <- identical(type, "LengthComp") &&
@@ -735,8 +772,10 @@ initialize_comp <- function(data,
   pretty_comp_name <- gsub("_comp", "-composition", comp[["name"]])
   if (is.null(comp_data) || length(comp_data) == 0) {
     cli::cli_abort(c(
-      "The {pretty_comp_name} data for fleet {.var {fleet}} is
-      unavailable or empty."
+      "x" = "Fleet {.val {fleet}} has no {pretty_comp_name} data.",
+      "i" = "Rows for this fleet need {.code type = \"{comp[['name']]}\"}.
+      Check the {.var fleet} and {.var type} columns, for example with
+      {.code dplyr::count(data, fleet, type)}."
     ))
   }
 
@@ -853,14 +892,44 @@ initialize_comp <- function(data,
 #'   modules requires passing the data and information regarding the uncertainty
 #'   of that data, i.e., input sample sizes for the multinomial distribution.
 #' @return
-#' A list is returned with two elements, `parameters` and `model`. The list can
-#' be passed to the `input` argument of [fit_fims()] to fit the model. The first
-#' element of the list can also be passed to the `parameters` argument of
-#' [TMB::MakeADFun()] if you wish to have more control over the model-fitting
-#' process.
-#' The model element of the returned list stores the instantiated C++ model
-#' module, e.g., the results of `methods::new(CatchAtAge)` for a catch-at-age
-#' model.
+#' A named list with exactly two top-level elements:
+#'
+#' * `parameters`: A named list of numeric starting-value vectors for TMB:
+#'   * `p`: Fixed-effect values returned by `get_fixed()`.
+#'   * `re`: Random-effect values returned by `get_random()`. This vector is
+#'     empty if the model has no random effects.
+#'
+#'   These vectors follow the initialized C++ parameter order, not necessarily
+#'   the row order of the input `parameters` tibble. They contain values on the
+#'   model's estimation scale (for example, log scale for log parameters).
+#'   Parameters with `estimation_type = "constant"` are stored in the modules,
+#'   not in these vectors. This nested list is not the input tibble.
+#' * `model`: The instantiated C++ model module. Currently this is the
+#'   catch-at-age model created with `methods::new(CatchAtAge)`.
+#'
+#' The structure is:
+#' ```
+#' list(
+#'   parameters = list(
+#'     p = get_fixed(),
+#'     re = get_random()
+#'   ),
+#'   model = fims_model
+#' )
+#' ```
+#'
+#' If the returned list is assigned to `initialized`, pass the entire list as
+#' `fit_fims(input = initialized)`. For manual fitting, pass only
+#' `initialized[["parameters"]]` to the `parameters` argument of
+#' [TMB::MakeADFun()], with `random = "re"` and `DLL = "FIMS"`.
+#' The top-level name must be `parameters`, not `parameter_list`.
+#'
+#' No `map` element is returned. To map parameters when using [fit_fims()], add
+#' `initialized[["map"]]` as a top-level named list of factors with entries
+#' `p` and/or `re`. Each factor must match the length and order of its
+#' corresponding vector in `initialized[["parameters"]]`. Omit an entry to
+#' leave that vector unmapped. See [fit_fims()] for mapping rules.
+#'
 #' It is important that you only have one FIMS model initialized in your R
 #' workspace at a time. Thus, after you initialize and fit the model, you should
 #' run [clear()].
@@ -903,6 +972,33 @@ initialize_fims <- function(parameters, data) {
     ))
   }
 
+  # A catch of 0 is left out of the likelihood (see initialize_catch()), so an
+  # estimated F in that year has nothing in the data to inform it.
+  zero_catch <- get_data(data) |>
+    dplyr::filter(.data$type == "catch", .data$observed == 0) |>
+    dplyr::select(dplyr::all_of(c("fleet", "timing")))
+  estimated_zero_catch_Fmort <- parameters |>
+    dplyr::filter(
+      .data$label == "log_Fmort",
+      .data$estimation_type != "constant"
+    ) |>
+    dplyr::semi_join(zero_catch, by = c("fleet", "timing"))
+  if (NROW(estimated_zero_catch_Fmort) > 0) {
+    zero_catch_labels <- paste(
+      estimated_zero_catch_Fmort[["fleet"]],
+      estimated_zero_catch_Fmort[["timing"]]
+    )
+    cli::cli_warn(c(
+      "!" = "{.var log_Fmort} is estimated for the following {.var fleet} and
+      {.var timing} combinations with a catch of 0: {.val {zero_catch_labels}}.",
+      "i" = "A catch of 0 is left out of the likelihood, so nothing in the
+      data informs fishing mortality in those years.
+      {.fn setup_default_parameters} fixes {.var log_Fmort} at -200 for them.",
+      "i" = "Use {.code dplyr::filter(parameters, label == 'log_Fmort',
+      estimation_type != 'constant')} to find the rows."
+    ))
+  }
+
   # Clear any previous FIMS settings
   clear()
 
@@ -913,7 +1009,10 @@ initialize_fims <- function(parameters, data) {
 
   if (length(fleets) == 0) {
     cli::cli_abort(c(
-      "No fleets found in the provided {.var parameters}."
+      "x" = "No fleets found in the provided {.var parameters}.",
+      "i" = "The {.var fleet} column is empty or all {.code NA}.",
+      "i" = "Create {.var parameters} with {.fn setup_default_parameters},
+      which fills in {.var fleet} for each fleet."
     ))
   }
 
@@ -1150,6 +1249,28 @@ initialize_fims <- function(parameters, data) {
       ))
     }
 
+    # The process density covers every element of the vector, including
+    # elements set to constant (with distribution NA) that were filtered out of
+    # recruitment_process_input above. NA estimation types are treated as
+    # constant, as in initialize_process_distribution().
+    process_estimation_types <- parameters |>
+      dplyr::filter(
+        .data$module_name == "Recruitment" & .data$label %in% par
+      ) |>
+      dplyr::pull(.data$estimation_type)
+    n_constant <- sum(
+      process_estimation_types == "constant" | is.na(process_estimation_types)
+    )
+    if (n_constant > 0) {
+      cli::cli_warn(c(
+        "!" = "{n_constant} of the {length(process_estimation_types)}
+        {.var {par}} values in the recruitment module are constant, but the
+        recruitment process distribution includes all of them.",
+        i = "The constant values still add to the negative log-likelihood and
+        affect the estimate of {.var log_sd} (biased low when they are fixed at
+        0) and, for {.var log_r}, the stock-recruit parameters."
+      ))
+    }
 
     # Initialize_process_distribution
     sd_input <- recruitment_process_input |>

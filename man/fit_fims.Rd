@@ -12,14 +12,26 @@ fit_fims(
   optimize = TRUE,
   number_of_newton_steps = 0,
   control = list(eval.max = 10000, iter.max = 10000, trace = 0),
-  filename = NULL
+  filename = NULL,
+  getReportCovariance = FALSE
 )
 }
 \arguments{
-\item{input}{Input list as returned by \code{\link[=initialize_fims]{initialize_fims()}}.}
+\item{input}{Input list as returned by \code{\link[=initialize_fims]{initialize_fims()}}. An optional
+\code{map} entry is a named list of factors for \code{p} (fixed effects) and/or \code{re}
+(random effects), in the order of the corresponding \code{parameters} vector.
+Each factor must have one entry per parameter. \code{NA} holds a parameter at
+its starting value; repeated levels share one estimated value. Shared
+entries must have identical starting values; otherwise, the error lists
+each parameter's name, 1-based index in \code{p} or \code{re}, and initial value.
+Factor levels determine the
+reduced parameter order; unused levels are dropped. Levels in \code{p} and \code{re}
+are independent; sharing
+across these vectors is not supported.}
 
 \item{get_sd}{A boolean specifying if the \code{\link[TMB:sdreport]{TMB::sdreport()}} should be
-calculated?}
+calculated? It is skipped when the maximum gradient is above 0.01 or not
+finite, because standard errors far from the optimum are not meaningful.}
 
 \item{save_sd}{A logical, with the default \code{TRUE}, indicating whether the
 sdreport is returned in the output. If \code{FALSE}, the slot for the report
@@ -43,11 +55,20 @@ the default is a list of length three with \code{eval.max = 1000},
 object as an RDS object. Defaults to 'fit.RDS', and a value of NULL
 indicates not to save it. If specified, it must end in .RDS. The file is
 written to folder given by \code{input[["path"]]}. Not yet implemented.}
+
+\item{getReportCovariance}{A logical passed to \code{\link[TMB:sdreport]{TMB::sdreport()}}, with the
+default \code{FALSE}. Standard errors of all parameters and derived quantities
+are calculated either way. If \code{TRUE}, the full covariance matrix of the
+derived quantities is also calculated and stored as \code{cov} in the
+\code{sdreport}; it grows with the square of the number of derived quantities
+and can use several GB of memory. If \code{FALSE}, \code{cov} is \code{NA}.}
 }
 \value{
 An object of class \code{FIMSFit} is returned, where the structure is the same
 regardless if \code{optimize = TRUE} or not. Uncertainty information is only
-included in the \code{estimates} slot if \code{get_sd = TRUE}.
+included in the \code{estimates} slot if \code{get_sd = TRUE}. The result of each
+convergence check is stored on the object and returned by
+\code{\link[=get_convergence]{get_convergence()}}.
 }
 \description{
 Fit a FIMS model (BETA)
@@ -55,6 +76,15 @@ Fit a FIMS model (BETA)
 \details{
 This function is a beta version still and subject to change
 without warning.
+Mapped parameters are expanded to their full FIMS vectors for reporting.
+Shared parameters receive the same estimate and standard error in
+\code{\link[=get_estimates]{get_estimates()}}. Mapped-off parameters retain their starting values and
+have \code{NA} standard errors. Gradients describe reduced fixed-effect
+optimization variables and are reported only on the first full parameter
+in each shared level. Parameter counts describe the reduced vectors.
+With no active fixed effects, TMB evaluates the random-effects model without
+running an outer optimizer. If no parameters remain active, use
+\code{optimize = FALSE}.
 }
 \seealso{
 \itemize{

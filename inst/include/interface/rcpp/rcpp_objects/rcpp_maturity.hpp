@@ -75,11 +75,11 @@ class MaturityInterfaceBase : public FIMSRcppInterfaceBase {
 class LogisticMaturityInterface : public MaturityInterfaceBase {
  public:
   /**
-   * @brief The index value at which the response reaches 0.5.
+   * @copydoc fims_popdy::LogisticMaturity::inflection_point
    */
   VariableVector inflection_point;
   /**
-   * @brief The width of the curve at the inflection point.
+   * @copydoc fims_popdy::LogisticMaturity::slope
    */
   VariableVector slope;
 
@@ -246,6 +246,8 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
         info->RegisterRandomEffect(maturity->inflection_point[i]);
       }
     }
+    info->variable_map[this->inflection_point.id_m] =
+        &(maturity)->inflection_point;
 
     maturity->slope.resize(this->slope.size());
     for (size_t i = 0; i < this->slope.size(); i++) {
@@ -263,6 +265,7 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
         info->RegisterRandomEffectName(ss.str());
       }
     }
+    info->variable_map[this->slope.id_m] = &(maturity)->slope;
 
     // add to Information
     info->maturity_models[maturity->id] = maturity;

@@ -32,14 +32,15 @@ The returned tibble follows the conventions expected by every
 \code{\link[yardstick:metric_set]{yardstick::metric_set()}} metric function:\tabular{ll}{
    Column \tab Role \cr
    \code{.truth} \tab Observed data value (maps from \code{observed}) \cr
-   \code{.pred} \tab Model-expected value (maps from \code{expected}) \cr
+   \code{.pred} \tab Model prediction on the data scale (from \code{estimated}) \cr
    \code{.weight} \tab Inverse-variance weight from \code{uncertainty} (optional) \cr
    \code{label} \tab Parameter / quantity label, e.g. \code{"catch_expected"} \cr
-   \code{fleet} \tab Fleet identifier (integer) \cr
+   \code{fleet} \tab Fleet name for fleet rows, otherwise \code{NA} \cr
    \code{module_id} \tab Unique module identifier \cr
    \code{distribution} \tab Likelihood distribution used for this data stream \cr
    \code{year_i} \tab Year index (present when available in the estimates) \cr
-   \code{age_i} \tab Age index  (present when available in the estimates) \cr
+   \code{age} \tab Age from the data, \code{NA} for rows without an age \cr
+   \code{length} \tab Length bin from the data, \code{NA} for rows without a length \cr
 }
 }
 \examples{

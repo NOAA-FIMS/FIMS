@@ -23,7 +23,8 @@ TEST_F(CAAEvaluateTestFixture,
   for (size_t year = 0; year < n_years; year++) {
     for (size_t age = 0; age < n_ages; age++) {
       int i_age_year = year * population->n_ages + age;
-      catch_at_age_model->CalculateMaturityAA(population, i_age_year, age);
+      catch_at_age_model->CalculateMaturityAA(population, i_age_year, year,
+                                              age);
       expect_maturity[i_age_year] =
           1.0 /
           (1.0 + exp(-(population->ages[age] - inflection_point) * slope));
@@ -32,5 +33,43 @@ TEST_F(CAAEvaluateTestFixture,
   size_t pop_id = population->GetId();
   auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
   EXPECT_NEAR(dq["proportion_mature_at_age"][10], expect_maturity[10], 0.0001);
+}
+
+// Time-varying maturity uses each year's parameters
+TEST_F(CAAEvaluateTestFixture,
+       HandlesTimeVaryingParameters_CatchAtAge_CalculateMaturityAA) {
+  const size_t years = static_cast<size_t>(n_years);
+  const size_t ages = static_cast<size_t>(n_ages);
+  auto maturity = std::make_shared<fims_popdy::LogisticMaturity<double>>();
+  maturity->inflection_point.resize(years);
+  maturity->slope.resize(years);
+  for (size_t year = 0; year < years; year++) {
+    maturity->inflection_point[year] = 2.0 + year;
+    maturity->slope[year] = 0.5;
+  }
+  population->maturity = maturity;
+
+  // The year loop also reaches n_years, which uses the last year's values
+  for (size_t year = 0; year <= years; year++) {
+    for (size_t age = 0; age < ages; age++) {
+      size_t i_age_year = year * ages + age;
+      catch_at_age_model->CalculateMaturityAA(population, i_age_year, year,
+                                              age);
+    }
+  }
+
+  size_t pop_id = population->GetId();
+  auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
+  for (size_t year = 0; year <= years; year++) {
+    const double inflection_point =
+        2.0 + static_cast<double>(std::min(year, years - 1));
+    for (size_t age = 0; age < ages; age++) {
+      size_t i_age_year = year * ages + age;
+      EXPECT_NEAR(
+          dq["proportion_mature_at_age"][i_age_year],
+          1.0 / (1.0 + exp(-(population->ages[age] - inflection_point) * 0.5)),
+          1e-12);
+    }
+  }
 }
 }  // namespace

@@ -2,10 +2,11 @@
 # 0. Setup
 # -------------------------------------------------------------------------
 # Purpose:
-# Extract equations from FIMS source/documentation comments and render a small
-# equation catalog that can later be connected to the package-level explorer.
+# Extract documented equations from FIMS repository source files and
+# generate a CSV catalogue and searchable HTML reference for publication
+# on the FIMS website.
 #
-# This is a prototype script. It does not modify FIMS source code.
+# This script does not modify FIMS source code or run model calculations.
 #
 # Run from the FIMS repository root.
 
@@ -33,13 +34,8 @@ clean_comment_text <- function(lines) {
 }
 
 extract_regex_matches <- function(text, pattern) {
-  matches <- gregexpr(pattern, text, perl = TRUE)[[1]]
-
-  if (identical(matches, -1L)) {
-    return(character())
-  }
-
-  regmatches(text, list(matches))[[1]]
+  matches <- gregexpr(pattern, text, perl = TRUE)
+  regmatches(text, matches)[[1]]
 }
 
 is_equation_like <- function(x) {
@@ -53,6 +49,7 @@ is_equation_like <- function(x) {
           "\\\\sum",
           "\\\\exp",
           "\\\\log",
+          "\\\\mathrm\\{log\\}",
           "\\\\sqrt",
           "\\\\left",
           "\\\\begin",
@@ -126,6 +123,9 @@ infer_module <- function(path) {
   if (grepl("/growth/", path)) {
     return("Growth")
   }
+  if (grepl("/size/", path)) {
+    return("Size")
+  }
   if (grepl("/maturity/", path)) {
     return("Maturity")
   }
@@ -182,8 +182,7 @@ normalize_signature <- function(lines) {
     return(NA_character_)
   }
 
-  signature <- paste(lines[seq_len(min(6, length(lines)))], collapse = " ")
-  trimws(signature)
+  paste(lines[seq_len(min(6, length(lines)))], collapse = " ")
 }
 
 infer_entity <- function(lines, block_end) {
@@ -311,6 +310,8 @@ parse_comment_blocks <- function(lines) {
 extract_equations_from_file <- function(path) {
   lines <- readLines(path, warn = FALSE)
   comment_blocks <- parse_comment_blocks(lines)
+  source_kind <- infer_source_kind(path)
+  module <- infer_module(path)
   rows <- list()
 
   for (block in comment_blocks) {
@@ -322,18 +323,12 @@ extract_equations_from_file <- function(path) {
       extract_regex_matches(comment_text, "(?s)\\$\\$.*?\\$\\$")
     )
 
-    math_matches <- math_matches[
-      vapply(math_matches, is_equation_like, logical(1))
-    ]
+    math_matches <- math_matches[is_equation_like(math_matches)]
 
     equation_format <- "latex"
     if (length(math_matches) == 0) {
-      plain_equations <- extract_plain_equations(comment_text)
-
-      if (length(plain_equations) > 0) {
-        math_matches <- plain_equations
-        equation_format <- "plain"
-      }
+      math_matches <- extract_plain_equations(comment_text)
+      equation_format <- "plain"
     }
 
     if (length(math_matches) == 0) {
@@ -391,8 +386,8 @@ extract_equations_from_file <- function(path) {
         source_file = path,
         line_start = block$start_line,
         line_end = block$end_line,
-        source_kind = infer_source_kind(path),
-        module = infer_module(path),
+        source_kind = source_kind,
+        module = module,
         entity = entity_info$entity,
         entity_type = entity_info$entity_type,
         enclosing_class = enclosing_class,
@@ -429,7 +424,8 @@ extract_equations_from_file <- function(path) {
 }
 
 render_equation_catalog <- function(equation_catalog, path) {
-  rows_html <- apply(equation_catalog, 1, function(row) {
+  rows_html <- vapply(seq_len(nrow(equation_catalog)), function(i) {
+    row <- equation_catalog[i, , drop = FALSE]
     card_title <- row[["display_name"]]
     entity <- row[["entity"]]
     entity_type <- row[["entity_type"]]
@@ -442,11 +438,11 @@ render_equation_catalog <- function(equation_catalog, path) {
       card_title <- paste0(card_title, ": ", entity)
     }
 
-    entity_label <- ifelse(
-      !is.na(entity_type) && entity_type != "",
-      paste0(entity_type, ": ", entity),
+    entity_label <- if (!is.na(entity_type) && entity_type != "") {
+      paste0(entity_type, ": ", entity)
+    } else {
       entity
-    )
+    }
 
     # Change display labels only; keep the original identifiers in the footer.
     card_title <- gsub("([A-Z]+)([A-Z][a-z])", "\\1 \\2", card_title)
@@ -485,45 +481,14 @@ render_equation_catalog <- function(equation_catalog, path) {
       ""
     }
 
-    definitions_html <- ""
-    if (!is.na(symbol_definitions) && nzchar(symbol_definitions)) {
-      definition_items <- strsplit(
-        trimws(symbol_definitions),
-        "\\n(?=\\s*- )",
-        perl = TRUE
-      )[[1]]
-
-      # Join wrapped source lines and remove the source bullet markers.
-      definition_items <- trimws(gsub("\\s+", " ", definition_items))
-      definition_items <- sub("^-\\s+", "", definition_items)
-
-      # Escape source text before adding the supported display markup.
-      definition_items <- html_escape(definition_items)
-      definition_items <- gsub(
-        "\\\\f\\$(.*?)\\\\f\\$",
-        "\\\\(\\1\\\\)",
-        definition_items,
-        perl = TRUE
-      )
-      definition_items <- gsub(
-        "`([^`]+)`",
-        "<code>\\1</code>",
-        definition_items,
-        perl = TRUE
-      )
-
-      definitions_html <- paste0(
-        "<ul class='meaning definitions'>",
-        paste0("<li>", definition_items, "</li>", collapse = ""),
-        "</ul>"
-      )
-    }
-
     # Search the source text rather than MathJax's generated markup.
-    search_values <- row[c(
-      "display_name", "module", "entity", "enclosing_class", "r_visible_name",
-      "equation", "source_file"
-    )]
+    search_values <- unlist(
+      row[c(
+        "display_name", "module", "entity", "enclosing_class", "r_visible_name",
+        "equation", "source_file"
+      )],
+      use.names = FALSE
+    )
     search_values <- c(
       search_values, card_title, description, symbol_definitions
     )
@@ -555,7 +520,7 @@ render_equation_catalog <- function(equation_catalog, path) {
       "</footer>",
       "</article>"
     )
-  })
+  }, character(1))
 
   html <- paste0(
     "<!doctype html>",
@@ -564,7 +529,7 @@ render_equation_catalog <- function(equation_catalog, path) {
     "<meta charset='utf-8'>",
     "<meta name='viewport' content='width=device-width, initial-scale=1'>",
     "<title>Equation catalog | FIMS</title>",
-    "<link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap'>",
+    "<link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Outfit:wght@400;500;600&amp;display=swap'>",
     "<script>",
     "window.MathJax = { tex: { inlineMath: [['\\\\(','\\\\)']], displayMath: [['\\\\[','\\\\]']] }, chtml: { scale: 1, matchFontHeight: false } };",
     "</script>",
@@ -573,8 +538,8 @@ render_equation_catalog <- function(equation_catalog, path) {
     "body{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;",
     "margin:0;padding:2rem;color:#213f4b;background:#ffffff;}",
     "a{color:#0e6876;}",
-    "h1{color:#0e6876;font-size:2.25rem;margin:0 0 .5rem 0;}",
-    ".product-name{color:#0e6876;font-size:.85rem;font-weight:700;letter-spacing:.12em;margin:0 0 .35rem;}",
+    "h1,h2{font-family:Outfit,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}",
+    "h1{color:#0e6876;font-size:2.25rem;font-weight:500;margin:0 0 .5rem 0;}",
     ".catalog-header{border-bottom:1px solid #cfd5d8;padding-bottom:1rem;margin-bottom:1rem;}",
     ".subtitle{color:#4a636c;margin:0 0 .75rem;}",
     ".catalog-info{color:#4a636c;margin:.4rem 0;font-size:.95rem;}",
@@ -599,7 +564,6 @@ render_equation_catalog <- function(equation_catalog, path) {
     ".equation-card[data-module='Growth']{--module-badge-color:#9B4678;}",
     ".equation-card[data-module='Maturity']{--module-badge-color:#716800;}",
     ".meaning{color:#213f4b;font-size:.95rem;line-height:1.45;margin:.35rem 0 .65rem;}",
-    ".definitions code{overflow-wrap:anywhere;}",
     ".equation{overflow-x:auto;padding:.35rem .65rem;background:#FFFFFF;border-radius:6px;font-size:1rem;}",
     ".equation mjx-container[display='true']{margin:.5em 0 !important;}",
     ".equation pre{margin:.5em 0;font-size:.9rem;line-height:1.5;white-space:pre;}",
@@ -638,7 +602,7 @@ render_equation_catalog <- function(equation_catalog, path) {
 
     "<aside class='version-notice' aria-labelledby='version-notice-label'>",
     "<strong id='version-notice-label'>Version information</strong>",
-    "<p>This catalog corresponds to the FIMS version shown above. ",
+    "<p>This catalog reflects the FIMS source version used when the website was built. ",
     "GitHub’s <code>main</code> branch may differ. ",
     "Check your installed version with <code>packageVersion(\"FIMS\")</code>. ",
     "<a href='https://noaa-fims.github.io/FIMS/#installation'>",
@@ -668,6 +632,8 @@ render_equation_catalog <- function(equation_catalog, path) {
       "<script>\n",
       "const searchInput = document.getElementById('equation-search');\n",
       "const moduleFilter = document.getElementById('module-filter');\n",
+      "const searchCount = document.getElementById('search-count');\n",
+      "const searchEmpty = document.getElementById('search-empty');\n",
       "const cards = Array.from(document.querySelectorAll('.equation-card'));\n",
       "const modules = [...new Set(cards.map(card => card.dataset.module).filter(Boolean))].sort((a,b) => a.localeCompare(b));\n",
       "modules.forEach(module => {\n",
@@ -683,8 +649,8 @@ render_equation_catalog <- function(equation_catalog, path) {
       "    card.hidden = !visible;\n",
       "    if(visible) matches++;\n",
       "  });\n",
-      "  document.getElementById('search-count').textContent = (terms.length || moduleFilter.value) ? `${matches} of ${cards.length} equations` : `${cards.length} equations`;\n",
-      "  document.getElementById('search-empty').hidden = matches !== 0;\n",
+      "  searchCount.textContent = (terms.length || moduleFilter.value) ? `${matches} of ${cards.length} equations` : `${cards.length} equations`;\n",
+      "  searchEmpty.hidden = matches !== 0;\n",
       "}\n",
       "searchInput.addEventListener('input', filterEquations);\n",
       "moduleFilter.addEventListener('change', filterEquations);\n",
@@ -759,21 +725,20 @@ row.names(equation_catalog) <- NULL
 # 2. Save outputs (configurable for website builds)
 # -------------------------------------------------------------------------
 
-default_data_output_dir <- file.path("visualization-prototypes", "data")
-default_example_output_dir <- file.path(
-  "visualization-prototypes",
-  "examples",
-  "package-level-explorer"
+default_output_dir <- file.path(
+  "visualizations",
+  "equation-catalog",
+  "output"
 )
 
 csv_path <- Sys.getenv(
   "FIMS_EQ_CSV_OUT",
-  unset = file.path(default_data_output_dir, "fims_equation_catalog.csv")
+  unset = file.path(default_output_dir, "fims_equation_catalog.csv")
 )
 
 html_path <- Sys.getenv(
   "FIMS_EQ_HTML_OUT",
-  unset = file.path(default_example_output_dir, "fims_equation_catalog.html")
+  unset = file.path(default_output_dir, "fims_equation_catalog.html")
 )
 
 dir.create(dirname(csv_path), showWarnings = FALSE, recursive = TRUE)

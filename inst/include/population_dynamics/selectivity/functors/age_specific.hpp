@@ -98,15 +98,30 @@ struct AgeSpecificSelectivity : public SelectivityBase<Type> {
   /**
    * @copydoc AgeSpecificSelectivity::evaluate(const Type &x)
    * @param pos Position index, e.g., which year.
+   * @details `logit_sel_at_age` can hold 1 value for all ages and years,
+   * `n_ages` values used in every year, or `n_ages` values per year (age
+   * within year). Any other length is an input error and throws
+   * `std::invalid_argument`, rather than silently reusing values for the
+   * wrong ages.
    */
   virtual const Type evaluate(const Type &x, size_t pos) {
     Type a = static_cast<Type>(0.0);
     Type b = static_cast<Type>(1.0);
     double x_temp = fims_math::Value(x);
     size_t x_final = static_cast<size_t>(x_temp);
-    size_t i_age_year = pos * n_ages + x_final - min_age;
-    return fims_math::inv_logit<Type>(
-        a, b, logit_sel_at_age.get_force_scalar_wrap(i_age_year));
+    size_t i_age = x_final - min_age;
+    size_t n_values = logit_sel_at_age.size();
+    if (n_values == 1) {
+      return fims_math::inv_logit<Type>(a, b, logit_sel_at_age[0]);
+    }
+    if (n_ages == 0 || n_values % n_ages != 0) {
+      throw std::invalid_argument(
+          "AgeSpecificSelectivity: logit_sel_at_age has " +
+          std::to_string(n_values) + " values, which is not 1 or a multiple " +
+          "of n_ages (" + std::to_string(n_ages) + ").");
+    }
+    size_t i_value = (n_values == n_ages) ? i_age : pos * n_ages + i_age;
+    return fims_math::inv_logit<Type>(a, b, logit_sel_at_age[i_value]);
   }
 };
 

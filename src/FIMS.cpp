@@ -40,9 +40,16 @@ Type objective_function<Type>::operator()() {
   try {
     nll = model->Evaluate();
   } catch (const std::exception& e) {
+    model->of = nullptr;
     Rf_error("Error during model evaluation: %s",
              std::string(e.what()).c_str());
   }
+  // TMB often builds this objective function on the stack, e.g., when taping
+  // in MakeADFun(), so it is gone once the call returns and the model must not
+  // keep a pointer to it. Model::Evaluate() is also called outside of TMB by
+  // get_output(), where a stale pointer would be used to report into memory
+  // that now belongs to other objects.
+  model->of = nullptr;
 
   return nll;
 }

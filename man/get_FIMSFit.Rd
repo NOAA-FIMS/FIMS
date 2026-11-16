@@ -16,6 +16,8 @@
 \alias{get_gradient,FIMSFit-method}
 \alias{get_sdreport}
 \alias{get_sdreport,FIMSFit-method}
+\alias{get_convergence}
+\alias{get_convergence,FIMSFit-method}
 \alias{get_estimates}
 \alias{get_estimates,FIMSFit-method}
 \alias{get_number_of_parameters}
@@ -55,6 +57,10 @@ get_gradient(x)
 get_sdreport(x)
 
 \S4method{get_sdreport}{FIMSFit}(x)
+
+get_convergence(x)
+
+\S4method{get_convergence}{FIMSFit}(x)
 
 get_estimates(x)
 
@@ -101,8 +107,16 @@ from a stored R vector rather than the compiled C++ objective function.
 
 \code{\link[=get_sdreport]{get_sdreport()}} returns the list from \code{\link[TMB:sdreport]{TMB::sdreport()}}.
 
+\code{\link[=get_convergence]{get_convergence()}} returns a tibble with one row per convergence check
+run by \code{\link[=fit_fims]{fit_fims()}}: \code{check}, \code{severity} (\code{"OK"}, \code{"NOTE"} for a check that
+did not run, \code{"WARN"}, or \code{"FAIL"}), \code{value}, \code{threshold}, \code{parameter},
+and \code{message}. It has no rows when the model was not optimized.
+
 \code{\link[=get_estimates]{get_estimates()}} returns a tibble of parameter values and their
-uncertainties from a fitted model.
+uncertainties from a fitted model. The \code{year_i} column is a position that
+starts at 1, and the \code{age} and \code{length} columns are the ages and length bins
+from the data. \code{age} is \code{NA} if populations have different ages, and both
+are \code{NA} for fits saved before they were added to the output.
 
 \code{\link[=get_number_of_parameters]{get_number_of_parameters()}} returns a vector of integers specifying the
 number of fixed-effect parameters and the number of random-effect parameters

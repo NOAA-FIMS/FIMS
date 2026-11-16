@@ -115,7 +115,7 @@ class FleetInterface : public FleetInterfaceBase {
    */
   SharedInt n_lengths = 0;
   /**
-   * @brief Fleet-specific observation-bin centers.
+   * @brief Fleet-specific observation-bin lower edges.
    */
   RealVector lengths;
   /**
@@ -124,12 +124,12 @@ class FleetInterface : public FleetInterfaceBase {
   SharedInt n_years = 0;
   /**
    * @brief What units are the observed catch for this fleet measured in.
-   * Options are weight or numbers, default is weight.
+   * Options are "weight" or "number", default is "weight".
    */
   SharedString observed_catch_units = fims::to_string("weight");
   /**
    * @brief What units is the observed index of abundance for this fleet
-   * measured in. Options are weight or numbers, default is weight.
+   * measured in. Options are "weight" or "number", default is "weight".
    */
   SharedString observed_index_units = fims::to_string("weight");
   /**
@@ -148,6 +148,20 @@ class FleetInterface : public FleetInterfaceBase {
    * age-to-length-conversion matrix.
    */
   VariableVector age_to_length_conversion;
+  /**
+   * @brief Weight at age for this fleet's catch and index weight, ordered by
+   * year and then age, with n_years x n_ages values. It is empty when the
+   * fleet uses the population weight at age. It is data, so it is never
+   * registered as a parameter.
+   */
+  RealVector weight_at_age;
+
+  /**
+   * @brief Ageing error matrices, 1 for all years or 1 per year, with true age
+   * as rows and observed age varying fastest. It is empty when the fleet has
+   * no ageing error. It is data, so it is never registered as a parameter.
+   */
+  RealVector ageing_error;
 
   // Fleet based derived quantities
   /**
@@ -233,6 +247,11 @@ class FleetInterface : public FleetInterfaceBase {
    * @brief The constructor.
    */
   FleetInterface() : FleetInterfaceBase() {
+    // RealVector starts with 1 value, but an empty weight_at_age is how a
+    // fleet says it uses the population weight at age
+    this->weight_at_age.resize(0);
+    // Likewise, an empty ageing_error means no ageing error
+    this->ageing_error.resize(0);
     std::shared_ptr<FleetInterface> fleet =
         std::make_shared<FleetInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(fleet);
@@ -269,6 +288,8 @@ class FleetInterface : public FleetInterfaceBase {
         log_q(other.log_q),
         log_Fmort(other.log_Fmort),
         age_to_length_conversion(other.age_to_length_conversion),
+        weight_at_age(other.weight_at_age),
+        ageing_error(other.ageing_error),
         catch_numbers_at_age(other.catch_numbers_at_age),
         catch_weight_at_age(other.catch_weight_at_age),
         catch_numbers_at_length(other.catch_numbers_at_length),
@@ -507,6 +528,18 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->fleet_selectivity_id_m = interface_selectivity_id_m.get();
 
+    // The index reads 1 log_q for all years or 1 log_q per year
+    if (this->log_q.size() != 1 &&
+        this->log_q.size() != static_cast<size_t>(this->n_years.get())) {
+      FIMS_ERROR_LOG("The size of `log_q` is not 1 or `n_years`: " +
+                     fims::to_string(this->log_q.size()) + " values and " +
+                     fims::to_string(this->n_years.get()) + " years");
+      throw std::invalid_argument(
+          "Fleet log_q size mismatch. Fleet log_q has " +
+          fims::to_string(this->log_q.size()) +
+          " values, but it needs 1 value or 1 value per year (" +
+          fims::to_string(this->n_years.get()) + ").");
+    }
     fleet->log_q.resize(this->log_q.size());
     for (size_t i = 0; i < this->log_q.size(); i++) {
       fleet->log_q[i] = this->log_q[i].initial_value_m;
@@ -524,6 +557,8 @@ class FleetInterface : public FleetInterfaceBase {
         info->RegisterRandomEffect(fleet->log_q[i]);
       }
     }
+    // add to variable_map
+    info->variable_map[this->log_q.id_m] = &(fleet)->log_q;
 
     if (this->log_Fmort.size() != static_cast<size_t>(this->n_years.get())) {
       FIMS_ERROR_LOG("The size of `log_Fmort` does not match `n_years`: " +
@@ -556,6 +591,25 @@ class FleetInterface : public FleetInterfaceBase {
     // add to variable_map
     info->variable_map[this->log_Fmort.id_m] = &(fleet)->log_Fmort;
 
+    const size_t expected_weight_at_age_size =
+        static_cast<size_t>(this->n_years.get() * this->n_ages.get());
+    if (this->weight_at_age.size() != 0 &&
+        this->weight_at_age.size() != expected_weight_at_age_size) {
+      FIMS_ERROR_LOG(
+          "The size of `weight_at_age` does not match n_years x "
+          "n_ages: " +
+          fims::to_string(this->weight_at_age.size()) +
+          " != " + fims::to_string(expected_weight_at_age_size));
+      throw std::invalid_argument(
+          "Fleet weight_at_age size mismatch. Expected 0 or " +
+          fims::to_string(expected_weight_at_age_size) + " values, found " +
+          fims::to_string(this->weight_at_age.size()) + ".");
+    }
+    fleet->weight_at_age.resize(this->weight_at_age.size());
+    for (size_t i = 0; i < fleet->weight_at_age.size(); i++) {
+      fleet->weight_at_age[i] = this->weight_at_age[i];
+    }
+
     if (this->n_lengths.get() > 0) {
       if (this->lengths.size() != static_cast<size_t>(this->n_lengths.get())) {
         FIMS_ERROR_LOG("The size of `lengths` does not match `n_lengths`: " +
@@ -576,21 +630,29 @@ class FleetInterface : public FleetInterfaceBase {
       fleet->age_to_length_conversion.resize(
           this->age_to_length_conversion.size());
 
+      // One age x length table for all years, or one table per year.
       const size_t expected_age_to_length_conversion_size =
           static_cast<size_t>(this->n_ages.get() * this->n_lengths.get());
+      const size_t expected_age_to_length_conversion_size_by_year =
+          static_cast<size_t>(this->n_years.get()) *
+          expected_age_to_length_conversion_size;
       const size_t supplied_age_to_length_conversion_size =
           this->age_to_length_conversion.size();
 
       if (supplied_age_to_length_conversion_size != 0 &&
           supplied_age_to_length_conversion_size !=
-              expected_age_to_length_conversion_size) {
+              expected_age_to_length_conversion_size &&
+          supplied_age_to_length_conversion_size !=
+              expected_age_to_length_conversion_size_by_year) {
         FIMS_ERROR_LOG(
             "age_to_length_conversion size mismatch, " +
-            fims::to_string(supplied_age_to_length_conversion_size) +
-            " != " + fims::to_string(expected_age_to_length_conversion_size));
+            fims::to_string(supplied_age_to_length_conversion_size) + " != " +
+            fims::to_string(expected_age_to_length_conversion_size) + " or " +
+            fims::to_string(expected_age_to_length_conversion_size_by_year));
         throw std::invalid_argument(
             "Fleet age_to_length_conversion size mismatch. Expected " +
-            fims::to_string(expected_age_to_length_conversion_size) +
+            fims::to_string(expected_age_to_length_conversion_size) + " or " +
+            fims::to_string(expected_age_to_length_conversion_size_by_year) +
             " values but received " +
             fims::to_string(supplied_age_to_length_conversion_size) + ".");
       }
@@ -616,6 +678,28 @@ class FleetInterface : public FleetInterfaceBase {
 
       info->variable_map[this->age_to_length_conversion.id_m] =
           &(fleet)->age_to_length_conversion;
+    }
+
+    if (this->ageing_error.size() != 0) {
+      const size_t matrix_size =
+          static_cast<size_t>(this->n_ages.get() * this->n_ages.get());
+      const size_t supplied_size = this->ageing_error.size();
+      if (supplied_size != matrix_size &&
+          supplied_size !=
+              matrix_size * static_cast<size_t>(this->n_years.get())) {
+        FIMS_ERROR_LOG("ageing_error size mismatch, " +
+                       fims::to_string(supplied_size) +
+                       " is not n_ages^2 or n_years * n_ages^2.");
+        throw std::invalid_argument(
+            "Fleet ageing_error size mismatch. Expected " +
+            fims::to_string(matrix_size) + " or " +
+            fims::to_string(matrix_size * this->n_years.get()) +
+            " values but received " + fims::to_string(supplied_size) + ".");
+      }
+    }
+    fleet->ageing_error.resize(this->ageing_error.size());
+    for (size_t i = 0; i < fleet->ageing_error.size(); i++) {
+      fleet->ageing_error[i] = this->ageing_error[i];
     }
 
     // add to Information
