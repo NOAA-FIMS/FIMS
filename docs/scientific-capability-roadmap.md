@@ -172,3 +172,16 @@ under combined observations but favored below-truth SDs in the profiled dataset.
 Next, assess calibration and process-SD sensitivity with more replicates under
 informative composition designs before adding mortality covariance complexity.
 This is not evidence of operational coverage or a sampling-cost recommendation.
+
+The replicated interval-calibration pilot is complete in
+`tests/integration/process-recovery/calibration-pilot/`. Thirty informative,
+18-year datasets span true M SDs 0.025/0.05/0.10. All 60 uncertainty reports
+succeeded; 58/60 covariance starts passed checks, with a valid selected start for
+every estimated fit. Known-SD mean M coverage was 93.3–94.5%; estimated-SD coverage
+was 92.7–93.7%, with replicate-level MCSEs around 1–1.5 percentage points. Paired
+differences were modest relative to Monte Carlo uncertainty. Five of ten fits
+at the smallest true M SD reached the lower bound; larger SDs had no boundaries.
+These results support continued sensitivity testing rather than a claim of
+operational calibration. Next validation targets include more replication,
+misspecification and derived-quantity/forecast uncertainty, before unrestricted
+mortality covariance or assessment recommendations.

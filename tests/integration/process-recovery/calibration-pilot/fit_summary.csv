@@ -1,0 +1,7 @@
+"true_M_sd","sd_mode","planned_fits","errors","valid_optimizers","sdreport_failures","boundary_fits","M_boundary_fits","regular_fits"
+0.025,"estimated",10,0,10,0,5,5,5
+0.025,"known",10,0,10,0,0,0,10
+0.05,"estimated",10,0,10,0,0,0,10
+0.05,"known",10,0,10,0,0,0,10
+0.1,"estimated",10,0,10,0,0,0,10
+0.1,"known",10,0,10,0,0,0,10

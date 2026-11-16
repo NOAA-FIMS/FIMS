@@ -220,3 +220,80 @@ overdispersion or biological misspecification.
 
 The retained [observation-information pilot](information-pilot/README.md) includes
 all attempts, paired state/SD results, separately normalized profiles and inspected plots.
+
+## Interval calibration and true mortality-SD sensitivity
+
+```sh
+Rscript tests/integration/process-recovery/run-calibration.R /tmp/fims-calibration 10 18
+Rscript tests/integration/process-recovery/plot-calibration.R /tmp/fims-calibration
+```
+
+This extension uses the combined informative design (survey log-SD 0.05 and
+composition size 2000), proper-normal first-year uncertainty, and true mortality
+innovation SDs 0.025, 0.05 and 0.10. Ten replicates per setting are the default;
+the runner also accepts replicate count and horizon after the output directory.
+Recruitment/F SDs remain 0.20/0.15. All biology and observation parameters remain
+known. Within each dataset, fits compare **all** innovation SDs held at truth
+against **all three** estimated, so differences cannot be attributed exclusively
+to estimating the mortality SD. Estimated fits use common starts 0.05 and 0.20.
+Every optimizer attempt and its selection/validity flag is retained.
+
+The same process/observation seed labels are used across true M-SD settings.
+Recruitment deviations, F paths, initial M states and standardized mortality
+innovations are paired; biological trajectories and observation probabilities
+change with M SD. Categorical observations need not be nested across M-SD values.
+At true SD 0.05, the first three datasets reproduce the prior combined-information
+design's data. Per-dataset truth, inputs, sampling pools and seeds are stored in
+RDS/checkpoint output. The original source files and pilots remain unchanged.
+
+For estimated covariance, the best valid starting-point result is rebuilt at
+its selected full-precision covariance parameters, with a checked objective
+agreement before uncertainty estimation. A fresh latent-mode solve and TMB
+`sdreport` produce Laplace/Gaussian marginal log-state intervals. Known-SD models
+have no outer parameters but still check inner-mode stationarity. State modes,
+SEs, pointwise interval coverage, interval width and standardized errors are
+recorded for recruitment log-deviations, annual log-F and age-specific log-M.
+These are not intervals for total recruits after biological-mean uncertainty.
+This does not assess simultaneous all-cell
+coverage, forecast intervals or derived-quantity intervals such as spawning biomass. These are joint-generative simulation checks
+for latent-state uncertainty, not fixed-state frequentist coverage guarantees.
+
+`diagnostics.csv` distinguishes optimizer validity, `sdreport` exceptions,
+positive-definite outer Hessian status, any-SD and M-specific boundaries, and a
+`regular` reporting flag. Regular fits require valid optimization, a positive
+`sdreport` Hessian, finite positive state SEs and no covariance boundary. That is
+a reporting stratum, not evidence of a unique solution or calibrated intervals.
+All computed numerical intervals remain in the `all` summaries; regular and
+nonregular strata are also shown. Off-optimum or boundary intervals must not be
+interpreted as regular asymptotic inference. Missing intervals are not silently
+assigned zero error or successful coverage. Fit/interval denominators and failure
+rows are retained; strata with no computed fits may have no summary row.
+
+State coverage is first averaged within each replicate, then across replicates.
+Its MCSE uses the variation in those fractions, not a binomial count of dependent
+age-year cells. The plot shows one MCSE on either side, not a confidence interval. Its
+postprocessor also writes `paired-summary.csv`, with estimated-minus-known
+coverage differences and MCSEs calculated from paired replicate differences.
+Ten replicates remain a screening run; even zero empirical MCSE does not prove
+coverage. Regular-only results condition on successful, interior outcomes and
+cannot substitute for unconditional performance.
+
+Hyperparameter tables retain natural-scale SD estimates and log-SD Wald-interval
+coverage. `hyperparameter_summary.csv` gives covered/available counts and exact
+binomial uncertainty limits for the **coverage proportion**, not for the process
+SD. At variance boundaries, huge log-SD SEs can yield superficially high coverage;
+those apparent successes are recorded but are not evidence of valid Wald
+intervals. All, regular and nonregular results are separated.
+
+The default run has 30 generated datasets, 60 known/estimated uncertainty reports
+and 60 estimated-covariance optimizer starts. Checkpoints persist after each
+dataset. Candidate fit timings and uncertainty-report timings are separate; the
+latter include initialization, rebuilding/evaluation and `sdreport`, not a second
+outer optimization. No production code, dependencies or prior pilot sources are
+changed. Results apply to the declared correct-model, informative-data scenario;
+more replication, misspecification and observation uncertainty require separate
+experiments before operational conclusions.
+
+The retained [interval-calibration pilot](calibration-pilot/README.md) records
+all 60 uncertainty reports, covariance starts, state/hyperparameter summaries,
+paired differences and the inspected coverage/width plot.

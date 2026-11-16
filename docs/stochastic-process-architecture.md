@@ -831,3 +831,42 @@ limitations are in `tests/integration/process-recovery/information-pilot/`.
 Validation passed 13 tests / 83 assertions, including all three benchmark
 integration checks. Both PNGs were visually inspected. No production code or
 previous pilot source was changed.
+
+### Interval calibration across true mortality SDs
+
+The `calibration.R` extension uses the informative combined observation design,
+proper-normal initial uncertainty and true M innovation SDs 0.025, 0.05 and 0.10.
+Ten datasets per setting are the default, with shared standardized process
+innovations across settings. Each dataset compares all covariance SDs fixed at
+truth against all three estimated from two starts. The comparison therefore
+includes uncertainty/confounding in recruitment and F SDs, not only mortality SD.
+
+A selected covariance point is rebuilt and its marginal objective checked before
+`sdreport`. State modes and Laplace/Gaussian marginal SEs give pointwise intervals,
+coverage, width and standardized error diagnostics. Coverage is averaged within
+replicate and its MCSE uses replicate fractions, respecting dependence among
+age-year cells. Diagnostics separate optimizer validity, Hessian status,
+any-covariance/M boundaries and a regular reporting stratum. All numerical
+intervals remain visible; neither boundary fits nor failures are silently
+classified as successful uncertainty estimates. Regular-only results are selected
+outcomes and do not establish unconditional calibration. Hyperparameter interval
+coverage includes explicit denominators and exact binomial uncertainty bounds on
+the coverage proportion, while boundary Wald intervals remain nonregular.
+
+This is a joint-generative latent-state uncertainty screening experiment, not a
+fixed-state frequentist guarantee. More replication, misspecification and
+unknown observation/biological parameters remain separate validation needs.
+Previous sources/pilots and production code are unchanged.
+
+The retained calibration pilot generated 30 datasets and all 60 known/estimated
+uncertainty reports succeeded. 58 of 60 covariance starts passed optimizer checks,
+and every selected fit was valid. Covariance-point rebuild differences were below
+0.0000000021 NLL units. Known-SD M state coverage averaged 93.3–94.5%, versus
+92.7–93.7% when SDs were estimated. Paired differences were small relative to their
+Monte Carlo uncertainty; ten replicates per setting do not establish nominal
+coverage. At true M SD 0.025, five of ten estimates reached the lower bound, while
+no boundaries occurred at 0.05 or 0.10. Boundary log-SD intervals had superficially
+high apparent coverage and are kept separate from regular outcomes. Tables and
+a visually inspected plot are in `tests/integration/process-recovery/calibration-pilot/`.
+Validation passed 17 tests / 114 assertions, including four integration checks.
+Production code and earlier numerical-source checksums remain unchanged.

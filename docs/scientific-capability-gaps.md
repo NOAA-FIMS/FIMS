@@ -258,3 +258,11 @@ not stochastic abundance or correlated age effects. Mortality process simulation
 and conditional forecasting are now implemented for this same formulation. See the architecture document for the
 formulation, dimensionality and validation limits; baseline evidence above is
 retained as the historical audit.
+
+Validation update: process recovery, information sensitivity and pointwise
+fitted-state interval screening are now reproducible through
+`tests/integration/process-recovery/`, including the ten-replicate-per-setting
+calibration pilot. This is partial simulation-based validation under known
+biology and matching observation models, not demonstrated operational coverage,
+forecast/derived-quantity calibration or general model adequacy. The small-M-SD
+boundary cases and Monte Carlo uncertainty remain explicit in the roadmap.

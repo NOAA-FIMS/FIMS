@@ -294,3 +294,5 @@
 * Extended the scientific process benchmark with longer horizons, multiple covariance starting values and reoptimized mortality-SD likelihood profiles, retaining all attempts and replicate checkpoints.
 
 * Added a paired observation-information benchmark varying survey precision and multinomial composition sample sizes, with shared trajectories, common survey errors, nested composition samples and separately normalized mortality-SD profiles.
+
+* Added a replicated state-interval calibration benchmark under informative observations, comparing known/estimated innovation SDs across true mortality SDs and retaining boundary, missing-interval and optimizer diagnostics.
