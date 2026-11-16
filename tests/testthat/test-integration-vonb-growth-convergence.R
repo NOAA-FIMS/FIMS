@@ -309,9 +309,8 @@ test_that("reference lengths survive initialization across estimation settings",
         )
       )
 
-    fit <- parameters |>
-      FIMS::initialize_fims(data = ctx$data) |>
-      FIMS::fit_fims(optimize = FALSE, get_sd = FALSE)
+    input <- FIMS::initialize_fims(parameters = parameters, data = ctx$data)
+    fit <- FIMS::fit_fims(input, optimize = FALSE, get_sd = FALSE)
 
     lengths <- FIMS::get_estimates(fit) |>
       dplyr::filter(
@@ -334,6 +333,104 @@ test_that("reference lengths survive initialization across estimation settings",
       lengths$input[lengths$label == "mean_length_young"],
       tolerance = 1e-8,
       info = case
+    )
+    if (settings$old[i] == "fixed_effects") {
+      working <- FIMS::get_fixed()
+      parameter_names <- names(FIMS::get_obj(fit)[["par"]])
+      old_index <- grep("^Growth\\..*\\.mean_length_old\\.", parameter_names)
+      expect_length(old_index, 1L)
+
+      expected_young <- lengths[["input"]][
+        lengths[["label"]] == "mean_length_young"
+      ]
+
+      if (settings$young[i] == "fixed_effects") {
+        young_index <- grep(
+          "^Growth\\..*\\.mean_length_young\\.", parameter_names
+        )
+        expect_length(young_index, 1L)
+        expected_young <- 400
+        working[young_index] <- log(expected_young)
+      }
+
+      working[old_index] <- log(200)
+      FIMS::set_fixed(working)
+
+      updated_lengths <- FIMS:::reshape_json_estimates(
+        input[["model"]]$get_output()
+      ) |>
+        dplyr::filter(
+          module_name == "Growth",
+          label %in% c("mean_length_young", "mean_length_old")
+        ) |>
+        dplyr::arrange(match(label, c("mean_length_young", "mean_length_old")))
+
+      #' @description Reporting reconstructs physical lengths from updated working values.
+      expect_equal(
+        updated_lengths[["estimated"]],
+        c(expected_young, expected_young + 200),
+        tolerance = 1e-8,
+        info = case
+      )
+    }
+  }
+})
+
+test_that("von bertalanffy automatic K derivative matches numerical differences", {
+  FIMS::clear()
+  on.exit(FIMS::clear(), add = TRUE)
+
+  ctx <- make_vonb_convergence_context()
+  input <- FIMS::initialize_fims(
+    parameters = ctx$parameters,
+    data = ctx$data
+  )
+  fit <- FIMS::fit_fims(input, optimize = FALSE, get_sd = FALSE)
+  obj <- FIMS::get_obj(fit)
+  starting <- obj[["par"]]
+
+  k_index <- grep("^Growth\\..*\\.growth_coefficient\\.", names(starting))
+  expect_length(k_index, 1L)
+
+  reference_ages <- ctx$parameters |>
+    dplyr::filter(
+      module_name == "Growth",
+      label %in% c(
+        "reference_age_for_length_young",
+        "reference_age_for_length_old"
+      )
+    ) |>
+    dplyr::arrange(match(label, c(
+      "reference_age_for_length_young",
+      "reference_age_for_length_old"
+    ))) |>
+    dplyr::pull(value)
+  reference_span <- diff(reference_ages)
+
+  # Reuse the same AD tape on both sides of the small-x transition.
+  for (growth_coefficient in c(
+    exp(starting[k_index]),
+    0.99e-3 / reference_span,
+    1.01e-3 / reference_span
+  )) {
+    point <- starting
+    point[k_index] <- log(growth_coefficient)
+    automatic <- as.numeric(obj[["gr"]](point))[k_index]
+
+    step <- 1e-4
+    plus <- minus <- point
+    plus[k_index] <- plus[k_index] + step
+    minus[k_index] <- minus[k_index] - step
+    numerical <- (obj[["fn"]](plus) - obj[["fn"]](minus)) / (2 * step)
+
+    #' @description Automatic derivatives with respect to log K agree with numerical differences.
+    expect_true(
+      is.finite(automatic) && is.finite(numerical),
+      info = paste("K:", growth_coefficient)
+    )
+    expect_true(
+      abs(automatic - numerical) / max(1, abs(numerical)) < 1e-4,
+      info = paste("K:", growth_coefficient)
     )
   }
 })
@@ -519,7 +616,7 @@ test_that("von bertalanffy growth estimates stay close to Model Comparison OM gr
   fit <- FIMS::fit_fims(
     input = input,
     optimize = TRUE,
-    number_of_loops = 2,
+    number_of_loops = 5,
     number_of_newton_steps = 0,
     get_sd = FALSE
   )
