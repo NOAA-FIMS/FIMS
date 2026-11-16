@@ -87,4 +87,23 @@ TEST(GaussianProcessLPDF, RandomWalkNormalAndFixedAnchor) {
   EXPECT_DOUBLE_EQ(mean_path[1], -0.5);
 }
 
+TEST(GaussianProcessLPDF, InterleavedAgeSeries) {
+  fims_distributions::GaussianProcessLPDF<double> process;
+  process.rw1 = true;
+  process.initial_fixed = true;
+  process.n_series = 2;
+  process.log_sd = {std::log(0.2)};
+  process.unconstrained_rho = {0.0};
+  process.observed_values = {-1.0, -2.0, -0.8, -2.2};
+  process.expected_values = {0.0};
+  const double expected =
+      -std::log(2 * std::acos(-1.0)) - 2 * std::log(0.2) - 1.0;
+  EXPECT_NEAR(process.evaluate(), expected, 1e-12);
+  const auto draws = process.Simulate([]() { return 0.0; });
+  EXPECT_DOUBLE_EQ(draws[2], -1.0);
+  EXPECT_DOUBLE_EQ(draws[3], -2.0);
+  process.n_series = 3;
+  EXPECT_THROW(process.evaluate(), std::invalid_argument);
+}
+
 }  // namespace

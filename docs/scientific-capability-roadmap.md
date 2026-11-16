@@ -17,7 +17,8 @@ parameter/state uncertainty and generalized scheduling remain open. Package 3
 now includes independent annual fleet log-F random walks, proper/fixed initial
 rules, inference, process-aware simulation and shared innovation SD groups.
 Mortality and selectivity targets remain open. Packages 4 onward are not implemented.
-All changes remain uncommitted.
+The initial investigation and recruitment/fishing upgrades were committed in
+`9ea49e1`; subsequent upgrades are committed after validation at the user’s request.
 
 ## Prioritization
 
@@ -76,7 +77,7 @@ Suggested sequence within the scoped change:
 5. Run recovery and scaling experiments; report limitations before widening scope.
 
 Review the concrete API and variance/mean convention before production edits.
-The current documents remain uncommitted for review.
+The investigation documents were committed with the initial process upgrades in `9ea49e1`.
 
 ## Benchmark and validation plan
 
@@ -123,3 +124,11 @@ AD, sparse factorization and Laplace requirements without adding a dependency to
 this investigation.
 
 Shared fleet innovation SD groups now use validated `sd_group` labels and the existing TMB factor-map machinery. This reduces covariance parameter dimension without coupling latent trajectories. No new native backend or dependency is required.
+
+Natural mortality inference now supports independent age-specific annual log-M
+random walks with one common innovation SD and explicit fixed/proper-normal
+initialization. The existing age-year Population vector and TMB registration
+are reused. The next increment is mortality-aware simulation and conditional
+forecasting; common annual shocks, age covariance and selectivity processes
+remain open. Assessment-scale recovery, identifiability and scaling benchmarks
+are still required.

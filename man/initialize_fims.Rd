@@ -8,7 +8,8 @@ initialize_fims(
   parameters,
   data,
   recruitment_process = NULL,
-  fishing_process = NULL
+  fishing_process = NULL,
+  mortality_process = NULL
 )
 }
 \arguments{
@@ -45,6 +46,14 @@ retain this map when constructing the objective.
 The specification does not change state estimation types: use
 \code{"random_effects"} for TMB integration or \code{"fixed_effects"} for a penalized
 fixed-effect fit.}
+
+\item{mortality_process}{Optional \code{list(type = "rw1", sd = 0.1, estimation_type = "fixed_effects", initial = list(type = "fixed"))}.
+Independent age-specific log-M random walks share one innovation SD.
+Supply a complete year-major, age-fast Population \code{log_M} grid. A fixed
+initial rule requires constant first-year values at every age and estimated
+later values. A normal rule (\code{type}, \code{mean}, \code{sd}) estimates every state;
+initial means and SDs are common across ages and held constant. This option
+supports inference only; mortality paths are not simulated by \code{\link[=simulate_fims]{simulate_fims()}}.}
 }
 \value{
 A named list with \code{parameters} and \code{model}, plus \code{map} for shared estimated SDs:

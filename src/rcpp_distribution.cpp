@@ -23,6 +23,7 @@ void register_distributions(Rcpp::Module& m) {
       .constructor()
       .method("get_id", &GaussianProcessDistributionsInterface::get_id)
       .method("set_process", &GaussianProcessDistributionsInterface::set_process)
+      .method("set_series_count", &GaussianProcessDistributionsInterface::set_series_count)
       .method("set_random_walk", &GaussianProcessDistributionsInterface::set_random_walk)
       .method("set_distribution_links",
               &GaussianProcessDistributionsInterface::set_distribution_links)

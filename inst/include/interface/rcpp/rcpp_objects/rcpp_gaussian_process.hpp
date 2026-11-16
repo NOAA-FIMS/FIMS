@@ -22,6 +22,7 @@ class GaussianProcessDistributionsInterface
   VariableVector unconstrained_rho; /*!< Scalar atanh correlation. */
   RealVector
       lpdf_vec; /*!< Initial and conditional log-density contributions. */
+  std::shared_ptr<size_t> n_series_m = std::make_shared<size_t>(1);
   SharedString process_m = fims::to_string("iid");
   SharedString initial_rule_m = fims::to_string("none");
   std::shared_ptr<double> initial_mean_m = std::make_shared<double>(0.0);
@@ -69,8 +70,16 @@ class GaussianProcessDistributionsInterface
     return true;
   }
 
+  /** @brief Declare interleaved independent series in year-major order. */
+  bool set_series_count(int count) {
+    if (count < 1) Rcpp::stop("GaussianProcess series count must be positive");
+    *n_series_m = static_cast<size_t>(count);
+    return true;
+  }
+
   template <typename Type>
   void Configure(fims_distributions::GaussianProcessLPDF<Type>& density) {
+    density.n_series = *n_series_m;
     density.ar1 = process_m.get() == "ar1";
     density.rw1 = process_m.get() == "rw1";
     density.initial_fixed = initial_rule_m.get() == "fixed";
@@ -206,17 +215,24 @@ class GaussianProcessDistributionsInterface
       Rcpp::stop(
           "GaussianProcess target ID is not a nonempty registered vector");
     }
+    if (*n_series_m == 0 || target->second->size() % *n_series_m != 0) {
+      Rcpp::stop("GaussianProcess series count must divide target length");
+    }
     if (process_m.get() == "rw1" && initial_rule_m.get() == "fixed") {
-      auto address = &(*target->second)[0];
-      if (std::find(info->fixed_effects_parameters.begin(),
-                    info->fixed_effects_parameters.end(),
-                    address) != info->fixed_effects_parameters.end() ||
-          std::find(info->random_effects_parameters.begin(),
-                    info->random_effects_parameters.end(),
-                    address) != info->random_effects_parameters.end()) {
-        Rcpp::stop(
-            "A fixed random-walk initial state cannot be registered for "
-            "estimation");
+      if (*n_series_m > target->second->size())
+        Rcpp::stop("Invalid process series count");
+      for (size_t j = 0; j < *n_series_m; ++j) {
+        auto address = &(*target->second)[j];
+        if (std::find(info->fixed_effects_parameters.begin(),
+                      info->fixed_effects_parameters.end(),
+                      address) != info->fixed_effects_parameters.end() ||
+            std::find(info->random_effects_parameters.begin(),
+                      info->random_effects_parameters.end(),
+                      address) != info->random_effects_parameters.end()) {
+          Rcpp::stop(
+              "A fixed random-walk initial state cannot be registered for "
+              "estimation");
+        }
       }
     }
     if (this->key_m->size() == 2) {
@@ -290,6 +306,7 @@ class GaussianProcessDistributionsInterface
     if (process_m.get() == "rw1") {
       const auto precision = ss.precision();
       ss << std::setprecision(std::numeric_limits<double>::max_digits10);
+      if (*n_series_m > 1) ss << "\"n_series\": " << *n_series_m << ",\n";
       ss << "\"initial_rule\": \"" << initial_rule_m.get() << "\",\n"
          << "\"initial_mean\": " << (*initial_mean_m) << ",\n"
          << "\"initial_sd\": " << (*initial_sd_m) << ",\n";

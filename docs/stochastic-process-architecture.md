@@ -590,3 +590,81 @@ fleet/recruitment/simulation run passed 32 tests / 272 assertions. These checks
 do not establish assessment-scale coverage or scalability. Existing diagnostic
 fit warnings in map regression fixtures are expected and do not establish
 convergence of those deliberately constrained test fits.
+
+## Age-specific natural mortality random walks: inference increment
+
+`initialize_fims(..., mortality_process = ...)` can now attach independent
+annual random walks to the existing Population `log_M` age-by-year grid. This
+uses the existing vector registration, transformations and survival equations;
+it does not introduce latent abundance states or an alternative mortality
+component. It leaves defaults unchanged.
+
+```r
+m_rows <- which(parameters$module_name == "Population" &
+                parameters$label == "log_M")
+parameters$estimation_type[m_rows] <- "random_effects"
+first_year <- parameters$timing[m_rows] == get_start_year(data)
+parameters$estimation_type[m_rows[first_year]] <- "constant"
+mortality <- list(type = "rw1", sd = 0.1, estimation_type = "fixed_effects",
+                  initial = list(type = "fixed"))
+initialized <- initialize_fims(parameters, data, mortality_process = mortality)
+```
+
+For calendar age `a` and year `t`, `x[a,t] = log M[a,t]` and
+
+\[
+x_{a,t} - x_{a,t-1} \sim N(0,\sigma_M^2),\qquad t>1.
+\]
+
+Innovations are independent across ages and years, with a common supplied or
+estimated innovation SD. The fixed initial rule conditions on every age's
+first-year log-M. Alternatively, `initial = list(type = "normal", mean = ...,
+sd = ...)` places independent proper normal distributions on all first-year
+log-M values with common fixed mean and SD; every target must then be estimated.
+Internal constant states, incomplete or reordered grids, and duplicate density
+declarations are rejected before clearing the active model. State estimation
+flags remain explicit: random effects use TMB Laplace integration, fixed effects
+use a penalized joint fit. The density does not register states a second time.
+
+The reusable Gaussian kernel now supports `n_series` interleaved independent
+series. With age-fast, year-major storage the predecessor index is `i - A`,
+where `A` is the number of ages. This avoids imposing spurious transitions
+between adjacent ages. It applies the initial rule to the first `A` entries,
+and native registration checks that every fixed initial anchor is constant.
+The default `n_series = 1` preserves existing recruitment and fishing behavior.
+The Rcpp `set_series_count()` method configures this dimension; multi-series
+random-walk JSON includes `n_series` metadata. The model continues to exponentiate
+all supplied log-M values before mortality and survival calculations.
+
+This formulation is a calendar-age process, not a cohort process or a common
+annual mortality shock. Those models need different indexing/covariance choices.
+A common innovation SD does not imply common innovations. The conditional
+zero-innovation path is a log-scale mean and a natural-scale median. Prior
+precision is block-tridiagonal after ordering by age; biological likelihoods,
+recruitment feedback and plus-group parents add posterior dependencies.
+With `A` ages and `T` years, fixed initialization adds `A(T-1)` estimated states;
+proper initialization adds `AT`. The one common covariance parameter couples
+those chains in the Hessian. Mortality/F/recruitment confounding means that
+assessment-scale recovery and sensitivity to the initial rule remain necessary
+before operational use.
+
+This upgrade provides inference only. `simulate_fims()` and `forecast_fims()`
+do not accept mortality process specifications or draw mortality paths; they
+continue evaluating supplied mortality states. The next upgrade should apply
+sampled mortality grids before model preparation and recompute all quantities,
+restore all targets on success/error, and validate conditional forecasts,
+cohort survival and both plus-group contributions. No Quadra dependency or
+other dependency has been introduced.
+
+Validation for the mortality inference increment: an isolated clean package
+installation passed. The final combined mortality/fishing/recruitment/simulation
+suite passed 38 tests / 310 assertions with no failures, errors or skips. Tests
+cover independently computed age-specific increment and initial densities,
+analytic innovation-SD derivatives and finite differences, interleaved simulation
+covariance, conditional zero-innovation continuation, pre-clear validation,
+native protection of all initial anchors, reporting, age-year mortality values,
+cohort survival, both plus-group contributions, and finite evaluation of a small
+Laplace-integrated assessment. A standalone C++ interleaved-process smoke test
+passed. A corresponding GTest case was added, but the GTest suite was not run
+because the existing local GoogleTest dependency cache is unavailable. These
+checks do not establish operational assessment recovery, coverage or scaling.

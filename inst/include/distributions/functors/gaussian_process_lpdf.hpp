@@ -16,10 +16,13 @@ namespace fims_distributions {
  * @details log_sd is a scalar innovation log-SD. For AR(1), rho =
  * tanh(unconstrained_rho[0]) and the first residual has stationary SD
  * exp(log_sd[0]) * cosh(unconstrained_rho[0]). Targets must form one
- * contiguous series. This class does not change random-effect registration.
+ * contiguous series by default; n_series supports interleaved independent
+ * series. This class does not change random-effect registration.
  */
 template <typename Type>
 struct GaussianProcessLPDF : public DensityComponentBase<Type> {
+  size_t n_series =
+      1; /*!< Interleaved independent series; year-major layout. */
   bool rw1 =
       false; /*!< First-order random walk instead of a stationary process. */
   bool initial_fixed = false; /*!< Condition on the supplied first state. */
@@ -49,6 +52,10 @@ struct GaussianProcessLPDF : public DensityComponentBase<Type> {
       throw std::invalid_argument(
           "GaussianProcess requires a nonempty target "
           "and a scalar or matching mean");
+    }
+    if (n_series == 0 || n % n_series != 0) {
+      throw std::invalid_argument(
+          "GaussianProcess series count must divide target length");
     }
     if (log_sd.size() != 1 || unconstrained_rho.size() != 1) {
       throw std::invalid_argument(
@@ -85,18 +92,19 @@ struct GaussianProcessLPDF : public DensityComponentBase<Type> {
   const Type evaluate() override {
     const size_t n = Validate();
     const Type rho = Rho();
-    Type previous = static_cast<Type>(0);
+    fims::Vector<Type> previous(n_series, static_cast<Type>(0));
     this->lpdf = static_cast<Type>(0);
     this->lpdf_vec.resize(n);
     for (size_t i = 0; i < n; ++i) {
       const Type residual = this->get_observed(i) - Mean(i);
-      if (i == 0 && rw1 && initial_fixed) {
+      if (i < n_series && rw1 && initial_fixed) {
         this->lpdf_vec[i] = static_cast<Type>(0);
-        previous = residual;
+        previous[i % n_series] = residual;
         continue;
       }
-      const Type log_scale = i == 0 ? InitialLogSD() : log_sd[0];
-      const Type location = i == 0 && rw1 ? initial_mean : rho * previous;
+      const Type log_scale = i < n_series ? InitialLogSD() : log_sd[0];
+      const Type location =
+          i < n_series && rw1 ? initial_mean : rho * previous[i % n_series];
       const Type standardized =
           (residual - location) * fims_math::exp(-log_scale);
       // log(sqrt(2*pi)), with all likelihood normalizers retained.
@@ -104,7 +112,7 @@ struct GaussianProcessLPDF : public DensityComponentBase<Type> {
                           log_scale -
                           static_cast<Type>(0.5) * standardized * standardized;
       this->lpdf += this->lpdf_vec[i];
-      previous = residual;
+      previous[i % n_series] = residual;
     }
     return this->lpdf;
   }
@@ -129,17 +137,19 @@ struct GaussianProcessLPDF : public DensityComponentBase<Type> {
           "GaussianProcess continuation index is out of range");
     }
     fims::Vector<Type> draws(n);
-    Type previous = static_cast<Type>(0);
+    fims::Vector<Type> previous(n_series, static_cast<Type>(0));
     const Type rho = Rho();
     for (size_t i = 0; i < n; ++i) {
-      if (i < first || (i == 0 && rw1 && initial_fixed)) {
+      if (i < first || (i < n_series && rw1 && initial_fixed)) {
         draws[i] = this->get_observed(i);
-        previous = draws[i] - Mean(i);
+        previous[i % n_series] = draws[i] - Mean(i);
       } else {
-        const Type log_scale = i == 0 ? InitialLogSD() : log_sd[0];
-        const Type location = i == 0 && rw1 ? initial_mean : rho * previous;
-        previous = location + fims_math::exp(log_scale) * draw_normal();
-        draws[i] = Mean(i) + previous;
+        const Type log_scale = i < n_series ? InitialLogSD() : log_sd[0];
+        const Type location =
+            i < n_series && rw1 ? initial_mean : rho * previous[i % n_series];
+        previous[i % n_series] =
+            location + fims_math::exp(log_scale) * draw_normal();
+        draws[i] = Mean(i) + previous[i % n_series];
       }
     }
     return draws;

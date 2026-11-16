@@ -284,3 +284,5 @@
 * Added a `NEWS.md` file to track changes to the package.
 
 * Fleet log-F random walks can share innovation SDs through explicit `sd_group` labels and TMB parameter maps. Grouped fleets retain separate trajectories and initial distributions.
+
+* Added opt-in age-specific annual log-M random walks for assessment inference, with a common innovation SD and explicit fixed or proper-normal initialization. Gaussian process densities now support interleaved independent series.

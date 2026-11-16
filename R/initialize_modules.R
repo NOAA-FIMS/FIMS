@@ -933,6 +933,14 @@ initialize_comp <- function(data,
 #'   The specification does not change state estimation types: use
 #'   `"random_effects"` for TMB integration or `"fixed_effects"` for a penalized
 #'   fixed-effect fit.
+#' @param mortality_process Optional `list(type = "rw1", sd = 0.1,
+#'   estimation_type = "fixed_effects", initial = list(type = "fixed"))`.
+#'   Independent age-specific log-M random walks share one innovation SD.
+#'   Supply a complete year-major, age-fast Population `log_M` grid. A fixed
+#'   initial rule requires constant first-year values at every age and estimated
+#'   later values. A normal rule (`type`, `mean`, `sd`) estimates every state;
+#'   initial means and SDs are common across ages and held constant. This option
+#'   supports inference only; mortality paths are not simulated by [simulate_fims()].
 #' @return
 #' A named list with `parameters` and `model`, plus `map` for shared estimated SDs:
 #'
@@ -992,7 +1000,7 @@ initialize_comp <- function(data,
 #' clear()
 #' }
 initialize_fims <- function(parameters, data, recruitment_process = NULL,
-                            fishing_process = NULL) {
+                            fishing_process = NULL, mortality_process = NULL) {
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
@@ -1015,6 +1023,7 @@ initialize_fims <- function(parameters, data, recruitment_process = NULL,
     ))
   }
 
+  mortality_process <- normalize_mortality_process(mortality_process, parameters, data)
   fishing_process <- normalize_fishing_processes(fishing_process, parameters, data)
 
   # A catch of 0 is left out of the likelihood (see initialize_catch()), so an
@@ -1387,6 +1396,10 @@ initialize_fims <- function(parameters, data, recruitment_process = NULL,
     linked_ids = population_module_ids
   )
 
+  if (!is.null(mortality_process)) {
+    mortality_distribution <- initialize_mortality_process(population, mortality_process, get_n_ages(data))
+  }
+
   # Set-up TMB
   # Hard code to be a catch-at-age model
   fims_model <- methods::new(CatchAtAge)
@@ -1402,6 +1415,9 @@ initialize_fims <- function(parameters, data, recruitment_process = NULL,
     model = fims_model
   )
 
+  if (!is.null(mortality_process)) {
+    attr(parameter_list, "gaussian_mortality") <- mortality_distribution
+  }
   if (has_gaussian_process) {
     attr(parameter_list, "gaussian_recruitment") <- recruitment_distribution
   }
