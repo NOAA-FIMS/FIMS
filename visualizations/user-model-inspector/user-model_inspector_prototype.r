@@ -47,9 +47,9 @@ safe_file_name <- function(x) {
 default_model_inspector_output <- function(
     model_label = "User model",
     output_dir = file.path(
-      "visualization-prototypes",
-      "examples",
-      "user-model-inspector"
+      "visualizations",
+      "user-model-inspector",
+      "output"
     )) {
   file.path(
     output_dir,
@@ -450,8 +450,9 @@ rcpp_registration <- merge(
 # -------------------------------------------------------------------------
 
 equation_catalog_path <- file.path(
-  "visualization-prototypes",
-  "data",
+  "visualizations",
+  "equation-catalog",
+  "output",
   "fims_equation_catalog.csv"
 )
 if (!file.exists(equation_catalog_path)) {
@@ -1872,8 +1873,9 @@ build_inspector_metadata_catalog <- function() {
 
 write_inspector_metadata_catalog <- function(
     output = file.path(
-      "visualization-prototypes",
-      "data",
+      "visualizations",
+      "user-model-inspector",
+      "output",
       "fims_inspector_metadata_catalog.json"
     )) {
   output_dir <- dirname(output)
@@ -2798,9 +2800,9 @@ render_stage <- function(stage_id, title, node_data) {
 render_model_inspector <- function(
     model_spec,
     output = file.path(
-      "visualization-prototypes",
-      "examples",
+      "visualizations",
       "user-model-inspector",
+      "output",
       "fims_user_model_inspector_example.html"
     ),
     open = FALSE,
@@ -3075,7 +3077,7 @@ html <- paste0(
   "function renderDefinitionToggle(node){const labels=arrayValue(node.field_definition_labels).filter(Boolean); if(fieldDefinitionMode==='hover' || labels.length===0){return '';} return `<button type='button' class='definition-toggle' data-toggle-definitions>Show definitions</button>`;}\n",
   "function renderFields(node){const notes=arrayValue(node.field_notes).filter(Boolean); const inactive=arrayValue(node.inactive_fields).filter(Boolean); let html=''; if(notes.length>0){html += notes.map((note)=>`<p class='field-note'>${esc(note)}</p>`).join('');} html += renderDefinitionToggle(node); if(notes.length===0 && inactive.length===0){html += renderFieldDisplay(node.fields,node);} else {html += `<div class='field-subheading'>Active for this configuration</div>${renderFieldDisplay(node.fields,node)}`; if(inactive.length>0){html += `<div class='field-subheading'>Registered delta-method fields not active here</div>${renderFieldDisplay(inactive,node)}`;}} return html;}\n",
   "function renderAssumptions(values){values=arrayValue(values).filter(Boolean); if(values.length===0){return `<span class='empty'>No tagged assumptions found yet.</span>`;} return `<ul class='assumption-list'>${values.map((value)=>`<li>${esc(value)}</li>`).join('')}</ul>`;}\n",
-  "function renderEquations(node){const equations=arrayValue(node.equations).filter(Boolean); if(equations.length===0){return `<span class='empty'>No equation extracted yet.</span>`;} return equations.slice(0,3).map((eq)=>`<div class='equation-box'>${esc(eq)}</div>`).join('') + `<div class='link-list'><a href='../package-level-explorer/fims_equation_catalog.html' target='_blank'>Open equation catalog</a></div>`;}\n",
+  "function renderEquations(node){const equations=arrayValue(node.equations).filter(Boolean); if(equations.length===0){return `<span class='empty'>No equation extracted yet.</span>`;} return equations.slice(0,3).map((eq)=>`<div class='equation-box'>${esc(eq)}</div>`).join('') + `<div class='link-list'><a href='../../equation-catalog/output/fims_equation_catalog.html' target='_blank'>Open equation catalog</a></div>`;}\n",
   "function renderLinks(node){let links=''; if(node.url){links += `<a href='${esc(node.url)}' target='_blank'>Open Doxygen page</a>`;} if(node.source){links += `<a href='../${esc(node.source)}' target='_blank'>${esc(node.source)}</a>`;} return links || `<span class='empty'>No link available for this node yet.</span>`;}\n",
   "function renderDeveloperRows(rows){rows=rows.filter((row)=>row && row[1]); if(rows.length===0){return '';} return `<div class='developer-list'>${rows.map(([label,value])=>`<div class='developer-row'><strong>${esc(label)}</strong><code>${esc(value)}</code></div>`).join('')}</div>`;}\n",
   "function renderDeveloperTab(node){const dev=node.developer || {}; let html=''; if(dev.setup_helper){html += `<section class='section'><h3>R setup helper</h3><p><code>${esc(dev.setup_helper)}()</code></p></section>`;} const optionLabels=arrayValue(dev.valid_module_option_labels).filter(Boolean); if(optionLabels.length>0){html += `<section class='section'><h3>Valid module options</h3>${renderList(optionLabels,'No module options detected')}</section>`;} const rows=renderDeveloperRows([['metadata type',dev.metadata_type],['module_name',dev.module_name],['selected module_type',dev.selected_module_type],['option source',dev.option_source],['Rcpp class',dev.rcpp_class],['C++ interface',dev.cpp_interface],['source file',dev.source_file],['source',dev.source],['note',dev.note]]); if(rows){html += `<section class='section'><h3>Technical mapping</h3>${rows}</section>`;} return html || `<section class='section'><h3>Developer metadata</h3><span class='empty'>No developer metadata available for this node yet.</span></section>`;}\n",

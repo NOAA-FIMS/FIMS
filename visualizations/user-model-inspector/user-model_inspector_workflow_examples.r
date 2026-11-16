@@ -2,16 +2,15 @@
 # Run from the repository root with FIMS from this branch already loaded.
 
 source(file.path(
-  "visualization-prototypes",
-  "R",
+  "visualizations",
   "user-model-inspector",
   "user-model_inspector_prototype.r"
 ))
 
 output_dir <- file.path(
-  "visualization-prototypes",
-  "examples",
-  "user-model-inspector"
+  "visualizations",
+  "user-model-inspector",
+  "output"
 )
 
 # -------------------------------------------------------------------------

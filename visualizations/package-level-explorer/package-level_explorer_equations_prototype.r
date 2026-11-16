@@ -686,8 +686,9 @@ interface_title_lookup <- setNames(
 )
 
 equation_catalog_path <- file.path(
-  "visualization-prototypes",
-  "data",
+  "visualizations",
+  "equation-catalog",
+  "output",
   "fims_equation_catalog.csv"
 )
 
@@ -787,7 +788,7 @@ make_equation_tooltip <- function(node_id) {
       format_equation_for_tooltip(equation_rows$equation),
       collapse = "<br>"
     ),
-    "<br><a href='fims_equation_catalog.html' ",
+    "<br><a href='../../equation-catalog/output/fims_equation_catalog.html' ",
     "target='_blank'>Open equation catalog</a>"
   )
 }
@@ -1242,9 +1243,9 @@ graph_focus_with_members <- render_focus_graph(
 # - viz_edges_main
 
 output_dir <- file.path(
-  "visualization-prototypes",
-  "examples",
-  "package-level-explorer"
+  "visualizations",
+  "package-level-explorer",
+  "output"
 )
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
