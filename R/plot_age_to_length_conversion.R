@@ -59,8 +59,8 @@ plot_age_to_length_conversion <- function(data, fleet = NULL) {
       "fleet",
       "label",
       "year_i",
-      "age_i",
-      "length_i",
+      "age",
+      "length",
       "estimated"
     )
     missing_columns <- setdiff(required_columns, names(data))
@@ -122,15 +122,15 @@ plot_age_to_length_conversion <- function(data, fleet = NULL) {
       ) |>
       dplyr::transmute(
         timing = .data[["year_i"]],
-        age = .data[["age_i"]],
-        length = .data[["length_i"]],
+        age = .data[["age"]],
+        length = .data[["length"]],
         value = .data[["estimated"]]
       )
 
     plot_title <- "Realized Growth-derived age-to-length conversion"
     plot_subtitle <- "Length-bin distributions by age and model-year index"
-    x_label <- "Fleet length-bin index"
-    y_label <- "Age index"
+    x_label <- "Fleet length-bin lower edge"
+    y_label <- "Age"
   } else {
     cli::cli_abort(
       "{.var data} must be a {.cls FIMSFrame} or a long model-output data frame."
