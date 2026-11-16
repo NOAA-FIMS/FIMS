@@ -159,3 +159,16 @@ interior optimum but broad relative likelihood support near the lower bound.
 This small experiment supports observation-information and process-SD sensitivity
 experiments next; it does not support adding unrestricted covariance merely to
 address variance instability. No coverage or general scaling claim follows.
+
+The paired observation-information pilot is complete in
+`tests/integration/process-recovery/information-pilot/`. Three shared 18-year
+trajectories were fitted under baseline/improved survey and composition designs.
+94 of 96 attempts passed optimizer checks, and every selected case had a valid
+start. With proper initial uncertainty, composition size 2000 versus 200 reduced
+mean log-M state RMSE by about 21%; combined precision/sample-size improvements
+reduced it by about 23%. Survey precision alone changed mean RMSE little, and
+variance estimates remained design/replicate dependent. Profiles were sharper
+under combined observations but favored below-truth SDs in the profiled dataset.
+Next, assess calibration and process-SD sensitivity with more replicates under
+informative composition designs before adding mortality covariance complexity.
+This is not evidence of operational coverage or a sampling-cost recommendation.

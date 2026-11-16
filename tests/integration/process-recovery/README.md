@@ -156,3 +156,67 @@ before choosing additional mortality covariance or claiming coverage/scalability
 
 The retained [longer-series/profile pilot](sensitivity-pilot/README.md) records
 all attempts, profile results, source provenance and the inspected profile plot.
+
+## Paired observation-information experiment
+
+```sh
+Rscript tests/integration/process-recovery/run-information.R /tmp/fims-information 3 18
+Rscript tests/integration/process-recovery/plot-information.R /tmp/fims-information
+```
+
+The runner accepts an empty output directory, replicate count and horizon. The
+four designs form a two-by-two information comparison:
+
+| Design | Survey log-SD | Age/length multinomial sample size |
+|---|---:|---:|
+| baseline | 0.20 | 200 |
+| survey | 0.05 | 200 |
+| compositions | 0.20 | 2000 |
+| both | 0.05 | 2000 |
+
+Catch log-SD remains 0.1. The operating recruitment/F/M processes, truth SDs,
+initial rules and known biology remain those of the original benchmark. A single
+latent trajectory is generated per replicate, then all four observation datasets
+are generated around it. They use matching likelihood formulas when fitted.
+These are hypothetical sampling designs, not a cost analysis or recommendation
+that actual data achieve independent multinomial information of this size.
+
+Pairing uses a separate observation seed (`process_seed + 100000`), common normal
+errors for catch/survey observations, and one independent categorical pool per
+composition observation. The larger sample includes the smaller sample as a
+prefix, so both have the appropriate multinomial marginal distribution. Age
+and length compositions remain independent observation streams, as assumed by
+the likelihood. Each design retains identical catch observations. The RNG state
+is restored. This coupling reduces sampling differences between designs without
+changing their marginal observation models. These observations differ from the
+older pilots' sampling algorithm, so compare information designs within this
+experiment rather than attributing changes from prior pilot numbers to precision.
+
+Joint recruitment/F/M fits use common SD starts 0.05 and 0.2, with known first-year
+anchors or proper initial priors. At default settings there are three replicates
+and 18 model years. Baseline and `both` designs receive reoptimized mortality-SD
+profiles for dataset 1 at six grid points (`0.001, 0.01, 0.05, 0.1, 0.2, 0.4`),
+from both starts under both initial settings. Intermediate designs receive free
+fits only. The default experiment therefore has 96 optimizer attempts.
+
+Selection and gradient diagnostics reuse the sensitivity benchmark. Every
+attempt remains in `attempts.csv`; `best.csv` and `summary.csv` retain valid-fit
+and dataset denominators, boundary flags, mortality state RMSE and profile deltas.
+All-invalid groups remain present with missing estimates. Profile references are
+computed **separately for every observation dataset and initial-information
+setting**: raw objectives from different designs or conditioning settings must
+not be compared. No coverage, Hessian qualification or
+asymptotic profile confidence cutoff is calculated in this experiment.
+
+RDS results/checkpoints retain every design's data, shared truth, predictions,
+standard-normal errors, categorical pools and seeds. Source checksums are captured
+before running. Existing pilot sources and artifacts remain unchanged. The plot
+of SD estimates shows paired datasets across designs; the profiles show dataset
+1 only, on each design's own relative NLL scale. Missing/invalid fitted values
+are not drawn as successful estimates. Three paired replicates provide screening
+evidence only; stronger sampling does not guarantee identifiable process variance,
+and these runs do not incorporate unknown selectivity, aging error, composition
+overdispersion or biological misspecification.
+
+The retained [observation-information pilot](information-pilot/README.md) includes
+all attempts, paired state/SD results, separately normalized profiles and inspected plots.

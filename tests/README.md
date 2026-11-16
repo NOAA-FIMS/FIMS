@@ -197,3 +197,5 @@ runtime. Its [small pilot](integration/process-recovery/pilot/README.md) records
 variance-boundary behavior without filtering it from the results.
 The same benchmark directory also provides `run-sensitivity.R` for longer-series,
 multiple-start and mortality-SD profile experiments, plus a profile plotting script.
+`run-information.R` adds paired survey-precision and composition-size comparisons;
+`plot-information.R` renders paired SD estimates and relative mortality-SD profiles.

@@ -793,3 +793,41 @@ frequencies or coverage. Details, all attempt outcomes and a visually inspected
 profile PNG are retained in `tests/integration/process-recovery/sensitivity-pilot/`.
 Validation passed 9 tests / 51 assertions, including the two opt-in integration
 checks. Production code and the original pilot source remain unchanged.
+
+### Paired observation-information experiment
+
+The `information.R` benchmark extension varies survey log-SD (0.20 versus 0.05)
+and age/length composition sample size (200 versus 2000) in a two-by-two design.
+Catch log-SD stays at 0.1. One recruitment/F/M trajectory is generated per
+replicate and reused exactly across designs, with known biology and matching
+observation likelihoods in every fit. Catch observations are identical. Survey
+observations use `y_d = exp(mu + s_d z)` with the same standard-normal `z` for
+all designs. Each composition has an independent categorical pool; the first
+200 draws form the smaller sample and the first 2000 form the larger sample.
+Each prefix is marginally multinomial with the declared size. Pairing is across
+hypothetical designs, not additional correlated observations within a fit.
+
+The default experiment has three 18-year datasets, two common covariance starts,
+and both first-year information settings. Baseline and combined-improvement
+designs receive reoptimized mortality-SD profiles for dataset 1; intermediate
+designs receive free fits. Selection reuses the sensitivity benchmark, retaining
+all attempts and explicit valid-fit denominators. Every observation dataset has
+its own profile likelihood reference; raw objectives across designs are not
+compared. RDS outputs preserve truth, all datasets, errors/pools and seeds.
+Previous sources and pilots remain unchanged; no production code or dependencies
+are added. These optimistic sampling designs do not account for composition
+overdispersion, aging error, unknown selectivity or observation costs, and do
+not establish interval coverage.
+
+The retained observation-information pilot has 96 attempts (94 passed optimizer
+checks) and 48 valid selected free/profile cases. Under proper initialization,
+larger compositions reduced mean log-M state RMSE by about 21% across three
+paired 18-year datasets; combined survey/composition improvements reduced it by
+about 23%, while survey precision alone changed it little. The combined-data
+profile was sharper but favored below-truth mortality SD in dataset 1. State
+recovery, covariance recovery and interval calibration therefore remain separate
+validation targets. All-attempt tables, paired estimates, profile plots and
+limitations are in `tests/integration/process-recovery/information-pilot/`.
+Validation passed 13 tests / 83 assertions, including all three benchmark
+integration checks. Both PNGs were visually inspected. No production code or
+previous pilot source was changed.

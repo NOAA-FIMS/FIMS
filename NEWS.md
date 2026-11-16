@@ -292,3 +292,5 @@
 * Added a reproducible scientific recovery benchmark for recruitment, fishing and natural mortality processes, with paired initialization/innovation-SD comparisons, failure accounting, interval diagnostics, posterior correlations and a retained five-replicate pilot.
 
 * Extended the scientific process benchmark with longer horizons, multiple covariance starting values and reoptimized mortality-SD likelihood profiles, retaining all attempts and replicate checkpoints.
+
+* Added a paired observation-information benchmark varying survey precision and multinomial composition sample sizes, with shared trajectories, common survey errors, nested composition samples and separately normalized mortality-SD profiles.
