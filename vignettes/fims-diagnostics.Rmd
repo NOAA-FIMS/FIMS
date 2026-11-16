@@ -67,7 +67,7 @@ like_fit <- run_fims_likelihood(
 
 ### Visualize results
 
-Use `plot_likelihood()` to visualize the profile. The plot shows the change in total likelihood over the R~0~ values profiled in the solid black line and the change in likelihood for each data type in the color lines below it. This plot indicates that the R~0~ value estimated by the base model (13.9) is the value that leads to the lowest likelihood and all of the data types support this (i.e., the data do not conflict).  
+Use `plot_likelihood()` to visualize the profile. The plot shows the change in total likelihood over the R~0~ values profiled in the solid black line and the change in likelihood for each data type in the color lines below it. This plot indicates that the R~0~ value estimated by the base model (`r round(dplyr::filter(get_estimates(base_model), label == "log_rzero")[["estimated"]], 1)`) is the value that leads to the lowest likelihood and all of the data types support this (i.e., the data do not conflict).  
 
 ```{r}
 #| fig.alt: >

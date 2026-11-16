@@ -433,20 +433,45 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
          << "\n\n";
       ss << "},\n";
 
-      for (size_t i = 0; i < pop->log_init_naa.size(); i++) {
-        population_interface_ptr->log_init_naa[i].final_value_m =
-            pop->log_init_naa[i];
-      }
-      ss << " {\n\"name\": \"log_init_naa\",\n";
-      ss << "  \"id\":" << population_interface->log_init_naa.id_m << ",\n";
-      ss << "  \"type\": \"vector\",\n";
-      ss << " \"dimensionality\": {\n";
-      ss << "  \"header\": [" << "\"n_ages\"" << "],\n";
-      ss << "  \"dimensions\": [" << population_interface->n_ages.get()
-         << "]\n},\n";
+      // Only one of log_init_naa and log_init_rzero_offset is used, depending
+      // on how initial numbers at age are set. The other keeps the 1
+      // placeholder element that every interface vector starts with, so the
+      // size cannot be used to tell them apart.
+      if (pop->initial_numbers == "free") {
+        for (size_t i = 0; i < pop->log_init_naa.size(); i++) {
+          population_interface_ptr->log_init_naa[i].final_value_m =
+              pop->log_init_naa[i];
+        }
+        ss << " {\n\"name\": \"log_init_naa\",\n";
+        ss << "  \"id\":" << population_interface->log_init_naa.id_m << ",\n";
+        ss << "  \"type\": \"vector\",\n";
+        ss << " \"dimensionality\": {\n";
+        ss << "  \"header\": [" << "\"n_ages\"" << "],\n";
+        ss << "  \"dimensions\": [" << population_interface->n_ages.get()
+           << "]\n},\n";
 
-      ss << "  \"values\":" << population_interface->log_init_naa << "\n";
-      ss << "},\n";
+        ss << "  \"values\":" << population_interface->log_init_naa << "\n";
+        ss << "},\n";
+      }
+
+      if (pop->initial_numbers == "equilibrium") {
+        for (size_t i = 0; i < pop->log_init_rzero_offset.size(); i++) {
+          population_interface_ptr->log_init_rzero_offset[i].final_value_m =
+              pop->log_init_rzero_offset[i];
+        }
+        ss << " {\n\"name\": \"log_init_rzero_offset\",\n";
+        ss << "  \"id\":" << population_interface->log_init_rzero_offset.id_m
+           << ",\n";
+        ss << "  \"type\": \"vector\",\n";
+        ss << " \"dimensionality\": {\n";
+        ss << "  \"header\": [null],\n";
+        ss << "  \"dimensions\": ["
+           << population_interface->log_init_rzero_offset.size() << "]\n},\n";
+
+        ss << "  \"values\":" << population_interface->log_init_rzero_offset
+           << "\n";
+        ss << "},\n";
+      }
 
       for (size_t i = 0; i < population_interface->proportion_female.size();
            i++) {
@@ -1035,6 +1060,33 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         FIMS_ERROR_LOG("Population with id " + fims::to_string(*it) +
                        " not found in live objects.");
         continue;
+      }
+
+      // The log_devs output labels years from the recruitment n_years, but
+      // the model applies the deviations by the population n_years. If the 2
+      // differ, the deviations would be reported on the wrong years.
+      auto recruitment_interface_it =
+          RecruitmentInterfaceBase::live_objects.find(
+              population_interface->recruitment_id.get());
+      if (recruitment_interface_it !=
+          RecruitmentInterfaceBase::live_objects.end()) {
+        std::shared_ptr<BevertonHoltRecruitmentInterface>
+            recruitment_interface =
+                std::dynamic_pointer_cast<BevertonHoltRecruitmentInterface>(
+                    recruitment_interface_it->second);
+        if (recruitment_interface && recruitment_interface->n_years.get() !=
+                                         population_interface->n_years.get()) {
+          std::string message =
+              "Recruitment " + fims::to_string(recruitment_interface->id) +
+              " has n_years = " +
+              fims::to_string(recruitment_interface->n_years.get()) +
+              ", but population " + fims::to_string(population_interface->id) +
+              " has n_years = " +
+              fims::to_string(population_interface->n_years.get()) +
+              ". Set the same n_years for both.";
+          FIMS_ERROR_LOG(message);
+          throw std::invalid_argument(message);
+        }
       }
 
       model->InitializePopulationDerivedQuantities(population_interface->id);

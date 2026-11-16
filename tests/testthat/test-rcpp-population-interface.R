@@ -93,4 +93,69 @@ test_that("rcpp population interface works with correct inputs", {
 # No Edge handling for now.
 
 ## Error handling ----
-# No built in errors or warnings to test for now.
+test_that("rcpp population rejects initial numbers it does not use", {
+  n_ages <- 3
+  new_population <- function(initial_numbers) {
+    population <- methods::new(Population)
+    population$n_ages$set(n_ages)
+    population$ages[] <- seq(1, n_ages)
+    population$n_years$set(2)
+    population$initial_numbers$set(initial_numbers)
+    population
+  }
+
+  population <- new_population("equilibrium")
+  population$log_init_naa[] <- rep(0, n_ages)
+  #' @description Test that log_init_naa values with equilibrium initial numbers return an error instead of being ignored.
+  expect_error(CreateTMBModel(), "sets log_init_naa")
+  clear()
+
+  population <- new_population("free")
+  population$log_init_rzero_offset[] <- 0
+  population$log_init_rzero_offset$set_estimation_types("fixed_effects")
+  #' @description Test that an estimated log_init_rzero_offset with free initial numbers returns an error.
+  expect_error(CreateTMBModel(), "sets log_init_rzero_offset")
+  clear()
+
+  population <- new_population("free")
+  population$log_init_rzero_offset[] <- 0.5
+  #' @description Test that a nonzero constant log_init_rzero_offset with free initial numbers returns an error instead of being ignored.
+  expect_error(CreateTMBModel(), "sets log_init_rzero_offset")
+  clear()
+
+  population <- new_population("Equilibrium")
+  population$log_init_rzero_offset[] <- 0.3
+  #' @description Test that a misspelled initial_numbers option is reported before the unused vector.
+  expect_error(CreateTMBModel(), "must be \"free\" or \"equilibrium\"")
+  clear()
+})
+
+test_that("rcpp population and recruitment need the same number of years", {
+  population <- methods::new(Population)
+  population$n_ages$set(3)
+  population$ages[] <- seq(1, 3)
+  population$n_years$set(2)
+  population$log_init_naa[] <- rep(0, 3)
+  recruitment <- methods::new(BevertonHoltRecruitment)
+  recruitment$n_years$set(3)
+  population$SetRecruitmentID(recruitment$get_id())
+  catch_at_age <- methods::new(CatchAtAge)
+  catch_at_age$AddPopulation(population$get_id())
+  #' @description Test that a recruitment n_years that differs from the population n_years returns an error because log_devs would be labeled on the wrong years.
+  expect_error(CreateTMBModel(), "has n_years = 3, but population")
+  clear()
+})
+
+test_that("rcpp catch-at-age model needs recruitment for each population", {
+  population <- methods::new(Population)
+  population$n_ages$set(3)
+  population$ages[] <- seq(1, 3)
+  population$n_years$set(2)
+  population$initial_numbers$set("free")
+  population$log_init_naa[] <- rep(0, 3)
+  catch_at_age <- methods::new(CatchAtAge)
+  catch_at_age$AddPopulation(population$get_id())
+  #' @description Test that a population with no recruitment returns an error instead of crashing R.
+  expect_error(CreateTMBModel(), "has no recruitment")
+  clear()
+})

@@ -8,7 +8,8 @@ setup_default_Population(
   data,
   log_M = log(0.2),
   log_init_naa = NA_real_,
-  proportion_female = 0.5
+  proportion_female = 0.5,
+  initial_numbers = c("equilibrium", "free")
 )
 }
 \arguments{
@@ -26,11 +27,26 @@ equilibrium implied by unfished recruitment \eqn{R_0} and natural mortality
 \deqn{N_a = R_0 \exp\left(-\sum_{j < a} M_j\right)}
 for ages below the plus group, and for the plus group \eqn{A}, which
 accumulates survivors each year,
-\deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}}
+\deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}
+Must be \code{NA} unless \code{initial_numbers = "free"}.}
 
 \item{proportion_female}{A numeric value or vector (length equal to the
 number of ages) between 0 and 1 specifying the proportion of each age that
 is female, which scales spawning biomass. Default is \code{0.5}.}
+
+\item{initial_numbers}{A string specifying how numbers at age in the first
+year are set. The available options are
+equilibrium, free.
+The default,
+equilibrium,
+starts from the unfished equilibrium with recruitment deviations for every
+cohort in the first-year age structure except the plus group, so
+\code{log_devs} start \code{n_ages - 2} years before the first year. To keep the
+oldest of those cohorts at equilibrium, remove their \code{log_devs} rows,
+starting with the earliest \code{timing}. Do not set them to constant instead,
+because a constant deviation still adds a term to the recruitment
+likelihood. \code{"free"} estimates \code{log_init_naa} for every age, and
+\code{log_devs} start in the second year.}
 }
 \value{
 A tibble of default population configurations, including initial numbers at
@@ -42,9 +58,23 @@ This function sets up default parameters for a population module.
 }
 \details{
 The function creates a tibble of default population configurations, including
-log natural mortality rate, log initial numbers at age, and proportion of
-females. The function performs input checks to ensure that the provided
-arguments are valid.
+log natural mortality rate, how initial numbers at age are set, and
+proportion of females. The function performs input checks to ensure that the
+provided arguments are valid.
+
+With \code{initial_numbers = "equilibrium"}, numbers at age in the first year are
+the unfished equilibrium \eqn{N^U_a} from unfished recruitment and
+first-year natural mortality, scaled by the offset and by the recruitment
+deviation \eqn{\epsilon} of each cohort:
+\deqn{N_a = N^U_a \exp\left(\delta + \epsilon_{y_1 - a}\right),}
+where \eqn{\delta} is \code{log_init_rzero_offset}, \eqn{a} counts ages from 0
+for the youngest age, and \eqn{y_1} is the first year. Cohorts without a
+deviation, including the plus group, use \eqn{\epsilon = 0}. The deviations
+are part of \code{log_devs} in the recruitment module (see
+\code{\link[=setup_default_Recruitment]{setup_default_Recruitment()}}). \code{log_init_rzero_offset} is on the natural log
+scale and is constant at 0 by default, so the first-year age structure is
+built from unfished recruitment. With \code{initial_numbers = "free"}, numbers at
+age in the first year are the parameters \code{log_init_naa}.
 }
 \examples{
 \dontrun{

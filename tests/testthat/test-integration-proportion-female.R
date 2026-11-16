@@ -59,12 +59,10 @@ test_that("proportion_female by age reaches spawning biomass", {
     parameters_4_model <- default_parameters |>
       dplyr::filter(label != "proportion_female") |>
       dplyr::bind_rows(
-        # Only the proportion_female rows are used, so the message about
-        # log_init_naa being NA does not apply.
-        suppressMessages(setup_default_Population(
+        setup_default_Population(
           data = data_4_model,
           proportion_female = prop_female
-        )) |>
+        ) |>
           dplyr::filter(label == "proportion_female")
       )
     fit <- parameters_4_model |>

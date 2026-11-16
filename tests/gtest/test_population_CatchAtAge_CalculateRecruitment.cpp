@@ -77,4 +77,45 @@ TEST_F(CAAEvaluateTestFixture,
   // testing that population numbers_at_age > 0.0
   EXPECT_GT(dq["numbers_at_age"][r_i_age_year], 0.0);
 }
+
+// CatchAtAge_CalculateRecruitment
+// IO correctness
+TEST_F(CAAEvaluateTestFixture,
+       HandlesEquilibriumDeviations_CatchAtAge_CalculateRecruitment) {
+  auto& dq =
+      catch_at_age_model->GetPopulationDerivedQuantities(population->GetId());
+  // With equilibrium initial numbers at age, recruitment in year y uses
+  // deviation y + n_initial_devs because the first n_initial_devs + 1
+  // deviations belong to the first-year age structure.
+  size_t n_initial_devs = 3;
+  population->initial_numbers = "equilibrium";
+  population->n_initial_devs = n_initial_devs;
+  population->recruitment->log_recruit_devs.resize(n_years + n_initial_devs);
+  for (size_t i = 0; i < population->recruitment->log_recruit_devs.size();
+       i++) {
+    population->recruitment->log_recruit_devs[i] = 0.1 * (i + 1);
+  }
+  population->recruitment->log_expected_recruitment.resize(n_years +
+                                                           n_initial_devs);
+
+  // Spawning biomass in the year before recruitment sets the mean
+  int year = 5;
+  for (size_t y = 0; y < n_years; y++) {
+    for (size_t age = 0; age < n_ages; age++) {
+      catch_at_age_model->CalculateMaturityAA(
+          population, y * population->n_ages + age, y, age);
+    }
+  }
+  catch_at_age_model->CalculateSpawningBiomass(
+      population, (year - 1) * population->n_ages, year - 1, 0);
+
+  int i_age_year = year * population->n_ages;
+  catch_at_age_model->CalculateRecruitment(population, i_age_year, year, year);
+
+  double phi_0 = catch_at_age_model->CalculateSBPR0(population);
+  double expected_mean = population->recruitment->evaluate_mean(
+      dq["spawning_biomass"][year - 1], phi_0);
+  double expected = expected_mean * std::exp(0.1 * (year + n_initial_devs + 1));
+  EXPECT_NEAR(dq["numbers_at_age"][i_age_year], expected, 1e-10 * expected);
+}
 }  // namespace

@@ -46,6 +46,48 @@ test_that("`setup_default_parameters()` works with correct inputs", {
   )
 })
 
+test_that("`setup_default_parameters()` sets up equilibrium and free initial numbers at age", {
+  start_year <- get_start_year(data)
+  end_year <- get_end_year(data)
+  n_ages <- get_n_ages(data)
+  equilibrium <- setup_default_parameters(data = data)
+  free <- setup_default_parameters(data = data, initial_numbers = "free")
+
+  #' @description Test that the default equilibrium initial numbers at age have recruitment deviations for every cohort in the first-year age structure except the plus group.
+  expect_equal(
+    dplyr::filter(equilibrium, .data[["label"]] == "log_devs")[["timing"]],
+    (start_year - n_ages + 2):end_year
+  )
+  #' @description Test that the deviations before the first year share the distribution of the other recruitment deviations.
+  expect_equal(
+    dplyr::filter(equilibrium, .data[["label"]] == "log_devs") |>
+      dplyr::distinct(.data[["estimation_type"]], .data[["distribution"]]) |>
+      nrow(),
+    1
+  )
+  #' @description Test that the default equilibrium initial numbers at age use log_init_rzero_offset instead of log_init_naa.
+  expect_true("log_init_rzero_offset" %in% equilibrium[["label"]])
+  expect_false("log_init_naa" %in% equilibrium[["label"]])
+
+  #' @description Test that free initial numbers at age keep recruitment deviations from the second year on.
+  expect_equal(
+    dplyr::filter(free, .data[["label"]] == "log_devs")[["timing"]],
+    (start_year + 1):end_year
+  )
+  #' @description Test that free initial numbers at age start at the unfished equilibrium from the default R0 and M.
+  expect_equal(
+    dplyr::filter(free, .data[["label"]] == "log_init_naa")[["value"]],
+    FIMS:::setup_default_log_init_naa(
+      n_ages = n_ages,
+      log_rzero = log(1e+06),
+      log_M = log(0.2)
+    )
+  )
+  expect_false("log_init_rzero_offset" %in% free[["label"]])
+
+  clear()
+})
+
 test_that("`setup_default_parameters()` defaults to EWAA when empirical weight-at-age is present", {
   result <- setup_default_parameters(data = data)
 
@@ -167,19 +209,10 @@ test_that("modular pipeline matches `setup_default_parameters()`", {
   recruitment_defaults <- setup_default_Recruitment(data = data)
   maturity_defaults <- setup_default_Maturity(data = data)
   growth_defaults <- setup_default_Growth()
-
-  log_M <- log(0.2)
-  log_rzero <- recruitment_defaults |>
-    dplyr::filter(.data[["label"]] == "log_rzero") |>
-    dplyr::pull(.data[["value"]])
+  # Equilibrium initial numbers at age, the default, need no log_init_naa
   population_defaults <- setup_default_Population(
     data = data,
-    log_M = log_M,
-    log_init_naa = FIMS:::setup_default_log_init_naa(
-      n_ages = get_n_ages(data),
-      log_rzero = log_rzero,
-      log_M = log_M
-    )
+    log_M = log(0.2)
   )
 
   modular_result <- dplyr::bind_rows(
@@ -229,7 +262,10 @@ test_that("modular pipeline with `purrr` matches `setup_default_parameters()`", 
   ) |>
     dplyr::bind_rows()
 
-  recruitment_defaults <- setup_default_Recruitment(data = data)
+  recruitment_defaults <- setup_default_Recruitment(
+    data = data,
+    initial_numbers = "free"
+  )
   maturity_defaults <- setup_default_Maturity(data = data)
   growth_defaults <- setup_default_Growth()
 
@@ -246,7 +282,8 @@ test_that("modular pipeline with `purrr` matches `setup_default_parameters()`", 
   population_defaults <- setup_default_Population(
     data = data,
     log_M = log_M,
-    log_init_naa = log_init_naa
+    log_init_naa = log_init_naa,
+    initial_numbers = "free"
   )
 
   # Explicitly update log_init_naa values to mirror downstream modular workflows.
@@ -269,7 +306,10 @@ test_that("modular pipeline with `purrr` matches `setup_default_parameters()`", 
     population_defaults
   )
 
-  expected_result <- setup_default_parameters(data = data)
+  expected_result <- setup_default_parameters(
+    data = data,
+    initial_numbers = "free"
+  )
 
   #' @description Test that the modular pipeline output is identical to `setup_default_parameters()`.
   expect_true(identical(modular_result, expected_result))
@@ -406,6 +446,12 @@ test_that("`setup_default_parameters()` returns correct error messages", {
   expect_error(
     object = setup_default_parameters(data = "not_a_fimsframe"),
     regexp = "FIMSFrame"
+  )
+
+  #' @description Test that an unknown initial_numbers option triggers an informative error.
+  expect_error(
+    object = setup_default_parameters(data = data, initial_numbers = "fished"),
+    regexp = "initial_numbers"
   )
 
   clear()

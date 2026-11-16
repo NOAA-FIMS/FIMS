@@ -15,7 +15,11 @@ testthat::skip_if(
 )
 
 make_vonb_parameters <- function(fims_frame) {
-  default_parameters <- FIMS::setup_default_parameters(data = fims_frame)
+  # The OM-truth bounds below were set with free first-year numbers at age.
+  default_parameters <- FIMS::setup_default_parameters(
+    data = fims_frame,
+    initial_numbers = "free"
+  )
 
   default_parameters |>
     dplyr::filter(.data[["module_name"]] != "Growth") |>
