@@ -1147,14 +1147,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Prepares cached population growth products for all populations whose
-   * growth objects expose the growth-derived observation interface.
+   * @brief Prepares Growth products and, when configured, dependent population
+   * size products before catch-at-age evaluation.
    *
-   * This helper makes sure growth-derived-capable populations prepare their
-   * cached growth products before catch-at-age evaluation so code that uses
-   * those prepared values can access them consistently.
+   * Size products are prepared after Growth because they use prepared
+   * length-at-age values.
    */
-  void PreparePopulationGrowthProducts() {
+  void PreparePopulationGrowthAndSizeProducts() {
     for (size_t p = 0; p < this->populations.size(); ++p) {
       std::shared_ptr<fims_popdy::Population<Type>> &population =
           this->populations[p];
@@ -1505,7 +1504,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
                Sets recruitment deviations to mean 0.
      */
     Prepare();
-    PreparePopulationGrowthProducts();
+    PreparePopulationGrowthAndSizeProducts();
     /*
      start at year=0, age=0;
      here year 0 is the estimated initial population structure and age 0 are
