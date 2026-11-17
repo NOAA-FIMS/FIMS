@@ -641,17 +641,15 @@ methods::setMethod(
 # methods::setMethod: plot ----
 #' Plot a `FIMSFrame` object
 #'
-#' Use `ggplot2::geom_point()` to plot summary information stored in the data
-#' slot of the `FIMSFrame` class.
+#' Plot data availability for a `FIMSFrame` object using
+#' [stockplotr::plot_data_availability()].
 #'
 #' @param x A `FIMSFrame` object.
 #' @param y Unused (inherited from R base).
 #' @param ... Unused (inherited from R base).
 #'
 #' @return
-#' A \pkg{ggplot2} object is returned that uses [stockplotr::theme_noaa()].
-#' There will be one panel per input type with fleet-specific information
-#' denoted using colors.
+#' The result of [stockplotr::plot_data_availability()].
 #' @examples
 #' \dontrun{
 #' data("data_big", package = "FIMS")
@@ -660,7 +658,6 @@ methods::setMethod(
 #' }
 #'
 #' @importFrom graphics plot
-#' @importFrom stockplotr theme_noaa
 #' @method plot FIMSFrame
 #' @rdname plot
 #' @aliases plot,FIMSFrame,missing-method
@@ -671,41 +668,7 @@ methods::setMethod(
   f = "plot",
   signature = c(x = "FIMSFrame", y = "missing"),
   definition = function(x, y, ...) {
-    data_for_plot <- get_data(x) |>
-      dplyr::mutate(
-        type = gsub("_", " ", .data$type)
-      ) |>
-      dplyr::group_by(dplyr::across(
-        dplyr::all_of(c("fleet", "timing", "type"))
-      )) |>
-      dplyr::filter(.data$observed != -999) |>
-      dplyr::summarize(
-        no = dplyr::n()
-      ) |>
-      dplyr::filter(.data$no > 0)
-    ggplot2::ggplot(
-      data = data_for_plot,
-      mapping = ggplot2::aes(
-        x = .data$timing,
-        y = .data$fleet,
-        col = .data$fleet
-      )
-    ) +
-      ggplot2::facet_wrap(
-        "type",
-        scales = "free_y",
-        ncol = 1
-      ) +
-      ggplot2::geom_point(alpha = 0.8) +
-      ggplot2::xlab("Timing") +
-      ggplot2::ylab("") +
-      stockplotr::theme_noaa() +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_text(angle = 15),
-        axis.ticks.y = ggplot2::element_blank()
-      ) +
-      ggplot2::labs(col = "Fleet") +
-      ggplot2::guides(color = "none")
+    stockplotr::plot_data_availability(x)
   }
 )
 

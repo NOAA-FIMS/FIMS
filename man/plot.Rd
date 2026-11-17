@@ -14,13 +14,11 @@
 \item{...}{Unused (inherited from R base).}
 }
 \value{
-A \pkg{ggplot2} object is returned that uses \code{\link[stockplotr:theme_noaa]{stockplotr::theme_noaa()}}.
-There will be one panel per input type with fleet-specific information
-denoted using colors.
+The result of \code{\link[stockplotr:plot_data_availability]{stockplotr::plot_data_availability()}}.
 }
 \description{
-Use \code{ggplot2::geom_point()} to plot summary information stored in the data
-slot of the \code{FIMSFrame} class.
+Plot data availability for a \code{FIMSFrame} object using
+\code{\link[stockplotr:plot_data_availability]{stockplotr::plot_data_availability()}}.
 }
 \examples{
 \dontrun{
