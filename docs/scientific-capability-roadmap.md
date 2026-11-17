@@ -1,24 +1,30 @@
 # Scientific capability roadmap
 
-Investigation draft, 2026-11-16. This orders proposed work; it does not authorize
-production changes. See the [gap matrix](scientific-capability-gaps.md) for
-baseline evidence and [process design](stochastic-process-architecture.md) for
-mathematical contracts. No new dependency, commit, push or PR is part of this pass.
+First drafted 2026-11-16; current branch status updated 2026-11-17. This orders
+proposed work and records completed increments; it is not authorization for
+unrelated production work. See the [gap matrix](scientific-capability-gaps.md)
+for baseline evidence, [process design](stochastic-process-architecture.md) for
+mathematical contracts, and the maintained [change/inspiration log](scientific-capability-change-log.md)
+for current scope, commit history and platform attribution.
 
 ## Current increment
 
-The opt-in IID/AR1 density and recruitment connection are implemented on this
-branch, with focused mathematical, simulation and integration tests. Package 1
-remains subject to review and wider assessment recovery/coverage and scaling
-validation. Package 2 now has a bounded implementation: Gaussian recruitment
-path simulation/continuation, recomputed trajectories and normal/lognormal/
-multinomial observations at supplied parameters and initial states. Joint
-parameter/state uncertainty and generalized scheduling remain open. Package 3
-now includes independent annual fleet log-F random walks, proper/fixed initial
-rules, inference, process-aware simulation and shared innovation SD groups.
-Mortality and selectivity targets remain open. Packages 4 onward are not implemented.
-The initial investigation and recruitment/fishing upgrades were committed in
-`9ea49e1`; subsequent upgrades are committed after validation at the user’s request.
+Implemented on this branch: opt-in IID/AR1 recruitment, process-aware simulation
+and conditional forecasting, annual fleet log-F random walks and shared innovation
+SD groups, independent age-specific annual log-M random walks and mortality-aware
+simulation, and opt-in Dirichlet-multinomial composition inference. A benchmark
+snapshot pathway preserves local fitted modes across uncertainty reconstruction.
+Selectivity process extensions, multivariate covariance, latent older-age abundance
+states, generalized partitions and a new backend are not completed by these changes.
+
+Recovery, profile, information, calibration and misspecification pilots are
+recorded with explicit limitations. The current single-case matched-DM result
+is not evidence of replicated dispersion recovery or calibrated intervals.
+**Next: replicated matched-DM validation**, including estimated concentration and
+alternate covariance/inner-state starts, before further production simulation or
+covariance extensions. The [ledger](scientific-capability-change-log.md#next-task-replicated-matched-dm-validation)
+outlines its scope. Upgrades are committed after validation at the user's request;
+pushes remain separate authorized actions.
 
 ## Prioritization
 
@@ -39,7 +45,7 @@ assessment has enough information to estimate another variance or correlation.
 | 4 | Multivariate and separable age-year covariance | High / broad | Medium–large | Density extensions plus explicit axis metadata | 3; validated indexing | Dense covariance oracle, dimension checks, positive-definite parameterization and measured factorization costs. |
 | 5 | Latent abundance-at-age transition model | High / state-space assessments | Large | Requires state storage and transition changes | 1–4 as needed, not every covariance option mandatory | Cohort/plus-group recovery, deterministic-mode equivalence, pinned WHAM/SAM comparisons. |
 | Parallel A | Fractional-year survey timing | High / surveys | Small–medium | Local observation-operator extension | Defined year/rate units | Analytical tau=0/0.5/1 results and unchanged default timing. |
-| Parallel B | Dirichlet-multinomial composition likelihood | High / integrated assessment | Medium | Existing likelihood/parser extension points | Composition count/sample-size contract | Multinomial limit, dispersion recovery, zero handling and sensitivity. |
+| Parallel B | Dirichlet-multinomial inference implemented; broader validation/simulation remain | High / integrated assessment | Medium | Existing likelihood/parser extension points | Composition count/sample-size contract | Multinomial limit, dispersion recovery, zero handling and sensitivity. |
 | Later 1 | Environmental predictors, then covariate observation error | Medium / ecosystem applications | Medium–large | Needs shared predictors and latent covariate module | Process layer; lag and missing-year semantics | beta=0 limit; covariate/state recovery and predictive checks. |
 | Later 2 | Fixed productivity regimes and richer biological means | Medium / changing productivity | Medium | Recruitment mean extension | Explicit regime maps and reference-point definitions | One-regime limit, boundary-year checks, identifiable parameters. |
 | Later 3 | Sex/area/season partitions and movement | Medium overall; high for particular stocks | Large | Empty Subpopulation and pooled-growth constraints need substantial work | State/index contract and process schedule | Mass conservation, pooled limits and consistent observation aggregation. |
@@ -51,7 +57,7 @@ Parallel A/B are independent work packages, not instructions to spawn agents or
 make concurrent implementation changes. They need separate scoped changes and
 validation; neither requires waiting for a complete latent-abundance engine.
 
-## First proposed implementation scope
+## Original proposed implementation scope (historical)
 
 The first scientific extension is an opt-in stationary AR(1) recruitment process
 built on a reusable density. Include IID as its exact rho=0 baseline, a stationary

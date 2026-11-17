@@ -5,6 +5,9 @@ fields in the design sections are guarantees of an existing public API. The firs
 implementation increment is described below. Evidence IDs refer to the source registry in
 [scientific-capability-gaps.md](scientific-capability-gaps.md).
 
+Current implementation history and platform attribution are maintained in the
+[change log](scientific-capability-change-log.md).
+
 ## First implementation increment
 
 The working branch now includes `GaussianProcessDistribution`, a reusable

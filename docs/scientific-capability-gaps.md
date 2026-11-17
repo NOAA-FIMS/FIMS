@@ -5,7 +5,9 @@ Investigation draft, 2026-11-16. FIMS baseline: `f028bff` on
 not a numerical certification of the models. No assessment fits or external
 framework executables were run. The architecture and roadmap are in
 [stochastic-process-architecture.md](stochastic-process-architecture.md) and
-[scientific-capability-roadmap.md](scientific-capability-roadmap.md).
+[scientific-capability-roadmap.md](scientific-capability-roadmap.md). Current
+implementation history and platform attribution are maintained separately in the
+[change log](scientific-capability-change-log.md).
 
 Implementation update: IID/AR1 recruitment and a bounded process-aware simulation/
 continuation driver, plus initialized fleet log-F random walks, are now present

@@ -118,6 +118,7 @@ docs
 !/docs/scientific-capability-gaps.md
 !/docs/stochastic-process-architecture.md
 !/docs/scientific-capability-roadmap.md
+!/docs/scientific-capability-change-log.md
 pkgdown/assets/
 
 # CodeQL generated files
