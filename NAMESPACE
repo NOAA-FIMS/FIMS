@@ -121,5 +121,4 @@ importFrom(rlang,
   .data,
   .env
 )
-importFrom(stockplotr,theme_noaa)
 useDynLib(FIMS, .registration = TRUE)
