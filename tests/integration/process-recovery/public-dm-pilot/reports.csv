@@ -1,0 +1,21 @@
+"replicate","seed","scenario","case","selected_start","warm","status","objective_difference","joint_reference_difference","after_difference","optimizer_valid","pd_hessian","boundary","max_mode_drift","mode_scope","warnings","elapsed_seconds","eligible","regular"
+1,6301,"moderate","known_dm",1,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",4.28699999999999,TRUE,TRUE
+1,6301,"moderate","estimated_dm",2,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",5.12700000000001,TRUE,TRUE
+1,6301,"strong","known_dm",1,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",4.39700000000001,TRUE,TRUE
+1,6301,"strong","estimated_dm",6,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",5.333,TRUE,TRUE
+2,6302,"moderate","known_dm",1,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",4.541,TRUE,TRUE
+2,6302,"moderate","estimated_dm",4,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",5.21100000000001,TRUE,TRUE
+2,6302,"strong","known_dm",3,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",4.47499999999997,TRUE,TRUE
+2,6302,"strong","estimated_dm",3,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",5.29500000000002,TRUE,TRUE
+3,6303,"moderate","known_dm",1,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",4.79200000000003,TRUE,TRUE
+3,6303,"moderate","estimated_dm",2,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",5.34500000000003,TRUE,TRUE
+3,6303,"strong","known_dm",1,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",4.67600000000004,TRUE,TRUE
+3,6303,"strong","estimated_dm",6,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",5.35300000000001,TRUE,TRUE
+4,6304,"moderate","known_dm",3,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",4.577,TRUE,TRUE
+4,6304,"moderate","estimated_dm",2,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",5.27800000000002,TRUE,TRUE
+4,6304,"strong","known_dm",3,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",4.476,TRUE,TRUE
+4,6304,"strong","estimated_dm",1,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,TRUE,0,"local conditional solution; global optimality not established","",5.33400000000006,TRUE,FALSE
+5,6305,"moderate","known_dm",2,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,TRUE,0,"local conditional solution; global optimality not established","",4.58600000000001,TRUE,FALSE
+5,6305,"moderate","estimated_dm",1,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,TRUE,0,"local conditional solution; global optimality not established","",5.36199999999997,TRUE,FALSE
+5,6305,"strong","known_dm",1,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",4.58600000000001,TRUE,TRUE
+5,6305,"strong","estimated_dm",1,TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",5.22799999999995,TRUE,TRUE

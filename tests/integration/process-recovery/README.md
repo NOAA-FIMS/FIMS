@@ -400,3 +400,11 @@ DM baseline and compares stopping controls/initializations on the same snapshots
 It profiles M innovation SD while reoptimizing composition concentrations, other
 SDs and latent states, retaining failed attempts and exposing local optimization
 gaps without claiming calibrated profile intervals.
+
+## Public DM simulation integration
+
+The [public-simulator study](public-dm-pilot/README.md) compares fixed-path draws
+with analytical DM moments and the independent stress sampler, then refits fresh
+18-year datasets with known/estimated concentrations. It preserves generation
+alignment checks, all starts and adaptive refinements, report eligibility and
+replicate-level uncertainty without replacing earlier pilots.

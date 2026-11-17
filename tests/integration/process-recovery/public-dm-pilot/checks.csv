@@ -1,0 +1,11 @@
+"replicate","scenario","seed","concentration","aligned","integer_counts","shared_paths_and_scalars"
+1,"moderate",6301,2000,TRUE,TRUE,TRUE
+1,"strong",6301,200,TRUE,TRUE,TRUE
+2,"moderate",6302,2000,TRUE,TRUE,TRUE
+2,"strong",6302,200,TRUE,TRUE,TRUE
+3,"moderate",6303,2000,TRUE,TRUE,TRUE
+3,"strong",6303,200,TRUE,TRUE,TRUE
+4,"moderate",6304,2000,TRUE,TRUE,TRUE
+4,"strong",6304,200,TRUE,TRUE,TRUE
+5,"moderate",6305,2000,TRUE,TRUE,TRUE
+5,"strong",6305,200,TRUE,TRUE,TRUE

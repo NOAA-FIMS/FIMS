@@ -1,0 +1,13 @@
+"scenario","process","metric","comparison","n","mean_difference","mcse"
+"moderate","R","coverage","estimated minus known concentration",5,0,0
+"moderate","R","rmse","estimated minus known concentration",5,0.000753709943917089,0.000314421010021175
+"moderate","F","coverage","estimated minus known concentration",5,0.0111111111111111,0.0111111111111111
+"moderate","F","rmse","estimated minus known concentration",5,-0.000271111936645485,0.000163389956613292
+"moderate","M","coverage","estimated minus known concentration",5,-0.000925925925925929,0.00661243373013226
+"moderate","M","rmse","estimated minus known concentration",5,0.00312916418227968,0.00162482760275564
+"strong","R","coverage","estimated minus known concentration",5,0,0
+"strong","R","rmse","estimated minus known concentration",5,0.000344573546757726,0.000526250885601522
+"strong","F","coverage","estimated minus known concentration",5,0,0
+"strong","F","rmse","estimated minus known concentration",5,5.10145090634461e-06,0.000121195579584359
+"strong","M","coverage","estimated minus known concentration",5,-0.00462962962962963,0.0020704333124998
+"strong","M","rmse","estimated minus known concentration",5,0.00132105811827962,0.0017569487852251

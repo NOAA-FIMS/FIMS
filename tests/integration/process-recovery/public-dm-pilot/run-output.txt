@@ -1,0 +1,24 @@
+distribution check kappa=Inf
+distribution check kappa=2000
+distribution check kappa=200
+public recovery replicate=1/5 scenario=moderate case=known_dm
+public recovery replicate=1/5 scenario=moderate case=estimated_dm
+public recovery replicate=1/5 scenario=strong case=known_dm
+public recovery replicate=1/5 scenario=strong case=estimated_dm
+public recovery replicate=2/5 scenario=moderate case=known_dm
+public recovery replicate=2/5 scenario=moderate case=estimated_dm
+public recovery replicate=2/5 scenario=strong case=known_dm
+public recovery replicate=2/5 scenario=strong case=estimated_dm
+public recovery replicate=3/5 scenario=moderate case=known_dm
+public recovery replicate=3/5 scenario=moderate case=estimated_dm
+public recovery replicate=3/5 scenario=strong case=known_dm
+public recovery replicate=3/5 scenario=strong case=estimated_dm
+public recovery replicate=4/5 scenario=moderate case=known_dm
+public recovery replicate=4/5 scenario=moderate case=estimated_dm
+public recovery replicate=4/5 scenario=strong case=known_dm
+public recovery replicate=4/5 scenario=strong case=estimated_dm
+public recovery replicate=5/5 scenario=moderate case=known_dm
+public recovery replicate=5/5 scenario=moderate case=estimated_dm
+public recovery replicate=5/5 scenario=strong case=known_dm
+public recovery replicate=5/5 scenario=strong case=estimated_dm
+Results written to /private/tmp/fims-public-dm-pilot

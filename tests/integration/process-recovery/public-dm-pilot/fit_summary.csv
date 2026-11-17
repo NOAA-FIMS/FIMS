@@ -1,0 +1,5 @@
+"scenario","case","warm","planned","optimizer_valid","consistent","eligible","regular","boundary"
+"moderate","estimated_dm",TRUE,5,5,5,5,4,1
+"strong","estimated_dm",TRUE,5,5,5,5,4,1
+"moderate","known_dm",TRUE,5,5,5,5,4,1
+"strong","known_dm",TRUE,5,5,5,5,5,0

@@ -1095,3 +1095,40 @@ reproducibility, native target restoration and public continuation. The focused
 simulation/likelihood/RW regression run passed 45 tests / 383 assertions without
 failures, warnings or skips. A separate three-replicate, four-year check found
 complete default output identical to the simulator at `bc18046`.
+
+## Public simulate/refit integration validation
+
+`tests/integration/process-recovery/public-dm.R` connects public-generated
+composition observations back to the assessment initializer using checked
+fleet/type/year/bin identities and integral nominal counts. Fixed-path draws are
+compared with analytical moments and the independent quantile/inverse-CDF stress
+sampler. The moment checks retain rare bins without estimable empirical variance
+MCSEs; neither full joint-law equality nor independent replication across bins
+is inferred from standardized residuals.
+
+Fresh process seeds pair moderate/strong concentration settings with identical
+R/F/M paths and scalar data. Known/estimated-concentration fits use the same
+observations, four starts and a predeclared two-control saved-state restart only
+when no initial fit passes. Checked state-only reports retain failures, bounds,
+denominators and dataset-level MCSEs. The [pilot report](../tests/integration/process-recovery/public-dm-pilot/README.md)
+and regeneration audit provide evidence without changing production fitting
+policy or overwriting the earlier stress datasets.
+
+A subsequent derived-quantity study should use existing native reporting rather
+than assume it is absent: [`CatchAtAge::Report()`](../inst/include/models/functors/catch_at_age.hpp#L1684)
+already assembles `spawning_biomass` at line 1929 and passes it to `ADREPORT_F`
+at line 2000. The present benchmark
+explicitly skips that delta-method calculation. Validating mode-preserving
+spawning-biomass uncertainty, report indexing and fitted-year truth is a distinct
+step from adding forecasts or drawing full parameter uncertainty. Existing
+reporting support does not establish coverage in these stochastic assessments.
+
+
+The recorded public-integration study has 84 optimization attempts and 20 eligible
+reports, plus 1000 fixed-path observation draws per concentration. Distributional
+reference differences stay below 2.96 MCSE units among informative marginal
+checks; rare variance-error estimates remain unavailable. Complete input/truth
+regeneration verifies the seeded workflow. Three focused tests / 15 assertions
+and count/hash/reference-objective audits pass. Three remaining M-SD bounds and
+five biological replicates per scenario limit inference; this completes an
+integration check without validating derived/forecast intervals or new dynamics.

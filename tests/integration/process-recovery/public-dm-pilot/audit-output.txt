@@ -1,0 +1,47 @@
+Counts, adaptive rule, source/production hashes, paired truth/scalars and report objectives: PASS
+Attempts: 84 valid: 64 ; selected valid: 20 /20
+  scenario         case warm planned optimizer_valid consistent eligible
+1 moderate estimated_dm TRUE       5               5          5        5
+2   strong estimated_dm TRUE       5               5          5        5
+3 moderate     known_dm TRUE       5               5          5        5
+4   strong     known_dm TRUE       5               5          5        5
+  regular boundary
+1       4        1
+2       4        1
+3       4        1
+4       5        0
+   scenario         case process  stratum   metric planned n      mean
+33 moderate estimated_dm       M eligible coverage       5 5 0.9194444
+34 moderate estimated_dm       M eligible     rmse       5 5 0.1690380
+41   strong estimated_dm       M eligible coverage       5 5 0.9509259
+42   strong estimated_dm       M eligible     rmse       5 5 0.2343550
+49 moderate     known_dm       M eligible coverage       5 5 0.9203704
+50 moderate     known_dm       M eligible     rmse       5 5 0.1659088
+57   strong     known_dm       M eligible coverage       5 5 0.9555556
+58   strong     known_dm       M eligible     rmse       5 5 0.2330340
+         mcse
+33 0.03997599
+34 0.01674997
+41 0.02134656
+42 0.02566625
+49 0.04463213
+50 0.01796873
+57 0.02083848
+58 0.02638593
+   scenario process   metric                          comparison n
+5  moderate       M coverage estimated minus known concentration 5
+6  moderate       M     rmse estimated minus known concentration 5
+11   strong       M coverage estimated minus known concentration 5
+12   strong       M     rmse estimated minus known concentration 5
+   mean_difference        mcse
+5    -0.0009259259 0.006612434
+6     0.0031291642 0.001624828
+11   -0.0046296296 0.002070433
+12    0.0013210581 0.001756949
+bins mean_z : informative 420 / 420 max abs 3.325482 over 6 0
+bins variance_z : informative 373 / 420 max abs 4.161548 over 6 0
+generator_differences mean_z : informative 210 / 210 max abs 2.67353 over 6 0
+generator_differences variance_z : informative 188 / 210 max abs 2.955562 over 6 0
+Selected covariance residual maximum MCSE units: 2.856324
+Public/reference covariance-difference maximum MCSE units: 2.680809
+Complete input/truth regeneration for all ten datasets: PASS; RNG kind: Mersenne-Twister, Inversion, Rejection

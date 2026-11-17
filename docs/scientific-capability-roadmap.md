@@ -27,14 +27,22 @@ universal improvement and weak M-variance information/basin sensitivity remain.
 Concentration traces show only modest local coupling with M SD in these cases.
 These are local diagnostics, not operational calibration or global-mode proof.
 
-Production DM observation simulation is now implemented through the same optional
-fleet/type configuration, with analytical sampling checks and preserved default
-behavior. **Next: public-simulator/matched-likelihood integration validation**,
-including comparison with the independent stress generator. Keep process-variance
-sensitivity, bounds and multiple starts. Parameter propagation and derived/forecast
-coverage remain separate tasks. The [ledger](scientific-capability-change-log.md#next-task-production-simulaterefit-integration-validation)
-records evidence and attribution. Upgrades are committed after validation at the
-user's request; pushes remain separate authorized actions.
+Production DM observation simulation and its public simulate/refit integration
+pilot are complete. Analytical/independent-sampler checks support the tested
+moments; all 20 new assessment reports are eligible, with three M-SD bounds and
+only five process replicates per concentration setting. Earlier pilots are kept
+intact; this is not operational calibration or a same-data improvement claim.
+
+**Next: mode-preserving spawning-biomass uncertainty validation.** Native
+`CatchAtAge::Report()` already ADREPORTs spawning biomass. Extend the checked
+benchmark handoff to that existing quantity, verify fitted-year indexing/truth,
+and assess delta-method intervals with the same eligibility and boundary rules.
+The extra terminal mean-recruitment year is not a validated stochastic forecast;
+future innovations and full parameter propagation remain separate tasks. See the
+[ledger](scientific-capability-change-log.md#next-task-mode-preserving-spawning-biomass-uncertainty-validation)
+and [public-simulator pilot](../tests/integration/process-recovery/public-dm-pilot/README.md).
+Upgrades are committed after validation at the user's request; pushes remain
+separate authorized actions.
 
 ## Prioritization
 
@@ -275,3 +283,15 @@ seeded legacy comparison preserves complete default output. This closes the
 observation-generation gap, without resolving weak process-variance information
 or providing parameter/forecast uncertainty. Next validate public simulate/refit
 integration against the independent benchmark generator and matched likelihoods.
+
+
+The public DM integration study is complete in
+`tests/integration/process-recovery/public-dm-pilot/`. Fixed-path public draws agree
+with the checked analytical/independent-sampler moments within reported Monte
+Carlo variation; rare empirical variance-error estimates remain explicit. Ten
+new datasets sharing five process realizations yield 20 eligible matched reports
+from 84 attempts. Small paired known/estimated-concentration differences and
+remaining M-SD boundaries are reported without a calibration claim. All input
+and truth values regenerate identically. Next validate existing spawning-biomass
+ADREPORT uncertainty through a checked full-report pathway, retaining scope and
+indexing checks before tackling stochastic forecasts or unrestricted covariance.

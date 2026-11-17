@@ -124,7 +124,7 @@ visual figure review passed. These are targeted diagnostics, not new calibration
 replicates, a global solution or evidence for adding covariance to fix variance
 bounds. Earlier pilot results remain intact.
 
-## Production DM observation simulation upgrade
+## Production DM observation simulation upgrade — `921ef82`
 
 **Implemented.** [simulate_fims.R](../R/simulate_fims.R) appends the opt-in
 `composition_likelihood` argument to simulation/forecasting, reusing the existing
@@ -150,14 +150,51 @@ three-replicate/four-year check. See [architecture/API details](stochastic-proce
 and [help source](../man/simulate_fims.Rd). Existing weak M-variance and basin
 findings remain; a correct generative sampler does not establish calibration.
 
-## Next task: production simulate/refit integration validation
+## Public DM simulate/refit integration upgrade
 
-**Planned.** Use the new public DM sampler in a controlled assessment integration
-benchmark, compare its distributional behavior with the independent stress
-generator, and check matched likelihoods at supplied/estimated concentration.
-Retain process-SD sensitivity, failed fits, bounds and multiple starts. Forecast
-and derived-quantity uncertainty still require separate parameter propagation
-and coverage validation; do not infer them from fixed-parameter observation draws.
+**Benchmark implemented; no production change.** [public-dm.R](../tests/integration/process-recovery/public-dm.R)
+compares public fixed-path draws with analytical moments and the independent
+quantile/inverse-CDF stress sampler, then fits fresh public-generated assessments.
+Round trips check bin identity and integer counts. Four starts and a predeclared
+saved-state restart rule retain failures and unchanged acceptance thresholds.
+The [report and artifacts](../tests/integration/process-recovery/public-dm-pilot/README.md)
+include all denominators, parameter boundaries, covariance checks and source hashes;
+[tests](../tests/testthat/test-public-dm.R) cover round trips, paired eligibility
+and failed-case records.
+
+Scientific precedents remain [SS3 DM composition errors](https://nmfs-ost.github.io/ss3-doc/SS330_User_Manual_release.html)
+and [SAM simulation/re-estimation](https://fishfollower.r-universe.dev/stockassessment/doc/manual.html).
+The public/reference comparison, fresh seeds, adaptive control rule and checked
+handoff are FIMS-specific. No external model executable, copied sampler or
+cross-platform numerical equivalence is claimed; shared FIMS dynamics remain a
+limit of the closed-loop validation.
+
+Recorded results: 1000 fixed-path draws per concentration; mean and second-moment
+public/reference residual maxima below 2.96 MCSE units among informative bins.
+Rare variance-error estimates remain missing (22/210 generator differences).
+Ten assessment datasets share five process realizations. All 20 matched fits and
+warm reports are eligible after 84 attempts (64 valid), including four declared
+restart attempts. M coverage is 92.0/91.9% (known/estimated concentration) at
+moderate variation and 95.6/95.1% at strong variation. Paired coverage changes are
+-0.09 pp (MCSE 0.66) and -0.46 pp (0.21), respectively, with five pairs each.
+Three M-SD bounds remain. These small samples do not establish calibration.
+The published branch also preserves automated saved-fit fixture refresh
+`d06877e`; simulation inputs/types and production source are unchanged. The
+study execution base/fingerprints remain `921ef82`.
+Three tests / 15 assertions, count/hash/objective audits and complete input/truth
+regeneration pass; final figure and document links were checked. Earlier pilots
+are preserved and cannot be compared as same-data estimator improvements.
+
+## Next task: mode-preserving spawning-biomass uncertainty validation
+
+**Planned.** Use existing `CatchAtAge::Report()` spawning-biomass ADREPORT support
+(lines 1929/2000 in `inst/include/models/functors/catch_at_age.hpp`), extend the
+checked benchmark report to that derived quantity, verify owner/year indexing
+and fitted-year truth, and evaluate local delta-method coverage with bounds and
+replicate denominators. This is validation of existing reporting infrastructure,
+not an assertion that derived quantities are missing. Exclude the extra terminal
+mean-recruitment year from stochastic forecast claims. Future process innovations
+and full parameter propagation remain separate forecast-validation work.
 
 ## Maintenance contract
 
