@@ -927,9 +927,22 @@ class DlnormDistributionsInterface : public DistributionsInterfaceBase {
  */
 class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
  public:
-  /**
-   * @brief Observed data, which should be a vector of length K of integers.
-   */
+  /** @brief Scalar log concentration for the opt-in DM backend. */
+  VariableVector log_concentration;
+  std::shared_ptr<bool> dirichlet_m = std::make_shared<bool>(false);
+  bool set_dirichlet_multinomial() {
+#ifdef TMB_MODEL
+    auto info = fims_info::Information<double>::GetInstance();
+    auto found = info->density_components.find(this->id_m);
+    if (found != info->density_components.end() &&
+        !std::dynamic_pointer_cast<fims_distributions::DirichletMultinomialLPMF<double>>(found->second))
+      Rcpp::stop("Configure DM before model creation; reinitialize to change likelihoods");
+#endif
+    *dirichlet_m = true;
+    return true;
+  }
+
+  /** @brief Observed row-major counts, including weighted fractional counts. */
   VariableVector observed_values;
   /**
    * @brief The expected values, which should be a vector of length K where
@@ -958,6 +971,9 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @brief The constructor.
    */
   DmultinomDistributionsInterface() : DistributionsInterfaceBase() {
+    log_concentration.resize(1);
+    log_concentration[0].initial_value_m = 0;
+    log_concentration[0].estimation_type_m.set("constant");
     DistributionsInterfaceBase::live_objects[this->id_m] =
         std::make_shared<DmultinomDistributionsInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
@@ -971,6 +987,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    */
   DmultinomDistributionsInterface(const DmultinomDistributionsInterface &other)
       : DistributionsInterfaceBase(other),
+        log_concentration(other.log_concentration),
+        dirichlet_m(other.dirichlet_m),
         observed_values(other.observed_values),
         expected_values(other.expected_values),
         dims(other.dims),
@@ -1027,6 +1045,26 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    * @return double
    */
   virtual double evaluate() {
+    if (*dirichlet_m) {
+      ValidateConcentration();
+      fims_distributions::DirichletMultinomialLPMF<double> density;
+      density.log_concentration = {log_concentration[0].initial_value_m};
+      for (size_t i = 0; i < observed_values.size(); ++i)
+        density.observed_values.push_back(
+            double(observed_values[i].initial_value_m));
+      for (size_t i = 0; i < expected_values.size(); ++i)
+        density.expected_values.push_back(
+            double(expected_values[i].initial_value_m));
+      if (dims.size() != 2) Rcpp::stop("DM requires two dimensions");
+      for (size_t j = 0; j < 2; ++j)
+        if (!std::isfinite(dims[j]) || dims[j] < 1 ||
+            dims[j] != std::floor(dims[j]) ||
+            dims[j] > std::numeric_limits<int>::max())
+          Rcpp::stop("DM dimensions must be positive finite integers");
+      density.dims = {static_cast<size_t>(dims[0]),
+                      static_cast<size_t>(dims[1])};
+      return density.evaluate();
+    }
     fims_distributions::MultinomialLPMF<double> dmultinom;
     // Declare TMBVector in this scope
     dmultinom.observed_values.resize(this->observed_values.size());
@@ -1041,6 +1079,17 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     dmultinom.dims[0] = this->dims[0];
     dmultinom.dims[1] = this->dims[1];
     return dmultinom.evaluate();
+  }
+
+  void ValidateConcentration() {
+    if (log_concentration.size() != 1 ||
+        !std::isfinite(log_concentration[0].initial_value_m) ||
+        !std::isfinite(std::exp(log_concentration[0].initial_value_m)) ||
+        std::exp(log_concentration[0].initial_value_m) <= 0)
+      Rcpp::stop("DM requires one finite positive concentration");
+    const auto role = log_concentration[0].estimation_type_m.get();
+    if (role != "constant" && role != "fixed_effects")
+      Rcpp::stop("DM concentration must be constant or fixed_effects");
   }
 
   void finalize() {
@@ -1070,6 +1119,12 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
           std::dynamic_pointer_cast<
               fims_distributions::MultinomialLPMF<double>>(it->second);
 
+      if (*dirichlet_m) {
+        auto dm = std::dynamic_pointer_cast<
+            fims_distributions::DirichletMultinomialLPMF<double>>(it->second);
+        if (!dm) Rcpp::stop("DM configuration differs from the active model; reinitialize");
+        log_concentration[0].final_value_m = dm->log_concentration[0];
+      }
       this->lpdf_value = dmultinom->lpdf;
 
       size_t n_x = dmultinom->lpdf_vec.size();
@@ -1115,7 +1170,14 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     ss << "{\n";
     ss << " \"module_name\": \"density\",\n";
     ss << " \"module_id\": " << this->id_m << ",\n";
-    ss << " \"module_type\": \"multinomial\",\n";
+    ss << " \"module_type\": \""
+       << (*dirichlet_m ? "dirichlet_multinomial" : "multinomial") << "\",\n";
+    if (*dirichlet_m) {
+      ss << "\"composition_type\": \"" << notes.get() << "\",\n";
+      ss << this->linked_ids_to_json();
+      ss << this->parameters_to_json(
+          {{"log_concentration", &log_concentration}});
+    }
     ss << "\"observed_data_id\" : " << this->interface_observed_data_id_m
        << ",\n";
     ss << " \"input_type\" : \"" << this->input_type_m << "\",\n";
@@ -1173,6 +1235,22 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     std::shared_ptr<fims_distributions::MultinomialLPMF<Type>> distribution =
         std::make_shared<fims_distributions::MultinomialLPMF<Type>>();
 
+    if (*dirichlet_m) {
+      ValidateConcentration();
+      if (this->input_type_m.get() != "data")
+        Rcpp::stop("Linked DM likelihoods support data inputs only");
+      auto dm = std::make_shared<
+          fims_distributions::DirichletMultinomialLPMF<Type>>();
+      dm->log_concentration = {Type(log_concentration[0].initial_value_m)};
+      if (log_concentration[0].estimation_type_m.get() == "fixed_effects") {
+        info->RegisterParameterName(
+            "dirichlet_multinomial." + fims::to_string(this->id_m) +
+            ".log_concentration." + fims::to_string(log_concentration[0].id_m));
+        info->RegisterParameter(dm->log_concentration[0]);
+      }
+      info->variable_map[log_concentration.id_m] = &dm->log_concentration;
+      distribution = dm;
+    }
     distribution->id = this->id_m;
     distribution->observed_data_id_m = interface_observed_data_id_m;
     distribution->input_type = this->input_type_m;

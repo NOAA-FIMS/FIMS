@@ -14,6 +14,7 @@
 #include "functors/density_components_base.hpp"
 #include "functors/lognormal_lpdf.hpp"
 #include "functors/multinomial_lpmf.hpp"
+#include "functors/dirichlet_multinomial_lpmf.hpp"
 #include "functors/normal_lpdf.hpp"
 #include "functors/gaussian_process_lpdf.hpp"
 

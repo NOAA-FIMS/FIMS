@@ -933,6 +933,15 @@ initialize_comp <- function(data,
 #'   The specification does not change state estimation types: use
 #'   `"random_effects"` for TMB integration or `"fixed_effects"` for a penalized
 #'   fixed-effect fit.
+#' @param composition_likelihood Optional named fleet/type list, for example
+#'   `list(fleet1 = list(age_comp = list(type = "dirichlet_multinomial",
+#'   concentration = 200, estimation_type = "fixed_effects")))`. Each `age_comp`
+#'   or `length_comp` entry selects a Dirichlet-multinomial likelihood with one
+#'   positive concentration shared across that fleet/type's years. Default
+#'   estimation type is `"constant"`. Existing multinomial uncertainty formulas
+#'   still supply nominal sample sizes for converting proportions to counts.
+#'   `NULL` preserves multinomial behavior. This option currently applies to
+#'   inference; [simulate_fims()] does not draw these composition errors.
 #' @param mortality_process Optional `list(type = "rw1", sd = 0.1,
 #'   estimation_type = "fixed_effects", initial = list(type = "fixed"))`.
 #'   Independent age-specific log-M random walks share one innovation SD.
@@ -1000,7 +1009,8 @@ initialize_comp <- function(data,
 #' clear()
 #' }
 initialize_fims <- function(parameters, data, recruitment_process = NULL,
-                            fishing_process = NULL, mortality_process = NULL) {
+                            fishing_process = NULL, mortality_process = NULL,
+                            composition_likelihood = NULL) {
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
@@ -1023,6 +1033,7 @@ initialize_fims <- function(parameters, data, recruitment_process = NULL,
     ))
   }
 
+  composition_likelihood <- normalize_composition_likelihood(composition_likelihood, data)
   mortality_process <- normalize_mortality_process(mortality_process, parameters, data)
   fishing_process <- normalize_fishing_processes(fishing_process, parameters, data)
 
@@ -1221,6 +1232,7 @@ initialize_fims <- function(parameters, data, recruitment_process = NULL,
       fleet_agecomp_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
         data_type = "age_comp",
+        composition = composition_likelihood[[fleets[i]]][["age_comp"]],
         uncertainty = get_data(data) |>
           dplyr::filter(
             .data$fleet == .env$fleets[i] &
@@ -1234,6 +1246,7 @@ initialize_fims <- function(parameters, data, recruitment_process = NULL,
       fleet_lengthcomp_distribution[[i]] <- initialize_data_distribution(
         module = fleet[[i]],
         data_type = "length_comp",
+        composition = composition_likelihood[[fleets[i]]][["length_comp"]],
         uncertainty = get_data(data) |>
           dplyr::filter(
             .data$fleet == .env$fleets[i] &
@@ -1425,6 +1438,11 @@ initialize_fims <- function(parameters, data, recruitment_process = NULL,
     attr(parameter_list, "fishing_processes") <- fishing_distributions
     shared_map <- fishing_process_map(parameter_list$parameters, fishing_distributions, fishing_process)
     if (!is.null(shared_map)) parameter_list$map <- shared_map
+  }
+  if (length(composition_likelihood)) {
+    attr(parameter_list, "composition_distributions") <- list(age_comp = stats::setNames(fleet_agecomp_distribution, fleets),
+      length_comp = stats::setNames(fleet_lengthcomp_distribution, fleets))
+    attr(parameter_list, "composition_likelihood") <- composition_likelihood
   }
   return(parameter_list)
 }

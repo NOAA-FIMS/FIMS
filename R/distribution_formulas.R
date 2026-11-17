@@ -127,6 +127,8 @@ check_distribution_validity <- function(args) {
 #' @param uncertainty A vector of strings specifying formulas for each data
 #'   point. See [FIMSFrame()] for more information on what the formula should
 #'   look like.
+#' @param composition Optional Dirichlet-multinomial composition specification,
+#'   as in the `composition_likelihood` argument of [initialize_fims()].
 #' @return
 #' A reference class. is returned. Use [methods::show()] to view the various
 #' Rcpp class fields, methods, and documentation.
@@ -153,9 +155,13 @@ check_distribution_validity <- function(args) {
 initialize_data_distribution <- function(
   module,
   data_type = c("catch", "index", "age_comp", "length_comp"),
-  uncertainty
+  uncertainty,
+  composition = NULL
 ) {
   data_type <- rlang::arg_match(data_type)
+  composition <- normalize_composition_spec(composition)
+  if (!is.null(composition) && !data_type %in% c("age_comp", "length_comp"))
+    cli::cli_abort("Composition overrides apply only to age_comp or length_comp.")
   uncertainty_split <- parse_data_distribution(uncertainty) |>
     validate_distribution_families()
   family <- unique(stats::na.omit(uncertainty_split[["family"]]))
@@ -176,6 +182,14 @@ initialize_data_distribution <- function(
       unlist(uncertainty_split[[ancillary_parameter]], use.names = FALSE)
     )
     new_module$log_sd$set_estimation_types("constant")
+  }
+
+  if (!is.null(composition)) {
+    if (!identical(family, "dmultinom")) cli::cli_abort("DM overrides require multinomial input-size formulas.")
+    new_module$set_dirichlet_multinomial()
+    new_module$log_concentration[] <- log(composition$concentration)
+    new_module$log_concentration$set_estimation_types(composition$estimation_type)
+    new_module$set_note(data_type)
   }
 
   # setup link to observed data

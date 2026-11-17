@@ -199,3 +199,13 @@ of a correctly specified overdispersed composition likelihood, with dispersion/
 multinomial-limit/zero-bin/AD validation, and a separate mode-consistent uncertainty
 handoff investigation. Production DM support remains missing; no new production
 code or dependencies were introduced in the stress benchmark.
+
+An opt-in Dirichlet-multinomial composition likelihood is now implemented for
+inference, with one fixed/estimated concentration per fleet/type and normalized
+row contributions. Existing sample-size formulas and multinomial defaults remain
+unchanged. Missing rows, structural zeros, concentration registration and fleet
+reporting are covered. Production DM simulation, a dedicated dispersion-sharing
+interface, broad assessment recovery/coverage and extreme-concentration accuracy
+remain separate extensions. A mode-consistent benchmark uncertainty handoff is
+being evaluated on the existing stress data; a local report must not be mistaken
+for a global solution or calibrated intervals.

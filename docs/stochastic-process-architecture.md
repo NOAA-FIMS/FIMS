@@ -892,3 +892,72 @@ uncertainty pathway should preserve modes and expose alternate solutions, while
 a robust observation likelihood should be validated on the same stress data.
 Details and all failed/numerical outcomes are retained in the robustness pilot.
 Validation passed 22 tests / 194 assertions; production interfaces are unchanged.
+
+## Opt-in Dirichlet-multinomial composition inference
+
+`initialize_fims(..., composition_likelihood = ...)` now supports a scalar
+concentration for each selected fleet and composition type:
+
+```r
+composition <- list(fleet1 = list(
+  age_comp = list(type = "dirichlet_multinomial", concentration = 200,
+                  estimation_type = "fixed_effects"),
+  length_comp = list(type = "dirichlet_multinomial", concentration = 200)
+))
+input <- initialize_fims(parameters, data, composition_likelihood = composition)
+```
+
+The default estimation type is constant. The input uncertainty formulas remain
+`dmultinom(prob = ..., size = ...)`: they supply nominal sample sizes for
+converting proportions to counts. The explicit initializer option selects the
+likelihood. Each selected fleet/type shares its concentration across years;
+different fleet/type entries are independent parameters. Users can compose TMB
+maps if sharing is scientifically justified. No additional dispersion grouping
+interface is provided. Counts supplied in number units retain their row totals.
+The default NULL option preserves the existing multinomial path and JSON shape.
+
+For integer counts, `q ~ Dirichlet(kappa*p)` and `x|q ~ Multinomial(n,q)` give
+
+\[
+\log L=\log\Gamma(n+1)-\sum_j\log\Gamma(x_j+1)
+ +\log\Gamma(\kappa)-\log\Gamma(\kappa+n)
+ +\sum_j[\log\Gamma(\kappa p_j+x_j)-\log\Gamma(\kappa p_j)].
+\]
+
+`DirichletMultinomialLPMF` implements this normalized density behind the existing
+composition interface. An explicit native setter selects the backend before
+model creation; switching an already-created multinomial density requires
+reinitialization and is rejected otherwise. Concentration is positive via
+`exp(log_concentration)` and may be constant or an estimated fixed effect.
+It is registered once, supports TMB automatic differentiation, and is reported
+under the fleet using its observed-data ID, with `composition_type` metadata.
+Derived expected-probability vectors are not mistaken for owning parameters.
+
+A missing cell skips its entire composition row, matching existing conventions.
+Structural p=0/x=0 contributes zero without a pseudocount, while positive counts
+at p=0 have zero probability. Invalid counts, dimensions and probability sums
+are rejected. Pointwise reporting allocates each row's log density equally to
+its bins, so summing bins counts that row exactly once. Fractional counts use
+the gamma extension as a weighted likelihood; only integer counts define a
+normalized sampling PMF. No rounding or implied sample-size estimation is added.
+
+Large concentration tends to the multinomial, but direct gamma differences and
+vanishing dispersion information require numerical care at extreme values.
+Tests exercise concentrations through 1e7 for small-count limit checks; this is
+not an accuracy guarantee at arbitrary counts/concentrations. Practical bounded
+optimization and checks for weak concentration information remain necessary.
+The present increment supports inference. Production `simulate_fims()` does not
+yet accept this option or generate DM observations; the validated benchmark
+sampler supplies such data for testing. Assessment-scale dispersion/coverage
+recovery is distinct from the standalone concentration-recovery checks.
+
+DM validation: clean package installation passed. The focused production-density
+and existing distribution tests passed 13 tests / 72 assertions after the final
+lifecycle guard, with no failures/skips. A broader run passed 94 tests / 554
+assertions with two existing CRAN-gated reporting skips. Checks include a
+beta-binomial oracle, full small-count normalization, multinomial limit,
+structural support, dimensions, independent concentration recovery, exact
+assessment likelihood differences, AD gradients/Hessian, reporting ownership and
+pre-clear validation. A standalone C++ linked-data/missing-row smoke test passed;
+a GTest case is registered, but GoogleTest was not run because its local dependency
+cache is unavailable. These checks do not establish assessment-scale calibration.

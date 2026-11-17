@@ -7,7 +7,8 @@
 initialize_data_distribution(
   module,
   data_type = c("catch", "index", "age_comp", "length_comp"),
-  uncertainty
+  uncertainty,
+  composition = NULL
 )
 }
 \arguments{
@@ -16,13 +17,16 @@ of interest.}
 
 \item{data_type}{A string specifying the type of data that the
 distribution will be fit to. Allowable types include
-"catch", "index", "age_comp", and "length_comp"
+\verb{r glue::glue_collapse(sprintf('"\%s"', eval(formals(initialize_data_distribution)[["data_type"]])), sep = ", ", last = ", and ")}
 and the default is
-catch.}
+\verb{r eval(formals(initialize_data_distribution)[["data_type"]])[1]}.}
 
 \item{uncertainty}{A vector of strings specifying formulas for each data
 point. See \code{\link[=FIMSFrame]{FIMSFrame()}} for more information on what the formula should
 look like.}
+
+\item{composition}{Optional Dirichlet-multinomial composition specification,
+as in the \code{composition_likelihood} argument of \code{\link[=initialize_fims]{initialize_fims()}}.}
 }
 \value{
 A reference class. is returned. Use \code{\link[methods:show]{methods::show()}} to view the various

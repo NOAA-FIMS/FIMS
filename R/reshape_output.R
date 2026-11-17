@@ -76,13 +76,14 @@ reshape_json_estimates <- function(model_output) {
   density_components <- read_list[["density_components"]]
   distribution_information <- NULL
   if ("parameters" %in% names(density_components)) {
-    # Only random-effect distributions for now. The log_sd of a data
+    # Process hyperparameters and opt-in DM dispersion are owned parameters.
+    # The log_sd of a normal/lognormal data
     # distribution is set from the data uncertainty, held constant, and
     # already reported next to each observation, and a prior's parameters are
     # fixed inputs.
     random_effect_distributions <- density_components |>
       dplyr::filter(
-        .data$input_type == "random_effects",
+        .data$input_type == "random_effects" | .data$module_type == "dirichlet_multinomial",
         purrr::map_lgl(.data$parameters, \(x) length(x) > 0)
       )
     # A model without random effects has no distribution parameters, and
@@ -104,8 +105,8 @@ reshape_json_estimates <- function(model_output) {
         dplyr::select(
           dplyr::all_of(c(
             "module_name", "module_id", "module_type", "distribution",
-            "linked_id", "parameters"
-          ))
+            "linked_id", "observed_data_id", "parameters"
+          )), dplyr::any_of("composition_type")
         ) |>
         tidyr::unnest(dplyr::all_of("parameters")) |>
         # A single log_sd is copied to every element with the same id
@@ -284,6 +285,30 @@ reshape_json_estimates <- function(model_output) {
       ) |>
       dplyr::left_join(linked_modules, by = c("linked_id" = "type_id")) |>
       dplyr::select(-dplyr::all_of("linked_id"))
+    if (any(distribution_information$distribution == "dirichlet_multinomial")) {
+      # Expected composition vectors are derived outputs, not parameter vectors.
+      # Their owning fleet is identified by the observed data ID instead.
+      owners <- read_list[["fleets"]] |>
+        dplyr::select(dplyr::all_of(c("module_name", "module_id", "fleet", "data_ids"))) |>
+        dplyr::mutate(module_type = NA_character_,
+          observed_data_id = purrr::map(.data$data_ids, function(x) as.integer(unlist(x)))) |>
+        dplyr::select(-dplyr::all_of("data_ids")) |>
+        tidyr::unnest(dplyr::all_of("observed_data_id")) |>
+        dplyr::filter(.data$observed_data_id != -999) |>
+        dplyr::distinct() |>
+        dplyr::add_count(.data$observed_data_id) |>
+        dplyr::filter(.data$n == 1) |>
+        dplyr::select(-dplyr::all_of("n")) |>
+        dplyr::rename_with(function(x) paste0("owner_", x), -dplyr::all_of("observed_data_id"))
+      distribution_information <- distribution_information |>
+        dplyr::left_join(owners, by = "observed_data_id") |>
+        dplyr::mutate(module_name = dplyr::coalesce(.data$module_name, .data$owner_module_name),
+          module_id = dplyr::coalesce(.data$module_id, .data$owner_module_id),
+          module_type = dplyr::coalesce(.data$module_type, .data$owner_module_type),
+          fleet = dplyr::coalesce(.data$fleet, .data$owner_fleet)) |>
+        dplyr::select(-dplyr::starts_with("owner_"))
+    }
+    distribution_information <- dplyr::select(distribution_information, -dplyr::all_of("observed_data_id"))
   }
 
   # TODO: Change some column names

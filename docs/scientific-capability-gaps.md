@@ -276,3 +276,11 @@ the benchmark's DM sampler does not implement a production DM likelihood. SS3's
 [composition-error options](https://nmfs-ost.github.io/ss3-doc/SS330_User_Manual_release.html)
 remain an authoritative example of reference-model support, with different
 parameter interfaces from the generic concentration used in this stress test.
+
+Implementation update: the previous missing overdispersed-composition likelihood
+now has an opt-in inference path through `composition_likelihood` in
+`R/initialize_modules.R`, `R/composition_likelihood.R`, the existing Rcpp composition
+interface and `DirichletMultinomialLPMF`. A scalar fixed/estimated concentration is
+supported per fleet/type. The historical gap matrix remains the audited baseline;
+current support is partial pending production simulation, broader recovery and
+coverage validation, and additional robust composition families.

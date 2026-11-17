@@ -9,7 +9,8 @@ initialize_fims(
   data,
   recruitment_process = NULL,
   fishing_process = NULL,
-  mortality_process = NULL
+  mortality_process = NULL,
+  composition_likelihood = NULL
 )
 }
 \arguments{
@@ -54,6 +55,15 @@ initial rule requires constant first-year values at every age and estimated
 later values. A normal rule (\code{type}, \code{mean}, \code{sd}) estimates every state;
 initial means and SDs are common across ages and held constant. This option
 is also supported by \code{\link[=simulate_fims]{simulate_fims()}} and \code{\link[=forecast_fims]{forecast_fims()}}.}
+
+\item{composition_likelihood}{Optional named fleet/type list, for example
+\code{list(fleet1 = list(age_comp = list(type = "dirichlet_multinomial", concentration = 200, estimation_type = "fixed_effects")))}. Each \code{age_comp}
+or \code{length_comp} entry selects a Dirichlet-multinomial likelihood with one
+positive concentration shared across that fleet/type's years. Default
+estimation type is \code{"constant"}. Existing multinomial uncertainty formulas
+still supply nominal sample sizes for converting proportions to counts.
+\code{NULL} preserves multinomial behavior. This option currently applies to
+inference; \code{\link[=simulate_fims]{simulate_fims()}} does not draw these composition errors.}
 }
 \value{
 A named list with \code{parameters} and \code{model}, plus \code{map} for shared estimated SDs:

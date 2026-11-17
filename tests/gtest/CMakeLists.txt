@@ -504,3 +504,8 @@ add_executable(gaussian_process_lpdf test_gaussian_process_lpdf.cpp)
 add_as_invoker_manifest(gaussian_process_lpdf)
 target_link_libraries(gaussian_process_lpdf gtest_main fims_test)
 gtest_discover_tests(gaussian_process_lpdf)
+
+add_executable(dirichlet_multinomial_lpmf test_dirichlet_multinomial_lpmf.cpp)
+add_as_invoker_manifest(dirichlet_multinomial_lpmf)
+target_link_libraries(dirichlet_multinomial_lpmf gtest_main fims_test)
+gtest_discover_tests(dirichlet_multinomial_lpmf)

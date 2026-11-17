@@ -83,6 +83,8 @@ void register_distributions(Rcpp::Module& m) {
       .method("set_distribution_links",
               &DmultinomDistributionsInterface::set_distribution_links)
       .method("set_note", &DmultinomDistributionsInterface::set_note)
+      .method("set_dirichlet_multinomial", &DmultinomDistributionsInterface::set_dirichlet_multinomial)
+      .field("log_concentration", &DmultinomDistributionsInterface::log_concentration)
       .field("observed_values",
              &DmultinomDistributionsInterface::observed_values)
       .field("expected_values",
