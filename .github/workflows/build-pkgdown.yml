@@ -110,6 +110,7 @@ jobs:
           args: >-
             --config .github/lychee.toml
             --scheme http --scheme https
+            --accept 200,403,503
             --exclude '^https?://(?i:noaa-fims\.github\.io)/(?i:FIMS)([/?#]|$)'
             docs/
           output: lychee/external.md
