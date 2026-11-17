@@ -38,10 +38,8 @@ class GrowthDerivedObservationBase : public GrowthBase<Type> {
    * @brief Initialize any cached growth products.
    * @param n_years Number of modeled years.
    * @param n_ages Number of modeled ages.
-   * @param n_sexes Number of modeled sexes.
    */
-  virtual void Initialize(std::size_t n_years, std::size_t n_ages,
-                          std::size_t n_sexes = 1) = 0;
+  virtual void Initialize(std::size_t n_years, std::size_t n_ages) = 0;
 
   /**
    * @brief Report whether this growth object can support the dynamic
@@ -326,21 +324,13 @@ class VonBertalanffySchnuteGrowthModelAdapter
    * @brief Initialize the backing growth model and cache dimensions.
    * @param n_years Number of modeled years.
    * @param n_ages Number of modeled ages.
-   * @param n_sexes Number of modeled sexes.
    */
-  void Initialize(std::size_t n_years, std::size_t n_ages,
-                  std::size_t n_sexes = 1) override {
+  void Initialize(std::size_t n_years, std::size_t n_ages) override {
     EnsureParamsSet();
-    if (n_sexes != 1) {
-      throw std::runtime_error(
-          "VonBertalanffySchnuteGrowthModelAdapter currently supports n_sexes "
-          "== 1");
-    }
     n_years_ = n_years;
     n_ages_ = n_ages;
-    n_sexes_ = n_sexes;
     growth_products_prepared_ = false;
-    model_ = std::make_shared<GrowthModel<Type>>(n_years, n_ages, n_sexes);
+    model_ = std::make_shared<GrowthModel<Type>>(n_years, n_ages);
     SyncParamsToModel();
     if (age_offset_set_) {
       model_->SetAgeOffset(static_cast<Type>(age_offset_));
@@ -390,7 +380,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
             (year >= 0 && static_cast<std::size_t>(year) < p.n_years)
                 ? static_cast<std::size_t>(year)
                 : static_cast<std::size_t>(0);
-        return p.MeanWAA(year_index, age_index, 0);
+        return p.MeanWAA(year_index, age_index);
       }
     }
 
@@ -407,8 +397,7 @@ class VonBertalanffySchnuteGrowthModelAdapter
       if (n_ages_ == 0) {
         throw std::runtime_error("Growth model not initialized; n_ages is 0");
       }
-      Initialize(n_years_ == 0 ? 1 : n_years_, n_ages_,
-                 n_sexes_ == 0 ? 1 : n_sexes_);
+      Initialize(n_years_ == 0 ? 1 : n_years_, n_ages_);
     }
     SyncParamsToModel();
     model_->Prepare();
@@ -472,7 +461,6 @@ class VonBertalanffySchnuteGrowthModelAdapter
   Type constant_mean_length_old_ = Type(0.0);
   std::size_t n_years_ = 0;
   std::size_t n_ages_ = 0;
-  std::size_t n_sexes_ = 1;
   double age_offset_ = 0.0;
   bool age_offset_set_ = false;
   bool vb_params_set_ = false;

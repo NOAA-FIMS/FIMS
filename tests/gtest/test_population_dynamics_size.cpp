@@ -23,9 +23,8 @@ struct FakeGrowthDerivedObservation
 
   void SetAgeOffset(double) override {}
 
-  void Initialize(std::size_t n_years, std::size_t n_ages,
-                  std::size_t n_sexes = 1) override {
-    products.Resize(n_years, n_ages, n_sexes);
+  void Initialize(std::size_t n_years, std::size_t n_ages) override {
+    products.Resize(n_years, n_ages);
     products_prepared = false;
   }
 
@@ -54,9 +53,9 @@ struct FakeGrowthDerivedObservation
 std::shared_ptr<FakeGrowthDerivedObservation> MakePreparedGrowth(
     double mean_laa, double sd_laa) {
   auto growth = std::make_shared<FakeGrowthDerivedObservation>();
-  growth->Initialize(1, 1, 1);
-  growth->products.MeanLAA(0, 0, 0) = mean_laa;
-  growth->products.SdLAA(0, 0, 0) = sd_laa;
+  growth->Initialize(1, 1);
+  growth->products.MeanLAA(0, 0) = mean_laa;
+  growth->products.SdLAA(0, 0) = sd_laa;
   growth->PrepareGrowthProducts();
   return growth;
 }
@@ -217,7 +216,7 @@ TEST(GrowthDerivedSizeProvider,
   ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 10.0,
                    120.0);
   growth->SetAgeOffset(1.0);
-  growth->Initialize(1, 3, 1);
+  growth->Initialize(1, 3);
   ASSERT_NO_THROW(growth->PrepareGrowthProducts());
 
   fims::Vector<fims::Vector<double>> fleet_edges;
@@ -294,7 +293,7 @@ TEST(GrowthDerivedSizeProvider,
   ConfigureAdapter(*lower_growth, 225.0, 575.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0,
                    28.0, 73.0);
   lower_growth->SetAgeOffset(1.0);
-  lower_growth->Initialize(1, 1, 1);
+  lower_growth->Initialize(1, 1);
   ASSERT_NO_THROW(lower_growth->PrepareGrowthProducts());
 
   auto higher_growth = std::make_shared<
@@ -302,7 +301,7 @@ TEST(GrowthDerivedSizeProvider,
   ConfigureAdapter(*higher_growth, 325.0, 825.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0,
                    28.0, 73.0);
   higher_growth->SetAgeOffset(1.0);
-  higher_growth->Initialize(1, 1, 1);
+  higher_growth->Initialize(1, 1);
   ASSERT_NO_THROW(higher_growth->PrepareGrowthProducts());
 
   const fims_popdy::SizeGrid grid = fims_popdy::SizeGridBuilder::BuildFromEdges(
@@ -381,7 +380,7 @@ TEST(GrowthDerivedSizeProvider,
   ConfigureAdapter(*growth, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
   growth->SetAgeOffset(1.0);
-  growth->Initialize(1, 12, 1);
+  growth->Initialize(1, 12);
   ASSERT_NO_THROW(growth->PrepareGrowthProducts());
 
   // 1-unit bins covering well beyond every age's length distribution.
@@ -398,8 +397,8 @@ TEST(GrowthDerivedSizeProvider,
   ASSERT_NE(products, nullptr);
 
   for (std::size_t age_index = 0; age_index < 12; ++age_index) {
-    const double mean = products->MeanLAA(0, age_index, 0);
-    const double sd = products->SdLAA(0, age_index, 0);
+    const double mean = products->MeanLAA(0, age_index);
+    const double sd = products->SdLAA(0, age_index);
     // For normal lengths and b = 3, E[a L^3] = a (mu^3 + 3 mu sd^2), which is
     // larger than weight at the mean length, a mu^3.
     const double expected =
@@ -407,7 +406,7 @@ TEST(GrowthDerivedSizeProvider,
     const double observed = provider.MeanWeightAtAge(0, age_index);
 
     EXPECT_NEAR(observed / expected, 1.0, 1e-4);
-    EXPECT_GT(observed, products->MeanWAA(0, age_index, 0));
+    EXPECT_GT(observed, products->MeanWAA(0, age_index));
   }
 }
 

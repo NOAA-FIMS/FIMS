@@ -115,7 +115,7 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
       growth_products = TryGetGrowthProducts();
     }
 
-    if (growth_products == nullptr || growth_products->n_sexes != 1) {
+    if (growth_products == nullptr) {
       return false;
     }
 
