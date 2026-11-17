@@ -257,9 +257,8 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
     }
 
     const Type mean_laa = growth_products.MeanLAA(year_index, age_index);
-    const Type sd_laa =
-        fims_math::ad_max(growth_products.SdLAA(year_index, age_index),
-                          static_cast<Type>(1e-8));
+    const Type sd_laa = fims_math::ad_max(
+        growth_products.SdLAA(year_index, age_index), static_cast<Type>(1e-8));
 
     if (population_size_grid_->n_bins == 1) {
       return static_cast<Type>(1.0);

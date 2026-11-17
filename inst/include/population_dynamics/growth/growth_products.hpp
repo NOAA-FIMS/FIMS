@@ -41,9 +41,7 @@ struct GrowthProducts {
    * @param years Number of years.
    * @param ages Number of ages.
    */
-  GrowthProducts(std::size_t years, std::size_t ages) {
-    Resize(years, ages);
-  }
+  GrowthProducts(std::size_t years, std::size_t ages) { Resize(years, ages); }
 
   /**
    * @brief Resize all cached product arrays.
