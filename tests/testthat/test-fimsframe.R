@@ -43,8 +43,10 @@ test_that("`fims_frame()` works with the correct inputs", {
 
   #' @description Test that the `FIMSFrame` plot method delegates to `stockplotr::plot_data_availability()`.
   expect_identical(
-    plot(fims_frame),
-    stockplotr::plot_data_availability(fims_frame)
+    ggplot2::ggplot_build(plot(fims_frame))[["data"]],
+    ggplot2::ggplot_build(
+      stockplotr::plot_data_availability(fims_frame)
+    )[["data"]]
   )
 
   #' @description Test that the selected S4 `plot()` method for `FIMSFrame` can be called directly.
