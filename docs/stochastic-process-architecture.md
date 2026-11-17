@@ -1013,3 +1013,26 @@ separately, avoiding false replication across composition types. See the
 [pilot report](../tests/integration/process-recovery/dm-validation-pilot/README.md)
 for recorded outcomes and limitations. This supplies a validation pathway, not
 full assessment calibration or a production DM observation simulator.
+
+## Profiled process/observation variance and convergence diagnostics
+
+`tests/integration/process-recovery/dm-profiles.R` adds a benchmark-only TMB map
+that holds the mortality innovation SD at a grid value while reoptimizing R/F
+SDs, all four DM concentrations and latent trajectories. Native density ownership
+is checked before mapping the parameter. The reduced map's fitted vectors are
+not presented as full-model persistence objects. A test at the free fit's M SD
+checks absolute marginal-objective agreement within 1e-5.
+
+Free refits compare original/tighter outer controls and saved/cold/template
+starts. Tighter convergence is an experiment, not an automatic fallback policy;
+optimizer code, gradients and objective consistency remain separate acceptance
+conditions. Reduced-map gradients apply to free nuisance parameters only. All
+planned failed attempts/reports remain in the artifacts. Delta NLL uses the best
+valid new free or grid result, exposing any free-optimization gap without clipping.
+
+These local profiles and concentration traces test variance information and
+coupling. They do not constitute a two-dimensional surface, calibrated profile
+intervals, global optimization, or a new covariance structure. The fixed grid and
+initializations are deliberately limited; local Wald correlations must be read
+with report eligibility and boundary flags. See the [profile pilot](../tests/integration/process-recovery/dm-profile-pilot/README.md)
+for controls, source provenance and results. Production interfaces are unchanged.

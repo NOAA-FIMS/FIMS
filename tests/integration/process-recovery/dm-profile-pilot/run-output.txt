@@ -1,0 +1,113 @@
+refit replicate=1 case=estimated_dm control=original start=saved
+refit replicate=1 case=estimated_dm control=original start=cold
+refit replicate=1 case=estimated_dm control=original start=template
+refit replicate=1 case=estimated_dm control=tight start=saved
+refit replicate=1 case=estimated_dm control=tight start=cold
+refit replicate=1 case=estimated_dm control=tight start=template
+profile replicate=1 M_sd=0.001 start=saved
+profile replicate=1 M_sd=0.001 start=cold
+profile replicate=1 M_sd=0.010 start=saved
+profile replicate=1 M_sd=0.010 start=cold
+profile replicate=1 M_sd=0.025 start=saved
+profile replicate=1 M_sd=0.025 start=cold
+profile replicate=1 M_sd=0.050 start=saved
+profile replicate=1 M_sd=0.050 start=cold
+profile replicate=1 M_sd=0.100 start=saved
+profile replicate=1 M_sd=0.100 start=cold
+profile replicate=1 M_sd=0.200 start=saved
+profile replicate=1 M_sd=0.200 start=cold
+profile replicate=1 M_sd=0.400 start=saved
+profile replicate=1 M_sd=0.400 start=cold
+refit replicate=2 case=estimated_dm control=original start=saved
+refit replicate=2 case=estimated_dm control=original start=cold
+refit replicate=2 case=estimated_dm control=original start=template
+refit replicate=2 case=estimated_dm control=tight start=saved
+refit replicate=2 case=estimated_dm control=tight start=cold
+refit replicate=2 case=estimated_dm control=tight start=template
+profile replicate=2 M_sd=0.001 start=saved
+profile replicate=2 M_sd=0.001 start=cold
+profile replicate=2 M_sd=0.010 start=saved
+profile replicate=2 M_sd=0.010 start=cold
+profile replicate=2 M_sd=0.025 start=saved
+profile replicate=2 M_sd=0.025 start=cold
+profile replicate=2 M_sd=0.050 start=saved
+profile replicate=2 M_sd=0.050 start=cold
+profile replicate=2 M_sd=0.100 start=saved
+profile replicate=2 M_sd=0.100 start=cold
+profile replicate=2 M_sd=0.200 start=saved
+profile replicate=2 M_sd=0.200 start=cold
+profile replicate=2 M_sd=0.400 start=saved
+profile replicate=2 M_sd=0.400 start=cold
+refit replicate=3 case=estimated_dm control=original start=saved
+refit replicate=3 case=estimated_dm control=original start=cold
+refit replicate=3 case=estimated_dm control=original start=template
+refit replicate=3 case=estimated_dm control=tight start=saved
+refit replicate=3 case=estimated_dm control=tight start=cold
+refit replicate=3 case=estimated_dm control=tight start=template
+profile replicate=3 M_sd=0.001 start=saved
+profile replicate=3 M_sd=0.001 start=cold
+profile replicate=3 M_sd=0.010 start=saved
+profile replicate=3 M_sd=0.010 start=cold
+profile replicate=3 M_sd=0.025 start=saved
+profile replicate=3 M_sd=0.025 start=cold
+profile replicate=3 M_sd=0.050 start=saved
+profile replicate=3 M_sd=0.050 start=cold
+profile replicate=3 M_sd=0.100 start=saved
+profile replicate=3 M_sd=0.100 start=cold
+profile replicate=3 M_sd=0.200 start=saved
+profile replicate=3 M_sd=0.200 start=cold
+profile replicate=3 M_sd=0.400 start=saved
+profile replicate=3 M_sd=0.400 start=cold
+refit replicate=4 case=estimated_dm control=original start=saved
+refit replicate=4 case=estimated_dm control=original start=cold
+refit replicate=4 case=estimated_dm control=original start=template
+refit replicate=4 case=estimated_dm control=tight start=saved
+refit replicate=4 case=estimated_dm control=tight start=cold
+refit replicate=4 case=estimated_dm control=tight start=template
+profile replicate=4 M_sd=0.001 start=saved
+profile replicate=4 M_sd=0.001 start=cold
+profile replicate=4 M_sd=0.010 start=saved
+profile replicate=4 M_sd=0.010 start=cold
+profile replicate=4 M_sd=0.025 start=saved
+profile replicate=4 M_sd=0.025 start=cold
+profile replicate=4 M_sd=0.050 start=saved
+profile replicate=4 M_sd=0.050 start=cold
+profile replicate=4 M_sd=0.100 start=saved
+profile replicate=4 M_sd=0.100 start=cold
+profile replicate=4 M_sd=0.200 start=saved
+profile replicate=4 M_sd=0.200 start=cold
+profile replicate=4 M_sd=0.400 start=saved
+profile replicate=4 M_sd=0.400 start=cold
+refit replicate=5 case=estimated_dm control=original start=saved
+refit replicate=5 case=estimated_dm control=original start=cold
+refit replicate=5 case=estimated_dm control=original start=template
+refit replicate=5 case=estimated_dm control=tight start=saved
+refit replicate=5 case=estimated_dm control=tight start=cold
+refit replicate=5 case=estimated_dm control=tight start=template
+profile replicate=5 M_sd=0.001 start=saved
+profile replicate=5 M_sd=0.001 start=cold
+profile replicate=5 M_sd=0.010 start=saved
+profile replicate=5 M_sd=0.010 start=cold
+profile replicate=5 M_sd=0.025 start=saved
+profile replicate=5 M_sd=0.025 start=cold
+profile replicate=5 M_sd=0.050 start=saved
+profile replicate=5 M_sd=0.050 start=cold
+profile replicate=5 M_sd=0.100 start=saved
+profile replicate=5 M_sd=0.100 start=cold
+profile replicate=5 M_sd=0.200 start=saved
+profile replicate=5 M_sd=0.200 start=cold
+profile replicate=5 M_sd=0.400 start=saved
+profile replicate=5 M_sd=0.400 start=cold
+refit replicate=3 case=multinomial control=original start=saved
+refit replicate=3 case=multinomial control=original start=cold
+refit replicate=3 case=multinomial control=original start=template
+refit replicate=3 case=multinomial control=tight start=saved
+refit replicate=3 case=multinomial control=tight start=cold
+refit replicate=3 case=multinomial control=tight start=template
+refit replicate=4 case=multinomial control=original start=saved
+refit replicate=4 case=multinomial control=original start=cold
+refit replicate=4 case=multinomial control=original start=template
+refit replicate=4 case=multinomial control=tight start=saved
+refit replicate=4 case=multinomial control=tight start=cold
+refit replicate=4 case=multinomial control=tight start=template
+Results written to /private/tmp/fims-dm-profiles-pilot

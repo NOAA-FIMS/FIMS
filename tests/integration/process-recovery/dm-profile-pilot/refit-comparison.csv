@@ -1,0 +1,8 @@
+"replicate","case","control","start","objective","optimizer_code","optimizer_message","optimizer_valid_new","evaluation_drift","max_projected_gradient","max_inner_gradient","M_sd","fixed_M_sd","nuisance_boundary","warnings","elapsed_seconds","selected","optimizer_valid_old","eligible","objective_change"
+1,"estimated_dm","original","saved",4513.63887344513,0,"relative convergence (4)",TRUE,0,6.91027437881228e-05,4.49756676346169e-10,0.001,NA,TRUE,"",4.374,TRUE,TRUE,TRUE,0
+2,"estimated_dm","original","saved",4417.83603695283,0,"relative convergence (4)",TRUE,0,0.000142363920280327,4.37207603454226e-10,0.001,NA,TRUE,"",3.863,TRUE,TRUE,TRUE,0
+3,"estimated_dm","tight","cold",4527.1944919484,0,"relative convergence (4)",TRUE,0,0.000143559957474726,1.10959241794717e-10,0.075970604380046,NA,FALSE,"",5.05600000000004,TRUE,FALSE,FALSE,-5.23950802744366e-08
+3,"multinomial","original","cold",7645.66700398455,0,"relative convergence (4)",TRUE,0,9.37493540303924e-06,5.56000800955303e-10,1,NA,TRUE,"",5.24299999999994,TRUE,TRUE,TRUE,-9.91349224932492e-11
+4,"estimated_dm","original","cold",4431.13088845261,0,"relative convergence (4)",TRUE,0,0.000138758982469012,2.86653172032469e-09,0.0224411392039276,NA,FALSE,"",4.01500000000004,TRUE,TRUE,TRUE,-1.24600774142891e-10
+4,"multinomial","original","saved",7048.33426260156,0,"relative convergence (4)",TRUE,0,4.69414674383328e-05,1.007016692256e-11,1,NA,TRUE,"",3.58399999999995,TRUE,FALSE,FALSE,-4.46707417722791e-08
+5,"estimated_dm","tight","cold",4382.76629487488,0,"relative convergence (4)",TRUE,0,7.54897041973512e-05,6.6161298661882e-11,0.0834093073276922,NA,FALSE,"",4.62799999999999,TRUE,FALSE,FALSE,-1.86364559340291e-08

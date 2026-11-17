@@ -1,0 +1,66 @@
+Counts, selection, map values, local references and hashes: PASS
+
+           FALSE TRUE
+  original     5   16
+  tight       13    8
+
+FALSE  TRUE
+    8    62
+   replicate         case  control start objective       M_sd optimizer_valid
+1          1 estimated_dm original saved  4513.639 0.00100000            TRUE
+7          2 estimated_dm original saved  4417.836 0.00100000            TRUE
+17         3 estimated_dm    tight  cold  4527.194 0.07597060            TRUE
+20         4 estimated_dm original  cold  4431.131 0.02244114            TRUE
+29         5 estimated_dm    tight  cold  4382.766 0.08340931            TRUE
+32         3  multinomial original  cold  7645.667 1.00000000            TRUE
+37         4  multinomial original saved  7048.334 1.00000000            TRUE
+  replicate         case optimizer_valid                  status eligible
+1         1 estimated_dm            TRUE consistent_local_report     TRUE
+2         2 estimated_dm            TRUE consistent_local_report     TRUE
+3         3 estimated_dm            TRUE consistent_local_report     TRUE
+4         4 estimated_dm            TRUE consistent_local_report     TRUE
+5         5 estimated_dm            TRUE consistent_local_report     TRUE
+6         3  multinomial            TRUE consistent_local_report     TRUE
+7         4  multinomial            TRUE consistent_local_report     TRUE
+  regular
+1   FALSE
+2   FALSE
+3    TRUE
+4    TRUE
+5    TRUE
+6   FALSE
+7   FALSE
+Profile gaps:
+   replicate free_optimization_gap
+1          1                     0
+15         2                     0
+29         3                     0
+43         4                     0
+57         5                     0
+   replicate start optimizer_valid delta_nll
+7          1 saved            TRUE 0.4019179
+8          1  cold            TRUE 0.4019179
+21         2 saved            TRUE 0.5814386
+22         2  cold            TRUE 0.5814386
+35         3 saved            TRUE 0.1998052
+36         3  cold            TRUE 0.1998052
+49         4 saved            TRUE 0.1308540
+50         4  cold            TRUE 0.1308540
+63         5 saved            TRUE 0.5117316
+64         5  cold            TRUE 0.5117316
+  replicate         case optimizer_valid_old optimizer_valid_new
+1         1 estimated_dm                TRUE                TRUE
+2         2 estimated_dm                TRUE                TRUE
+3         3 estimated_dm               FALSE                TRUE
+4         3  multinomial                TRUE                TRUE
+5         4 estimated_dm                TRUE                TRUE
+6         4  multinomial               FALSE                TRUE
+7         5 estimated_dm               FALSE                TRUE
+  objective_change
+1     0.000000e+00
+2     0.000000e+00
+3    -5.239508e-08
+4    -9.913492e-11
+5    -1.246008e-10
+6    -4.467074e-08
+7    -1.863646e-08

@@ -67,7 +67,7 @@ FIMS investigation; they are not claimed as copied framework diagnostics.
 | Composition misspecification / mode diagnosis — `72adf28` | SS3's overdispersion option motivated the DM stress hierarchy; FIMS failures motivated the cold/warm investigation. | [Pilot](../tests/integration/process-recovery/robustness-pilot/README.md): known-SD M coverage fell from about 95% to 57% in the strongest case; estimated-SD inference became unreliable. Five-replicate stress evidence. |
 | Matched-DM / saved-mode comparison — `3ff7ea9` | Combines the SS3-inspired likelihood family with the FIMS-specific handoff fix. | [Pilot](../tests/integration/process-recovery/mode-handoff-pilot/README.md): one dataset shows numerical handoff consistency and reduced state distortion, but both covariance fits remain at bounds. Not replicated calibration. |
 
-## Replicated matched-DM validation upgrade
+## Replicated matched-DM validation upgrade — `b835c15`
 
 The benchmark in [dm-validation.R](../tests/integration/process-recovery/dm-validation.R)
 now compares multinomial, known-concentration DM and estimated-concentration DM
@@ -93,15 +93,45 @@ separated by 5.152 NLL units; variance bounds and gradient failures persist.
 Four focused tests / 25 assertions and count/hash/objective audits passed. See
 the report for concentration recovery, missing SEs and all failed cases.
 
-## Next task: M-SD/concentration identifiability and convergence
+## M-SD/concentration profile and control upgrade
 
-**Planned; no production implementation in this benchmark upgrade.** Preserve the
-same datasets and failed attempts, refine optimizer stopping controls without
-relaxing acceptance thresholds, compare conditional basins, and profile M SD while
-reoptimizing concentration and other SDs. Assess variance/concentration confounding
-before adding covariance structure or claiming calibrated intervals. Production
-DM observation simulation is a separate useful capability extension; forecast and
-derived-quantity uncertainty remain separate validation targets.
+[dm-profiles.R](../tests/integration/process-recovery/dm-profiles.R) adds targeted
+free refits and local nuisance-reoptimized M-SD profiles on the same strong-stress
+datasets. It compares original/tight outer controls and saved/cold/template starts,
+retains unchanged acceptance thresholds and failed attempts, and exposes profile
+solutions below free refits. Reduced profile maps are distinct from full-model
+snapshots. The [report](../tests/integration/process-recovery/dm-profile-pilot/README.md)
+records controls, exact baseline/source fingerprints, parameter traces and limits;
+[tests](../tests/testthat/test-dm-profiles.R) check objective agreement, ownership,
+reference selection and complete failure denominators.
+
+This is FIMS-specific numerical investigation prompted by prior failures.
+[SS3 profiling/restart facilities](https://nmfs-ost.github.io/ss3-doc/SS330_User_Manual_release.html)
+and [SAM jitter runs](https://fishfollower.r-universe.dev/stockassessment/doc/manual.html)
+are conceptual precedents, not copied implementations or numerical equivalents.
+The DM family/process precedents above remain applicable. No production API,
+dependency, unrestricted covariance feature or calibrated interval is added.
+
+Recorded result: 42 refits (24 valid) and 70 profiles (62 valid); all seven
+selected refits/reports pass the original checks. The three earlier selected
+gradient failures are recovered with NLL changes below 6e-8, but tight controls
+pass only 8/21 attempts versus 16/21 original-control attempts. Two DM variance
+bounds remain. True M SD is within 0.582 local NLL units in all five profiles;
+concentrations change at most 2.32% over valid low-M grid points, with absolute
+interior local correlations at most 0.110. A 5.152-NLL multinomial start split
+persists. Three tests / 19 assertions, mapping/reference/count/hash checks and
+visual figure review passed. These are targeted diagnostics, not new calibration
+replicates, a global solution or evidence for adding covariance to fix variance
+bounds. Earlier pilot results remain intact.
+
+## Next task: production DM observation simulation
+
+**Planned; not implemented by this validation upgrade.** Connect fleet/type DM
+concentrations to the production simulator using the existing nominal-count and
+seeded-RNG contracts, structural-zero/missing-row handling and native restoration
+lifecycle. Validate sampling moments, overdispersion, reproducibility and the
+multinomial limit independently. Keep process-SD sensitivity and multiple-start
+checks; derived/forecast uncertainty needs separate propagation and calibration.
 
 ## Maintenance contract
 

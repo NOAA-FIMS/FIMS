@@ -1,0 +1,8 @@
+"replicate","case","warm","status","objective_difference","joint_reference_difference","after_difference","optimizer_valid","pd_hessian","boundary","max_mode_drift","mode_scope","warnings","elapsed_seconds","eligible","regular"
+1,"estimated_dm",TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,TRUE,0,"local conditional solution; global optimality not established","",5.436,TRUE,FALSE
+2,"estimated_dm",TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,TRUE,0,"local conditional solution; global optimality not established","",5.27799999999999,TRUE,FALSE
+3,"estimated_dm",TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",5.39799999999997,TRUE,TRUE
+4,"estimated_dm",TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",5.31700000000001,TRUE,TRUE
+5,"estimated_dm",TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,FALSE,0,"local conditional solution; global optimality not established","",5.25800000000004,TRUE,TRUE
+3,"multinomial",TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,TRUE,0,"local conditional solution; global optimality not established","",3.86699999999996,TRUE,FALSE
+4,"multinomial",TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,TRUE,0,"local conditional solution; global optimality not established","",3.86700000000008,TRUE,FALSE

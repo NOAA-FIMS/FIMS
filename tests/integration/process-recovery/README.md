@@ -392,3 +392,11 @@ The subsequent [matched-DM study](dm-validation-pilot/README.md) compares the
 multinomial stress comparator with known/estimated composition concentration,
 using four process/latent starts and mode-preserving uncertainty reports. It
 retains the prior datasets and explicit failure/boundary denominators.
+
+## M-SD/concentration profiles and convergence
+
+The [targeted profile study](dm-profile-pilot/README.md) preserves the replicated
+DM baseline and compares stopping controls/initializations on the same snapshots.
+It profiles M innovation SD while reoptimizing composition concentrations, other
+SDs and latent states, retaining failed attempts and exposing local optimization
+gaps without claiming calibrated profile intervals.

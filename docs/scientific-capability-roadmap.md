@@ -17,17 +17,21 @@ snapshot pathway preserves local fitted modes across uncertainty reconstruction.
 Selectivity process extensions, multivariate covariance, latent older-age abundance
 states, generalized partitions and a new backend are not completed by these changes.
 
-Recovery, profile, information, calibration and misspecification pilots are
-recorded with explicit limitations. The current single-case matched-DM result
-is not evidence of replicated dispersion recovery or calibrated intervals.
-Replicated matched-DM validation is now complete as a limited pilot: 160 starts,
-40 selected fits, 80 cold/warm reports. Observation-family improvements coexist
-with variance bounds, gradient failures and alternate basins. **Next: profile
-M-SD/concentration identifiability and refine convergence**, preserving the
-original thresholds and failures. The [ledger](scientific-capability-change-log.md#next-task-m-sdconcentration-identifiability-and-convergence)
-and [pilot report](../tests/integration/process-recovery/dm-validation-pilot/README.md)
-outline the evidence and scope. Upgrades are committed after validation at the user's request;
-pushes remain separate authorized actions.
+Recovery, information, calibration and misspecification pilots retain their
+explicit limitations. The replicated matched-DM pilot has 160 starts and 80 report
+attempts; its targeted [profile/convergence follow-up](../tests/integration/process-recovery/dm-profile-pilot/README.md)
+adds 42 refits and 70 profiles without rewriting those outcomes. All seven targeted
+selected fits now pass the unchanged checks, but tighter controls are not a
+universal improvement and weak M-variance information/basin sensitivity remain.
+Concentration traces show only modest local coupling with M SD in these cases.
+These are local diagnostics, not operational calibration or global-mode proof.
+
+**Next: production DM observation simulation**, with independent sampling-moment,
+count/zero/missing/RNG and multinomial-limit validation. Keep process-variance
+sensitivity and multiple starts; derived/forecast uncertainty remains a separate
+propagation/calibration task. The [ledger](scientific-capability-change-log.md#next-task-production-dm-observation-simulation)
+records status and attribution. Upgrades are committed after validation at the
+user's request; pushes remain separate authorized actions.
 
 ## Prioritization
 
@@ -245,3 +249,16 @@ and refine optimizer convergence while retaining the original failed attempts.
 Production DM sampling is a separate extension; more covariance is not justified
 as a cure for weak variance identification. Full results and concentration-owner
 summaries are in `tests/integration/process-recovery/dm-validation-pilot/`.
+
+
+The targeted M-SD/concentration follow-up is complete in
+`tests/integration/process-recovery/dm-profile-pilot/`. All three previous selected
+gradient failures pass after small stopping refinements (NLL improvements <6e-8).
+Only 8/21 tight-control attempts pass versus 16/21 original-control attempts;
+blindly tighter tolerances are not a general fitting policy. All seven selected
+reports pass checks, while two DM lower M-SD bounds and the multinomial 5.152-NLL
+start split remain. True M SD is within 0.582 local NLL units in all five profiles,
+with modest concentration movement and interior correlations. This supports
+variance-sensitivity reporting and checked starts, without adding covariance or
+priors merely to force an interior estimate. Next add production DM observation
+simulation as a separate capability; retain interval calibration as open work.
