@@ -413,7 +413,7 @@ TEST(AgeToLengthConversionRuntime,
   model.populations.push_back(population);
 
   // Prepares the growth products and then the population size products.
-  ASSERT_NO_THROW(model.PreparePopulationGrowthProducts());
+  ASSERT_NO_THROW(model.PreparePopulationGrowthAndSizeProducts());
 
   const double expected = size_provider->MeanWeightAtAge(0, 1);
   const double weight_at_mean_length =
