@@ -67,23 +67,41 @@ FIMS investigation; they are not claimed as copied framework diagnostics.
 | Composition misspecification / mode diagnosis — `72adf28` | SS3's overdispersion option motivated the DM stress hierarchy; FIMS failures motivated the cold/warm investigation. | [Pilot](../tests/integration/process-recovery/robustness-pilot/README.md): known-SD M coverage fell from about 95% to 57% in the strongest case; estimated-SD inference became unreliable. Five-replicate stress evidence. |
 | Matched-DM / saved-mode comparison — `3ff7ea9` | Combines the SS3-inspired likelihood family with the FIMS-specific handoff fix. | [Pilot](../tests/integration/process-recovery/mode-handoff-pilot/README.md): one dataset shows numerical handoff consistency and reduced state distortion, but both covariance fits remain at bounds. Not replicated calibration. |
 
-## Next task: replicated matched-DM validation
+## Replicated matched-DM validation upgrade
 
-**Planned; not implemented by this documentation update.** Reuse the existing
-composition stress datasets rather than changing their truth or deleting failed
-outcomes.
+The benchmark in [dm-validation.R](../tests/integration/process-recovery/dm-validation.R)
+now compares multinomial, known-concentration DM and estimated-concentration DM
+on the existing stress-generating design. Four starts cross process-SD and latent
+initializations. Independent concentration parameters retain fleet/type ownership;
+mode checks, rejected attempts, boundary strata and replicate-level Monte Carlo
+uncertainty are explicit. This is benchmark work; no production interface or
+sampling family is changed. Source/results and interpretation are recorded in the
+[pilot report](../tests/integration/process-recovery/dm-validation-pilot/README.md).
 
-1. Compare the multinomial fit with DM fits at known and estimated concentration.
-2. Repeat across datasets, overdispersion strengths and covariance/inner-state starts.
-3. Use saved-mode reports, retaining cold/warm disagreements, boundaries and failed reports.
-4. Measure concentration/process-SD recovery, state error and interval coverage with
-   explicit denominators and replicate-level Monte Carlo uncertainty.
-5. Decide whether evidence supports extending the production simulator to DM errors;
-   keep forecast/derived-quantity uncertainty as a separate validation target.
+Scientific precedents are SS3's composition-overdispersion options and SAM/WHAM
+simulation validation. The paired experiment, acceptance rules and snapshot
+handoff are FIMS-specific. This increment does not demonstrate cross-platform
+numerical equivalence, global mode selection or operational calibration.
 
-This follows the scientific precedent of SS3 composition errors and SAM/WHAM
-simulation validation, but the benchmark design is FIMS-specific. No additional
-covariance, partition, environmental or backend feature is claimed complete.
+Recorded pilot: 160 starts, 134 optimizer-valid; 37/40 selected optimizers valid,
+40/40 consistent warm rebuilds, four cold mismatches and 36/40 eligible warm
+reports. Strong-stress known-DM mean M coverage is 87.5% (5 eligible) versus
+61.4% for multinomial (3); the paired difference is +28.7 pp (MCSE 10.2 pp,
+3 pairs). Estimated DM has only 3 eligible strong reports and 1 multinomial pair,
+so its calibration remains unresolved. One case has valid-start objectives
+separated by 5.152 NLL units; variance bounds and gradient failures persist.
+Four focused tests / 25 assertions and count/hash/objective audits passed. See
+the report for concentration recovery, missing SEs and all failed cases.
+
+## Next task: M-SD/concentration identifiability and convergence
+
+**Planned; no production implementation in this benchmark upgrade.** Preserve the
+same datasets and failed attempts, refine optimizer stopping controls without
+relaxing acceptance thresholds, compare conditional basins, and profile M SD while
+reoptimizing concentration and other SDs. Assess variance/concentration confounding
+before adding covariance structure or claiming calibrated intervals. Production
+DM observation simulation is a separate useful capability extension; forecast and
+derived-quantity uncertainty remain separate validation targets.
 
 ## Maintenance contract
 

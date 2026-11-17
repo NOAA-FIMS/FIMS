@@ -1,0 +1,17 @@
+"scenario","case","warm","planned","optimizer_valid","consistent","eligible","regular","boundary"
+"moderate","estimated_dm",FALSE,5,5,5,5,4,1
+"multinomial","estimated_dm",FALSE,5,5,5,5,1,4
+"strong","estimated_dm",FALSE,5,3,5,3,1,2
+"moderate","known_dm",FALSE,5,5,5,5,4,1
+"strong","known_dm",FALSE,5,5,5,5,3,2
+"moderate","multinomial",FALSE,5,5,5,5,5,0
+"multinomial","multinomial",FALSE,5,5,5,5,5,0
+"strong","multinomial",FALSE,5,4,1,0,0,5
+"moderate","estimated_dm",TRUE,5,5,5,5,4,1
+"multinomial","estimated_dm",TRUE,5,5,5,5,1,4
+"strong","estimated_dm",TRUE,5,3,5,3,1,2
+"moderate","known_dm",TRUE,5,5,5,5,4,1
+"strong","known_dm",TRUE,5,5,5,5,3,2
+"moderate","multinomial",TRUE,5,5,5,5,5,0
+"multinomial","multinomial",TRUE,5,5,5,5,5,0
+"strong","multinomial",TRUE,5,4,5,3,0,5

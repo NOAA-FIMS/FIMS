@@ -992,3 +992,24 @@ metadata, source hashes, serialization and local objective differences are
 retained in `tests/integration/process-recovery/mode-handoff-pilot/`. The remaining
 validation targets are replicated matched-likelihood fits, joint concentration
 recovery, alternate latent/covariance starts and derived/forecast interval coverage.
+
+## Replicated concentration/process-variance benchmark
+
+`tests/integration/process-recovery/dm-validation.R` extends validation without
+changing production registration or dynamics. The fitted model jointly estimates
+three process innovation SDs and, optionally, four composition concentrations
+(one per fleet/type across years). Initializations cross two common process-SD
+starts and two deterministic latent-state starts. Parameter ownership is resolved
+from registered density IDs before native objects are released; saved snapshots
+retain the existing input/layout/objective checks. Historical helpers and pilots
+are preserved rather than overwritten.
+
+Every start and both cold/saved-state report attempts are retained. Warm reports
+supply state metrics only when optimization, objective consistency, Hessian and
+SE checks pass; boundary and interior strata remain separate. Monte Carlo
+uncertainty is calculated across independent datasets, with paired contrasts
+restricted to datasets eligible in both fits. Concentration owners are summarized
+separately, avoiding false replication across composition types. See the
+[pilot report](../tests/integration/process-recovery/dm-validation-pilot/README.md)
+for recorded outcomes and limitations. This supplies a validation pathway, not
+full assessment calibration or a production DM observation simulator.

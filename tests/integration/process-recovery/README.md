@@ -385,3 +385,10 @@ multinomial cold-start discrepancy and a matched DM composition model using the
 new opt-in production likelihood. Snapshot reports are explicitly local and
 retain covariance-bound flags; this is not a public fit-persistence API or a
 coverage-validation claim. Existing failed pilot rows remain unchanged.
+
+## Replicated DM validation
+
+The subsequent [matched-DM study](dm-validation-pilot/README.md) compares the
+multinomial stress comparator with known/estimated composition concentration,
+using four process/latent starts and mode-preserving uncertainty reports. It
+retains the prior datasets and explicit failure/boundary denominators.

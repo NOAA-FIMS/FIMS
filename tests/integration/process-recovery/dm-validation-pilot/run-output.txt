@@ -1,0 +1,43 @@
+replicate=1/5 scenario=multinomial case=multinomial
+replicate=1/5 scenario=multinomial case=estimated_dm
+replicate=1/5 scenario=moderate case=multinomial
+replicate=1/5 scenario=moderate case=known_dm
+replicate=1/5 scenario=moderate case=estimated_dm
+replicate=1/5 scenario=strong case=multinomial
+replicate=1/5 scenario=strong case=known_dm
+replicate=1/5 scenario=strong case=estimated_dm
+replicate=2/5 scenario=multinomial case=multinomial
+replicate=2/5 scenario=multinomial case=estimated_dm
+replicate=2/5 scenario=moderate case=multinomial
+replicate=2/5 scenario=moderate case=known_dm
+replicate=2/5 scenario=moderate case=estimated_dm
+replicate=2/5 scenario=strong case=multinomial
+replicate=2/5 scenario=strong case=known_dm
+replicate=2/5 scenario=strong case=estimated_dm
+replicate=3/5 scenario=multinomial case=multinomial
+replicate=3/5 scenario=multinomial case=estimated_dm
+replicate=3/5 scenario=moderate case=multinomial
+replicate=3/5 scenario=moderate case=known_dm
+replicate=3/5 scenario=moderate case=estimated_dm
+replicate=3/5 scenario=strong case=multinomial
+replicate=3/5 scenario=strong case=known_dm
+replicate=3/5 scenario=strong case=estimated_dm
+replicate=4/5 scenario=multinomial case=multinomial
+replicate=4/5 scenario=multinomial case=estimated_dm
+replicate=4/5 scenario=moderate case=multinomial
+replicate=4/5 scenario=moderate case=known_dm
+replicate=4/5 scenario=moderate case=estimated_dm
+replicate=4/5 scenario=strong case=multinomial
+replicate=4/5 scenario=strong case=known_dm
+replicate=4/5 scenario=strong case=estimated_dm
+replicate=5/5 scenario=multinomial case=multinomial
+replicate=5/5 scenario=multinomial case=estimated_dm
+replicate=5/5 scenario=moderate case=multinomial
+replicate=5/5 scenario=moderate case=known_dm
+replicate=5/5 scenario=moderate case=estimated_dm
+replicate=5/5 scenario=strong case=multinomial
+replicate=5/5 scenario=strong case=known_dm
+replicate=5/5 scenario=strong case=estimated_dm
+Warning message:
+In sqrt(diag(report$fixed_covariance)) : NaNs produced
+Results written to /private/tmp/fims-dm-validation-pilot

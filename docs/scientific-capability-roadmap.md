@@ -20,10 +20,13 @@ states, generalized partitions and a new backend are not completed by these chan
 Recovery, profile, information, calibration and misspecification pilots are
 recorded with explicit limitations. The current single-case matched-DM result
 is not evidence of replicated dispersion recovery or calibrated intervals.
-**Next: replicated matched-DM validation**, including estimated concentration and
-alternate covariance/inner-state starts, before further production simulation or
-covariance extensions. The [ledger](scientific-capability-change-log.md#next-task-replicated-matched-dm-validation)
-outlines its scope. Upgrades are committed after validation at the user's request;
+Replicated matched-DM validation is now complete as a limited pilot: 160 starts,
+40 selected fits, 80 cold/warm reports. Observation-family improvements coexist
+with variance bounds, gradient failures and alternate basins. **Next: profile
+M-SD/concentration identifiability and refine convergence**, preserving the
+original thresholds and failures. The [ledger](scientific-capability-change-log.md#next-task-m-sdconcentration-identifiability-and-convergence)
+and [pilot report](../tests/integration/process-recovery/dm-validation-pilot/README.md)
+outline the evidence and scope. Upgrades are committed after validation at the user's request;
 pushes remain separate authorized actions.
 
 ## Prioritization
@@ -227,3 +230,18 @@ log-M RMSE, but its M SD reaches the lower bound and pointwise coverage is only
 calibration, joint dispersion estimation and global-mode behavior remain open.
 Next, repeat the matched-likelihood stress comparison across replicates and
 latent/covariance starts before extending uncertainty to forecasts/derived outputs.
+
+
+The replicated matched-DM pilot now fits the five existing datasets per stress
+level using four covariance/latent starts. 134/160 attempts and 37/40 selected
+optimizers pass checks; all saved-state reports reconstruct consistently, but
+only 36/40 meet the inference eligibility checks. Strong known-DM M coverage is
+87.5% over five eligible datasets; the paired improvement versus multinomial is
+28.7 pp (MCSE 10.2 pp, three pairs). Strong estimated-DM has only three eligible
+reports and one paired comparison, so it cannot establish calibrated uncertainty
+or the cost of estimating concentration. A 5.152-NLL valid-start spread confirms
+remaining basin sensitivity. Next, profile coupled process/observation variances
+and refine optimizer convergence while retaining the original failed attempts.
+Production DM sampling is a separate extension; more covariance is not justified
+as a cure for weak variance identification. Full results and concentration-owner
+summaries are in `tests/integration/process-recovery/dm-validation-pilot/`.
