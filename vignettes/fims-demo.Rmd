@@ -418,17 +418,13 @@ output <- get_estimates(fit) |>
     uncertainty_label = "se",
     year = year_i,
     estimate = estimated
-  )
+  ) |>
+  stockplotr::convert_output()
 ```
 
 ```{r load-precomputed-estimates, echo=FALSE}
 data("estimates_big_optimized", package = "FIMS")
-output <- estimates_big_optimized |>
-  dplyr::mutate(
-    uncertainty_label = "se",
-    year = year_i,
-    estimate = estimated
-  )
+output <- stockplotr::convert_output(estimates_big_optimized, model = "fims")
 ```
 
 ```{r fit-plot-spawning-biomass}
@@ -436,12 +432,7 @@ output <- estimates_big_optimized |>
 #| message: false
 #| fig.alt: >
 #|   Plot of spawning biomass.
-stockplotr::plot_spawning_biomass(
-  dplyr::filter(output, label == "spawning_biomass"),
-  # get_estimates() has no unit column, so give the unit of weight_at_age
-  unit_label = "mt"
-) +
-  stockplotr::theme_noaa()
+stockplotr::plot_spawning_biomass(output)
 ```
 
 ```{r fit-plot-log-fishing-mortality}
@@ -449,15 +440,14 @@ stockplotr::plot_spawning_biomass(
 #|   Plot of log fishing mortality.
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
-    output |> dplyr::filter(module_id == 1),
-    label_name = "log_Fmort$",
+    output |> dplyr::filter(fleet == "fleet1"),
+    label_name = "log_fishing_mortality$",
     geom = "line"
   ),
   x = "year",
   y = "estimate",
   ylab = "natural log of Fishing Mortality"
-) +
-  stockplotr::theme_noaa()
+)
 ```
 
 ```{r fit-plot-index-of-abundance}
@@ -465,8 +455,8 @@ stockplotr::plot_timeseries(
 #|   Plot of estimated index of abundance versus observed values.
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
-    output |> dplyr::filter(module_id == 2),
-    label_name = "^index_expected$",
+    output |> dplyr::filter(fleet == "survey1"),
+    label_name = "^index_[ep]",
     geom = "line"
   ),
   x = "year",
@@ -480,24 +470,13 @@ stockplotr::plot_timeseries(
       year = get_start_year(data_4_model):get_end_year(data_4_model)
     ),
     ggplot2::aes(x = year, y = observed)
-  ) +
-  stockplotr::theme_noaa()
+  )
 ```
 
 ```{r fit-plot-catch}
 #| fig.alt: >
 #|   Plot of estimated catch.
-stockplotr::plot_timeseries(
-  stockplotr::filter_data(
-    output |> dplyr::filter(module_id == 1),
-    label_name = "^catch_expected$",
-    geom = "line"
-  ),
-  x = "year",
-  y = "estimate",
-  ylab = "Expected Catch (mt)"
-) +
-  stockplotr::theme_noaa()
+stockplotr::plot_landings(output)
 ```
 
 ### Sensitivities
@@ -631,21 +610,12 @@ clear()
 #| fig.alt: >
 #|   Plot of spawning biomass for each sensitivity model.
 stockplotr::plot_biomass(
-  list(
-    "age" = get_estimates(age_only_fit) |>
-      dplyr::mutate(
-        uncertainty_label = "se",
-        year = year_i,
-        estimate = estimated
-      ),
-    "length" = get_estimates(length_only_fit) |>
-      dplyr::mutate(
-        uncertainty_label = "se",
-        year = year_i,
-        estimate = estimated
-      )
-  ),
-  # get_estimates() has no unit column, so give the unit of weight_at_age
-  unit_label = "mt"
+  stockplotr::convert_output(
+    list(
+      "age" = get_estimates(age_only_fit),
+      "length" = get_estimates(length_only_fit)
+    ),
+    models = rep("fims", 2)
+  )
 )
 ```

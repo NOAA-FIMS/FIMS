@@ -251,21 +251,15 @@ clear()
 
 ### Model summaries
 
-We use {stockplotr} to plot the model results. In the code below, we pass a single model to `stockplotr::plot_biomass()` but the list can contain multiple models, where the start and end year of each model that is included need not align. Thus, if we had fit the model without projections we could have plotted that here as well for comparison.
+We use {stockplotr} to plot the model results. In the code below, we pass a single model to `stockplotr::plot_biomass()` but the input can contain multiple models, where the start and end year of each model that is included need not align. Thus, if we had fit the model without projections we could have plotted that here as well for comparison.
 
 ```{r fit-plot-projections}
 #| fig.alt: >
 #|   Plot of spawning biomass for projection model.
 stockplotr::plot_biomass(
-  list(
-    "age" = get_estimates(projection_fit) |>
-      dplyr::mutate(
-        uncertainty_label = "se",
-        year = year_i,
-        estimate = estimated
-      )
-  ),
-  # get_estimates() has no unit column, so give the unit of weight_at_age
-  unit_label = "mt"
+  stockplotr::convert_output(
+    get_estimates(projection_fit),
+    model = "fims"
+  )
 )
 ```
