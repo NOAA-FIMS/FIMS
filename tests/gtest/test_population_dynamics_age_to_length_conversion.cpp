@@ -282,27 +282,7 @@ TEST(AgeToLengthConversionFixed,
 }
 
 TEST(AgeToLengthConversionRuntime,
-     BuildAgeToLengthConversionFleetReturnsNullWhenGrowthDerivedPrepareFails) {
-  auto population = std::make_shared<fims_popdy::Population<double>>();
-  auto fleet = MakeFleet();
-  FillFixedMatrix(fleet);
-
-  auto growth = std::make_shared<FakeGrowthDerivedObservation>();
-  growth->Initialize(1, fleet->n_ages, 2);
-
-  population->growth = growth;
-  ConfigurePopulationSizeSupport(population, fleet, growth);
-
-  std::shared_ptr<fims_popdy::AgeToLengthConversionBase<double>>
-      age_to_length_conversion =
-          fims_popdy::BuildAgeToLengthConversionFleet<double>(population,
-                                                              fleet);
-
-  EXPECT_EQ(age_to_length_conversion, nullptr);
-}
-
-TEST(AgeToLengthConversionRuntime,
-     BuildAgeToLengthConversionFleetUsesGrowthDerivedWhenPrepareSucceeds) {
+     BuildAgeToLengthConversionFleetUsesGrowthDerived) {
   auto population = std::make_shared<fims_popdy::Population<double>>();
   auto fleet = MakeFleet();
 
@@ -326,62 +306,6 @@ TEST(AgeToLengthConversionRuntime,
       std::dynamic_pointer_cast<fims_popdy::AgeToLengthConversionFixed<double>>(
           age_to_length_conversion),
       nullptr);
-  EXPECT_EQ(growth->prepare_calls, 1);
-}
-
-TEST(
-    AgeToLengthConversionRuntime,
-    EnsureAgeToLengthConversionFleetThrowsWhenExistingGrowthDerivedPrepareFails) {
-  auto population = std::make_shared<fims_popdy::Population<double>>();
-  auto fleet = MakeFleet();
-  FillFixedMatrix(fleet);
-
-  auto growth = std::make_shared<FakeGrowthDerivedObservation>();
-  growth->Initialize(1, fleet->n_ages, 2);
-
-  population->growth = growth;
-  ConfigurePopulationSizeSupport(population, fleet, growth);
-
-  fleet->age_to_length_conversion_model =
-      std::make_shared<fims_popdy::AgeToLengthConversionDerived<double>>(
-          fleet, growth, population->size_distribution_provider);
-
-  ASSERT_NE(fleet->age_to_length_conversion_model, nullptr);
-  EXPECT_NE(std::dynamic_pointer_cast<
-                fims_popdy::AgeToLengthConversionDerived<double>>(
-                fleet->age_to_length_conversion_model),
-            nullptr);
-
-  EXPECT_THROW(
-      fims_popdy::EnsureAgeToLengthConversionFleet<double>(population, fleet),
-      std::runtime_error);
-}
-
-TEST(
-    AgeToLengthConversionRuntime,
-    EnsureAgeToLengthConversionFleetDoesNotReuseFixedAgeToLengthConversionForGrowthDerivedPopulation) {
-  auto population = std::make_shared<fims_popdy::Population<double>>();
-  auto fleet = MakeFleet();
-  FillFixedMatrix(fleet);
-
-  auto growth = std::make_shared<FakeGrowthDerivedObservation>();
-  growth->Initialize(1, fleet->n_ages, 2);
-
-  population->growth = growth;
-  ConfigurePopulationSizeSupport(population, fleet, growth);
-
-  fleet->age_to_length_conversion_model =
-      std::make_shared<fims_popdy::AgeToLengthConversionFixed<double>>(fleet);
-
-  ASSERT_NE(fleet->age_to_length_conversion_model, nullptr);
-  EXPECT_NE(
-      std::dynamic_pointer_cast<fims_popdy::AgeToLengthConversionFixed<double>>(
-          fleet->age_to_length_conversion_model),
-      nullptr);
-
-  EXPECT_THROW(
-      fims_popdy::EnsureAgeToLengthConversionFleet<double>(population, fleet),
-      std::runtime_error);
 }
 
 TEST(AgeToLengthConversionRuntime,
@@ -410,12 +334,13 @@ TEST(
   std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
       size_provider = MakeConfiguredSizeProvider(growth, &population_size_grid,
                                                  fleet->n_years, fleet->n_ages);
+  ASSERT_NO_THROW(growth->PrepareGrowthProducts());
+  ASSERT_NO_THROW(size_provider->PrepareSizeProducts());
 
   auto age_to_length_conversion_derived =
       std::make_shared<fims_popdy::AgeToLengthConversionDerived<double>>(
           fleet, growth, size_provider);
   ASSERT_TRUE(age_to_length_conversion_derived->IsActive());
-  ASSERT_TRUE(age_to_length_conversion_derived->PrepareForCurrentState());
 
   fleet->age_to_length_conversion_model = age_to_length_conversion_derived;
 
@@ -439,7 +364,7 @@ TEST(
 }
 
 TEST(AgeToLengthConversionRuntime,
-     PopulationMeanWeightAAPreparesGrowthProductsWhenNeeded) {
+     PopulationMeanWeightAARequiresPreparedGrowthProducts) {
   fims_popdy::CatchAtAge<double> model;
   auto population = std::make_shared<fims_popdy::Population<double>>();
 
@@ -456,12 +381,11 @@ TEST(AgeToLengthConversionRuntime,
   population->ages[1] = 2.0;
   population->ages[2] = 3.0;
 
-  EXPECT_EQ(growth->prepare_calls, 0u);
+  EXPECT_THROW(model.PopulationMeanWeightAA(population, 0, 1),
+               std::runtime_error);
 
-  const double mean_weight = model.PopulationMeanWeightAA(population, 0, 1);
-
-  EXPECT_EQ(growth->prepare_calls, 1u);
-  EXPECT_DOUBLE_EQ(mean_weight, 2.5);
+  ASSERT_NO_THROW(growth->PrepareGrowthProducts());
+  EXPECT_DOUBLE_EQ(model.PopulationMeanWeightAA(population, 0, 1), 2.5);
 }
 
 TEST(AgeToLengthConversionRuntime,
@@ -525,25 +449,6 @@ TEST(AgeToLengthConversionDerived,
   EXPECT_FALSE(age_to_length_conversion.IsActive());
 }
 
-TEST(AgeToLengthConversionDerived,
-     PrepareForCurrentStateFailsForMultiSexProducts) {
-  auto fleet = MakeFleet();
-  auto growth = std::make_shared<FakeGrowthDerivedObservation>();
-
-  growth->Initialize(1, fleet->n_ages, 2);
-  const fims_popdy::SizeGrid population_size_grid =
-      MakePopulationSizeGridForFleet(fleet);
-  std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
-      size_provider = MakeConfiguredSizeProvider(growth, &population_size_grid,
-                                                 fleet->n_years, fleet->n_ages);
-
-  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(
-      fleet, growth, size_provider);
-
-  EXPECT_TRUE(age_to_length_conversion.IsActive());
-  EXPECT_FALSE(age_to_length_conversion.PrepareForCurrentState());
-}
-
 TEST(AgeToLengthConversionDerived, IsActiveDoesNotPrepareGrowthProducts) {
   auto fleet = MakeFleet();
   auto growth = std::make_shared<FakeGrowthDerivedObservation>();
@@ -563,7 +468,7 @@ TEST(AgeToLengthConversionDerived, IsActiveDoesNotPrepareGrowthProducts) {
 }
 
 TEST(AgeToLengthConversionDerived,
-     BuildAgeToLengthConversionRowThrowsBeforePrepareForCurrentState) {
+     BuildAgeToLengthConversionRowThrowsWithoutPreparedSizeProducts) {
   auto fleet = MakeFleet();
   auto growth = std::make_shared<FakeGrowthDerivedObservation>();
 
@@ -582,52 +487,6 @@ TEST(AgeToLengthConversionDerived,
   EXPECT_THROW(
       age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row),
       std::runtime_error);
-  EXPECT_EQ(growth->prepare_calls, 0);
-}
-
-TEST(AgeToLengthConversionDerived, PrepareForCurrentStateEnablesRowBuilding) {
-  auto fleet = MakeFleet();
-  auto growth = std::make_shared<FakeGrowthDerivedObservation>();
-
-  growth->Initialize(1, fleet->n_ages, 1);
-  const fims_popdy::SizeGrid population_size_grid =
-      MakePopulationSizeGridForFleet(fleet);
-  std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
-      size_provider = MakeConfiguredSizeProvider(growth, &population_size_grid,
-                                                 fleet->n_years, fleet->n_ages);
-
-  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(
-      fleet, growth, size_provider);
-  fims::Vector<double> row;
-
-  ASSERT_TRUE(age_to_length_conversion.IsActive());
-  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
-  EXPECT_EQ(growth->prepare_calls, 1);
-  ASSERT_TRUE(
-      age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row));
-  ASSERT_EQ(row.size(), fleet->n_lengths);
-}
-
-TEST(AgeToLengthConversionDerived,
-     PrepareForCurrentStateReusesAlreadyPreparedProducts) {
-  auto fleet = MakeFleet();
-  auto growth = std::make_shared<FakeGrowthDerivedObservation>();
-
-  growth->Initialize(1, fleet->n_ages, 1);
-  const fims_popdy::SizeGrid population_size_grid =
-      MakePopulationSizeGridForFleet(fleet);
-  std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
-      size_provider = MakeConfiguredSizeProvider(growth, &population_size_grid,
-                                                 fleet->n_years, fleet->n_ages);
-  growth->PrepareGrowthProducts();
-  ASSERT_EQ(growth->prepare_calls, 1u);
-
-  fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(
-      fleet, growth, size_provider);
-
-  ASSERT_TRUE(age_to_length_conversion.IsActive());
-  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
-  EXPECT_EQ(growth->prepare_calls, 1u);
 }
 
 TEST(AgeToLengthConversionDerived,
@@ -644,13 +503,14 @@ TEST(AgeToLengthConversionDerived,
   std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
       size_provider = MakeConfiguredSizeProvider(growth, &population_size_grid,
                                                  fleet->n_years, fleet->n_ages);
+  ASSERT_NO_THROW(growth->PrepareGrowthProducts());
+  ASSERT_NO_THROW(size_provider->PrepareSizeProducts());
 
   fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(
       fleet, growth, size_provider);
   fims::Vector<double> row;
 
   ASSERT_TRUE(age_to_length_conversion.IsActive());
-  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
   ASSERT_TRUE(
       age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row));
   ASSERT_EQ(row.size(), fleet->n_lengths);
@@ -685,7 +545,6 @@ TEST(AgeToLengthConversionDerived,
   fims::Vector<double> row;
 
   ASSERT_TRUE(age_to_length_conversion.IsActive());
-  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
   EXPECT_FALSE(age_to_length_conversion.BuildAgeToLengthConversionRow(
       0, fleet->n_ages, row));
 }
@@ -705,13 +564,14 @@ TEST(AgeToLengthConversionDerived,
   std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
       size_provider = MakeConfiguredSizeProvider(growth, &population_size_grid,
                                                  fleet->n_years, fleet->n_ages);
+  ASSERT_NO_THROW(growth->PrepareGrowthProducts());
+  ASSERT_NO_THROW(size_provider->PrepareSizeProducts());
 
   fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(
       fleet, growth, size_provider);
   fims::Vector<double> row;
 
   ASSERT_TRUE(age_to_length_conversion.IsActive());
-  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
   ASSERT_TRUE(
       age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row));
   ASSERT_EQ(row.size(), fleet->n_lengths);
@@ -742,12 +602,13 @@ TEST(AgeToLengthConversionDerived,
   std::shared_ptr<fims_popdy::SizeDistributionProviderBase<double>>
       size_provider = MakeConfiguredSizeProvider(growth, &population_size_grid,
                                                  fleet->n_years, fleet->n_ages);
+  ASSERT_NO_THROW(growth->PrepareGrowthProducts());
+  ASSERT_NO_THROW(size_provider->PrepareSizeProducts());
 
   fims_popdy::AgeToLengthConversionDerived<double> age_to_length_conversion(
       fleet, growth, size_provider);
   fims::Vector<double> row;
 
-  ASSERT_TRUE(age_to_length_conversion.PrepareForCurrentState());
   ASSERT_TRUE(
       age_to_length_conversion.BuildAgeToLengthConversionRow(0, 1, row));
   ASSERT_EQ(row.size(), 4u);
