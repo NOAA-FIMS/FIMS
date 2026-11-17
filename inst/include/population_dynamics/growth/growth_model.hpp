@@ -36,9 +36,7 @@ class GrowthModel : public GrowthModelBase<Type> {
    * @param n_ages Number of ages.
    */
   GrowthModel(std::size_t n_years, std::size_t n_ages)
-      : n_years_(n_years),
-        n_ages_(n_ages),
-        products_(n_years, n_ages) {}
+      : n_years_(n_years), n_ages_(n_ages), products_(n_years, n_ages) {}
 
   /// Set VonBertalanffySchnute parameters with explicit reference ages.
   void SetVonBertalanffySchnuteParameters(Type mean_length_young,
