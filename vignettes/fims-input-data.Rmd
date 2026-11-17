@@ -56,10 +56,10 @@ data_4_model <- FIMSFrame(data_big)
 data_4_model
 ```
 
-To visualize the range of time and fleets with each data type, you can use a function in the {stockplotr} package.
+To visualize the range of years and fleets with data for each type, you can use `plot()` (which relies on `stockplotr::plot_data_availability()`).
 
 ```{r plot-data-availability}
-data_4_model |> stockplotr::plot_data_availability()
+plot(data_4_model)
 ```
 
 
