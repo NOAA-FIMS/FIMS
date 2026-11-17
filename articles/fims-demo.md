@@ -828,7 +828,7 @@ unconverged_fit <- parameters_4_model |>
     ## ✖ Convergence: "FAIL" from "optimizer", "max_gradient", and "sdreport". Use
     ##   `sanity_fims(fit)` to see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 2.46813 seconds
+    ## ℹ Total run time was 2.43714 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 27.41724
     ## ℹ Negative log likelihood (NLL):
@@ -904,17 +904,19 @@ output <- get_estimates(fit) |>
     uncertainty_label = "se",
     year = year_i,
     estimate = estimated
-  )
+  ) |>
+  stockplotr::convert_output()
 ```
+
+    ## → `files` is a single model. Converting to list object.
+
+    ## ℹ FIMS reports years as indices (1 = first model year); use `start_year` to convert them to years.
+
+    ## ✔ Conversion finished!
 
 ``` r
 
-stockplotr::plot_spawning_biomass(
-  dplyr::filter(output, label == "spawning_biomass"),
-  # get_estimates() has no unit column, so give the unit of weight_at_age
-  unit_label = "mt"
-) +
-  stockplotr::theme_noaa()
+stockplotr::plot_spawning_biomass(output)
 ```
 
 ![Plot of spawning
@@ -924,15 +926,14 @@ biomass.](fims-demo_files/figure-html/fit-plot-spawning-biomass-1.png)
 
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
-    output |> dplyr::filter(module_id == 1),
-    label_name = "log_Fmort$",
+    output |> dplyr::filter(fleet == "fleet1"),
+    label_name = "log_fishing_mortality$",
     geom = "line"
   ),
   x = "year",
   y = "estimate",
   ylab = "natural log of Fishing Mortality"
-) +
-  stockplotr::theme_noaa()
+)
 ```
 
     ## ℹ Estimates are negative.
@@ -948,8 +949,8 @@ mortality.](fims-demo_files/figure-html/fit-plot-log-fishing-mortality-1.png)
 
 stockplotr::plot_timeseries(
   stockplotr::filter_data(
-    output |> dplyr::filter(module_id == 2),
-    label_name = "^index_expected$",
+    output |> dplyr::filter(fleet == "survey1"),
+    label_name = "^index_[ep]",
     geom = "line"
   ),
   x = "year",
@@ -963,8 +964,7 @@ stockplotr::plot_timeseries(
       year = get_start_year(data_4_model):get_end_year(data_4_model)
     ),
     ggplot2::aes(x = year, y = observed)
-  ) +
-  stockplotr::theme_noaa()
+  )
 ```
 
 ![Plot of estimated index of abundance versus observed
@@ -972,17 +972,7 @@ values.](fims-demo_files/figure-html/fit-plot-index-of-abundance-1.png)
 
 ``` r
 
-stockplotr::plot_timeseries(
-  stockplotr::filter_data(
-    output |> dplyr::filter(module_id == 1),
-    label_name = "^catch_expected$",
-    geom = "line"
-  ),
-  x = "year",
-  y = "estimate",
-  ylab = "Expected Catch (mt)"
-) +
-  stockplotr::theme_noaa()
+stockplotr::plot_landings(output)
 ```
 
 ![Plot of estimated
@@ -1050,7 +1040,7 @@ high_slope_fit <- parameters_high_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 49.12285 seconds
+    ## ℹ Total run time was 49.13343 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00043
     ## ℹ Negative log likelihood (NLL):
@@ -1086,7 +1076,7 @@ low_slope_fit <- parameters_low_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 46.19911 seconds
+    ## ℹ Total run time was 45.65334 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00034
     ## ℹ Negative log likelihood (NLL):
@@ -1210,7 +1200,7 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 46.74832 seconds
+    ## ℹ Total run time was 46.44588 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00028
     ## ℹ Negative log likelihood (NLL):
@@ -1318,7 +1308,7 @@ age_only_fit <- parameters_4_model |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 8.68851 seconds
+    ## ℹ Total run time was 8.81135 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00036
     ## ℹ Negative log likelihood (NLL):
@@ -1377,7 +1367,7 @@ length_only_fit <- parameters_4_model |>
     ## ! Convergence: "WARN" from "large_standard_errors". Use `sanity_fims(fit)` to
     ##   see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.07038 minutes
+    ## ℹ Total run time was 1.07912 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 0.00025
     ## ℹ Negative log likelihood (NLL):
@@ -1393,22 +1383,13 @@ clear()
 ``` r
 
 stockplotr::plot_biomass(
-  list(
-    "age" = get_estimates(age_only_fit) |>
-      dplyr::mutate(
-        uncertainty_label = "se",
-        year = year_i,
-        estimate = estimated
-      ),
-    "length" = get_estimates(length_only_fit) |>
-      dplyr::mutate(
-        uncertainty_label = "se",
-        year = year_i,
-        estimate = estimated
-      )
-  ),
-  # get_estimates() has no unit column, so give the unit of weight_at_age
-  unit_label = "mt"
+  stockplotr::convert_output(
+    list(
+      "age" = get_estimates(age_only_fit),
+      "length" = get_estimates(length_only_fit)
+    ),
+    models = rep("fims", 2)
+  )
 )
 ```
 

@@ -330,7 +330,7 @@ projection_fit <- parameters_projection |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 10.55054 seconds
+    ## ℹ Total run time was 10.51182 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=39, and total=88
     ## ℹ Maximum gradient= 0.00028
     ## ℹ Negative log likelihood (NLL):
@@ -348,7 +348,7 @@ clear()
 We use {stockplotr} to plot the model results. In the code below, we
 pass a single model to
 [`stockplotr::plot_biomass()`](https://rdrr.io/pkg/stockplotr/man/plot_biomass.html)
-but the list can contain multiple models, where the start and end year
+but the input can contain multiple models, where the start and end year
 of each model that is included need not align. Thus, if we had fit the
 model without projections we could have plotted that here as well for
 comparison.
@@ -356,20 +356,20 @@ comparison.
 ``` r
 
 stockplotr::plot_biomass(
-  list(
-    "age" = get_estimates(projection_fit) |>
-      dplyr::mutate(
-        uncertainty_label = "se",
-        year = year_i,
-        estimate = estimated
-      )
-  ),
-  # get_estimates() has no unit column, so give the unit of weight_at_age
-  unit_label = "mt"
+  stockplotr::convert_output(
+    get_estimates(projection_fit),
+    model = "fims"
+  )
 )
 ```
 
-    ## ! biomass_msy not found for age
+    ## → `files` is a single model. Converting to list object.
+
+    ## ℹ FIMS reports years as indices (1 = first model year); use `start_year` to convert them to years.
+
+    ## ✔ Conversion finished!
+
+    ## ! biomass_msy not found for data
 
 ![Plot of spawning biomass for projection
 model.](fims-demo-projections_files/figure-html/fit-plot-projections-1.png)

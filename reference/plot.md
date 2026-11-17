@@ -1,9 +1,7 @@
 # Plot a `FIMSFrame` object
 
-Use
-[`ggplot2::geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)
-to plot summary information stored in the data slot of the `FIMSFrame`
-class.
+Plot data availability for a `FIMSFrame` object using
+[`stockplotr::plot_data_availability()`](https://rdrr.io/pkg/stockplotr/man/plot_data_availability.html).
 
 ## Usage
 
@@ -28,10 +26,8 @@ plot(x, y, ...)
 
 ## Value
 
-A ggplot2 object is returned that uses
-[`stockplotr::theme_noaa()`](https://rdrr.io/pkg/stockplotr/man/theme_noaa.html).
-There will be one panel per input type with fleet-specific information
-denoted using colors.
+The result of
+[`stockplotr::plot_data_availability()`](https://rdrr.io/pkg/stockplotr/man/plot_data_availability.html).
 
 ## Examples
 

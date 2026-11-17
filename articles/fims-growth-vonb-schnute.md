@@ -580,7 +580,7 @@ fit <- FIMS::fit_fims(
 #> ℹ Convergence: "NOTE" from "sdreport". Use `sanity_fims(fit)` to see each
 #>   check.
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 2.66017 minutes
+#> ℹ Total run time was 2.62129 minutes
 #> ℹ Number of parameters: fixed_effects=39, random_effects=1, and total=40
 #> ℹ Maximum gradient= 1e-04
 #> ℹ Negative log likelihood (NLL):

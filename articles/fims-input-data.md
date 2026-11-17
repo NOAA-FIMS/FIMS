@@ -150,6 +150,18 @@ data_4_model
     ## end_year:
     ## [1] 30
 
+To visualize the range of years and fleets with data for each type, you
+can use [`plot()`](https://rdrr.io/r/graphics/plot.default.html) (which
+relies on
+[`stockplotr::plot_data_availability()`](https://rdrr.io/pkg/stockplotr/man/plot_data_availability.html)).
+
+``` r
+
+plot(data_4_model)
+```
+
+![](fims-input-data_files/figure-html/plot-data-availability-1.png)
+
 ## Catch (`type == "catch"`)
 
 The catch data type contains the total catch in weight or numbers for
