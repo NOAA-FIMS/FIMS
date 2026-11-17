@@ -207,5 +207,17 @@ unchanged. Missing rows, structural zeros, concentration registration and fleet
 reporting are covered. Production DM simulation, a dedicated dispersion-sharing
 interface, broad assessment recovery/coverage and extreme-concentration accuracy
 remain separate extensions. A mode-consistent benchmark uncertainty handoff is
-being evaluated on the existing stress data; a local report must not be mistaken
+now evaluated on the existing stress data; a local report must not be mistaken
 for a global solution or calibrated intervals.
+
+
+The saved-mode benchmark pathway now serializes plain fixed/random vectors,
+checks inputs/layouts and validates marginal objectives before and after state
+uncertainty estimation. On one strongest-stress dataset, warm reconstruction
+reproduces the multinomial local fit while cold reconstruction differs by 0.567
+NLL units. A matching fixed-concentration DM fit agrees cold/warm and reduces
+log-M RMSE, but its M SD reaches the lower bound and pointwise coverage is only
+75.5% in that dataset. The numerical handoff is addressed locally; broad
+calibration, joint dispersion estimation and global-mode behavior remain open.
+Next, repeat the matched-likelihood stress comparison across replicates and
+latent/covariance starts before extending uncertainty to forecasts/derived outputs.

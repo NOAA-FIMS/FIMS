@@ -300,3 +300,5 @@
 * Added a composition-overdispersion robustness benchmark, independently checked Dirichlet–multinomial sampling, scenario-specific failure accounting and a cold/warm inner-state diagnostic. Fitted production likelihoods are unchanged.
 
 * Added opt-in Dirichlet-multinomial composition likelihoods with fixed or estimated log-concentration per fleet/type, normalized row likelihoods, missing-row/structural-zero handling and fleet-owned parameter reporting. Multinomial defaults are preserved.
+
+* Added mode-preserving benchmark snapshots with model/layout checks, before/after uncertainty objective validation and state-only/full `sdreport` equivalence checks. A controlled DM comparison retains covariance-bound and local-mode limitations. Native composition-type JSON now safely limits arbitrary notes to recognized metadata enums.

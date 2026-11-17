@@ -1173,7 +1173,11 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     ss << " \"module_type\": \""
        << (*dirichlet_m ? "dirichlet_multinomial" : "multinomial") << "\",\n";
     if (*dirichlet_m) {
-      ss << "\"composition_type\": \"" << notes.get() << "\",\n";
+      ss << "\"composition_type\": ";
+      if (notes.get() == "age_comp" || notes.get() == "length_comp")
+        ss << "\"" << notes.get() << "\"";
+      else ss << "null";
+      ss << ",\n";
       ss << this->linked_ids_to_json();
       ss << this->parameters_to_json(
           {{"log_concentration", &log_concentration}});

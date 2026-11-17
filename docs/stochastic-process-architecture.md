@@ -961,3 +961,31 @@ assessment likelihood differences, AD gradients/Hessian, reporting ownership and
 pre-clear validation. A standalone C++ linked-data/missing-row smoke test passed;
 a GTest case is registered, but GoogleTest was not run because its local dependency
 cache is unavailable. These checks do not establish assessment-scale calibration.
+
+
+## Saved-mode benchmark uncertainty handoff
+
+`mode-handoff.R` adds a fresh-model report pathway storing only fixed/random
+vectors, reference objectives, transient-ID-independent layouts and exact model
+inputs. RDS round trips across native model clearing are tested. Reconstruction
+rejects changed inputs/layouts or truncated/nonfinite vectors, restores the saved
+states, probes the joint objective at a common point and checks marginal objective
+agreement before/after `sdreport`. Cold discrepancies remain explicit with no
+substitute intervals. State-only reporting skips unused ADREPORT delta-method
+calculations; state SEs and fixed covariance agree with the full call in tests.
+
+The retained single-case comparison reproduces the strong multinomial cold/warm
+difference (0.567 NLL units). Warm reconstruction is consistent; a matched DM model
+with known concentration 200 also agrees from cold/warm starts. M-state RMSE falls
+from 1.215 to 0.292 in that one case, but its estimated innovation SD moves from
+the upper to lower benchmark bound and local pointwise coverage remains 75.5%.
+This is neither global-mode validation nor replicated calibration. Reference-point
+agreement does not certify every Hessian perturbation or alternate mode. The
+public fit API is unchanged; this benchmark pathway demonstrates mode ownership
+and checked handoff without rewriting historical pilot outcomes.
+
+The final focused run passed 16 tests / 85 assertions with no failures/skips;
+metadata, source hashes, serialization and local objective differences are
+retained in `tests/integration/process-recovery/mode-handoff-pilot/`. The remaining
+validation targets are replicated matched-likelihood fits, joint concentration
+recovery, alternate latent/covariance starts and derived/forecast interval coverage.

@@ -1,0 +1,7 @@
+"case","parameter","value","lower","upper"
+"multinomial","gaussian_process.1.log_sd.318",-1.94771840654334,-6.90775527898214,0
+"multinomial","gaussian_process.8.log_sd.727",-1.31482706079911,-6.90775527898214,0
+"multinomial","gaussian_process.9.log_sd.1010",0,-6.90775527898214,0
+"matched_dm","gaussian_process.1.log_sd.318",-2.17470002917554,-6.90775527898214,0
+"matched_dm","gaussian_process.8.log_sd.727",-1.4551583781072,-6.90775527898214,0
+"matched_dm","gaussian_process.9.log_sd.1010",-6.90775527898214,-6.90775527898214,0

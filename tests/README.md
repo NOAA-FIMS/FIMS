@@ -203,3 +203,5 @@ multiple-start and mortality-SD profile experiments, plus a profile plotting scr
 sensitivity; `plot-calibration.R` shows replicate-level coverage MCSEs and interval widths.
 `run-robustness.R` stress-tests multinomial fits with overdispersed composition
 data; `diagnose-robustness.R` reproduces a difficult inner-state rebuild case.
+`run-mode-handoff.R` demonstrates serialized fixed/random-state snapshots,
+checked uncertainty reconstruction and a matched overdispersed-composition fit.

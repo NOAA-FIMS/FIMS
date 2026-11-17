@@ -371,3 +371,17 @@ optimizer reports while retaining their numerical outcomes in raw tables. Run
 `diagnose-robustness.R OUTPUT_DIRECTORY` to reproduce the documented cold/warm
 inner-state check; that check does not certify global modes or supply replacement
 uncertainty intervals.
+
+## Saved-mode uncertainty reconstruction
+
+```sh
+Rscript tests/integration/process-recovery/run-mode-handoff.R /tmp/fims-mode-handoff
+```
+
+The [single-case mode/DM diagnostic](mode-handoff-pilot/README.md) reconstructs a
+fit from plain fixed/random parameter snapshots and checks objective agreement
+before and after state uncertainty estimation. It demonstrates both the prior
+multinomial cold-start discrepancy and a matched DM composition model using the
+new opt-in production likelihood. Snapshot reports are explicitly local and
+retain covariance-bound flags; this is not a public fit-persistence API or a
+coverage-validation claim. Existing failed pilot rows remain unchanged.

@@ -145,3 +145,14 @@ test_that("DM concentration is recovered from independently sampled compositions
   expect_equal(opt$convergence, 0)
   expect_lt(abs(log(exp(opt$par) / 20)), .35)
 })
+
+
+test_that("native notes cannot corrupt DM JSON metadata", {
+  on.exit(clear())
+  x <- dm_fixture()
+  initialized <- initialize_fims(x$parameters, x$data, composition_likelihood = x$spec)
+  density <- attr(initialized, "composition_distributions")$age_comp$fleet1
+  density$set_note('arbitrary "note"')
+  fit <- suppressMessages(fit_fims(initialized, optimize = FALSE, get_sd = FALSE))
+  expect_true(is.list(jsonlite::fromJSON(get_model_output(fit))))
+})

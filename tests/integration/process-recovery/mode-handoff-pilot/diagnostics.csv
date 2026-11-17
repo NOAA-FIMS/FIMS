@@ -1,0 +1,5 @@
+"case","warm","status","objective_difference","joint_reference_difference","after_difference","optimizer_valid","pd_hessian","boundary","max_mode_drift","mode_scope"
+"multinomial",FALSE,"rebuild_mismatch",0.567460978908457,0,NA,TRUE,NA,TRUE,NA,"local conditional solution; global optimality not established"
+"multinomial",TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,TRUE,0,"local conditional solution; global optimality not established"
+"matched_dm",FALSE,"consistent_local_report",1.2732925824821e-10,0,1.2732925824821e-10,TRUE,TRUE,TRUE,1.98748928426085e-09,"local conditional solution; global optimality not established"
+"matched_dm",TRUE,"consistent_local_report",0,0,0,TRUE,TRUE,TRUE,0,"local conditional solution; global optimality not established"
