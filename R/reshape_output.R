@@ -231,7 +231,29 @@ reshape_json_estimates <- function(model_output) {
       by = c("module_id", "name", "join_by"),
       suffix = c("", "_density")
     ) |>
-    dplyr::select(-dplyr::all_of("join_by"))
+    dplyr::select(-dplyr::all_of("join_by")) |>
+    # Missing observations are -999 in the data. Other -999 values come from
+    # non-finite values in C++ and are kept so they can be found.
+    dplyr::mutate(
+      observed_values = dplyr::na_if(.data$observed_values, -999)
+    ) |>
+    # The multinomial skips a composition year with any missing bin, so every
+    # bin of that year is NA, as is every year of a fleet without composition
+    # data. The expected counts are the expected proportions scaled to the
+    # number observed, so they are NA too. The expected proportions are kept
+    # because they are predictions.
+    dplyr::mutate(
+      skipped_year = any(is.na(.data$observed_values)) &
+        .data$name %in% c("agecomp_expected", "lengthcomp_expected"),
+      observed_values = dplyr::if_else(
+        .data$skipped_year, NA_real_, .data$observed_values
+      ),
+      estimated_value = dplyr::if_else(
+        .data$skipped_year, NA_real_, .data$estimated_value
+      ),
+      .by = dplyr::all_of(c("module_id", "name", "year_i"))
+    ) |>
+    dplyr::select(-dplyr::all_of("skipped_year"))
 
   # Process the data components
   # TODO: Data component needs actual uncertainty instead of 0
