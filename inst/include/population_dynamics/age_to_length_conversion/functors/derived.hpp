@@ -12,12 +12,10 @@
 #ifndef POPULATION_DYNAMICS_AGE_TO_LENGTH_CONVERSION_DERIVED_HPP
 #define POPULATION_DYNAMICS_AGE_TO_LENGTH_CONVERSION_DERIVED_HPP
 
-#include <algorithm>
 #include <cstddef>
 #include <memory>
 #include <stdexcept>
 
-#include "common/fims_math.hpp"
 #include "base.hpp"
 #include "population_dynamics/fleet/fleet.hpp"
 #include "population_dynamics/growth/growth_model_adapter.hpp"
@@ -85,45 +83,6 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
   }
 
   /**
-   * @brief Ensures the linked growth products and population size-provider
-   * products are prepared for the current model state.
-   *
-   * This helper reuses already prepared growth products when available and only
-   * triggers preparation when products have not yet been prepared. It then
-   * prepares the linked population size provider so the age-to-length
-   * conversion can read population age-to-size rows for mapping into fleet
-   * observation bins.
-   *
-   * @return True if the required growth products are available for this
-   * age-to-length conversion path and the linked population size provider can
-   * be prepared.
-   */
-  virtual bool PrepareForCurrentState() override {
-    if (!this->IsActive()) {
-      return false;
-    }
-
-    std::shared_ptr<SizeDistributionProviderBase<Type>> size_provider_ptr =
-        TryGetSizeProvider();
-    if (size_provider_ptr == nullptr) {
-      return false;
-    }
-
-    const GrowthProducts<Type>* growth_products = TryGetGrowthProducts();
-    if (growth_products == nullptr) {
-      growth_observation_->PrepareGrowthProducts();
-      growth_products = TryGetGrowthProducts();
-    }
-
-    if (growth_products == nullptr || growth_products->n_sexes != 1) {
-      return false;
-    }
-
-    size_provider_ptr->PrepareSizeProducts();
-    return true;
-  }
-
-  /**
    * @brief Builds the normalized age-to-length conversion row for a given year
    * and age.
    * @param year Year index.
@@ -150,7 +109,7 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
   fims::Vector<Type> BuildPopulationProbSizeRow(std::size_t year_index,
                                                 std::size_t age_index) const {
     std::shared_ptr<SizeDistributionProviderBase<Type>> size_provider_ptr =
-        TryGetSizeProvider();
+        size_provider_.lock();
 
     if (size_provider_ptr == nullptr) {
       return fims::Vector<Type>();
@@ -214,7 +173,7 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
       std::size_t year_index, std::size_t age_index) const {
     std::shared_ptr<Fleet<Type>> fleet_ptr = fleet_.lock();
     std::shared_ptr<SizeDistributionProviderBase<Type>> size_provider_ptr =
-        TryGetSizeProvider();
+        size_provider_.lock();
 
     if (fleet_ptr == nullptr || size_provider_ptr == nullptr) {
       return fims::Vector<Type>();
@@ -260,28 +219,6 @@ struct AgeToLengthConversionDerived : public AgeToLengthConversionBase<Type> {
     }
 
     return fleet_row;
-  }
-
-  /**
-   * @brief Try to get the linked population size provider.
-   * @return Shared pointer to the size provider, or nullptr if unavailable.
-   */
-  std::shared_ptr<SizeDistributionProviderBase<Type>> TryGetSizeProvider()
-      const {
-    return size_provider_.lock();
-  }
-
-  /**
-   * @brief Try to get prepared growth products from the linked growth object.
-   * @return Pointer to prepared growth products, or nullptr if unavailable.
-   */
-  const GrowthProducts<Type>* TryGetGrowthProducts() const {
-    if (growth_observation_ == nullptr ||
-        !growth_observation_->SupportsAgeToLengthConversionDerived()) {
-      return nullptr;
-    }
-
-    return growth_observation_->TryGetPreparedGrowthProducts();
   }
 };
 

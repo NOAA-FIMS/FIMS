@@ -1147,22 +1147,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Ensure all fleets linked to this model have a usable age-to-length
-   * conversion.
-   *
-   * Reuses each fleet's current age-to-length conversion when it matches the
-   * current population growth path and can prepare for the current model state.
-   * Otherwise rebuilds the fleet age-to-length conversion from the current
-   * population and fleet state before evaluation or reporting uses it.
-   */
-  void EnsureAllFleetAgeToLengthConversion() {
-    for (size_t p = 0; p < this->populations.size(); ++p) {
-      fims_popdy::EnsurePopulationFleetAgeToLengthConversion<Type>(
-          this->populations[p]);
-    }
-  }
-
-  /**
    * @brief Prepares cached population growth products for all populations whose
    * growth objects expose the growth-derived observation interface.
    *
@@ -1268,13 +1252,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
         growth_observation->TryGetPreparedGrowthProducts();
 
     if (gp == nullptr) {
-      growth_observation->PrepareGrowthProducts();
-      gp = growth_observation->TryGetPreparedGrowthProducts();
-    }
-
-    if (gp == nullptr) {
       throw std::runtime_error(
-          "Growth products were unavailable while resolving biological mean "
+          "Growth products were not prepared while resolving biological mean "
           "weight-at-age.");
     }
 
@@ -1527,7 +1506,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
      */
     Prepare();
     PreparePopulationGrowthProducts();
-    EnsureAllFleetAgeToLengthConversion();
     /*
      start at year=0, age=0;
      here year 0 is the estimated initial population structure and age 0 are
@@ -1670,7 +1648,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
     int n_pops = this->populations.size();
 #ifdef TMB_MODEL
     if (this->do_reporting == true) {
-      EnsureAllFleetAgeToLengthConversion();
       report_vectors.clear();
       // std::shared_ptr<UncertaintyReportInfoMap>
       // population_uncertainty_report_info_map =
