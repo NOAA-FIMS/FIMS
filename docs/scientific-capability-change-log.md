@@ -49,7 +49,7 @@ commit ID rather than implying a finer history that does not exist.
 | Shared fleet innovation SDs — `9ea49e1` | Explicit `sd_group` labels tie SD parameters through TMB maps; paths remain separate. | Conceptually related to SAM variance coupling/WHAM variance maps; actual map construction and reporting adapt existing FIMS interfaces. | [Configuration/map helper](../R/fishing_process.R). No shared innovations or cross-fleet covariance implied. |
 | Age-specific mortality RW1 inference — `85d4c9a` | Independent annual log-M chains on the existing age-year grid, common innovation SD, fixed/proper initialization; interleaved-series kernel support. | WHAM supplies the time-varying-M precedent; FIMS indexing and the independent RW1 formulation are scoped design choices. | [R connection](../R/mortality_process.R), [tests](../tests/testthat/test-mortality-random-walk.R). No common annual shock, cohort process or age correlation. |
 | Mortality simulation and forecasts — `053646a` | Applies full M grids before dynamics, conditions historical cells, restores native targets and records path metadata. | General WHAM/SAM process-aware prediction precedent; native restoration and scheduling respond to FIMS's model lifecycle. | [R driver](../R/simulate_fims.R), [native evaluator](../inst/include/interface/rcpp/rcpp_objects/rcpp_models.hpp). Supplied parameters/horizon, not full assessment uncertainty propagation. |
-| DM composition likelihood — `b3e79b2` | Opt-in fixed/estimated concentration per fleet/type, normalized row likelihood, zero/missing handling, AD and fleet reporting; multinomial default retained. | SS3 composition-overdispersion precedent. Kernel, concentration convention and initializer override are FIMS-specific implementations. | [Kernel](../inst/include/distributions/functors/dirichlet_multinomial_lpmf.hpp), [configuration](../R/composition_likelihood.R), [tests](../tests/testthat/test-dirichlet-multinomial.R). Inference only; production DM observation simulation and broad dispersion calibration remain open. |
+| DM composition likelihood — `b3e79b2` | Opt-in fixed/estimated concentration per fleet/type, normalized row likelihood, zero/missing handling, AD and fleet reporting; multinomial default retained. | SS3 composition-overdispersion precedent. Kernel, concentration convention and initializer override are FIMS-specific implementations. | [Kernel](../inst/include/distributions/functors/dirichlet_multinomial_lpmf.hpp), [configuration](../R/composition_likelihood.R), [tests](../tests/testthat/test-dirichlet-multinomial.R). Initial increment covered inference; see the later simulation upgrade. Broad dispersion/interval calibration remains open. |
 | Saved-mode uncertainty handoff — `3ff7ea9` | Plain fixed/random snapshots, exact input/layout checks and objective checks before/after state-only uncertainty reports; metadata JSON guard. | FIMS-specific response to a reproduced cold-rebuild failure, using existing TMB facilities. No external platform provenance is claimed for this fix. | [Snapshot helper](../tests/integration/process-recovery/mode-handoff.R), [pilot](../tests/integration/process-recovery/mode-handoff-pilot/README.md). Benchmark pathway, not a new public fit-persistence API; local consistency does not prove a global mode. |
 
 ## Validation and diagnostic upgrades
@@ -93,7 +93,7 @@ separated by 5.152 NLL units; variance bounds and gradient failures persist.
 Four focused tests / 25 assertions and count/hash/objective audits passed. See
 the report for concentration recovery, missing SEs and all failed cases.
 
-## M-SD/concentration profile and control upgrade
+## M-SD/concentration profile and control upgrade — `bc18046`
 
 [dm-profiles.R](../tests/integration/process-recovery/dm-profiles.R) adds targeted
 free refits and local nuisance-reoptimized M-SD profiles on the same strong-stress
@@ -124,14 +124,40 @@ visual figure review passed. These are targeted diagnostics, not new calibration
 replicates, a global solution or evidence for adding covariance to fix variance
 bounds. Earlier pilot results remain intact.
 
-## Next task: production DM observation simulation
+## Production DM observation simulation upgrade
 
-**Planned; not implemented by this validation upgrade.** Connect fleet/type DM
-concentrations to the production simulator using the existing nominal-count and
-seeded-RNG contracts, structural-zero/missing-row handling and native restoration
-lifecycle. Validate sampling moments, overdispersion, reproducibility and the
-multinomial limit independently. Keep process-SD sensitivity and multiple-start
-checks; derived/forecast uncertainty needs separate propagation and calibration.
+**Implemented.** [simulate_fims.R](../R/simulate_fims.R) appends the opt-in
+`composition_likelihood` argument to simulation/forecasting, reusing the existing
+fleet/type concentration configuration and nominal-count contract. It draws a
+Dirichlet probability vector and multinomial counts, using log-gamma normalization
+for small shapes. Structural zeros, zero-size count rows, missing designs and
+conditional history are handled explicitly. Unrepresentable shapes are rejected,
+not clamped. Metadata records supplied concentration; no parameter-uncertainty
+draw is implied. Unspecified/default compositions keep the legacy path.
+
+Scientific precedent: [SS3 composition errors](https://nmfs-ost.github.io/ss3-doc/SS330_User_Manual_release.html)
+for the DM observation family. Gamma sampling, RNG scheduling, native lifecycle
+and API integration are FIMS-specific engineering using existing R facilities;
+no SS3 sampling code or numerical equivalence is claimed. No new dependency or
+C++ implementation was added.
+
+[Tests](../tests/testthat/test-dm-simulation.R) cover moments/covariance,
+multinomial limit, small shapes/zeros, counts, missing designs, continuation,
+per-type ownership, caller RNG, process-path equality and native restoration.
+The focused regression run passed 45 tests / 383 assertions with no failures,
+warnings or skips; complete default output matched `bc18046` in a separate
+three-replicate/four-year check. See [architecture/API details](stochastic-process-architecture.md#production-dm-observation-simulation)
+and [help source](../man/simulate_fims.Rd). Existing weak M-variance and basin
+findings remain; a correct generative sampler does not establish calibration.
+
+## Next task: production simulate/refit integration validation
+
+**Planned.** Use the new public DM sampler in a controlled assessment integration
+benchmark, compare its distributional behavior with the independent stress
+generator, and check matched likelihoods at supplied/estimated concentration.
+Retain process-SD sensitivity, failed fits, bounds and multiple starts. Forecast
+and derived-quantity uncertainty still require separate parameter propagation
+and coverage validation; do not infer them from fixed-parameter observation draws.
 
 ## Maintenance contract
 

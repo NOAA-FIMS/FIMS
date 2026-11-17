@@ -12,7 +12,8 @@ for current scope, commit history and platform attribution.
 Implemented on this branch: opt-in IID/AR1 recruitment, process-aware simulation
 and conditional forecasting, annual fleet log-F random walks and shared innovation
 SD groups, independent age-specific annual log-M random walks and mortality-aware
-simulation, and opt-in Dirichlet-multinomial composition inference. A benchmark
+simulation, and opt-in Dirichlet-multinomial composition inference and observation
+simulation. A benchmark
 snapshot pathway preserves local fitted modes across uncertainty reconstruction.
 Selectivity process extensions, multivariate covariance, latent older-age abundance
 states, generalized partitions and a new backend are not completed by these changes.
@@ -26,11 +27,13 @@ universal improvement and weak M-variance information/basin sensitivity remain.
 Concentration traces show only modest local coupling with M SD in these cases.
 These are local diagnostics, not operational calibration or global-mode proof.
 
-**Next: production DM observation simulation**, with independent sampling-moment,
-count/zero/missing/RNG and multinomial-limit validation. Keep process-variance
-sensitivity and multiple starts; derived/forecast uncertainty remains a separate
-propagation/calibration task. The [ledger](scientific-capability-change-log.md#next-task-production-dm-observation-simulation)
-records status and attribution. Upgrades are committed after validation at the
+Production DM observation simulation is now implemented through the same optional
+fleet/type configuration, with analytical sampling checks and preserved default
+behavior. **Next: public-simulator/matched-likelihood integration validation**,
+including comparison with the independent stress generator. Keep process-variance
+sensitivity, bounds and multiple starts. Parameter propagation and derived/forecast
+coverage remain separate tasks. The [ledger](scientific-capability-change-log.md#next-task-production-simulaterefit-integration-validation)
+records evidence and attribution. Upgrades are committed after validation at the
 user's request; pushes remain separate authorized actions.
 
 ## Prioritization
@@ -52,7 +55,7 @@ assessment has enough information to estimate another variance or correlation.
 | 4 | Multivariate and separable age-year covariance | High / broad | Medium–large | Density extensions plus explicit axis metadata | 3; validated indexing | Dense covariance oracle, dimension checks, positive-definite parameterization and measured factorization costs. |
 | 5 | Latent abundance-at-age transition model | High / state-space assessments | Large | Requires state storage and transition changes | 1–4 as needed, not every covariance option mandatory | Cohort/plus-group recovery, deterministic-mode equivalence, pinned WHAM/SAM comparisons. |
 | Parallel A | Fractional-year survey timing | High / surveys | Small–medium | Local observation-operator extension | Defined year/rate units | Analytical tau=0/0.5/1 results and unchanged default timing. |
-| Parallel B | Dirichlet-multinomial inference implemented; broader validation/simulation remain | High / integrated assessment | Medium | Existing likelihood/parser extension points | Composition count/sample-size contract | Multinomial limit, dispersion recovery, zero handling and sensitivity. |
+| Parallel B | Dirichlet-multinomial inference/simulation implemented; broader uncertainty validation remains | High / integrated assessment | Medium | Existing likelihood/parser extension points | Composition count/sample-size contract | Multinomial limit, dispersion recovery, zero handling and sensitivity. |
 | Later 1 | Environmental predictors, then covariate observation error | Medium / ecosystem applications | Medium–large | Needs shared predictors and latent covariate module | Process layer; lag and missing-year semantics | beta=0 limit; covariate/state recovery and predictive checks. |
 | Later 2 | Fixed productivity regimes and richer biological means | Medium / changing productivity | Medium | Recruitment mean extension | Explicit regime maps and reference-point definitions | One-regime limit, boundary-year checks, identifiable parameters. |
 | Later 3 | Sex/area/season partitions and movement | Medium overall; high for particular stocks | Large | Empty Subpopulation and pooled-growth constraints need substantial work | State/index contract and process schedule | Mass conservation, pooled limits and consistent observation aggregation. |
@@ -262,3 +265,13 @@ with modest concentration movement and interior correlations. This supports
 variance-sensitivity reporting and checked starts, without adding covariance or
 priors merely to force an interior estimate. Next add production DM observation
 simulation as a separate capability; retain interval calibration as open work.
+
+
+Production DM composition sampling is now available through `simulate_fims()` and
+`forecast_fims()` using the existing concentration override. Structural zeros,
+small-shape stability, count units, valid missing designs and conditional history
+are covered. The 45-test / 383-assertion focused regression run passes, and a
+seeded legacy comparison preserves complete default output. This closes the
+observation-generation gap, without resolving weak process-variance information
+or providing parameter/forecast uncertainty. Next validate public simulate/refit
+integration against the independent benchmark generator and matched likelihoods.

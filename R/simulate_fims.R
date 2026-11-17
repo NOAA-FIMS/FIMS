@@ -40,6 +40,10 @@
 #'   Zero innovations continue its last log-M level; whole-series normal draws
 #'   use the declared initial distribution independently at each age. Zero
 #'   innovations give natural-scale medians, not arithmetic mean M or biomass.
+#' @param composition_likelihood Optional fleet/type DM specifications, as in
+#'   [initialize_fims()]. Supply concentration values explicitly, including fitted
+#'   values when desired; simulation holds them fixed regardless of estimation role.
+#'   `NULL` retains multinomial compositions.
 #' @param observation_error Draw observation noise when `TRUE`. Otherwise return
 #'   model predictions (lognormal medians) in the simulated column.
 #' @return A list with configuration, RNG metadata and `replicates`. Each replicate
@@ -53,13 +57,26 @@
 #' @details
 #' The supported scope is one population with IID/AR1 Gaussian recruitment,
 #' optional independent random walks on annual fleet log-F and age-specific log-M,
-#' normal/lognormal catch and index data, and multinomial compositions. Other
+#' normal/lognormal catch and index data, and multinomial or Dirichlet-multinomial
+#' compositions. Other
 #' parameters and latent processes are fixed. Initial abundance is conditional;
 #' the existing extra terminal report year uses mean recruitment. All process
 #' paths are drawn before observations, so toggling observation error preserves
 #' trajectories under the same seed. This function rebuilds the active native
 #' model, like [initialize_fims()]; stored fits remain readable, but their live
 #' TMB methods should not be reused after another model is initialized.
+#'
+#' DM draws mix multinomial probabilities with a Dirichlet distribution having
+#' shapes `concentration * probability`. Structural-zero bins remain zero. Missing
+#' observations can be generated when a complete sampling design is declared;
+#' missing designs are not invented. Count data use their observed integer total
+#' or the declared size when observations are missing. Proportion data use the
+#' declared integer size. Fractional-count likelihood weights are not a sampling
+#' distribution. Zero-size count rows remain zero. With no observation error,
+#' DM and multinomial observation expectations coincide. Changing observation
+#' families can change subsequent observation draws, but not the process paths
+#' under the same seed and number of replicates. Extreme positive shapes that
+#' cannot be represented numerically are rejected rather than clamped.
 #'
 #' [forecast_fims()] uses the same evaluator with an explicit continuation year.
 #' Future model years, growth and other inputs must already be configured.
@@ -81,7 +98,8 @@ simulate_fims <- function(parameters, data, recruitment_process,
                           process_mode = c("simulate", "fixed", "mean"),
                           observation_error = TRUE, fishing_process = NULL,
                           fishing_mode = process_mode,
-                          mortality_process = NULL, mortality_mode = process_mode) {
+                          mortality_process = NULL, mortality_mode = process_mode,
+                          composition_likelihood = NULL) {
   process_mode <- match.arg(process_mode)
   fishing_mode <- match.arg(fishing_mode, c("simulate", "fixed", "mean"))
   mortality_mode <- match.arg(mortality_mode, c("simulate", "fixed", "mean"))
@@ -127,11 +145,13 @@ simulate_fims <- function(parameters, data, recruitment_process,
   fishing_first <- if (whole_series) 0L else from_year - get_start_year(data)
   observation_from <- if (whole_series) get_start_year(data) else from_year
   target <- unique(recruitment_rows$label)
-  design <- simulation_observation_design(data)
+  composition <- normalize_composition_likelihood(composition_likelihood, data)
+  design <- simulation_observation_design(data, composition)
   initialized <- initialize_fims(
     parameters, data, recruitment_process = process,
     fishing_process = if (length(fishing)) fishing else NULL,
-    mortality_process = mortality
+    mortality_process = mortality,
+    composition_likelihood = if (length(composition)) composition else NULL
   )
   baseline <- initialized$model$evaluate_recruitment_path(numeric(), target)
   residuals <- if (target == "log_r") baseline$target - baseline$log_mean else baseline$target
@@ -241,6 +261,7 @@ simulate_fims <- function(parameters, data, recruitment_process,
     rng = list(seed = seed, kind = RNGkind(), initial_state = rng_state),
     replicates = replicates
   )
+  if (length(composition)) result$configuration$composition_likelihood <- composition
   if (length(fishing)) {
     result$configuration$fishing_process <- fishing
     result$configuration$fishing_mode <- fishing_mode
@@ -266,15 +287,17 @@ forecast_fims <- function(parameters, data, recruitment_process, from_year,
                           process_mode = c("simulate", "fixed", "mean"),
                           observation_error = TRUE, fishing_process = NULL,
                           fishing_mode = process_mode,
-                          mortality_process = NULL, mortality_mode = process_mode) {
+                          mortality_process = NULL, mortality_mode = process_mode,
+                          composition_likelihood = NULL) {
   simulate_fims(parameters, data, recruitment_process, nsim, seed, from_year,
                  match.arg(process_mode), observation_error,
                  fishing_process = fishing_process, fishing_mode = fishing_mode,
-                 mortality_process = mortality_process, mortality_mode = mortality_mode)
+                 mortality_process = mortality_process, mortality_mode = mortality_mode,
+                 composition_likelihood = composition_likelihood)
 }
 
 # Resolve observation layout once; use the same fleet-specific bins as setup.
-simulation_observation_design <- function(data) {
+simulation_observation_design <- function(data, composition = list()) {
   rows <- get_data(data) |>
     dplyr::filter(.data$type %in% c("catch", "index", "age_comp", "length_comp"))
   parsed <- parse_data_distribution(rows$uncertainty)
@@ -307,6 +330,14 @@ simulation_observation_design <- function(data) {
   if (any(comp & !is.na(rows$family) & rows$family != "dmultinom") ||
       any(!comp & rows$family %in% "dmultinom")) {
     cli::cli_abort("Simulation requires multinomial compositions and normal/lognormal scalar observations.")
+  }
+  if (length(composition)) {
+    rows$concentration <- NA_real_
+    for (fleet in names(composition)) for (type in names(composition[[fleet]])) {
+      idx <- rows$fleet == fleet & rows$type == type
+      rows$family[idx] <- "dirichlet_multinomial"
+      rows$concentration[idx] <- composition[[fleet]][[type]]$concentration
+    }
   }
   rows
 }
@@ -389,10 +420,46 @@ simulation_observations <- function(snapshot, design, from_year, noise) {
       out$status[idx] <- "missing_uncertainty"
       next
     }
-    counts <- if (noise) as.numeric(stats::rmultinom(1, size, probability)) else size * probability
+    counts <- if (!noise) size * probability else if (
+      all(out$family[idx] == "dirichlet_multinomial")) {
+      simulation_dm_counts(size, probability, unique(out$concentration[idx]))
+    } else as.numeric(stats::rmultinom(1, size, probability))
     out$simulated[idx] <- if (count_units) counts else counts / size
     out$observation_mean[idx] <- if (count_units) size * probability else probability
     out$status[idx] <- if (noise) "simulated" else "expected"
   }
   out
+}
+
+# Gamma normalization in log space avoids all-zero draws for small shapes.
+# G(alpha) = G(alpha+1) * U^(1/alpha), independently, for alpha <= 1.
+simulation_dm_counts <- function(size, probability, concentration) {
+  if (length(size) != 1L || !is.finite(size) || size < 0 ||
+      size != floor(size) || size > .Machine$integer.max ||
+      length(concentration) != 1L || !is.finite(concentration) || concentration <= 0 ||
+      !length(probability) || any(!is.finite(probability)) || any(probability < 0) ||
+      abs(sum(probability) - 1) > 1e-6) {
+    cli::cli_abort("DM sampling requires integer size within R's range, positive finite concentration and normalized probabilities.")
+  }
+  probability <- probability / sum(probability)
+  positive <- which(probability > 0)
+  counts <- numeric(length(probability))
+  if (size == 0) return(counts)
+  if (length(positive) == 1L) {
+    counts[positive] <- size
+    return(counts)
+  }
+  shape <- concentration * probability[positive]
+  if (any(!is.finite(shape) | shape <= 0))
+    cli::cli_abort("DM sampling shapes are outside the representable positive range.")
+  small <- shape <= 1
+  log_gamma <- numeric(length(shape))
+  log_gamma[small] <- log(stats::rgamma(sum(small), shape[small] + 1)) +
+    log(stats::runif(sum(small))) / shape[small]
+  log_gamma[!small] <- log(stats::rgamma(sum(!small), shape[!small]))
+  if (any(!is.finite(log_gamma)))
+    cli::cli_abort("DM gamma draws are outside the representable log range.")
+  weights <- exp(log_gamma - max(log_gamma))
+  counts[positive] <- as.numeric(stats::rmultinom(1, size, weights / sum(weights)))
+  counts
 }

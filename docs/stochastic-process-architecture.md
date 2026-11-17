@@ -1036,3 +1036,62 @@ intervals, global optimization, or a new covariance structure. The fixed grid an
 initializations are deliberately limited; local Wald correlations must be read
 with report eligibility and boundary flags. See the [profile pilot](../tests/integration/process-recovery/dm-profile-pilot/README.md)
 for controls, source provenance and results. Production interfaces are unchanged.
+
+## Production DM observation simulation
+
+`simulate_fims()` and `forecast_fims()` now accept the same optional
+`composition_likelihood` fleet/type configuration as `initialize_fims()`:
+
+```r
+simulation <- simulate_fims(
+  parameters, data, recruitment_process = list(type = "iid"), seed = 123,
+  composition_likelihood = list(fleet1 = list(age_comp = list(
+    type = "dirichlet_multinomial", concentration = 200
+  )))
+)
+```
+
+Only configured fleet/types use DM errors. Unspecified compositions retain the
+multinomial sampler; `NULL` retains the pre-change output layout and random stream.
+Concentrations are supplied values (including fitted values when explicitly
+provided), not draws from parameter uncertainty. Estimation roles do not cause
+optimization or covariance draws inside the simulator. The normalized
+configuration is saved, with family/concentration metadata in observation rows
+when DM overrides exist. Uncertainty formulas still declare nominal sample size;
+there is no new distribution DSL family.
+
+For positive predicted categories, draw independent `G_i ~ Gamma(kappa*p_i, 1)`,
+normalize to `q_i = G_i/sum(G)`, then draw `x ~ Multinomial(n, q)`. This gives
+`E[x_i] = n*p_i` and `Var[x_i] = n*p_i*(1-p_i)*(n+kappa)/(1+kappa)`, with analogous
+negative cross-category covariance. Gamma normalization uses log weights; for
+shape at most one it uses the identity
+`log G(a) = log G(a+1) + log U/a`. This avoids an all-zero gamma vector at small
+concentration. Structural-zero probabilities are excluded from gamma draws and
+remain zero; no pseudocount or silent concentration clamp is used. Numerically
+unrepresentable positive shapes/log draws raise an error. Sampling uses integer
+sizes within R's multinomial range; fractional likelihood weights do not define
+a sampling PMF.
+
+Count rows use their complete observed total, or their declared size when
+observations are missing. Proportions use the declared sample size. A zero-size
+count row is deterministic zero. Missing observations with a valid design can be
+generated; missing sampling designs remain labeled `missing_uncertainty`. This
+preserves the simulator's established generation contract and differs from a
+likelihood dropping an incomplete observed row. Explicit continuation years retain
+earlier observed rows. Without observation noise, DM gives the same observation
+expectations as multinomial.
+
+Recruitment/F/M paths are drawn before all observation noise, so changing family
+or toggling observation noise preserves those paths under the same seed/replicate
+count. It can change subsequent observation draws. Existing seeded caller-RNG
+restoration and native target restoration apply. No C++ path evaluator or fitting
+policy changes. This completes a generative observation pathway, not forecast
+parameter-uncertainty propagation or assessment calibration.
+
+The new tests in `tests/testthat/test-dm-simulation.R` check analytical means,
+variances and cross-category covariance, the large-concentration limit, small
+shapes, zeros, count/missing/conditioning rules, fleet/type ownership, seeded
+reproducibility, native target restoration and public continuation. The focused
+simulation/likelihood/RW regression run passed 45 tests / 383 assertions without
+failures, warnings or skips. A separate three-replicate, four-year check found
+complete default output identical to the simulator at `bc18046`.

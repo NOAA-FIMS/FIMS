@@ -17,7 +17,8 @@ simulate_fims(
   fishing_process = NULL,
   fishing_mode = process_mode,
   mortality_process = NULL,
-  mortality_mode = process_mode
+  mortality_mode = process_mode,
+  composition_likelihood = NULL
 )
 
 forecast_fims(
@@ -32,7 +33,8 @@ forecast_fims(
   fishing_process = NULL,
   fishing_mode = process_mode,
   mortality_process = NULL,
-  mortality_mode = process_mode
+  mortality_mode = process_mode,
+  composition_likelihood = NULL
 )
 }
 \arguments{
@@ -83,6 +85,11 @@ defaulting to \code{process_mode}. Continuations retain each age's earlier state
 Zero innovations continue its last log-M level; whole-series normal draws
 use the declared initial distribution independently at each age. Zero
 innovations give natural-scale medians, not arithmetic mean M or biomass.}
+
+\item{composition_likelihood}{Optional fleet/type DM specifications, as in
+\code{\link[=initialize_fims]{initialize_fims()}}. Supply concentration values explicitly, including fitted
+values when desired; simulation holds them fixed regardless of estimation role.
+\code{NULL} retains multinomial compositions.}
 }
 \value{
 A list with configuration, RNG metadata and \code{replicates}. Each replicate
@@ -103,13 +110,26 @@ simulation from a configuration, not a draw from a fitted posterior.
 \details{
 The supported scope is one population with IID/AR1 Gaussian recruitment,
 optional independent random walks on annual fleet log-F and age-specific log-M,
-normal/lognormal catch and index data, and multinomial compositions. Other
+normal/lognormal catch and index data, and multinomial or Dirichlet-multinomial
+compositions. Other
 parameters and latent processes are fixed. Initial abundance is conditional;
 the existing extra terminal report year uses mean recruitment. All process
 paths are drawn before observations, so toggling observation error preserves
 trajectories under the same seed. This function rebuilds the active native
 model, like \code{\link[=initialize_fims]{initialize_fims()}}; stored fits remain readable, but their live
 TMB methods should not be reused after another model is initialized.
+
+DM draws mix multinomial probabilities with a Dirichlet distribution having
+shapes \code{concentration * probability}. Structural-zero bins remain zero. Missing
+observations can be generated when a complete sampling design is declared;
+missing designs are not invented. Count data use their observed integer total
+or the declared size when observations are missing. Proportion data use the
+declared integer size. Fractional-count likelihood weights are not a sampling
+distribution. Zero-size count rows remain zero. With no observation error,
+DM and multinomial observation expectations coincide. Changing observation
+families can change subsequent observation draws, but not the process paths
+under the same seed and number of replicates. Extreme positive shapes that
+cannot be represented numerically are rejected rather than clamped.
 
 \code{\link[=forecast_fims]{forecast_fims()}} uses the same evaluator with an explicit continuation year.
 Future model years, growth and other inputs must already be configured.
