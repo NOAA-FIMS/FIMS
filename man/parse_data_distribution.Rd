@@ -27,7 +27,8 @@ Parameters that do not apply to a non-missing specification are represented
 by \code{NA}. Missing specifications use \code{NA_character_} for the family and link,
 \code{NA} for central parameters, and \code{1} for ancillary parameters. These neutral
 ancillary values prevent missing observations from introducing \code{NA} into
-vectorized likelihood calculations.
+vectorized likelihood calculations. \code{\link[=initialize_data_distribution]{initialize_data_distribution()}} skips
+these rows when it reads the multinomial offsets.
 }
 \description{
 Parse one-sided formula-like distribution specifications and return their
@@ -61,7 +62,10 @@ arguments remain unnamed.
 Parameter values are returned as language objects rather than evaluated
 numeric vectors. This preserves references to symbols in the calling
 environment (for example, \code{catch_expected}) so evaluation can occur later
-in a context where those objects exist.
+in a context where those objects exist. The multinomial \code{offset_expected}
+and \code{offset_observed} are the exception: they are evaluated in the base
+environment and checked here, so an expression such as \code{1/1000} returns its
+value and a variable name is an error.
 }
 \examples{
 FIMS:::parse_data_distribution(

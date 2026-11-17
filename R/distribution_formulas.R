@@ -126,9 +126,11 @@ check_distribution_validity <- function(args) {
 #'   `r eval(formals(initialize_data_distribution)[["data_type"]])[1]`.
 #' @param uncertainty A vector of strings specifying formulas for each data
 #'   point. See [FIMSFrame()] for more information on what the formula should
-#'   look like.
+#'   look like. For `dmultinom()`, all formulas must give the same
+#'   `offset_expected` and the same `offset_observed`. See
+#'   `vignette("fims-input-data", package = "FIMS")`.
 #' @return
-#' A reference class. is returned. Use [methods::show()] to view the various
+#' A reference class is returned. Use [methods::show()] to view the various
 #' Rcpp class fields, methods, and documentation.
 #' @keywords distribution
 #' @export
@@ -176,6 +178,60 @@ initialize_data_distribution <- function(
       unlist(uncertainty_split[[ancillary_parameter]], use.names = FALSE)
     )
     new_module$log_sd$set_estimation_types("constant")
+  }
+  if ("offset_expected" %in% names(new_module)) {
+    # Rows without a formula hold placeholder values, so only rows with a
+    # formula set the offsets.
+    has_formula <- !is.na(uncertainty_split[["family"]])
+    default_offset <- 1e-5
+    offsets <- c(
+      offset_expected = default_offset,
+      offset_observed = default_offset
+    )
+    for (offset_name in names(offsets)) {
+      offset <- unlist(
+        uncertainty_split[[offset_name]][has_formula],
+        use.names = FALSE
+      )
+      offset <- unique(dplyr::coalesce(offset, default_offset))
+      if (length(offset) > 1) {
+        cli::cli_abort(c(
+          "x" = "The {.val {data_type}} formulas for fleet
+          {.val {module$GetName()}} give more than 1 value of
+          {.var {offset_name}}: {.val {offset}}.",
+          "i" = "Each fleet takes 1 {.var {offset_name}} per composition
+          type. A formula without {.var {offset_name}} uses
+          {.val {default_offset}}.",
+          "i" = "Check the formulas with {.code dplyr::filter(data, fleet ==
+          \"{module$GetName()}\", type == \"{data_type}\") |>
+          dplyr::distinct(uncertainty)}."
+        ))
+      }
+      offsets[[offset_name]] <- offset
+    }
+    # An expected offset alone is common in assessment models, so only an
+    # observed offset that differs from the expected one warns.
+    # scale = max(offsets) makes the comparison relative, so offsets near 0
+    # that differ still warn.
+    if (offsets[["offset_observed"]] > 0 &&
+      !isTRUE(all.equal(
+        offsets[["offset_expected"]],
+        offsets[["offset_observed"]],
+        scale = max(offsets)
+      ))) {
+      cli::cli_warn(c(
+        "!" = "The {.val {data_type}} formulas for fleet
+        {.val {module$GetName()}} use {.var offset_expected} =
+        {.val {offsets[['offset_expected']]}} and {.var offset_observed} =
+        {.val {offsets[['offset_observed']]}}.",
+        "i" = "An observed offset that differs from the expected offset
+        moves the best fit away from the observed proportions.",
+        "i" = "Use the same value for both, or {.code offset_observed = 0}
+        for an expected offset alone."
+      ))
+    }
+    new_module$offset_expected[] <- offsets[["offset_expected"]]
+    new_module$offset_observed[] <- offsets[["offset_observed"]]
   }
 
   # setup link to observed data

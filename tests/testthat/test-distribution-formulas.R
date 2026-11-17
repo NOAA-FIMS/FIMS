@@ -115,6 +115,35 @@ test_that("`initialize_data_distribution()` works with correct inputs", {
       glue::glue("~dlnorm(meanlog = log_index_expected, sdlog = {fleet_sd[1]})")
     )$log_sd[1]$value
   )
+  default_offsets <- initialize_data_distribution(
+    module = fishing_fleet,
+    data_type = "age_comp",
+    uncertainty = c(NA, "~dmultinom(prob = agecomp_proportion, size = 10)")
+  )
+  #' @description Test that `initialize_data_distribution()` sets both multinomial offsets to 1e-5 when the formulas omit them, ignoring rows without a formula.
+  expect_equal(
+    c(
+      default_offsets$offset_expected$get_values(),
+      default_offsets$offset_observed$get_values()
+    ),
+    c(1e-5, 1e-5)
+  )
+  given_offsets <- initialize_data_distribution(
+    module = fishing_fleet,
+    data_type = "age_comp",
+    uncertainty = rep(
+      "~dmultinom(prob = agecomp_proportion, size = 10, offset_expected = 0.001, offset_observed = 0)",
+      2
+    )
+  )
+  #' @description Test that `initialize_data_distribution()` uses the multinomial offsets given in the formulas.
+  expect_equal(
+    c(
+      given_offsets$offset_expected$get_values(),
+      given_offsets$offset_observed$get_values()
+    ),
+    c(0.001, 0)
+  )
 })
 
 ## Edge handling ----
@@ -215,6 +244,58 @@ test_that("`initialize_data_distribution()` returns correct error messages", {
       data_type = "age_comp"
     ),
     "argument .*uncertainty.* is missing"
+  )
+
+  #' @description Test that error is thrown when the multinomial formulas of one fleet give more than 1 value of an offset.
+  expect_error(
+    initialize_data_distribution(
+      module = fishing_fleet,
+      data_type = "age_comp",
+      uncertainty = c(
+        "~dmultinom(prob = agecomp_proportion, size = 10, offset_observed = 0.001)",
+        "~dmultinom(prob = agecomp_proportion, size = 10)"
+      )
+    ),
+    "more than 1 value of `offset_observed`"
+  )
+
+  #' @description Test that a warning is given when both multinomial offsets are above 0 and differ.
+  expect_warning(
+    initialize_data_distribution(
+      module = fishing_fleet,
+      data_type = "age_comp",
+      uncertainty = "~dmultinom(prob = agecomp_proportion, size = 10, offset_expected = 0.001)"
+    ),
+    "moves the best fit away from the observed proportions"
+  )
+
+  #' @description Test that a warning is given for offsets that differ by less than the default all.equal() tolerance.
+  expect_warning(
+    initialize_data_distribution(
+      module = fishing_fleet,
+      data_type = "age_comp",
+      uncertainty = "~dmultinom(prob = agecomp_proportion, size = 10, offset_expected = 0, offset_observed = 1e-8)"
+    ),
+    "moves the best fit away from the observed proportions"
+  )
+
+  #' @description Test that a warning is given for an observed offset with an expected offset of 0.
+  expect_warning(
+    initialize_data_distribution(
+      module = fishing_fleet,
+      data_type = "age_comp",
+      uncertainty = "~dmultinom(prob = agecomp_proportion, size = 10, offset_expected = 0)"
+    ),
+    "moves the best fit away from the observed proportions"
+  )
+
+  #' @description Test that no warning is given for an expected offset with an observed offset of 0.
+  expect_no_warning(
+    initialize_data_distribution(
+      module = fishing_fleet,
+      data_type = "age_comp",
+      uncertainty = "~dmultinom(prob = agecomp_proportion, size = 10, offset_observed = 0)"
+    )
   )
   clear()
 })

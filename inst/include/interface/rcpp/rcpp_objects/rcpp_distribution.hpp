@@ -9,6 +9,7 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_DISTRIBUTION_HPP
 
+#include <cmath>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -943,6 +944,16 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
    */
   RealVector dims;
   /**
+   * @brief Constant added to each expected proportion, 0 by default, see
+   * fims_distributions::MultinomialLPMF.
+   */
+  RealVector offset_expected;
+  /**
+   * @brief Constant added to each observed proportion, 0 by default, see
+   * fims_distributions::MultinomialLPMF.
+   */
+  RealVector offset_observed;
+  /**
    * @brief Vector that records the individual log probability function for each
    * observation.
    */
@@ -974,6 +985,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
         observed_values(other.observed_values),
         expected_values(other.expected_values),
         dims(other.dims),
+        offset_expected(other.offset_expected),
+        offset_observed(other.offset_observed),
         lpdf_vec(other.lpdf_vec),
         notes(other.notes) {}
 
@@ -1022,11 +1035,29 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
   void set_note(std::string note) { this->notes.set(note); }
 
   /**
+   * @brief Throws if an offset is not a single finite value of 0 or more.
+   * @details R checks the offsets in the formula, but not when they are set
+   * on this object directly.
+   * @param name The name of the offset, for the error message.
+   * @param offset The offset to check.
+   */
+  void check_offset(const std::string &name, RealVector &offset) {
+    if (offset.size() != 1 || !std::isfinite(offset[0]) || offset[0] < 0.0) {
+      std::string message = "DmultinomDistribution: " + name +
+                            " must be a single finite number of 0 or more.";
+      FIMS_ERROR_LOG(message);
+      throw std::invalid_argument(message);
+    }
+  }
+
+  /**
    * @brief
    *
    * @return double
    */
   virtual double evaluate() {
+    this->check_offset("offset_expected", this->offset_expected);
+    this->check_offset("offset_observed", this->offset_observed);
     fims_distributions::MultinomialLPMF<double> dmultinom;
     // Declare TMBVector in this scope
     dmultinom.observed_values.resize(this->observed_values.size());
@@ -1040,6 +1071,8 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
     dmultinom.dims.resize(2);
     dmultinom.dims[0] = this->dims[0];
     dmultinom.dims[1] = this->dims[1];
+    dmultinom.offset_expected = this->offset_expected[0];
+    dmultinom.offset_observed = this->offset_observed[0];
     return dmultinom.evaluate();
   }
 
@@ -1191,6 +1224,10 @@ class DmultinomDistributionsInterface : public DistributionsInterfaceBase {
       distribution->expected_values[i] =
           this->expected_values[i].initial_value_m;
     }
+    this->check_offset("offset_expected", this->offset_expected);
+    this->check_offset("offset_observed", this->offset_observed);
+    distribution->offset_expected = this->offset_expected[0];
+    distribution->offset_observed = this->offset_observed[0];
 
     info->density_components[distribution->id] = distribution;
     return true;
