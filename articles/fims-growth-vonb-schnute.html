@@ -140,6 +140,24 @@ growth coefficient,
 In this example, the following three Growth parameters are estimated: -
 <code>mean_length_young</code> - <code>mean_length_old</code> -
 <code>growth_coefficient</code></p>
+<p>The model requires the older reference length to be larger than the
+younger reference length. You may either fix or estimate each reference
+length. During optimization, FIMS uses internal transformations to keep
+the reference lengths in that order. If older length is estimated, FIMS
+estimates a positive difference from younger length, then sets
+<code>older length = younger length + difference</code>. If older length
+is fixed and younger length is estimated, FIMS constrains younger length
+to remain below the fixed older length. Supply starting values in
+physical length units; finalized Growth parameter estimates are also
+reported in those units.</p>
+<p>This parameterization supports increasing growth curves that approach
+a plateau. When the difference between the two reference lengths is
+extremely small, the model may calculate them as equal because of
+rounding.</p>
+<p>When older length is estimated, its internal working value represents
+the logarithm of the length difference, not the logarithm of older
+length. This distinction matters when interpreting raw optimizer output
+or attaching distributions to working-scale parameters.</p>
 <p>FIMS uses the fitted growth curve and supplied variability in
 length-at-age to prepare mean length-at-age, standard deviation of
 length-at-age, mean weight-at-age, and the growth-derived age-to-length
@@ -157,7 +175,11 @@ length at the younger and older reference ages. These SDs use the same
 length units as the growth inputs. Their <code>age</code> entries are
 <code>NA</code> because their ages come from
 <code>reference_age_for_length_young</code> and
-<code>reference_age_for_length_old</code>.</p>
+<code>reference_age_for_length_old</code>. Between the two reference
+ages, SD is interpolated linearly with mean length. Before the younger
+reference age, SD stays at <code>length_at_age_sd_young</code>; after
+the older reference age, it stays at <code>length_at_age_sd_old</code>.
+Mean length continues to follow the growth curve.</p>
 <blockquote>
 <p>Note: The delta-method variability pathway is wired into FIMS, but it
 is not used here because it depends on using von Bertalanffy growth,
@@ -268,14 +290,11 @@ and are not passed to FIMS as model inputs.</p>
 <span>      reference_age_for_length_old <span class="op">=</span> <span class="va">reference_age_for_length_old</span></span>
 <span>    <span class="op">)</span>,</span>
 <span>    true_sd_length <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/approxfun.html" class="external-link">approx</a></span><span class="op">(</span></span>
-<span>      x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>        <span class="va">reference_age_for_length_young</span>,</span>
-<span>        <span class="va">reference_age_for_length_old</span></span>
-<span>      <span class="op">)</span>,</span>
+<span>      x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean_length_young</span>, <span class="va">mean_length_old</span><span class="op">)</span>,</span>
 <span>      y <span class="op">=</span> <span class="va">sd_at_reference_ages</span>,</span>
-<span>      xout <span class="op">=</span> <span class="va">ages</span>,</span>
+<span>      xout <span class="op">=</span> <span class="va">true_mean_length</span>,</span>
 <span>      rule <span class="op">=</span> <span class="fl">2</span></span>
-<span>    <span class="op">)</span><span class="op">$</span><span class="va">y</span></span>
+<span>    <span class="op">)</span><span class="op">[[</span><span class="st">"y"</span><span class="op">]</span><span class="op">]</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>      true_weight_at_age <span class="op">=</span></span>
@@ -649,7 +668,7 @@ growth to fleet length bins.</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Starting optimization ...</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Restarting optimizer 5 times to improve gradient.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00055</span> to <span style="color: #0000BB;">7e-05</span> after 5 steps.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient went from <span style="color: #0000BB;">0.00042</span> to <span style="color: #0000BB;">1e-04</span> after 5 steps.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished optimization</span></span>
 <span><span class="co">#&gt; Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -674,13 +693,13 @@ growth to fleet length bins.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Convergence: <span style="color: #0000BB;">"NOTE"</span> from <span style="color: #0000BB;">"sdreport"</span>. Use `sanity_fims(fit)` to see each</span></span>
 <span><span class="co">#&gt;   check.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> FIMS model version: <span style="color: #0000BB;">0.11.0.9000</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">5.20386</span> seconds</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Total run time was <span style="color: #0000BB;">2.66017</span> minutes</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Number of parameters: fixed_effects=39, random_effects=1, and total=40</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">7e-05</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Maximum gradient= <span style="color: #0000BB;">1e-04</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Negative log likelihood (NLL):</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">186.44652</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">44.18449</span></span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">22138.63892</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Marginal NLL= <span style="color: #0000BB;">186.26673</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Total NLL= <span style="color: #0000BB;">-167.70569</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Terminal SB= <span style="color: #0000BB;">1393517.87869</span></span></span>
 <span></span>
 <span><span class="co"># Keep only the core VonBertalanffySchnute Growth estimates.</span></span>
 <span><span class="va">growth_estimates</span> <span class="op">&lt;-</span> <span class="fu">FIMS</span><span class="fu">::</span><span class="fu"><a href="../reference/get_FIMSFit.html">get_estimates</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -705,9 +724,9 @@ used to generate the data:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 4</span></span></span>
 <span><span class="co">#&gt;   label               input estimated true_value</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> mean_length_young  150      179.        180   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> growth_coefficient   0.22     0.182       0.18</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> mean_length_old    800      848.        850</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> mean_length_young  150      180.        180   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> growth_coefficient   0.22     0.180       0.18</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> mean_length_old    800      850.        850</span></span></code></pre></div>
 <p>Check both the optimizer convergence code and the maximum
 gradient:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -718,7 +737,7 @@ gradient:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   convergence max_gradient</span></span>
 <span><span class="co">#&gt;         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>           0    0.000<span style="text-decoration: underline;">066</span>3</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>           0    0.000<span style="text-decoration: underline;">099</span>4</span></span></code></pre></div>
 <p>A convergence code of <code>0</code> indicates normal optimizer
 convergence. The maximum gradient should also be small. These
 diagnostics should be considered together with whether the estimated
@@ -868,7 +887,7 @@ from the fitted parameters and is for visualization only.</p>
 <span>    x <span class="op">=</span> <span class="st">"Age"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Length"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="fims-growth-vonb-schnute_files/figure-html/growth-curve-plot-1.png" class="r-plt" alt="Point and line plot comparing generated observed lengths-at-age with the true and fitted Schnute-parameterized von Bertalanffy growth curves, with the plotting range extended to show the implied asymptote." width="864"><p class="caption">
 Observed lengths-at-age, the true <code>VonBertalanffySchnute</code>
@@ -905,7 +924,7 @@ tracks the demo observations.</p>
 <span>    x <span class="op">=</span> <span class="st">"Age"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Observed minus predicted length"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="fims-growth-vonb-schnute_files/figure-html/growth-residual-plot-1.png" class="r-plt" alt="Residual plot with age on the x-axis and observed minus predicted length on the y-axis for the generated `VonBertalanffySchnute` example." width="768"><p class="caption">
 Residual plot showing observed minus predicted length-at-age for the
@@ -978,7 +997,7 @@ growth-derived age-to-length row for a representative age.</p>
 <span>    x <span class="op">=</span> <span class="st">"Fleet observation bin"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Probability"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/theme_noaa.html" class="external-link">theme_noaa</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="figure">
 <img src="fims-growth-vonb-schnute_files/figure-html/growth-size-handoff-plot-1.png" class="r-plt" alt="Bar plot of one realized growth-derived age-to-length row across fleet observation bins labeled by their lower edges for a representative age." width="768"><p class="caption">
 One realized growth-derived age-to-length row, showing how the fitted

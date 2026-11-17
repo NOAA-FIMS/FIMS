@@ -23,7 +23,10 @@ initialize_fims(parameters, data)
   It is the primary source of information for what is initialized. That
   is, if a fleet exists in the data but parameter information for how to
   specify selectivity for that fleet is not provided, then selectivity
-  will not be initialized for that fleet.
+  will not be initialized for that fleet. The rows of a parameter with
+  more than 1 value are used in order of `timing`, then `age`, then
+  `length`, not in the order they appear in the tibble. So each row
+  needs its own combination of `timing`, `age`, and `length`.
 
 - data:
 

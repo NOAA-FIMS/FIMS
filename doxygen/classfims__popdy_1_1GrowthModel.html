@@ -446,10 +446,10 @@ template&lt;typename Type&gt; </div>
 </table>
 </div><div class="memdoc">
 <p>Set the covariance values used by the delta-method growth variability path.</p>
-<p>The supplied covariance must match the current log-scale FIMS VonBertalanffySchnute estimation parameterization in this exact order:</p><ol type="1">
+<p>The supplied covariance describes variability in the physical growth parameters on log scales, in this exact order:</p><ol type="1">
 <li>log(mean_length_young)</li>
 <li>log(mean_length_old)</li>
-<li>log(growth_coefficient) </li>
+<li>log(growth_coefficient) These are not necessarily the optimizer's working scales. In particular, the second entry describes log older length, not log length difference. </li>
 </ol>
 
 </div>

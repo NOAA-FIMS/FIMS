@@ -250,12 +250,13 @@ uncertainty to a small number, like 0.001, so the catch data are fit
 closely. A catch of 0 means the fleet did not fish in that time step.
 <code><a href="../reference/setup_default_parameters.html">setup_default_parameters()</a></code> fixes <code>log_Fmort</code> for
 that fleet and year at -200, so fishing mortality is effectively 0, and
-the 0 is left out of the likelihood. It is reported as -999 in the
-output, the same as missing data. If you estimate <code>log_Fmort</code>
-in that year instead, <code><a href="../reference/initialize_fims.html">initialize_fims()</a></code> warns, because
-nothing in the data informs it. A fleet with a catch of 0 in every year
-and no composition data gives no information on its selectivity. Use
--999, not 0, for a missing catch.</p>
+the 0 is left out of the likelihood. It is reported as <code>NA</code>
+in the output, the same as missing data. If you estimate
+<code>log_Fmort</code> in that year instead,
+<code><a href="../reference/initialize_fims.html">initialize_fims()</a></code> warns, because nothing in the data
+informs it. A fleet with a catch of 0 in every year and no composition
+data gives no information on its selectivity. Use -999, not 0, for a
+missing catch.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># first three rows of the catch data</span></span>
 <span><span class="fu">FIMS</span><span class="fu">::</span><span class="va"><a href="../reference/data_big.html">data_big</a></span> <span class="op">|&gt;</span></span>

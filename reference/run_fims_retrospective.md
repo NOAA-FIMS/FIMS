@@ -93,7 +93,7 @@ assessment models. ICES Journal of Marine Science 72(1): 99-110.
 
 ## See also
 
-- [`stockplotr::plot_spawning_biomass()`](https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_spawning_biomass.html)
+- [`stockplotr::plot_spawning_biomass()`](https://rdrr.io/pkg/stockplotr/man/plot_spawning_biomass.html)
   for visualizing retrospective results
 
 - [`calculate_mohns_rho()`](https://NOAA-FIMS.github.io/FIMS/reference/calculate_mohns_rho.md)

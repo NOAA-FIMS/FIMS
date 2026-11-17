@@ -149,11 +149,20 @@ done in the [introductory
 vignette](https://NOAA-FIMS.github.io/FIMS/articles/fims-demo.md).
 
 The major difference below compared to a model without projections is
-that the recruitment deviations for the projection period are fixed at
-zero. Because the new data object has all years,
+that fishing mortality is fixed for the projection years. Because the
+new data object has all years,
 [`FIMS::setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)
 will ensure that all time-series parameters, e.g., natural mortality,
 have the correct dimensions.
+
+The recruitment deviations for the projection years are random effects,
+as in the other years. No data or priors inform them in this example, so
+they are estimated at zero and do not change the estimates for the years
+with data. Their variability is included in the standard errors of
+projected quantities such as spawning biomass. Do not fix them at zero
+when the recruitment standard deviation (`log_sd`) is estimated. The
+recruitment likelihood includes every deviation, so deviations fixed at
+zero would bias `log_sd` low.
 
 ``` r
 
@@ -218,22 +227,10 @@ parameters_projection <- setup_default_parameters(data = data_4_projections) |>
         0.24094126, -0.54480751, -0.23680557, -0.58483386, 0.30122785,
         0.21930545, -0.22281699, -0.51358369, 0.15740234, -0.53988240,
         -0.19556523, 0.20094360, 0.37248740, -0.07163145,
-        # recruitment deviations are fixed at zero for the projections
+        # projection recruitment deviations start at zero
         rep(0, years_of_projection)
       ),
       estimation_type = "random_effects"
-    ),
-    by = c("label", "timing")
-  ) |>
-  # Fix the projection log recruitment deviations at zero
-  dplyr::rows_update(
-    tibble::tibble(
-      label = "log_devs",
-      timing = (get_end_year(data_4_projections) - years_of_projection + 1):
-      get_end_year(data_4_projections),
-      estimation_type = rep("constant", years_of_projection),
-      distribution_type = rep(NA, years_of_projection),
-      distribution = rep(NA, years_of_projection)
     ),
     by = c("label", "timing")
   ) |>
@@ -281,7 +278,9 @@ the population to be adjusted while keeping relative fleet effort
 constant by fixing `log_Fmort`. This approach allows the annual
 `log_f_multiplier` to be estimated while ensuring that total fishing
 mortality is held constant during the projection period and achieves the
-spawning biomass target.
+spawning biomass target. A prior on `spawning_biomass_ratio` would also
+move the projection recruitment deviations toward the target because
+they are random effects.
 
 The wrapper functions used in this vignette are not yet capable of
 setting up priors so the full projection approach is not included here.
@@ -304,15 +303,9 @@ projection_fit <- parameters_projection |>
   fit_fims(optimize = TRUE)
 ```
 
-    ## Warning: ! 10 of the 39 `log_devs` values in the recruitment module are constant, but
-    ##   the recruitment process distribution includes all of them.
-    ## ℹ The constant values still add to the negative log-likelihood and affect the
-    ##   estimate of `log_sd` (biased low when they are fixed at 0) and, for `log_r`,
-    ##   the stock-recruit parameters.
-
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00241 to 0.00025 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00257 to 0.00028 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -337,13 +330,13 @@ projection_fit <- parameters_projection |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 12.79946 seconds
-    ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00025
+    ## ℹ Total run time was 10.55054 seconds
+    ## ℹ Number of parameters: fixed_effects=49, random_effects=39, and total=88
+    ## ℹ Maximum gradient= 0.00028
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 1624.68892
-    ## • Total NLL= 1560.83065
-    ## ℹ Terminal SB= 988.67084
+    ## • Marginal NLL= 1627.76704
+    ## • Total NLL= 1561.85107
+    ## ℹ Terminal SB= 986.08992
 
 ``` r
 
@@ -354,7 +347,7 @@ clear()
 
 We use {stockplotr} to plot the model results. In the code below, we
 pass a single model to
-[`stockplotr::plot_biomass()`](https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/plot_biomass.html)
+[`stockplotr::plot_biomass()`](https://rdrr.io/pkg/stockplotr/man/plot_biomass.html)
 but the list can contain multiple models, where the start and end year
 of each model that is included need not align. Thus, if we had fit the
 model without projections we could have plotted that here as well for

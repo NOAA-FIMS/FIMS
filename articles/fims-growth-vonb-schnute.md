@@ -15,6 +15,27 @@ coefficient, $`K`$. In this example, the following three Growth
 parameters are estimated: - `mean_length_young` - `mean_length_old` -
 `growth_coefficient`
 
+The model requires the older reference length to be larger than the
+younger reference length. You may either fix or estimate each reference
+length. During optimization, FIMS uses internal transformations to keep
+the reference lengths in that order. If older length is estimated, FIMS
+estimates a positive difference from younger length, then sets
+`older length = younger length + difference`. If older length is fixed
+and younger length is estimated, FIMS constrains younger length to
+remain below the fixed older length. Supply starting values in physical
+length units; finalized Growth parameter estimates are also reported in
+those units.
+
+This parameterization supports increasing growth curves that approach a
+plateau. When the difference between the two reference lengths is
+extremely small, the model may calculate them as equal because of
+rounding.
+
+When older length is estimated, its internal working value represents
+the logarithm of the length difference, not the logarithm of older
+length. This distinction matters when interpreting raw optimizer output
+or attaching distributions to working-scale parameters.
+
 FIMS uses the fitted growth curve and supplied variability in
 length-at-age to prepare mean length-at-age, standard deviation of
 length-at-age, mean weight-at-age, and the growth-derived age-to-length
@@ -32,6 +53,11 @@ standard deviations of length at the younger and older reference ages.
 These SDs use the same length units as the growth inputs. Their `age`
 entries are `NA` because their ages come from
 `reference_age_for_length_young` and `reference_age_for_length_old`.
+Between the two reference ages, SD is interpolated linearly with mean
+length. Before the younger reference age, SD stays at
+`length_at_age_sd_young`; after the older reference age, it stays at
+`length_at_age_sd_old`. Mean length continues to follow the growth
+curve.
 
 > Note: The delta-method variability pathway is wired into FIMS, but it
 > is not used here because it depends on using von Bertalanffy growth,
@@ -142,14 +168,11 @@ make_vonb_demo_data <- function(
       reference_age_for_length_old = reference_age_for_length_old
     ),
     true_sd_length = stats::approx(
-      x = c(
-        reference_age_for_length_young,
-        reference_age_for_length_old
-      ),
+      x = c(mean_length_young, mean_length_old),
       y = sd_at_reference_ages,
-      xout = ages,
+      xout = true_mean_length,
       rule = 2
-    )$y
+    )[["y"]]
   ) |>
     dplyr::mutate(
       true_weight_at_age =
@@ -532,7 +555,7 @@ fit <- FIMS::fit_fims(
 )
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 5 times to improve gradient.
-#> ℹ Maximum gradient went from 0.00055 to 7e-05 after 5 steps.
+#> ℹ Maximum gradient went from 0.00042 to 1e-04 after 5 steps.
 #> ✔ Finished optimization
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
 #> 
@@ -557,13 +580,13 @@ fit <- FIMS::fit_fims(
 #> ℹ Convergence: "NOTE" from "sdreport". Use `sanity_fims(fit)` to see each
 #>   check.
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 5.20386 seconds
+#> ℹ Total run time was 2.66017 minutes
 #> ℹ Number of parameters: fixed_effects=39, random_effects=1, and total=40
-#> ℹ Maximum gradient= 7e-05
+#> ℹ Maximum gradient= 1e-04
 #> ℹ Negative log likelihood (NLL):
-#> • Marginal NLL= 186.44652
-#> • Total NLL= 44.18449
-#> ℹ Terminal SB= 22138.63892
+#> • Marginal NLL= 186.26673
+#> • Total NLL= -167.70569
+#> ℹ Terminal SB= 1393517.87869
 
 # Keep only the core VonBertalanffySchnute Growth estimates.
 growth_estimates <- FIMS::get_estimates(fit) |>
@@ -592,9 +615,9 @@ growth_comparison
 #> # A tibble: 3 × 4
 #>   label               input estimated true_value
 #>   <chr>               <dbl>     <dbl>      <dbl>
-#> 1 mean_length_young  150      179.        180   
-#> 2 growth_coefficient   0.22     0.182       0.18
-#> 3 mean_length_old    800      848.        850
+#> 1 mean_length_young  150      180.        180   
+#> 2 growth_coefficient   0.22     0.180       0.18
+#> 3 mean_length_old    800      850.        850
 ```
 
 Check both the optimizer convergence code and the maximum gradient:
@@ -608,7 +631,7 @@ tibble::tibble(
 #> # A tibble: 1 × 2
 #>   convergence max_gradient
 #>         <int>        <dbl>
-#> 1           0    0.0000663
+#> 1           0    0.0000994
 ```
 
 A convergence code of `0` indicates normal optimizer convergence. The

@@ -516,9 +516,9 @@ FIMS:::setup_default_log_init_naa(
 
 Catchability (`log_q`) can vary by year, with 1 value specified for each
 year instead of using a single value for all years. Give 1 row per year,
-in year order, because FIMS uses the rows in the order they appear
-rather than sorting by `timing`. Years without index data for that fleet
-do not inform `log_q`, so set those rows to
+with the year in `timing`. FIMS sorts the rows by `timing`, so their
+order in the tibble does not matter. Years without index data for that
+fleet do not inform `log_q`, so set those rows to
 `estimation_type = "constant"`. The value does not change the fit,
 because `log_q` in a year without index data is not included in the
 likelihood. It only affects the expected index for that year. Estimating
@@ -754,7 +754,7 @@ removes everything from memory, including the log.
 [`get_log()`](https://NOAA-FIMS.github.io/FIMS/reference/Cpp_functions.md)
 returns the log information as a string. This string can be manipulated
 into a data frame using
-[`jsonlite::fromJSON()`](https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html).
+[`jsonlite::fromJSON()`](https://rdrr.io/pkg/jsonlite/man/fromJSON.html).
 There are three logging levels, “info”, “warning”, and “error”. The log
 below will not have any error messages but if you were to have error
 messages and you want to know immediately upon the first error that
@@ -828,7 +828,7 @@ unconverged_fit <- parameters_4_model |>
     ## ✖ Convergence: "FAIL" from "optimizer", "max_gradient", and "sdreport". Use
     ##   `sanity_fims(fit)` to see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 2.93631 seconds
+    ## ℹ Total run time was 2.46813 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
     ## ℹ Maximum gradient= 27.41724
     ## ℹ Negative log likelihood (NLL):
@@ -1033,7 +1033,7 @@ high_slope_fit <- parameters_high_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00206 to 0.00041 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00309 to 0.00043 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -1050,13 +1050,13 @@ high_slope_fit <- parameters_high_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 57.65224 seconds
+    ## ℹ Total run time was 49.12285 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00041
+    ## ℹ Maximum gradient= 0.00043
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
     ## • Total NLL= 3164.83637
-    ## ℹ Terminal SB= 1791.57926
+    ## ℹ Terminal SB= 1791.58429
 
 ``` r
 
@@ -1069,7 +1069,7 @@ low_slope_fit <- parameters_low_slope |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00224 to 0.00065 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00766 to 0.00034 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -1086,13 +1086,13 @@ low_slope_fit <- parameters_low_slope |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 56.74669 seconds
+    ## ℹ Total run time was 46.19911 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00065
+    ## ℹ Maximum gradient= 0.00034
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.25994
-    ## • Total NLL= 3164.83638
-    ## ℹ Terminal SB= 1791.58707
+    ## • Total NLL= 3164.83637
+    ## ℹ Terminal SB= 1791.58697
 
 ``` r
 
@@ -1193,7 +1193,7 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00393 to 0.00051 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00712 to 0.00028 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -1210,13 +1210,13 @@ age_specific_selectivity_fit <- parameters_age_specific_selectivity |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 57.89169 seconds
+    ## ℹ Total run time was 46.74832 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00051
+    ## ℹ Maximum gradient= 0.00028
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 3231.29832
     ## • Total NLL= 3164.88132
-    ## ℹ Terminal SB= 1791.0139
+    ## ℹ Terminal SB= 1791.01628
 
 ``` r
 
@@ -1301,7 +1301,7 @@ age_only_fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00225 to 0.00034 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00287 to 0.00036 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -1318,13 +1318,13 @@ age_only_fit <- parameters_4_model |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 11.38604 seconds
+    ## ℹ Total run time was 8.68851 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00034
+    ## ℹ Maximum gradient= 0.00036
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 1627.76704
     ## • Total NLL= 1564.08529
-    ## ℹ Terminal SB= 1740.95011
+    ## ℹ Terminal SB= 1740.95158
 
 ``` r
 
@@ -1358,7 +1358,7 @@ length_only_fit <- parameters_4_model |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.02402 to 0.00027 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00473 to 0.00025 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
 
@@ -1377,13 +1377,13 @@ length_only_fit <- parameters_4_model |>
     ## ! Convergence: "WARN" from "large_standard_errors". Use `sanity_fims(fit)` to
     ##   see each check.
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 1.27733 minutes
+    ## ℹ Total run time was 1.07038 minutes
     ## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-    ## ℹ Maximum gradient= 0.00027
+    ## ℹ Maximum gradient= 0.00025
     ## ℹ Negative log likelihood (NLL):
-    ## • Marginal NLL= 1568.32686
+    ## • Marginal NLL= 1568.32685
     ## • Total NLL= 1518.62645
-    ## ℹ Terminal SB= 1722.35773
+    ## ℹ Terminal SB= 1722.36309
 
 ``` r
 

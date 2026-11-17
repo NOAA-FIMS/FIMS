@@ -173,7 +173,7 @@ means the fleet did not fish in that time step.
 [`setup_default_parameters()`](https://NOAA-FIMS.github.io/FIMS/reference/setup_default_parameters.md)
 fixes `log_Fmort` for that fleet and year at -200, so fishing mortality
 is effectively 0, and the 0 is left out of the likelihood. It is
-reported as -999 in the output, the same as missing data. If you
+reported as `NA` in the output, the same as missing data. If you
 estimate `log_Fmort` in that year instead,
 [`initialize_fims()`](https://NOAA-FIMS.github.io/FIMS/reference/initialize_fims.md)
 warns, because nothing in the data informs it. A fleet with a catch of 0

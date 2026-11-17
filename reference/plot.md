@@ -29,7 +29,7 @@ plot(x, y, ...)
 ## Value
 
 A ggplot2 object is returned that uses
-[`stockplotr::theme_noaa()`](https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html).
+[`stockplotr::theme_noaa()`](https://rdrr.io/pkg/stockplotr/man/theme_noaa.html).
 There will be one panel per input type with fleet-specific information
 denoted using colors.
 

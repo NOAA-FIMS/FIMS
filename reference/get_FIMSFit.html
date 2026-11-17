@@ -181,7 +181,12 @@ and <code>message</code>. It has no rows when the model was not optimized.</p>
 uncertainties from a fitted model. The <code>year_i</code> column is a position that
 starts at 1, and the <code>age</code> and <code>length</code> columns are the ages and length bins
 from the data. <code>age</code> is <code>NA</code> if populations have different ages, and both
-are <code>NA</code> for fits saved before they were added to the output.</p>
+are <code>NA</code> for fits saved before they were added to the output. <code>observed</code> is
+<code>NA</code> for missing observations. The likelihood skips a composition year with
+any missing bin, so <code>observed</code> and <code>estimated</code> are <code>NA</code> for every bin of
+that year, and for every year of a fleet without composition data. The
+proportions are reported as <code>agecomp_proportion</code> and
+<code>lengthcomp_proportion</code>.</p>
 <p><code>get_number_of_parameters()</code> returns a vector of integers specifying the
 number of fixed-effect parameters and the number of random-effect parameters
 in the model.</p>

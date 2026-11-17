@@ -45,7 +45,7 @@ A ggplot object displaying likelihood profiles. The plot includes:
 - Y-axis showing change in log-likelihood from maximum
 
 - NOAA-themed styling via
-  [`stockplotr::theme_noaa()`](https://noaa-fisheries-integrated-toolbox.r-universe.dev/stockplotr/reference/theme_noaa.html)
+  [`stockplotr::theme_noaa()`](https://rdrr.io/pkg/stockplotr/man/theme_noaa.html)
 
 The plot is also automatically saved as "likelihood.png".
 

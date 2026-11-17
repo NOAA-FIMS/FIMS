@@ -1,6 +1,7 @@
 var structfims__popdy_1_1VonBertalanffySchnuteGrowth =
 [
     [ "evaluate", "structfims__popdy_1_1VonBertalanffySchnuteGrowth.html#aef661f9ec7359b39fbccdf25b9427108", null ],
+    [ "growth_fraction", "structfims__popdy_1_1VonBertalanffySchnuteGrowth.html#ae8feae54da0f04eae6aa7b7a8b0963b9", null ],
     [ "length_at_age", "structfims__popdy_1_1VonBertalanffySchnuteGrowth.html#a2d77c5b55a4ae57d1cf41d03f28101ce", null ],
     [ "log_length_at_age", "structfims__popdy_1_1VonBertalanffySchnuteGrowth.html#ac770d425c7258fceb968c1d591eeb37f", null ],
     [ "log_length_at_age_gradient", "structfims__popdy_1_1VonBertalanffySchnuteGrowth.html#acb10a41e4c7069bb26aed89776ac6b16", null ],

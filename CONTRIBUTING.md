@@ -26,8 +26,7 @@ enhancement to FIMS, please use GitHub to submit a [Feature
 request](https://github.com/NOAA-FIMS/FIMS/issues/new?template=feature_request.yml).
 Before submitting either of these tickets, please search the [existing
 issues](https://github.com/NOAA-FIMS/FIMS/issues?q=is%3Aissue) to see if
-something identical or similar has already been submitted. Once created,
-Issues are automatically tagged with the `status: triage_needed` tag.
+something identical or similar has already been submitted.
 
 ## Contributing code
 
@@ -44,7 +43,7 @@ generally small and well-defined, making them a good starting point for
 new contributors. We encourage collaborators to feel welcome to
 contribute in any way they can, and we will do our best to incorporate
 these contributions into the FIMS projects. Please see the [feature
-branches](#feature-branches), [pull requests](#pull-requests), and
+branches](#feature-branches), [Pull Requests](#pull-requests), and
 [style guide](#style-guide) sections below for how to make your
 contributions to FIMS. We thank you in advance for being part of the
 team.
@@ -157,7 +156,7 @@ for more information.
 
 Along the development process it is important to add tests and ensure
 that the code is well documented. Below are the standard contributor
-checks to follow so that the code is ready for a pull request:
+checks to follow so that the code is ready for a Pull Request:
 
 #### Standard contributor checks
 
@@ -174,9 +173,8 @@ checks to follow so that the code is ready for a pull request:
   failed tests verbosely.
 - Format C++ code using clang-format version 18.0.0 with Google style:
   `clang-format -i --style="{BasedOnStyle: Google, SortIncludes: false}" $(find ./inst/include ./src ./tests/gtest -name "*.hpp" -o -name "*.cpp")`.
-  If you are contributing from a fork, the automated formatting workflow
-  will add a comment to your pull request with detailed instructions on
-  how to format your code locally.
+  If you are contributing from a fork, you will need to perform this
+  step manually because our actions do not run on forks.
 - Run clang tidy to check C++ for common mistakes using TODO: document
   how to run clang-tidy.
 - Spell check the package using [cspell](https://cspell.org/). Install
@@ -211,45 +209,68 @@ checks to follow so that the code is ready for a pull request:
   ensure that all of the code is covered, with the goal of maintaining
   80 percent code coverage.
 
-### Pull requests
+### Pull Requests
 
-Once the work is complete, a pull request should be created to bring the
-changes into the appropriate branch. Pull requests from forks will be
-reviewed under the same guidelines as pull requests from internal
-branches. Review of the pull request will be both automated and manual,
-where all pull requests must pass automated tests and syntax checks
-before being merged in addition to being reviewed by at least one
-developer. [Code review](https://github.com/features/code-review)
-ensures health and continuous improvement of the FIMS codebase, while
-simultaneously helping FIMS developers become familiar with the
-codebase. [Google’s code review
-guide](https://google.github.io/eng-practices/review/) provides a useful
-set of guidelines for both reviewers and code authors. Each PR is
-accompanied by a [checklist of major considerations for code
-reviews](https://github.com/NOAA-FIMS/FIMS/blob/main/.github/workflows/pr-checklist.yml)
-to guide reviewers through the PR. Additional guidance can be found at
-[Conventional Comments](https://conventionalcomments.org/) for
-formatting/structuring your reviewer comments. Navigate to the [Perforce
-Blog](https://www.perforce.com/blog/qac/9-best-practices-for-code-review)
-for nine best practices for code review and use the [FIMS Style
-Guide](#style-guide) to settle any style arguments.
+Once the work is complete, a Pull Request should be created to bring the
+changes into the appropriate branch. Pull Requests from forks will be
+reviewed under the same guidelines as Pull Requests from internal
+branches, i.e., it checks off the following requirements:
+
+The code is well-designed
+
+The code is designed well for both users and developers
+
+Code coverage remains high’ +
+
+Comments are clear, useful, and explain why instead of what
+
+Code is appropriately documented (doxygen and roxygen)
+
+Review of the Pull Request will be both automated and manual, where all
+Pull Requests must pass automated tests and syntax checks before being
+merged in addition to being reviewed by at least one developer. [Code
+review](https://github.com/features/code-review) ensures health and
+continuous improvement of the FIMS codebase, while simultaneously
+helping FIMS developers become familiar with the codebase. [Google’s
+code review guide](https://google.github.io/eng-practices/review/)
+provides a useful set of guidelines for both reviewers and code authors.
 
 An automated workflow
 ([pr-format.yml](https://github.com/NOAA-FIMS/FIMS/blob/main/.github/workflows/pr-format.yml))
-runs when you open or update a pull request. This workflow checks both
+runs when you open or update a Pull Request. This workflow checks both
 C++ and R code formatting. If you are contributing from the main
-repository, the workflow will automatically create a pull request with
+repository, the workflow will automatically create a Pull Request with
 formatting changes that need to be merged into your feature branch. If
-you are contributing from a fork, the workflow will add a comment to
-your pull request with detailed instructions on how to format your code
-locally, since the automated workflow cannot push changes to forks.
+you are contributing from a fork, you will need to run the workflow
+yourself (see [Standard contributor
+checks](#standard-contributor-checks)) because the automated workflow
+cannot push changes to forks.
 
-Versioning follows [semantic versioning](https://semver.org/) to
-establish the major, minor, and patch number for a release. Often,
-multiple pull requests are included in a single release, which will be
-initiated by a member of the FIMS Implementation Team. Release notes for
-each version can be found in the [release
-notes](https://github.com/NOAA-FIMS/FIMS/releases).
+### Reviewing Pull Requests
+
+- See the [GitHub documentation for how to comment on a
+  PR](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/commenting-on-a-pull-request)
+  to indicate where you have questions or changes are needed before
+  approving the PR.
+- Please use standard [conventional
+  messages](https://www.conventionalcommits.org/) for both commit
+  messages and comments
+- Reviews of Pull Requests are a great way to learn so feel free to
+  share your tips and tricks. However, when suggesting changes to the PR
+  that are optional please include `nit:` (for nitpicking) as the
+  comment type. For example, `nit:` I prefer using a
+  [`data.frame()`](https://rdrr.io/r/base/data.frame.html) instead of a
+  `matrix` because …
+- Engage with the developer. Make it clear when the PR is approved by
+  selecting the approved status, and potentially commenting on the PR
+  with something like `This PR is now ready to be merged.`
+
+Additional guidance can be found at [Conventional
+Comments](https://conventionalcomments.org/) for formatting/structuring
+your reviewer comments. Navigate to the [Perforce
+Blog](https://www.perforce.com/blog/qac/9-best-practices-for-code-review)
+for nine best practices for code review and use the [FIMS Style
+Guide](#style-guide) to settle any style arguments.
 
 ## Style guide
 
@@ -272,3 +293,12 @@ Commits](https://www.conventionalcommits.org), which is our style guide
 for commit messages. See [Conventional
 Comments](https://conventionalcomments.org/) for how to format reviewer
 comments.
+
+## Versioning
+
+Versioning follows [semantic versioning](https://semver.org/) to
+establish the major, minor, and patch number for a release. Often,
+multiple Pull Requests are included in a single release, which will be
+initiated by a member of the FIMS Implementation Team. Release notes for
+each version can be found in the [release
+notes](https://github.com/NOAA-FIMS/FIMS/releases).

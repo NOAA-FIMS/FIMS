@@ -255,7 +255,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>UseEstimatedReference
 <tr class="memitem:aca8584cf6b6ad576b2f8e3691e8a5de6" id="r_aca8584cf6b6ad576b2f8e3691e8a5de6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; Type &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aca8584cf6b6ad576b2f8e3691e8a5de6">MeanLengthYoungVector</a> ()</td></tr>
 <tr class="memdesc:aca8584cf6b6ad576b2f8e3691e8a5de6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the working-scale storage for the first reference-length parameter.  <br /></td></tr>
 <tr class="memitem:aa708750a2743c70ed8b71c38a1da525f" id="r_aa708750a2743c70ed8b71c38a1da525f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; Type &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa708750a2743c70ed8b71c38a1da525f">MeanLengthOldVector</a> ()</td></tr>
-<tr class="memdesc:aa708750a2743c70ed8b71c38a1da525f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the log-scale length-at-reference-age-2 parameter vector.  <br /></td></tr>
+<tr class="memdesc:aa708750a2743c70ed8b71c38a1da525f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access working-scale storage for the older reference length.  <br /></td></tr>
 <tr class="memitem:af2283cc55b6c4c48e2b4ff9ce5f4ed93" id="r_af2283cc55b6c4c48e2b4ff9ce5f4ed93"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; Type &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af2283cc55b6c4c48e2b4ff9ce5f4ed93">GrowthCoefficientVector</a> ()</td></tr>
 <tr class="memdesc:af2283cc55b6c4c48e2b4ff9ce5f4ed93"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the log-scale VonBertalanffySchnute growth coefficient vector.  <br /></td></tr>
 <tr class="memitem:a21aa23299ec4293c36876b05706f4183" id="r_a21aa23299ec4293c36876b05706f4183"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classfims_1_1Vector.html">fims::Vector</a>&lt; Type &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a21aa23299ec4293c36876b05706f4183">ReferenceAgeForLengthYoungVector</a> ()</td></tr>
@@ -810,8 +810,8 @@ template&lt;typename Type&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Access the log-scale length-at-reference-age-2 parameter vector. </p>
-<dl class="section return"><dt>Returns</dt><dd>Mutable parameter vector. </dd></dl>
+<p>Access working-scale storage for the older reference length. </p>
+<p>When older length is estimated, stores log(older - younger). When constant, stores log(older); evaluation uses the saved constant. </p><dl class="section return"><dt>Returns</dt><dd>Mutable parameter vector. </dd></dl>
 
 </div>
 </div>

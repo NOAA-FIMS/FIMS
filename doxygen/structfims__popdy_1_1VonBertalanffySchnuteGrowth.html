@@ -233,6 +233,8 @@ Inheritance diagram for fims_popdy::VonBertalanffySchnuteGrowth&lt; Type &gt;:</
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:ae8feae54da0f04eae6aa7b7a8b0963b9" id="r_ae8feae54da0f04eae6aa7b7a8b0963b9"><td class="memItemLeft" align="right" valign="top">Type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae8feae54da0f04eae6aa7b7a8b0963b9">growth_fraction</a> (const Type &amp;age, Type *derivative=nullptr) const</td></tr>
+<tr class="memdesc:ae8feae54da0f04eae6aa7b7a8b0963b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Growth fraction at or after the younger reference age.  <br /></td></tr>
 <tr class="memitem:a2d77c5b55a4ae57d1cf41d03f28101ce" id="r_a2d77c5b55a4ae57d1cf41d03f28101ce"><td class="memItemLeft" align="right" valign="top">Type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2d77c5b55a4ae57d1cf41d03f28101ce">length_at_age</a> (const Type &amp;age) const</td></tr>
 <tr class="memdesc:a2d77c5b55a4ae57d1cf41d03f28101ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate mean length at age.  <br /></td></tr>
 <tr class="memitem:ac770d425c7258fceb968c1d591eeb37f" id="r_ac770d425c7258fceb968c1d591eeb37f"><td class="memItemLeft" align="right" valign="top">Type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac770d425c7258fceb968c1d591eeb37f">log_length_at_age</a> (const Type &amp;age) const</td></tr>
@@ -240,7 +242,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acb10a41e4c7069bb26aed89776ac6b16" id="r_acb10a41e4c7069bb26aed89776ac6b16"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acb10a41e4c7069bb26aed89776ac6b16">log_length_at_age_gradient</a> (const Type &amp;age, Type &amp;d_log_laa_d_length_young, Type &amp;d_log_laa_d_length_old, Type &amp;d_log_laa_d_k) const</td></tr>
 <tr class="memdesc:acb10a41e4c7069bb26aed89776ac6b16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the gradient of log mean length at age with respect to the current natural-scale FIMS VonBertalanffySchnute parameterization.  <br /></td></tr>
 <tr class="memitem:a6687b16235aadefd241ead1e4db9b986" id="r_a6687b16235aadefd241ead1e4db9b986"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6687b16235aadefd241ead1e4db9b986">log_length_at_age_logscale_gradient</a> (const Type &amp;age, Type &amp;d_log_laa_d_log_length_young, Type &amp;d_log_laa_d_log_length_old, Type &amp;d_log_laa_d_log_k) const</td></tr>
-<tr class="memdesc:a6687b16235aadefd241ead1e4db9b986"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the gradient of log mean length at age with respect to the log-scale FIMS VonBertalanffySchnute parameterization [log(mean_length_young), log(mean_length_old), log(growth_coefficient)].  <br /></td></tr>
+<tr class="memdesc:a6687b16235aadefd241ead1e4db9b986"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the gradient of log mean length at age with respect to [log(mean_length_young), log(mean_length_old), log(growth_coefficient)].  <br /></td></tr>
 <tr class="memitem:a666d790516d94d0777abbf1fbd9ae55c" id="r_a666d790516d94d0777abbf1fbd9ae55c"><td class="memItemLeft" align="right" valign="top">Type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a666d790516d94d0777abbf1fbd9ae55c">weight_at_age</a> (const Type &amp;age) const</td></tr>
 <tr class="memdesc:a666d790516d94d0777abbf1fbd9ae55c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate mean weight at age via the length-weight relationship.  <br /></td></tr>
 <tr class="memitem:aef661f9ec7359b39fbccdf25b9427108" id="r_aef661f9ec7359b39fbccdf25b9427108"><td class="memItemLeft" align="right" valign="top">virtual const Type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aef661f9ec7359b39fbccdf25b9427108">evaluate</a> (int year, const double &amp;a) override</td></tr>
@@ -339,6 +341,46 @@ template&lt;typename Type&gt; </div>
 </dl>
 
 <p>Implements <a class="el" href="structfims__popdy_1_1GrowthBase.html#a955f3f4ab3f30dfa2e6d6f884becfab6">fims_popdy::GrowthBase&lt; Type &gt;</a>.</p>
+
+</div>
+</div>
+<a id="ae8feae54da0f04eae6aa7b7a8b0963b9" name="ae8feae54da0f04eae6aa7b7a8b0963b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8feae54da0f04eae6aa7b7a8b0963b9">&#9670;&#160;</a></span>growth_fraction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Type&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Type <a class="el" href="structfims__popdy_1_1VonBertalanffySchnuteGrowth.html">fims_popdy::VonBertalanffySchnuteGrowth</a>&lt; Type &gt;::growth_fraction </td>
+          <td>(</td>
+          <td class="paramtype">const Type &amp;</td>          <td class="paramname"><span class="paramname"><em>age</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Type *</td>          <td class="paramname"><span class="paramname"><em>derivative</em></span><span class="paramdefsep"> = </span><span class="paramdefval">nullptr</span>&#160;) const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Growth fraction at or after the younger reference age. </p>
+<p>Requires ordered reference ages and nonnegative K. Uses the linear-growth limit as K approaches zero. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">age</td><td>Age on the natural scale. </td></tr>
+    <tr><td class="paramname">derivative</td><td>Optional output derivative with respect to K. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -505,8 +547,8 @@ template&lt;typename Type&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate the gradient of log mean length at age with respect to the log-scale FIMS VonBertalanffySchnute parameterization [log(mean_length_young), log(mean_length_old), log(growth_coefficient)]. </p>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Evaluate the gradient of log mean length at age with respect to [log(mean_length_young), log(mean_length_old), log(growth_coefficient)]. </p>
+<p>These derivatives use physical reference lengths on log scales for delta-method variability, not the optimizer's log length difference. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">age</td><td>Age on the natural scale. </td></tr>
     <tr><td class="paramname">d_log_laa_d_log_length_young</td><td>Output derivative with respect to log(mean_length_young). </td></tr>

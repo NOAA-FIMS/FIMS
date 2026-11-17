@@ -59,12 +59,13 @@ var searchData=
   ['getselectivityid_56',['GetSelectivityID',['../classFleetInterface.html#a3bcb379f52ba814e2187e526c6bc0cdc',1,'FleetInterface']]],
   ['getstring_57',['GetString',['../classfims_1_1JsonValue.html#a31946cee61877ffe6efbf88c727a0ddc',1,'fims::JsonValue']]],
   ['gettype_58',['GetType',['../classfims_1_1JsonValue.html#acd1a10bbe8ccf212442dc7caea990763',1,'fims::JsonValue']]],
-  ['growthbase_59',['GrowthBase',['../structfims__popdy_1_1GrowthBase.html#a0352b6934eea814c055d7fdbc81efa14',1,'fims_popdy::GrowthBase']]],
-  ['growthcoefficientvector_60',['GrowthCoefficientVector',['../classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html#af2283cc55b6c4c48e2b4ff9ce5f4ed93',1,'fims_popdy::VonBertalanffySchnuteGrowthModelAdapter']]],
-  ['growthderivedfleetmeanweightaa_61',['GrowthDerivedFleetMeanWeightAA',['../classfims__popdy_1_1CatchAtAge.html#a475894ed296c8d4d858c7c56918695dc',1,'fims_popdy::CatchAtAge']]],
-  ['growthderivedobservationinterfacebase_62',['GrowthDerivedObservationInterfaceBase',['../classGrowthDerivedObservationInterfaceBase.html#adbb6472d0e087dfbf59e2371329ae1f6',1,'GrowthDerivedObservationInterfaceBase']]],
-  ['growthderivedsizeprovider_63',['GrowthDerivedSizeProvider',['../classfims__popdy_1_1GrowthDerivedSizeProvider.html#a774da3bef1281ce400bf083c1aaf7480',1,'fims_popdy::GrowthDerivedSizeProvider']]],
-  ['growthinterfacebase_64',['GrowthInterfaceBase',['../classGrowthInterfaceBase.html#ad85e41235e30d0c04aad6817ef81be12',1,'GrowthInterfaceBase::GrowthInterfaceBase()'],['../classGrowthInterfaceBase.html#a6b3aead008a2230892a64a51c804b4bf',1,'GrowthInterfaceBase::GrowthInterfaceBase(const GrowthInterfaceBase &amp;other)']]],
-  ['growthmodel_65',['GrowthModel',['../classfims__popdy_1_1GrowthModel.html#a3d36e88bf61f25eaf8ac9d38bee3fed6',1,'fims_popdy::GrowthModel']]],
-  ['growthproducts_66',['GrowthProducts',['../structfims__popdy_1_1GrowthProducts.html#a04c2e7b0fa10f4e0b8184712e3276b8d',1,'fims_popdy::GrowthProducts::GrowthProducts()=default'],['../structfims__popdy_1_1GrowthProducts.html#a1b0bd2f094a8dbf6e17964b86ae5a549',1,'fims_popdy::GrowthProducts::GrowthProducts(std::size_t years, std::size_t ages, std::size_t sexes)']]]
+  ['growth_5ffraction_59',['growth_fraction',['../structfims__popdy_1_1VonBertalanffySchnuteGrowth.html#ae8feae54da0f04eae6aa7b7a8b0963b9',1,'fims_popdy::VonBertalanffySchnuteGrowth']]],
+  ['growthbase_60',['GrowthBase',['../structfims__popdy_1_1GrowthBase.html#a0352b6934eea814c055d7fdbc81efa14',1,'fims_popdy::GrowthBase']]],
+  ['growthcoefficientvector_61',['GrowthCoefficientVector',['../classfims__popdy_1_1VonBertalanffySchnuteGrowthModelAdapter.html#af2283cc55b6c4c48e2b4ff9ce5f4ed93',1,'fims_popdy::VonBertalanffySchnuteGrowthModelAdapter']]],
+  ['growthderivedfleetmeanweightaa_62',['GrowthDerivedFleetMeanWeightAA',['../classfims__popdy_1_1CatchAtAge.html#a475894ed296c8d4d858c7c56918695dc',1,'fims_popdy::CatchAtAge']]],
+  ['growthderivedobservationinterfacebase_63',['GrowthDerivedObservationInterfaceBase',['../classGrowthDerivedObservationInterfaceBase.html#adbb6472d0e087dfbf59e2371329ae1f6',1,'GrowthDerivedObservationInterfaceBase']]],
+  ['growthderivedsizeprovider_64',['GrowthDerivedSizeProvider',['../classfims__popdy_1_1GrowthDerivedSizeProvider.html#a774da3bef1281ce400bf083c1aaf7480',1,'fims_popdy::GrowthDerivedSizeProvider']]],
+  ['growthinterfacebase_65',['GrowthInterfaceBase',['../classGrowthInterfaceBase.html#ad85e41235e30d0c04aad6817ef81be12',1,'GrowthInterfaceBase::GrowthInterfaceBase()'],['../classGrowthInterfaceBase.html#a6b3aead008a2230892a64a51c804b4bf',1,'GrowthInterfaceBase::GrowthInterfaceBase(const GrowthInterfaceBase &amp;other)']]],
+  ['growthmodel_66',['GrowthModel',['../classfims__popdy_1_1GrowthModel.html#a3d36e88bf61f25eaf8ac9d38bee3fed6',1,'fims_popdy::GrowthModel']]],
+  ['growthproducts_67',['GrowthProducts',['../structfims__popdy_1_1GrowthProducts.html#a04c2e7b0fa10f4e0b8184712e3276b8d',1,'fims_popdy::GrowthProducts::GrowthProducts()=default'],['../structfims__popdy_1_1GrowthProducts.html#a1b0bd2f094a8dbf6e17964b86ae5a549',1,'fims_popdy::GrowthProducts::GrowthProducts(std::size_t years, std::size_t ages, std::size_t sexes)']]]
 ];
