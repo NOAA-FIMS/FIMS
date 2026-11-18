@@ -1,13 +1,9 @@
 # FIMS 0.11.0
 
-## Breaking changes
+## Development
 
-* Explicit subpopulations now own their initial abundance. Replace
-  `initial_fraction` with `init_naa` (a positive vector by age), optionally using
-  `init_estimation_type`, or supply a `log_init_naa` parameter tibble through
-  `initialize_fims()`. `SetTwoSex()` now accepts female and male initial abundance
-  vectors followed by the female recruitment fraction. Recruitment allocation
-  remains separate. Pooled models without explicit subpopulations are unchanged.
+* Develop standalone subpopulation configuration and validation. Subpopulations
+  are not connected to model execution or exposed through the R interface.
 
 ## Bug Fixes
 

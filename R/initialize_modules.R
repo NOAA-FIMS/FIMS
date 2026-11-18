@@ -859,22 +859,6 @@ initialize_comp <- function(data,
 #' It is important that you only have one FIMS model initialized in your R
 #' workspace at a time. Thus, after you initialize and fit the model, you should
 #' run [clear()].
-#' @param subpopulations Optional list of named biological-group configurations.
-#'   Each entry must contain `name`, `recruitment_fraction`, and
-#'   `reproductive_contribution`, plus its own `init_naa` vector (one strictly
-#'   positive number per modeled age). Initial numbers default to constant;
-#'   `init_estimation_type` accepts a scalar or per-age estimation types.
-#'   Alternatively, supply `log_init_naa` as a parameter tibble with `value`
-#'   and `estimation_type`, ordered by modeled age. Recruitment fractions are
-#'   fixed and must sum to one. Pooled initial-abundance parameters are replaced
-#'   by the group parameters when subpopulations are configured.
-#'   `NULL` (default) retains pooled dynamics. Optional `growth` and `maturity`
-#'   overrides are lists containing a parameter tibble (`parameters`) and/or
-#'   FIMSFrame (`data`); omitted settings use the population inputs. EWAA growth
-#'   also accepts `weights`. Optional `selectivity` is a list named by fleet,
-#'   with the same `parameters`/`data` settings. Unspecified modules are shared.
-#'   Module IDs are for direct Rcpp construction only; this function rebuilds
-#'   its module registry before constructing overrides.
 #' @export
 #' @seealso
 #' * [setup_default_parameters()]
@@ -891,7 +875,7 @@ initialize_comp <- function(data,
 #'   initialize_fims(data = data_4_model)
 #' clear()
 #' }
-initialize_fims <- function(parameters, data, subpopulations = NULL) {
+initialize_fims <- function(parameters, data) {
   # Validate parameters input
   if (missing(parameters) || !tibble::is_tibble(parameters)) {
     cli::cli_abort("The {.var parameters} argument must be a tibble.")
@@ -1237,12 +1221,6 @@ initialize_fims <- function(parameters, data, subpopulations = NULL) {
     # parameters tibble
     linked_ids = population_module_ids
   )
-
-  if (!is.null(subpopulations)) {
-    population$SetSubpopulations(initialize_subpopulation_modules(
-      subpopulations, parameters, data, stats::setNames(fleet, fleets)
-    ))
-  }
 
   # Set-up TMB
   # Hard code to be a catch-at-age model

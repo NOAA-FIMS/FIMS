@@ -4,24 +4,9 @@
 \alias{initialize_fims}
 \title{Initialize C++ modules via Rcpp for a FIMS model}
 \usage{
-initialize_fims(parameters, data, subpopulations = NULL)
+initialize_fims(parameters, data)
 }
 \arguments{
-\item{subpopulations}{Optional list of group configurations, each containing
-\code{name}, \code{recruitment_fraction}, and \code{reproductive_contribution},
-plus its own \code{init_naa} vector of strictly positive numbers in modeled-age
-order. Initial numbers default to constant; \code{init_estimation_type} accepts
-one estimation type or a type per age. Alternatively, supply \code{log_init_naa}
-as a parameter tibble with \code{value} and \code{estimation_type}, ordered by
-modeled age. Recruitment fractions are fixed and must sum to one. Group initial
-parameters replace the pooled initial-abundance parameters.
-\code{NULL} retains pooled dynamics. Optional \code{growth} and \code{maturity}
-settings are lists containing \code{parameters} (a parameter tibble) and/or
-\code{data} (a FIMSFrame), defaulting to the population inputs. EWAA growth
-also accepts \code{weights}. Optional \code{selectivity} is a list named by
-fleet, with the same parameter/data settings. Unspecified modules are shared.
-Use configurations rather than IDs, because this function rebuilds its registry.}
-
 \item{parameters}{A tibble returned from \code{\link[=setup_default_parameters]{setup_default_parameters()}}. It
 is the primary source of information for what is initialized. That is, if a
 fleet exists in the data but parameter information for how to specify

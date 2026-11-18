@@ -9,8 +9,6 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_POPULATION_HPP
 
-#include <limits>
-
 #include "rcpp_interface_base.hpp"
 #include "../../../population_dynamics/population/population.hpp"
 
@@ -134,8 +132,7 @@ class PopulationInterface : public PopulationInterfaceBase {
    */
   VariableVector log_f_multiplier;
   /**
-   * @brief Initial log-abundance parameter adapter: pooled age order or
-   * group/age order when explicit subpopulations own the model parameters.
+   * @brief The natural log of the initial numbers at age.
    */
   VariableVector log_init_naa;
   /**
@@ -147,11 +144,6 @@ class PopulationInterface : public PopulationInterfaceBase {
    * Out-of-range inputs are logged as warnings.
    */
   VariableVector proportion_female;
-
-  /** @brief Shared configuration so the registered Rcpp object sees edits. */
-  std::shared_ptr<std::vector<fims_popdy::Subpopulation<double>>>
-      subpopulations =
-          std::make_shared<std::vector<fims_popdy::Subpopulation<double>>>();
   /**
    * @brief Ages that are modeled in the population, the length of this vector
    * should equal \"n_ages\".
@@ -269,7 +261,6 @@ class PopulationInterface : public PopulationInterfaceBase {
         log_f_multiplier(other.log_f_multiplier),
         log_init_naa(other.log_init_naa),
         proportion_female(other.proportion_female),
-        subpopulations(other.subpopulations),
         ages(other.ages),
         name(other.name),
         total_catch_weight(other.total_catch_weight),
@@ -297,178 +288,6 @@ class PopulationInterface : public PopulationInterfaceBase {
    * @return The ID.
    */
   virtual uint32_t get_id() { return this->id; }
-
-  /** @brief Configure explicit groups; an empty list restores pooled dynamics.
-   */
-  void SetSubpopulations(Rcpp::List values) {
-    std::vector<fims_popdy::Subpopulation<double>> groups;
-    std::vector<std::string> estimation_types;
-    for (int i = 0; i < values.size(); ++i) {
-      Rcpp::List item = Rcpp::as<Rcpp::List>(values[i]);
-      for (const char* key : {"name", "init_naa", "recruitment_fraction",
-                              "reproductive_contribution"}) {
-        if (!item.containsElementNamed(key)) {
-          throw std::invalid_argument(
-              std::string("Missing subpopulation field: ") + key);
-        }
-      }
-      const std::set<std::string> allowed{"name",
-                                          "init_naa",
-                                          "recruitment_fraction",
-                                          "reproductive_contribution",
-                                          "growth_id",
-                                          "maturity_id",
-                                          "selectivity_ids",
-                                          "init_estimation_type"};
-      std::set<std::string> seen;
-      Rcpp::CharacterVector fields = item.names();
-      for (int j = 0; j < fields.size(); ++j) {
-        const std::string field = Rcpp::as<std::string>(fields[j]);
-        if (!allowed.count(field) || !seen.insert(field).second) {
-          throw std::invalid_argument(
-              "Unknown or duplicate subpopulation field: " + field);
-        }
-      }
-      auto read_id = [](double value) {
-        if (!std::isfinite(value) || value < 0.0 ||
-            value != std::floor(value) ||
-            value > std::numeric_limits<int>::max()) {
-          throw std::invalid_argument(
-              "Module and fleet IDs must be nonnegative integers");
-        }
-        return static_cast<int>(value);
-      };
-      Rcpp::NumericVector initial =
-          Rcpp::as<Rcpp::NumericVector>(item["init_naa"]);
-      if (initial.size() == 0 ||
-          (n_ages.get() > 0 && initial.size() != n_ages.get())) {
-        throw std::invalid_argument(
-            "init_naa must have one value per modeled age");
-      }
-      Rcpp::CharacterVector types =
-          item.containsElementNamed("init_estimation_type")
-              ? Rcpp::as<Rcpp::CharacterVector>(item["init_estimation_type"])
-              : Rcpp::CharacterVector::create("constant");
-      if (types.size() != 1 && types.size() != initial.size()) {
-        throw std::invalid_argument(
-            "init_estimation_type must be scalar or have one value per age");
-      }
-      fims_popdy::Subpopulation<double> group;
-      group.name = Rcpp::as<std::string>(item["name"]);
-      group.recruitment_fraction =
-          Rcpp::as<double>(item["recruitment_fraction"]);
-      group.reproductive_contribution =
-          Rcpp::as<double>(item["reproductive_contribution"]);
-      group.log_init_naa.resize(initial.size());
-      for (int a = 0; a < initial.size(); ++a) {
-        if (!std::isfinite(initial[a]) || initial[a] <= 0.0) {
-          throw std::invalid_argument(
-              "init_naa must be finite and strictly positive");
-        }
-        group.log_init_naa[a] = std::log(initial[a]);
-        const std::string type =
-            Rcpp::as<std::string>(types[types.size() == 1 ? 0 : a]);
-        if (type != "constant" && type != "fixed_effects" &&
-            type != "random_effects") {
-          throw std::invalid_argument("Invalid init_estimation_type");
-        }
-        estimation_types.push_back(type);
-      }
-      if (item.containsElementNamed("growth_id")) {
-        group.growth_id = read_id(Rcpp::as<double>(item["growth_id"]));
-      }
-      if (item.containsElementNamed("maturity_id")) {
-        group.maturity_id = read_id(Rcpp::as<double>(item["maturity_id"]));
-      }
-      if (item.containsElementNamed("selectivity_ids")) {
-        Rcpp::NumericVector ids =
-            Rcpp::as<Rcpp::NumericVector>(item["selectivity_ids"]);
-        if (!ids.hasAttribute("names")) {
-          throw std::invalid_argument(
-              "selectivity_ids must be named by fleet ID");
-        }
-        Rcpp::CharacterVector names = ids.names();
-        for (int j = 0; j < ids.size(); ++j) {
-          const std::string name = Rcpp::as<std::string>(names[j]);
-          if (name.empty() ||
-              name.find_first_not_of("0123456789") != std::string::npos) {
-            throw std::invalid_argument(
-                "selectivity_ids names must be fleet IDs");
-          }
-          const int fleet_id = read_id(std::stod(name));
-          if (!group.selectivity_ids.emplace(fleet_id, read_id(ids[j]))
-                   .second) {
-            throw std::invalid_argument("Duplicate fleet in selectivity_ids");
-          }
-        }
-      }
-      groups.push_back(std::move(group));
-    }
-    fims_popdy::ValidateSubpopulations(groups);
-    if (!groups.empty()) {
-      log_init_naa.resize(estimation_types.size());
-      size_t index = 0;
-      for (const auto& group : groups) {
-        for (size_t a = 0; a < group.log_init_naa.size(); ++a, ++index) {
-          log_init_naa[index].initial_value_m = group.log_init_naa[a];
-          log_init_naa[index].estimation_type_m.set(estimation_types[index]);
-        }
-      }
-    }
-    *subpopulations = std::move(groups);
-  }
-
-  /** @brief Configure females and males with their own initial abundance. */
-  void SetTwoSex(Rcpp::NumericVector female_init_naa,
-                 Rcpp::NumericVector male_init_naa, double recruitment_female) {
-    SetSubpopulations(Rcpp::List::create(
-        Rcpp::List::create(
-            Rcpp::Named("name") = "female",
-            Rcpp::Named("init_naa") = female_init_naa,
-            Rcpp::Named("recruitment_fraction") = recruitment_female,
-            Rcpp::Named("reproductive_contribution") = 1.0),
-        Rcpp::List::create(
-            Rcpp::Named("name") = "male",
-            Rcpp::Named("init_naa") = male_init_naa,
-            Rcpp::Named("recruitment_fraction") = 1.0 - recruitment_female,
-            Rcpp::Named("reproductive_contribution") = 0.0)));
-  }
-
-  /** @brief Return groups in the same order used by parameters and outputs. */
-  Rcpp::List GetSubpopulations() {
-    Rcpp::List result(subpopulations->size());
-    size_t index = 0;
-    for (size_t i = 0; i < subpopulations->size(); ++i) {
-      const auto& group = (*subpopulations)[i];
-      Rcpp::NumericVector initial(group.log_init_naa.size());
-      Rcpp::CharacterVector types(group.log_init_naa.size());
-      for (size_t a = 0; a < group.log_init_naa.size(); ++a, ++index) {
-        initial[a] = std::exp(log_init_naa[index].initial_value_m);
-        types[a] = log_init_naa[index].estimation_type_m.get();
-      }
-      Rcpp::List item = Rcpp::List::create(
-          Rcpp::Named("name") = group.name, Rcpp::Named("init_naa") = initial,
-          Rcpp::Named("init_estimation_type") = types,
-          Rcpp::Named("recruitment_fraction") = group.recruitment_fraction,
-          Rcpp::Named("reproductive_contribution") =
-              group.reproductive_contribution);
-      if (group.growth_id != -999) item["growth_id"] = group.growth_id;
-      if (group.maturity_id != -999) item["maturity_id"] = group.maturity_id;
-      if (!group.selectivity_ids.empty()) {
-        Rcpp::IntegerVector ids(group.selectivity_ids.size());
-        Rcpp::CharacterVector names(group.selectivity_ids.size());
-        size_t j = 0;
-        for (const auto& link : group.selectivity_ids) {
-          ids[j] = link.second;
-          names[j++] = std::to_string(link.first);
-        }
-        ids.attr("names") = names;
-        item["selectivity_ids"] = ids;
-      }
-      result[i] = item;
-    }
-    return result;
-  }
 
   /**
    * @brief Sets the name of the population.
@@ -590,31 +409,6 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     // set relative info
     population->id = this->id;
-    if (!subpopulations->empty()) {
-      if (n_ages.get() < 2 ||
-          log_init_naa.size() != subpopulations->size() * n_ages.get()) {
-        throw std::invalid_argument(
-            "Subpopulation initial abundance must match modeled ages");
-      }
-      for (const auto& group : *subpopulations) {
-        if (group.log_init_naa.size() != static_cast<size_t>(n_ages.get())) {
-          throw std::invalid_argument(
-              "Each subpopulation needs one initial abundance per modeled age");
-        }
-      }
-    }
-    population->subpopulations.resize(subpopulations->size());
-    for (size_t g = 0; g < subpopulations->size(); ++g) {
-      const auto& source = (*subpopulations)[g];
-      auto& target = population->subpopulations[g];
-      target.name = source.name;
-      target.recruitment_fraction = source.recruitment_fraction;
-      target.reproductive_contribution = source.reproductive_contribution;
-      target.growth_id = source.growth_id;
-      target.maturity_id = source.maturity_id;
-      target.selectivity_ids = source.selectivity_ids;
-      target.log_init_naa.resize(source.log_init_naa.size());
-    }
     population->n_years = this->n_years.get();
     population->n_fleets = this->n_fleets.get();
     // only define ages if n_ages greater than 0
@@ -711,25 +505,19 @@ class PopulationInterface : public PopulationInterfaceBase {
 
     for (size_t i = 0; i < log_init_naa.size(); i++) {
       population->log_init_naa[i] = this->log_init_naa[i].initial_value_m;
-      Type& initial_parameter =
-          population->subpopulations.empty()
-              ? population->log_init_naa[i]
-              : population->subpopulations.at(i / n_ages.get())
-                    .log_init_naa.at(i % n_ages.get());
-      initial_parameter = this->log_init_naa[i].initial_value_m;
       if (this->log_init_naa[i].estimation_type_m.get() == "fixed_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_init_naa."
            << this->log_init_naa[i].id_m;
         info->RegisterParameterName(ss.str());
-        info->RegisterParameter(initial_parameter);
+        info->RegisterParameter(population->log_init_naa[i]);
       }
       if (this->log_init_naa[i].estimation_type_m.get() == "random_effects") {
         ss.str("");
         ss << "Population." << this->id << ".log_init_naa."
            << this->log_init_naa[i].id_m;
         info->RegisterRandomEffectName(ss.str());
-        info->RegisterRandomEffect(initial_parameter);
+        info->RegisterRandomEffect(population->log_init_naa[i]);
       }
     }
     info->variable_map[this->log_init_naa.id_m] = &(population)->log_init_naa;
@@ -758,12 +546,6 @@ class PopulationInterface : public PopulationInterfaceBase {
       }
       population->proportion_female[i] =
           this->proportion_female[i].initial_value_m;
-      if (!subpopulations->empty() &&
-          this->proportion_female[i].estimation_type_m.get() != "constant") {
-        throw std::invalid_argument(
-            "proportion_female is unused with explicit "
-            "subpopulations and must be constant");
-      }
       if (this->proportion_female[i].estimation_type_m.get() ==
           "fixed_effects") {
         ss.str("");

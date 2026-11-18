@@ -16,21 +16,12 @@
 #include "../maturity/maturity.hpp"
 #include "../size/size_distribution_provider_base.hpp"
 #include "../size/size_grid.hpp"
-#include "subpopulation.hpp"
 
 namespace fims_popdy {
 
-/** @brief Resolved optional module references for one biological group. */
-template <typename Type>
-struct SubpopulationBiology {
-  std::shared_ptr<GrowthBase<Type>> growth;
-  std::shared_ptr<MaturityBase<Type>> maturity;
-  std::map<uint32_t, std::shared_ptr<SelectivityBase<Type>>> selectivity;
-};
-
 /**
- * @brief Population with optional named biological subpopulations.
- * Empty subpopulation configuration retains pooled dynamics.
+ * @brief Population class for pooled population dynamics.
+ * that are divided into generic partitions (e.g., sex, area).
  */
 template <typename Type>
 struct Population : public fims_model_object::FIMSObject<Type> {
@@ -41,8 +32,8 @@ struct Population : public fims_model_object::FIMSObject<Type> {
 
   // parameters are estimated; after initialize in create_model, push_back to
   // parameter list - in information.hpp (same for initial F in fleet)
-  fims::Vector<Type> log_init_naa; /*!< pooled initial parameters, or flattened
-                                      view of group-owned initial parameters */
+  fims::Vector<Type>
+      log_init_naa; /*!< estimated parameter: natural log of numbers at age*/
   fims::Vector<Type>
       log_M; /*!< estimated parameter: natural log of Natural Mortality*/
   fims::Vector<Type> proportion_female = fims::Vector<Type>(
@@ -85,10 +76,6 @@ annual fishing mortality multipliers to scale total mortality of all fleets*/
   std::set<uint32_t> fleet_ids; /*!< id of fleet model object*/
   std::vector<std::shared_ptr<fims_popdy::Fleet<Type>>>
       fleets; /*!< shared pointer to fleet module */
-
-  /** @brief Empty preserves pooled dynamics; otherwise each group has state. */
-  std::vector<Subpopulation<Type>> subpopulations;
-  std::vector<SubpopulationBiology<Type>> subpopulation_biology;
 
   /**
    * @brief Constructor.

@@ -21,6 +21,9 @@ namespace fims_popdy {
 /**
  * @brief Configuration of a group with its own abundance and survival.
  *
+ * Development-only scaffold: not connected to Population, model execution,
+ * parameter registration, reporting, or the R interface.
+ *
  * Each group owns its initial abundance; fractions allocate recruitment.
  * Reproductive contribution multiplies mature biomass; it is not maturity.
  * Recruitment fractions and reproductive contributions are fixed configuration.
