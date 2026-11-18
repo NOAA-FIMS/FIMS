@@ -565,20 +565,17 @@ clear()
 #| message: false
 #| fig.alt: >
 #|   Plot of spawning biomass for each sensitivity model.
-stockplotr::plot_biomass(
-  list(
-    "age" = get_estimates(age_only_fit) |>
-      dplyr::mutate(
-        uncertainty_label = "se",
-        year = year_i,
-        estimate = estimated
-      ),
-    "length" = get_estimates(length_only_fit) |>
-      dplyr::mutate(
-        uncertainty_label = "se",
-        year = year_i,
-        estimate = estimated
-      )
-  )
+stockplotr::plot_spawning_biomass(
+  dplyr::bind_rows(
+    age = get_estimates(age_only_fit),
+    length = get_estimates(length_only_fit),
+    .id = "model"
+  ) |>
+    dplyr::mutate(
+      uncertainty_label = "se",
+      year = year_i,
+      estimate = estimated
+    ),
+  group = "model"
 )
 ```

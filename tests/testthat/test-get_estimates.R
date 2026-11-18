@@ -15,6 +15,19 @@ fit_big_optimized <- FIMS::fit_big_optimized
 fit_big_unoptimized <- FIMS:::fit_big_unoptimized
 
 ## IO correctness ----
+test_that("bundled examples retain pooled spawning biomass outputs", {
+  #' @description Test that serialized example fits and estimates use the active pooled model labels.
+  for (estimates in list(
+    estimates_big_optimized, estimates_big_unoptimized,
+    get_estimates(fit_big_optimized), get_estimates(fit_big_unoptimized)
+  )) {
+    expect_true(all(c(
+      "spawning_biomass", "unfished_spawning_biomass", "spawning_biomass_ratio"
+    ) %in% estimates$label))
+    expect_false(any(grepl("mature_biomass", estimates$label)))
+  }
+})
+
 # Define the expected column names for the estimates tibble
 expected_colnames <- c(
   "module_name", "module_id", "module_type", "label", "type", "type_id",
