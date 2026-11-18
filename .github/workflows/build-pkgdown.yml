@@ -59,7 +59,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::., any::fs, any::jsonlite, any::yaml, any::purrr, any::stringr
+          extra-packages: any::pkgdown, local::., any::rmarkdown, any::purrr, any::jsonlite
           needs: website
 
       - name: build pkgdown
