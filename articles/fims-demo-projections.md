@@ -305,7 +305,7 @@ projection_fit <- parameters_projection |>
 
     ## ✔ Starting optimization ...
     ## ℹ Restarting optimizer 3 times to improve gradient.
-    ## ℹ Maximum gradient went from 0.00257 to 0.00028 after 3 steps.
+    ## ℹ Maximum gradient went from 0.00425 to 0.00038 after 3 steps.
     ## ✔ Finished optimization
     ## ✔ Finished sdreport
     ## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -330,13 +330,13 @@ projection_fit <- parameters_projection |>
     ## 
     ## ✔ Convergence: "OK"
     ## ℹ FIMS model version: 0.11.0.9000
-    ## ℹ Total run time was 10.51182 seconds
+    ## ℹ Total run time was 13.40538 seconds
     ## ℹ Number of parameters: fixed_effects=49, random_effects=39, and total=88
-    ## ℹ Maximum gradient= 0.00028
+    ## ℹ Maximum gradient= 0.00038
     ## ℹ Negative log likelihood (NLL):
     ## • Marginal NLL= 1627.76704
-    ## • Total NLL= 1561.85107
-    ## ℹ Terminal SB= 986.08992
+    ## • Total NLL= 1561.85108
+    ## ℹ Terminal SB= 986.08991
 
 ``` r
 
@@ -369,7 +369,17 @@ stockplotr::plot_biomass(
 
     ## ✔ Conversion finished!
 
+    ## Warning in min(x): no non-missing arguments to min; returning Inf
+
+    ## Warning in max(x): no non-missing arguments to max; returning -Inf
+
     ## ! biomass_msy not found for data
+
+    ## Warning: Removed 41 rows containing missing values or values outside the scale range
+    ## (`geom_ribbon()`).
+
+    ## Warning: Removed 41 rows containing missing values or values outside the scale range
+    ## (`geom_line()`).
 
 ![Plot of spawning biomass for projection
 model.](fims-demo-projections_files/figure-html/fit-plot-projections-1.png)

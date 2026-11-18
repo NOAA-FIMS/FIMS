@@ -56,7 +56,7 @@ metric function:
 | `fleet`        | Fleet name for fleet rows, otherwise `NA`                |
 | `module_id`    | Unique module identifier                                 |
 | `distribution` | Likelihood distribution used for this data stream        |
-| `year_i`       | Year index (present when available in the estimates)     |
+| `year`         | Calendar year                                            |
 | `age`          | Age from the data, `NA` for rows without an age          |
 | `length`       | Length bin from the data, `NA` for rows without a length |
 

@@ -13,6 +13,7 @@ var searchData=
   ['slope_5fdesc_10',['slope_desc',['../classDoubleLogisticSelectivityInterface.html#a44f546b0fd4b8be36722ec6eefe8f904',1,'DoubleLogisticSelectivityInterface::slope_desc'],['../structfims__popdy_1_1DoubleLogisticSelectivity.html#ac4c70f550f23d0a4cd97c402f6e3fff3',1,'fims_popdy::DoubleLogisticSelectivity::slope_desc']]],
   ['spawning_5fbiomass_11',['spawning_biomass',['../classPopulationInterface.html#a540415258a4ff06850352c9ac1015410',1,'PopulationInterface']]],
   ['spawning_5fbiomass_5fratio_12',['spawning_biomass_ratio',['../classPopulationInterface.html#a83d11bfdf0a046650117f5537fef08d3',1,'PopulationInterface::spawning_biomass_ratio'],['../structfims__popdy_1_1Population.html#a8eb044da00071f31ce522bb55359358e',1,'fims_popdy::Population::spawning_biomass_ratio']]],
-  ['storage_5fm_13',['storage_m',['../classVariableVector.html#aa521865cddfc9ffb8b75b7f90cd2d8d0',1,'VariableVector::storage_m'],['../classRealVector.html#a60f12148f4f54adbf68fc515db662e89',1,'RealVector::storage_m']]],
-  ['sum_5fselectivity_14',['sum_selectivity',['../classPopulationInterface.html#a97223beeb3c8a8531ad8215cb224431e',1,'PopulationInterface']]]
+  ['start_5fyear_13',['start_year',['../classPopulationInterface.html#ae2c1a258c7a3a263b1226e9f24207647',1,'PopulationInterface']]],
+  ['storage_5fm_14',['storage_m',['../classVariableVector.html#aa521865cddfc9ffb8b75b7f90cd2d8d0',1,'VariableVector::storage_m'],['../classRealVector.html#a60f12148f4f54adbf68fc515db662e89',1,'RealVector::storage_m']]],
+  ['sum_5fselectivity_15',['sum_selectivity',['../classPopulationInterface.html#a97223beeb3c8a8531ad8215cb224431e',1,'PopulationInterface']]]
 ];

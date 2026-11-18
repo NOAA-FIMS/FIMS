@@ -36,7 +36,7 @@ base_model <- parameters |>
   fit_fims(optimize = TRUE)
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 3 times to improve gradient.
-#> ℹ Maximum gradient went from 0.00904 to 0.00048 after 3 steps.
+#> ℹ Maximum gradient went from 0.0044 to 6e-04 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -61,13 +61,13 @@ base_model <- parameters |>
 #> 
 #> ✔ Convergence: "OK"
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 51.96815 seconds
+#> ℹ Total run time was 1.07307 minutes
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-#> ℹ Maximum gradient= 0.00048
+#> ℹ Maximum gradient= 6e-04
 #> ℹ Negative log likelihood (NLL):
 #> • Marginal NLL= 3231.28735
 #> • Total NLL= 3164.86339
-#> ℹ Terminal SB= 1728.67939
+#> ℹ Terminal SB= 1728.67424
 
 # Clear memory post-run
 clear()
@@ -205,7 +205,7 @@ retro_fit <- run_fims_retrospective(
 #> ℹ running model with 0 years of data removed
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 3 times to improve gradient.
-#> ℹ Maximum gradient went from 0.00904 to 0.00048 after 3 steps.
+#> ℹ Maximum gradient went from 0.0044 to 6e-04 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -222,18 +222,18 @@ retro_fit <- run_fims_retrospective(
 #> 
 #> ✔ Convergence: "OK"
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 52.73383 seconds
+#> ℹ Total run time was 1.08175 minutes
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-#> ℹ Maximum gradient= 0.00048
+#> ℹ Maximum gradient= 6e-04
 #> ℹ Negative log likelihood (NLL):
 #> • Marginal NLL= 3231.28735
 #> • Total NLL= 3164.86339
-#> ℹ Terminal SB= 1728.67939
+#> ℹ Terminal SB= 1728.67424
 #> ℹ running model with 1 years of data removed
 #> 
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 3 times to improve gradient.
-#> ℹ Maximum gradient went from 0.00833 to 0.00025 after 3 steps.
+#> ℹ Maximum gradient went from 0.00453 to 0.00037 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -250,18 +250,18 @@ retro_fit <- run_fims_retrospective(
 #> 
 #> ✔ Convergence: "OK"
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 49.60474 seconds
+#> ℹ Total run time was 1.07916 minutes
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-#> ℹ Maximum gradient= 0.00025
+#> ℹ Maximum gradient= 0.00037
 #> ℹ Negative log likelihood (NLL):
 #> • Marginal NLL= 3132.00827
-#> • Total NLL= 3066.98892
-#> ℹ Terminal SB= 1654.1506
+#> • Total NLL= 3066.98893
+#> ℹ Terminal SB= 1654.17341
 #> ℹ running model with 2 years of data removed
 #> 
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 3 times to improve gradient.
-#> ℹ Maximum gradient went from 0.00221 to 0.00028 after 3 steps.
+#> ℹ Maximum gradient went from 0.00206 to 0.00034 after 3 steps.
 #> ✔ Finished optimization
 #> ✔ Finished sdreport
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
@@ -278,13 +278,13 @@ retro_fit <- run_fims_retrospective(
 #> 
 #> ✔ Convergence: "OK"
 #> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 52.93319 seconds
+#> ℹ Total run time was 1.0461 minutes
 #> ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78
-#> ℹ Maximum gradient= 0.00028
+#> ℹ Maximum gradient= 0.00034
 #> ℹ Negative log likelihood (NLL):
 #> • Marginal NLL= 3036.85438
-#> • Total NLL= 2973.27388
-#> ℹ Terminal SB= 1500.15865
+#> • Total NLL= 2973.27389
+#> ℹ Terminal SB= 1500.18512
 ```
 
 ### Mohn’s Rho
@@ -300,20 +300,18 @@ rho_sb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
 ### Visualize the results
 
 To visualize the results of the retrospective analysis, we can use
-`plot_retrospective()` to display the quantity of interest. Below, we
-want to assess the impact on spawning biomass. The function returns a
-`ggplot` object, which you can customize by adding add layers as you
-normally would to a `ggplot`. For example, below, we specify the x and y
-axes labels and the legend title.
+[`plot_retrospective()`](https://rdrr.io/pkg/stockplotr/man/plot_retrospective.html)
+to display the quantity of interest. Below, we want to assess the impact
+on spawning biomass. The function returns a `ggplot` object, which you
+can customize by adding add layers as you normally would to a `ggplot`.
+For example, below, we specify the x and y axes labels and the legend
+title.
 
 ``` r
 
 fig_retrospective_sb <- stockplotr::plot_spawning_biomass(
   retro_fit$estimates |>
-    dplyr::rename(
-      year = year_i,
-      estimate = estimated
-    ) |>
+    dplyr::rename(estimate = estimated) |>
     dplyr::mutate(
       uncertainty_label = "se"
     ),
@@ -334,13 +332,13 @@ and each peel for the last six years.
 
 retro_fit[["estimates"]] |>
   dplyr::filter(label == "spawning_biomass") |>
-  dplyr::select(label, year_i, estimated, retrospective_peel) |>
+  dplyr::select(label, year, estimated, retrospective_peel) |>
   tidyr::pivot_wider(
     names_from = retrospective_peel,
     values_from = estimated
   ) |>
   dplyr::rename(
-    "Year" = year_i,
+    "Year" = year,
     "Reference model" = `0`,
     "Peel 1" = `1`,
     "Peel 2" = `2`

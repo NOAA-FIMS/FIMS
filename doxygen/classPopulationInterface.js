@@ -37,6 +37,7 @@ var classPopulationInterface =
     [ "recruitment_id", "classPopulationInterface.html#ac29b9cd4342fce77b72213d7a448bdf6", null ],
     [ "spawning_biomass", "classPopulationInterface.html#a540415258a4ff06850352c9ac1015410", null ],
     [ "spawning_biomass_ratio", "classPopulationInterface.html#a83d11bfdf0a046650117f5537fef08d3", null ],
+    [ "start_year", "classPopulationInterface.html#ae2c1a258c7a3a263b1226e9f24207647", null ],
     [ "sum_selectivity", "classPopulationInterface.html#a97223beeb3c8a8531ad8215cb224431e", null ],
     [ "total_catch_numbers", "classPopulationInterface.html#a6aa1f707b4be582d894fed7b1ca75ec1", null ],
     [ "total_catch_weight", "classPopulationInterface.html#ad52dec6945385780ce27d5ffc7952150", null ],

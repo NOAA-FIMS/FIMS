@@ -1,5 +1,6 @@
 var NAVTREEINDEX7 =
 {
+"structfims__popdy_1_1LogisticSelectivity.html":[2,0,5,25],
 "structfims__popdy_1_1LogisticSelectivity.html#a47d008ca4b862abca4f361d68b07d4f0":[1,0,0,25,3],
 "structfims__popdy_1_1LogisticSelectivity.html#a47d008ca4b862abca4f361d68b07d4f0":[2,0,5,25,3],
 "structfims__popdy_1_1LogisticSelectivity.html#a7e5e73a7689cefb1949cb844d12307b8":[1,0,0,25,0],

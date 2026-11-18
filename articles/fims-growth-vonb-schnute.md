@@ -555,38 +555,34 @@ fit <- FIMS::fit_fims(
 )
 #> ✔ Starting optimization ...
 #> ℹ Restarting optimizer 5 times to improve gradient.
-#> ℹ Maximum gradient went from 0.00042 to 1e-04 after 5 steps.
-#> ✔ Finished optimization
+#> ── `stats::nlminb()` failure details ───────────────────────────────────────────
+#> 
+#> ! `nlminb()` failed during loop 1.
+#> ℹ The model successfully converged before this loop.
+#> ℹ The failed results are being returned.
+#> Warning: ✖ `fit_fims()` did not lead to a converged model.
+#> ℹ The resulting coefficients, probability values, or predictions are not
+#>   accurate or stable and should not be used for management.
+#> ℹ A <FIMSFit> object containing partial results is returned.
+#> ℹ Type the name of the variable you assigned it (e.g., `fit <- ...`) to inspect
+#>   the model inputs and configuration.
+#> ℹ Run `sanity_fims(fit)` to see each convergence check, or
+#>   `get_convergence(fit)` for the same checks as a tibble.
+#> ℹ To check the starting values, run `fit_fims(optimize = FALSE)` and look at
+#>   `get_report(fit)`.
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
-#> 
 #> Also defined by 'tibble'
-#> 
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
-#> 
 #> Also defined by 'tibble'
-#> 
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
-#> 
 #> Also defined by 'tibble'
-#> 
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
-#> 
 #> Also defined by 'tibble'
-#> 
+#> Warning: ✖ Negative log-likelihood is not finite for "objective".
+#> ℹ Check the data and starting values for these components.
+#> ℹ Run `sanity_fims(fit)` to see every convergence check.
 #> Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'
-#> 
 #> Also defined by 'tibble'
-#> 
-#> ℹ Convergence: "NOTE" from "sdreport". Use `sanity_fims(fit)` to see each
-#>   check.
-#> ℹ FIMS model version: 0.11.0.9000
-#> ℹ Total run time was 2.62129 minutes
-#> ℹ Number of parameters: fixed_effects=39, random_effects=1, and total=40
-#> ℹ Maximum gradient= 1e-04
-#> ℹ Negative log likelihood (NLL):
-#> • Marginal NLL= 186.26673
-#> • Total NLL= -167.70569
-#> ℹ Terminal SB= 1393517.87869
 
 # Keep only the core VonBertalanffySchnute Growth estimates.
 growth_estimates <- FIMS::get_estimates(fit) |>
@@ -631,7 +627,7 @@ tibble::tibble(
 #> # A tibble: 1 × 2
 #>   convergence max_gradient
 #>         <int>        <dbl>
-#> 1           0    0.0000994
+#> 1           1     0.000597
 ```
 
 A convergence code of `0` indicates normal optimizer convergence. The

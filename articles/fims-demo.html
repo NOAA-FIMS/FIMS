@@ -820,7 +820,7 @@ errors are not calculated.</p>
 <span><span class="co">## ✖ Convergence: "FAIL" from "optimizer", "max_gradient", and "sdreport". Use</span></span>
 <span><span class="co">##   `sanity_fims(fit)` to see each check.</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 2.43714 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 2.98532 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
 <span><span class="co">## ℹ Maximum gradient= 27.41724</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
@@ -871,7 +871,6 @@ looking.</p>
 <span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_FIMSFit.html">get_estimates</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    uncertainty_label <span class="op">=</span> <span class="st">"se"</span>,</span>
-<span>    year <span class="op">=</span> <span class="va">year_i</span>,</span>
 <span>    estimate <span class="op">=</span> <span class="va">estimated</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/convert_output.html" class="external-link">convert_output</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -892,11 +891,17 @@ looking.</p>
 <span>  y <span class="op">=</span> <span class="st">"estimate"</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="st">"natural log of Fishing Mortality"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in min(x): no non-missing arguments to min; returning Inf</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in max(x): no non-missing arguments to max; returning -Inf</span></span></code></pre>
 <pre><code><span><span class="co">## ℹ Estimates are negative.</span></span></code></pre>
 <pre><code><span><span class="co">## ℹ If estimates were log-transformed, please update the y axis label for accuracy.</span></span></code></pre>
 <pre><code><span><span class="co">## ℹ Example: log(natural log of Fishing Mortality)</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 30 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_ribbon()`).</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 30 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_line()`).</span></span></code></pre>
 <p><img src="fims-demo_files/figure-html/fit-plot-log-fishing-mortality-1.png" class="r-plt" alt="Plot of log fishing mortality." width="700"></p>
-<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_timeseries.html" class="external-link">plot_timeseries</a></span><span class="op">(</span></span>
 <span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/filter_data.html" class="external-link">filter_data</a></span><span class="op">(</span></span>
 <span>    <span class="va">output</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">fleet</span> <span class="op">==</span> <span class="st">"survey1"</span><span class="op">)</span>,</span>
@@ -915,9 +920,22 @@ looking.</p>
 <span>    <span class="op">)</span>,</span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">year</span>, y <span class="op">=</span> <span class="va">observed</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in min(x): no non-missing arguments to min; returning Inf</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in max(x): no non-missing arguments to max; returning -Inf</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 30 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_ribbon()`).</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 30 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_line()`).</span></span></code></pre>
 <p><img src="fims-demo_files/figure-html/fit-plot-index-of-abundance-1.png" class="r-plt" alt="Plot of estimated index of abundance versus observed values." width="700"></p>
-<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_landings.html" class="external-link">plot_landings</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## ℹ No predicted landings found for the years with observed landings; plotting the observed landings only.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in min(x): no non-missing arguments to min; returning Inf</span></span></code></pre>
+<pre><code><span><span class="co">## Warning in max(x): no non-missing arguments to max; returning -Inf</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 30 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_ribbon()`).</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: Removed 30 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">## (`geom_line()`).</span></span></code></pre>
 <p><img src="fims-demo_files/figure-html/fit-plot-catch-1.png" class="r-plt" alt="Plot of estimated catch." width="700"></p>
 </div>
 <div class="section level3">
@@ -932,7 +950,7 @@ that is used to fit the model.</p>
 <p>For example, one could change the initial value used for the slope of
 the logistic curve for the survey to see if the terminal estimate
 changes due to changes to the initial value.</p>
-<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb97"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters_high_slope</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Update the slope value of the logistic selectivity for the survey</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
@@ -961,7 +979,7 @@ changes due to changes to the initial value.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00309 to 0.00043 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.00206 to 0.00041 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span>
@@ -978,14 +996,14 @@ changes due to changes to the initial value.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## ✔ Convergence: "OK"</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 49.13343 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 57.19909 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">## ℹ Maximum gradient= 0.00043</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00041</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
 <span><span class="co">## • Marginal NLL= 3231.25994</span></span>
 <span><span class="co">## • Total NLL= 3164.83637</span></span>
-<span><span class="co">## ℹ Terminal SB= 1791.58429</span></span></code></pre>
-<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r">
+<span><span class="co">## ℹ Terminal SB= 1791.57926</span></span></code></pre>
+<div class="sourceCode" id="cb99"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">low_slope_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_low_slope</span> <span class="op">|&gt;</span></span>
@@ -993,7 +1011,7 @@ changes due to changes to the initial value.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00766 to 0.00034 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.00224 to 0.00065 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span>
@@ -1010,14 +1028,14 @@ changes due to changes to the initial value.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## ✔ Convergence: "OK"</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 45.65334 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 55.82075 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">## ℹ Maximum gradient= 0.00034</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00065</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
 <span><span class="co">## • Marginal NLL= 3231.25994</span></span>
-<span><span class="co">## • Total NLL= 3164.83637</span></span>
-<span><span class="co">## ℹ Terminal SB= 1791.58697</span></span></code></pre>
-<div class="sourceCode" id="cb88"><pre class="downlit sourceCode r">
+<span><span class="co">## • Total NLL= 3164.83638</span></span>
+<span><span class="co">## ℹ Terminal SB= 1791.58707</span></span></code></pre>
+<div class="sourceCode" id="cb101"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -1026,7 +1044,7 @@ changes due to changes to the initial value.</p>
 <p>One could also change the default selectivity configuration for the
 survey, update default parameterization, and evaluate the ability to
 estimate a small number of age-specific parameter values.</p>
-<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb102"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Update "survey1" selectivity from "Logistic" to "AgeSpecificSelectivity"</span></span>
 <span><span class="co"># This function is also used by setup_default_parameters()</span></span>
 <span><span class="va">age_specific_selectivity_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/setup_default_Selectivity.html">setup_default_Selectivity</a></span><span class="op">(</span></span>
@@ -1051,7 +1069,7 @@ estimate a small number of age-specific parameter values.</p>
 <span><span class="co">## 11 Selectivity surv… AgeSpecific logi…    11     NA     NA  9.00 fixed_effects  </span></span>
 <span><span class="co">## 12 Selectivity surv… AgeSpecific logi…    12     NA     NA 10.0  constant       </span></span>
 <span><span class="co">## # ℹ 2 more variables: distribution_type &lt;chr&gt;, distribution &lt;chr&gt;</span></span></code></pre>
-<div class="sourceCode" id="cb91"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb104"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters_age_specific_selectivity</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="op">(</span><span class="va">fleet</span> <span class="op">==</span> <span class="st">"survey1"</span> <span class="op">&amp;</span> <span class="va">module_name</span> <span class="op">==</span> <span class="st">"Selectivity"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">age_specific_selectivity_default</span><span class="op">)</span></span>
@@ -1075,7 +1093,7 @@ estimate a small number of age-specific parameter values.</p>
 <span><span class="co">## 10 AgeSpecific survey1 logit_sel_at_age    10  8.00 fixed_effects  </span></span>
 <span><span class="co">## 11 AgeSpecific survey1 logit_sel_at_age    11  9.00 fixed_effects  </span></span>
 <span><span class="co">## 12 AgeSpecific survey1 logit_sel_at_age    12 10.0  constant</span></span></code></pre>
-<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb106"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Update the age-specific selectivity parameterization to facilitate estimation</span></span>
 <span><span class="co"># Values for first two ages are set to generic initial values and estimated</span></span>
 <span><span class="co"># using "fixed_effects"</span></span>
@@ -1103,7 +1121,7 @@ estimate a small number of age-specific parameter values.</p>
 <span>  <span class="fu"><a href="../reference/fit_fims.html">fit_fims</a></span><span class="op">(</span>optimize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00712 to 0.00028 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.00393 to 0.00051 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span>
@@ -1120,14 +1138,14 @@ estimate a small number of age-specific parameter values.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## ✔ Convergence: "OK"</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 46.44588 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 57.72544 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">## ℹ Maximum gradient= 0.00028</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00051</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
 <span><span class="co">## • Marginal NLL= 3231.29832</span></span>
 <span><span class="co">## • Total NLL= 3164.88132</span></span>
-<span><span class="co">## ℹ Terminal SB= 1791.01628</span></span></code></pre>
-<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
+<span><span class="co">## ℹ Terminal SB= 1791.0139</span></span></code></pre>
+<div class="sourceCode" id="cb108"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_FIMSFit.html">get_estimates</a></span><span class="op">(</span><span class="va">age_specific_selectivity_fit</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">module_name</span> <span class="op">==</span> <span class="st">"Selectivity"</span>, <span class="va">module_type</span> <span class="op">==</span> <span class="st">"AgeSpecific"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## # A tibble: 12 × 24</span></span>
@@ -1145,11 +1163,11 @@ estimate a small number of age-specific parameter values.</p>
 <span><span class="co">## 10 Selectivity         2 AgeSpecific logit_sel… vect…      31          373 surv…</span></span>
 <span><span class="co">## 11 Selectivity         2 AgeSpecific logit_sel… vect…      31          374 surv…</span></span>
 <span><span class="co">## 12 Selectivity         2 AgeSpecific logit_sel… vect…      31          375 surv…</span></span>
-<span><span class="co">## # ℹ 16 more variables: year_i &lt;int&gt;, age &lt;dbl&gt;, length &lt;dbl&gt;, input &lt;dbl&gt;,</span></span>
+<span><span class="co">## # ℹ 16 more variables: year &lt;int&gt;, age &lt;dbl&gt;, length &lt;dbl&gt;, input &lt;dbl&gt;,</span></span>
 <span><span class="co">## #   estimated &lt;dbl&gt;, expected &lt;dbl&gt;, observed &lt;dbl&gt;, estimation_type &lt;chr&gt;,</span></span>
 <span><span class="co">## #   uncertainty &lt;dbl&gt;, distribution &lt;chr&gt;, input_type &lt;chr&gt;, lpdf &lt;dbl&gt;,</span></span>
 <span><span class="co">## #   likelihood &lt;dbl&gt;, log_sd &lt;dbl&gt;, log_like_cv &lt;dbl&gt;, gradient &lt;dbl&gt;</span></span></code></pre>
-<div class="sourceCode" id="cb97"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb110"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -1157,7 +1175,7 @@ estimate a small number of age-specific parameter values.</p>
 </h4>
 <p>The same model can be fit to just the age data, removing the
 length-composition configurations.</p>
-<div class="sourceCode" id="cb98"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb111"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># and fit the model</span></span>
 <span><span class="va">age_only_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_data</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -1181,9 +1199,11 @@ length-composition configurations.</p>
 <pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
 <pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
 <pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
+<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
+<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00287 to 0.00036 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.00225 to 0.00034 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span>
 <span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span>
@@ -1200,14 +1220,14 @@ length-composition configurations.</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## ✔ Convergence: "OK"</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 8.81135 seconds</span></span>
+<span><span class="co">## ℹ Total run time was 11.32317 seconds</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">## ℹ Maximum gradient= 0.00036</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00034</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
 <span><span class="co">## • Marginal NLL= 1627.76704</span></span>
 <span><span class="co">## • Total NLL= 1564.08529</span></span>
-<span><span class="co">## ℹ Terminal SB= 1740.95158</span></span></code></pre>
-<div class="sourceCode" id="cb118"><pre class="downlit sourceCode r">
+<span><span class="co">## ℹ Terminal SB= 1740.95011</span></span></code></pre>
+<div class="sourceCode" id="cb133"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
@@ -1215,7 +1235,7 @@ length-composition configurations.</p>
 </h4>
 <p>The same model can be fit to just the length data, removing the
 age-composition configurations.</p>
-<div class="sourceCode" id="cb119"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb134"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">length_only_fit</span> <span class="op">&lt;-</span> <span class="va">parameters_4_model</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/initialize_fims.html">initialize_fims</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="../reference/get_FIMSFrame.html">get_data</a></span><span class="op">(</span><span class="va">data_4_model</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">type</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age_comp"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -1224,11 +1244,9 @@ age-composition configurations.</p>
 <pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
 <pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
 <pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
-<pre><code><span><span class="co">## Found more than one class "tbl_df" in cache; using the first, from namespace 'FIMS'</span></span></code></pre>
-<pre><code><span><span class="co">## Also defined by 'tibble'</span></span></code></pre>
 <pre><code><span><span class="co">## ✔ Starting optimization ...</span></span>
 <span><span class="co">## ℹ Restarting optimizer 3 times to improve gradient.</span></span>
-<span><span class="co">## ℹ Maximum gradient went from 0.00473 to 0.00025 after 3 steps.</span></span>
+<span><span class="co">## ℹ Maximum gradient went from 0.02402 to 0.00027 after 3 steps.</span></span>
 <span><span class="co">## ✔ Finished optimization</span></span>
 <span><span class="co">## ✔ Finished sdreport</span></span></code></pre>
 <pre><code><span><span class="co">## Warning: ! 1 fixed or random effect has a standard error above 1000:</span></span>
@@ -1245,16 +1263,16 @@ age-composition configurations.</p>
 <span><span class="co">## ! Convergence: "WARN" from "large_standard_errors". Use `sanity_fims(fit)` to</span></span>
 <span><span class="co">##   see each check.</span></span>
 <span><span class="co">## ℹ FIMS model version: 0.11.0.9000</span></span>
-<span><span class="co">## ℹ Total run time was 1.07912 minutes</span></span>
+<span><span class="co">## ℹ Total run time was 1.27457 minutes</span></span>
 <span><span class="co">## ℹ Number of parameters: fixed_effects=49, random_effects=29, and total=78</span></span>
-<span><span class="co">## ℹ Maximum gradient= 0.00025</span></span>
+<span><span class="co">## ℹ Maximum gradient= 0.00027</span></span>
 <span><span class="co">## ℹ Negative log likelihood (NLL):</span></span>
-<span><span class="co">## • Marginal NLL= 1568.32685</span></span>
+<span><span class="co">## • Marginal NLL= 1568.32686</span></span>
 <span><span class="co">## • Total NLL= 1518.62645</span></span>
-<span><span class="co">## ℹ Terminal SB= 1722.36309</span></span></code></pre>
-<div class="sourceCode" id="cb129"><pre class="downlit sourceCode r">
+<span><span class="co">## ℹ Terminal SB= 1722.35773</span></span></code></pre>
+<div class="sourceCode" id="cb142"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Cpp_functions.html">clear</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb130"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb143"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/plot_biomass.html" class="external-link">plot_biomass</a></span><span class="op">(</span></span>
 <span>  <span class="fu">stockplotr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/stockplotr/man/convert_output.html" class="external-link">convert_output</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
