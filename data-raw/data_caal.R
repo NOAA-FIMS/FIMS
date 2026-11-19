@@ -257,7 +257,7 @@ for (iter in 1:sim_num) {
   em_input[["L.caal.obs"]][["fleet1"]] <- vector(length = om_input[["nyr"]] * length(om_input[["ages"]]) * length(len_bins))
   em_input[["survey_caal.obs"]][["survey1"]] <- vector(length = om_input[["nyr"]] * length(om_input[["ages"]]) * length(len_bins))
 
- 
+
   em_input[["lengths"]] <- len_bins
   em_input[["nlengths"]] <- length(len_bins)
   em_input[["cv.length_at_age"]] <- cv
@@ -294,10 +294,10 @@ for (iter in 1:sim_num) {
           age_to_length_conversion[k, j] *
             em_input[["survey.age.obs"]][[1]][i, k]
 
-        #Calculate conditional age at length values and insert in row index 
-        #sorted by year, then age, then length bin.
+        # Calculate conditional age at length values and insert in row index
+        # sorted by year, then age, then length bin.
         caal_row <- (i - 1) * length(om_input[["ages"]]) * length(len_bins) + (k - 1) * length(len_bins) + j
-        
+
         om_output[["N.caal"]][caal_row] <- om_output[["N.caal"]][caal_row] +
           age_to_length_conversion[k, j] *
             om_output[["N.age"]][i, k]
@@ -533,12 +533,12 @@ length_comp_data <- data.frame(
   )
 )
 
-# Create a conditional age-at-length (CAAL) composition data frame that will 
+# Create a conditional age-at-length (CAAL) composition data frame that will
 # be filled by transforming the age composition data
 caal_comp_data <- data.frame(
   type = "caal_comp",
-  fleet = sort(rep(observers, length(len_bins) * length(timing_fishery[["timing"]])*length(ages))),
-  age = rep(rep(ages, each = length(len_bins)), length(observers)*length(timing_fishery[["timing"]])),
+  fleet = sort(rep(observers, length(len_bins) * length(timing_fishery[["timing"]]) * length(ages))),
+  age = rep(rep(ages, each = length(len_bins)), length(observers) * length(timing_fishery[["timing"]])),
   length = rep(len_bins, length(ages) * length(timing_fishery[["timing"]]) * length(observers)),
   timing = rep(rep(timing_fishery[["timing"]], each = length(len_bins) * length(ages)), length(observers)),
   observed = c(
