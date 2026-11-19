@@ -98,29 +98,29 @@ test_that("run_fims_retrospective() works with correct inputs", {
     )
   expect_equal(
     object = last_years[["last_year"]],
-    expected = 30 - last_years[["retrospective_peel"]]
+    expected = get_end_year(data_4_model) - last_years[["retrospective_peel"]]
   )
 
-  # Year 30 is the start of the year after the last year of the 1-year peel,
-  # which is the year calculate_mohns_rho() uses for that peel
+  # Year 29 is the last model year of the 1-year peel, which is the year
+  # calculate_mohns_rho() compares for that peel
   retro_sb <- retro_fit[["estimates"]] |>
     dplyr::filter(label == "spawning_biomass") |>
     dplyr::select(label, year, estimated, retrospective_peel) |>
     tidyr::pivot_wider(names_from = retrospective_peel, values_from = estimated) |>
-    dplyr::filter(year == 30) |>
+    dplyr::filter(year == 29) |>
     dplyr::select(-c(1, 2)) |>
     as.numeric()
 
-  #' @description Test that the spawning biomass at the start of year 30 from
-  #' the base model and the 1-year peel match earlier runs.
+  #' @description Test that the spawning biomass in year 29 from the base model
+  #' and the 1-year peel match earlier runs.
   expect_equal(
     object = retro_sb,
-    expected = c(1827.167, 1715.361),
-    tolerance = .1
+    expected = c(1723.985, 1608.494),
+    tolerance = 1e-3
   )
 })
 
-test_that("run_modified_data_fims() keeps length_bin rows", {
+test_that("run_modified_data_fims() removes catch and keeps length_bin rows", {
   # The fleet1 length_bin rows are the only length data. They set the population
   # length bins that mean weight at age is averaged over, so the jnll changes if
   # they are dropped. Von Bertalanffy growth gives length at age, so the

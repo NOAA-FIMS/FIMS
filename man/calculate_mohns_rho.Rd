@@ -9,7 +9,7 @@ calculate_mohns_rho(retro_fit, quantity)
 \arguments{
 \item{retro_fit}{List returned by the \code{\link[=run_fims_retrospective]{run_fims_retrospective()}} function
 containing \code{years_to_remove} (vector of years peeled) and \code{estimates}
-(data frame with retrospective results)}
+(data frame with retrospective results, including the \code{log_Fmort} rows)}
 
 \item{quantity}{Character string specifying which quantity to calculate
 Mohn's rho for (e.g., "spawning_biomass", "expected_recruitment")}
@@ -34,6 +34,12 @@ The formula for Mohn's rho is:
 where n is the number of retrospective peels, \eqn{x_{peel,i}} is the
 estimated value from peel i at its terminal year, and \eqn{x_{base,i}} is
 the value from the base model at that same year.
+
+The terminal year of a peel is its last model year, which is the last year
+of \code{log_Fmort}. Some quantities, such as \code{spawning_biomass} and
+\code{expected_recruitment}, also have a value for the start of the year after,
+which is not used. For recruitment, that value is the mean of the
+stock-recruitment relationship, with no recruitment deviation.
 }
 \details{
 Calculate Mohn's rho for retrospective analysis

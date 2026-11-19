@@ -141,7 +141,9 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
   if ("FIMSFrame" %in% methods::is(data)) {
     data_to_use <- data@data
   } else {
-    data_to_use <- data
+    # FIMSFrame() adds -999 rows for years without data, so the last year of
+    # the peel has rows even if nothing was observed in it
+    data_to_use <- FIMS::FIMSFrame(data)@data
   }
 
   # Remove all data after the last year of the peel, including catch, so the

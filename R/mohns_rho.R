@@ -16,9 +16,15 @@
 #' estimated value from peel i at its terminal year, and \eqn{x_{base,i}} is
 #' the value from the base model at that same year.
 #'
+#' The terminal year of a peel is its last model year, which is the last year
+#' of `log_Fmort`. Some quantities, such as `spawning_biomass` and
+#' `expected_recruitment`, also have a value for the start of the year after,
+#' which is not used. For recruitment, that value is the mean of the
+#' stock-recruitment relationship, with no recruitment deviation.
+#'
 #' @param retro_fit List returned by the [run_fims_retrospective()] function
 #' containing `years_to_remove` (vector of years peeled) and `estimates`
-#' (data frame with retrospective results)
+#' (data frame with retrospective results, including the `log_Fmort` rows)
 #' @param quantity Character string specifying which quantity to calculate
 #' Mohn's rho for (e.g., "spawning_biomass", "expected_recruitment")
 #'
@@ -105,8 +111,28 @@ calculate_mohns_rho <- function(retro_fit, quantity) {
   # Initialize vector to store relative differences
   mohn_values <- numeric()
 
-  # Calculate vector of ending year for each model
-  end_year <- max(retro_estimates$year, na.rm = TRUE) - retro_fit$years_to_remove
+  # Each peel is compared in its last model year, which is the last year of
+  # log_Fmort (1 value per fleet and model year). The value that some
+  # quantities have for the start of the year after is not used. For
+  # recruitment, it is the stock-recruitment mean with no deviation.
+  reference_Fmort_years <- retro_fit[["estimates"]] |>
+    dplyr::filter(
+      .data$label == "log_Fmort",
+      .data$retrospective_peel == retro_fit[["years_to_remove"]][[1]]
+    ) |>
+    dplyr::pull(.data$year)
+  if (length(reference_Fmort_years) == 0) {
+    cli::cli_abort(c(
+      "x" = "{.arg retro_fit} has no {.val log_Fmort} estimates for the
+      reference run.",
+      "i" = "The last model year of each run is the last year of
+      {.val log_Fmort}, so it is needed to find the year to compare.",
+      "i" = "Use {.code dplyr::count(retro_fit[['estimates']], label)} to see
+      the estimates."
+    ))
+  }
+  end_year <- max(reference_Fmort_years, na.rm = TRUE) -
+    retro_fit$years_to_remove
 
   # Calculate relative differences for each peel (excluding reference model)
   for (i in 2:length(retro_fit$years_to_remove)) {
