@@ -106,9 +106,15 @@ run_modified_pars_fims <- function(
 #' Function to remove a given number of years of data and run FIMS model.
 #' This function is called by run_fims_retrospective()
 #'
+#' All data after the last year that is kept are removed, including catch, so
+#' the model ends in that year. The weight at age in the year after the last
+#' year is kept because the biomass at the start of that year needs it.
+#'
 #' @param years_to_remove number of years to remove
 #' @param data full dataset used in base model run
-#' @param parameters input parameters used in base FIMS model
+#' @param parameters input parameters used in base FIMS model. Rows with a
+#'   `timing` after the last year that is kept, e.g., `log_Fmort`, `log_devs`,
+#'   and `log_M`, are removed.
 #' @return FIMS model fitted with years of data removed
 #' @export
 #' @keywords diagnostics
@@ -138,10 +144,12 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
     data_to_use <- data
   }
 
-  # Remove years from data, but leave catch, weight_at_age, ageing_error,
-  # age_to_length_conversion, and length_bin (if present)
+  # Remove all data after the last year of the peel, including catch, so the
+  # peel is not fit to data from the years it removes. FIMSFrame() sets the
+  # model years from the data, so the peel also ends in that year.
   if (years_to_remove == 0) {
     data_mod <- data_to_use
+    parameters_mod <- parameters
   } else {
     # exclude weight-at-age and ageing error from the calculation of the max
     # year of data
@@ -149,13 +157,22 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
       dplyr::filter(!.data[["type"]] %in% c("weight_at_age", "ageing_error")) |>
       dplyr::pull(.data[["timing"]]) |>
       max(na.rm = TRUE)
+    last_year <- max_timing - years_to_remove
+    # Rows without a timing, e.g., length_bin rows, apply to every year
     data_mod <- data_to_use |>
       dplyr::filter(
-        (.data[["type"]] %in% c(
-          "catch", "age_to_length_conversion", "weight_at_age",
-          "ageing_error", "length_bin"
-        )) |
-          .data[["timing"]] <= max_timing - years_to_remove
+        is.na(.data[["timing"]]) |
+          .data[["timing"]] <= last_year |
+          # Biomass is also calculated at the start of the year after the last
+          # model year, which needs the weight at age in that year
+          (.data[["type"]] == "weight_at_age" &
+            .data[["timing"]] == last_year + 1)
+      )
+    # Parameters with 1 value per year, e.g., log_Fmort, log_devs, and log_M,
+    # need 1 value per year of the peel
+    parameters_mod <- parameters |>
+      dplyr::filter(
+        is.na(.data[["timing"]]) | .data[["timing"]] <= last_year
       )
   }
   # convert to FIMSFrame format
@@ -166,8 +183,7 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
     "running model with {years_to_remove} years of data removed"
   )
 
-  # User supplies parameters from base model
-  fit <- parameters |>
+  fit <- parameters_mod |>
     FIMS::initialize_fims(data = data_model) |>
     FIMS::fit_fims(optimize = TRUE)
 

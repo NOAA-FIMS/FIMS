@@ -11,7 +11,9 @@ run_modified_data_fims(years_to_remove = 0, data, parameters)
 
 \item{data}{full dataset used in base model run}
 
-\item{parameters}{input parameters used in base FIMS model}
+\item{parameters}{input parameters used in base FIMS model. Rows with a
+\code{timing} after the last year that is kept, e.g., \code{log_Fmort}, \code{log_devs},
+and \code{log_M}, are removed.}
 }
 \value{
 FIMS model fitted with years of data removed
@@ -19,6 +21,10 @@ FIMS model fitted with years of data removed
 \description{
 Function to remove a given number of years of data and run FIMS model.
 This function is called by run_fims_retrospective()
+
+All data after the last year that is kept are removed, including catch, so
+the model ends in that year. The weight at age in the year after the last
+year is kept because the biomass at the start of that year needs it.
 }
 \examples{
 \dontrun{
