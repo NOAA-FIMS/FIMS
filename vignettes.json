@@ -1,0 +1,79 @@
+[
+  {
+    "title": "Adding a New C++ Module",
+    "summary": "Instructions for adding a new C++ module to FIMS",
+    "level": "contributor",
+    "page": "https://noaa-fims.github.io/FIMS/articles/adding-new-module.html",
+    "source": "vignettes/adding-new-module.Rmd"
+  },
+  {
+    "title": "Simple projections using FIMS",
+    "summary": "Instructions for running a FIMS model with projections.",
+    "level": "intermediate-user",
+    "page": "https://noaa-fims.github.io/FIMS/articles/fims-demo-projections.html",
+    "source": "vignettes/fims-demo-projections.Rmd"
+  },
+  {
+    "title": "Introducing the Fisheries Integrated Modeling System (FIMS)",
+    "summary": "How to run a simple FIMS model.",
+    "level": "new-user",
+    "page": "https://noaa-fims.github.io/FIMS/articles/fims-demo.html",
+    "source": "vignettes/fims-demo.Rmd"
+  },
+  {
+    "title": "Running diagnostics on a FIMS model",
+    "summary": "How to run diagnostics on your FIMS model.",
+    "level": "new-user",
+    "page": "https://noaa-fims.github.io/FIMS/articles/fims-diagnostics.html",
+    "source": "vignettes/fims-diagnostics.Rmd"
+  },
+  {
+    "title": "FIMS Growth With VonBertalanffySchnute",
+    "summary": "Walks through the `VonBertalanffySchnute` growth option in FIMS using simulated data",
+    "level": "intermediate-user",
+    "page": "https://noaa-fims.github.io/FIMS/articles/fims-growth-vonb-schnute.html",
+    "source": "vignettes/fims-growth-vonb-schnute.Rmd"
+  },
+  {
+    "title": "Introducing FIMS input data",
+    "summary": "Details about the data structure for a FIMS model and how to prepare your data for using the `FIMSFrame()` function",
+    "level": "new-user",
+    "page": "https://noaa-fims.github.io/FIMS/articles/fims-input-data.html",
+    "source": "vignettes/fims-input-data.Rmd"
+  },
+  {
+    "title": "FIMS Path: Maturity",
+    "summary": "Describes the hierarchical structure of FIMS by describing the linkages from R to C++ using maturity as an example",
+    "level": "contributor",
+    "page": "https://noaa-fims.github.io/FIMS/articles/fims-path-maturity.html",
+    "source": "vignettes/fims-path-maturity.Rmd"
+  },
+  {
+    "title": "FIMS User Setup Guide",
+    "summary": "Set up a standardized FIMS environment using Google Workstations, Codespaces, WSL, or on your local machine",
+    "level": "intermediate-user",
+    "page": "https://noaa-fims.github.io/FIMS/articles/fims-user-setup-guide.html",
+    "source": "vignettes/fims-user-setup-guide.Rmd"
+  },
+  {
+    "title": "Random Effects Sparsity",
+    "summary": "Investigates the performance and optimization time of simple random effects parameterized as a dense vs. sparse matrix",
+    "level": "contributor",
+    "page": "https://noaa-fims.github.io/FIMS/articles/RD-re-sparsity.html",
+    "source": "vignettes/RD-re-sparsity.Rmd"
+  },
+  {
+    "title": "Intro to C++",
+    "summary": "Intro training to C++ for FIMS development",
+    "level": "contributor",
+    "page": "https://noaa-fims.github.io/FIMS/articles/training-intro-cpp.html",
+    "source": "vignettes/training-intro-cpp.Rmd"
+  },
+  {
+    "title": "Intro to Rcpp",
+    "summary": "Intro training to {Rcpp} for FIMS development",
+    "level": "contributor",
+    "page": "https://noaa-fims.github.io/FIMS/articles/training-intro-rcpp.html",
+    "source": "vignettes/training-intro-rcpp.Rmd"
+  }
+]

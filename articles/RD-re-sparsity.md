@@ -1,4 +1,4 @@
-# RE Sparsity
+# Random Effects Sparsity
 
 ## Introduction
 

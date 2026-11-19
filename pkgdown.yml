@@ -8,13 +8,12 @@ articles:
   fims-diagnostics: fims-diagnostics.html
   fims-growth-vonb-schnute: fims-growth-vonb-schnute.html
   fims-input-data: fims-input-data.html
-  fims-logging: fims-logging.html
   fims-path-maturity: fims-path-maturity.html
   fims-user-setup-guide: fims-user-setup-guide.html
   RD-re-sparsity: RD-re-sparsity.html
   training-intro-cpp: training-intro-cpp.html
   training-intro-rcpp: training-intro-rcpp.html
-last_built: 2026-11-18T21:12Z
+last_built: 2026-11-19T15:39Z
 urls:
   reference: https://NOAA-FIMS.github.io/FIMS/reference
   article: https://NOAA-FIMS.github.io/FIMS/articles

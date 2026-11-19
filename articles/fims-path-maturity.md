@@ -87,9 +87,9 @@ maturity <- FIMS:::initialize_maturity(
 )
 ```
 
-For power users, the methods package can be used to call Rcpp and create
-the module without using lists of parameters or any wrapper functions.
-The following code also creates the same maturity module.
+For contributors, the methods package can be used to call Rcpp and
+create the module without using lists of parameters or any wrapper
+functions. The following code also creates the same maturity module.
 
 ``` r
 
@@ -148,9 +148,9 @@ population <- population_defaults |>
   )
 ```
 
-For power users, the methods package can be used to call Rcpp and create
-the population module without using lists of parameters or any wrapper
-functions.
+For contributors, the methods package can be used to call Rcpp and
+create the population module without using lists of parameters or any
+wrapper functions.
 
 ``` r
 
