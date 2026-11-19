@@ -15,18 +15,43 @@
 namespace fims_popdy {
 
 /**
- * @brief VonBertalanffySchnute growth functor for length-at-age and
- * weight-at-age.
+ * @brief Von Bertalanffy growth using the Schnute parameterization.
  *
- * Parameterization using length at two reference ages:
- * L(a) = mean_length_young +
- *        (mean_length_old - mean_length_young) *
- *        (1 - exp(-growth_coefficient * (a - reference_age_for_length_young)))
- * / (1 - exp(-growth_coefficient * (reference_age_for_length_old -
- * reference_age_for_length_young)))
- * @note Users can anchor at t0 by setting reference_age_for_length_young = 0
- * and mean_length_young = L(0). This is valid as long as
- * reference_age_for_length_old > reference_age_for_length_young.
+ * Mean length at age is defined using lengths at two reference ages:
+ *
+ * \f[
+ * L(a) = L_y + (L_o - L_y)
+ * \frac{1 - \exp[-K(a-a_y)]}{1 - \exp[-K(a_o-a_y)]}
+ * \f]
+ *
+ * where:
+ * - \f$a\f$ is the age being evaluated.
+ * - \f$L_y\f$ is the mean length at the younger reference age
+ *   (`mean_length_young`).
+ * - \f$L_o\f$ is the mean length at the older reference age
+ *   (`mean_length_old`).
+ * - \f$a_y\f$ is the younger reference age
+ *   (`reference_age_for_length_young`).
+ * - \f$a_o\f$ is the older reference age
+ *   (`reference_age_for_length_old`).
+ * - \f$K\f$ is the growth coefficient (`growth_coefficient`).
+ *
+ * @details The equation above describes the main growth curve.
+ * When the younger reference age is greater than zero, mean length
+ * at earlier ages is calculated using a linear ramp from age zero
+ * to the younger reference age. Ages used in the ramp are bounded
+ * below by zero.
+ *
+ * For numerical stability, the implementation applies smooth
+ * approximations to the absolute value and maximum operations,
+ * using 1e-8 as the lower-bound argument. These approximations
+ * can affect the curve when the denominator is small.
+ *
+ * @note When `reference_age_for_length_young` is zero,
+ * `mean_length_young` represents mean length at age zero, L(0).
+ * Setting the reference age to zero does not imply that the
+ * traditional von Bertalanffy zero-length age parameter, t0,
+ * is zero.
  */
 template <typename Type>
 struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
