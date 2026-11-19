@@ -57,36 +57,6 @@ default_model_inspector_output <- function(
   )
 }
 
-make_readable_equation <- function(equation) {
-  equation <- gsub("\\\\_", "_", equation)
-  equation <- gsub("\\\\mathrm\\{([^{}]+)\\}", "\\1", equation, perl = TRUE)
-  equation <- gsub("\\\\text\\{([^{}]+)\\}", "\\1", equation, perl = TRUE)
-  equation <- gsub("\\\\exp", "exp", equation)
-  equation <- gsub("\\\\log", "log", equation)
-  equation <- gsub("\\\\sqrt", "sqrt", equation)
-  equation <- gsub("\\\\times", "*", equation)
-  equation <- gsub("\\\\quad", " ", equation)
-  equation <- gsub("\\\\left|\\\\right", "", equation, perl = TRUE)
-  equation <- gsub("\\\\,", ",", equation)
-  equation <- gsub("\\{([A-Za-z_][A-Za-z0-9_]*)\\}", "\\1", equation, perl = TRUE)
-
-  previous_equation <- NA_character_
-
-  while (!identical(previous_equation, equation)) {
-    previous_equation <- equation
-    equation <- gsub(
-      "\\\\frac\\{([^{}]+)\\}\\{([^{}]+)\\}",
-      "(\\1) / (\\2)",
-      equation,
-      perl = TRUE
-    )
-  }
-
-  equation <- gsub("\\\\([A-Za-z]+)", "\\1", equation, perl = TRUE)
-  equation <- gsub("\\s+", " ", equation)
-  trimws(equation)
-}
-
 # -------------------------------------------------------------------------
 # 1. Parse FIMS documentation links and Rcpp registrations
 # -------------------------------------------------------------------------
@@ -1814,7 +1784,18 @@ module_metadata_for_option <- function(model_role, module_type) {
     )
   })
   equation_rows <- get_equation_rows_for_component(component_name)
-  equations <- make_readable_equation(equation_rows$equation)
+  equations <- lapply(seq_len(nrow(equation_rows)), function(i) {
+    list(
+      display_name = equation_rows[["display_name"]][[i]],
+      entity = equation_rows[["entity"]][[i]],
+      equation = equation_rows$equation[[i]],
+      equation_format = if ("equation_format" %in% names(equation_rows)) {
+        equation_rows$equation_format[[i]]
+      } else {
+        "plain"
+      }
+    )
+  })
 
   list(
     module_type = module_type,
@@ -2568,7 +2549,18 @@ make_module_node <- function(module_row) {
   }
 
   equation_rows <- get_equation_rows_for_component(component_name)
-  equations <- make_readable_equation(equation_rows$equation)
+  equations <- lapply(seq_len(nrow(equation_rows)), function(i) {
+    list(
+      display_name = equation_rows[["display_name"]][[i]],
+      entity = equation_rows[["entity"]][[i]],
+      equation = equation_rows$equation[[i]],
+      equation_format = if ("equation_format" %in% names(equation_rows)) {
+        equation_rows$equation_format[[i]]
+      } else {
+        "plain"
+      }
+    )
+  })
   assumptions <- format_assumptions_for_component(component_name)
   field_notes <- character()
   inactive_fields <- character()
@@ -2797,6 +2789,10 @@ html <- paste0(
   "<meta name='viewport' content='width=device-width, initial-scale=1'>\n",
   "<title>", html_escape(model_title), "</title>\n",
   "<link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Outfit:wght@400;500;600&amp;display=swap'>\n",
+  "<script>\n",
+  "window.MathJax = { tex: { inlineMath: [['\\\\(','\\\\)']], displayMath: [['\\\\[','\\\\]']] }, chtml: { scale: 1, matchFontHeight: false }, startup: { typeset: false } };\n",
+  "</script>\n",
+  "<script defer src='https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'></script>\n",
   "<style>\n",
   ":root{",
   "--ink:#213f4b;--muted:#51595d;--line:#ebeeef;--blue:#2e75b6;",
@@ -2879,6 +2875,7 @@ html <- paste0(
   ".section h3{font-family:Outfit,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:.04em;",
   "color:var(--muted);margin:0 0 8px 0}",
   ".section p{margin:0;color:var(--ink);line-height:1.45}",
+  ".tab-content:is([data-tab='overview'],[data-tab='documentation'])>.section>p:not(.field-note){font-size:14px;line-height:1.5;color:var(--muted)}",
   ".field-note{border:1px solid #d6e6d1;background:#f6faf8;border-radius:7px;",
   "padding:8px 10px;margin:0 0 10px 0;font-size:12px;line-height:1.4}",
   ".field-subheading{font-size:11px;text-transform:uppercase;letter-spacing:.04em;",
@@ -2927,6 +2924,11 @@ html <- paste0(
   ".value-table{width:100%;border-collapse:collapse;font-size:12px;min-width:0}",
   ".value-table th{background:#f8fafb;color:#4a636c;text-align:left;",
   "font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:8px 7px}",
+  ".value-sort{position:relative;display:block;width:100%;border:0;padding:0;margin:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;text-transform:inherit;text-align:inherit;cursor:pointer}",
+  ".value-sort span{display:block;width:16px;margin-top:4px;font-size:13px;line-height:16px;letter-spacing:0;color:var(--muted)}",
+  ".value-table th[aria-sort] .value-sort{color:#0e6876}",
+  ".value-table th[aria-sort] .value-sort span{color:#0e6876;font-weight:700}",
+  ".value-sort:focus-visible{outline:2px solid #0e6876;outline-offset:2px}",
   ".value-table td{border-top:1px solid var(--line);padding:8px 7px;vertical-align:top}",
   ".value-table td:first-child{width:30%}",
   ".value-table td:nth-child(2),.value-table td:nth-child(3){width:16%}",
@@ -2953,6 +2955,11 @@ html <- paste0(
   ".definition-toggle{margin-top:10px;border:1px solid var(--line);background:#fff;",
   "border-radius:999px;padding:5px 9px;font-size:12px;color:var(--teal);cursor:pointer}",
   ".field-box-list{display:grid;gap:8px}",
+  ".documentation-active-fields>.field-box-list,.documentation-active-fields>.chip-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}",
+  ".documentation-active-fields .field-box,.documentation-active-fields .chip{min-width:0;overflow-wrap:anywhere;white-space:normal}",
+  ".definition-toggle+.documentation-active-fields{margin-top:10px}",
+  ".documentation-inactive-fields{margin-top:12px}",
+  ".documentation-inactive-fields>summary{cursor:pointer}",
   ".definition-toggle+.field-box-list{margin-top:10px}",
   ".field-box{border:1px solid var(--line);background:#ffffff;border-radius:8px;",
   "padding:9px 10px}",
@@ -2960,6 +2967,7 @@ html <- paste0(
   "font-size:12px;color:var(--ink);overflow-wrap:anywhere}",
   ".field-box-definition{color:var(--muted);font-size:12px;line-height:1.4;",
   "margin-top:6px}",
+  ".equation-title{font-family:Inter,system-ui,sans-serif;font-size:14px;font-weight:600;line-height:1.4;margin-bottom:8px;overflow-wrap:anywhere}",
   ".equation-box{font-family:Consolas,Menlo,monospace;font-size:12px;line-height:1.35;",
   "background:#f6faf8;border:1px solid #d6e6d1;border-radius:7px;padding:10px;",
   "white-space:pre-wrap;overflow:auto;color:#213f4b;margin-bottom:8px}",
@@ -2967,6 +2975,7 @@ html <- paste0(
   ".assumption-list li{line-height:1.38}",
   ".empty{color:var(--muted);font-style:italic}",
   ".link-list a{display:block;color:var(--teal);font-weight:700;word-break:break-all;margin-bottom:6px}",
+  ".tab-content:is([data-tab='overview'],[data-tab='documentation']) .link-list a{font-size:14px;line-height:1.5;text-decoration:underline}",
   "@media (max-width:1200px){.shell{grid-template-columns:1fr}.inspector{min-height:auto}.graph-panel{min-height:680px}}",
   "@media (max-width:860px){.page{padding:12px}.header{display:block}.graph-grid{grid-template-columns:minmax(var(--graph-col-input-min),1fr) minmax(var(--graph-col-module-min),1.6fr) minmax(var(--graph-col-output-min),1fr)}.stage-modules{grid-template-columns:repeat(2,minmax(160px,1fr))}.graph-panel{min-height:auto}}",
   "</style>\n",
@@ -2997,7 +3006,7 @@ html <- paste0(
   "<div class='graph-grid' id='graphGrid'>",
   render_stage("inputs", "Inputs", nodes),
   render_stage("modules", "Configured Model", nodes),
-  render_stage("outputs", "Expected Outputs", nodes),
+  render_stage("outputs", "Model Outputs", nodes),
   "</section>\n",
   "<aside class='inspector' aria-live='polite'>",
   "<div class='inspector-header'>",
@@ -3029,9 +3038,9 @@ html <- paste0(
   "function renderFieldBoxes(values,node,emptyText='None detected'){values=arrayValue(values).filter(Boolean); if(values.length===0){return `<span class='empty'>${esc(emptyText)}</span>`;} const definitions=fieldDefinitionMap(node); return `<div class='field-box-list'>${values.map((value)=>`<div class='field-box'><div class='field-box-term'>${esc(value)}</div><div class='field-box-definition' data-field-definition hidden>${esc(definitions[value] || 'No definition found yet.')}</div></div>`).join('')}</div>`;}\n",
   "function renderFieldDisplay(values,node,emptyText='None detected'){if(fieldDefinitionMode==='hover'){return renderFieldChips(values,node,emptyText);} return renderFieldBoxes(values,node,emptyText);}\n",
   "function renderDefinitionToggle(node){const labels=arrayValue(node.field_definition_labels).filter(Boolean); if(fieldDefinitionMode==='hover' || labels.length===0){return '';} return `<button type='button' class='definition-toggle' data-toggle-definitions>Show definitions</button>`;}\n",
-  "function renderFields(node){const notes=arrayValue(node.field_notes).filter(Boolean); const inactive=arrayValue(node.inactive_fields).filter(Boolean); let html=''; if(notes.length>0){html += notes.map((note)=>`<p class='field-note'>${esc(note)}</p>`).join('');} html += renderDefinitionToggle(node); if(notes.length===0 && inactive.length===0){html += renderFieldDisplay(node.fields,node);} else {html += `<div class='field-subheading'>Active for this configuration</div>${renderFieldDisplay(node.fields,node)}`; if(inactive.length>0){html += `<div class='field-subheading'>Registered delta-method fields not active here</div>${renderFieldDisplay(inactive,node)}`;}} return html;}\n",
+  "function renderFields(node){const notes=arrayValue(node.field_notes).filter(Boolean); const inactive=arrayValue(node.inactive_fields).filter(Boolean); const active=arrayValue(node.fields).filter((field)=>field && !inactive.includes(field)); let html=''; if(notes.length>0){html += notes.map((note)=>`<p class='field-note'>${esc(note)}</p>`).join('');} html += renderDefinitionToggle(node); if(notes.length>0 || inactive.length>0){html += `<div class='field-subheading'>Active for this configuration</div>`;} html += `<div class='documentation-active-fields'>${renderFieldDisplay(active,node)}</div>`; if(inactive.length>0){html += `<details class='documentation-inactive-fields'><summary class='field-subheading'>Fields not active in this configuration</summary>${renderFieldDisplay(inactive,node)}</details>`;} return html;}\n",
   "function renderAssumptions(values){values=arrayValue(values).filter(Boolean); if(values.length===0){return `<span class='empty'>No tagged assumptions found yet.</span>`;} return `<ul class='assumption-list'>${values.map((value)=>`<li>${esc(value)}</li>`).join('')}</ul>`;}\n",
-  "function renderEquations(node){const equations=arrayValue(node.equations).filter(Boolean); if(equations.length===0){return `<span class='empty'>No equation extracted yet.</span>`;} return equations.slice(0,3).map((eq)=>`<div class='equation-box'>${esc(eq)}</div>`).join('') + `<div class='link-list'><a href='../../equation-catalog/output/fims_equation_catalog.html' target='_blank'>Open equation catalog</a></div>`;}\n",
+  "function renderEquations(node){const equations=arrayValue(node.equations).filter((eq)=>eq && eq.equation); if(equations.length===0){return \"<span class='empty'>No equation extracted yet.</span>\";} return equations.slice(0,3).map((eq)=>{let title=eq.display_name || ''; if(title && eq.entity && eq.entity!==title){title += ': ' + eq.entity;} title=title.replace(/([A-Z]+)([A-Z][a-z])/g,'$1 $2').replace(/([a-z0-9])([A-Z])/g,'$1 $2').replace(/_/g,' '); const heading=title ? \"<div class='equation-title'>\" + esc(title) + '</div>' : ''; const expression=esc(eq.equation); return \"<div class='equation-box'>\" + heading + (eq.equation_format==='latex' ? '\\\\[' + expression + '\\\\]' : expression) + '</div>';}).join('') + \"<div class='link-list'><a href='../../equation-catalog/output/fims_equation_catalog.html' target='_blank'>Open equation catalog</a></div>\";}\n",
   "function renderLinks(node){let links=''; if(node.url){links += `<a href='${esc(node.url)}' target='_blank'>Open Doxygen page</a>`;} if(node.source){links += `<a href='../${esc(node.source)}' target='_blank'>${esc(node.source)}</a>`;} return links || `<span class='empty'>No link available for this node yet.</span>`;}\n",  "function renderOptionContext(node){const selected=node.selected_option_label || node.selected_module_type || ''; const labels=arrayValue(node.available_option_labels).filter(Boolean); if(!selected && labels.length===0){return '';} const others=labels.filter((label)=>label!==selected); const otherHtml=others.length>0 ? renderList(others,'No alternatives listed') : `<span class='empty'>No alternatives listed.</span>`; const roleLabel=(node.role || 'Module').replace(/ module$/i,''); return `<section class='section'><h3>${esc(roleLabel)} option</h3><div class='option-context'><div><strong>Selected</strong><div class='chip-list'><span class='chip'>${esc(selected || node.component || node.label)}</span></div></div><div><strong>Available alternatives</strong>${otherHtml}</div></div></section>`;}\n",
   "function renderFleetGroups(node,title='Fleets'){const groups=arrayValue(node.fleet_groups).filter((group)=>group && arrayValue(group.fleets).filter(Boolean).length>0); if(groups.length===0){return '';} const groupHtml=groups.map((group)=>{const fleets=arrayValue(group.fleets).filter(Boolean); const chips=fleets.map((fleet)=>`<span class='chip'>${esc(fleet)}</span>`).join(''); const count=group.count_label || `${fleets.length} ${fleets.length===1 ? 'fleet' : 'fleets'}`; return `<div class='fleet-group'><div class='fleet-group-title'><span>${esc(group.label || 'Fleets')}</span><span class='fleet-count'>${esc(count)}</span></div><div class='chip-list'>${chips}</div></div>`;}).join(''); return `<section class='section'><h3>${esc(title)}</h3><div class='fleet-groups'>${groupHtml}</div></section>`;}\n",
   "function renderRelatedValueLinks(node){const links=arrayValue(node.related_value_links).filter((link)=>link && link.target_id && nodeById[link.target_id]); if(links.length===0){return '';} const buttons=links.map((link)=>`<button type='button' class='related-link-button' data-related-node='${esc(link.target_id)}' data-related-tab='${esc(link.target_tab || 'values')}'>${esc(link.label)}</button>`).join(''); return `<section class='section'><h3>Related composition data</h3><div class='related-link-list'>${buttons}</div></section>`;}\n",
@@ -3043,15 +3052,54 @@ html <- paste0(
   "function contextWithoutFleet(context){return String(context || '').split(';').map((part)=>part.trim()).filter((part)=>part && !/^fleet\\s+/i.test(part)).join('; ');}\n",
   "function fleetOptionLabel(node,fleet){const groups=arrayValue(node.fleet_groups); for(const group of groups){const fleets=arrayValue(group && group.fleets).filter(Boolean); if(fleets.includes(fleet)){return group.label || '';}} return '';}\n",
   "function parameterGroupLabel(node,row){const fleet=fleetFromContext(row.context); if(!fleet){return '';} const option=fleetOptionLabel(node,fleet); return option ? `${option}: ${fleet}` : fleet;}\n",
-  "function renderParameterTable(rows,stripFleetContext=false){const body=rows.map((row)=>{const context=stripFleetContext ? contextWithoutFleet(row.context) : row.context; return `<tr><td><code>${formatParameterName(row.parameter)}</code>${context ? `<span class='value-context'>${esc(context)}</span>` : ''}</td><td>${esc(row.user_value)}</td><td>${esc(row.default_value)}</td><td><span class='status-pill ${statusClass(row.status)}'>${esc(formatDisplayValue(row.status))}</span></td><td>${esc(formatDisplayValue(row.estimation_type))}</td></tr>`;}).join(''); return `<div class='value-table-wrap'><table class='value-table'><thead><tr><th>Parameter</th><th>Your value</th><th>Default</th><th>Status</th><th>Estimation</th></tr></thead><tbody>${body}</tbody></table></div>`;}\n",
+  "function renderParameterTable(rows,stripFleetContext=false){const body=rows.map((row,index)=>{const context=stripFleetContext ? contextWithoutFleet(row.context) : row.context; return `<tr data-original-order=\"${index}\"><td><code>${formatParameterName(row.parameter)}</code>${context ? `<span class='value-context'>${esc(context)}</span>` : ''}</td><td>${esc(row.user_value)}</td><td>${esc(row.default_value)}</td><td><span class='status-pill ${statusClass(row.status)}'>${esc(formatDisplayValue(row.status))}</span></td><td>${esc(formatDisplayValue(row.estimation_type))}</td></tr>`;}).join(''); return `<div class='value-table-wrap'><table class='value-table'><thead><tr>${[\"Parameter\",\"Your value\",\"Default\",\"Status\",\"Estimation\"].map((label,column)=>column===2 ? `<th scope=\"col\">${label}</th>` : `<th scope=\"col\"><button type=\"button\" class=\"value-sort\" data-sort-column=\"${column}\" aria-label=\"${label}: sort ascending\">${label}<span aria-hidden=\"true\">&#8597;</span></button></th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div>`;}\n",
+  "function sortParameterTable(button){\n",
+  "  const table=button.closest('table');\n",
+  "  const header=button.closest('th');\n",
+  "  const column=Number(button.dataset.sortColumn);\n",
+  "  const previous=header.getAttribute('aria-sort');\n",
+  "  const direction=previous==='ascending' ? 'descending' : previous==='descending' ? 'original' : 'ascending';\n",
+  "  const categories=column===3 ? ['default','changed','not in defaults'] : column===4 ? ['constant','fixed effects','random effects'] : null;\n",
+  "  const rows=Array.from(table.tBodies[0].rows).map(row=>{\n",
+  "    const text=(column===0 ? row.cells[0].querySelector('code').textContent : row.cells[column].textContent).trim();\n",
+  "    const missing=!text || text==='not set' || text==='not available';\n",
+  "    const numeric=/^[+-]?(?:\\d+\\.?\\d*|\\.\\d+)(?:e[+-]?\\d+)?$/i.test(text) && Number.isFinite(Number(text));\n",
+  "    const rank=categories ? categories.indexOf(text) : -1;\n",
+  "    return {row,original:Number(row.dataset.originalOrder),key:column===1 ? Number(text) : categories && rank>=0 ? rank : text,bucket:column===1 ? (numeric ? 0 : 1) : missing ? 2 : categories && rank<0 ? 1 : 0};\n",
+  "  });\n",
+  "  rows.sort((a,b)=>{\n",
+  "    if(direction==='original')return a.original-b.original;\n",
+  "    if(a.bucket!==b.bucket)return a.bucket-b.bucket;\n",
+  "    let compared=0;\n",
+  "    if(column===1){if(a.bucket===0)compared=a.key-b.key;}\n",
+  "    else if(categories && a.bucket===0){compared=a.key-b.key;}\n",
+  "    else if(a.bucket!==2){compared=String(a.key).localeCompare(String(b.key),'en',{numeric:true,sensitivity:'base'});}\n",
+  "    return (direction==='descending' ? -compared : compared) || a.original-b.original;\n",
+  "  });\n",
+  "  rows.forEach(({row})=>table.tBodies[0].appendChild(row));\n",
+  "  table.querySelectorAll('[data-sort-column]').forEach(control=>{\n",
+  "    const active=control===button && direction!=='original';\n",
+  "    control.closest('th').removeAttribute('aria-sort');\n",
+  "    if(active)control.closest('th').setAttribute('aria-sort',direction);\n",
+  "    control.querySelector('span').textContent=String.fromCharCode(active ? (direction==='ascending' ? 8593 : 8595) : 8597);\n",
+  "    const next=active ? (direction==='ascending' ? 'sort descending' : 'restore original order') : 'sort ascending';\n",
+  "    control.setAttribute('aria-label',control.childNodes[0].textContent+': '+next);\n",
+  "  });\n",
+  "}\n",
   "function renderGroupedParameterValues(node,rows){const groups=new Map(); rows.forEach((row)=>{const label=parameterGroupLabel(node,row); if(!label){return;} if(!groups.has(label)){groups.set(label,[]);} groups.get(label).push(row);}); if(groups.size===0){return renderParameterTable(rows,false);} const groupedRows=new Set(Array.from(groups.values()).flat()); const otherRows=rows.filter((row)=>!groupedRows.has(row)); let html=`<div class='value-groups'>${Array.from(groups.entries()).map(([label,groupRows])=>`<div class='value-group'><div class='value-group-title'><span>${esc(label)}</span></div>${renderParameterTable(groupRows,true)}</div>`).join('')}</div>`; if(otherRows.length>0){html += renderParameterTable(otherRows,false);} return html;}\n",
   "function renderParameterValues(node){const rows=arrayValue(node.parameter_values).filter((row)=>row && row.parameter); if(rows.length===0){return `<span class='empty'>No explicit pre-run parameter values are available for this node.</span>`;} return renderGroupedParameterValues(node,rows);}\n",
   "function renderOverviewTab(node){return `<section class='section'><h3>What this shows</h3><p>${esc(node.description)}</p></section>${renderOptionContext(node)}<section class='section'><h3>Equation preview</h3>${renderEquations(node)}</section><section class='section'><h3>Assumptions</h3>${renderAssumptions(node.assumptions)}</section>`;}\n",
-  "function renderValuesTab(node){if(node.kind==='output'){return `<section class='section'><h3>Model-derived output</h3><p>${esc(node.description)}</p><p class='empty'>Numerical results for this output are not available until the configured model is evaluated.</p></section>`;} const rows=arrayValue(node.parameter_values).filter((row)=>row && row.parameter); const compositionHtml=renderCompositionSummaries(node); const hideFleetSummary=compositionHtml || (rows.length>0 && /selectivity/i.test(node.role || '')); const fleetTitle=/observation/i.test(node.role || '') ? 'Fleet inputs' : 'Fleets'; const fleetHtml=hideFleetSummary ? '' : renderFleetGroups(node,fleetTitle); let html=compositionHtml + fleetHtml + renderRelatedValueLinks(node); if(rows.length>0 || !html){html += `<section class='section'><h3>Configured values</h3>${renderParameterValues(node)}</section>`;} return html;}\n",
-  "function renderDocumentationTab(node){return `<section class='section'><h3>Documentation and source</h3><div class='link-list'>${renderLinks(node)}</div></section><section class='section'><h3>Parameters or fields</h3>${renderFields(node)}</section>`;}\n",
+  "function renderValuesTab(node){if(node.kind==='output'){return `<section class='section'><h3>Model-derived output</h3><p class='empty'>Numerical results for this output are not available until the configured model is evaluated.</p></section>`;} const rows=arrayValue(node.parameter_values).filter((row)=>row && row.parameter); const compositionHtml=renderCompositionSummaries(node); const hideFleetSummary=compositionHtml || (rows.length>0 && /selectivity/i.test(node.role || '')); const fleetTitle=/observation/i.test(node.role || '') ? 'Fleet inputs' : 'Fleets'; const fleetHtml=hideFleetSummary ? '' : renderFleetGroups(node,fleetTitle); let html=compositionHtml + fleetHtml + renderRelatedValueLinks(node); if(rows.length>0 || !html){html += `<section class='section'><h3>Configured values</h3>${renderParameterValues(node)}</section>`;} return html;}\n",
+  "function renderDocumentationTab(node){return `<section class='section'><h3>Documentation and source</h3><div class='link-list'>${renderLinks(node)}</div></section><section class='section'><h3>Parameters or fields</h3>${renderFields(node)}</section><section class='section'><h3>Vignettes</h3><p>Explore examples of how to configure and use FIMS.</p><div class='link-list'><a href='https://noaa-fims.github.io/FIMS/articles/index.html' target='_blank' rel='noopener'>Browse FIMS vignettes</a></div></section>`;}\n",
   "function renderTabContent(node){if(activeInspectorTab===\'values\'){return renderValuesTab(node);} if(activeInspectorTab===\'documentation\'){return renderDocumentationTab(node);} return renderOverviewTab(node);}\n",
   "function renderTabButtons(){const tabs=[[\'overview\',\'Overview\'],[\'values\',\'Values\'],[\'documentation\',\'Documentation\']]; return `<div class=\'inspector-tabs\'>${tabs.map(([id,label])=>`<button type=\'button\' class=\'tab-button ${activeInspectorTab===id ? \'active\' : \'\'}\' data-inspector-tab=\'${id}\'>${label}</button>`).join(\'\')}</div>`;}\n",
-  "function updateInspector(node){document.getElementById('inspectorRole').textContent=node.role; document.getElementById('inspectorTitle').textContent=node.label; document.getElementById('inspectorSubtitle').textContent=node.subtitle || node.component || ''; const body=document.getElementById('inspectorBody'); body.innerHTML = `${renderTabButtons()}<div class='tab-content'>${renderTabContent(node)}</div>`; body.querySelectorAll('[data-inspector-tab]').forEach((button)=>button.addEventListener('click',()=>{activeInspectorTab=button.dataset.inspectorTab; updateInspector(node);})); body.querySelectorAll('[data-related-node]').forEach((button)=>button.addEventListener('click',()=>{activeInspectorTab=button.dataset.relatedTab || 'values'; selectNode(button.dataset.relatedNode);})); body.querySelectorAll('[data-composition-open]').forEach((button)=>button.addEventListener('click',()=>{const open=button.dataset.compositionOpen==='true'; body.querySelectorAll('.composition-summary').forEach((summary)=>{summary.open=open;});})); const definitionButton=body.querySelector('[data-toggle-definitions]'); if(definitionButton){definitionButton.addEventListener('click',()=>{const definitions=Array.from(body.querySelectorAll('[data-field-definition]')); const opening=definitions.some((definition)=>definition.hasAttribute('hidden')); definitions.forEach((definition)=>{if(opening){definition.removeAttribute('hidden');} else {definition.setAttribute('hidden','');}}); definitionButton.textContent=opening ? 'Hide definitions' : 'Show definitions';});}}\n",
+  "let inspectorUpdate = Promise.resolve();\n",
+  "let inspectorRevision = 0;\n",
+  "// Serialize DOM replacement and typesetting; discard superseded selections.\n",
+  "function updateInspector(node){const revision=++inspectorRevision; inspectorUpdate=inspectorUpdate.then(async()=>{if(revision!==inspectorRevision)return; const math=window.MathJax; if(math && math.startup && math.startup.promise){await math.startup.promise;} if(revision!==inspectorRevision)return; const body=document.getElementById('inspectorBody'); if(math && math.typesetClear)math.typesetClear([body]); renderInspector(node); if(math && math.typesetPromise && activeInspectorTab==='overview'){await math.typesetPromise([body]);}}).catch((error)=>console.error('Inspector equation rendering failed:',error)); return inspectorUpdate;}\n",
+  "// The first selection may precede the CDN script; refresh once it has loaded.\n",
+  "window.addEventListener('load',()=>updateInspector(nodeById[selectedNodeId]));\n",
+  "function renderInspector(node){document.getElementById('inspectorRole').textContent=node.role; document.getElementById('inspectorTitle').textContent=node.label; document.getElementById('inspectorSubtitle').textContent=node.subtitle || node.component || ''; const body=document.getElementById('inspectorBody'); body.innerHTML = `${renderTabButtons()}<div class='tab-content' data-tab='${activeInspectorTab}'>${renderTabContent(node)}</div>`; body.querySelectorAll('[data-inspector-tab]').forEach((button)=>button.addEventListener('click',()=>{activeInspectorTab=button.dataset.inspectorTab; updateInspector(node);})); body.querySelectorAll('[data-related-node]').forEach((button)=>button.addEventListener('click',()=>{activeInspectorTab=button.dataset.relatedTab || 'values'; selectNode(button.dataset.relatedNode);})); body.querySelectorAll('[data-composition-open]').forEach((button)=>button.addEventListener('click',()=>{const open=button.dataset.compositionOpen==='true'; body.querySelectorAll('.composition-summary').forEach((summary)=>{summary.open=open;});})); body.querySelectorAll('[data-sort-column]').forEach((button)=>button.addEventListener('click',()=>sortParameterTable(button))); const definitionButton=body.querySelector('[data-toggle-definitions]'); if(definitionButton){definitionButton.addEventListener('click',()=>{const definitions=Array.from(body.querySelectorAll('[data-field-definition]')); const opening=definitions.some((definition)=>definition.hasAttribute('hidden')); definitions.forEach((definition)=>{if(opening){definition.removeAttribute('hidden');} else {definition.setAttribute('hidden','');}}); definitionButton.textContent=opening ? 'Hide definitions' : 'Show definitions';});}}\n",
   "function updateNodeClasses(){const near=neighbors(selectedNodeId); document.querySelectorAll('.node-card').forEach((card)=>{card.classList.toggle('active', card.dataset.nodeId===selectedNodeId); card.classList.toggle('related', near.has(card.dataset.nodeId) && card.dataset.nodeId!==selectedNodeId); card.classList.toggle('dimmed', !near.has(card.dataset.nodeId));});}\n",
   "function selectNode(id){selectedNodeId=id; updateInspector(nodeById[id]); updateNodeClasses(); drawEdges();}\n",
   "function cardRect(card){const wrap=graphWrap.getBoundingClientRect(); const box=card.getBoundingClientRect(); const scrollX=graphWrap.scrollLeft; const scrollY=graphWrap.scrollTop; return {left:box.left-wrap.left+scrollX,right:box.right-wrap.left+scrollX,top:box.top-wrap.top+scrollY,bottom:box.bottom-wrap.top+scrollY,width:box.width,height:box.height};}\n",
