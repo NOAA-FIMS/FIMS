@@ -115,6 +115,7 @@ jobs:
             --scheme http --scheme https
             --accept 200,403,503
             --exclude '^https?://(?i:noaa-fims\.github\.io)/(?i:FIMS)([/?#]|$)'
+            ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && format('--exclude=^https?://github\.com/noaa-fims/fims/blob/{0}/', github.head_ref) || '' }}
             docs/
           output: lychee/external.md
           fail: true
