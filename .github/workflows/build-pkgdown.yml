@@ -59,7 +59,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
+          extra-packages: any::pkgdown, local::., any::rmarkdown, any::purrr, any::jsonlite
           needs: website
 
       - name: build pkgdown
@@ -89,6 +89,9 @@ jobs:
           mkdir -p docs/doxygen
           cp -a doxygen/html/. docs/doxygen/
 
+      - name: Build vignette JSON
+        run: Rscript .github/build_vignette_index.R
+
       - name: Check local site links
         id: local-links
         uses: lycheeverse/lychee-action@v2
@@ -112,6 +115,7 @@ jobs:
             --scheme http --scheme https
             --accept 200,403,503
             --exclude '^https?://(?i:noaa-fims\.github\.io)/(?i:FIMS)([/?#]|$)'
+            ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository && format('--exclude=^https?://github\.com/noaa-fims/fims/blob/{0}/', github.head_ref) || '' }}
             docs/
           output: lychee/external.md
           fail: true
@@ -126,7 +130,7 @@ jobs:
             lychee/
   
       - name: Deploy package
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'NOAA-FIMS/FIMS'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

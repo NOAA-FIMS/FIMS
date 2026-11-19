@@ -514,10 +514,7 @@ tmb_parameter_mapping <- function(input) {
 #' @param sdreport An object of the `sdreport` class as returned from
 #'   [TMB::sdreport()].
 #' @param run_time A vector of at least length one, where all entries are of the
-#'   `timediff` class and at least one is named "time_total". This information
-#'   is available in [fit_fims()] and added to this argument internally but if
-#'   you are a power user you can calculate the time it took to run your model
-#'   by subtracting two [Sys.time()] objects.
+#'   `timediff` class and at least one is named "time_total".
 #' @param version The version of FIMS that was used to optimize the model. If
 #'   [fit_fims()] was not used to optimize the model, then the default is to
 #'   use the current version of the package that is loaded.
