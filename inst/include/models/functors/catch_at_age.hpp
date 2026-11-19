@@ -1284,14 +1284,9 @@ class CatchAtAge : public FisheryModelBase<Type> {
           "weight-at-age.");
     }
 
-    if (gp->n_sexes != 1) {
-      throw std::runtime_error(
-          "Biological mean weight-at-age currently requires one prepared sex.");
-    }
-
     const size_t y = (std::min)(year, gp->n_years - 1);
     const size_t a = (std::min)(age, gp->n_ages - 1);
-    return gp->MeanWAA(y, a, 0);
+    return gp->MeanWAA(y, a);
   }
 
   /**

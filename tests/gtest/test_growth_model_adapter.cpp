@@ -44,7 +44,7 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, UsesWaaFromLaa) {
   ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
   adapter.SetAgeOffset(1.0);
-  adapter.Initialize(1, 12, 1);
+  adapter.Initialize(1, 12);
 
   const double age = 5.0;
   const double mean_length_young = 275.0;
@@ -73,7 +73,7 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, HonorsAgeOffset) {
   ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
   adapter.SetAgeOffset(1.0);
-  adapter.Initialize(1, 12, 1);
+  adapter.Initialize(1, 12);
 
   const double age = 1.0;
   const double mean_length_young = 275.0;
@@ -101,7 +101,7 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, RejectsFractionalAge) {
   ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
   adapter.SetAgeOffset(1.0);
-  adapter.Initialize(1, 12, 1);
+  adapter.Initialize(1, 12);
 
   EXPECT_THROW(adapter.evaluate(0, 5.5), std::runtime_error);
 }
@@ -111,7 +111,7 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, RejectsNegativeAge) {
   ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
   adapter.SetAgeOffset(1.0);
-  adapter.Initialize(1, 12, 1);
+  adapter.Initialize(1, 12);
 
   EXPECT_THROW(adapter.evaluate(0, -1.0), std::runtime_error);
 }
@@ -121,7 +121,7 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, ExtrapolatesAboveCachedAgeRange) {
   ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0, 2.5e-11, 3.0, 28.0,
                    73.0);
   adapter.SetAgeOffset(1.0);
-  adapter.Initialize(1, 12, 1);
+  adapter.Initialize(1, 12);
 
   const double age = 13.0;
   const double mean_length_young = 275.0;
@@ -166,7 +166,7 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter, RejectsBothVariabilityPaths) {
   adapter.SetAgeOffset(1.0);
 
   try {
-    adapter.Initialize(1, 12, 1);
+    adapter.Initialize(1, 12);
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
     EXPECT_NE(std::string(e.what()).find("exactly one supported path"),
@@ -190,7 +190,7 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter,
     }
 
     adapter.SetAgeOffset(1.0);
-    adapter.Initialize(1, 12, 1);
+    adapter.Initialize(1, 12);
 
     // Change working values after initialization, as optimization would.
     adapter.MeanLengthYoungVector()[0] = fims_math::log(800.0);
@@ -203,19 +203,19 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter,
 
       const auto* products = adapter.TryGetPreparedGrowthProducts();
       ASSERT_NE(products, nullptr);
-      EXPECT_NEAR(products->MeanLAA(0, 0, 0), expected_young, 1e-8);
+      EXPECT_NEAR(products->MeanLAA(0, 0), expected_young, 1e-8);
       if (gap == 1e-20) {
         // This gap is too small to distinguish the two physical lengths.
-        EXPECT_EQ(products->MeanLAA(0, 11, 0),
-                  products->MeanLAA(0, 0, 0));
+        EXPECT_EQ(products->MeanLAA(0, 11),
+                  products->MeanLAA(0, 0));
       } else {
-        EXPECT_GT(products->MeanLAA(0, 11, 0),
-                  products->MeanLAA(0, 0, 0));
+        EXPECT_GT(products->MeanLAA(0, 11),
+                  products->MeanLAA(0, 0));
       }
-      EXPECT_NEAR(products->MeanLAA(0, 11, 0),
+      EXPECT_NEAR(products->MeanLAA(0, 11),
                   expected_young + gap, 1e-8);
-      EXPECT_NEAR(products->SdLAA(0, 0, 0), 28.0, 1e-4);
-      EXPECT_NEAR(products->SdLAA(0, 11, 0), 73.0, 1e-4);
+      EXPECT_NEAR(products->SdLAA(0, 0), 28.0, 1e-4);
+      EXPECT_NEAR(products->SdLAA(0, 11), 73.0, 1e-4);
     }
   }
 }
