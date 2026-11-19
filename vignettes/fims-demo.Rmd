@@ -581,7 +581,7 @@ clear()
 
 #### Age only
 
-The same model can be fit to just the age data, removing the length-composition configurations and caal.
+The same model can be fit to just the age data, removing the length-composition configurations and conditional age at length (caal).
 
 ```{r age}
 # and fit the model
