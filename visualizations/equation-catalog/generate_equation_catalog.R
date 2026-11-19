@@ -119,39 +119,21 @@ extract_plain_equations <- function(comment_text) {
 
 infer_module <- function(path) {
   path <- gsub("\\\\", "/", path)
+  folders <- strsplit(dirname(path), "/", fixed = TRUE)[[1]]
 
-  if (grepl("/growth/", path)) {
-    return("Growth")
-  }
-  if (grepl("/size/", path)) {
-    return("Size")
-  }
-  if (grepl("/maturity/", path)) {
-    return("Maturity")
-  }
-  if (grepl("/selectivity/", path)) {
-    return("Selectivity")
-  }
-  if (grepl("/recruitment/", path)) {
-    return("Recruitment")
-  }
-  if (grepl("/distributions/", path)) {
-    return("Distribution")
-  }
-  if (grepl("/common/", path)) {
-    return("Common math")
-  }
-  if (grepl("/models/", path)) {
-    return("Model")
-  }
-  if (grepl("^vignettes/", path)) {
-    return("Vignette")
-  }
-  if (grepl("^R/", path)) {
-    return("R")
+  if (length(folders) >= 4L &&
+      identical(folders[1:3], c("inst", "include", "population_dynamics"))) {
+    category <- folders[[4]]
+  } else if (length(folders) >= 3L &&
+             identical(folders[1:2], c("inst", "include"))) {
+    category <- folders[[3]]
+  } else if (folders[[1]] %in% c("R", "src", "vignettes")) {
+    category <- folders[[1]]
+  } else {
+    return("Other")
   }
 
-  "Other"
+  tools::toTitleCase(gsub("_", " ", category, fixed = TRUE))
 }
 
 infer_source_kind <- function(path) {
@@ -558,9 +540,9 @@ render_equation_catalog <- function(equation_catalog, path) {
     ".module-badge:focus-visible{outline:3px solid #213F4B;outline-offset:3px;}",
     ".equation-card[data-module='Selectivity']{--module-badge-color:#0072B2;}",
     ".equation-card[data-module='Recruitment']{--module-badge-color:#875D00;}",
-    ".equation-card[data-module='Model']{--module-badge-color:#007653;}",
-    ".equation-card[data-module='Distribution']{--module-badge-color:#B34D00;}",
-    ".equation-card[data-module='Common math']{--module-badge-color:#236C91;}",
+    ".equation-card[data-module='Models']{--module-badge-color:#007653;}",
+    ".equation-card[data-module='Distributions']{--module-badge-color:#B34D00;}",
+    ".equation-card[data-module='Common']{--module-badge-color:#236C91;}",
     ".equation-card[data-module='Growth']{--module-badge-color:#9B4678;}",
     ".equation-card[data-module='Maturity']{--module-badge-color:#716800;}",
     ".meaning{color:#213f4b;font-size:.95rem;line-height:1.45;margin:.35rem 0 .65rem;}",
