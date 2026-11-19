@@ -760,9 +760,9 @@ initialize_comp <- function(data,
   assert_presence_of_fleet(data, fleet)
 
   fleet_length_bins <- NULL
-  uses_growth_derived_path <- (identical(type, "LengthComp") || 
-                                identical(type, "CaalComp")) &&
-                                !is.null(parameters) &&
+  uses_growth_derived_path <- (identical(type, "LengthComp") ||
+    identical(type, "CaalComp")) &&
+    !is.null(parameters) &&
     any(
       parameters |>
         dplyr::filter(.data$module_name == "Growth") |>

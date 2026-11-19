@@ -663,8 +663,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
          << "},\n";
       ss << "{\"lengthcomp\": "
          << fleet_interface->GetObservedLengthCompDataID() << "},\n";
-      ss << "{\"caalcomp\": "
-         << fleet_interface->GetObservedCaalCompDataID() << "},\n";
+      ss << "{\"caalcomp\": " << fleet_interface->GetObservedCaalCompDataID()
+         << "},\n";
       ss << "{\"index\": " << fleet_interface->GetObservedIndexDataID()
          << "},\n";
       ss << "{\"catch\": " << fleet_interface->GetObservedCatchDataID()

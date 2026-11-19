@@ -800,7 +800,7 @@ methods::setValidity(
     # Composition data are counts ("number") or proportions that are scaled by
     # the sample size ("proportion"), so any other unit would be read as a
     # proportion without a message.
-    #TODO: it would be better to have a check on the unit types where we do the
+    # TODO: it would be better to have a check on the unit types where we do the
     # conversions so that it is all contained in one place if we added a
     # additional unit types in the future.
     comp_units <- object@data |>
