@@ -447,14 +447,14 @@ class Information {
    * @param &valid_model reference to true/false boolean indicating whether
    * model is valid.
    * @param f shared pointer to fleet module
-   * @param composition_type type of composition data (e.g., "age", "length", 
+   * @param composition_type type of composition data (e.g., "age", "length",
    * "caal")
    */
   void SetCompositionData(bool& valid_model,
-                             std::shared_ptr<fims_popdy::Fleet<Type>> f,
-                            std::string composition_type) {
-    if (composition_type == "age" && 
-      f->fleet_observed_agecomp_data_id_m != static_cast<Type>(-999)) {
+                          std::shared_ptr<fims_popdy::Fleet<Type>> f,
+                          std::string composition_type) {
+    if (composition_type == "age" &&
+        f->fleet_observed_agecomp_data_id_m != static_cast<Type>(-999)) {
       uint32_t observed_agecomp_id =
           static_cast<uint32_t>(f->fleet_observed_agecomp_data_id_m);
       data_iterator it = this->data_objects.find(observed_agecomp_id);
@@ -469,8 +469,9 @@ class Information {
             "Expected age-composition observations not defined for fleet " +
             fims::to_string(f->id));
       }
-    }else if (composition_type == "length" && 
-      f->fleet_observed_lengthcomp_data_id_m != static_cast<Type>(-999)) {
+    } else if (composition_type == "length" &&
+               f->fleet_observed_lengthcomp_data_id_m !=
+                   static_cast<Type>(-999)) {
       uint32_t observed_lengthcomp_id =
           static_cast<uint32_t>(f->fleet_observed_lengthcomp_data_id_m);
       data_iterator it = this->data_objects.find(observed_lengthcomp_id);
@@ -485,8 +486,9 @@ class Information {
             "Expected length-composition observations not defined for fleet " +
             fims::to_string(f->id));
       }
-    }else if (composition_type == "caal" && 
-      f->fleet_observed_caalcomp_data_id_m != static_cast<Type>(-999)) {
+    } else if (composition_type == "caal" &&
+               f->fleet_observed_caalcomp_data_id_m !=
+                   static_cast<Type>(-999)) {
       uint32_t observed_caalcomp_id =
           static_cast<uint32_t>(f->fleet_observed_caalcomp_data_id_m);
       data_iterator it = this->data_objects.find(observed_caalcomp_id);
@@ -532,7 +534,7 @@ class Information {
   }
 
   /**
-   * @brief Set pointers to Condition age at length composition data in the 
+   * @brief Set pointers to Condition age at length composition data in the
    * fleet module.
    *
    * @param &valid_model reference to true/false boolean indicating whether
@@ -540,7 +542,7 @@ class Information {
    * @param f shared pointer to fleet module
    */
   void SetCaalCompositionData(bool& valid_model,
-                                std::shared_ptr<fims_popdy::Fleet<Type>> f) {
+                              std::shared_ptr<fims_popdy::Fleet<Type>> f) {
     if (f->fleet_observed_caalcomp_data_id_m != static_cast<Type>(-999)) {
       uint32_t observed_caalcomp_id =
           static_cast<uint32_t>(f->fleet_observed_caalcomp_data_id_m);

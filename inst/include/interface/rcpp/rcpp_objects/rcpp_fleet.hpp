@@ -351,7 +351,7 @@ class FleetInterface : public FleetInterfaceBase {
 
   /**
    * @brief Set the unique ID for a data object.
-   * @param data_type Type of data ("age_comp", "length_comp", "caal_comp", 
+   * @param data_type Type of data ("age_comp", "length_comp", "caal_comp",
    *                  "catch", "index").
    * @param observed_comp_data_id Unique ID for the observed data object.
    */
@@ -374,7 +374,7 @@ class FleetInterface : public FleetInterfaceBase {
 
   /**
    * @brief Get the unique ID for a data object.
-   * @param data_type Type of data ("age_comp", "length_comp", "caal_comp", 
+   * @param data_type Type of data ("age_comp", "length_comp", "caal_comp",
    *                  "catch", "index").
    * @param observed_comp_data_id Unique ID for the observed data object.
    */
@@ -389,7 +389,7 @@ class FleetInterface : public FleetInterfaceBase {
       return interface_observed_catch_data_id_m.get();
     } else if (data_type == "index") {
       return interface_observed_index_data_id_m.get();
-    }else{
+    } else {
       throw std::invalid_argument(
           "Fleet observed data ID mismatch. Unknown data type: " + data_type);
     }
@@ -606,7 +606,7 @@ class FleetInterface : public FleetInterfaceBase {
 
     fleet->fleet_observed_index_data_id_m =
         interface_observed_index_data_id_m.get();
-        
+
     fleet->fleet_observed_catch_data_id_m =
         interface_observed_catch_data_id_m.get();
 

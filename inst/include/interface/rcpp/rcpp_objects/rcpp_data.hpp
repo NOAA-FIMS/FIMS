@@ -84,7 +84,6 @@ class DataInterfaceBase : public FIMSRcppInterfaceBase {
  */
 class DataInterface : public DataInterfaceBase {
  public:
-  
   /**
    * @brief The type of data input. The options are catch, index, age_comp,
    * length_comp, or caal_comp.
@@ -92,14 +91,15 @@ class DataInterface : public DataInterfaceBase {
   SharedString data_type;
 
   /**
-   * @brief The vector of dimensions that is being passed from R. The 
-   * length of this vector specifies the number of dimensions 
-   * (i.e. 2 for age and year) and the values specify the size of each dimension.
+   * @brief The vector of dimensions that is being passed from R. The
+   * length of this vector specifies the number of dimensions
+   * (i.e. 2 for age and year) and the values specify the size of each
+   * dimension.
    */
   std::vector<int> dimension_sizes;
-  
-   /**
-   * @brief The vector of dimension names where the vector length matches the 
+
+  /**
+   * @brief The vector of dimension names where the vector length matches the
    * number of dimensions specified in dimension_sizes and the values name
    * the dimensions (i.e. "year", "age", "length", "sex").
    */
@@ -108,14 +108,20 @@ class DataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  DataInterface(std::string data_type, std::vector<int> dimension_sizes, std::vector<std::string> dimension_names) : DataInterfaceBase() {
+  DataInterface(std::string data_type, std::vector<int> dimension_sizes,
+                std::vector<std::string> dimension_names)
+      : DataInterfaceBase() {
     this->data_type = data_type;
     this->dimension_sizes.resize(dimension_sizes.size());
-    std::copy(dimension_sizes.begin(), dimension_sizes.end(), this->dimension_sizes.begin());
+    std::copy(dimension_sizes.begin(), dimension_sizes.end(),
+              this->dimension_sizes.begin());
     this->dimension_names.resize(dimension_names.size());
-    std::copy(dimension_names.begin(), dimension_names.end(), this->dimension_names.begin());
-    this->observed_data = Rcpp::NumericVector(Rcpp::algorithm::prod(dimension_sizes.begin(), dimension_sizes.end()));
-    this->uncertainty = Rcpp::NumericVector(Rcpp::algorithm::prod(dimension_sizes.begin(), dimension_sizes.end()));
+    std::copy(dimension_names.begin(), dimension_names.end(),
+              this->dimension_names.begin());
+    this->observed_data = Rcpp::NumericVector(
+        Rcpp::algorithm::prod(dimension_sizes.begin(), dimension_sizes.end()));
+    this->uncertainty = Rcpp::NumericVector(
+        Rcpp::algorithm::prod(dimension_sizes.begin(), dimension_sizes.end()));
     DataInterfaceBase::live_objects[this->id] =
         std::make_shared<DataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
@@ -189,8 +195,7 @@ class DataInterface : public DataInterfaceBase {
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_data_object::DataObject<Type>> data =
         std::make_shared<fims_data_object::DataObject<Type>>(
-          this->dimension_sizes);
-
+            this->dimension_sizes);
 
     data->id = this->id;
     for (size_t i = 0; i < observed_data.size(); i++) {
@@ -198,10 +203,10 @@ class DataInterface : public DataInterfaceBase {
       data->uncertainty[i] = this->uncertainty[i];
     }
 
-    for(size_t i = 0; i < this->dimension_sizes.size(); i++) {
+    for (size_t i = 0; i < this->dimension_sizes.size(); i++) {
       data->generic_dimensions[i] = this->dimension_sizes[i];
     }
-    
+
     std::shared_ptr<fims_info::Information<Type>> info =
         fims_info::Information<Type>::GetInstance();
 
@@ -492,7 +497,7 @@ class LengthCompDataInterface : public DataInterfaceBase {
 class CaalCompDataInterface : public DataInterfaceBase {
  public:
   /**
-   * @brief The first dimension of the data, which relates to the number of 
+   * @brief The first dimension of the data, which relates to the number of
    * length bins.
    */
   fims_int lmax = 0;
@@ -519,7 +524,8 @@ class CaalCompDataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  CaalCompDataInterface(int ymax = 0, int amax = 0, int lmax = 0) : DataInterfaceBase() {
+  CaalCompDataInterface(int ymax = 0, int amax = 0, int lmax = 0)
+      : DataInterfaceBase() {
     this->amax = amax;
     this->ymax = ymax;
     this->lmax = lmax;
@@ -570,8 +576,10 @@ class CaalCompDataInterface : public DataInterfaceBase {
     ss << " \"id\":" << this->id << ",\n";
     ss << " \"type\": \"data\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [" << "\"n_ages\", \"n_lengths\", \"n_years\"" << "],\n";
-    ss << "  \"dimensions\": [" << amax << ", " << lmax << ", " << ymax << "]\n},\n";
+    ss << "  \"header\": [" << "\"n_ages\", \"n_lengths\", \"n_years\""
+       << "],\n";
+    ss << "  \"dimensions\": [" << amax << ", " << lmax << ", " << ymax
+       << "]\n},\n";
     ss << " \"value\": [";
     for (size_t i = 0; i < caal_comp_data.size() - 1; i++) {
       ss << caal_comp_data[i] << ", ";
@@ -591,9 +599,8 @@ class CaalCompDataInterface : public DataInterfaceBase {
   template <typename Type>
   bool add_to_fims_tmb_internal() {
     std::shared_ptr<fims_data_object::DataObject<Type>> caal_comp_data =
-        std::make_shared<fims_data_object::DataObject<Type>>(this->ymax,
-                                                             this->amax,
-                                                             this->lmax);
+        std::make_shared<fims_data_object::DataObject<Type>>(
+            this->ymax, this->amax, this->lmax);
 
     caal_comp_data->id = this->id;
     for (int y = 0; y < ymax; y++) {
@@ -601,8 +608,8 @@ class CaalCompDataInterface : public DataInterfaceBase {
         for (int l = 0; l < lmax; l++) {
           int i_length_age_year = y * amax * lmax + a * lmax + l;
           caal_comp_data->at(y, a, l) = this->caal_comp_data[i_length_age_year];
-          caal_comp_data->uncertainty[i_length_age_year] = 
-          this->uncertainty[i_length_age_year];
+          caal_comp_data->uncertainty[i_length_age_year] =
+              this->uncertainty[i_length_age_year];
         }
       }
     }

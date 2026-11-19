@@ -609,11 +609,11 @@ The same model can also be fit to only conditional age at length data.
 TODO: Commented out until caal data is added
 
 ```{r caal}
-#caal_fit <- parameters_4_model |>
+# caal_fit <- parameters_4_model |>
 #  initialize_fims(data = get_data(data_4_model) |>
 #    dplyr::filter(!type %in% c("age_comp", "length_comp"))) |>
 #  fit_fims(optimize = TRUE)
-#clear()
+# clear()
 ```
 
 ```{r fit-plot-biomass}
