@@ -14,6 +14,34 @@ std::map<uint32_t, std::shared_ptr<DataInterfaceBase>>
  * Function to register data classes with the Rcpp module system.
  */
 void register_data(Rcpp::Module& m) {
+  Rcpp::class_<DataInterfaceBase>("DataBase",
+                                     "See "
+                                     "https://noaa-fims.github.io/FIMS/doxygen/"
+                                     "classDataInterfaceBase.html.")
+      .constructor<>()
+      .field("observed_data", &DataInterfaceBase::observed_data)
+      .field("uncertainty", &DataInterfaceBase::uncertainty)
+      .method("get_id", &DataInterfaceBase::get_id);
+
+  Rcpp::class_<DataInterface>("Data",
+                                     "See "
+                                     "https://noaa-fims.github.io/FIMS/doxygen/"
+                                     "classDataInterface.html.")
+      .derives<DataInterfaceBase>("DataBase")
+      .constructor<std::string, std::vector<int>, std::vector<std::string>>()
+      .field("data_type", &DataInterface::data_type)
+      .field("dimension_sizes", &DataInterface::dimension_sizes)
+      .field("dimension_names", &DataInterface::dimension_names)
+      .method("get_id", &DataInterface::get_id);
+
+  Rcpp::class_<CaalCompDataInterface>("CaalComp",
+                                     "See "
+                                     "https://noaa-fims.github.io/FIMS/doxygen/"
+                                     "classCaalCompDataInterface.html.")
+      .constructor<int, int>()
+      .field("caal_comp_data", &CaalCompDataInterface::caal_comp_data)
+      .method("get_id", &CaalCompDataInterface::get_id);
+
   Rcpp::class_<AgeCompDataInterface>("AgeComp",
                                      "See "
                                      "https://noaa-fims.github.io/FIMS/doxygen/"

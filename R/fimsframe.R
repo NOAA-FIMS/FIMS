@@ -309,6 +309,10 @@ NULL
 #' Returns a numeric vector of age-composition data (type `"age_comp"`) for the
 #' specified fleet(s).
 #'
+#' ## `model_caal_comp()`
+#' Returns a numeric vector of conditional age at length data (type `"caal_comp"`) for the
+#' specified fleet(s).
+#'
 #' ## `model_length_comp()`
 #' Returns a numeric vector of length-composition data (type `"length_comp"`)
 #' for the specified fleet(s). This accessor requires that age-to-length
@@ -445,6 +449,49 @@ methods::setMethod(
   "model_age_comp",
   "data.frame",
   function(x, fleet) model_age_comp(FIMSFrame(x), fleet)
+)
+
+#' @export
+#' @rdname model_
+#' @keywords FIMSFrame
+methods::setGeneric(
+  "model_caal_comp",
+  function(x, fleet) standardGeneric("model_caal_comp")
+)
+#' @rdname model_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "model_caal_comp", "FIMSFrame",
+  function(x, fleet) {
+    dplyr::filter(
+      .data = x@data,
+      .data[["type"]] == "caal_comp",
+      .data[["fleet"]] %in% .env$fleet
+    ) |>
+      dplyr::mutate(
+        sample_size = ifelse(
+          .data$observed == -999,
+          1,
+          unlist(
+            parse_data_distribution(.data$uncertainty)$size,
+            use.names = FALSE
+          )
+        ),
+        probabilities = ifelse(
+          .data$unit == "number",
+          .data$observed,
+          .data$observed * .data$sample_size
+        )
+      ) |>
+      dplyr::pull(.data[["probabilities"]])
+  }
+)
+#' @rdname model_
+#' @keywords FIMSFrame
+methods::setMethod(
+  "model_caal_comp",
+  "data.frame",
+  function(x, fleet) model_caal_comp(FIMSFrame(x), fleet)
 )
 
 #' @export
@@ -753,6 +800,9 @@ methods::setValidity(
     # Composition data are counts ("number") or proportions that are scaled by
     # the sample size ("proportion"), so any other unit would be read as a
     # proportion without a message.
+    # TODO: it would be better to have a check on the unit types where we do the
+    # conversions so that it is all contained in one place if we added a
+    # additional unit types in the future.
     comp_units <- object@data |>
       dplyr::filter(.data$type %in% grep("_comp", present_types, value = TRUE)) |>
       dplyr::pull(.data$unit) |>
