@@ -15,6 +15,9 @@
 #' pattern of revision as new data are added. The function runs models in
 #' parallel for computational efficiency.
 #'
+#' Each peel removes all data after its last year, including catch, and ends
+#' in that year. See [run_modified_data_fims()] for what is kept.
+#'
 #' The first element of `years_to_remove` should typically be 0 to represent
 #' the reference model with no data removed. This allows for direct comparison
 #' of retrospective peels to the base model.

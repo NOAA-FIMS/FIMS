@@ -9,29 +9,55 @@
 
 # calculate_mohns_rho ----
 ## Setup ----
-# A reference run (peel 0) and 2 peels over 10 years. Each peel spans all years,
-# as in run_fims_retrospective() output, and is compared at its terminal year:
-# peel 1 at year 9 is 20% above the reference and peel 2 at year 8 is 10% above.
-# Values after each peel's terminal year (999) must be ignored.
+# A reference run (peel 0) and 2 peels of a model with years 2001-2010. As in
+# run_fims_retrospective() output, each peel ends in its last model year, and
+# spawning biomass has 1 more value, for the start of the next year. Peel 1 in
+# 2009 is 20% above the reference and peel 2 in 2008 is 10% above. Their values
+# for the start of the next year (999) must be ignored.
 retro_fit <- list(
   years_to_remove = c(0, 1, 2),
-  estimates = tibble::tibble(
-    label = "spawning_biomass",
-    year = rep(2001:2010, 3),
-    retrospective_peel = rep(0:2, each = 10),
-    estimated = c(
-      rep(100, 10),
-      rep(100, 8), 120, 999,
-      rep(100, 7), 110, 999, 999
+  estimates = dplyr::bind_rows(
+    tibble::tibble(
+      label = "log_Fmort",
+      year = c(2001:2010, 2001:2009, 2001:2008),
+      retrospective_peel = rep(0:2, times = c(10, 9, 8)),
+      estimated = -2
+    ),
+    tibble::tibble(
+      label = "spawning_biomass",
+      year = c(2001:2011, 2001:2010, 2001:2009),
+      retrospective_peel = rep(0:2, times = c(11, 10, 9)),
+      estimated = c(
+        rep(100, 11),
+        rep(100, 8), 120, 999,
+        rep(100, 7), 110, 999
+      )
     )
   )
 )
 
 ## IO correctness ----
 test_that("calculate_mohns_rho() works with correct inputs", {
-  #' @description Test that peels estimating more than the reference model give a positive rho equal to the mean relative difference at their terminal years.
+  #' @description Test that peels estimating more than the reference model give a positive rho equal to the mean relative difference in their last model years.
   expect_equal(
     object = calculate_mohns_rho(retro_fit, quantity = "spawning_biomass"),
     expected = 0.15
+  )
+})
+
+## Error handling ----
+test_that("calculate_mohns_rho() returns correct error messages", {
+  #' @description Test that calculate_mohns_rho() errors when the estimates have no log_Fmort rows to give the last model year.
+  retro_fit_no_Fmort <- retro_fit
+  retro_fit_no_Fmort[["estimates"]] <- dplyr::filter(
+    retro_fit[["estimates"]],
+    label != "log_Fmort"
+  )
+  expect_error(
+    object = calculate_mohns_rho(
+      retro_fit_no_Fmort,
+      quantity = "spawning_biomass"
+    ),
+    regexp = "has no.*log_Fmort"
   )
 })
