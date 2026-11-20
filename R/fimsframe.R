@@ -49,8 +49,6 @@
 # See the following link if we do want to document them in the future:
 # https://stackoverflow.com/questions/7368262/how-to-properly-document-s4-class-slots-using-roxygen2
 
-methods::setOldClass(c("tbl_df", "tbl", "data.frame"))
-
 methods::setClass(
   Class = "FIMSFrame",
   slots = c(
