@@ -44,6 +44,7 @@
 #' @export SharedString
 #' @import methods
 #' @import stats
+#' @importClassesFrom tibble tbl_df
 #' @importFrom rlang .data
 #' @importFrom rlang :=
 #' @importFrom TMB MakeADFun
