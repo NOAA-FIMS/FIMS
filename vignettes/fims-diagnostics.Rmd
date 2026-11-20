@@ -101,7 +101,7 @@ A retrospective analysis is a common model diagnostic used to assess the stabili
 
 $$\rho = \frac{1}{n} \sum_{i=1}^{n} \frac{x_{p,y} - x_{base,y}}{x_{base,y}}$$
 
-where $n$ is the number of retrospective peels, $x_{p, y}$ is the estimated value (e.g., spawning biomass, fishing mortality, etc.) from peel $p$ at its terminal year $y$, and $x_{base,y}$ is the value from the reference model, $base$, at that same year $y$. The terminal year of a peel is its last model year, which is the last year of data it keeps.
+where $n$ is the number of retrospective peels, $x_{p, y}$ is the estimated value (e.g., spawning biomass, fishing mortality, etc.) from peel $p$ at its terminal year $y$, and $x_{base,y}$ is the value from the reference model, $base$, at that same year $y$. The terminal year of a peel is its last model year, which is the last year of catch, index, and composition data it keeps.
 
 Some things to note about `run_fims_retrospective()` is that you can provide data that is already a `FIMSFrame` object or you can give it one that is not. In the example below, we are using the `FIMSFrame` data object (`data_4_model`) created above. Additionally, it expects a vector of positive values of `years_to_remove` from the base model, starting from 0. If you are running many peels, it may be more efficient to use multiple cores, which can be specified with the `n_cores` argument. 
 
@@ -144,7 +144,7 @@ fig_retrospective_sb <- stockplotr::plot_spawning_biomass(
 print(fig_retrospective_sb)
 ```
 
-We can compare the spawning biomass estimates from the reference model and each peel for the last six years. Each peel removes all of the data after its last year, including catch, so it has fewer years than the reference model and its column is `NA` in the last rows.
+We can compare the spawning biomass estimates from the reference model and each peel for the last six years. Each peel removes all of the data after its last year, including catch, so it has fewer years than the reference model. Its column is `NA` in the last rows of the table.
 ```{r}
 retro_fit[["estimates"]] |>
   dplyr::filter(label == "spawning_biomass") |>

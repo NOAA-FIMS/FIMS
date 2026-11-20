@@ -111,10 +111,8 @@ calculate_mohns_rho <- function(retro_fit, quantity) {
   # Initialize vector to store relative differences
   mohn_values <- numeric()
 
-  # Each peel is compared in its last model year, which is the last year of
-  # log_Fmort (1 value per fleet and model year). The value that some
-  # quantities have for the start of the year after is not used. For
-  # recruitment, it is the stock-recruitment mean with no deviation.
+  # Each peel is compared in its last model year. log_Fmort has 1 value per
+  # fleet and model year, so its last year is the last model year.
   reference_Fmort_years <- retro_fit[["estimates"]] |>
     dplyr::filter(
       .data$label == "log_Fmort",
@@ -125,14 +123,14 @@ calculate_mohns_rho <- function(retro_fit, quantity) {
     cli::cli_abort(c(
       "x" = "{.arg retro_fit} has no {.val log_Fmort} estimates for the
       reference run.",
-      "i" = "The last model year of each run is the last year of
-      {.val log_Fmort}, so it is needed to find the year to compare.",
+      "i" = "Each run is compared in its last model year, the last year of
+      {.val log_Fmort}.",
       "i" = "Use {.code dplyr::count(retro_fit[['estimates']], label)} to see
-      the estimates."
+      which labels are in the estimates."
     ))
   }
   end_year <- max(reference_Fmort_years, na.rm = TRUE) -
-    retro_fit$years_to_remove
+    retro_fit[["years_to_remove"]]
 
   # Calculate relative differences for each peel (excluding reference model)
   for (i in 2:length(retro_fit$years_to_remove)) {

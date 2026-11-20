@@ -12,9 +12,8 @@
 # A reference run (peel 0) and 2 peels of a model with years 2001-2010. As in
 # run_fims_retrospective() output, each peel ends in its last model year, and
 # spawning biomass has 1 more value, for the start of the next year. Peel 1 in
-# 2009 is 20% above the reference and peel 2 in 2008 is 10% above. The values
-# for the start of the year after each peel's last model year (999) must be
-# ignored.
+# 2009 is 20% above the reference and peel 2 in 2008 is 10% above. Their values
+# for the start of the next year (999) must be ignored.
 retro_fit <- list(
   years_to_remove = c(0, 1, 2),
   estimates = dplyr::bind_rows(
@@ -59,6 +58,6 @@ test_that("calculate_mohns_rho() returns correct error messages", {
       retro_fit_no_Fmort,
       quantity = "spawning_biomass"
     ),
-    regexp = "has no"
+    regexp = "has no.*log_Fmort"
   )
 })
