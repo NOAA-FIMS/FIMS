@@ -1,8 +1,10 @@
 # Helper file for the population properties tests ----
-# These functions are used by the test-integration-properties-*.R files. Each
-# property runs the model at its input values without optimizing and compares
-# the output to a value worked out in R from the inputs, or from other model
-# outputs through a closed form.
+# These functions are used by the test-integration-properties-*.R files, and
+# run_deterministic() also by test-integration-ageing-error.R. Each property
+# changes a few inputs and runs the model at its input values without
+# optimizing. It compares the output to a value worked out in R from the
+# inputs, or from other model outputs through a closed form, or to the output
+# of a second run.
 
 #' Pull the values of one input from a parameter tibble
 #'
@@ -36,6 +38,27 @@ pull_input <- function(parameters, module, input_label, fleet_name = NA) {
 #' @return A numeric vector ordered by year and then age or length.
 pull_output <- function(report, output_label, fleet_number = 1) {
   report[[output_label]][[fleet_number]]
+}
+
+#' Find the position of a fleet in the report
+#'
+#' @details Reordering parameter rows can change the position, so use the
+#'   parameters of the run that made the report. The function stops if the
+#'   name is not a fleet, because `pull_output()` would then return `NULL`,
+#'   and 2 runs that both return `NULL` compare equal.
+#' @param parameters The parameter tibble used for the run.
+#' @param fleet_name A string with the fleet name.
+#' @return An integer to pass to `pull_output()` as `fleet_number`.
+fleet_position <- function(parameters, fleet_name) {
+  fleets <- unique(stats::na.omit(parameters[["fleet"]]))
+  position <- match(fleet_name, fleets)
+  if (is.na(position)) {
+    cli::cli_abort(c(
+      "x" = "{.val {fleet_name}} is not a fleet in the parameters.",
+      "i" = "The fleets are {.val {fleets}}."
+    ))
+  }
+  position
 }
 
 #' Run FIMS once at the input values and return the report
@@ -99,5 +122,53 @@ weight_at_age_matrix <- function(data) {
     weight_at_age[["observed"]],
     ncol = dplyr::n_distinct(weight_at_age[["age"]]),
     byrow = TRUE
+  )
+}
+
+#' Calculate unfished quantities from the inputs
+#'
+#' @details The closed forms assume a single M for all ages and years. The
+#'   function stops unless the inputs have exactly 1 value of M, because SB0
+#'   would otherwise be wrong with no error. The FIMS logistic with slope s is
+#'   the logistic distribution function with scale 1 / s. Unfished spawning
+#'   biomass SB0 is R0 times spawning biomass per recruit, using first-year
+#'   weight at age and the single maturity ogive in the inputs.
+#' @param parameters A tibble from `setup_default_parameters()`.
+#' @param ages A numeric vector of model ages from `get_ages()`.
+#' @param weight_at_age A matrix from `weight_at_age_matrix()`.
+#' @return A list with `r0`, `maturity` at age, `proportion_female`,
+#'   equilibrium `numbers_at_age`, and SB0 as `spawning_biomass`.
+unfished_quantities <- function(parameters, ages, weight_at_age) {
+  r0 <- exp(pull_input(parameters, "Recruitment", "log_rzero"))
+  natural_mortality <- exp(unique(
+    pull_input(parameters, "Population", "log_M")
+  ))
+  if (length(natural_mortality) != 1) {
+    cli::cli_abort(c(
+      "x" = "The inputs have {.val {length(natural_mortality)}} values of M.",
+      "i" = "{.fn unfished_quantities} assumes a single M for all ages and
+      years.",
+      "i" = "Check {.code dplyr::filter(parameters, label == \"log_M\")}."
+    ))
+  }
+  maturity <- stats::plogis(
+    ages,
+    location = pull_input(parameters, "Maturity", "inflection_point"),
+    scale = 1 / pull_input(parameters, "Maturity", "slope")
+  )
+  proportion_female <- pull_input(
+    parameters, "Population", "proportion_female"
+  )
+  numbers_at_age <- equilibrium_numbers_at_age(
+    r0, rep(natural_mortality, length(ages))
+  )
+  list(
+    r0 = r0,
+    maturity = maturity,
+    proportion_female = proportion_female,
+    numbers_at_age = numbers_at_age,
+    spawning_biomass = sum(
+      numbers_at_age * weight_at_age[1, ] * proportion_female * maturity
+    )
   )
 }
