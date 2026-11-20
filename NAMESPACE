@@ -109,6 +109,7 @@ exportMethods(Summary)
 exportMethods(plot)
 import(methods)
 import(stats)
+importClassesFrom(tibble,tbl_df)
 importFrom(TMB,MakeADFun)
 importFrom(generics,
   augment,
