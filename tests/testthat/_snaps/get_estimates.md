@@ -2,7 +2,8 @@
 
     Code
       estimates_snapshot <- dplyr::select(FIMS:::estimates_big_unoptimized,
-      -estimated, -expected, -uncertainty, -gradient, -likelihood, -log_like_cv)
+      -estimated, -expected, -uncertainty, -gradient, -likelihood, -log_like_cv,
+      -dplyr::any_of("resids"))
       estimates_snapshot_lines <- capture.output(print(estimates_snapshot, n = 320,
         width = Inf))
       cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
@@ -980,7 +981,8 @@
 
     Code
       estimates_snapshot <- dplyr::select(estimates_big_optimized, -estimated,
-        -expected, -uncertainty, -gradient, -likelihood, -log_like_cv)
+        -expected, -uncertainty, -gradient, -likelihood, -log_like_cv, -dplyr::any_of(
+          "resids"))
       estimates_snapshot_lines <- capture.output(print(estimates_snapshot, n = 320,
         width = Inf))
       cat(trimws(estimates_snapshot_lines, which = "right"), sep = "\n")
