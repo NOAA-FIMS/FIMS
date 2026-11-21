@@ -126,6 +126,8 @@ any missing bin, so \code{observed} and \code{estimated} are \code{NA} for every
 that year, and for every year of a fleet without composition data. The
 proportions are reported as \code{agecomp_proportion} and
 \code{lengthcomp_proportion}.
+The \code{resids} column holds Pearson residuals for the data, see
+\code{\link[=calculate_residuals]{calculate_residuals()}}, and is \code{NA} for all other rows.
 
 \code{\link[=get_number_of_parameters]{get_number_of_parameters()}} returns a vector of integers specifying the
 number of fixed-effect parameters and the number of random-effect parameters

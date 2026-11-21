@@ -260,6 +260,8 @@ methods::setMethod("get_convergence", "FIMSFit", function(x) {
 #' that year, and for every year of a fleet without composition data. The
 #' proportions are reported as `agecomp_proportion` and
 #' `lengthcomp_proportion`.
+#' The `resids` column holds Pearson residuals for the data, see
+#' [calculate_residuals()], and is `NA` for all other rows.
 #' @export
 #' @rdname get_FIMSFit
 #' @keywords fit_fims
@@ -321,7 +323,9 @@ methods::setMethod(
       by = c("unique_id")
     ) |>
       dplyr::select(-dplyr::all_of("unique_id")) |>
-      dplyr::relocate(dplyr::all_of("uncertainty"), .after = dplyr::all_of("estimation_type"))
+      dplyr::relocate(dplyr::all_of("uncertainty"), .after = dplyr::all_of("estimation_type")) |>
+      # Add Pearson residuals for the data so users do not have to
+      calculate_residuals(type = "pearson")
   }
 )
 
