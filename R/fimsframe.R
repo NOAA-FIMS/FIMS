@@ -815,6 +815,56 @@ validate_data_colnames <- function(data) {
   return(errors)
 }
 
+# The uncertainty column is optional. For catch, index, age-composition, and
+# length-composition rows it must hold the distribution formula that the data
+# are fit to. A numeric column is easy to create by accident and would
+# otherwise only fail when the model is initialized.
+validate_uncertainty <- function(data) {
+  if (!"uncertainty" %in% colnames(data)) {
+    return(invisible(TRUE))
+  }
+  distribution_rows <- data[["type"]] %in%
+    c("catch", "index", "age_comp", "length_comp")
+  supplied <- data[["uncertainty"]][distribution_rows]
+  supplied <- supplied[!is.na(supplied)]
+  if (length(supplied) == 0) {
+    return(invisible(TRUE))
+  }
+  if (!is.character(supplied)) {
+    cli::cli_abort(c(
+      "x" = "{.var uncertainty} must be a character column of distribution
+      formulas, not {.cls {class(supplied)}}.",
+      "i" = "Use a one-sided formula for each row, for example
+      {.code \"~dlnorm(meanlog = catch_expected, sdlog = 0.1)\"}."
+    ))
+  }
+  formulas <- unique(supplied)
+  invalid <- vapply(
+    formulas,
+    function(formula) {
+      tryCatch(
+        {
+          parse_data_distribution(formula)
+          NA_character_
+        },
+        error = function(e) conditionMessage(e)
+      )
+    },
+    character(1)
+  )
+  invalid <- invalid[!is.na(invalid)]
+  if (length(invalid) > 0) {
+    cli::cli_abort(c(
+      "x" = "{.var uncertainty} has values that are not valid distribution
+      formulas: {.val {names(invalid)}}.",
+      "i" = "The parser reports: {invalid[[1]]}",
+      "i" = "Use a one-sided formula for each row, for example
+      {.code \"~dlnorm(meanlog = catch_expected, sdlog = 0.1)\"}."
+    ))
+  }
+  invisible(TRUE)
+}
+
 validate_composition_data <- function(data) {
   composition_type <- pretty_type(unique(data[["type"]]))
   if (all(data[["observed"]] == -999)) {
@@ -2150,6 +2200,7 @@ FIMSFrame <- function(data) {
 
   validate_fleets_have_observations(data)
   validate_catch_and_index_units(data)
+  validate_uncertainty(data)
   validate_lognormal_observations(data)
 
   # Get the fleets represented in the data
