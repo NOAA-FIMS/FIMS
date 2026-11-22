@@ -12,6 +12,7 @@
 #' |---------------|-----------------------------------------------------------|
 #' | `.truth`      | Observed data value (maps from `observed`)                |
 #' | `.pred`       | Model prediction on the data scale (from `estimated`)     |
+#' | `.resid`      | Pearson residual, see [calculate_residuals()]             |
 #' | `.weight`     | Inverse-variance weight from `uncertainty` (optional)     |
 #' | `label`       | Parameter / quantity label, e.g. `"catch_expected"`    |
 #' | `fleet`       | Fleet name for fleet rows, otherwise `NA`                 |
@@ -30,7 +31,7 @@
 #' @param ... Unused; present for S3 method compatibility.
 #'
 #' @return A [tibble::tibble()] with at least the columns `.truth`, `.pred`,
-#'   and optional `.weight`, plus grouping-metadata columns.
+#'   `.resid`, and optional `.weight`, plus grouping-metadata columns.
 #'
 #' @examples
 #' \dontrun{
@@ -56,7 +57,8 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   # column names to the yardstick convention (.truth, .pred, .weight).
   # After applying fimsfit-patches.R the gradient is stored in x@gradient at
   # fit time, so this call is safe after clear().
-  estimates <- get_estimates(x)
+  estimates <- get_estimates(x) |>
+    calculate_residuals(type = "pearson")
 
   # Keep only rows that are data-fit rows: both observed and expected must be
   # present.  Parameter rows (fixed_effects, random_effects) that have no
@@ -75,6 +77,7 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
     return(tibble::tibble(
       .truth       = numeric(),
       .pred        = numeric(),
+      .resid       = numeric(),
       label        = character(),
       fleet        = character(),
       module_id    = integer(),
@@ -97,10 +100,11 @@ augment.FIMSFit <- function(x, include_weights = TRUE, ...) {
   out <- fit_rows |>
     dplyr::mutate(
       .truth = as.numeric(.data$observed),
-      .pred  = as.numeric(.data$estimated)
+      .pred  = as.numeric(.data$estimated),
+      .resid = .data$resids
     ) |>
     dplyr::select(
-      dplyr::all_of(c(meta_cols, ".truth", ".pred")),
+      dplyr::all_of(c(meta_cols, ".truth", ".pred", ".resid")),
       dplyr::any_of("uncertainty")
     )
 

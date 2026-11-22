@@ -83,7 +83,7 @@ Residuals are the first place to look when checking whether a model fits its dat
 
 ### Pearson residuals in FIMS
 
-`get_estimates()` returns a tibble with one row for every parameter, derived quantity, and data point. It calculates Pearson residuals for every data observation and returns them in the `resids` column, next to `observed` and `expected`. Rows that are not data, e.g., parameters and derived quantities, have a residual of `NA`. Under the hood, `get_estimates()` calls `calculate_residuals()`, which you can also call directly.
+`residuals()` calculates Pearson residuals for a fitted FIMS model, as it does for models fit with `lm()` and other modeling functions. It returns a tibble with one row for every data observation, the columns needed to identify it (e.g., `label`, `fleet`, `year`, `age`, and `length`), `observed`, `expected`, and the residual in `resids`. Residuals are calculated when you ask for them rather than stored in the output of `get_estimates()`. If you only have the output of `get_estimates()`, e.g., saved to a file, `calculate_residuals()` adds the same `resids` column to it. `augment()` also returns the residuals, in `.resid`, next to the observed and predicted values.
 
 A Pearson residual is the observed value minus the expected value, divided by the standard deviation implied by the likelihood:
 
@@ -92,20 +92,20 @@ A Pearson residual is the observed value minus the expected value, divided by th
 * **Multinomial** (`multinomial`): `observed` is the number in bin $i$, $o_i$, `expected` is the expected proportion, $p_i$, and the sample size, $N$, is the sum of the observations in the composition. The residual is $r_i = (o_i - Np_i) / \sqrt{Np_i(1 - p_i)}$. Bins with an expected proportion of zero have no variance, so their residual is `NA`.
 
 ```{r pearson-residuals}
-estimates <- get_estimates(base_model)
+fit_residuals <- residuals(base_model)
 
-estimates |>
+fit_residuals |>
   dplyr::filter(!is.na(resids)) |>
   dplyr::count(label, fleet, distribution)
 ```
 
 If the model and the data agree, Pearson residuals have a mean near zero and a standard deviation near one. A standard deviation of the normalized residuals (SDNR) well above one suggests the data are given too much weight (the assumed variance is too small); well below one suggests they are given too little.
 
-The {stockplotr} plotting functions use a standard format that `stockplotr::convert_output()` creates from the estimates. It splits each data point into an observed and a predicted row, e.g., `index_observed` and `index_predicted`.
+The {stockplotr} plotting functions use a standard format that `stockplotr::convert_output()` creates from the output of `get_estimates()`. It splits each data point into an observed and a predicted row, e.g., `index_observed` and `index_predicted`.
 
 ```{r convert-output}
 #| message: false
-output <- estimates |>
+output <- get_estimates(base_model) |>
   # convert_output() reads the model year from `year_i`, the name used before
   # FIMS reported calendar years in `year`
   dplyr::rename(year_i = year) |>
@@ -161,11 +161,11 @@ stockplotr::plot_runs_test(output, interactive = FALSE)
 
 ### Age and length compositions
 
-The composition plots in {stockplotr} accept the output of `get_estimates()` directly. We keep the multinomial data and rename `resids` to `pearson` so the plots use the residuals FIMS has already calculated. We also add the sample size of each composition, `n`, which FIMS takes as the sum of the observations; some plots use it for intervals and data weights. Most composition plots accept `comp_type` (`"age"` or `"length"`) and `fleet` to plot one type of composition or one fleet at a time.
+The composition plots in {stockplotr} accept the output of `residuals()` directly. We keep the multinomial data and rename `resids` to `pearson` so the plots use the residuals FIMS has calculated. We also add the sample size of each composition, `n`, which FIMS takes as the sum of the observations; some plots use it for intervals and data weights. Most composition plots accept `comp_type` (`"age"` or `"length"`) and `fleet` to plot one type of composition or one fleet at a time.
 
 ```{r composition-data}
-composition <- estimates |>
-  dplyr::filter(input_type == "data", distribution == "multinomial") |>
+composition <- fit_residuals |>
+  dplyr::filter(distribution == "multinomial") |>
   dplyr::group_by(label, fleet, year) |>
   dplyr::mutate(n = sum(observed)) |>
   dplyr::ungroup() |>

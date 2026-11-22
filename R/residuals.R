@@ -1,15 +1,60 @@
-# This file contains functions to calculate residuals for the data in the
-# tibble returned by get_estimates(). The argument names and the use of one
-# function per distribution follow residuals.sdmTMB() in the sdmTMB package.
+# This file contains functions to calculate residuals for the data in a fitted
+# FIMS model: the residuals() method for FIMSFit objects and
+# calculate_residuals(), which works on the tibble returned by get_estimates().
+# The argument names and the use of one function per distribution follow
+# residuals.sdmTMB() in the sdmTMB package.
+
+#' Residuals of a fitted FIMS model
+#'
+#' @description
+#' Calculates residuals for the data in a fitted FIMS model, like
+#' [stats::residuals()] does for other model objects. Residuals are calculated
+#' when you ask for them rather than stored in the output of [get_estimates()],
+#' so other types, e.g., one-step-ahead residuals that require additional
+#' model runs, can be added without slowing down [get_estimates()].
+#'
+#' @details
+#' See [calculate_residuals()] for how the residuals are calculated for each
+#' distribution. Because the data in a FIMS model come from several types of
+#' data, e.g., indices, landings, and compositions, the residuals are returned
+#' in a tibble along with the columns needed to identify each observation
+#' rather than as a vector.
+#'
+#' @param object A `FIMSFit` object returned from [fit_fims()].
+#' @param type A string specifying the type of residual. Only `"pearson"` is
+#'   available at this time.
+#' @param ... Unused; present for compatibility with [stats::residuals()].
+#' @return
+#' A tibble with one row per data observation, i.e., rows of
+#' [get_estimates()] where `input_type` is `"data"`, and the columns
+#' `module_name`, `module_id`, `label`, `fleet`, `year`, `age`, `length`,
+#' `distribution`, `observed`, `expected`, and `resids`. `resids` is `NA` for
+#' missing observations and for distributions without a residual
+#' calculation; see [calculate_residuals()].
+#' @seealso [calculate_residuals()], [augment.FIMSFit()]
+#' @exportS3Method stats::residuals
+#' @keywords diagnostics
+#' @examples
+#' data("fit_big_optimized")
+#' residuals(fit_big_optimized)
+residuals.FIMSFit <- function(object, type = c("pearson"), ...) {
+  type <- rlang::arg_match(type)
+  get_estimates(object) |>
+    calculate_residuals(type = type) |>
+    dplyr::filter(.data$input_type %in% "data") |>
+    dplyr::select(dplyr::any_of(c(
+      "module_name", "module_id", "label", "fleet", "year", "age", "length",
+      "distribution", "observed", "expected", "resids"
+    )))
+}
 
 #' Calculate residuals for the data in a FIMS estimates tibble
 #'
 #' @description
 #' Calculates residuals for every data observation in the tibble returned by
-#' [get_estimates()]. [get_estimates()] calls this function, so the tibble it
-#' returns already has a `resids` column next to `observed` and `expected`.
-#' Call this function yourself to recalculate the residuals, e.g., for
-#' estimates saved before the column was added.
+#' [get_estimates()]. For a fitted model, [residuals()][residuals.FIMSFit()]
+#' is usually more convenient; use this function when you only have the
+#' estimates, e.g., estimates saved to a file.
 #'
 #' @details
 #' Only Pearson residuals, i.e., `type = "pearson"`, are available. A Pearson
@@ -48,7 +93,7 @@
 #' @return
 #' The `estimates` tibble with a `resids` column placed after `observed`.
 #' An existing `resids` column is replaced.
-#' @seealso [get_estimates()]
+#' @seealso [residuals.FIMSFit()], [get_estimates()]
 #' @export
 #' @keywords diagnostics
 #' @examples

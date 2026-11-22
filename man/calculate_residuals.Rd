@@ -20,10 +20,9 @@ An existing \code{resids} column is replaced.
 }
 \description{
 Calculates residuals for every data observation in the tibble returned by
-\code{\link[=get_estimates]{get_estimates()}}. \code{\link[=get_estimates]{get_estimates()}} calls this function, so the tibble it
-returns already has a \code{resids} column next to \code{observed} and \code{expected}.
-Call this function yourself to recalculate the residuals, e.g., for
-estimates saved before the column was added.
+\code{\link[=get_estimates]{get_estimates()}}. For a fitted model, \link[=residuals.FIMSFit]{residuals()}
+is usually more convenient; use this function when you only have the
+estimates, e.g., estimates saved to a file.
 }
 \details{
 Only Pearson residuals, i.e., \code{type = "pearson"}, are available. A Pearson
@@ -63,6 +62,6 @@ calculate_residuals(estimates_big_optimized) |>
   dplyr::select(label, fleet, year, age, length, observed, resids)
 }
 \seealso{
-\code{\link[=get_estimates]{get_estimates()}}
+\code{\link[=residuals.FIMSFit]{residuals.FIMSFit()}}, \code{\link[=get_estimates]{get_estimates()}}
 }
 \keyword{diagnostics}

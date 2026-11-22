@@ -19,7 +19,7 @@ silently drops when calling weighted metrics.}
 }
 \value{
 A \code{\link[tibble:tibble]{tibble::tibble()}} with at least the columns \code{.truth}, \code{.pred},
-and optional \code{.weight}, plus grouping-metadata columns.
+\code{.resid}, and optional \code{.weight}, plus grouping-metadata columns.
 }
 \description{
 Returns a tidy tibble of observed-vs-expected pairs drawn from the output of
@@ -33,6 +33,7 @@ The returned tibble follows the conventions expected by every
    Column \tab Role \cr
    \code{.truth} \tab Observed data value (maps from \code{observed}) \cr
    \code{.pred} \tab Model prediction on the data scale (from \code{estimated}) \cr
+   \code{.resid} \tab Pearson residual, see \code{\link[=calculate_residuals]{calculate_residuals()}} \cr
    \code{.weight} \tab Inverse-variance weight from \code{uncertainty} (optional) \cr
    \code{label} \tab Parameter / quantity label, e.g. \code{"catch_expected"} \cr
    \code{fleet} \tab Fleet name for fleet rows, otherwise \code{NA} \cr

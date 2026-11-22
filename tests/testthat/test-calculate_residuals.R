@@ -69,14 +69,14 @@ test_that("`calculate_residuals()` works with correct inputs", {
 })
 
 test_that("`calculate_residuals()` works with get_estimates() output", {
-  estimates <- get_estimates(FIMS::fit_big_optimized)
-  #' @description Test that `get_estimates()` returns a `resids` column.
+  estimates <- calculate_residuals(get_estimates(FIMS::fit_big_optimized))
+  #' @description Test that `calculate_residuals()` adds a `resids` column to `get_estimates()` output.
   expect_true("resids" %in% names(estimates))
-  #' @description Test that `get_estimates()` only returns residuals for data rows.
+  #' @description Test that `calculate_residuals()` only returns residuals for data rows.
   expect_true(all(is.na(estimates[["resids"]][
     !estimates[["input_type"]] %in% "data"
   ])))
-  #' @description Test that `get_estimates()` returns finite residuals for every data stream in the example model.
+  #' @description Test that `calculate_residuals()` returns finite residuals for every data stream in the example model.
   data_rows <- dplyr::filter(estimates, .data$input_type %in% "data")
   expect_true(all(
     tapply(is.finite(data_rows[["resids"]]), data_rows[["label"]], any)
@@ -123,5 +123,57 @@ test_that("`calculate_residuals()` returns correct error messages", {
       dplyr::select(residual_estimates, -"expected")
     ),
     regexp = "missing"
+  )
+})
+
+# residuals.FIMSFit ----
+## Setup ----
+fit <- FIMS::fit_big_optimized
+
+## IO correctness ----
+test_that("residuals() works with correct inputs", {
+  fit_residuals <- residuals(fit)
+  estimates <- get_estimates(fit)
+
+  #' @description Test that residuals(fit) returns one row per data observation in get_estimates(fit).
+  expect_equal(
+    object = nrow(fit_residuals),
+    expected = sum(estimates[["input_type"]] %in% "data")
+  )
+
+  #' @description Test that residuals(fit) returns the identifying columns, observed, expected, and resids.
+  expect_equal(
+    object = colnames(fit_residuals),
+    expected = c(
+      "module_name", "module_id", "label", "fleet", "year", "age", "length",
+      "distribution", "observed", "expected", "resids"
+    )
+  )
+
+  #' @description Test that residuals(fit) matches calculate_residuals() on the estimates from the same fit.
+  expect_equal(
+    object = fit_residuals[["resids"]],
+    expected = calculate_residuals(estimates) |>
+      dplyr::filter(.data[["input_type"]] %in% "data") |>
+      dplyr::pull("resids")
+  )
+
+  #' @description Test that residuals(fit) does not add a resids column to get_estimates(fit).
+  expect_false("resids" %in% colnames(estimates))
+})
+
+## Edge handling ----
+test_that("residuals() returns correct outputs for edge cases", {
+  #' @description Test that residuals(fit) does not error after clear() has been called.
+  clear()
+  expect_no_error(object = residuals(fit))
+})
+
+## Error handling ----
+test_that("residuals() returns correct error messages", {
+  #' @description Test that residuals(fit, type = "osa") errors because only Pearson residuals are available.
+  expect_error(
+    object = residuals(fit, type = "osa"),
+    regexp = "pearson"
   )
 })
