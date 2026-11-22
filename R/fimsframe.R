@@ -39,7 +39,6 @@
 # TODO: ----
 
 # TODO: make date_formats a local variable
-# TODO: document sorting of information in terms of alphabetized fleet order
 # TODO: test implement addition of -999
 # TODO: validate that all length-age combinations exist in the conversion matrix
 
@@ -104,7 +103,8 @@ methods::setMethod(
 )
 
 #' @return
-#' [get_fleets()] returns a vector of strings containing the fleet names.
+#' [get_fleets()] returns a vector of strings containing the fleet names in the
+#' order in which they first appear in the input data.
 #' @export
 #' @rdname get_FIMSFrame
 #' @keywords FIMSFrame
@@ -2069,19 +2069,17 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
 #' It is important that the order of the rows in the data are correct but it is
 #' not expected that the user will do this. Instead, the returned data are
 #' sorted using [dplyr::arrange()] before placing them in the data slot. Data
-#' are first sorted by data type, placing all `weight_at_age` data next to
-#' other `weight_at_age` data and all catch data next to catch data.
-#' Thus, `age_comp` data will come first because their type is "age" and "a" is
-#' first in the alphabet. All other types will follow according to their order
-#' in the alphabet.
-#' Next, within each type, data are organized by fleet. So, `age_comp`
-#' information for fleet1 will come before survey1. Next, all data within type
-#' and fleet are arranged by timing, e.g., by year. That is the end of the
-#' sorting for time series data like catch and indices. The biological data
-#' are further sorted by bin. Thus, `age_comp` information will be arranged as
-#' follows:
+#' are first sorted by fleet in alphabetical order, with capital letters before
+#' lowercase letters. So, all fleet1 data will come before survey1 data. Rows
+#' without a fleet come last.
+#' Next, within each fleet, data are sorted by type in alphabetical order. So,
+#' `age_comp` information for fleet1 will come before `catch` for fleet1. Next,
+#' all data within fleet and type are arranged by timing, e.g., by year, and
+#' rows without a timing come last. That is the end of the sorting for time
+#' series data like catch and indices. The biological data are further sorted by
+#' bin. Thus, `age_comp` information will be arranged as follows:
 #'
-#' | type     | name     | timing  | age  | observed  |
+#' | type     | fleet    | timing  | age  | observed  |
 #' |:-------- |:--------:|:-------:|:----:|-------:|
 #' | age_comp | fleet1   | 2022    | 1    | 0.3    |
 #' | age_comp | fleet1   | 2022    | 2    | 0.7    |
@@ -2089,11 +2087,13 @@ validate_population_length_bins <- function(data, fleet_length_bins) {
 #'
 #' `length_comp` data are sorted the same way but by length bin instead of
 #' by age bin. It becomes more complicated for the `age_to_length_conversion`
-#' data, which are sorted by type, name, timing, age, and then length. So, a
+#' data, which are sorted by fleet, type, timing, age, and then length. So, a
 #' full set of length, e.g., length 10, length 20, length 30, etc., is placed
 #' together for a given age. After that age, another entire set of length
 #' information will be provided for that next age. Once the year is complete
 #' for a given fleet then the next year will begin.
+#'
+#' Sorting does not change the order of the `fleets` slot (see [get_fleets()]).
 #'
 #' @rdname FIMSFrame
 #'

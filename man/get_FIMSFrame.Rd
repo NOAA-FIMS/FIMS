@@ -104,7 +104,8 @@ following columns depending if it fits to ages and lengths or just one of
 them:
 type, fleet, age, length, timing, observed, unit, and uncertainty.
 
-\code{\link[=get_fleets]{get_fleets()}} returns a vector of strings containing the fleet names.
+\code{\link[=get_fleets]{get_fleets()}} returns a vector of strings containing the fleet names in the
+order in which they first appear in the input data.
 
 \code{\link[=get_n_fleets]{get_n_fleets()}} returns an integer specifying the number of fleets in the
 model, where fleets is inclusive of both fishing fleets and survey vessels.
