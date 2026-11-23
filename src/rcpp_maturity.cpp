@@ -17,6 +17,11 @@ std::map<uint32_t, std::shared_ptr<MaturityInterfaceBase>>
  *
  */
 void register_maturity(Rcpp::Module& m) {
+  Rcpp::class_<ConstantMaturityInterface>("ConstantMaturity")
+      .constructor()
+      .method("SetValue", &ConstantMaturityInterface::SetValue)
+      .method("get_id", &ConstantMaturityInterface::get_id)
+      .method("evaluate", &ConstantMaturityInterface::evaluate);
   Rcpp::class_<LogisticMaturityInterface>(
       "LogisticMaturity",
       "See "

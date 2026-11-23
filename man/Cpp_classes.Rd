@@ -15,6 +15,7 @@
 \alias{Index}
 \alias{Catch}
 \alias{LengthComp}
+\alias{ConstantMaturity}
 \alias{LogDevsRecruitmentProcess}
 \alias{LogRRecruitmentProcess}
 \alias{LogisticMaturity}
@@ -49,6 +50,7 @@ docs.
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLengthCompDataInterface.html}{LengthComp}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogDevsRecruitmentInterface.html}{LogDevsRecruitmentProcess}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogRRecruitmentInterface.html}{LogRRecruitmentProcess}
+\item \href{https://noaa-fims.github.io/FIMS/doxygen/classConstantMaturityInterface.html}{ConstantMaturity}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogisticMaturityInterface.html}{LogisticMaturity}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classLogisticSelectivityInterface.html}{LogisticSelectivity}
 \item \href{https://noaa-fims.github.io/FIMS/doxygen/classPopulationInterface.html}{Population}

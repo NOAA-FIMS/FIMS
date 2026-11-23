@@ -24,6 +24,8 @@ void register_fishery_models(Rcpp::Module& m) {
       "https://noaa-fims.github.io/FIMS/doxygen/classCatchAtAgeInterface.html.")
       .constructor()
       .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
+      .method("LinkRecruitment", &CatchAtAgeInterface::LinkRecruitment)
+      .method("LinkFleetObservations", &CatchAtAgeInterface::LinkFleetObservations)
       .method("get_output", &CatchAtAgeInterface::to_json)
       .method("GetId", &CatchAtAgeInterface::get_id)
       .method("DoReporting", &CatchAtAgeInterface::DoReporting)

@@ -476,3 +476,8 @@ add_executable(population_Subpopulation test_population_Subpopulation.cpp)
 add_as_invoker_manifest(population_Subpopulation)
 target_link_libraries(population_Subpopulation gtest_main fims_test)
 gtest_discover_tests(population_Subpopulation)
+
+add_executable(population_RecruitmentLink test_population_RecruitmentLink.cpp)
+add_as_invoker_manifest(population_RecruitmentLink)
+target_link_libraries(population_RecruitmentLink gtest_main fims_test)
+gtest_discover_tests(population_RecruitmentLink)

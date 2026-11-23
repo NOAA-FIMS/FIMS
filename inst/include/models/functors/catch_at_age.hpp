@@ -15,6 +15,8 @@
 #include <stdexcept>
 
 #include "fishery_model_base.hpp"
+#include "population_dynamics/fleet/observation_link.hpp"
+#include "population_dynamics/recruitment/recruitment_link.hpp"
 #include "population_dynamics/age_to_length_conversion/functors/runtime.hpp"
 
 /* Dictionary block for shared parameter snippet documentations.
@@ -56,78 +58,91 @@ template <typename Type>
  */
 class CatchAtAge : public FisheryModelBase<Type> {
  public:
-  /**
-   * @brief The name of the model.
-   *
-   */
-  std::string name_m;
+   /**
+    * @brief The name of the model.
+    *
+    */
+   std::string name_m;
 
-  /**
-   * @brief Iterate the derived quantities.
-   *
-   */
-  typedef typename std::map<std::string, fims::Vector<Type>>::iterator
-      derived_quantities_iterator;
+   /** @brief Explicit groups sharing stock recruitment; empty retains pooled
+    * behavior. */
+   std::vector<RecruitmentLink> recruitment_links;
+  /** @brief Explicit pooling of population-specific fleet predictions. */
+  std::vector<FleetObservationLink> observation_links;
 
-  /**
-   * @brief Used to iterate through fleet-based derived quantities.
-   *
-   */
-  typedef typename std::map<uint32_t,
-                            std::map<std::string, fims::Vector<Type>>>::iterator
-      fleet_derived_quantities_iterator;
+   /** @brief Resolved configuration, rebuilt before each evaluation. */
+   std::map<uint32_t, size_t> recruitment_link_by_population;
+   std::map<uint32_t, std::shared_ptr<Population<Type>>> linked_populations;
+   std::map<uint32_t, double> recruitment_fractions;
 
-  /**
-   * @brief Used to iterate through fleet-based derived quantities dimensions.
-   */
-  typedef
-      typename std::map<uint32_t,
-                        std::map<std::string, fims::Vector<size_t>>>::iterator
-          fleet_derived_quantities_dims_iterator;
-  /**
-   * @brief Used to iterate through population-based derived quantities.
-   *
-   */
-  typedef typename std::map<uint32_t,
-                            std::map<std::string, fims::Vector<Type>>>::iterator
-      population_derived_quantities_iterator;
+   /**
+    * @brief Iterate the derived quantities.
+    *
+    */
+   typedef typename std::map<std::string, fims::Vector<Type>>::iterator
+       derived_quantities_iterator;
 
-  /**
-   * @brief Used to iterate through population-based derived quantities
-   * dimensions.
-   */
-  typedef
-      typename std::map<uint32_t,
-                        std::map<std::string, fims::Vector<size_t>>>::iterator
-          population_derived_quantities_dims_iterator;
+   /**
+    * @brief Used to iterate through fleet-based derived quantities.
+    *
+    */
+   typedef
+       typename std::map<uint32_t,
+                         std::map<std::string, fims::Vector<Type>>>::iterator
+           fleet_derived_quantities_iterator;
 
-  /**
-   * @brief Iterate through fleets.
-   *
-   */
-  typedef typename std::map<uint32_t,
-                            std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator
-      fleet_iterator;
-  /**
-   * @brief Iterate through derived quantities.
-   *
-   */
-  typedef
-      typename std::map<std::string, fims::Vector<Type>>::iterator dq_iterator;
-  /**
-   * @brief A map of report vectors for the object.
-   * used to populate the report_vectors map in for submodule
-   * parameters.
-   */
-  std::map<std::string, fims::Vector<fims::Vector<Type>>> report_vectors;
-  /**
-   * @brief Controls whether reporting materializes the full derived
-   * age-to-length tensor for fleets using the growth-derived age-to-length
-   * conversion path.
-   *
-   * Default is false to avoid large report-side allocations.
-   */
-  bool report_age_to_length_conversion_derived_tensor = false;
+   /**
+    * @brief Used to iterate through fleet-based derived quantities dimensions.
+    */
+   typedef
+       typename std::map<uint32_t,
+                         std::map<std::string, fims::Vector<size_t>>>::iterator
+           fleet_derived_quantities_dims_iterator;
+   /**
+    * @brief Used to iterate through population-based derived quantities.
+    *
+    */
+   typedef
+       typename std::map<uint32_t,
+                         std::map<std::string, fims::Vector<Type>>>::iterator
+           population_derived_quantities_iterator;
+
+   /**
+    * @brief Used to iterate through population-based derived quantities
+    * dimensions.
+    */
+   typedef
+       typename std::map<uint32_t,
+                         std::map<std::string, fims::Vector<size_t>>>::iterator
+           population_derived_quantities_dims_iterator;
+
+   /**
+    * @brief Iterate through fleets.
+    *
+    */
+   typedef typename std::map<uint32_t,
+                             std::shared_ptr<fims_popdy::Fleet<Type>>>::iterator
+       fleet_iterator;
+   /**
+    * @brief Iterate through derived quantities.
+    *
+    */
+   typedef
+       typename std::map<std::string, fims::Vector<Type>>::iterator dq_iterator;
+   /**
+    * @brief A map of report vectors for the object.
+    * used to populate the report_vectors map in for submodule
+    * parameters.
+    */
+   std::map<std::string, fims::Vector<fims::Vector<Type>>> report_vectors;
+   /**
+    * @brief Controls whether reporting materializes the full derived
+    * age-to-length tensor for fleets using the growth-derived age-to-length
+    * conversion path.
+    *
+    * Default is false to avoid large report-side allocations.
+    */
+   bool report_age_to_length_conversion_derived_tensor = false;
 
  public:
   std::vector<Type> ages; /*!< vector of the ages for referencing*/
@@ -150,6 +165,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
   CatchAtAge(const CatchAtAge &other)
       : FisheryModelBase<Type>(other),
         name_m(other.name_m),
+        recruitment_links(other.recruitment_links),
+        observation_links(other.observation_links),
         ages(other.ages),
         report_age_to_length_conversion_derived_tensor(
             other.report_age_to_length_conversion_derived_tensor) {
@@ -231,6 +248,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
       for (auto &kv : derived_quantities) {
         this->ResetVector(kv.second);
       }
+
+      if (this->observation_fleet_ids.count(fleet->GetId())) continue;
 
       // Transformation Section
       for (size_t i = 0; i < fleet->log_q.size(); i++) {
@@ -589,8 +608,25 @@ class CatchAtAge : public FisheryModelBase<Type> {
       std::shared_ptr<fims_popdy::Population<Type>> &population, size_t year) {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
-    population->spawning_biomass_ratio[year] =
-        dq_["spawning_biomass"][year] / dq_["unfished_spawning_biomass"][0];
+    auto it = recruitment_link_by_population.find(population->GetId());
+    if (it == recruitment_link_by_population.end()) {
+      population->spawning_biomass_ratio[year] =
+          dq_["spawning_biomass"][year] / dq_["unfished_spawning_biomass"][0];
+      return;
+    }
+    Type spawning = 0.0;
+    Type unfished = 0.0;
+    for (const auto &allocation : recruitment_links[it->second].allocations) {
+      auto &member =
+          this->GetPopulationDerivedQuantities(allocation.population_id);
+      spawning += member["spawning_biomass"][year];
+      unfished += member["unfished_spawning_biomass"][0];
+    }
+    if (unfished <= Type(0.0)) {
+      throw std::invalid_argument(
+          "Linked stock must have positive unfished spawning biomass");
+    }
+    population->spawning_biomass_ratio[year] = spawning / unfished;
   }
 
   /**
@@ -676,27 +712,152 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::map<std::string, fims::Vector<Type>> &dq_ =
         this->GetPopulationDerivedQuantities(population->GetId());
 
-    Type phi_0 = CalculateSBPR0(population);
-
-    if (i_dev == population->n_years) {
-      dq_["numbers_at_age"][i_age_year] =
-          population->recruitment->evaluate_mean(
-              dq_["spawning_biomass"][year - 1], phi_0);
-      /*the final year of the time series has no data to inform recruitment
-      devs, so this value is set to the mean recruitment.*/
-    } else {
-      // Why are we using evaluate_mean, how come a virtual function was
-      // changed? AMH: there are now two virtual functions: evaluate_mean and
-      // evaluate_process (see below)
-      population->recruitment->log_expected_recruitment[year - 1] =
-          fims_math::log(population->recruitment->evaluate_mean(
-              dq_["spawning_biomass"][year - 1], phi_0));
-
-      dq_["numbers_at_age"][i_age_year] = fims_math::exp(
-          population->recruitment->process->evaluate_process(year - 1));
-    }
-
+    dq_["numbers_at_age"][i_age_year] = EvaluateStockRecruitment(
+        population->recruitment, dq_["spawning_biomass"][year - 1],
+        CalculateSBPR0(population), year, i_dev == population->n_years);
     dq_["expected_recruitment"][year] = dq_["numbers_at_age"][i_age_year];
+  }
+
+  /** @brief Evaluate one recruitment process in total-stock units. */
+  Type EvaluateStockRecruitment(
+      const std::shared_ptr<RecruitmentBase<Type>> &recruitment,
+      const Type &spawners, const Type &phi_0, size_t year, bool terminal) {
+    Type mean = recruitment->evaluate_mean(spawners, phi_0);
+    if (terminal)
+      return mean;
+    recruitment->log_expected_recruitment[year - 1] = fims_math::log(mean);
+    return fims_math::exp(recruitment->process->evaluate_process(year - 1));
+  }
+
+  /** @brief Resolve and validate recruitment links before modifying annual
+   * state. */
+  void PrepareRecruitmentLinks() {
+    recruitment_link_by_population.clear();
+    linked_populations.clear();
+    recruitment_fractions.clear();
+    if (recruitment_links.empty()) return;
+    for (const auto &population : this->populations) {
+      linked_populations.emplace(population->GetId(), population);
+    }
+    for (size_t i = 0; i < recruitment_links.size(); ++i) {
+      const auto &link = recruitment_links[i];
+      link.Validate();
+      std::shared_ptr<Population<Type>> first;
+      std::set<uint32_t> fleet_ids;
+      for (const auto &allocation : link.allocations) {
+        auto it = linked_populations.find(allocation.population_id);
+        if (it == linked_populations.end()) {
+          throw std::invalid_argument(
+              "Recruitment link population is not in this model");
+        }
+        if (!recruitment_link_by_population.emplace(allocation.population_id, i)
+                 .second) {
+          throw std::invalid_argument(
+              "A population cannot belong to multiple recruitment links");
+        }
+        const auto &population = it->second;
+        if (population->n_years == 0 || population->n_ages < 2) {
+          throw std::invalid_argument(
+              "Linked populations require years and at least two age classes");
+        }
+        if (!population->recruitment || !population->recruitment->process) {
+          throw std::invalid_argument(
+              "Linked populations require a recruitment mean and process");
+        }
+        if (!first)
+          first = population;
+        if (population->recruitment != first->recruitment) {
+          throw std::invalid_argument(
+              "Linked populations must share the same recruitment module");
+        }
+        if (population->n_years != first->n_years ||
+            !std::equal(population->years.begin(), population->years.end(),
+                        first->years.begin(), first->years.end()) ||
+            population->ages.empty() || first->ages.empty() ||
+            population->ages[0] != first->ages[0]) {
+          throw std::invalid_argument(
+              "Linked populations must use the same years and recruitment age");
+        }
+        for (const auto &fleet : population->fleets) {
+          if (!fleet_ids.insert(fleet->GetId()).second) {
+            throw std::invalid_argument(
+                "Shared fleets across linked populations require observation "
+                "aggregation, which is not implemented");
+          }
+        }
+        recruitment_fractions.emplace(allocation.population_id,
+                                      allocation.fraction);
+      }
+    }
+    // A module shared outside its declared link would overwrite process
+    // expectations.
+    for (const auto &left : this->populations) {
+      for (const auto &right : this->populations) {
+        if (left == right)
+          continue;
+        auto a = recruitment_link_by_population.find(left->GetId());
+        auto b = recruitment_link_by_population.find(right->GetId());
+        if (a != recruitment_link_by_population.end() ||
+            b != recruitment_link_by_population.end()) {
+          for (const auto &left_fleet : left->fleets) {
+            for (const auto &right_fleet : right->fleets) {
+              if (left_fleet->GetId() == right_fleet->GetId()) {
+                throw std::invalid_argument(
+                    "Shared fleets involving linked populations require "
+                    "observation aggregation, which is not implemented");
+              }
+            }
+          }
+        }
+        if (left->recruitment != right->recruitment)
+          continue;
+        if ((a != recruitment_link_by_population.end() ||
+             b != recruitment_link_by_population.end()) &&
+            (a == recruitment_link_by_population.end() ||
+             b == recruitment_link_by_population.end() ||
+             a->second != b->second)) {
+          throw std::invalid_argument(
+              "A linked recruitment module cannot be shared outside its link");
+        }
+      }
+    }
+  }
+
+  /** @brief Allocate stock recruitment once, after all previous-year spawners
+   * exist. */
+  void CalculateLinkedRecruitment(const RecruitmentLink &link, size_t year) {
+    auto first = linked_populations.at(link.allocations.front().population_id);
+    if (year > first->n_years)
+      return;
+    Type spawners = 0.0;
+    Type phi_0 = 0.0;
+    for (const auto &allocation : link.allocations) {
+      auto population = linked_populations.at(allocation.population_id);
+      spawners += this->GetPopulationDerivedQuantities(
+          population->GetId())["spawning_biomass"][year - 1];
+      phi_0 += allocation.fraction * CalculateSBPR0(population);
+    }
+    if (phi_0 <= Type(0.0)) {
+      throw std::invalid_argument(
+          "Linked stock must have positive spawning biomass per recruit");
+    }
+    Type recruits = EvaluateStockRecruitment(
+        first->recruitment, spawners, phi_0, year, year == first->n_years);
+    for (const auto &allocation : link.allocations) {
+      auto population = linked_populations.at(allocation.population_id);
+      auto &dq = this->GetPopulationDerivedQuantities(population->GetId());
+      dq["numbers_at_age"][year * population->n_ages] =
+          allocation.fraction * recruits;
+      dq["expected_recruitment"][year] = allocation.fraction * recruits;
+    }
+  }
+
+  /** @brief Unfished entrants use allocated R0 for linked populations. */
+  Type
+  UnfishedRecruitment(const std::shared_ptr<Population<Type>> &population) {
+    auto it = recruitment_fractions.find(population->GetId());
+    double fraction = it == recruitment_fractions.end() ? 1.0 : it->second;
+    return fraction * fims_math::exp(population->recruitment->log_rzero[0]);
   }
 
   /**
@@ -962,6 +1123,154 @@ class CatchAtAge : public FisheryModelBase<Type> {
     }
   }
 
+  /** @brief Validate flat observation links and compatible observation bins. */
+  void PrepareObservationLinks() {
+    std::set<uint32_t> targets;
+    std::map<uint32_t, std::shared_ptr<Population<Type>>> owners;
+    for (const auto &population : this->populations) {
+      for (const auto &fleet : population->fleets) {
+        if (!owners.emplace(fleet->GetId(), population).second &&
+            !observation_links.empty()) {
+          throw std::invalid_argument(
+              "Dynamic fleet objects must belong to one population; use "
+              "observation links to pool them");
+        }
+      }
+    }
+    for (const auto &link : observation_links) {
+      link.Validate();
+      if (!targets.insert(link.target_id).second ||
+          !this->observation_fleet_ids.count(link.target_id) ||
+          !this->fleets.count(link.target_id) || owners.count(link.target_id)) {
+        throw std::invalid_argument("Observation target must be unique and "
+                                    "outside population dynamics");
+      }
+    }
+    for (const auto &link : observation_links) {
+      auto target = this->fleets.at(link.target_id);
+      std::shared_ptr<Population<Type>> first;
+      std::shared_ptr<Fleet<Type>> first_fleet;
+      for (auto id : link.source_ids) {
+        if (targets.count(id) || !this->fleets.count(id) || !owners.count(id)) {
+          throw std::invalid_argument(
+              "Observation sources must be population-specific dynamic fleets; "
+              "nested links are not supported");
+        }
+        auto source = this->fleets.at(id);
+        auto population = owners.at(id);
+        if (!first)
+          first = population;
+        if (!first_fleet)
+          first_fleet = source;
+        if (source->n_years != target->n_years ||
+            source->n_ages != target->n_ages ||
+            source->n_years != population->n_years ||
+            source->n_ages != population->n_ages ||
+            !(population->ages == first->ages) ||
+            !(population->years == first->years)) {
+          throw std::invalid_argument(
+              "Pooled fleets require matching year and age grids");
+        }
+        if (target->n_lengths > 0 &&
+            (source->n_lengths != target->n_lengths ||
+             !source->requires_age_length_mapping ||
+             !(source->lengths == target->lengths) ||
+             !(source->length_bin_edges == first_fleet->length_bin_edges) ||
+             (!target->length_bin_edges.empty() &&
+              !(source->length_bin_edges == target->length_bin_edges)))) {
+          throw std::invalid_argument(
+              "Pooled length observations require matching length bins and a "
+              "mapping for every source");
+        }
+      }
+    }
+    if (targets != this->observation_fleet_ids) {
+      throw std::invalid_argument(
+          "Each observation-only fleet requires an observation link");
+    }
+  }
+
+  /** @brief Composition source for a target is explicit, independent of
+   * component data. */
+  bool
+  UseCatchForCompositions(const std::shared_ptr<Fleet<Type>> &fleet) const {
+    for (const auto &link : observation_links) {
+      if (link.target_id == fleet->GetId())
+        return link.use_catch;
+    }
+    return fleet->fleet_observed_catch_data_id_m != -999;
+  }
+
+  /** @brief Sum counts and weights, without averaging component proportions. */
+  void AggregateObservationAgePredictions() {
+    for (const auto &link : observation_links) {
+      auto &target = this->GetFleetDerivedQuantities(link.target_id);
+      for (const auto &key :
+           {"catch_numbers_at_age", "catch_weight_at_age", "catch_numbers",
+            "catch_weight", "index_numbers_at_age", "index_weight_at_age",
+            "index_numbers", "index_weight"}) {
+        std::fill(target[key].begin(), target[key].end(), Type(0.0));
+        for (auto id : link.source_ids) {
+          auto &source = this->GetFleetDerivedQuantities(id)[key];
+          if (target[key].size() != source.size()) {
+            throw std::invalid_argument(
+                "Observation prediction dimensions do not match");
+          }
+          for (size_t i = 0; i < source.size(); ++i)
+            target[key][i] += source[i];
+        }
+      }
+    }
+  }
+
+  /** @brief Pool component length counts after their separate growth mappings.
+   */
+  void AggregateObservationLengthPredictions() {
+    for (const auto &link : observation_links) {
+      auto fleet = this->fleets.at(link.target_id);
+      if (fleet->n_lengths == 0)
+        continue;
+      auto &dq = this->GetFleetDerivedQuantities(link.target_id);
+      for (const auto &key :
+           {"catch_numbers_at_length", "index_numbers_at_length"}) {
+        std::fill(dq[key].begin(), dq[key].end(), Type(0.0));
+        for (auto id : link.source_ids) {
+          auto &source = this->GetFleetDerivedQuantities(id)[key];
+          if (source.size() != dq[key].size()) {
+            throw std::invalid_argument(
+                "Observation length prediction dimensions do not match");
+          }
+          for (size_t i = 0; i < source.size(); ++i)
+            dq[key][i] += source[i];
+        }
+      }
+      for (size_t y = 0; y < fleet->n_years; ++y) {
+        Type total = 0.0;
+        Type sample_size = 0.0;
+        for (size_t l = 0; l < fleet->n_lengths; ++l) {
+          size_t i = y * fleet->n_lengths + l;
+          dq["lengthcomp_expected"][i] =
+              dq[link.use_catch ? "catch_numbers_at_length"
+                                : "index_numbers_at_length"][i];
+          total += dq["lengthcomp_expected"][i];
+          if (fleet->observed_lengthcomp_data &&
+              fleet->observed_lengthcomp_data->at(i) !=
+                  fleet->observed_lengthcomp_data->na_value) {
+            sample_size += fleet->observed_lengthcomp_data->at(i);
+          }
+        }
+        for (size_t l = 0; l < fleet->n_lengths; ++l) {
+          size_t i = y * fleet->n_lengths + l;
+          dq["lengthcomp_proportion"][i] = dq["lengthcomp_expected"][i] / total;
+          if (fleet->observed_lengthcomp_data) {
+            dq["lengthcomp_expected"][i] =
+                dq["lengthcomp_proportion"][i] * sample_size;
+          }
+        }
+      }
+    }
+  }
+
   /**
    * Evaluate the proportion of catch numbers at age.
    */
@@ -991,7 +1300,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
           // In the future this will have more impact as we implement
           // timing rather than everything occurring at the start of
           // the year.
-          if (fleet->fleet_observed_catch_data_id_m == -999) {
+          if (!UseCatchForCompositions(fleet)) {
             fdq_["agecomp_expected"][i_age_year] =
                 fdq_["index_numbers_at_age"][i_age_year];
           } else {
@@ -1328,7 +1637,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
-      if (!fleet->requires_age_length_mapping || fleet->n_lengths == 0) {
+      if (this->observation_fleet_ids.count(fleet->GetId()) ||
+          !fleet->requires_age_length_mapping || fleet->n_lengths == 0) {
         continue;
       }
 
@@ -1477,14 +1787,26 @@ class CatchAtAge : public FisheryModelBase<Type> {
      explicitly referencing the exact date (or period of averaging) at which any
      calculation or output is being made.
      */
-    for (size_t p = 0; p < this->populations.size(); p++) {
-      std::shared_ptr<fims_popdy::Population<Type>> &population =
-          this->populations[p];
-      std::map<std::string, fims::Vector<Type>> &pdq_ =
-          this->GetPopulationDerivedQuantities(population->GetId());
-      // CAAPopulationProxy<Type>& population = this->populations_proxies[p];
+    PrepareRecruitmentLinks();
+    PrepareObservationLinks();
+    size_t max_years = 0;
+    for (const auto &population : this->populations) {
+      max_years = (std::max)(max_years, population->n_years);
+    }
+    for (size_t y = 0; y <= max_years; ++y) {
+      if (y > 0) {
+        for (const auto &link : recruitment_links)
+          CalculateLinkedRecruitment(link, y);
+      }
+      for (size_t p = 0; p < this->populations.size(); p++) {
+        std::shared_ptr<fims_popdy::Population<Type>> &population =
+            this->populations[p];
+        std::map<std::string, fims::Vector<Type>> &pdq_ =
+            this->GetPopulationDerivedQuantities(population->GetId());
+        // CAAPopulationProxy<Type>& population = this->populations_proxies[p];
 
-      for (size_t y = 0; y <= population->n_years; y++) {
+        if (y > population->n_years)
+          continue;
         for (size_t a = 0; a < population->n_ages; a++) {
           /*
            index naming defines the dimensional folding structure
@@ -1528,7 +1850,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
               pdq_["expected_recruitment"][y] =
                   pdq_["numbers_at_age"][i_age_year];
               pdq_["unfished_numbers_at_age"][i_age_year] =
-                  fims_math::exp(population->recruitment->log_rzero[0]);
+                  UnfishedRecruitment(population);
             } else {
               CalculateUnfishedInitialNumbersAA(population, i_age_year, a);
             }
@@ -1537,9 +1859,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
             if (a == 0) {
               // Set the nrecruits for age a=0 year y (use pointers instead of
               // functional returns)
-              CalculateRecruitment(population, i_age_year, y, y);
+              if (recruitment_link_by_population.count(population->GetId()) ==
+                  0) {
+                CalculateRecruitment(population, i_age_year, y, y);
+              }
               pdq_["unfished_numbers_at_age"][i_age_year] =
-                  fims_math::exp(population->recruitment->log_rzero[0]);
+                  UnfishedRecruitment(population);
             } else {
               size_t i_agem1_yearm1 = (y - 1) * population->n_ages + (a - 1);
               CalculateNumbersAA(population, i_age_year, i_agem1_yearm1, a);
@@ -1583,12 +1908,18 @@ class CatchAtAge : public FisheryModelBase<Type> {
             CalculateIndex(population, i_age_year, y, a);
           }
         }
-        /* Calculate spawning biomass depletion ratio */
-        CalculateSpawningBiomassRatio(population, y);
+      }
+      // All linked populations must have current-year spawning output before
+      // ratios.
+      for (auto &population : this->populations) {
+        if (y <= population->n_years)
+          CalculateSpawningBiomassRatio(population, y);
       }
     }
+    AggregateObservationAgePredictions();
     evaluate_age_comp();
     evaluate_length_comp();
+    AggregateObservationLengthPredictions();
     evaluate_index();
     evaluate_catch();
   }

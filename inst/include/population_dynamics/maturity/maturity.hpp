@@ -14,6 +14,7 @@
 #define FIMS_POPULATION_DYNAMICS_MATURITY_HPP
 
 #include "functors/logistic.hpp"
+#include "functors/constant.hpp"
 #include "functors/maturity_base.hpp"
 
 #endif /* FIMS_POPULATION_DYNAMICS_MATURITY_HPP */

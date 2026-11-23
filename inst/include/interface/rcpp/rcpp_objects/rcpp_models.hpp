@@ -214,7 +214,113 @@ class FisheryModelInterfaceBase : public FIMSRcppInterfaceBase {
  * CatchAtAge model. It inherits from the FisheryModelInterfaceBase class.
  */
 class CatchAtAgeInterface : public FisheryModelInterfaceBase {
- public:
+public:
+  /** @brief Shared configuration survives copies held by the Rcpp live
+   * registry. */
+  std::shared_ptr<std::vector<fims_popdy::RecruitmentLink>> recruitment_links =
+      std::make_shared<std::vector<fims_popdy::RecruitmentLink>>();
+
+  /** @brief Shared observation-link configuration retained by registry copies.
+   */
+  std::shared_ptr<std::vector<fims_popdy::FleetObservationLink>>
+      observation_links =
+          std::make_shared<std::vector<fims_popdy::FleetObservationLink>>();
+
+  /** @brief Pool population-specific fleet components into one observation
+   * fleet. */
+  void LinkFleetObservations(int target_id, std::vector<int> source_ids,
+                             bool use_catch) {
+    if (target_id < 0 || !FleetInterfaceBase::live_objects.count(target_id)) {
+      throw std::invalid_argument("Observation target fleet is not defined");
+    }
+    fims_popdy::FleetObservationLink link{
+        static_cast<uint32_t>(target_id), {}, use_catch};
+    for (int id : source_ids) {
+      if (id < 0 || !FleetInterfaceBase::live_objects.count(id)) {
+        throw std::invalid_argument("Observation source fleet is not defined");
+      }
+      link.source_ids.push_back(static_cast<uint32_t>(id));
+    }
+    link.Validate();
+    for (const auto &existing : *observation_links) {
+      if (existing.target_id == link.target_id) {
+        throw std::invalid_argument("Observation target already has a link");
+      }
+    }
+    auto target = std::dynamic_pointer_cast<FleetInterface>(
+        FleetInterfaceBase::live_objects.at(target_id));
+    if (target->n_years.get() <= 0 || target->n_ages.get() <= 0 ||
+        target->n_lengths.get() < 0) {
+      throw std::invalid_argument(
+          "Configure observation fleet dimensions before linking");
+    }
+
+    for (auto *parameters : {&target->log_Fmort, &target->log_q}) {
+      for (size_t i = 0; i < parameters->size(); ++i) {
+        if ((*parameters)[i].estimation_type_m.get() != "constant") {
+          throw std::invalid_argument(
+              "Observation-only fleet F and q must be constant; estimate these "
+              "on its components");
+        }
+      }
+    }
+    // Targets have no fishing dynamics, but the standard fleet registrar
+    // requires a year-sized constant placeholder vector.
+    if (target->log_Fmort.size() !=
+        static_cast<size_t>(target->n_years.get())) {
+      target->log_Fmort.resize(target->n_years.get());
+      for (size_t i = 0; i < target->log_Fmort.size(); ++i) {
+        target->log_Fmort[i].initial_value_m = 0.0;
+        target->log_Fmort[i].estimation_type_m.set("constant");
+      }
+    }
+    if (target->GetSelectivityID() != -999) {
+      throw std::invalid_argument(
+          "Observation-only fleets must not have their own selectivity");
+    }
+    for (size_t i = 0; i < target->age_to_length_conversion.size(); ++i) {
+      if (target->age_to_length_conversion[i].estimation_type_m.get() !=
+          "constant") {
+        throw std::invalid_argument(
+            "Observation-only fleets must not estimate a length mapping");
+      }
+    }
+    target->age_to_length_conversion.resize(0);
+    target->SetRequiresAgeLengthMapping(false);
+    observation_links->push_back(link);
+  }
+
+  /**
+   * @brief Link already-added populations to a shared total-stock recruitment
+   * module.
+   * @param ids Population IDs.
+   * @param fractions Fixed fractions of total recruits, summing to one.
+   */
+  void LinkRecruitment(std::vector<int> ids, std::vector<double> fractions) {
+    if (ids.size() != fractions.size()) {
+      throw std::invalid_argument(
+          "Population IDs and recruitment fractions must have equal lengths");
+    }
+    fims_popdy::RecruitmentLink link;
+    for (size_t i = 0; i < ids.size(); ++i) {
+      if (ids[i] < 0 || this->population_ids->count(ids[i]) == 0) {
+        throw std::invalid_argument(
+            "Add each population to the model before linking recruitment");
+      }
+      for (const auto &existing : *recruitment_links) {
+        for (const auto &allocation : existing.allocations) {
+          if (allocation.population_id == static_cast<uint32_t>(ids[i])) {
+            throw std::invalid_argument(
+                "A population cannot belong to multiple recruitment links");
+          }
+        }
+      }
+      link.allocations.push_back({static_cast<uint32_t>(ids[i]), fractions[i]});
+    }
+    link.Validate();
+    recruitment_links->push_back(link);
+  }
+
   /**
    * @brief The constructor.
    */
@@ -231,7 +337,9 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
    * @param other
    */
   CatchAtAgeInterface(const CatchAtAgeInterface &other)
-      : FisheryModelInterfaceBase(other) {}
+      : FisheryModelInterfaceBase(other),
+        recruitment_links(other.recruitment_links),
+        observation_links(other.observation_links) {}
 
   /**
    * Method to add a population id to the set of population ids.
@@ -733,11 +841,13 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
       }
     }
 
+    for (const auto& link : *observation_links) fleet_ids.insert(link.target_id);
+
     for (fids = fleet_ids.begin(); fids != fleet_ids.end(); fids++) {
       std::shared_ptr<FleetInterface> fleet_interface =
           std::dynamic_pointer_cast<FleetInterface>(
               FleetInterfaceBase::live_objects[*fids]);
-      if (fleet_interface) {
+      if (fleet_interface && fleet_interface->GetSelectivityID() != -999) {
         selectivity_ids.insert(fleet_interface->GetSelectivityID());
       }
     }
@@ -835,6 +945,36 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     }
     ss << "],\n";
 
+    ss << "\"fleet_observation_links\": [";
+    for (size_t i = 0; i < observation_links->size(); ++i) {
+      if (i)
+        ss << ",";
+      const auto &link = (*observation_links)[i];
+      ss << "{\"target_id\":" << link.target_id << ",\"source_ids\":[";
+      for (size_t j = 0; j < link.source_ids.size(); ++j) {
+        if (j)
+          ss << ",";
+        ss << link.source_ids[j];
+      }
+      ss << "],\"use_catch\":" << (link.use_catch ? "true" : "false") << "}";
+    }
+    ss << "],\n";
+    ss << "\"recruitment_links\": [";
+    for (size_t i = 0; i < recruitment_links->size(); ++i) {
+      if (i)
+        ss << ",";
+      ss << "{\"allocations\":[";
+      const auto &allocations = (*recruitment_links)[i].allocations;
+      for (size_t j = 0; j < allocations.size(); ++j) {
+        if (j)
+          ss << ",";
+        ss << "{\"population_id\":" << allocations[j].population_id
+           << ",\"fraction\":" << allocations[j].fraction << "}";
+      }
+      ss << "]}";
+    }
+    ss << "],\n";
+
     ss << " \"population_ids\": [";
     for (pit = this->population_ids->begin();
          pit != this->population_ids->end(); pit++) {
@@ -854,88 +994,38 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
     }
     ss << "],\n";
     ss << "\"populations\": [\n";
-    typename std::set<uint32_t>::iterator pop_it;
-    typename std::set<uint32_t>::iterator pop_end_it;
-    pop_end_it = this->population_ids->end();
-    typename std::set<uint32_t>::iterator pop_second_to_last_it;
-    if (pop_end_it != this->population_ids->begin()) {
-      pop_second_to_last_it = std::prev(pop_end_it);
-    } else {
-      pop_second_to_last_it = pop_end_it;
-    }
-    for (pop_it = this->population_ids->begin();
-         pop_it != pop_second_to_last_it; pop_it++) {
-      std::shared_ptr<PopulationInterface> population_interface =
+    for (auto pop_it = this->population_ids->begin();
+         pop_it != this->population_ids->end(); ++pop_it) {
+      auto population_interface =
           std::dynamic_pointer_cast<PopulationInterface>(
               PopulationInterfaceBase::live_objects[*pop_it]);
       if (population_interface) {
-        std::set<uint32_t>::iterator fids;
-        for (fids = population_interface->fleet_ids->begin();
-             fids != population_interface->fleet_ids->end(); fids++) {
-          fleet_ids.insert(*fids);
-        }
         population_interface->finalize();
-        ss << this->population_to_json(population_interface.get()) << ",";
+        ss << this->population_to_json(population_interface.get());
       } else {
         FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
                        " not found in live objects.");
-        ss << "{}";  // Return empty JSON for this population
+        ss << "{}";
       }
+      if (std::next(pop_it) != this->population_ids->end())
+        ss << ",";
     }
-
-    std::shared_ptr<PopulationInterface> population_interface =
-        std::dynamic_pointer_cast<PopulationInterface>(
-            PopulationInterfaceBase::live_objects[*pop_second_to_last_it]);
-    if (population_interface) {
-      std::set<uint32_t>::iterator fids;
-      for (fids = population_interface->fleet_ids->begin();
-           fids != population_interface->fleet_ids->end(); fids++) {
-        fleet_ids.insert(*fids);
-      }
-      ss << this->population_to_json(population_interface.get());
-    } else {
-      FIMS_ERROR_LOG("Population with id " + fims::to_string(*pop_it) +
-                     " not found in live objects.");
-      ss << "{}";  // Return empty JSON for this population
-    }
-
-    ss << "]";
-    ss << ",\n";
-    ss << "\"fleets\": [\n";
-
-    typename std::set<uint32_t>::iterator fleet_it;
-    typename std::set<uint32_t>::iterator fleet_end_it;
-    fleet_end_it = fleet_ids.end();
-    typename std::set<uint32_t>::iterator fleet_second_to_last_it;
-
-    if (fleet_end_it != fleet_ids.begin()) {
-      fleet_second_to_last_it = std::prev(fleet_end_it);
-    }
-    for (fleet_it = fleet_ids.begin(); fleet_it != fleet_second_to_last_it;
-         fleet_it++) {
-      std::shared_ptr<FleetInterface> fleet_interface =
-          std::dynamic_pointer_cast<FleetInterface>(
-              FleetInterfaceBase::live_objects[*fleet_it]);
+    ss << "],\n\"fleets\": [\n";
+    for (auto fleet_it = fleet_ids.begin(); fleet_it != fleet_ids.end();
+         ++fleet_it) {
+      auto fleet_interface = std::dynamic_pointer_cast<FleetInterface>(
+          FleetInterfaceBase::live_objects[*fleet_it]);
       if (fleet_interface) {
         fleet_interface->finalize();
-        ss << this->fleet_to_json(fleet_interface.get()) << ",";
+        ss << this->fleet_to_json(fleet_interface.get());
       } else {
         FIMS_ERROR_LOG("Fleet with id " + fims::to_string(*fleet_it) +
                        " not found in live objects.");
-        ss << "{}";  // Return empty JSON for this fleet
+        ss << "{}";
       }
+      if (std::next(fleet_it) != fleet_ids.end())
+        ss << ",";
     }
-    std::shared_ptr<FleetInterface> fleet_interface =
-        std::dynamic_pointer_cast<FleetInterface>(
-            FleetInterfaceBase::live_objects[*fleet_second_to_last_it]);
-    if (fleet_interface) {
-      ss << this->fleet_to_json(fleet_interface.get());
-    } else {
-      FIMS_ERROR_LOG("Fleet with id " + fims::to_string(*fleet_it) +
-                     " not found in live objects.");
-      ss << "{}";  // Return empty JSON for this fleet
-    }
-
     ss << "],\n";
 
     ss << "\"density_components\": [\n";
@@ -986,6 +1076,25 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
 
     std::shared_ptr<fims_popdy::CatchAtAge<Type>> model =
         std::make_shared<fims_popdy::CatchAtAge<Type>>();
+
+    model->recruitment_links = *this->recruitment_links;
+    model->observation_links = *this->observation_links;
+    for (const auto &link : *observation_links) {
+      auto target = std::dynamic_pointer_cast<FleetInterface>(
+          FleetInterfaceBase::live_objects.at(link.target_id));
+      for (auto *parameters : {&target->log_Fmort, &target->log_q}) {
+        for (size_t i = 0; i < parameters->size(); ++i) {
+          if ((*parameters)[i].estimation_type_m.get() != "constant") {
+            throw std::invalid_argument(
+                "Observation-only fleet F and q must be constant; estimate "
+                "these on its components");
+          }
+        }
+      }
+    }
+
+    for (const auto &link : *observation_links)
+      model->observation_fleet_ids.insert(link.target_id);
 
     population_id_iterator it;
 
@@ -1188,6 +1297,8 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
         fleet_ids.insert(*fit);
       }
     }
+
+    for (const auto& link : *observation_links) fleet_ids.insert(link.target_id);
 
     for (fleet_ids_iterator it = fleet_ids.begin(); it != fleet_ids.end();
          ++it) {

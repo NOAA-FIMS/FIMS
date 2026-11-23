@@ -1001,7 +1001,11 @@ class Information {
 
       SetLengthCompositionData(valid_model, f);
 
-      SetFleetSelectivityModel(valid_model, f);
+      bool observation_only = false;
+      for (const auto& entry : this->models_map) {
+        observation_only = observation_only || entry.second->observation_fleet_ids.count(f->GetId());
+      }
+      if (!observation_only) SetFleetSelectivityModel(valid_model, f);
     }
   }
 
@@ -1131,6 +1135,15 @@ class Information {
           valid_model = false;
           FIMS_ERROR_LOG("No population object defined for model " +
                          fims::to_string(model->GetId()));
+        }
+      }
+      for (auto fleet_id : model->observation_fleet_ids) {
+        auto fleet_it = this->fleets.find(fleet_id);
+        if (fleet_it == this->fleets.end()) {
+          valid_model = false;
+          FIMS_ERROR_LOG("Observation fleet is not defined: " + fims::to_string(fleet_id));
+        } else {
+          model->fleets[fleet_id] = fleet_it->second;
         }
       }
       model->Initialize();

@@ -9,6 +9,9 @@
 #ifndef FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MATURITY_HPP
 #define FIMS_INTERFACE_RCPP_RCPP_OBJECTS_RCPP_MATURITY_HPP
 
+#include <cmath>
+#include <stdexcept>
+
 #include "../../../population_dynamics/maturity/maturity.hpp"
 #include "rcpp_interface_base.hpp"
 
@@ -284,6 +287,50 @@ class LogisticMaturityInterface : public MaturityInterfaceBase {
     return true;
   }
 
+#endif
+};
+
+/** @brief Fixed maturity schedule; zero denotes no spawning contribution. */
+class ConstantMaturityInterface : public MaturityInterfaceBase {
+public:
+  std::shared_ptr<double> proportion = std::make_shared<double>(0.0);
+  ConstantMaturityInterface() : MaturityInterfaceBase() {
+    auto object = std::make_shared<ConstantMaturityInterface>(*this);
+    MaturityInterfaceBase::live_objects[this->id] = object;
+    FIMSRcppInterfaceBase::fims_interface_objects.push_back(object);
+  }
+  uint32_t get_id() override { return this->id; }
+  /** @brief Set a fixed proportion in [0, 1]. */
+  void SetValue(double value) {
+    if (!std::isfinite(value) || value < 0.0 || value > 1.0) {
+      throw std::invalid_argument(
+          "Constant maturity must be finite and in [0, 1]");
+    }
+    *proportion = value;
+  }
+  double evaluate(double) { return *proportion; }
+  void finalize() override { this->finalized = true; }
+  std::string to_json() override {
+    std::stringstream ss;
+    ss << "{\"module_name\":\"Maturity\",\"module_type\":\"Constant\","
+       << "\"module_id\":" << this->id << ",\"proportion\":" << *proportion
+       << ",\"parameters\":[]}";
+    return ss.str();
+  }
+#ifdef TMB_MODEL
+  template <typename Type> bool add_to_fims_tmb_internal() {
+    auto maturity = std::make_shared<fims_popdy::ConstantMaturity<Type>>();
+    maturity->id = this->id;
+    maturity->proportion = *proportion;
+    fims_info::Information<Type>::GetInstance()->maturity_models[this->id] =
+        maturity;
+    return true;
+  }
+  bool add_to_fims_tmb() override {
+    add_to_fims_tmb_internal<TMB_FIMS_REAL_TYPE>();
+    add_to_fims_tmb_internal<TMBAD_FIMS_TYPE>();
+    return true;
+  }
 #endif
 };
 

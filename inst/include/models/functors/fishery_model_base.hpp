@@ -94,6 +94,8 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
    *
    */
   std::set<uint32_t> population_ids;
+  /** @brief Observation-only fleets bound to this model, outside population dynamics. */
+  std::set<uint32_t> observation_fleet_ids;
   /**
    * @brief A vector of populations in the fishery model.
    *
@@ -173,6 +175,7 @@ class FisheryModelBase : public fims_model_object::FIMSObject<Type> {
   FisheryModelBase(const FisheryModelBase &other)
       : id(other.id),
         population_ids(other.population_ids),
+        observation_fleet_ids(other.observation_fleet_ids),
         populations(other.populations),
         fleet_derived_quantities(other.fleet_derived_quantities),
         population_derived_quantities(other.population_derived_quantities),

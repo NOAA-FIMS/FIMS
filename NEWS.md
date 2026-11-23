@@ -2,6 +2,16 @@
 
 ## Development
 
+* Add an exploratory low-level recruitment link for independent populations:
+  one total-stock recruitment process, fixed entry allocations, and stock-level
+  unfished normalization and depletion ratios.
+* Add explicit pooled fleet observations: sum component catch and survey counts
+  and weights, map each component to length separately, and normalize pooled
+  composition counts before evaluating one likelihood per dataset. Dynamic fleet
+  objects remain population-specific.
+* Add fixed `ConstantMaturity` schedules, including exact zero spawning
+  contribution, and support exporting population models with no fleets.
+
 * Calculate spawning biomass as total mature biomass, without a sex-ratio
   multiplier. Remove `proportion_female` from population configuration and
   reporting. Unfished spawning biomass and spawning biomass per recruit use
