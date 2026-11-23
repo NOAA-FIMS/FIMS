@@ -475,7 +475,7 @@ clean_doxygen_lines <- function(lines) {
 }
 
 collapse_doxygen_tag <- function(lines, tag) {
-  tag_pattern <- paste0("^@", tag, "\\s+")
+  tag_pattern <- paste0("^@", tag, "(\\s+|$)")
   tag_indices <- grep(tag_pattern, lines)
 
   if (length(tag_indices) == 0) {
@@ -563,7 +563,8 @@ parse_assumption_tags_from_file <- function(path) {
 
     end <- possible_ends[[1]]
     block <- clean_doxygen_lines(source_lines[start:end])
-    assumptions <- collapse_doxygen_tag(block, "assumption")
+    assumptions <- collapse_doxygen_tag(block, "par\\s+Assumptions")
+    assumptions <- assumptions[nzchar(assumptions)]
 
     if (length(assumptions) == 0) {
       next
@@ -614,27 +615,9 @@ source_files_for_assumptions <- c(
   list.files("src", pattern = "\\.(hpp|cpp)$", recursive = TRUE, full.names = TRUE)
 )
 
-source_assumption_catalog <- do.call(
+assumption_catalog <- do.call(
   rbind,
   lapply(source_files_for_assumptions, parse_assumption_tags_from_file)
-)
-
-discussion_assumption_catalog <- data.frame(
-  component = c("BevertonHoltRecruitment", "BevertonHoltRecruitment"),
-  cpp_entity = c("BevertonHolt", "BevertonHolt"),
-  assumption = c(
-    "Recruitment is strictly deterministic.",
-    "Spawning biomass must be greater than zero."
-  ),
-  status = c("prototype draft from discussion example", "prototype draft from discussion example"),
-  source_file = c("", ""),
-  source_line = c(NA_integer_, NA_integer_),
-  stringsAsFactors = FALSE
-)
-
-assumption_catalog <- rbind(
-  source_assumption_catalog,
-  discussion_assumption_catalog
 )
 
 get_assumption_rows_for_component <- function(component_name) {
@@ -652,7 +635,7 @@ format_assumptions_for_component <- function(component_name) {
     return(character())
   }
 
-  paste0(rows$assumption, " [", rows$status, "]")
+  rows[["assumption"]]
 }
 
 # -------------------------------------------------------------------------
@@ -1846,7 +1829,7 @@ build_inspector_metadata_catalog <- function() {
       rcpp_registration = "src/rcpp_*.cpp",
       doxygen_member_docs = "inst/include/**/*.hpp",
       equations = equation_catalog_path,
-      assumptions = "Doxygen @assumption tags plus prototype discussion examples"
+      assumptions = "Doxygen @par Assumptions sections"
     ),
     modules = modules
   )
@@ -2003,7 +1986,6 @@ build_input_spec <- function(data, module_spec = NULL) {
       input_catalog$label,
       "provided by the user and routed into the configured model."
     ),
-    assumptions = "Input validation and dimensional checks depend on the FIMSFrame setup.",
     target = input_catalog$target,
     edge_label = input_catalog$edge_label,
     stringsAsFactors = FALSE
@@ -2120,7 +2102,7 @@ build_derived_spec <- function(module_spec) {
   module_ids <- module_spec$id
 
   if (!all(module_id(c("Growth", "Maturity", "Recruitment")) %in% module_ids)) {
-    return(empty_spec_table(c("id", "label", "subtitle", "description", "assumptions")))
+    return(empty_spec_table(c("id", "label", "subtitle", "description")))
   }
 
   data.frame(
@@ -2128,7 +2110,6 @@ build_derived_spec <- function(module_spec) {
     label = "Spawning biomass",
     subtitle = "Derived quantity",
     description = "A model-derived quantity connecting growth, maturity, and recruitment.",
-    assumptions = "Derived from selected biological processes and model state.",
     stringsAsFactors = FALSE
   )
 }
@@ -2144,7 +2125,6 @@ build_output_spec <- function(module_spec, derived_spec, data) {
       label = label,
       subtitle = "Model-derived result",
       description = description,
-      assumptions = "Output interpretation depends on the selected module configuration.",
       stringsAsFactors = FALSE
     )
   }
@@ -2174,7 +2154,7 @@ build_output_spec <- function(module_spec, derived_spec, data) {
   }
 
   if (length(output_rows) == 0) {
-    return(empty_spec_table(c("id", "label", "subtitle", "description", "assumptions")))
+    return(empty_spec_table(c("id", "label", "subtitle", "description")))
   }
 
   do.call(rbind, output_rows)
@@ -2402,7 +2382,6 @@ make_input_node <- function(input_row) {
     composition_summaries = composition_summaries,
     methods = character(),
     equations = character(),
-    assumptions = input_row$assumptions,
     url = "",
     source = "",
     component = input_row$label,
@@ -2434,7 +2413,6 @@ make_output_node <- function(output_row) {
     fleet_count_label = "",
     methods = character(),
     equations = character(),
-    assumptions = output_row$assumptions,
     url = "",
     source = "",
     component = output_row$label,
@@ -2654,7 +2632,6 @@ make_derived_node <- function(derived_row) {
     fleet_count_label = "",
     methods = character(),
     equations = character(),
-    assumptions = derived_row$assumptions,
     url = "",
     source = "",
     component = derived_row$label,
@@ -3039,7 +3016,7 @@ html <- paste0(
   "function renderFieldDisplay(values,node,emptyText='None detected'){if(fieldDefinitionMode==='hover'){return renderFieldChips(values,node,emptyText);} return renderFieldBoxes(values,node,emptyText);}\n",
   "function renderDefinitionToggle(node){const labels=arrayValue(node.field_definition_labels).filter(Boolean); if(fieldDefinitionMode==='hover' || labels.length===0){return '';} return `<button type='button' class='definition-toggle' data-toggle-definitions>Show definitions</button>`;}\n",
   "function renderFields(node){const notes=arrayValue(node.field_notes).filter(Boolean); const inactive=arrayValue(node.inactive_fields).filter(Boolean); const active=arrayValue(node.fields).filter((field)=>field && !inactive.includes(field)); let html=''; if(notes.length>0){html += notes.map((note)=>`<p class='field-note'>${esc(note)}</p>`).join('');} html += renderDefinitionToggle(node); if(notes.length>0 || inactive.length>0){html += `<div class='field-subheading'>Active for this configuration</div>`;} html += `<div class='documentation-active-fields'>${renderFieldDisplay(active,node)}</div>`; if(inactive.length>0){html += `<details class='documentation-inactive-fields'><summary class='field-subheading'>Fields not active in this configuration</summary>${renderFieldDisplay(inactive,node)}</details>`;} return html;}\n",
-  "function renderAssumptions(values){values=arrayValue(values).filter(Boolean); if(values.length===0){return `<span class='empty'>No tagged assumptions found yet.</span>`;} return `<ul class='assumption-list'>${values.map((value)=>`<li>${esc(value)}</li>`).join('')}</ul>`;}\n",
+  "function renderAssumptions(values){values=arrayValue(values).filter(Boolean); if(values.length===0){return `<span class='empty'>No documented assumptions found for this component.</span>`;} return `<ul class='assumption-list'>${values.map((value)=>{const text=esc(value).replace(/\\\\f\\$([\\s\\S]*?)\\\\f\\$/g,'\\\\($1\\\\)'); return `<li>${text}</li>`;}).join('')}</ul>`;}\n",
   "function renderEquations(node){const equations=arrayValue(node.equations).filter((eq)=>eq && eq.equation); if(equations.length===0){return \"<span class='empty'>No equation extracted yet.</span>\";} return equations.slice(0,3).map((eq)=>{let title=eq.display_name || ''; if(title && eq.entity && eq.entity!==title){title += ': ' + eq.entity;} title=title.replace(/([A-Z]+)([A-Z][a-z])/g,'$1 $2').replace(/([a-z0-9])([A-Z])/g,'$1 $2').replace(/_/g,' '); const heading=title ? \"<div class='equation-title'>\" + esc(title) + '</div>' : ''; const expression=esc(eq.equation); return \"<div class='equation-box'>\" + heading + (eq.equation_format==='latex' ? '\\\\[' + expression + '\\\\]' : expression) + '</div>';}).join('') + \"<div class='link-list'><a href='../../equation-catalog/output/fims_equation_catalog.html' target='_blank'>Open equation catalog</a></div>\";}\n",
   "function renderLinks(node){let links=''; if(node.url){links += `<a href='${esc(node.url)}' target='_blank'>Open Doxygen page</a>`;} if(node.source){links += `<a href='../${esc(node.source)}' target='_blank'>${esc(node.source)}</a>`;} return links || `<span class='empty'>No link available for this node yet.</span>`;}\n",  "function renderOptionContext(node){const selected=node.selected_option_label || node.selected_module_type || ''; const labels=arrayValue(node.available_option_labels).filter(Boolean); if(!selected && labels.length===0){return '';} const others=labels.filter((label)=>label!==selected); const otherHtml=others.length>0 ? renderList(others,'No alternatives listed') : `<span class='empty'>No alternatives listed.</span>`; const roleLabel=(node.role || 'Module').replace(/ module$/i,''); return `<section class='section'><h3>${esc(roleLabel)} option</h3><div class='option-context'><div><strong>Selected</strong><div class='chip-list'><span class='chip'>${esc(selected || node.component || node.label)}</span></div></div><div><strong>Available alternatives</strong>${otherHtml}</div></div></section>`;}\n",
   "function renderFleetGroups(node,title='Fleets'){const groups=arrayValue(node.fleet_groups).filter((group)=>group && arrayValue(group.fleets).filter(Boolean).length>0); if(groups.length===0){return '';} const groupHtml=groups.map((group)=>{const fleets=arrayValue(group.fleets).filter(Boolean); const chips=fleets.map((fleet)=>`<span class='chip'>${esc(fleet)}</span>`).join(''); const count=group.count_label || `${fleets.length} ${fleets.length===1 ? 'fleet' : 'fleets'}`; return `<div class='fleet-group'><div class='fleet-group-title'><span>${esc(group.label || 'Fleets')}</span><span class='fleet-count'>${esc(count)}</span></div><div class='chip-list'>${chips}</div></div>`;}).join(''); return `<section class='section'><h3>${esc(title)}</h3><div class='fleet-groups'>${groupHtml}</div></section>`;}\n",
@@ -3088,7 +3065,7 @@ html <- paste0(
   "}\n",
   "function renderGroupedParameterValues(node,rows){const groups=new Map(); rows.forEach((row)=>{const label=parameterGroupLabel(node,row); if(!label){return;} if(!groups.has(label)){groups.set(label,[]);} groups.get(label).push(row);}); if(groups.size===0){return renderParameterTable(rows,false);} const groupedRows=new Set(Array.from(groups.values()).flat()); const otherRows=rows.filter((row)=>!groupedRows.has(row)); let html=`<div class='value-groups'>${Array.from(groups.entries()).map(([label,groupRows])=>`<div class='value-group'><div class='value-group-title'><span>${esc(label)}</span></div>${renderParameterTable(groupRows,true)}</div>`).join('')}</div>`; if(otherRows.length>0){html += renderParameterTable(otherRows,false);} return html;}\n",
   "function renderParameterValues(node){const rows=arrayValue(node.parameter_values).filter((row)=>row && row.parameter); if(rows.length===0){return `<span class='empty'>No explicit pre-run parameter values are available for this node.</span>`;} return renderGroupedParameterValues(node,rows);}\n",
-  "function renderOverviewTab(node){return `<section class='section'><h3>What this shows</h3><p>${esc(node.description)}</p></section>${renderOptionContext(node)}<section class='section'><h3>Equation preview</h3>${renderEquations(node)}</section><section class='section'><h3>Assumptions</h3>${renderAssumptions(node.assumptions)}</section>`;}\n",
+  "function renderOverviewTab(node){const assumptions=node.kind==='module' ? `<section class='section'><h3>Assumptions</h3>${renderAssumptions(node.assumptions)}</section>` : ''; return `<section class='section'><h3>What this shows</h3><p>${esc(node.description)}</p></section>${renderOptionContext(node)}<section class='section'><h3>Equation preview</h3>${renderEquations(node)}</section>${assumptions}`;}\n",
   "function renderValuesTab(node){if(node.kind==='output'){return `<section class='section'><h3>Model-derived output</h3><p class='empty'>Numerical results for this output are not available until the configured model is evaluated.</p></section>`;} const rows=arrayValue(node.parameter_values).filter((row)=>row && row.parameter); const compositionHtml=renderCompositionSummaries(node); const hideFleetSummary=compositionHtml || (rows.length>0 && /selectivity/i.test(node.role || '')); const fleetTitle=/observation/i.test(node.role || '') ? 'Fleet inputs' : 'Fleets'; const fleetHtml=hideFleetSummary ? '' : renderFleetGroups(node,fleetTitle); let html=compositionHtml + fleetHtml + renderRelatedValueLinks(node); if(rows.length>0 || !html){html += `<section class='section'><h3>Configured values</h3>${renderParameterValues(node)}</section>`;} return html;}\n",
   "function renderDocumentationTab(node){return `<section class='section'><h3>Documentation and source</h3><div class='link-list'>${renderLinks(node)}</div></section><section class='section'><h3>Parameters or fields</h3>${renderFields(node)}</section><section class='section'><h3>Vignettes</h3><p>Explore examples of how to configure and use FIMS.</p><div class='link-list'><a href='https://noaa-fims.github.io/FIMS/articles/index.html' target='_blank' rel='noopener'>Browse FIMS vignettes</a></div></section>`;}\n",
   "function renderTabContent(node){if(activeInspectorTab===\'values\'){return renderValuesTab(node);} if(activeInspectorTab===\'documentation\'){return renderDocumentationTab(node);} return renderOverviewTab(node);}\n",
