@@ -1113,6 +1113,8 @@ class Information {
 
       SetLengthCompositionData(valid_model, f);
 
+      SetCaalCompositionData(valid_model, f);
+
       SetFleetSelectivityModel(valid_model, f);
     }
   }

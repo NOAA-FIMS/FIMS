@@ -1446,8 +1446,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       std::shared_ptr<fims_popdy::Fleet<Type>> &fleet = (*fit).second;
 
-      if (!fleet->requires_age_length_mapping || fleet->n_lengths == 0 ||
-          fleet->fleet_observed_caalcomp_data_id_m == -999) {
+      if (!fleet->requires_age_length_mapping || fleet->n_lengths == 0) {
         continue;
       }
 

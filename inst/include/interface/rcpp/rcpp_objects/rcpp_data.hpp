@@ -526,11 +526,11 @@ class CaalCompDataInterface : public DataInterfaceBase {
    */
   CaalCompDataInterface(int ymax = 0, int amax = 0, int lmax = 0)
       : DataInterfaceBase() {
-    this->amax = amax;
     this->ymax = ymax;
+    this->amax = amax;
     this->lmax = lmax;
-    this->caal_comp_data.resize(amax * lmax * ymax);
-    this->uncertainty.resize(amax * lmax * ymax);
+    this->caal_comp_data.resize(ymax * amax * lmax);
+    this->uncertainty.resize(ymax * amax * lmax);
     DataInterfaceBase::live_objects[this->id] =
         std::make_shared<CaalCompDataInterface>(*this);
     FIMSRcppInterfaceBase::fims_interface_objects.push_back(
@@ -544,9 +544,9 @@ class CaalCompDataInterface : public DataInterfaceBase {
    */
   CaalCompDataInterface(const CaalCompDataInterface &other)
       : DataInterfaceBase(other),
+        ymax(other.ymax),
         amax(other.amax),
         lmax(other.lmax),
-        ymax(other.ymax),
         caal_comp_data(other.caal_comp_data),
         uncertainty(other.uncertainty) {}
 
@@ -576,9 +576,9 @@ class CaalCompDataInterface : public DataInterfaceBase {
     ss << " \"id\":" << this->id << ",\n";
     ss << " \"type\": \"data\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [" << "\"n_ages\", \"n_lengths\", \"n_years\""
+    ss << "  \"header\": [" << "\"n_years\", \"n_ages\", \"n_lengths\""
        << "],\n";
-    ss << "  \"dimensions\": [" << amax << ", " << lmax << ", " << ymax
+    ss << "  \"dimensions\": [" << ymax << ", " << amax << ", " << lmax
        << "]\n},\n";
     ss << " \"value\": [";
     for (size_t i = 0; i < caal_comp_data.size() - 1; i++) {
