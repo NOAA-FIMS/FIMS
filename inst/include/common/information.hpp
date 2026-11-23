@@ -1143,6 +1143,7 @@ class Information {
             FIMS_INFO_LOG("Observed data " + fims::to_string(observed_data_id) +
                           " successfully set to density component " +
                           fims::to_string(d->id));
+                
           } else {
             valid_model = false;
             FIMS_ERROR_LOG(

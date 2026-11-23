@@ -53,6 +53,8 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * Constructs a one-dimensional data object.
    */
   DataObject(size_t imax) : dimensions(1), imax(imax) {
+    generic_dimensions.resize(1);
+    generic_dimensions[0] = imax;
     data.resize(imax);
     uncertainty.resize(imax);
     this->id = DataObject<Type>::id_g++;
@@ -63,6 +65,9 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * Constructs a two-dimensional data object.
    */
   DataObject(size_t imax, size_t jmax) : dimensions(2), imax(imax), jmax(jmax) {
+    generic_dimensions.resize(2);
+    generic_dimensions[0] = imax;
+    generic_dimensions[1] = jmax;
     data.resize(imax * jmax);
     uncertainty.resize(imax * jmax);
     this->id = DataObject<Type>::id_g++;
@@ -74,6 +79,10 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    */
   DataObject(size_t imax, size_t jmax, size_t kmax)
       : dimensions(3), imax(imax), jmax(jmax), kmax(kmax) {
+    generic_dimensions.resize(3);
+    generic_dimensions[0] = imax;
+    generic_dimensions[1] = jmax;
+    generic_dimensions[2] = kmax;
     data.resize(imax * jmax * kmax);
     uncertainty.resize(imax * jmax * kmax);
     this->id = DataObject<Type>::id_g++;
@@ -85,6 +94,11 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    */
   DataObject(size_t imax, size_t jmax, size_t kmax, size_t lmax)
       : dimensions(4), imax(imax), jmax(jmax), kmax(kmax), lmax(lmax) {
+    generic_dimensions.resize(4);
+    generic_dimensions[0] = imax;
+    generic_dimensions[1] = jmax;
+    generic_dimensions[2] = kmax;
+    generic_dimensions[3] = lmax;
     data.resize(imax * jmax * kmax * lmax);
     uncertainty.resize(imax * jmax * kmax * lmax);
     this->id = DataObject<Type>::id_g++;
@@ -196,6 +210,16 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * @return size_t
    */
   size_t get_dimensions() const { return dimensions; }
+
+  /**
+   * @brief Get the generic dimensions object vector
+   *
+   * @return std::vector<size_t>
+   */
+  std::vector<size_t> get_dimension_vector() const { 
+    return generic_dimensions;
+  }
+
 
   /**
    * @brief Get the imax object
