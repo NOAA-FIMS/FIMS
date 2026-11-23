@@ -313,4 +313,46 @@ TEST_F(LinkedRecruitmentTest, RejectsInvalidObservationLinks) {
   model.observation_links[0].source_ids[1] = f->GetId();
   EXPECT_THROW(model.PrepareObservationLinks(), std::invalid_argument);
 }
+// Description: shared parameters update both fleets while sex-specific
+// selectivity and mortality remain independent; different parameters may have
+// different owners without forming a cycle.
+TEST_F(LinkedRecruitmentTest, SharesFleetParametersWithoutSharingBiology) {
+  auto f = MakeFleet(female, 0.2, 0.7, false);
+  auto m = MakeFleet(male, 0.35, 0.4, true);
+  model.fleet_parameter_links = {{f->GetId(), {m->GetId()}, true},
+                                 {m->GetId(), {f->GetId()}, false}};
+  model.Initialize();
+  model.Evaluate();
+  EXPECT_EQ(f->log_Fmort, m->log_Fmort);
+  EXPECT_EQ(f->Fmort, m->Fmort);
+  EXPECT_EQ(f->log_q, m->log_q);
+  EXPECT_EQ(f->q, m->q);
+  EXPECT_NE(f->selectivity, m->selectivity);
+  auto &fdq = model.GetPopulationDerivedQuantities(female->GetId());
+  auto &mdq = model.GetPopulationDerivedQuantities(male->GetId());
+  EXPECT_NE(fdq["mortality_F"][0], mdq["mortality_F"][0]);
+  f->log_Fmort[0] = std::log(0.3);
+  m->log_q[0] = std::log(0.6);
+  model.Evaluate();
+  EXPECT_NEAR(m->Fmort[0], 0.3, 1e-12);
+  EXPECT_NEAR(f->q[0], 0.6, 1e-12);
+  model.fleet_parameter_links.push_back({m->GetId(), {f->GetId()}, true});
+  EXPECT_THROW(model.Prepare(), std::invalid_argument);
+}
+
+// Description: annual q remains annual, and incompatible follower shapes fail.
+TEST_F(LinkedRecruitmentTest, SharesAnnualCatchabilityAndChecksDimensions) {
+  auto f = MakeFleet(female, 0.2, 0.7, false);
+  auto m = MakeFleet(male, 0.35, 0.4, true);
+  f->log_q = {std::log(0.6), std::log(0.7), std::log(0.8)};
+  m->log_q = {0.0, 0.0, 0.0};
+  model.fleet_parameter_links = {{f->GetId(), {m->GetId()}, false}};
+  model.Initialize();
+  model.Evaluate();
+  for (size_t year = 0; year < 3; ++year)
+    EXPECT_NEAR(m->q[year], 0.6 + 0.1 * year, 1e-12);
+  m->log_q.resize(1);
+  EXPECT_THROW(model.Prepare(), std::invalid_argument);
+}
+
 } // namespace

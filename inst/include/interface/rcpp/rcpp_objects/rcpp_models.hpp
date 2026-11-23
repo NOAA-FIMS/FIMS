@@ -220,6 +220,64 @@ public:
   std::shared_ptr<std::vector<fims_popdy::RecruitmentLink>> recruitment_links =
       std::make_shared<std::vector<fims_popdy::RecruitmentLink>>();
 
+  /** @brief Fixed ownership rules shared with registry copies. */
+  std::shared_ptr<std::vector<fims_popdy::FleetParameterLink>>
+      fleet_parameter_links =
+          std::make_shared<std::vector<fims_popdy::FleetParameterLink>>();
+
+  /** @brief Link annual fishing mortality while retaining each fleet's
+   * selectivity. */
+  void ShareFishingMortality(int owner, std::vector<int> followers) {
+    AddFleetParameterLink(owner, followers, true);
+  }
+  /** @brief Link scalar or annual catchability across fleet components. */
+  void ShareCatchability(int owner, std::vector<int> followers) {
+    AddFleetParameterLink(owner, followers, false);
+  }
+  void AddFleetParameterLink(int owner_id, const std::vector<int> &followers,
+                             bool fishing) {
+    if (owner_id < 0 || !FleetInterfaceBase::live_objects.count(owner_id)) {
+      throw std::invalid_argument(
+          "Shared parameter owner fleet is not defined");
+    }
+    fims_popdy::FleetParameterLink link{
+        static_cast<uint32_t>(owner_id), {}, fishing};
+    for (int id : followers) {
+      if (id < 0 || !FleetInterfaceBase::live_objects.count(id)) {
+        throw std::invalid_argument(
+            "Shared parameter follower fleet is not defined");
+      }
+      link.follower_ids.push_back(static_cast<uint32_t>(id));
+    }
+    auto candidate = *fleet_parameter_links;
+    candidate.push_back(link);
+    fims_popdy::ValidateFleetParameterLinks(candidate);
+    auto owner = std::dynamic_pointer_cast<FleetInterface>(
+        FleetInterfaceBase::live_objects.at(owner_id));
+    auto &values = fishing ? owner->log_Fmort : owner->log_q;
+    for (auto id : link.follower_ids) {
+      auto follower = std::dynamic_pointer_cast<FleetInterface>(
+          FleetInterfaceBase::live_objects.at(id));
+      auto &parameters = fishing ? follower->log_Fmort : follower->log_q;
+      for (size_t i = 0; i < parameters.size(); ++i) {
+        if (parameters[i].estimation_type_m.get() != "constant") {
+          throw std::invalid_argument("Shared parameter followers must be "
+                                      "constant; estimate only the owner");
+        }
+      }
+    }
+    for (auto id : link.follower_ids) {
+      auto follower = std::dynamic_pointer_cast<FleetInterface>(
+          FleetInterfaceBase::live_objects.at(id));
+      auto &parameters = fishing ? follower->log_Fmort : follower->log_q;
+      parameters.resize(values.size());
+      for (size_t i = 0; i < parameters.size(); ++i) {
+        parameters[i].estimation_type_m.set("constant");
+      }
+    }
+    fleet_parameter_links->push_back(link);
+  }
+
   /** @brief Shared observation-link configuration retained by registry copies.
    */
   std::shared_ptr<std::vector<fims_popdy::FleetObservationLink>>
@@ -339,7 +397,8 @@ public:
   CatchAtAgeInterface(const CatchAtAgeInterface &other)
       : FisheryModelInterfaceBase(other),
         recruitment_links(other.recruitment_links),
-        observation_links(other.observation_links) {}
+        observation_links(other.observation_links),
+        fleet_parameter_links(other.fleet_parameter_links) {}
 
   /**
    * Method to add a population id to the set of population ids.
@@ -945,6 +1004,19 @@ public:
     }
     ss << "],\n";
 
+    ss << "\"fleet_parameter_links\": [";
+    for (size_t i = 0; i < fleet_parameter_links->size(); ++i) {
+      if (i) ss << ",";
+      const auto& link = (*fleet_parameter_links)[i];
+      ss << "{\"parameter\":\"" << (link.fishing_mortality ? "log_Fmort" : "log_q")
+         << "\",\"owner_id\":" << link.owner_id << ",\"follower_ids\":[";
+      for (size_t j = 0; j < link.follower_ids.size(); ++j) {
+        if (j) ss << ",";
+        ss << link.follower_ids[j];
+      }
+      ss << "]}";
+    }
+    ss << "],\n";
     ss << "\"fleet_observation_links\": [";
     for (size_t i = 0; i < observation_links->size(); ++i) {
       if (i)
@@ -1079,6 +1151,20 @@ public:
 
     model->recruitment_links = *this->recruitment_links;
     model->observation_links = *this->observation_links;
+    model->fleet_parameter_links = *this->fleet_parameter_links;
+    fims_popdy::ValidateFleetParameterLinks(*fleet_parameter_links);
+    for (const auto& link : *fleet_parameter_links) {
+      for (auto id : link.follower_ids) {
+        auto follower = std::dynamic_pointer_cast<FleetInterface>(FleetInterfaceBase::live_objects.at(id));
+        auto& parameters = link.fishing_mortality ? follower->log_Fmort : follower->log_q;
+        for (size_t i = 0; i < parameters.size(); ++i) {
+          if (parameters[i].estimation_type_m.get() != "constant") {
+            throw std::invalid_argument("Shared parameter followers must be constant; estimate only the owner");
+          }
+        }
+      }
+    }
+
     for (const auto &link : *observation_links) {
       auto target = std::dynamic_pointer_cast<FleetInterface>(
           FleetInterfaceBase::live_objects.at(link.target_id));

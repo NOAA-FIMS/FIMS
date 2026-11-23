@@ -2,6 +2,12 @@
 
 ## Development
 
+* Add explicit fleet F and q ownership links, registering estimated parameters
+  only on the owner while preserving sex-specific fleet biology and automatic
+  derivatives. Document a pinned Petrale sole input audit and comparison plan.
+* Keep link configuration metadata out of JSON estimate reshaping and report
+  broadcast empirical weight-at-age vectors with their actual dimensions.
+
 * Add an exploratory low-level recruitment link for independent populations:
   one total-stock recruitment process, fixed entry allocations, and stock-level
   unfished normalization and depletion ratios.

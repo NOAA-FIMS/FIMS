@@ -113,7 +113,7 @@ test_that("recruitment links reject invalid allocations at the R boundary", {
   expect_error(model$LinkRecruitment(ids, c(0.4, 0.6)), "multiple")
 })
 
-make_pooled_observation_example <- function(use_catch = TRUE) {
+make_pooled_observation_example <- function(use_catch = TRUE, shared = FALSE, annual_q = FALSE) {
   example <- make_linked_recruitment_example(initialize = FALSE)
   make_fleet <- function(population = NULL, male = FALSE) {
     fleet <- methods::new(Fleet)
@@ -143,6 +143,13 @@ make_pooled_observation_example <- function(use_catch = TRUE) {
   female <- make_fleet(example$female)
   male <- make_fleet(example$male, TRUE)
   target <- make_fleet()
+  if (shared) {
+    female$log_Fmort$set_estimation_types("fixed_effects")
+    if (annual_q) female$log_q[] <- log(c(0.6, 0.7, 0.8))
+    female$log_q$set_estimation_types("fixed_effects")
+    example$model$ShareFishingMortality(female$get_id(), male$get_id())
+    example$model$ShareCatchability(female$get_id(), male$get_id())
+  }
   catch <- methods::new(Catch, 3L)
   catch$catch_data[] <- rep(1000, 3)
   index <- methods::new(Index, 3L)
@@ -180,6 +187,7 @@ make_pooled_observation_example <- function(use_catch = TRUE) {
     data = list(), parameters = list(p = get_fixed(), re = get_random()), DLL = "FIMS", silent = TRUE
   )
   example$target <- target
+  example$component_fleets <- list(female, male)
   example
 }
 
@@ -214,6 +222,9 @@ test_that("pooled observations are combined before one likelihood per dataset", 
   config <- jsonlite::fromJSON(example$model$get_output(), simplifyVector = FALSE)
   expect_length(config$fleet_observation_links, 1)
   expect_length(config$fleets, 3)
+  estimates <- FIMS:::reshape_json_estimates(example$model$get_output())
+  expect_s3_class(estimates, "tbl_df")
+  expect_equal(sum(estimates$module_name == "Population" & estimates$label == "numbers_at_age"), 24)
 })
 
 test_that("survey compositions pool index counts rather than catch counts", {
@@ -226,4 +237,65 @@ test_that("survey compositions pool index counts rather than catch counts", {
   expect_equal(report$lengthcomp_proportion[[3]], as.vector(t(counts / rowSums(counts))))
   counts <- matrix(report$index_numbers_at_age[[3]], ncol = 3, byrow = TRUE)
   expect_equal(report$agecomp_proportion[[3]], as.vector(t(counts / rowSums(counts))))
+})
+
+
+test_that("shared F and q register one owner and preserve automatic derivatives", {
+  on.exit(clear())
+  clear()
+  example <- make_pooled_observation_example(shared = TRUE)
+  #' @description Only R0, three owner F values, and one owner q value are registered.
+  expect_length(get_fixed(), 5)
+  report <- example$obj$report()
+  configuration <- jsonlite::fromJSON(example$model$get_output(), simplifyVector = FALSE)
+  expect_length(configuration$fleet_parameter_links, 2)
+  for (label in c("log_Fmort", "log_q")) {
+    extract <- function(fleet) {
+      parameters <- Filter(function(x) x$name == label, fleet$parameters)
+      unlist(lapply(parameters[[1]]$values, function(x) x$estimated_value))
+    }
+    expect_length(extract(configuration$fleets[[1]]), if (label == "log_Fmort") 3 else 1)
+    expect_equal(extract(configuration$fleets[[1]]), extract(configuration$fleets[[2]]))
+  }
+  step <- 1e-5
+  numerical <- vapply(seq_along(example$obj$par), function(i) {
+    increment <- rep(0, length(example$obj$par))
+    increment[i] <- step
+    (example$obj$fn(example$obj$par + increment) - example$obj$fn(example$obj$par - increment)) / (2 * step)
+  }, numeric(1))
+  #' @description Derivatives of the pooled likelihood include contributions from both sexes to the same owner parameters.
+  expect_equal(as.numeric(example$obj$gr(example$obj$par)), numerical, tolerance = 1e-5)
+  expect_true(all(is.finite(unlist(report$catch_expected))))
+})
+
+test_that("annual shared catchability uses the owner's complete year vector", {
+  on.exit(clear())
+  clear()
+  example <- make_pooled_observation_example(shared = TRUE, annual_q = TRUE)
+  #' @description Three annual q parameters are registered once alongside three annual F values and R0.
+  expect_length(get_fixed(), 7)
+  report <- example$obj$report()
+  # Re-evaluation at the same parameters must not accumulate pooled predictions.
+  expect_equal(example$obj$report()$index_expected, report$index_expected)
+  expect_true(all(is.finite(as.numeric(example$obj$gr(example$obj$par)))))
+})
+
+test_that("shared fleet parameters reject ambiguous ownership", {
+  on.exit(clear())
+  clear()
+  model <- methods::new(CatchAtAge)
+  owner <- methods::new(Fleet)
+  follower <- methods::new(Fleet)
+  third <- methods::new(Fleet)
+  #' @description Unknown owners, self-links, duplicate owners, chains, and independently estimated followers are rejected.
+  expect_error(model$ShareFishingMortality(99999L, follower$get_id()), "not defined")
+  expect_error(model$ShareFishingMortality(owner$get_id(), owner$get_id()), "distinct")
+  follower$log_Fmort$set_estimation_types("fixed_effects")
+  expect_error(model$ShareFishingMortality(owner$get_id(), follower$get_id()), "estimate only the owner")
+  follower$log_Fmort$set_estimation_types("constant")
+  model$ShareFishingMortality(owner$get_id(), follower$get_id())
+  expect_error(model$ShareFishingMortality(third$get_id(), follower$get_id()), "only one owner")
+  expect_error(model$ShareFishingMortality(follower$get_id(), third$get_id()), "Chained or cyclic")
+  # Separate parameters may have different owners.
+  expect_silent(model$ShareCatchability(follower$get_id(), owner$get_id()))
 })

@@ -1,0 +1,27 @@
+{
+  "repository": "https://github.com/pfmc-assessments/petrale",
+  "revision": "09cee012c397df4793a859103941a54b544c6ebe",
+  "audit_date": "2026-11-23",
+  "files": [
+    {
+      "path": "models/2023.a034.001/petrale_control.ss",
+      "url": "https://raw.githubusercontent.com/pfmc-assessments/petrale/09cee012c397df4793a859103941a54b544c6ebe/models/2023.a034.001/petrale_control.ss",
+      "sha256": "75d2785561533fda67ee8064dd6a975bb407ae2391814fa813fd0cf6134f2f5b"
+    },
+    {
+      "path": "models/2023.a034.001/petrale_data.ss",
+      "url": "https://raw.githubusercontent.com/pfmc-assessments/petrale/09cee012c397df4793a859103941a54b544c6ebe/models/2023.a034.001/petrale_data.ss",
+      "sha256": "542bea2596e42bf178610907bf00d9dc8e302892e29ad499afa91729452c288d"
+    },
+    {
+      "path": "models/2023.a050.005_FIMS_case-study_1sex_with_growth_no_fecundity/petrale_control.ss",
+      "url": "https://raw.githubusercontent.com/pfmc-assessments/petrale/09cee012c397df4793a859103941a54b544c6ebe/models/2023.a050.005_FIMS_case-study_1sex_with_growth_no_fecundity/petrale_control.ss",
+      "sha256": "b9c6b9cdb417c3e577a3677df41edd9d96c16b434d84688f2b596f41cd723acf"
+    },
+    {
+      "path": "models/2023.a050.005_FIMS_case-study_1sex_with_growth_no_fecundity/petrale_data.ss",
+      "url": "https://raw.githubusercontent.com/pfmc-assessments/petrale/09cee012c397df4793a859103941a54b544c6ebe/models/2023.a050.005_FIMS_case-study_1sex_with_growth_no_fecundity/petrale_data.ss",
+      "sha256": "7a6c94be19522ae779c0cd56388eb271426499953d1d07a1afc4e14c5c6c8764"
+    }
+  ]
+}

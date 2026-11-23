@@ -16,6 +16,7 @@
 
 #include "fishery_model_base.hpp"
 #include "population_dynamics/fleet/observation_link.hpp"
+#include "population_dynamics/fleet/parameter_link.hpp"
 #include "population_dynamics/recruitment/recruitment_link.hpp"
 #include "population_dynamics/age_to_length_conversion/functors/runtime.hpp"
 
@@ -69,6 +70,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
    std::vector<RecruitmentLink> recruitment_links;
   /** @brief Explicit pooling of population-specific fleet predictions. */
   std::vector<FleetObservationLink> observation_links;
+  /** @brief Parameter ownership across independent dynamic fleet components. */
+  std::vector<FleetParameterLink> fleet_parameter_links;
 
    /** @brief Resolved configuration, rebuilt before each evaluation. */
    std::map<uint32_t, size_t> recruitment_link_by_population;
@@ -167,6 +170,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
         name_m(other.name_m),
         recruitment_links(other.recruitment_links),
         observation_links(other.observation_links),
+        fleet_parameter_links(other.fleet_parameter_links),
         ages(other.ages),
         report_age_to_length_conversion_derived_tensor(
             other.report_age_to_length_conversion_derived_tensor) {
@@ -212,6 +216,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * fleet to a given value.
    */
   virtual void Prepare() {
+    PrepareFleetParameterLinks();
     for (size_t p = 0; p < this->populations.size(); p++) {
       std::shared_ptr<fims_popdy::Population<Type>> &population =
           this->populations[p];
@@ -1120,6 +1125,48 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
       fdq_["index_weight_at_age"][i_age_year] =
           fdq_["index_numbers_at_age"][i_age_year] * mean_weight_at_age;
+    }
+  }
+
+  /** @brief Copy owner values as Type, retaining derivatives without duplicate
+   * parameters. */
+  void PrepareFleetParameterLinks() {
+    ValidateFleetParameterLinks(fleet_parameter_links);
+    if (fleet_parameter_links.empty())
+      return;
+    std::set<uint32_t> dynamic_fleets;
+    for (const auto &population : this->populations) {
+      for (const auto &fleet : population->fleets)
+        dynamic_fleets.insert(fleet->GetId());
+    }
+    for (const auto &link : fleet_parameter_links) {
+      if (!dynamic_fleets.count(link.owner_id) ||
+          this->observation_fleet_ids.count(link.owner_id)) {
+        throw std::invalid_argument(
+            "Shared parameter owners must be dynamic fleets in this model");
+      }
+      auto owner = this->fleets.at(link.owner_id);
+      auto &values = link.fishing_mortality ? owner->log_Fmort : owner->log_q;
+      for (auto id : link.follower_ids) {
+        if (!dynamic_fleets.count(id) ||
+            this->observation_fleet_ids.count(id)) {
+          throw std::invalid_argument("Shared parameter followers must be "
+                                      "dynamic fleets in this model");
+        }
+        auto follower = this->fleets.at(id);
+        auto &destination =
+            link.fishing_mortality ? follower->log_Fmort : follower->log_q;
+        if (follower->n_years != owner->n_years ||
+            destination.size() != values.size()) {
+          throw std::invalid_argument(
+              "Shared fleet parameters require matching years and parameter "
+              "dimensions");
+        }
+        // The follower vector is never registered as an independent parameter.
+        // Assignment of Type values propagates automatic derivatives and keeps
+        // its variable-map entry available for densities and reporting.
+        destination = values;
+      }
     }
   }
 

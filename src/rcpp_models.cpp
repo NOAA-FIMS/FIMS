@@ -25,6 +25,8 @@ void register_fishery_models(Rcpp::Module& m) {
       .constructor()
       .method("AddPopulation", &CatchAtAgeInterface::AddPopulation)
       .method("LinkRecruitment", &CatchAtAgeInterface::LinkRecruitment)
+      .method("ShareFishingMortality", &CatchAtAgeInterface::ShareFishingMortality)
+      .method("ShareCatchability", &CatchAtAgeInterface::ShareCatchability)
       .method("LinkFleetObservations", &CatchAtAgeInterface::LinkFleetObservations)
       .method("get_output", &CatchAtAgeInterface::to_json)
       .method("GetId", &CatchAtAgeInterface::get_id)

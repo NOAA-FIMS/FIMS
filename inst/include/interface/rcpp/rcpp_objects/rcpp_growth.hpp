@@ -301,9 +301,15 @@ class EWAAGrowthInterface : public GrowthInterfaceBase {
     ss << " \"id\": null,\n";
     ss << " \"type\": \"vector\",\n";
     ss << " \"dimensionality\": {\n";
-    ss << "  \"header\": [\"n_years+1\",\"n_ages\"],\n";
-    ss << "  \"dimensions\": [" << this->n_years.get() + 1 << ","
-       << this->ages.size() << "]\n},\n";
+    if (this->weights.size() == this->ages.size()) {
+      // A shared age vector is not a flattened year-by-age matrix.
+      ss << "  \"header\": [\"n_ages\"],\n";
+      ss << "  \"dimensions\": [" << this->ages.size() << "]\n},\n";
+    } else {
+      ss << "  \"header\": [\"n_years+1\",\"n_ages\"],\n";
+      ss << "  \"dimensions\": [" << this->n_years.get() + 1 << ","
+         << this->ages.size() << "]\n},\n";
+    }
 
     ss << " \"values\": [\n";
     for (size_t i = 0; i < weights.size() - 1; i++) {

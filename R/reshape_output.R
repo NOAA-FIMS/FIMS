@@ -247,7 +247,11 @@ reshape_json_estimates <- function(model_output) {
   population_ages <- read_list[["populations"]] |>
     tidyr::unnest_longer(age, indices_to = "age_i") |>
     # TODO: think about how to join based on population when more than one
-    dplyr::select(age, age_i)
+    dplyr::select(age, age_i) |>
+    dplyr::distinct()
+  if (anyDuplicated(population_ages[["age_i"]])) {
+    cli::cli_abort("JSON estimate reshaping requires consistent ages at each age index across populations.")
+  }
   # Process the population data
   population_information <- read_list[["populations"]] |>
     tidyr::pivot_longer(
@@ -464,11 +468,17 @@ reshape_tmb_estimates <- function(obj,
 #' )
 #' dimension_folded_to_tibble(section_derived)
 dimension_folded_to_tibble <- function(section) {
-  if (length(section) == 0) {
-    return(NA)
+  # Empty parameter lists may be represented as NA by unnest_wider().
+  # Only unwrap actual list containers; unlisting scalar NA never makes progress.
+  while (is.list(section) && length(section) == 1L) {
+    section <- section[[1L]]
   }
-  while (length(section) == 1) {
-    section <- unlist(section, recursive = FALSE)
+  if (length(section) == 0L ||
+      (!is.list(section) && length(section) == 1L && is.na(section))) {
+    return(tibble::tibble())
+  }
+  if (!is.list(section) || is.null(section[["dimensionality"]])) {
+    cli::cli_abort("A JSON parameter section must contain dimensionality information.")
   }
   temp <- dimensions_to_tibble(section[["dimensionality"]]) |>
     dplyr::mutate(name = section[["name"]])

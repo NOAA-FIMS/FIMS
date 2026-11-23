@@ -30,3 +30,11 @@ test_that("fresh pooled model exports reach get_estimates with link metadata", {
   configuration <- jsonlite::fromJSON(get_model_output(fit), simplifyVector = FALSE)
   expect_true(all(c("recruitment_links", "fleet_observation_links") %in% names(configuration)))
 })
+
+
+test_that("empty JSON parameter sections terminate without producing rows", {
+  #' @description Optional empty parameter modules, including tidyr's scalar NA placeholder, do not hang or create fake parameters.
+  for (section in list(NULL, list(), NA, list(NA), list(list()))) {
+    expect_equal(nrow(FIMS:::dimension_folded_to_tibble(section)), 0L)
+  }
+})
