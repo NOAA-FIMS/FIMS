@@ -66,7 +66,8 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
     size_t n_vals = 1;
     if (dims.size() != 2) {
       dims.resize(this->data_observed_values->get_dimension_vector().size());
-      for (size_t i = 0; i < this->data_observed_values->get_dimension_vector().size(); ++i) {
+      for (size_t i = 0;
+           i < this->data_observed_values->get_dimension_vector().size(); ++i) {
         dims[i] = this->data_observed_values->get_dimension_vector()[i];
         n_vals *= dims[i];
       }
@@ -88,8 +89,7 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
               "MultinomialLPDF: Vector index out of bounds. The dimension of "
               "the "
               "number of rows times the number of columns is of size " +
-              std::to_string(n_vals) +
-              " and the expected vector is of size " +
+              std::to_string(n_vals) + " and the expected vector is of size " +
               std::to_string(this->data_expected_values->size()));
         }
       }
@@ -98,8 +98,7 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
         throw std::invalid_argument(
             "MultinomialLPDF: Vector index out of bounds. The dimension of the "
             "number of  rows times the number of columns is of size " +
-            std::to_string(n_vals) +
-            " and the observed vector is of size " +
+            std::to_string(n_vals) + " and the observed vector is of size " +
             std::to_string(this->observed_values.size()));
       }
       if (this->observed_values.size() != this->expected_values.size()) {
@@ -116,14 +115,14 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       // for each row, create new observed_values and prob vectors
       fims::Vector<Type> observed_values_vector;
       fims::Vector<Type> prob_vector;
-      observed_values_vector.resize(n_vals/dims[0]);
-      prob_vector.resize(n_vals/dims[0]);
+      observed_values_vector.resize(n_vals / dims[0]);
+      prob_vector.resize(n_vals / dims[0]);
 
       // Skips the entire row if any values are NA
       bool containsNA = false;
 
 #ifdef TMB_MODEL
-      for (size_t j = 0; j < n_vals/dims[0]; j++) {
+      for (size_t j = 0; j < n_vals / dims[0]; j++) {
         if (this->input_type == "data") {
           // if data, check if there are any NA values and skip lpdf calculation
           // for entire row if there are
@@ -134,14 +133,14 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
             break;
           }
           if (!containsNA) {
-            size_t idx = (i * (n_vals/dims[0])) + j;
+            size_t idx = (i * (n_vals / dims[0])) + j;
             observed_values_vector[j] = this->get_observed(i, j);
             prob_vector[j] = this->get_expected(idx);
           }
         } else {
           // if not data (i.e. prior or process), use observed_values vector
           // instead of data_observed_values
-          size_t idx = (i * (n_vals/dims[0])) + j;
+          size_t idx = (i * (n_vals / dims[0])) + j;
           observed_values_vector[j] = this->get_observed(idx);
           prob_vector[j] = this->get_expected(idx);
         }
@@ -155,12 +154,12 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
         // share so that summing lpdf_vec over a composition counts each row
         // once.
         std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
-                  this->lpdf_vec.begin() + lpdf_vec_idx + n_vals/dims[0],
-                  row_lpmf / static_cast<Type>(n_vals/dims[0]));
+                  this->lpdf_vec.begin() + lpdf_vec_idx + n_vals / dims[0],
+                  row_lpmf / static_cast<Type>(n_vals / dims[0]));
 
         this->lpdf += row_lpmf;
       }
-      lpdf_vec_idx += n_vals/dims[0];
+      lpdf_vec_idx += n_vals / dims[0];
 /*
 if (this->simulate_flag)
 {

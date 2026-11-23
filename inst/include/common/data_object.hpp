@@ -28,7 +28,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g;                    /**< id of the Data Object >*/
   fims::Vector<Type> data;                 /**< vector of the data >*/
   fims::Vector<Type> uncertainty;          /**< vector of the data >*/
-  fims::Vector<size_t> generic_dimensions;   /**< vector indicating NA values >*/
+  fims::Vector<size_t> generic_dimensions; /**< vector indicating NA values >*/
   size_t dimensions;                       /**< dimension of the Data object >*/
   size_t imax;                             /**< 1st dimension of data object >*/
   size_t jmax;                             /**< 2nd dimension of data object>*/
@@ -219,10 +219,9 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    *
    * @return std::vector<size_t>
    */
-  fims::Vector<size_t> get_dimension_vector() const { 
+  fims::Vector<size_t> get_dimension_vector() const {
     return generic_dimensions;
   }
-
 
   /**
    * @brief Get the imax object
