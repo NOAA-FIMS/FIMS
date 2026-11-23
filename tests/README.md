@@ -158,7 +158,7 @@ R_KEEP_PKG_SOURCE=yes R_BACKTRACE_ON_ERROR=full TESTTHAT_PROGRESS=plain \
   Rscript -e "devtools::test(reporter = 'location')" > test_log.txt 2>&1
 ```
 
-For segfaults, running under GDB (which probably will not work on a Windows machine) gives you a native backtrace. If you are on a Windows machine and want good backtrace information, consider [installing WSL](https://nmfs-ost.github.io/on-off-boarding/getting-started.html#software-and-tools).
+For segfaults, running under GDB (which probably will not work on a Windows machine) gives you a native backtrace. If you are on a Windows machine and want good backtrace information, consider [installing WSL](https://nmfs-ost.github.io/noaa-fit-resources/developer%20resources/installing-wsl/).
 
 ```bash
 # Linux
