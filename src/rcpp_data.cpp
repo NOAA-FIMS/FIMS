@@ -38,7 +38,7 @@ void register_data(Rcpp::Module& m) {
                                      "See "
                                      "https://noaa-fims.github.io/FIMS/doxygen/"
                                      "classCaalCompDataInterface.html.")
-      .constructor<int, int>()
+      .constructor<int, int, int>()
       .field("caal_comp_data", &CaalCompDataInterface::caal_comp_data)
       .method("get_id", &CaalCompDataInterface::get_id);
 
