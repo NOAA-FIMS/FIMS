@@ -1496,7 +1496,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
 
             sum += fdq_["caalcomp_expected"][i_length_age_year];
 
-            if(fleet->fleet_observed_caalcomp_data_id_m != -999){
+            if (fleet->fleet_observed_caalcomp_data_id_m != -999) {
               if (fleet->observed_caalcomp_data->at(i_length_age_year) !=
                   fleet->observed_caalcomp_data->na_value) {
                 sum_obs += fleet->observed_caalcomp_data->at(i_length_age_year);

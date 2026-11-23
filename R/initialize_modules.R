@@ -803,13 +803,13 @@ initialize_comp <- function(data,
     ))
   }
 
-  if (identical(type, "LengthComp")){
+  if (identical(type, "LengthComp")) {
     module <- methods::new(
       comp[["comp_object"]],
       get_n_years(data),
       length(fleet_length_bins)
     )
-  }else if (identical(type, "CaalComp")) {
+  } else if (identical(type, "CaalComp")) {
     module <- methods::new(
       comp[["comp_object"]],
       get_n_years(data),
