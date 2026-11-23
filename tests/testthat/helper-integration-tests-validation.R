@@ -3,6 +3,18 @@
 # FIMS models with or without wrapper functions. The functions are sourced by
 # devtools::load_all().
 
+# The comparison project's SSB includes proportion.female. FIMS reports total
+# mature biomass, so build the reference directly from OM abundance, weight,
+# and maturity rather than comparing quantities with different definitions.
+om_mature_biomass <- function(om_input, om_output) {
+  rowSums(sweep(
+    om_output[["N.age"]],
+    2,
+    om_input[["W.mt"]] * om_input[["mat.age"]],
+    "*"
+  ))
+}
+
 # FIMS helper function to validate the output of the FIMS model
 #' Validate FIMS Estimation Run Output
 #'
@@ -114,9 +126,9 @@ validate_fims <- function(
     use_strict_outlier_check = TRUE
   )
 
-  # Spawning biomass
+  # Spawning biomass (total mature biomass)
   validate_error(
-    expected = om_output[["SSB"]],
+    expected = om_mature_biomass(om_input, om_output),
     param_name = "spawning_biomass",
     use_fimsfit = use_fimsfit,
     estimates = estimates,
@@ -327,7 +339,7 @@ verify_fims_deterministic <- function(
   #' @description Test that the spawning biomass values from report are equal to the true values.
   expect_equal(
     report[["spawning_biomass"]][[1]][1:n_years],
-    c(t(om_output[["SSB"]]))
+    om_mature_biomass(om_input, om_output)
   )
 
   fims_naa <- matrix(
