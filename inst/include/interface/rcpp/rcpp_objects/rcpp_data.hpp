@@ -524,7 +524,7 @@ class CaalCompDataInterface : public DataInterfaceBase {
   /**
    * @brief The constructor.
    */
-  CaalCompDataInterface(int ymax = 0, int amax = 0, int lmax = 0)
+  CaalCompDataInterface(int ymax = 1, int amax = 1, int lmax = 1)
       : DataInterfaceBase() {
     this->ymax = ymax;
     this->amax = amax;

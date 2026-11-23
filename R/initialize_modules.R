@@ -803,11 +803,30 @@ initialize_comp <- function(data,
     ))
   }
 
-  module <- methods::new(
-    comp[["comp_object"]],
-    get_n_years(data),
-    expected_n
-  )
+  if (identical(type, "LengthComp")){
+    module <- methods::new(
+      comp[["comp_object"]],
+      get_n_years(data),
+      length(fleet_length_bins)
+    )
+  }else if (identical(type, "CaalComp")) {
+    module <- methods::new(
+      comp[["comp_object"]],
+      get_n_years(data),
+      get_n_ages(data),
+      length(fleet_length_bins)
+    )
+  } else if (identical(type, "AgeComp")) {
+    module <- methods::new(
+      comp[["comp_object"]],
+      get_n_years(data),
+      get_n_ages(data)
+    )
+  } else {
+    cli::cli_abort(c(
+      "x" = "Unknown composition type: {.val {type}}"
+    ))
+  }
 
   comp_data <- comp[["m_comp"]](data, fleet)
   pretty_comp_name <- gsub("_comp", "-composition", comp[["name"]])
