@@ -63,8 +63,8 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
    */
   virtual const Type evaluate() {
     // set dims using data_observed_values if no user input
+    size_t n_vals = 1;
     if (dims.size() != 2) {
-      size_t n_vals = 1;
       dims.resize(this->data_observed_values->get_dimension_vector().size());
       for (size_t i = 0; i < this->data_observed_values->get_dimension_vector().size(); ++i) {
         dims[i] = this->data_observed_values->get_dimension_vector()[i];
