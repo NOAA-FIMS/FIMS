@@ -38,8 +38,6 @@ TEST_F(CAAInitializeTestFixture, HandlesCorrectInput_Population_InitializeCAA) {
   EXPECT_EQ(dq["unfished_biomass"].size(), (n_years + 1));
   EXPECT_EQ(dq["unfished_spawning_biomass"].size(), (n_years + 1));
   EXPECT_EQ(dq["spawning_biomass"].size(), n_years + 1);
-  EXPECT_EQ(catch_at_age_model->populations[0]->proportion_female.size(),
-            n_ages);
   EXPECT_EQ(catch_at_age_model->populations[0]->M.size(), n_years * n_ages);
   EXPECT_EQ(dq["expected_recruitment"].size(), n_years + 1);
   EXPECT_EQ(dq["sum_selectivity"].size(), n_years * n_ages);
@@ -78,11 +76,5 @@ TEST_F(CAAPrepareTestFixture,
   }
   EXPECT_EQ(catch_at_age_model->populations[0]->M.size(), n_years * n_ages);
 
-  // proportion_female is user-provided; Prepare() does not reset it
-  fims::Vector<double> p_female(n_ages, 0.5);
-  for (int i = 0; i < n_ages; i++) {
-    EXPECT_EQ(catch_at_age_model->populations[0]->proportion_female[i],
-              p_female[i]);
-  }
 }
 }  // namespace

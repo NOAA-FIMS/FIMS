@@ -142,7 +142,6 @@ TEST_F(
 
       test_unfished_spawning_biomass[year] +=
           dq["proportion_mature_at_age"][i_age_year] *
-          population->proportion_female[age] *
           test_unfished_numbers_at_age[i_age_year] *
           population->growth->evaluate(year, population->ages[age]);
 

@@ -464,9 +464,10 @@ setup_default_Growth <- function(
 #' This function sets up default parameters for a population module.
 #' @details
 #' The function creates a tibble of default population configurations, including
-#' log natural mortality rate, log initial numbers at age, and proportion of
-#' females. The function performs input checks to ensure that the provided
-#' arguments are valid.
+#' log natural mortality rate and log initial numbers at age. The function
+#' performs input checks to ensure that the provided arguments are valid.
+#' Spawning biomass is total mature population biomass, determined by the
+#' linked maturity module without a sex-ratio multiplier.
 #' @param log_M A numeric value or vector (length equal to the number of ages *
 #' number of years) specifying the log natural mortality rate. Default is `log(0.2)`.
 #' @param log_init_naa A numeric value or vector (length equal to the number of
@@ -478,13 +479,10 @@ setup_default_Growth <- function(
 #' for ages below the plus group, and for the plus group \eqn{A}, which
 #' accumulates survivors each year,
 #' \deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}
-#' @param proportion_female A numeric value or vector (length equal to the
-#' number of ages) between 0 and 1 specifying the proportion of each age that
-#' is female, which scales spawning biomass. Default is `0.5`.
 #' @inheritParams setup_default_parameters
 #' @return
 #' A tibble of default population configurations, including initial numbers at
-#' age, natural mortality rate, and proportion of females. See \code{\link{setup_default_parameters}}
+#' age and natural mortality rate. See \code{\link{setup_default_parameters}}
 #' for full column descriptions.
 #' @export
 #' @seealso
@@ -497,8 +495,7 @@ setup_default_Growth <- function(
 setup_default_Population <- function(
   data,
   log_M = log(0.2),
-  log_init_naa = NA_real_,
-  proportion_female = 0.5
+  log_init_naa = NA_real_
 ) {
   # Input checks
   is.FIMSFrame(data)
@@ -527,25 +524,6 @@ setup_default_Population <- function(
     requirement = "a single numeric value or a vector of length equal to the number of ages"
   )
 
-  # Check proportion_female is a scalar or a full age vector between 0 and 1.
-  assert_numeric_length(
-    x = proportion_female,
-    x_name = "proportion_female",
-    valid_lengths = c(1, n_ages),
-    requirement = "a single numeric value or a vector of length equal to the number of ages"
-  )
-  invalid_proportion <- is.na(proportion_female) |
-    proportion_female < 0 |
-    proportion_female > 1
-  if (any(invalid_proportion)) {
-    cli::cli_abort(c(
-      "x" = "{.var proportion_female} has values that are missing or outside
-      0 to 1: {.val {proportion_female[invalid_proportion]}}.",
-      "i" = "{.var proportion_female} is the proportion of each age that is
-      female, so every value must be between 0 and 1."
-    ))
-  }
-
   # If log_init_naa is NA, print a message to the user and advise them to set it
   # using dplyr::rows_update() or dplyr::mutate() before running the model
   if (any(is.na(log_init_naa))) {
@@ -571,12 +549,6 @@ setup_default_Population <- function(
       age = get_ages(data),
       value = .env$log_init_naa,
       estimation_type = "fixed_effects"
-    ) |>
-    dplyr::add_row(
-      label = "proportion_female",
-      age = if (length(proportion_female) == 1) NA else ages,
-      value = .env$proportion_female,
-      estimation_type = "constant"
     ) |>
     dplyr::mutate(
       module_name = "Population"

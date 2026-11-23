@@ -168,11 +168,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
    */
   virtual void Initialize() {
     for (size_t p = 0; p < this->populations.size(); p++) {
-      if (this->populations[p]->proportion_female.size() == 0) {
-        this->populations[p]->proportion_female.resize(1);
-        this->populations[p]->proportion_female[0] = static_cast<Type>(0.5);
-      }
-
       this->populations[p]->M.resize(this->populations[p]->n_years *
                                      this->populations[p]->n_ages);
 
@@ -524,9 +519,10 @@ class CatchAtAge : public FisheryModelBase<Type> {
    *
    * This function computes yearly \f$y\f$ spawning biomass \f$SB_y\f$ by
    * summing the contributions from each age \f$a\f$, accounting for proportion
-   * female, proportion mature, and weight at age \f$w_a\f$:
+   * mature and weight at age \f$w_a\f$. Spawning biomass is total mature
+   * population biomass:
    * \f[
-   * SB_y \mathrel{+}= N_{a,y} \times w_a \times p_{female,a} \times
+   * SB_y \mathrel{+}= N_{a,y} \times w_a \times
    * p_{mature,a}
    * \f]
    *
@@ -542,7 +538,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
         this->GetPopulationDerivedQuantities(population->GetId());
 
     dq_["spawning_biomass"][year] +=
-        population->proportion_female.get_force_scalar(age) *
         dq_["numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
         PopulationMeanWeightAA(population, year, age);
@@ -554,7 +549,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * Updates unfished spawning biomass \f$SB^U_y\f$ by adding the biomass of age
    * \f$a\f$ in year \f$y\f$:
    * \f[
-   * SB^U_y \mathrel{+}= N^U_{a,y} \times w_a \times p_{female,a} \times
+   * SB^U_y \mathrel{+}= N^U_{a,y} \times w_a \times
    * p_{mature,a}
    * \f]
    *
@@ -570,7 +565,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
         this->GetPopulationDerivedQuantities(population->GetId());
 
     dq_["unfished_spawning_biomass"][year] +=
-        population->proportion_female.get_force_scalar(age) *
         dq_["unfished_numbers_at_age"][i_age_year] *
         dq_["proportion_mature_at_age"][i_age_year] *
         PopulationMeanWeightAA(population, year, age);
@@ -606,7 +600,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
    * equilibrium, assuming an unfished stock. The biomass is calculated as the
    * sum of the biomass contributions from each age \f$a\f$:
    * \f[
-   * \phi_0 = \sum_{a=0}^{A} N_a \times p_{female,a} \times p_{mature,a} \times
+   * \phi_0 = \sum_{a=0}^{A} N_a \times p_{mature,a} \times
    * w_a
    * \f]
    *
@@ -631,14 +625,12 @@ class CatchAtAge : public FisheryModelBase<Type> {
     std::vector<Type> numbers_spr(population->n_ages, 1.0);
     Type phi_0 = 0.0;
     phi_0 += numbers_spr[0] *
-             population->proportion_female.get_force_scalar(0) *
              dq_["proportion_mature_at_age"][0] *
              PopulationMeanWeightAA(population, 0, 0);
     for (size_t a = 1; a < (population->n_ages - 1); a++) {
       numbers_spr[a] =
           numbers_spr[a - 1] * fims_math::exp(-population->M[a - 1]);
       phi_0 += numbers_spr[a] *
-               population->proportion_female.get_force_scalar(a) *
                dq_["proportion_mature_at_age"][a] *
                PopulationMeanWeightAA(population, 0, a);
     }
@@ -649,7 +641,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
         (1 - fims_math::exp(-population->M[population->n_ages - 1]));
     phi_0 +=
         numbers_spr[population->n_ages - 1] *
-        population->proportion_female.get_force_scalar(population->n_ages - 1) *
         dq_["proportion_mature_at_age"][population->n_ages - 1] *
         PopulationMeanWeightAA(population, 0, population->n_ages - 1);
 

@@ -21,7 +21,7 @@ namespace fims_popdy {
 
 /**
  * @brief Population class for pooled population dynamics.
- * that are divided into generic partitions (e.g., sex, area).
+ * Spawning biomass is total population biomass weighted by maturity.
  */
 template <typename Type>
 struct Population : public fims_model_object::FIMSObject<Type> {
@@ -36,8 +36,6 @@ struct Population : public fims_model_object::FIMSObject<Type> {
       log_init_naa; /*!< estimated parameter: natural log of numbers at age*/
   fims::Vector<Type>
       log_M; /*!< estimated parameter: natural log of Natural Mortality*/
-  fims::Vector<Type> proportion_female = fims::Vector<Type>(
-      1, static_cast<Type>(0.5));            /*!< proportion female by age */
   fims::Vector<Type> log_f_multiplier;       /*!< estimated parameter: vector of
     annual fishing mortality multipliers to scale total mortality of all fleets*/
   fims::Vector<Type> spawning_biomass_ratio; /*!< estimated parameter: vector of

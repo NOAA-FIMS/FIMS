@@ -30,7 +30,6 @@ TEST_F(
 
   auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
   test_SB[year] += dq["numbers_at_age"][i_age_year] *
-                   catch_at_age_model->populations[0]->proportion_female[age] *
                    dq["proportion_mature_at_age"][i_age_year] *
                    catch_at_age_model->populations[0]->growth->evaluate(
                        year, population->ages[age]);
@@ -67,7 +66,6 @@ TEST_F(CAAEvaluateTestFixture,
   auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(pop_id);
   test_SSB[n_years] +=
       dq["numbers_at_age"][i_age_year] *
-      catch_at_age_model->populations[0]->proportion_female[age] *
       dq["proportion_mature_at_age"][i_age_year] *
       catch_at_age_model->populations[0]->growth->evaluate(
           year, population->ages[age]);
@@ -75,4 +73,27 @@ TEST_F(CAAEvaluateTestFixture,
   EXPECT_EQ(dq["spawning_biomass"][year], test_SSB[year]);
   EXPECT_GT(dq["spawning_biomass"][year], 0);
 }
+// Description: zero, partial, and full maturity scale fished and unfished
+// biomass directly, with no additional population fraction.
+TEST_F(CAAEvaluateTestFixture, MaturityDeterminesSpawningContribution) {
+  auto& dq = catch_at_age_model->GetPopulationDerivedQuantities(
+      population->GetId());
+  dq["numbers_at_age"][i_age_year] = 1000.0;
+  dq["unfished_numbers_at_age"][i_age_year] = 2000.0;
+  double weight = catch_at_age_model->PopulationMeanWeightAA(
+      population, year, age);
+  for (double maturity : {0.0, 0.25, 1.0}) {
+    dq["proportion_mature_at_age"][i_age_year] = maturity;
+    dq["spawning_biomass"][year] = 0.0;
+    dq["unfished_spawning_biomass"][year] = 0.0;
+    catch_at_age_model->CalculateSpawningBiomass(
+        population, i_age_year, year, age);
+    catch_at_age_model->CalculateUnfishedSpawningBiomass(
+        population, i_age_year, year, age);
+    EXPECT_DOUBLE_EQ(dq["spawning_biomass"][year], 1000.0 * maturity * weight);
+    EXPECT_DOUBLE_EQ(dq["unfished_spawning_biomass"][year],
+                     2000.0 * maturity * weight);
+  }
+}
+
 }  // namespace

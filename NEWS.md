@@ -2,6 +2,11 @@
 
 ## Development
 
+* Calculate spawning biomass as total mature biomass, without a sex-ratio
+  multiplier. Remove `proportion_female` from population configuration and
+  reporting. Unfished spawning biomass and spawning biomass per recruit use
+  the same definition. Existing female spawning biomass inputs need review.
+
 * Develop standalone subpopulation configuration and validation. Subpopulations
   are not connected to model execution or exposed through the R interface.
 

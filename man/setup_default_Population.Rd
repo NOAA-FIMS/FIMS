@@ -7,8 +7,7 @@
 setup_default_Population(
   data,
   log_M = log(0.2),
-  log_init_naa = NA_real_,
-  proportion_female = 0.5
+  log_init_naa = NA_real_
 )
 }
 \arguments{
@@ -28,13 +27,10 @@ for ages below the plus group, and for the plus group \eqn{A}, which
 accumulates survivors each year,
 \deqn{N_A = \frac{R_0 \exp\left(-\sum_{j < A} M_j\right)}{1 - \exp(-M_A)}.}}
 
-\item{proportion_female}{A numeric value or vector (length equal to the
-number of ages) between 0 and 1 specifying the proportion of each age that
-is female, which scales spawning biomass. Default is \code{0.5}.}
 }
 \value{
 A tibble of default population configurations, including initial numbers at
-age, natural mortality rate, and proportion of females. See \code{\link{setup_default_parameters}}
+age and natural mortality rate. See \code{\link{setup_default_parameters}}
 for full column descriptions.
 }
 \description{
@@ -42,9 +38,10 @@ This function sets up default parameters for a population module.
 }
 \details{
 The function creates a tibble of default population configurations, including
-log natural mortality rate, log initial numbers at age, and proportion of
-females. The function performs input checks to ensure that the provided
-arguments are valid.
+log natural mortality rate and log initial numbers at age. The function
+performs input checks to ensure that the provided arguments are valid.
+Spawning biomass is total mature population biomass, determined by the
+linked maturity module without a sex-ratio multiplier.
 }
 \examples{
 \dontrun{
