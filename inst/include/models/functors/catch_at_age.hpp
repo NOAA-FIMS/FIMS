@@ -1494,14 +1494,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
                 fdq_["agecomp_proportion"][i_age_year] *
                 age_to_length_conversion_row[l];
 
-            fdq_["catch_numbers_at_length_age"][i_length_age_year] =
-                fdq_["catch_numbers_at_age"][i_age_year] *
-                age_to_length_conversion_row[l];
-
-            fdq_["index_numbers_at_length_age"][i_length_age_year] =
-                fdq_["index_numbers_at_age"][i_age_year] *
-                age_to_length_conversion_row[l];
-
             sum += fdq_["caalcomp_expected"][i_length_age_year];
 
             if(fleet->fleet_observed_caalcomp_data_id_m != -999){
@@ -1718,14 +1710,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
               if (fleet->fleet_observed_caalcomp_data_id_m != -999) {
                 fdq_["caalcomp_expected"][i_length_age_year] =
                     fdq_["agecomp_expected"][i_age_year] *
-                    age_to_length_conversion_row[l];
-
-                fdq_["catch_numbers_at_length_age"][i_length_age_year] =
-                    fdq_["catch_numbers_at_age"][i_age_year] *
-                    age_to_length_conversion_row[l];
-
-                fdq_["index_numbers_at_length_age"][i_length_age_year] =
-                    fdq_["index_numbers_at_age"][i_age_year] *
                     age_to_length_conversion_row[l];
 
                 if (fleet->observed_caalcomp_data->at(i_length_age_year) !=
