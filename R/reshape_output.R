@@ -61,7 +61,9 @@ reshape_json_estimates <- function(model_output) {
     json_list[!names(json_list) %in% c(
       "name", "type", "estimation_framework", "id", "objective_function_value",
       "max_gradient_component", "gradient",
-      "population_ids", "fleet_ids", "log"
+      "population_ids", "fleet_ids", "log",
+      # Ownership/allocation rules are configuration, not parameter modules.
+      "recruitment_links", "fleet_observation_links", "fleet_parameter_links"
     )],
     \(x) tidyr::unnest_wider(tibble::tibble(json = x), dplyr::all_of("json"))
   )
