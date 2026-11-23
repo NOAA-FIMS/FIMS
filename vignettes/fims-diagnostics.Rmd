@@ -136,6 +136,7 @@ fig_retrospective_ssb <- stockplotr::plot_spawning_biomass(
       estimate = estimated
     ) |>
     dplyr::mutate(
+      model = "retrospective",
       uncertainty_label = "se"
     ),
   group = "retrospective_peel"

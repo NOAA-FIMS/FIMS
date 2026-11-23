@@ -352,6 +352,7 @@ The results can be plotted with either base R, {ggplot2}, or {stockplotr}. Where
 # to work with stockplotr
 output <- get_estimates(fit) |>
   dplyr::mutate(
+    model = "base",
     uncertainty_label = "se",
     year = year_i,
     estimate = estimated
@@ -362,6 +363,7 @@ output <- get_estimates(fit) |>
 data("estimates_big_optimized", package = "FIMS")
 output <- estimates_big_optimized |>
   dplyr::mutate(
+    model = "base",
     uncertainty_label = "se",
     year = year_i,
     estimate = estimated
