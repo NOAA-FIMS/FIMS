@@ -1440,6 +1440,18 @@ class CatchAtAgeInterface : public FisheryModelInterfaceBase {
               fims::Vector<std::string>{"n_years", "n_lengths"});
       info->variable_map[fleet_interface->lengthcomp_expected.id_m] =
           &derived_quantities["lengthcomp_expected"];
+
+      derived_quantities["caalcomp_expected"] = fims::Vector<Type>(
+          fleet_interface->n_years.get() * fleet_interface->n_ages.get() * fleet_interface->n_lengths.get());
+      derived_quantities_dim_info["caalcomp_expected"] =
+          fims_popdy::DimensionInfo(
+              "caalcomp_expected",
+              fims::Vector<int>{(fleet_interface->n_years.get()),
+                                (fleet_interface->n_ages.get()),
+                                (fleet_interface->n_lengths.get())},
+              fims::Vector<std::string>{"n_years", "n_ages", "n_lengths"});
+      info->variable_map[fleet_interface->caalcomp_expected.id_m] =
+          &derived_quantities["caalcomp_expected"];
     }
 
     return true;
