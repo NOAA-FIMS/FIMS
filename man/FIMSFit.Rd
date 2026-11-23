@@ -36,10 +36,7 @@ across these vectors is not supported.}
 \code{\link[TMB:sdreport]{TMB::sdreport()}}.}
 
 \item{run_time}{A vector of at least length one, where all entries are of the
-\code{timediff} class and at least one is named "time_total". This information
-is available in \code{\link[=fit_fims]{fit_fims()}} and added to this argument internally but if
-you are a power user you can calculate the time it took to run your model
-by subtracting two \code{\link[=Sys.time]{Sys.time()}} objects.}
+\code{timediff} class and at least one is named "time_total".}
 
 \item{version}{The version of FIMS that was used to optimize the model. If
 \code{\link[=fit_fims]{fit_fims()}} was not used to optimize the model, then the default is to
