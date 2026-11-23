@@ -15,9 +15,8 @@
 namespace fims_popdy {
 
 /**
- * @brief Von Bertalanffy growth using the Schnute parameterization.
- *
- * Mean length at age is defined using lengths at two reference ages:
+ * @brief Calculates mean length at age from lengths at two reference ages
+ * using the von Bertalanffy-Schnute growth curve.
  *
  * \f[
  * L(a) = L_y + (L_o - L_y)
@@ -25,33 +24,36 @@ namespace fims_popdy {
  * \f]
  *
  * where:
- * - \f$a\f$ is the age being evaluated.
- * - \f$L_y\f$ is the mean length at the younger reference age
- *   (`mean_length_young`).
- * - \f$L_o\f$ is the mean length at the older reference age
- *   (`mean_length_old`).
- * - \f$a_y\f$ is the younger reference age
- *   (`reference_age_for_length_young`).
- * - \f$a_o\f$ is the older reference age
- *   (`reference_age_for_length_old`).
- * - \f$K\f$ is the growth coefficient (`growth_coefficient`).
+ * - \f$a\f$ is age and \f$L(a)\f$ is mean length at that age.
+ * - \f$L_y, L_o\f$ are mean lengths at the younger and older
+ *   reference ages (`mean_length_young`, `mean_length_old`).
+ * - \f$a_y, a_o\f$ are the younger and older reference ages
+ *   (`reference_age_for_length_young`, `reference_age_for_length_old`).
+ * - \f$K\f$ is the growth coefficient (`growth_coefficient`),
+ *   in inverse age units.
  *
- * @details The equation above describes the main growth curve.
- * When the younger reference age is greater than zero, mean length
- * at earlier ages is calculated using a linear ramp from age zero
- * to the younger reference age. Ages used in the ramp are bounded
- * below by zero.
+ * @par Assumptions
+ * The increasing-growth interpretation assumes \f$K > 0\f$,
+ * \f$a_o > a_y\f$, and \f$L_o > L_y > 0\f$.
+ * Reference lengths must share a common length unit, and ages
+ * must share a common time unit.
  *
- * For numerical stability, the implementation applies smooth
- * approximations to the absolute value and maximum operations,
- * using 1e-8 as the lower-bound argument. These approximations
- * can affect the curve when the denominator is small.
+ * @details When the younger reference age is greater than zero,
+ * FIMS calculates mean length at earlier ages using a linear ramp from zero
+ * length at age zero to the expected length at the younger reference age
+ * (\f$L_y\f$). For ages at or below zero in this case, mean length is zero.
+ * At all other ages, the von Bertalanffy-Schnute curve is used.
  *
- * @note When `reference_age_for_length_young` is zero,
- * `mean_length_young` represents mean length at age zero, L(0).
- * Setting the reference age to zero does not imply that the
- * traditional von Bertalanffy zero-length age parameter, t0,
- * is zero.
+ * When the younger reference age is zero, \f$L_y\f$ represents
+ * mean length at age zero, which does not imply that the
+ * traditional von Bertalanffy parameter \f$t_0\f$ is zero.
+ *
+ * Length-at-age variability is calculated separately.
+ *
+ * For numerical stability, FIMS uses smooth approximations of the
+ * absolute value (`ad_fabs`) and maximum (`ad_max`) functions to
+ * safeguard the denominator. These adjustments can affect predicted
+ * mean lengths, particularly when the denominator is small.
  */
 template <typename Type>
 struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
@@ -216,6 +218,14 @@ struct VonBertalanffySchnuteGrowth : public GrowthBase<Type> {
     return length_weight_a * fims_math::pow(length, length_weight_b);
   }
 
+  /**
+   * @brief Calculates mean weight at age using the length-weight relationship.
+   * @param year Unused because growth parameters are shared across years;
+   * the same age gives the same mean weight in every year.
+   * @param a Age in the same time units as the reference ages.
+   * @return Mean weight in units determined by the length units and
+   * length-weight coefficient.
+   */
   virtual const Type evaluate(int year, const double& a) override {
     (void)year;
     return weight_at_age(Type(a));

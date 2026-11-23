@@ -36,10 +36,10 @@ struct EWAAGrowth : public GrowthBase<Type> {
   virtual ~EWAAGrowth() {}
 
   /**
-   * @brief Returns the weight at age a (in kg) from the input vector.
-   *
-   * @param year year
-   * @param a  age of the fish, the age vector must start at zero
+   * @brief Retrieves the supplied empirical weight at age for a given year.
+   * @param year Year key in the supplied weight-at-age data.
+   * @param a Age key in the supplied weight-at-age data.
+   * @return Weight at age in the units of the supplied values.
    */
   virtual const Type evaluate(int year, const double& a) {
     return this->ewaa[year][a];

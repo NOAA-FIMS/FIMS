@@ -39,9 +39,11 @@ struct GrowthBase : public fims_model_object::FIMSObject<Type> {
   virtual ~GrowthBase() {}
 
   /**
-   * @brief Calculates the  growth at the independent variable value.
-   * @param year The year at which to return weight of the fish (in kg).
-   * @param a The age at which to return weight of the fish (in kg).
+   * @brief Returns mean weight at age.
+   * @param year Year identifier used by the growth implementation.
+   * @param a Age at which to return mean weight.
+   * @return Mean weight in units determined by the supplied data or
+   * length-weight relationship.
    */
   virtual const Type evaluate(int year, const double& a) = 0;
 };
