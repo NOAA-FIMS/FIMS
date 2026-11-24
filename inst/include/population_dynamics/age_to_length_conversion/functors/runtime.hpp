@@ -81,7 +81,6 @@ BuildAgeToLengthConversionFleet(
   return nullptr;
 }
 
-
 }  // namespace fims_popdy
 
 #endif
