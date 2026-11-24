@@ -528,9 +528,8 @@ class VonBertalanffySchnuteGrowthInterface
         fims_math::exp(vb->mean_length_old_vector[0]);
     const double mean_length_young =
         vb->use_bounded_young_length
-            ? fims_math::inv_logit(
-                  0.0, stored_mean_length_old,
-                  vb->mean_length_young_vector[0])
+            ? fims_math::inv_logit(0.0, stored_mean_length_old,
+                                   vb->mean_length_young_vector[0])
             : fims_math::exp(vb->mean_length_young_vector[0]);
     const double mean_length_old =
         vb->use_old_length_difference
@@ -914,8 +913,7 @@ class VonBertalanffySchnuteGrowthInterface
     const bool use_bounded_young_length =
         IsEstimated(this->mean_length_young) &&
         !IsEstimated(this->mean_length_old);
-    const bool use_old_length_difference =
-        IsEstimated(this->mean_length_old);
+    const bool use_old_length_difference = IsEstimated(this->mean_length_old);
     vb->use_bounded_young_length = use_bounded_young_length;
     vb->use_old_length_difference = use_old_length_difference;
 
@@ -930,14 +928,12 @@ class VonBertalanffySchnuteGrowthInterface
             Rcpp::stop((base_name + " must be > 0").c_str());
           }
 
-          if (&pv == &this->mean_length_young &&
-              use_bounded_young_length) {
-            v = fims_math::logit(
-                0.0, this->mean_length_old[0].initial_value_m, v);
+          if (&pv == &this->mean_length_young && use_bounded_young_length) {
+            v = fims_math::logit(0.0, this->mean_length_old[0].initial_value_m,
+                                 v);
           } else if (&pv == &this->mean_length_old &&
                      use_old_length_difference) {
-            v = fims_math::log(
-                v - this->mean_length_young[0].initial_value_m);
+            v = fims_math::log(v - this->mean_length_young[0].initial_value_m);
           } else {
             v = fims_math::log(v);
           }
