@@ -50,6 +50,7 @@
 #'   * `estimated` - Point estimate value
 #'   * `uncertainty` - Standard error of the estimate
 #'   * `retrospective_peel` - Number of years removed for this peel
+#'   * `model` - Model label (`"reference"` or `"retro-N"`) for plotting
 #'
 #' @references
 #' Mohn, R. 1999. The retrospective problem in sequential population analysis:
@@ -154,8 +155,18 @@ run_fims_retrospective <- function(
     .options = furrr::furrr_options(seed = TRUE, globals = TRUE)
   )
 
-  for (i in seq_along(estimates_list)) {
-    estimates_list[[i]]$retrospective_peel <- years_to_remove[i]
+  for (peel_index in seq_along(estimates_list)) {
+    years_peeled <- years_to_remove[peel_index]
+    model_name <- if (years_peeled == 0) {
+      "reference"
+    } else {
+      paste0("retro-", years_peeled)
+    }
+    estimates_list[[peel_index]] <- estimates_list[[peel_index]] |>
+      dplyr::mutate(
+        retrospective_peel = years_peeled,
+        model = model_name
+      )
   }
   estimates_df <- do.call(rbind, estimates_list)
 
