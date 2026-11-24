@@ -180,22 +180,17 @@ TEST(VonBertalanffySchnuteGrowthModelAdapter,
     ConfigureAdapter(adapter, 275.0, 725.0, 0.18, 1.0, 12.0,
                      2.5e-11, 3.0, 28.0, 73.0);
 
-    if (young_is_constant) {
-      adapter.UseConstantMeanLengthYoungWithEstimatedMeanLengthOld(275.0);
-    } else {
-      adapter.UseEstimatedReferenceMeanLengths();
-    }
-
-    adapter.SetAgeOffset(1.0);
-    adapter.Initialize(1, 12, 1);
+    adapter.Initialize(1, 12, 1, 1.0);
 
     // Change working values after initialization, as optimization would.
-    adapter.MeanLengthYoungVector()[0] = fims_math::log(800.0);
+    if (!young_is_constant) {
+      adapter.mean_length_young_vector[0] = fims_math::log(800.0);
+    }
     const double expected_young = young_is_constant ? 275.0 : 800.0;
 
     for (double gap : {1e-20, 0.001, 10.0, 450.0}) {
       SCOPED_TRACE(gap);
-      adapter.MeanLengthOldVector()[0] = fims_math::log(gap);
+      adapter.mean_length_old_vector[0] = fims_math::log(gap);
       adapter.PrepareGrowthProducts();
 
       const auto* products = adapter.TryGetPreparedGrowthProducts();

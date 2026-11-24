@@ -194,13 +194,12 @@ TEST(GrowthModel, SingleAgeRejectsCoincidentReferenceAges) {
 }
 
 TEST(GrowthModel, HoldsSdConstantOutsideReferenceAges) {
-  fims_popdy::GrowthModel<double> gm(1, 21, 1);
+  fims_popdy::GrowthModel<double> gm(1, 21, 1, 0.0);
 
   gm.SetVonBertalanffySchnuteParameters(
       275.0, 725.0, 0.18, 4.0, 18.0);
   gm.SetLengthWeightParameters(2.5e-11, 3.0);
   gm.SetLengthSdParams(28.0, 73.0);
-  gm.SetAgeOffset(0.0);
   gm.Prepare();
 
   const auto& products = gm.GetProducts();
