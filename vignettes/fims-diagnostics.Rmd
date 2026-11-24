@@ -148,12 +148,13 @@ We can compare the spawning biomass estimates from the reference model and each 
 ```{r}
 retro_fit[["estimates"]] |>
   dplyr::filter(label == "spawning_biomass") |>
-  dplyr::select(label, year, estimate, model) |>
+  dplyr::select(label, year, estimated, model) |>
+  dplyr::rename(estimate = estimated) |>
   tidyr::pivot_wider(
     names_from = model,
     values_from = estimate
-  )
-tail()
+  ) |>
+  tail()
 ```
 
 ### Clean up
