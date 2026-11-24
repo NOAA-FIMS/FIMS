@@ -206,14 +206,12 @@ class VonBertalanffySchnuteGrowthModelAdapter
         fims_math::exp(mean_length_old_vector[0]);
     const Type mean_length_young =
         use_bounded_young_length
-            ? fims_math::inv_logit(
-                  Type(0.0), stored_mean_length_old,
-                  mean_length_young_vector[0])
+            ? fims_math::inv_logit(Type(0.0), stored_mean_length_old,
+                                   mean_length_young_vector[0])
             : fims_math::exp(mean_length_young_vector[0]);
     const Type mean_length_old =
-        use_old_length_difference
-            ? mean_length_young + stored_mean_length_old
-            : stored_mean_length_old;
+        use_old_length_difference ? mean_length_young + stored_mean_length_old
+                                  : stored_mean_length_old;
 
     fims_popdy::VonBertalanffySchnuteGrowth<Type> vb;
     vb.mean_length_young = mean_length_young;
@@ -235,14 +233,12 @@ class VonBertalanffySchnuteGrowthModelAdapter
         fims_math::exp(mean_length_old_vector[0]);
     const Type mean_length_young =
         use_bounded_young_length
-            ? fims_math::inv_logit(
-                  Type(0.0), stored_mean_length_old,
-                  mean_length_young_vector[0])
+            ? fims_math::inv_logit(Type(0.0), stored_mean_length_old,
+                                   mean_length_young_vector[0])
             : fims_math::exp(mean_length_young_vector[0]);
     const Type mean_length_old =
-        use_old_length_difference
-            ? mean_length_young + stored_mean_length_old
-            : stored_mean_length_old;
+        use_old_length_difference ? mean_length_young + stored_mean_length_old
+                                  : stored_mean_length_old;
 
     model_->SetVonBertalanffySchnuteParameters(
         mean_length_young, mean_length_old,
