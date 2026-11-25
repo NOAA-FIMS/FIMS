@@ -774,6 +774,63 @@ test_that("`FIMSFrame()` returns correct error messages", {
   )
 })
 
+test_that("`FIMSFrame()` validates the uncertainty column", {
+  #' @description Test that `FIMSFrame()` errors when uncertainty is numeric rather than formula strings.
+  expect_error(
+    FIMSFrame(dplyr::mutate(data_big, uncertainty = 0.2)),
+    regexp = "`uncertainty` must be a character column"
+  )
+
+  #' @description Test that `FIMSFrame()` errors when uncertainty is a factor.
+  expect_error(
+    FIMSFrame(dplyr::mutate(data_big, uncertainty = factor(uncertainty))),
+    regexp = "`uncertainty` must be a character column"
+  )
+
+  #' @description Test that `FIMSFrame()` errors when a value in uncertainty is not a distribution formula.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      uncertainty = ifelse(type == "catch", "0.2", uncertainty)
+    )),
+    regexp = "\"0\\.2\""
+  )
+
+  #' @description Test that `FIMSFrame()` errors when uncertainty uses a distribution FIMS does not have.
+  expect_error(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      uncertainty = ifelse(
+        type == "catch",
+        "~dfake(mean = catch_expected, sd = 0.1)",
+        uncertainty
+      )
+    )),
+    regexp = "dfake"
+  )
+
+  #' @description Test that `FIMSFrame()` accepts an all `NA` uncertainty column.
+  expect_s4_class(
+    FIMSFrame(dplyr::mutate(data_big, uncertainty = NA_character_)),
+    "FIMSFrame"
+  )
+
+  #' @description Test that `FIMSFrame()` accepts data without an uncertainty column.
+  expect_s4_class(
+    FIMSFrame(dplyr::select(data_big, -uncertainty)),
+    "FIMSFrame"
+  )
+
+  #' @description Test that `FIMSFrame()` accepts formulas on some rows and `NA` on others.
+  expect_s4_class(
+    FIMSFrame(dplyr::mutate(
+      data_big,
+      uncertainty = ifelse(type == "index", NA_character_, uncertainty)
+    )),
+    "FIMSFrame"
+  )
+})
+
 test_that("`FIMSFrame()` returns errors for invalid population length bins", {
   #' @description Test that `FIMSFrame()` errors when population length bins start above the fleet length bins.
   expect_error(

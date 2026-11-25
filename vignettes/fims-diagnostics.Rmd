@@ -135,7 +135,8 @@ fig_retrospective_sb <- stockplotr::plot_spawning_biomass(
   retro_fit$estimates |>
     dplyr::rename(estimate = estimated) |>
     dplyr::mutate(
-      uncertainty_label = "se"
+      uncertainty_label = "se",
+      model = "fims"
     ),
   group = "retrospective_peel",
   # The estimates have no unit column, so give the unit of weight_at_age
