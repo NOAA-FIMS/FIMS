@@ -131,6 +131,15 @@ test_that("augment() works with correct inputs", {
   expect_false(any(is.na(generics::augment(fit)[[".truth"]])))
   expect_false(any(is.na(generics::augment(fit)[[".pred"]])))
 
+  #' @description Test that generics::augment(fit) returns the Pearson residuals from residuals(fit) in .resid.
+  augmented <- generics::augment(fit)
+  expect_equal(
+    object = augmented[[".resid"]],
+    expected = residuals(fit) |>
+      dplyr::filter(!is.na(.data[["observed"]]), !is.na(.data[["expected"]])) |>
+      dplyr::pull("resids")
+  )
+
   #' @description Test that generics::augment(fit, include_weights = FALSE) omits the .weight column.
   expect_false(".weight" %in% names(generics::augment(fit, include_weights = FALSE)))
 

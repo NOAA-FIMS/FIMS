@@ -1,12 +1,14 @@
 ---
 title: "Running diagnostics on a FIMS model"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
 vignette: >
   %\VignetteIndexEntry{Running diagnostics on a FIMS model}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 level: "new-user"
-summary: "How to run diagnostics on your FIMS model."
+summary: "How to check the fit of your FIMS model with residuals, likelihood profiles, and retrospective analyses."
 ---
 
 ```{r, include = FALSE}
@@ -18,6 +20,23 @@ knitr::opts_chunk$set(
   out.width = "100%"
 )
 ```
+
+This vignette shows how to check a fitted FIMS model. It starts with the data and the residuals of the fit, which only need the fitted model, and then covers likelihood profiles and retrospective analyses, which refit the model many times. Most of the figures come from [{stockplotr}](https://nmfs-ost.github.io/stockplotr/):
+
+| Diagnostic | Function | What it shows |
+|------------|----------|---------------|
+| Data | `plot()` on a `FIMSFrame` | Which fleets have which data in which years |
+| Index fit | `stockplotr::plot_index()` | Observed and expected index with intervals |
+| Index residuals | `stockplotr::plot_joint_residuals()` | Residuals over time with a smoother; RMSE or SDNR |
+| Index residuals | `stockplotr::plot_runs_test()` | Runs test for non-random residuals and three-sigma limits |
+| Composition fit | `stockplotr::plot_composition_distribution()` | Observed and expected compositions |
+| Composition residuals | `stockplotr::plot_composition_residuals()` | Bubble plot of Pearson residuals by year and bin |
+| Composition residuals | `stockplotr::plot_composition_residual_distribution()` | Q-Q plot of residuals; SDNR |
+| Composition residuals | `stockplotr::plot_composition_residual_pattern()` | Bias by bin or year, with a runs test |
+| Composition weights | `stockplotr::plot_composition_francis()` | Mean age or length over time; Francis (2011) weights |
+| Composition weights | `stockplotr::plot_composition_samples()` | Input versus effective sample size; McAllister-Ianelli weights |
+| Likelihood profile | `plot_likelihood()` | Change in likelihood, in total and by data type |
+| Retrospective | `stockplotr::plot_spawning_biomass()` | Estimates from each peel; Mohn's rho |
 
 ```{r setup}
 library(FIMS)
@@ -45,6 +64,189 @@ base_model <- parameters |>
 
 # Clear memory post-run
 clear()
+```
+
+## Data available to the model
+
+Before looking at the fit, it helps to see what data the model has. Calling `plot()` on a `FIMSFrame` shows which fleets have which types of data in which years, using `stockplotr::plot_data_availability()`. Each panel is a type of data and each row is a fleet. In this example the fishery (`fleet1`) has landings and age and length compositions, and the survey (`survey1`) has an index and age and length compositions, in every year.
+
+```{r data-availability, fig.height = 5}
+#| fig.alt: >
+#|   Grid of squares showing that landings, the index, and age and length
+#|   compositions are available in every year for the fishery and the survey.
+plot(data_4_model)
+```
+
+## Residuals
+
+Residuals are the first place to look when checking whether a model fits its data. This section uses the residual diagnostics in [{stockplotr}](https://nmfs-ost.github.io/stockplotr/), which follow the plots in `r4ss`, `ss3diags`, and `JABBA`. One-step-ahead (OSA) residuals are not yet available in FIMS, so we use Pearson residuals for compositions and log or standardized residuals for indices.
+
+### Pearson residuals in FIMS
+
+`residuals()` calculates Pearson residuals for a fitted FIMS model, as it does for models fit with `lm()` and other modeling functions. It returns a tibble with one row for every data observation, the columns needed to identify it (e.g., `label`, `fleet`, `year`, `age`, and `length`), `observed`, `expected`, and the residual in `resids`. Residuals are calculated when you ask for them rather than stored in the output of `get_estimates()`. If you only have the output of `get_estimates()`, e.g., saved to a file, `calculate_residuals()` adds the same `resids` column to it. `augment()` also returns the residuals, in `.resid`, next to the observed and predicted values.
+
+A Pearson residual is the observed value minus the expected value, divided by the standard deviation implied by the likelihood:
+
+* **Normal** (`normal`): $r = (y - \mu) / \sigma$.
+* **Lognormal** (`log_normal`): FIMS reports `expected` as the meanlog, $\mu$, and `log_sd` as $\log(\sigma)$. The residual is calculated on the scale of the data, with mean $\exp(\mu + \sigma^2 / 2)$ and variance $\exp(2\mu + \sigma^2)(\exp(\sigma^2) - 1)$.
+* **Multinomial** (`multinomial`): `observed` is the number in bin $i$, $o_i$, `expected` is the expected proportion, $p_i$, and the sample size, $N$, is the sum of the observations in the composition. The residual is $r_i = (o_i - Np_i) / \sqrt{Np_i(1 - p_i)}$. Bins with an expected proportion of zero have no variance, so their residual is `NA`.
+
+```{r pearson-residuals}
+fit_residuals <- residuals(base_model)
+
+fit_residuals |>
+  dplyr::filter(!is.na(resids)) |>
+  dplyr::count(label, fleet, distribution)
+```
+
+If the model and the data agree, Pearson residuals have a mean near zero and a standard deviation near one. A standard deviation of the normalized residuals (SDNR) well above one suggests the data are given too much weight (the assumed variance is too small); well below one suggests they are given too little.
+
+The {stockplotr} plotting functions use a standard format that `stockplotr::convert_output()` creates from the output of `get_estimates()`. It splits each data point into an observed and a predicted row, e.g., `index_observed` and `index_predicted`.
+
+```{r convert-output}
+#| message: false
+output <- get_estimates(base_model) |>
+  # convert_output() reads the model year from `year_i`, the name used before
+  # FIMS reported calendar years in `year`
+  dplyr::rename(year_i = year) |>
+  stockplotr::convert_output(models = "fims", start_year = 1)
+```
+
+### Index of abundance
+
+Start by looking at the fit itself. `stockplotr::plot_index()` shows the observed index as points with 95% intervals from the observation error and the expected index as a line.
+
+```{r index-fit, fig.height = 5}
+#| message: false
+#| fig.alt: >
+#|   Observed survey index with error bars and the expected index as a line,
+#|   both declining over time.
+stockplotr::plot_index(output, interactive = FALSE)
+```
+
+`stockplotr::plot_joint_residuals()` plots the log residuals, $\log(o) - \log(p)$, of every index over time, with a loess smoother and the root mean square error (RMSE). With several surveys the residuals of all indices are overlaid on one panel, so a year in which every index misses in the same direction stands out. A trend in the smoother points to a pattern the model is not capturing, such as a change in catchability.
+
+```{r index-joint-residuals, fig.height = 5}
+#| message: false
+#| fig.alt: >
+#|   Log residuals of the survey index by year as vertical lines from zero,
+#|   with the root mean square error.
+stockplotr::plot_joint_residuals(output, interactive = FALSE)
+```
+
+With `scaled = TRUE`, the log residuals are divided by the log-scale standard error of each observation, giving standardized residuals and the SDNR along with its critical value. These are close to, but not the same as, the FIMS Pearson residuals in `resids`, which are calculated on the natural scale. Here the SDNR is well below one: the residuals are smaller than the observation error assumed for the survey would suggest.
+
+```{r index-joint-residuals-scaled, fig.height = 5}
+#| message: false
+#| fig.alt: >
+#|   Standardized residuals of the survey index by year with a loess smoother
+#|   and the SDNR, which is below its critical value.
+stockplotr::plot_joint_residuals(
+  output,
+  scaled = TRUE,
+  overlay = FALSE,
+  interactive = FALSE
+)
+```
+
+`stockplotr::plot_runs_test()` checks whether the signs of the log residuals are random over time (Carvalho et al. 2017). The shaded band spans three-sigma limits; it is green when the runs test passes ($p \geq 0.05$) and red when it fails, and residuals outside the limits are filled red. Too few runs, i.e., long stretches of positive or negative residuals, suggest the model is missing a trend in the data.
+
+```{r index-runs-test, fig.height = 5}
+#| message: false
+#| fig.alt: >
+#|   Survey index residuals by year inside a green band, showing the runs
+#|   test passed.
+stockplotr::plot_runs_test(output, interactive = FALSE)
+```
+
+### Age and length compositions
+
+The composition plots in {stockplotr} accept the output of `residuals()` directly. We keep the multinomial data and rename `resids` to `pearson` so the plots use the residuals FIMS has calculated. We also add the sample size of each composition, `n`, which FIMS takes as the sum of the observations; some plots use it for intervals and data weights. Most composition plots accept `comp_type` (`"age"` or `"length"`) and `fleet` to plot one type of composition or one fleet at a time.
+
+```{r composition-data}
+composition <- fit_residuals |>
+  dplyr::filter(distribution == "multinomial") |>
+  dplyr::group_by(label, fleet, year) |>
+  dplyr::mutate(n = sum(observed)) |>
+  dplyr::ungroup() |>
+  dplyr::rename(pearson = resids)
+```
+
+Aggregating the compositions across years, weighted by sample size, gives an overview of the fit for each fleet.
+
+```{r composition-aggregate, fig.height = 5}
+#| fig.alt: >
+#|   Observed and expected age compositions summed across years for the
+#|   fishery and the survey; the expected values closely match the
+#|   observations.
+stockplotr::plot_composition_distribution(
+  composition,
+  comp_type = "age",
+  aggregate = TRUE
+)
+```
+
+The bubble plot shows the Pearson residual of every bin in every year. Filled bubbles are bins where more fish were observed than expected, and open bubbles bins where fewer were observed. Look for diagonal lines of bubbles of the same sign, which point to cohorts the model gets wrong, and for blocks or stripes, which point to misfit in a group of years or bins (e.g., selectivity). The largest residual in each panel is in its label.
+
+```{r composition-bubble, fig.height = 6}
+#| fig.alt: >
+#|   Bubble plot of Pearson residuals of the age compositions for the fishery
+#|   and the survey by year and age, with no obvious pattern.
+stockplotr::plot_composition_residuals(composition, comp_type = "age")
+```
+
+`stockplotr::plot_composition_residual_distribution()` compares the residuals of each fleet and type of composition to a standard normal distribution in a Q-Q plot, and gives the SDNR in the panel label. Points off the line in the tails show heavy tails or outliers. In this example the age compositions have an SDNR near one, as expected, while the length compositions have an SDNR well below one and an S-shaped Q-Q plot: the length compositions are fit more closely than a multinomial distribution with this sample size would predict.
+
+```{r composition-residual-distribution}
+#| fig.alt: >
+#|   Q-Q plots of Pearson residuals for age and length compositions for each
+#|   fleet; age composition residuals follow the one-to-one line and length
+#|   composition residuals are flatter than the line.
+stockplotr::plot_composition_residual_distribution(composition)
+```
+
+`stockplotr::plot_composition_residual_pattern()` summarizes the residuals by bin (or by year, with `by = "year"`), showing the mean and spread of the residuals in each bin. A mean away from zero is a bias, e.g., consistently too few old fish expected. A runs test is applied to the signs of the residuals across years within each bin, and filled points flag bins with a non-random pattern.
+
+```{r composition-residual-pattern, fig.height = 5}
+#| fig.alt: >
+#|   Mean and range of Pearson residuals by age for the fishery and the
+#|   survey, centered on zero.
+stockplotr::plot_composition_residual_pattern(composition, comp_type = "age")
+```
+
+Pearson residuals for individual bins can hide trends that show up when the composition is summarized. `stockplotr::plot_composition_francis()` plots the observed mean age (or length) in each year, with intervals based on the sample size, against the expected mean. If the intervals are much narrower than the spread of the points around the line, the sample sizes are too large. The panel labels give the Francis (2011) TA1.8 weight and its interval: a weight below one suggests the sample sizes should be reduced.
+
+```{r composition-francis, fig.height = 6}
+#| fig.alt: >
+#|   Observed mean age and mean length by year with intervals and the expected
+#|   mean as a line for the fishery and the survey, declining over time.
+stockplotr::plot_composition_francis(composition)
+```
+
+`stockplotr::plot_composition_samples()` compares the input sample size with the effective sample size implied by the fit to each year, and gives the McAllister-Ianelli weight (the harmonic mean of the effective sample sizes divided by the mean input sample size). The `data_big` compositions all have an input sample size of 200, so the points line up on a single vertical line.
+
+```{r composition-samples, fig.height = 6}
+#| fig.alt: >
+#|   Effective sample size against input sample size for each composition,
+#|   with McAllister-Ianelli weights in the panel labels.
+stockplotr::plot_composition_samples(composition)
+```
+
+The two weighting methods often disagree. Here, the McAllister-Ianelli weights are near one for the age compositions and much larger than one for the length compositions, consistent with the small SDNR above, whereas the Francis weights are larger than one for the fishery and closer to one for the survey, whose intervals include one. Neither is applied automatically; they are a guide to whether the input sample sizes are reasonable.
+
+Each of these functions returns a `ggplot` object, so it can be modified with {ggplot2}, e.g., by adding labels or a theme.
+
+```{r customize, fig.height = 5}
+#| fig.alt: >
+#|   The bubble plot of survey age composition residuals with a black and
+#|   white theme and a title.
+stockplotr::plot_composition_residuals(
+  composition,
+  comp_type = "age",
+  fleet = "survey1"
+) +
+  ggplot2::labs(title = "Survey age composition residuals") +
+  ggplot2::theme_bw()
 ```
 
 ## Likelihood profile
@@ -126,7 +328,7 @@ rho_sb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
 
 ### Visualize the results
 
-To visualize the results of the retrospective analysis, we can use `plot_retrospective()` to display the quantity of interest. Below, we want to assess the impact on spawning biomass. The function returns a `ggplot` object, which you can customize by adding add layers as you normally would to a `ggplot`. For example, below, we specify the x and y axes labels and the legend title.
+To visualize the results of the retrospective analysis, we can use `stockplotr::plot_spawning_biomass()` with one line for each peel. The function returns a `ggplot` object, which you can customize by adding layers as you normally would to a `ggplot`.
 
 ```{r, plot-spawning-biomass, message = FALSE, warning = FALSE}
 #| fig.alt: >
@@ -135,11 +337,14 @@ fig_retrospective_sb <- stockplotr::plot_spawning_biomass(
   retro_fit$estimates |>
     dplyr::rename(estimate = estimated) |>
     dplyr::mutate(
-      uncertainty_label = "se"
+      uncertainty_label = "se",
+      # All peels come from one model
+      model = "FIMS"
     ),
   group = "retrospective_peel",
   # The estimates have no unit column, so give the unit of weight_at_age
-  unit_label = "mt"
+  unit_label = "mt",
+  interactive = FALSE
 )
 print(fig_retrospective_sb)
 ```
@@ -168,3 +373,9 @@ Once you are finished running a FIMS model, it is always good practice to clear 
 ```{r}
 clear()
 ```
+
+## References
+
+Carvalho, F., Punt, A.E., Chang, Y.-J., Maunder, M.N., and Piner, K.R. 2017. Can diagnostic tests help identify model misspecification in integrated stock assessments? Fisheries Research 192: 28--40.
+
+Francis, R.I.C.C. 2011. Data weighting in statistical fisheries stock assessment models. Canadian Journal of Fisheries and Aquatic Sciences 68: 1124--1138.
