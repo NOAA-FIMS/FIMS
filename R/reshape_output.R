@@ -248,7 +248,7 @@ reshape_json_estimates <- function(model_output) {
     # because they are predictions.
     dplyr::mutate(
       skipped_year = any(is.na(.data$observed_values)) &
-        .data$name %in% c("agecomp_expected", "lengthcomp_expected"),
+        .data$name %in% c("agecomp_expected", "lengthcomp_expected", "caalcomp_expected"),
       observed_values = dplyr::if_else(
         .data$skipped_year, NA_real_, .data$observed_values
       ),

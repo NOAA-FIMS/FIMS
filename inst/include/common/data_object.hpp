@@ -12,6 +12,8 @@
 
 #include <exception>
 #include <vector>
+#include <numeric>
+#include <functional>
 
 #include "model_object.hpp"
 #include "fims_vector.hpp"
@@ -26,6 +28,7 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
   static uint32_t id_g;                    /**< id of the Data Object >*/
   fims::Vector<Type> data;                 /**< vector of the data >*/
   fims::Vector<Type> uncertainty;          /**< vector of the data >*/
+  fims::Vector<size_t> generic_dimensions;   /**< vector indicating NA values >*/
   size_t dimensions;                       /**< dimension of the Data object >*/
   size_t imax;                             /**< 1st dimension of data object >*/
   size_t jmax;                             /**< 2nd dimension of data object>*/
@@ -34,9 +37,27 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
   Type na_value = static_cast<Type>(-999); /**< specifying the NA value >*/
 
   /**
+   * Constructs a multi-dimensional data object.
+   */
+  DataObject(fims::Vector<int> dim) : dimensions(dim.size()) {
+    generic_dimensions.resize(dim.size());
+    for (size_t i = 0; i < dim.size(); ++i) {
+      generic_dimensions.at(i) = dim[i];
+    }
+    data.resize(
+        std::accumulate(dim.begin(), dim.end(), 1, std::multiplies<int>()));
+    uncertainty.resize(
+        std::accumulate(dim.begin(), dim.end(), 1, std::multiplies<int>()));
+    this->id = DataObject<Type>::id_g++;
+    this->register_self(this->id);
+  }
+
+  /**
    * Constructs a one-dimensional data object.
    */
   DataObject(size_t imax) : dimensions(1), imax(imax) {
+    generic_dimensions.resize(1);
+    generic_dimensions.at(0) = imax;
     data.resize(imax);
     uncertainty.resize(imax);
     this->id = DataObject<Type>::id_g++;
@@ -47,6 +68,9 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * Constructs a two-dimensional data object.
    */
   DataObject(size_t imax, size_t jmax) : dimensions(2), imax(imax), jmax(jmax) {
+    generic_dimensions.resize(2);
+    generic_dimensions.at(0) = imax;
+    generic_dimensions.at(1) = jmax;
     data.resize(imax * jmax);
     uncertainty.resize(imax * jmax);
     this->id = DataObject<Type>::id_g++;
@@ -58,6 +82,10 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    */
   DataObject(size_t imax, size_t jmax, size_t kmax)
       : dimensions(3), imax(imax), jmax(jmax), kmax(kmax) {
+    generic_dimensions.resize(3);
+    generic_dimensions.at(0) = imax;
+    generic_dimensions.at(1) = jmax;
+    generic_dimensions.at(2) = kmax;
     data.resize(imax * jmax * kmax);
     uncertainty.resize(imax * jmax * kmax);
     this->id = DataObject<Type>::id_g++;
@@ -69,6 +97,11 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    */
   DataObject(size_t imax, size_t jmax, size_t kmax, size_t lmax)
       : dimensions(4), imax(imax), jmax(jmax), kmax(kmax), lmax(lmax) {
+    generic_dimensions.resize(4);
+    generic_dimensions.at(0) = imax;
+    generic_dimensions.at(1) = jmax;
+    generic_dimensions.at(2) = kmax;
+    generic_dimensions.at(3) = lmax;
     data.resize(imax * jmax * kmax * lmax);
     uncertainty.resize(imax * jmax * kmax * lmax);
     this->id = DataObject<Type>::id_g++;
@@ -180,6 +213,16 @@ struct DataObject : public fims_model_object::FIMSObject<Type> {
    * @return size_t
    */
   size_t get_dimensions() const { return dimensions; }
+
+  /**
+   * @brief Get the generic dimensions object vector
+   *
+   * @return std::vector<size_t>
+   */
+  fims::Vector<size_t> get_dimension_vector() const { 
+    return generic_dimensions;
+  }
+
 
   /**
    * @brief Get the imax object

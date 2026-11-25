@@ -1,0 +1,690 @@
+#' Create a simulated data set using OM from model comparison project
+#'
+#' Use a simulated data set from {ASSAMC} to create an input data set
+#' for an age-structured stock assessment model fit using {FIMS}.
+#'
+#' @details
+#' * This script would need to be augmented to accommodate more than
+#'   one one fleet or one survey.
+#' * Timing:
+#'   * Fishery is assumed to operate over the entire year
+#'   * Survey occurs instantaneously at the start of the year
+#' * Note: If you encounter warning messages such as `cannot open the
+#'   connection: warning messages from top-level task callback
+#'   'vsc.workspace'` while running the code in VS Code, try calling
+#'   `removeTaskCallback("vsc.workspace")` before executing the code.
+#'
+#' @author Kathryn L. Doering and Kelli F. Johnson
+#'
+###############################################################################
+# Helper functions and load packages
+###############################################################################
+cv_2_sd <- function(x) {
+  sqrt(log(x^2 + 1))
+}
+
+check_ASSAMC <- function() {
+  packages_all <- .packages(all.available = TRUE)
+  if (!"ASSAMC" %in% packages_all) {
+    remotes::install_github(
+      "NOAA-FIMS/Age_Structured_Stock_Assessment_Model_Comparison"
+    )
+  }
+  library("ASSAMC")
+  return(TRUE)
+}
+
+# A saved fit changes on every run because it stores its run time and the
+# Rcpp model object, and the optimized estimates differ in about the 5th
+# significant digit between GitHub runners. Saving the fit only when its
+# version or estimates change keeps pull requests from carrying .rda files
+# that are not their own. Delete data/fit_big_optimized.rda to force a save.
+optimized_fit_changed <- function(fit, estimates, tolerance = 1e-3) {
+  fit_file <- file.path("data", "fit_caal_optimized.rda")
+  estimates_file <- file.path("data", "estimates_caal_optimized.rda")
+  if (!file.exists(fit_file) || !file.exists(estimates_file)) {
+    return(TRUE)
+  }
+  saved <- new.env(parent = emptyenv())
+  load(fit_file, envir = saved)
+  load(estimates_file, envir = saved)
+  saved_fit <- saved[["fit_caal_optimized"]]
+  saved_estimates <- saved[["estimates_caal_optimized"]]
+  if (!identical(
+    FIMS::get_version(fit),
+    FIMS::get_version(saved_fit)
+  ) ||
+    !identical(dim(estimates), dim(saved_estimates)) ||
+    !identical(names(estimates), names(saved_estimates))) {
+    return(TRUE)
+  }
+  is_value <- purrr::map_lgl(estimates, is.double)
+  if (!identical(estimates[!is_value], saved_estimates[!is_value])) {
+    return(TRUE)
+  }
+  # The gradient is near 0 at the optimum, so its difference between runners
+  # is large relative to its value and it is not compared.
+  value_columns <- setdiff(names(estimates)[is_value], "gradient")
+  for (column in value_columns) {
+    new_values <- estimates[[column]]
+    saved_values <- saved_estimates[[column]]
+    # Relative difference above 1 and absolute difference below 1.
+    allowed_difference <- tolerance * pmax(abs(saved_values), 1)
+    if (!identical(is.na(new_values), is.na(saved_values)) ||
+      any(abs(new_values - saved_values) > allowed_difference, na.rm = TRUE)) {
+      return(TRUE)
+    }
+  }
+  FALSE
+}
+
+# Use data_changed for tighter tolerances of data (i.e., not optimized fit)
+# changes
+data_changed <- function(objects, file,
+                         tolerance = sqrt(.Machine[["double.eps"]])) {
+  if (!file.exists(file)) {
+    return(TRUE)
+  }
+
+  saved <- new.env(parent = emptyenv())
+  load(file, envir = saved)
+
+  if (!setequal(names(objects), ls(saved, all.names = TRUE))) {
+    return(TRUE)
+  }
+
+  for (name in names(objects)) {
+    if (!isTRUE(all.equal(
+      objects[[name]],
+      saved[[name]],
+      tolerance = tolerance
+    ))) {
+      return(TRUE)
+    }
+  }
+
+  FALSE
+}
+
+# Ensure usethis writes generated data to the package root.
+usethis::proj_set(".", force = TRUE)
+
+check_ASSAMC()
+library(dplyr)
+
+###############################################################################
+# Simulate the data
+###############################################################################
+working_dir <- getwd()
+
+main_dir <- tempdir()
+
+# Save the initial OM input using ASSAMC package (sigmaR = 0.4)
+model_input <- ASSAMC::save_initial_input()
+
+# Configure the input parameters for the simulation
+sim_num <- 100
+sim_input <- ASSAMC::save_initial_input(
+  base_case = TRUE,
+  input_list = model_input,
+  maindir = main_dir,
+  om_sim_num = sim_num,
+  keep_sim_num = sim_num,
+  figure_number = 1,
+  seed_num = 9924,
+  case_name = "sim_data"
+)
+
+# Run OM and generate om_input, om_output, and em_input
+# using function from the model comparison project
+ASSAMC::run_om(input_list = sim_input)
+
+setwd(working_dir)
+
+# Helper function to calculate length at age using the von Bertalanffy growth
+# model
+# a: current age
+# Linf: asymptotic average length
+# K: Growth coefficient
+# a_0: Theoretical age at size zero
+AtoL <- function(a, Linf, K, a_0) {
+  L <- Linf * (1 - exp(-K * (a - a_0)))
+}
+
+# Initialize lists for operating model (OM) and estimation model (EM) inputs
+# and outputs
+om_input_list <- om_output_list <- em_input_list <-
+  vector(mode = "list", length = sim_num)
+
+# Loop through each simulation to generate length data
+for (iter in 1:sim_num) {
+  # Load the OM data for the current simulation
+  load(file.path(main_dir, "sim_data", "output", "OM", paste0("OM", iter, ".RData")))
+
+  # Extract von Bertalanffy growth model parameters from the OM input
+  Linf <- om_input[["Linf"]]
+  K <- om_input[["K"]]
+  a0 <- om_input[["a0"]]
+  amax <- max(om_input[["ages"]])
+  # Define coefficient of variation for length-at-age
+  cv <- 0.1
+  # Extract length-weight coefficient from OM
+  L2Wa <- om_input[["a.lw"]]
+  # Extract length-weight exponent from OM
+  L2Wb <- om_input[["b.lw"]]
+
+  # Extract age bins from the OM input
+  ages <- om_input[["ages"]]
+  # Define length bins in intervals of 50
+  len_bins <- seq(0, 1100, 50)
+
+  # Create length at age conversion matrix and fill proportions using above
+  # growth parameters
+  age_to_length_conversion <- matrix(
+    NA,
+    nrow = length(ages),
+    ncol = length(len_bins)
+  )
+  for (age in seq_along(ages)) {
+    # Calculate mean length at age to spread lengths around
+    mean_length <- AtoL(ages[age], Linf, K, a0)
+    # mean_length <- AtoLSchnute(ages[age],L1,L2,a1,a2,Ks)
+    # Calculate the cumulative proportion shorter than each composition length
+    temp_len_probs <- pnorm(
+      q = len_bins,
+      mean = mean_length,
+      sd = mean_length * cv
+    )
+    # Reset the first length proportion to zero so the first bin includes all
+    # density smaller than that bin
+    temp_len_probs[1] <- 0
+    # subtract the offset length probabilities to calculate the proportion in
+    # each bin. For each length bin the proportion is how many fish are larger
+    # than this length but shorter than the next bin length.
+    temp_len_probs <- c(temp_len_probs[-1], 1) - temp_len_probs
+    age_to_length_conversion[age, ] <- temp_len_probs
+  }
+  colnames(age_to_length_conversion) <- len_bins
+  rownames(age_to_length_conversion) <- ages
+
+  # Loop through each simulation to load the results from the corresponding
+  # .RData files
+  # Assign the conversion matrix and other information to the OM input
+  om_input[["lengths"]] <- len_bins
+  om_input[["nlengths"]] <- length(len_bins)
+  om_input[["cv.length_at_age"]] <- cv
+  om_input[["age_to_length_conversion"]] <- age_to_length_conversion
+
+  om_output[["L.length"]] <- list()
+  om_output[["survey_length_comp"]] <- list()
+  om_output[["N.length"]] <- matrix(
+    0,
+    nrow = om_input[["nyr"]],
+    ncol = length(len_bins)
+  )
+  om_output[["L.length"]][["fleet1"]] <- matrix(
+    0,
+    nrow = om_input[["nyr"]],
+    ncol = length(len_bins)
+  )
+  om_output[["survey_length_comp"]][["survey1"]] <- matrix(
+    0,
+    nrow = om_input[["nyr"]],
+    ncol = length(len_bins)
+  )
+
+  om_output[["L.caal"]] <- list()
+  om_output[["survey_caal_comp"]] <- list()
+  om_output[["N.caal"]] <- vector(length = om_input[["nyr"]] * length(om_input[["ages"]]) * length(len_bins))
+  om_output[["L.caal"]][["fleet1"]] <- vector(length = om_input[["nyr"]] * length(om_input[["ages"]]) * length(len_bins))
+  om_output[["survey_caal_comp"]][["survey1"]] <- vector(length = om_input[["nyr"]] * length(om_input[["ages"]]) * length(len_bins))
+
+  em_input[["L.length.obs"]] <- list()
+  em_input[["survey.length.obs"]] <- list()
+  em_input[["L.length.obs"]][["fleet1"]] <- matrix(
+    0,
+    nrow = om_input[["nyr"]],
+    ncol = length(len_bins)
+  )
+  em_input[["survey.length.obs"]][["survey1"]] <- matrix(
+    0,
+    nrow = om_input[["nyr"]],
+    ncol = length(len_bins)
+  )
+
+  em_input[["L.caal.obs"]] <- list()
+  em_input[["survey.caal.obs"]] <- list()
+  em_input[["L.caal.obs"]][["fleet1"]] <- vector(length = om_input[["nyr"]] * length(om_input[["ages"]]) * length(len_bins))
+  em_input[["survey.caal.obs"]][["survey1"]] <- vector(length = om_input[["nyr"]] * length(om_input[["ages"]]) * length(len_bins))
+
+
+  em_input[["lengths"]] <- len_bins
+  em_input[["nlengths"]] <- length(len_bins)
+  em_input[["cv.length_at_age"]] <- cv
+  em_input[["age_to_length_conversion"]] <- age_to_length_conversion
+  n_lengthcomps <- 200
+  em_input[["n.L.lengthcomp"]][["fleet1"]] <- n_lengthcomps
+  em_input[["n.survey.lengthcomp"]][["survey1"]] <- n_lengthcomps
+  n_caalcomps <- 200
+  em_input[["n.L.caalcomp"]][["fleet1"]] <- n_caalcomps
+  em_input[["n.survey.caalcomp"]][["survey1"]] <- n_caalcomps
+
+  # Populate length-based outputs for each year, length bin, and age
+  for (i in seq_along(om_input[["year"]])) {
+    for (j in seq_along(len_bins)) {
+      for (k in seq_along(om_input[["ages"]])) {
+        # Calculate numbers and catch at length for each fleet and survey
+        om_output[["N.length"]][i, j] <- om_output[["N.length"]][i, j] +
+          age_to_length_conversion[k, j] *
+            om_output[["N.age"]][i, k]
+
+        om_output[["L.length"]][[1]][i, j] <- om_output[["L.length"]][[1]][i, j] +
+          age_to_length_conversion[k, j] *
+            om_output[["L.age"]][[1]][i, k]
+
+        om_output[["survey_length_comp"]][[1]][i, j] <- om_output[["survey_length_comp"]][[1]][i, j] +
+          age_to_length_conversion[k, j] *
+            om_output[["survey_age_comp"]][[1]][i, k]
+
+        em_input[["L.length.obs"]][[1]][i, j] <- em_input[["L.length.obs"]][[1]][i, j] +
+          age_to_length_conversion[k, j] *
+            em_input[["L.age.obs"]][[1]][i, k]
+
+        em_input[["survey.length.obs"]][[1]][i, j] <- em_input[["survey.length.obs"]][[1]][i, j] +
+          age_to_length_conversion[k, j] *
+            em_input[["survey.age.obs"]][[1]][i, k]
+
+        # Calculate conditional age at length values and insert in row index
+        # sorted by year, then age, then length bin.
+        caal_row <- (i - 1) * length(om_input[["ages"]]) * length(len_bins) + (k - 1) * length(len_bins) + j
+
+        om_output[["N.caal"]][caal_row] <- om_output[["N.caal"]][caal_row] +
+          age_to_length_conversion[k, j] *
+            om_output[["N.age"]][i, k]
+
+        om_output[["L.caal"]][[1]][caal_row] <- om_output[["L.caal"]][[1]][caal_row] +
+          age_to_length_conversion[k, j] *
+            om_output[["L.age"]][[1]][i, k]
+
+        om_output[["survey_caal_comp"]][[1]][caal_row] <- om_output[["survey_caal_comp"]][[1]][caal_row] +
+          age_to_length_conversion[k, j] *
+            om_output[["survey_age_comp"]][[1]][i, k]
+
+        em_input[["L.caal.obs"]][[1]][caal_row] <- em_input[["L.caal.obs"]][[1]][caal_row] +
+          age_to_length_conversion[k, j] *
+            em_input[["L.age.obs"]][[1]][i, k]
+
+        em_input[["survey.caal.obs"]][[1]][caal_row] <- em_input[["survey.caal.obs"]][[1]][caal_row] +
+          age_to_length_conversion[k, j] *
+            em_input[["survey.age.obs"]][[1]][i, k]
+      }
+    }
+  }
+
+  # Save updated inputs and outputs to file
+  save(
+    om_input, om_output, em_input,
+    file = file.path(
+      main_dir,
+      "sim_data",
+      "output",
+      "OM",
+      paste0("OM", iter, ".RData")
+    )
+  )
+  # Store inputs and outputs in respective lists
+  om_input_list[[iter]] <- om_input
+  om_output_list[[iter]] <- om_output
+  em_input_list[[iter]] <- em_input
+}
+
+# Save all simulations to a single file for {testthat} integration tests
+dir.create(
+  testthat::test_path("fixtures"),
+  recursive = TRUE,
+  showWarnings = FALSE
+)
+fixture_file <- testthat::test_path(
+  "fixtures", "integration_test_data.RData"
+)
+fixture_objects <- list(
+  om_input_list = om_input_list,
+  om_output_list = om_output_list,
+  em_input_list = em_input_list
+)
+if (data_changed(fixture_objects, fixture_file)) {
+  save(
+    om_input_list, om_output_list, em_input_list,
+    file = fixture_file
+  )
+}
+
+# Load a specific simulation for further processing
+sim_id <- 1
+load(
+  file.path(
+    main_dir,
+    "sim_data",
+    "output",
+    "OM",
+    paste0("OM", sim_id, ".RData")
+  )
+)
+
+# Return the loaded data
+returned_om <- list(
+  om_input = om_input,
+  om_output = om_output,
+  em_input = em_input
+)
+
+###############################################################################
+# Catch
+###############################################################################
+catch_data <- data.frame(
+  # TODO: Should there be a type that are not removed but just noted,
+  #       where obviously in this instance they are removed.
+  type = "catch",
+  fleet = names(returned_om[["om_output"]][["L.mt"]])[1],
+  age = NA, # Not by age in this case, but there is a by age option.
+  timing = returned_om[["om_input"]][["year"]],
+  observed = returned_om[["em_input"]][["L.obs"]][[1]],
+  unit = "mt", # metric tons
+  uncertainty = paste(
+    "~ dlnorm(meanlog = log_catch_expected, sdlog = ",
+    cv_2_sd(returned_om[["em_input"]][["cv.L"]][[1]]),
+    ")"
+  )
+)
+
+###############################################################################
+# Survey index
+###############################################################################
+index_data <- data.frame(
+  type = "index",
+  fleet = names(returned_om[["om_output"]][["survey_index"]])[1],
+  age = NA, # Not by age in this case, but there is a by age option.
+  timing = returned_om[["om_input"]][["year"]],
+  observed = returned_om[["em_input"]][["surveyB.obs"]][[1]],
+  unit = "mt",
+  uncertainty = paste(
+    "~ dlnorm(meanlog = log_index_expected, sdlog = ",
+    cv_2_sd(returned_om[["em_input"]][["cv.survey"]][[1]]),
+    ")"
+  )
+)
+
+###############################################################################
+# Age-composition data
+###############################################################################
+age_data <- rbind(
+  data.frame(
+    fleet = names(returned_om[["em_input"]][["n.L"]]),
+    returned_om[["em_input"]][["L.age.obs"]][["fleet1"]],
+    unit = "proportion",
+    uncertainty = paste(
+      "~ dmultinom(prob = agecomp_proportion, size = ",
+      returned_om[["em_input"]][["n.L"]][["fleet1"]],
+      ")"
+    ),
+    timing = returned_om[["om_input"]][["year"]]
+  ),
+  data.frame(
+    fleet = names(returned_om[["om_output"]][["survey_age_comp"]])[1],
+    returned_om[["em_input"]][["survey.age.obs"]][[1]],
+    unit = "proportion",
+    uncertainty = paste(
+      "~ dmultinom(prob = agecomp_proportion, size = ",
+      returned_om[["om_input"]][["n.survey"]][["survey1"]],
+      ")"
+    ),
+    timing = returned_om[["om_input"]][["year"]]
+  )
+) |>
+  dplyr::mutate(
+    type = "age_comp"
+  ) |>
+  tidyr::pivot_longer(
+    cols = dplyr::starts_with("X"),
+    names_prefix = "X",
+    names_to = "age",
+    values_to = "observed",
+    # Convert the "age" column from strings to integers
+    names_transform = list(age = as.integer)
+  )
+
+###############################################################################
+# weight_at_age data
+###############################################################################
+timing_fishery <- data.frame(
+  timing = returned_om[["om_input"]][["year"]]
+)
+# Population weight at age uses fleet = NA
+weights_fishery <- data.frame(
+  type = "weight_at_age",
+  fleet = NA_character_,
+  age = seq_along(returned_om[["om_input"]][["W.kg"]]),
+  observed = returned_om[["om_input"]][["W.mt"]],
+  uncertainty = NA,
+  unit = "mt"
+)
+weight_at_age_data <- merge(
+  # Add on one more year for weight_at_age data because the model needs to
+  # compute spawning biomass for the beginning of the year following the
+  # terminal year
+  dplyr::bind_rows(
+    timing_fishery,
+    data.frame(timing = max(timing_fishery[["timing"]]) + 1)
+  ),
+  weights_fishery
+)
+
+###############################################################################
+# {FIMS} data
+###############################################################################
+# Add new column for length values and set to NA for all milestone 1 data
+data_caal <- rbind(catch_data, index_data, age_data, weight_at_age_data) |>
+  dplyr::mutate(
+    length = NA,
+    .after = "age"
+  )
+
+# Extract timing and fleets from milestone 1 data
+observers <- c("fleet1", "survey1")
+
+# Create data frame for length at age conversion proportions
+length_age_data <- data.frame(
+  type = "age_to_length_conversion",
+  fleet = NA_character_,
+  age = rep(ages, each = length(len_bins)),
+  length = rep(
+    len_bins,
+    length(ages)
+  ),
+  timing = NA_integer_,
+  observed = c(t(returned_om[["em_input"]][["age_to_length_conversion"]])),
+  unit = "proportion",
+  uncertainty = NA_character_
+)
+
+# Create a length-composition data frame that will be filled by transforming
+# the age composition data
+length_comp_data <- data.frame(
+  type = "length_comp",
+  fleet = sort(rep(observers, length(len_bins) * length(timing_fishery[["timing"]]))),
+  age = NA,
+  length = rep(len_bins, length(timing_fishery[["timing"]]) * length(observers)),
+  timing = rep(rep(timing_fishery[["timing"]], each = length(len_bins)), length(observers)),
+  observed = c(
+    c(t(returned_om[["em_input"]][["L.length.obs"]][["fleet1"]])),
+    c(t(returned_om[["em_input"]][["survey.length.obs"]][["survey1"]]))
+  ),
+  unit = "proportion",
+  uncertainty = paste(
+    "~ dmultinom(prob = lengthcomp_proportion, size = ",
+    sort(rep(
+      c(
+        em_input[["n.L.lengthcomp"]][["fleet1"]],
+        em_input[["n.survey.lengthcomp"]][["survey1"]]
+      ),
+      length(len_bins) * length(timing_fishery[["timing"]])
+    )),
+    ")"
+  )
+)
+
+# Create a conditional age-at-length (CAAL) composition data frame that will
+# be filled by transforming the age composition data
+caal_comp_data <- data.frame(
+  type = "caal_comp",
+  fleet = sort(rep(observers, length(len_bins) * length(timing_fishery[["timing"]]) * length(ages))),
+  age = rep(rep(ages, each = length(len_bins)), length(observers) * length(timing_fishery[["timing"]])),
+  length = rep(len_bins, length(ages) * length(timing_fishery[["timing"]]) * length(observers)),
+  timing = rep(rep(timing_fishery[["timing"]], each = length(len_bins) * length(ages)), length(observers)),
+  observed = c(
+    returned_om[["em_input"]][["L.caal.obs"]][["fleet1"]],
+    returned_om[["em_input"]][["survey.caal.obs"]][["survey1"]]
+  ),
+  unit = "proportion",
+  uncertainty = paste(
+    "~ dmultinom(prob = caalcomp_proportion, size = ",
+    sort(rep(
+      c(
+        em_input[["n.L.lengthcomp"]][["fleet1"]],
+        em_input[["n.survey.lengthcomp"]][["survey1"]]
+      ),
+      length(ages) * length(len_bins) * length(timing_fishery[["timing"]])
+    )),
+    ")"
+  )
+)
+
+# Save individual dataframes to a single file for {testthat} integration tests
+fixture_file <- testthat::test_path(
+  "fixtures", "caal_test_data_components.RData"
+)
+fixture_objects <- list(
+  catch_data = catch_data,
+  index_data = index_data,
+  age_data = age_data,
+  weight_at_age_data = weight_at_age_data,
+  length_comp_data = length_comp_data,
+  caal_comp_data = caal_comp_data,
+  length_age_data = length_age_data
+)
+
+if (data_changed(fixture_objects, fixture_file)) {
+  save(
+    catch_data, index_data, age_data, weight_at_age_data,
+    length_comp_data, caal_comp_data, length_age_data,
+    file = fixture_file
+  )
+}
+
+# Add the conversion matrix and length composition data to dataframe
+data_caal <- rbind(data_caal, length_comp_data, caal_comp_data, length_age_data)
+
+# Fit using current default-parameter setup and operating-model starting values.
+data_frame <- FIMS::FIMSFrame(data_caal)
+om_input <- returned_om[["om_input"]]
+om_output <- returned_om[["om_output"]]
+em_input <- returned_om[["em_input"]]
+
+parameters_caal <- FIMS::setup_default_parameters(data = data_frame) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      fleet = "fleet1",
+      label = "log_Fmort",
+      timing = seq_len(FIMS::get_n_years(data_frame)),
+      value = log(om_output[["f"]])
+    ),
+    by = c("fleet", "label", "timing")
+  ) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      fleet = "survey1",
+      label = c("inflection_point", "slope", "log_q"),
+      value = c(1.5, 2, log(om_output[["survey_q"]][["survey1"]]))
+    ),
+    by = c("fleet", "label")
+  ) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      label = "log_devs",
+      timing = seq.int(2, FIMS::get_n_years(data_frame)),
+      value = om_input[["logR.resid"]][-1]
+    ),
+    by = c("label", "timing")
+  ) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Recruitment",
+      label = "log_sd",
+      value = log(om_input[["logR_sd"]])
+    ),
+    by = c("module_name", "label")
+  ) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      module_name = "Maturity",
+      label = c("inflection_point", "slope"),
+      value = c(om_input[["A50.mat"]], om_input[["slope.mat"]])
+    ),
+    by = c("module_name", "label")
+  ) |>
+  dplyr::rows_update(
+    tibble::tibble(
+      label = "log_init_naa",
+      age = seq_len(FIMS::get_n_ages(data_frame)),
+      value = log(om_output[["N.age"]][1, ])
+    ),
+    by = c("label", "age")
+  )
+
+fit_caal_unoptimized <- parameters_caal |>
+  FIMS::initialize_fims(data = data_frame) |>
+  FIMS::fit_fims(optimize = FALSE)
+estimates_caal_unoptimized <- FIMS::get_estimates(
+  fit_caal_unoptimized
+)
+FIMS::clear()
+save(
+  fit_caal_unoptimized,
+  estimates_caal_unoptimized,
+  file = file.path("data-raw", "fit_estimates_caal_unoptimized.rda")
+)
+
+fit_caal_optimized <- parameters_caal |>
+  FIMS::initialize_fims(data = data_frame) |>
+  FIMS::fit_fims(optimize = TRUE)
+estimates_caal_optimized <- FIMS::get_estimates(
+  fit_caal_optimized
+)
+FIMS::clear()
+
+# Save the unoptimized objects
+if (data_changed(
+  list(data_big = data_big),
+  file.path("data", "data_big.rda")
+)) {
+  usethis::use_data(data_big, overwrite = TRUE, compress = "xz")
+}
+if (data_changed(
+  list(parameters_big = parameters_big),
+  file.path("data", "parameters_big.rda")
+)) {
+  usethis::use_data(parameters_big, overwrite = TRUE, compress = "xz")
+}
+
+# Save optimized objects
+if (optimized_fit_changed(fit_caal_optimized, estimates_caal_optimized)) {
+  usethis::use_data(
+    fit_caal_optimized,
+    estimates_caal_optimized,
+    overwrite = TRUE,
+    compress = "xz"
+  )
+}
+
+on.exit(setwd(working_dir), add = TRUE)
+rm(list = ls())

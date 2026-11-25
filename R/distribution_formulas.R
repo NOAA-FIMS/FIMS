@@ -152,7 +152,7 @@ check_distribution_validity <- function(args) {
 #' }
 initialize_data_distribution <- function(
   module,
-  data_type = c("catch", "index", "age_comp", "length_comp"),
+  data_type = c("catch", "index", "age_comp", "length_comp", "caal_comp"),
   uncertainty
 ) {
   data_type <- rlang::arg_match(data_type)

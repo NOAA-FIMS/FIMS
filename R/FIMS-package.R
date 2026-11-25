@@ -29,6 +29,7 @@
 #' @export Catch
 #' @export Index
 #' @export LengthComp
+#' @export CaalComp
 #' @export log_error
 #' @export log_info
 #' @export log_warning

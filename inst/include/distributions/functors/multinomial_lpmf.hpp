@@ -63,37 +63,42 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
    */
   virtual const Type evaluate() {
     // set dims using data_observed_values if no user input
+    size_t n_vals = 1;
     if (dims.size() != 2) {
-      dims.resize(2);
-      dims[0] = this->data_observed_values->get_imax();
-      dims[1] = this->data_observed_values->get_jmax();
+      dims.resize(this->data_observed_values->get_dimension_vector().size());
+      for (size_t i = 0; i < this->data_observed_values->get_dimension_vector().size(); ++i) {
+        dims[i] = this->data_observed_values->get_dimension_vector()[i];
+        n_vals *= dims[i];
+      }
+    } else {
+      n_vals = dims[0] * dims[1];
     }
 
     // setup vector for recording the log probability density function values
     this->lpdf = static_cast<Type>(0.0); /**< total log probability mass
                                            contribution of the distribution */
-    this->lpdf_vec.resize(dims[0] * dims[1]);
+    this->lpdf_vec.resize(n_vals);
     std::fill(this->lpdf_vec.begin(), this->lpdf_vec.end(), 0);
     size_t lpdf_vec_idx = 0; /**< index for lpdf_vec vector */
     // Dimension checks
     if (this->input_type == "data") {
       if (this->data_expected_values) {
-        if (dims[0] * dims[1] != this->data_expected_values->size()) {
+        if (n_vals != this->data_expected_values->size()) {
           throw std::invalid_argument(
               "MultinomialLPDF: Vector index out of bounds. The dimension of "
               "the "
               "number of rows times the number of columns is of size " +
-              std::to_string(dims[0] * dims[1]) +
+              std::to_string(n_vals) +
               " and the expected vector is of size " +
               std::to_string(this->data_expected_values->size()));
         }
       }
     } else {
-      if (dims[0] * dims[1] != this->observed_values.size()) {
+      if (n_vals != this->observed_values.size()) {
         throw std::invalid_argument(
             "MultinomialLPDF: Vector index out of bounds. The dimension of the "
             "number of  rows times the number of columns is of size " +
-            std::to_string(dims[0] * dims[1]) +
+            std::to_string(n_vals) +
             " and the observed vector is of size " +
             std::to_string(this->observed_values.size()));
       }
@@ -111,14 +116,14 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
       // for each row, create new observed_values and prob vectors
       fims::Vector<Type> observed_values_vector;
       fims::Vector<Type> prob_vector;
-      observed_values_vector.resize(dims[1]);
-      prob_vector.resize(dims[1]);
+      observed_values_vector.resize(n_vals/dims[0]);
+      prob_vector.resize(n_vals/dims[0]);
 
       // Skips the entire row if any values are NA
       bool containsNA = false;
 
 #ifdef TMB_MODEL
-      for (size_t j = 0; j < dims[1]; j++) {
+      for (size_t j = 0; j < n_vals/dims[0]; j++) {
         if (this->input_type == "data") {
           // if data, check if there are any NA values and skip lpdf calculation
           // for entire row if there are
@@ -129,14 +134,14 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
             break;
           }
           if (!containsNA) {
-            size_t idx = (i * dims[1]) + j;
+            size_t idx = (i * (n_vals/dims[0])) + j;
             observed_values_vector[j] = this->get_observed(i, j);
             prob_vector[j] = this->get_expected(idx);
           }
         } else {
           // if not data (i.e. prior or process), use observed_values vector
           // instead of data_observed_values
-          size_t idx = (i * dims[1]) + j;
+          size_t idx = (i * (n_vals/dims[0])) + j;
           observed_values_vector[j] = this->get_observed(idx);
           prob_vector[j] = this->get_expected(idx);
         }
@@ -150,24 +155,24 @@ struct MultinomialLPMF : public DensityComponentBase<Type> {
         // share so that summing lpdf_vec over a composition counts each row
         // once.
         std::fill(this->lpdf_vec.begin() + lpdf_vec_idx,
-                  this->lpdf_vec.begin() + lpdf_vec_idx + dims[1],
-                  row_lpmf / static_cast<Type>(dims[1]));
+                  this->lpdf_vec.begin() + lpdf_vec_idx + n_vals/dims[0],
+                  row_lpmf / static_cast<Type>(n_vals/dims[0]));
 
         this->lpdf += row_lpmf;
       }
-      lpdf_vec_idx += dims[1];
+      lpdf_vec_idx += n_vals/dims[0];
 /*
 if (this->simulate_flag)
 {
     FIMS_SIMULATE_F(this->of)
     {
         fims::Vector<Type> sim_observed;
-        sim_observed.resize(dims[1]);
+        sim_observed.resize(n_vals/dims[0]);
         sim_observed = rmultinom(prob_vector);
         sim_observed.resize(this->observed_values.size());
-        for (size_t j = 0; j < dims[1]; j++)
+        for (size_t j = 0; j < n_vals/dims[0]; j++)
         {
-            idx = (i * dims[1]) + j;
+            idx = (i * (n_vals/dims[0])) + j;
             this->observed_values[idx] = sim_observed[j];
         }
     }
