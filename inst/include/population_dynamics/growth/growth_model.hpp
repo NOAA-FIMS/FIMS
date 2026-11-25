@@ -1,9 +1,9 @@
 /**
  * @file growth_model.hpp
- * @brief Concrete growth model implementation (Phase 1).
+ * @brief Computes and stores growth products by year and age.
  *
  * Wraps a growth functor (e.g. VonBertalanffySchnute) and produces growth
- * products in (year, age, sex) space.
+ * products in (year, age) space.
  */
 #ifndef POPULATION_DYNAMICS_GROWTH_MODEL_HPP
 #define POPULATION_DYNAMICS_GROWTH_MODEL_HPP
@@ -19,13 +19,13 @@
 namespace fims_popdy {
 
 /**
- * @brief Concrete growth model using VonBertalanffySchnute growth (Phase 1).
+ * @brief Growth model using the VonBertalanffySchnute growth function.
  *
  * Assumptions:
- * - single sex (n_sexes = 1)
- * - no time variation (n_years = 1)
- * - fixed mean-growth parameters
- * - optional covariance-based delta-method variability
+ * - growth and variability parameters are shared across years
+ * - parameters may be estimated and updated between preparations
+ * - variability uses reference-age SD interpolation or the covariance-based
+ *   delta method
  */
 template <typename Type>
 class GrowthModel : public GrowthModelBase<Type> {
@@ -34,15 +34,11 @@ class GrowthModel : public GrowthModelBase<Type> {
    * @brief Construct a growth model with fixed dimensions.
    * @param n_years Number of years.
    * @param n_ages Number of ages.
-   * @param n_sexes Number of sexes.
    */
-  GrowthModel(std::size_t n_years, std::size_t n_ages, std::size_t n_sexes = 1)
-      : n_years_(n_years),
-        n_ages_(n_ages),
-        n_sexes_(n_sexes),
-        products_(n_years, n_ages, n_sexes) {}
+  GrowthModel(std::size_t n_years, std::size_t n_ages)
+      : n_years_(n_years), n_ages_(n_ages), products_(n_years, n_ages) {}
 
-  /// Set fixed VonBertalanffySchnute parameters (explicit reference ages).
+  /// Set VonBertalanffySchnute parameters with explicit reference ages.
   void SetVonBertalanffySchnuteParameters(Type mean_length_young,
                                           Type mean_length_old,
                                           Type growth_coefficient,
@@ -56,7 +52,7 @@ class GrowthModel : public GrowthModelBase<Type> {
     needs_update_ = true;
   }
 
-  /// fixed length-weight params (phase 1)
+  /// Set the length-weight coefficient and exponent.
   void SetLengthWeightParameters(Type length_weight_a, Type length_weight_b) {
     vb_.length_weight_a = length_weight_a;
     vb_.length_weight_b = length_weight_b;
@@ -139,20 +135,18 @@ class GrowthModel : public GrowthModelBase<Type> {
           "reference_age_for_length_young");
     }
 
-    // Fill mean length-at-age, sd, and mean weight-at-age.
-    for (std::size_t y = 0; y < n_years_; ++y) {
+    // Growth parameters are shared across years in this model.
+    if (n_years_ > 0) {
       for (std::size_t a = 0; a < n_ages_; ++a) {
-        for (std::size_t s = 0; s < n_sexes_; ++s) {
-          const Type age = static_cast<Type>(a) + age_offset_;
+        const Type age = static_cast<Type>(a) + age_offset_;
+        const Type laa = vb_.length_at_age(age);
+        const Type sd_laa = ComputeLengthSdAtAge(age, laa);
+        const Type waa = vb_.weight_at_length(laa);
 
-          // log-scale params live upstream; laa here is natural scale
-          const Type laa = vb_.length_at_age(age);
-          const Type sd_laa = ComputeLengthSdAtAge(age, laa);
-          const Type waa = vb_.weight_at_age(age);
-
-          products_.MeanLAA(y, a, s) = laa;
-          products_.SdLAA(y, a, s) = sd_laa;
-          products_.MeanWAA(y, a, s) = waa;
+        for (std::size_t y = 0; y < n_years_; ++y) {
+          products_.MeanLAA(y, a) = laa;
+          products_.SdLAA(y, a) = sd_laa;
+          products_.MeanWAA(y, a) = waa;
         }
       }
     }
@@ -282,11 +276,9 @@ class GrowthModel : public GrowthModelBase<Type> {
 
   std::size_t n_years_;
   std::size_t n_ages_;
-  std::size_t n_sexes_;
 
   GrowthProducts<Type> products_;
 
-  // Phase 1 functor
   VonBertalanffySchnuteGrowth<Type> vb_;
 
   // Caching state

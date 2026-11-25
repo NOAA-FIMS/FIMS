@@ -97,12 +97,6 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
           "configured population dimensions");
     }
 
-    if (growth_products.n_sexes != 1) {
-      throw std::runtime_error(
-          "GrowthDerivedSizeProvider currently requires pooled growth "
-          "products with n_sexes == 1");
-    }
-
     size_products_.ResizeProbSizeOnly(n_years_, n_ages_,
                                       population_size_grid_->n_bins);
 
@@ -190,12 +184,12 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
 
   const Type& MeanLAA(std::size_t year_index,
                       std::size_t age_index) const override {
-    return PreparedGrowthProducts().MeanLAA(year_index, age_index, 0);
+    return PreparedGrowthProducts().MeanLAA(year_index, age_index);
   }
 
   const Type& SdLAA(std::size_t year_index,
                     std::size_t age_index) const override {
-    return PreparedGrowthProducts().SdLAA(year_index, age_index, 0);
+    return PreparedGrowthProducts().SdLAA(year_index, age_index);
   }
 
   const Type& ProbSize(std::size_t year_index, std::size_t age_index,
@@ -262,10 +256,9 @@ class GrowthDerivedSizeProvider : public SizeDistributionProviderBase<Type> {
           " before computing ProbSize");
     }
 
-    const Type mean_laa = growth_products.MeanLAA(year_index, age_index, 0);
-    const Type sd_laa =
-        fims_math::ad_max(growth_products.SdLAA(year_index, age_index, 0),
-                          static_cast<Type>(1e-8));
+    const Type mean_laa = growth_products.MeanLAA(year_index, age_index);
+    const Type sd_laa = fims_math::ad_max(
+        growth_products.SdLAA(year_index, age_index), static_cast<Type>(1e-8));
 
     if (population_size_grid_->n_bins == 1) {
       return static_cast<Type>(1.0);

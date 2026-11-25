@@ -914,7 +914,7 @@ class Information {
                 growth_observation = std::dynamic_pointer_cast<
                     fims_popdy::GrowthDerivedObservationBase<Type>>(
                     p->growth)) {
-          growth_observation->Initialize(p->n_years, p->n_ages, 1);
+          growth_observation->Initialize(p->n_years, p->n_ages);
 
           if (p->ages.size() > 0) {
             double min_age = p->ages[0];
