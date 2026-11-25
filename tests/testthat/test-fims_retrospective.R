@@ -87,6 +87,11 @@ test_that("run_fims_retrospective() works with correct inputs", {
     expected = 2
   )
 
+  expect_equal(
+    object = unique(retro_fit[["estimates"]][["model"]]),
+    expected = c("reference", "retro-1")
+  )
+
   retro_sb <- retro_fit[["estimates"]] |>
     dplyr::filter(label == "spawning_biomass") |>
     dplyr::select(label, year, estimated, retrospective_peel) |>

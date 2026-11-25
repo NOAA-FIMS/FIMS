@@ -126,20 +126,23 @@ rho_sb <- calculate_mohns_rho(retro_fit, quantity = "spawning_biomass")
 
 ### Visualize the results
 
-To visualize the results of the retrospective analysis, we can use `plot_retrospective()` to display the quantity of interest. Below, we want to assess the impact on spawning biomass. The function returns a `ggplot` object, which you can customize by adding add layers as you normally would to a `ggplot`. For example, below, we specify the x and y axes labels and the legend title.
+To visualize the results of the retrospective analysis, we can use {stockplotr} to display the quantity of interest. The function returns a `ggplot` object, which you can customize by adding layers as you normally would to a `ggplot`.
 
 ```{r, plot-spawning-biomass, message = FALSE, warning = FALSE}
 #| fig.alt: >
 #|   Plot of spawning biomass showing a small negative bias with removed years.
 fig_retrospective_sb <- stockplotr::plot_spawning_biomass(
-  retro_fit$estimates |>
+  retro_fit[["estimates"]] |>
     dplyr::rename(estimate = estimated) |>
     dplyr::mutate(
       uncertainty_label = "se"
     ),
-  group = "retrospective_peel",
+  group = "model",
   # The estimates have no unit column, so give the unit of weight_at_age
-  unit_label = "mt"
+  unit_label = "mt",
+  ref_line = NULL,
+  interactive = FALSE,
+  model = unique(retro_fit[["estimates"]][["model"]])
 )
 print(fig_retrospective_sb)
 ```
@@ -148,16 +151,11 @@ We can compare the spawning biomass estimates from the reference model and each 
 ```{r}
 retro_fit[["estimates"]] |>
   dplyr::filter(label == "spawning_biomass") |>
-  dplyr::select(label, year, estimated, retrospective_peel) |>
+  dplyr::select(label, year, estimated, model) |>
+  dplyr::rename(estimate = estimated) |>
   tidyr::pivot_wider(
-    names_from = retrospective_peel,
-    values_from = estimated
-  ) |>
-  dplyr::rename(
-    "Year" = year,
-    "Reference model" = `0`,
-    "Peel 1" = `1`,
-    "Peel 2" = `2`
+    names_from = model,
+    values_from = estimate
   ) |>
   tail()
 ```
