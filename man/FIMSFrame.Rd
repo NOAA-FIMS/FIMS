@@ -75,18 +75,16 @@ section of the doxygen documentation for Fleet by running \code{?Fleet}.
 It is important that the order of the rows in the data are correct but it is
 not expected that the user will do this. Instead, the returned data are
 sorted using \code{\link[dplyr:arrange]{dplyr::arrange()}} before placing them in the data slot. Data
-are first sorted by data type, placing all \code{weight_at_age} data next to
-other \code{weight_at_age} data and all catch data next to catch data.
-Thus, \code{age_comp} data will come first because their type is "age" and "a" is
-first in the alphabet. All other types will follow according to their order
-in the alphabet.
-Next, within each type, data are organized by fleet. So, \code{age_comp}
-information for fleet1 will come before survey1. Next, all data within type
-and fleet are arranged by timing, e.g., by year. That is the end of the
-sorting for time series data like catch and indices. The biological data
-are further sorted by bin. Thus, \code{age_comp} information will be arranged as
-follows:\tabular{lcccr}{
-   type \tab name \tab timing \tab age \tab observed \cr
+are first sorted by fleet in alphabetical order, with capital letters before
+lowercase letters. So, all fleet1 data will come before survey1 data. Rows
+without a fleet come last.
+Next, within each fleet, data are sorted by type in alphabetical order. So,
+\code{age_comp} information for fleet1 will come before \code{catch} for fleet1. Next,
+all data within fleet and type are arranged by timing, e.g., by year, and
+rows without a timing come last. That is the end of the sorting for time
+series data like catch and indices. The biological data are further sorted by
+bin. Thus, \code{age_comp} information will be arranged as follows:\tabular{lcccr}{
+   type \tab fleet \tab timing \tab age \tab observed \cr
    age_comp \tab fleet1 \tab 2022 \tab 1 \tab 0.3 \cr
    age_comp \tab fleet1 \tab 2022 \tab 2 \tab 0.7 \cr
    age_comp \tab fleet1 \tab 2023 \tab 1 \tab 0.5 \cr
@@ -95,11 +93,13 @@ follows:\tabular{lcccr}{
 
 \code{length_comp} data are sorted the same way but by length bin instead of
 by age bin. It becomes more complicated for the \code{age_to_length_conversion}
-data, which are sorted by type, name, timing, age, and then length. So, a
+data, which are sorted by fleet, type, timing, age, and then length. So, a
 full set of length, e.g., length 10, length 20, length 30, etc., is placed
 together for a given age. After that age, another entire set of length
 information will be provided for that next age. Once the year is complete
 for a given fleet then the next year will begin.
+
+Sorting does not change the order of the \code{fleets} slot (see \code{\link[=get_fleets]{get_fleets()}}).
 }
 
 }
