@@ -139,7 +139,10 @@ fig_retrospective_sb <- stockplotr::plot_spawning_biomass(
     ),
   group = "model",
   # The estimates have no unit column, so give the unit of weight_at_age
-  unit_label = "mt"
+  unit_label = "mt",
+  ref_line = NULL,
+  interactive = FALSE,
+  model = unique(retro_fit[["estimates"]][["model"]])
 )
 print(fig_retrospective_sb)
 ```
