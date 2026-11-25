@@ -73,7 +73,7 @@ This repository is a scientific product and is not official communication of the
 
 Software code created by U.S. Government employees is not subject to copyright in the United States (17 U.S.C. section 105). The United States/Department of Commerce reserve all rights to seek and obtain copyright protection in countries other than the United States for Software authored in its entirety by the Department of Commerce. To this end, the Department of Commerce hereby grants to Recipient a royalty-free, nonexclusive license to use, copy, and create derivative works of the Software outside of the United States.
 
-The code and writing in this repository was augmented using GitHub Copilot. Qualified NOAA staff verified it for accuracy.
+The code and writing in this repository was augmented using generative Super Intelligence (GenSI) such as GitHub Copilot, Claude Code, Gemini, etc. Qualified NOAA staff verified it for accuracy.
 
 ****************************
 
