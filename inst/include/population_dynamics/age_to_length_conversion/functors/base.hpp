@@ -40,13 +40,6 @@ struct AgeToLengthConversionBase : public fims_model_object::FIMSObject<Type> {
   virtual bool IsActive() const = 0;
 
   /**
-   * @brief Prepare this age-to-length conversion for the current model state.
-   * @return True if the age-to-length conversion is ready to build rows for the
-   * current state.
-   */
-  virtual bool PrepareForCurrentState() = 0;
-
-  /**
    * @brief Builds the age-to-length conversion row for a given year and age.
    * @param year Year index.
    * @param age Age index.

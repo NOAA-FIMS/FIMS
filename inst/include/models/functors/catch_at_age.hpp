@@ -1147,30 +1147,13 @@ class CatchAtAge : public FisheryModelBase<Type> {
   }
 
   /**
-   * @brief Ensure all fleets linked to this model have a usable age-to-length
-   * conversion.
+   * @brief Prepares Growth products and, when configured, dependent population
+   * size products before catch-at-age evaluation.
    *
-   * Reuses each fleet's current age-to-length conversion when it matches the
-   * current population growth path and can prepare for the current model state.
-   * Otherwise rebuilds the fleet age-to-length conversion from the current
-   * population and fleet state before evaluation or reporting uses it.
+   * Size products are prepared after Growth because they use prepared
+   * length-at-age values.
    */
-  void EnsureAllFleetAgeToLengthConversion() {
-    for (size_t p = 0; p < this->populations.size(); ++p) {
-      fims_popdy::EnsurePopulationFleetAgeToLengthConversion<Type>(
-          this->populations[p]);
-    }
-  }
-
-  /**
-   * @brief Prepares cached population growth products for all populations whose
-   * growth objects expose the growth-derived observation interface.
-   *
-   * This helper makes sure growth-derived-capable populations prepare their
-   * cached growth products before catch-at-age evaluation so code that uses
-   * those prepared values can access them consistently.
-   */
-  void PreparePopulationGrowthProducts() {
+  void PreparePopulationGrowthAndSizeProducts() {
     for (size_t p = 0; p < this->populations.size(); ++p) {
       std::shared_ptr<fims_popdy::Population<Type>> &population =
           this->populations[p];
@@ -1268,13 +1251,8 @@ class CatchAtAge : public FisheryModelBase<Type> {
         growth_observation->TryGetPreparedGrowthProducts();
 
     if (gp == nullptr) {
-      growth_observation->PrepareGrowthProducts();
-      gp = growth_observation->TryGetPreparedGrowthProducts();
-    }
-
-    if (gp == nullptr) {
       throw std::runtime_error(
-          "Growth products were unavailable while resolving biological mean "
+          "Growth products were not prepared while resolving biological mean "
           "weight-at-age.");
     }
 
@@ -1526,8 +1504,7 @@ class CatchAtAge : public FisheryModelBase<Type> {
                Sets recruitment deviations to mean 0.
      */
     Prepare();
-    PreparePopulationGrowthProducts();
-    EnsureAllFleetAgeToLengthConversion();
+    PreparePopulationGrowthAndSizeProducts();
     /*
      start at year=0, age=0;
      here year 0 is the estimated initial population structure and age 0 are
@@ -1670,7 +1647,6 @@ class CatchAtAge : public FisheryModelBase<Type> {
     int n_pops = this->populations.size();
 #ifdef TMB_MODEL
     if (this->do_reporting == true) {
-      EnsureAllFleetAgeToLengthConversion();
       report_vectors.clear();
       // std::shared_ptr<UncertaintyReportInfoMap>
       // population_uncertainty_report_info_map =

@@ -90,13 +90,6 @@ struct AgeToLengthConversionFixed : public AgeToLengthConversionBase<Type> {
   /** @endcond */
 
   /**
-   * @brief Prepare the fixed-matrix age-to-length conversion for the current
-   * model state.
-   * @return True if the fixed matrix is active and usable.
-   */
-  virtual bool PrepareForCurrentState() override { return this->IsActive(); }
-
-  /**
    * @brief Builds the fixed age-to-length conversion row for a given age.
    * @param year Year index. Used only when the fleet stores one table per year.
    * @param age Age index.
