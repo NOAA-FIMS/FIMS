@@ -87,23 +87,40 @@ test_that("run_fims_retrospective() works with correct inputs", {
     expected = 2
   )
 
+  #' @description Test that each peel ends in its last year of data, so it has
+  #' no expected catch, fishing mortality, or recruitment deviation after that
+  #' year.
+  last_years <- retro_fit[["estimates"]] |>
+    dplyr::filter(label %in% c("catch_expected", "log_Fmort", "log_devs")) |>
+    dplyr::summarise(
+      last_year = max(year),
+      .by = c(retrospective_peel, label)
+    )
+  expect_equal(
+    object = last_years[["last_year"]],
+    expected = get_end_year(data_4_model) - last_years[["retrospective_peel"]]
+  )
+
+  # Year 29 is the last model year of the 1-year peel, which is the year
+  # calculate_mohns_rho() compares for that peel
   retro_sb <- retro_fit[["estimates"]] |>
     dplyr::filter(label == "spawning_biomass") |>
     dplyr::select(label, year, estimated, retrospective_peel) |>
     tidyr::pivot_wider(names_from = retrospective_peel, values_from = estimated) |>
-    dplyr::filter(year == 31) |>
+    dplyr::filter(year == 29) |>
     dplyr::select(-c(1, 2)) |>
     as.numeric()
 
-  #' @description Test that fims_retrospective(x) returns y.
+  #' @description Test that the spawning biomass in year 29 from the base model
+  #' and the 1-year peel match saved values.
   expect_equal(
     object = retro_sb,
-    expected = c(1728.686, 1654.160),
-    tolerance = .1
+    expected = c(1723.985, 1608.494),
+    tolerance = 1e-3
   )
 })
 
-test_that("run_modified_data_fims() keeps length_bin rows", {
+test_that("run_modified_data_fims() removes catch and keeps length_bin rows", {
   # The fleet1 length_bin rows are the only length data. They set the population
   # length bins that mean weight at age is averaged over, so the jnll changes if
   # they are dropped. Von Bertalanffy growth gives length at age, so the
@@ -132,12 +149,22 @@ test_that("run_modified_data_fims() keeps length_bin rows", {
       data = bins_frame,
       module_type = "VonBertalanffySchnute"
     ))
-  # Peeling 1 year removes the year-30 index and age_comp rows but keeps the
-  # catch, weight_at_age and length_bin rows
+  # Peeling 1 year removes every row after year 29, including catch, except the
+  # weight at age for year 30. It keeps the length_bin rows, which have no
+  # timing. The parameters are set up from the peeled data, as
+  # for a model with data that end in year 29.
   peeled_data <- dplyr::filter(
     bins_data,
-    !(timing %in% 30 & type %in% c("index", "age_comp"))
+    !(timing %in% 30 & type != "weight_at_age"),
+    !(timing %in% 31)
   )
+  peeled_frame <- FIMSFrame(peeled_data)
+  peeled_parameters <- setup_default_parameters(peeled_frame) |>
+    dplyr::filter(module_name != "Growth") |>
+    dplyr::bind_rows(setup_default_Growth(
+      data = peeled_frame,
+      module_type = "VonBertalanffySchnute"
+    ))
 
   retrospective_fit <- run_modified_data_fims(
     years_to_remove = 1,
@@ -145,13 +172,14 @@ test_that("run_modified_data_fims() keeps length_bin rows", {
     parameters = growth_parameters
   )
   clear()
-  peeled_fit <- growth_parameters |>
-    initialize_fims(data = FIMSFrame(peeled_data)) |>
+  peeled_fit <- peeled_parameters |>
+    initialize_fims(data = peeled_frame) |>
     fit_fims(optimize = TRUE)
   clear()
 
-  #' @description Test that run_modified_data_fims() keeps length_bin rows, so
-  #' a 1-year peel gives the same jnll as a fit to the peeled data.
+  #' @description Test that run_modified_data_fims() removes the catch and the
+  #' parameters after the last year and keeps the length_bin rows, so a 1-year
+  #' peel gives the same jnll as a model set up from the data through year 29.
   expect_equal(
     object = get_report(retrospective_fit)[["jnll"]],
     expected = get_report(peeled_fit)[["jnll"]]
@@ -174,6 +202,50 @@ test_that("run_fims_retrospective() handles edge cases correctly", {
   expect_equal(
     object = retro_fit_zero[["years_to_remove"]],
     expected = 0
+  )
+})
+
+test_that("run_modified_data_fims() removes a data type with no data left", {
+  # The survey1 age compositions start in year 29, so a 2-year peel has none
+  # left. FIMSFrame() fills years 1-28 with -999 rows, which cannot be fit.
+  recent_data <- dplyr::filter(
+    data_big,
+    !(fleet == "survey1" & type == "age_comp" & timing < 29)
+  )
+  recent_parameters <- setup_default_parameters(FIMSFrame(recent_data))
+  peeled_frame <- recent_data |>
+    dplyr::filter(
+      !(fleet == "survey1" & type == "age_comp"),
+      is.na(timing) | timing <= 28 | (type == "weight_at_age" & timing == 29)
+    ) |>
+    FIMSFrame()
+  peeled_fit <- setup_default_parameters(peeled_frame) |>
+    initialize_fims(data = peeled_frame) |>
+    fit_fims(optimize = TRUE)
+  clear()
+  raw_fit <- run_modified_data_fims(
+    years_to_remove = 2,
+    data = recent_data,
+    parameters = recent_parameters
+  )
+  clear()
+  frame_fit <- run_modified_data_fims(
+    years_to_remove = 2,
+    data = FIMSFrame(recent_data),
+    parameters = recent_parameters
+  )
+  clear()
+
+  #' @description Test that run_modified_data_fims() removes the survey1 age
+  #' compositions when a peel has none left, for data that are and are not a
+  #' FIMSFrame, so both give the same jnll as a model set up from the data
+  #' through year 28.
+  expect_equal(
+    object = c(
+      get_report(raw_fit)[["jnll"]],
+      get_report(frame_fit)[["jnll"]]
+    ),
+    expected = rep(get_report(peeled_fit)[["jnll"]], 2)
   )
 })
 

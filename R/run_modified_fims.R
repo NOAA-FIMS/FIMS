@@ -106,9 +106,17 @@ run_modified_pars_fims <- function(
 #' Function to remove a given number of years of data and run FIMS model.
 #' This function is called by run_fims_retrospective()
 #'
+#' Data after the last year kept, including catch, are removed, so the model
+#' ends in that year. Weight at age for the next year is kept, because biomass
+#' is also calculated at the start of that year. A data type of a fleet with
+#' no observations left, e.g., age compositions that started after the last
+#' year, is removed.
+#'
 #' @param years_to_remove number of years to remove
 #' @param data full dataset used in base model run
-#' @param parameters input parameters used in base FIMS model
+#' @param parameters input parameters used in base FIMS model. Rows with a
+#'   `timing` after the last year kept, e.g., `log_Fmort`, `log_devs`, and
+#'   `log_M`, are removed.
 #' @return FIMS model fitted with years of data removed
 #' @export
 #' @keywords diagnostics
@@ -129,33 +137,47 @@ run_modified_pars_fims <- function(
 #' )
 #' }
 run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
-  # check if the input is a FIMSframe object and if so, extract the data
-  # this is to avoid the warning:
-  # no applicable method for 'filter' applied to an object of class "FIMSFrame"
+  # FIMSFrame() adds -999 rows for years without data, so the last year of
+  # the peel has rows even if nothing was observed in it
   if ("FIMSFrame" %in% methods::is(data)) {
-    data_to_use <- data@data
+    fims_frame <- data
   } else {
-    data_to_use <- data
+    fims_frame <- FIMS::FIMSFrame(data)
   }
+  data_to_use <- fims_frame@data
 
-  # Remove years from data, but leave catch, weight_at_age, ageing_error,
-  # age_to_length_conversion, and length_bin (if present)
+  # Remove all data after the last year of the peel, including catch, so the
+  # peel is not fit to data from the years it removes. FIMSFrame() sets the
+  # model years from the data, so the peel also ends in that year.
   if (years_to_remove == 0) {
     data_mod <- data_to_use
+    parameters_mod <- parameters
   } else {
-    # exclude weight-at-age and ageing error from the calculation of the max
-    # year of data
-    max_timing <- data_to_use |>
-      dplyr::filter(!.data[["type"]] %in% c("weight_at_age", "ageing_error")) |>
-      dplyr::pull(.data[["timing"]]) |>
-      max(na.rm = TRUE)
+    last_year <- FIMS::get_end_year(fims_frame) - years_to_remove
+    # Rows without a timing, e.g., length_bin rows, apply to every year.
+    # Biomass is also calculated at the start of the year after the last year,
+    # which needs the weight at age in that year.
     data_mod <- data_to_use |>
       dplyr::filter(
-        (.data[["type"]] %in% c(
-          "catch", "age_to_length_conversion", "weight_at_age",
-          "ageing_error", "length_bin"
-        )) |
-          .data[["timing"]] <= max_timing - years_to_remove
+        is.na(.data[["timing"]]) |
+          .data[["timing"]] <= last_year |
+          (.data[["type"]] == "weight_at_age" &
+            .data[["timing"]] == last_year + 1)
+      )
+    # A data type of a fleet with only -999 rows left, e.g., age compositions
+    # that started after the last year, is removed as if it were never
+    # collected. The likelihood is set up from the observed rows, so it cannot
+    # be set up from -999 rows alone.
+    data_mod <- data_mod |>
+      dplyr::filter(
+        !all(.data[["observed"]] %in% -999),
+        .by = c("fleet", "type")
+      )
+    # Parameters with a timing, e.g., log_Fmort, log_devs, and log_M, keep
+    # only their values for the years of the peel
+    parameters_mod <- parameters |>
+      dplyr::filter(
+        is.na(.data[["timing"]]) | .data[["timing"]] <= last_year
       )
   }
   # convert to FIMSFrame format
@@ -166,8 +188,7 @@ run_modified_data_fims <- function(years_to_remove = 0, data, parameters) {
     "running model with {years_to_remove} years of data removed"
   )
 
-  # User supplies parameters from base model
-  fit <- parameters |>
+  fit <- parameters_mod |>
     FIMS::initialize_fims(data = data_model) |>
     FIMS::fit_fims(optimize = TRUE)
 
