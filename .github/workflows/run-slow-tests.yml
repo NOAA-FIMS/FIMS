@@ -48,6 +48,7 @@ jobs:
           - integration-fims-bayesian
           - integration-fims-estimation-random-effects
           - integration-proportion
+          - integration-retape
           - integration-unfished-equilibrium
           - integration-vonb-growth-convergence
           - fims_likelihood
